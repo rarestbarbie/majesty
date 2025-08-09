@@ -16,11 +16,13 @@ extension HexGrid {
             )
             for r: Int8 in r.0 ... r.1 {
                 let coordinate: AxialCoordinate = .init(q: q, r: r)
-                let north: HexCoordinate = .init(hemisphere: .north, coordinate: coordinate)
-                let south: HexCoordinate = .init(hemisphere: .south, coordinate: coordinate)
-
-                try yield(&result, north)
-                try yield(&result, south)
+                if  self.radius > 2,
+                    let φ: Int8 = coordinate.φ(self.radius) {
+                    try yield(&result, .e(φ))
+                } else {
+                    try yield(&result, .n(q, r))
+                    try yield(&result, .s(q, r))
+                }
             }
         }
         return result

@@ -7,7 +7,20 @@
         self.r = r
     }
 }
-
+extension AxialCoordinate {
+    /// Returns the equatorial coordinate of this axial coordinate, if it is a corner cell.
+    @inlinable public func φ(_ z: Int8) -> Int8? {
+        switch (self.q, self.r) {
+        case ( z, -z): 0
+        case ( 0, -z): 1
+        case (-z,  0): 2
+        case (-z,  z): 3
+        case ( 0,  z): 4
+        case ( z,  0): 5
+        case ( _,  _): nil
+        }
+    }
+}
 extension AxialCoordinate: LosslessStringConvertible {
     @inlinable public init?(_ string: some StringProtocol) {
         guard
