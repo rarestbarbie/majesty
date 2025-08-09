@@ -21,6 +21,7 @@ export class HexGrid {
 
     constructor() {
         this.svg = HexGrid.element('svg');
+        this.svg.setAttribute('viewBox', `-15 -7.5 30 15`);
 
         this.cells = new StaticList<HexGridCellBackground, string>(HexGrid.element('g'));
         this.cells.node.classList.add('cells');
@@ -48,12 +49,12 @@ export class HexGrid {
         target: (id: string) => string | null = (_: string) => null,
         selected?: string,
     ): void {
-        this.svg.setAttribute('viewBox', `-12 -6.5 24 13`);
         this.cells.update(
             cells,
             (cell: PlanetGridCell) => new HexGridCellBackground(cell),
             (cell: PlanetGridCell, element: HexGridCellBackground) => {
-                element.node.setAttribute('d', cell.d);
+                element.path.setAttribute('d', cell.d0);
+                element.twin?.setAttribute('d', cell.d1 ?? '');
                 element.node.setAttribute('fill', GameEngine.hex(cell.color));
             }
         );
@@ -68,7 +69,8 @@ export class HexGrid {
                 return instance;
             },
             (cell: PlanetGridCell, element: HexGridCell) => {
-                element.path.setAttribute('d', cell.d);
+                element.path.setAttribute('d', cell.d0);
+                element.twin?.setAttribute('d', cell.d1 ?? '');
             },
             selected,
         );

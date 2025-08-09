@@ -1,21 +1,14 @@
-@frozen public struct HexCoordinate: Equatable, Hashable, Sendable {
-    public let hemisphere: Hemisphere
-    public let coordinate: AxialCoordinate
-
-    @inlinable public init(hemisphere: Hemisphere, coordinate: AxialCoordinate) {
-        self.hemisphere = hemisphere
-        self.coordinate = coordinate
-    }
-}
-extension HexCoordinate {
-    @inlinable public var q: Int8 { self.coordinate.q }
-    @inlinable public var r: Int8 { self.coordinate.r }
+@frozen public enum HexCoordinate: Equatable, Hashable, Sendable {
+    case n(_ q: Int8, _ r: Int8)
+    case e(_ φ: Int8)
+    case s(_ q: Int8, _ r: Int8)
 }
 extension HexCoordinate: CustomStringConvertible {
     @inlinable public var description: String {
-        switch self.hemisphere {
-        case .north: "N\(self.coordinate)"
-        case .south: "S\(self.coordinate)"
+        switch self {
+        case .n(let q, let r): "N\(q),\(r)"
+        case .e(let φ): "E\(φ)"
+        case .s(let q, let r): "S\(q),\(r)"
         }
     }
 }
@@ -26,19 +19,28 @@ extension HexCoordinate: LosslessStringConvertible {
             return nil
         }
 
-        let hemisphere: Hemisphere
+        let i: String.Index = string.index(after: first)
 
         switch string[first] {
-        case "N":   hemisphere = .north
-        case "S":   hemisphere = .south
-        default:    return nil
+        case "N":
+            if  let coordinate: AxialCoordinate = .init(string[i...]) {
+                self = .n(coordinate.q, coordinate.r)
+                return
+            }
+        case "E":
+            if  let φ: Int8 = .init(string[i...]) {
+                self = .e(φ)
+                return
+            }
+        case "S":
+            if  let coordinate: AxialCoordinate = .init(string[i...]) {
+                self = .s(coordinate.q, coordinate.r)
+                return
+            }
+        default:
+            break
         }
 
-        guard
-        let coordinate: AxialCoordinate = .init(string[string.index(after: first)...]) else {
-            return nil
-        }
-
-        self.init(hemisphere: hemisphere, coordinate: coordinate)
+        return nil
     }
 }

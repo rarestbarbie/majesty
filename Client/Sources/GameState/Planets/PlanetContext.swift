@@ -2,6 +2,7 @@ import GameEngine
 import GameRules
 import OrderedCollections
 import Vector
+import VectorCharts
 
 struct PlanetContext {
     var state: Planet
@@ -124,8 +125,7 @@ extension PlanetContext {
     }
 
     var grid: [PlanetGridCell] {
-        let size: Int8 = self.cells.keys.reduce(0) { max($0, $1.coordinate.q) }
-        let radius: Double = 1.5 * Double.init(1 + size)
+        let radius: Double = 1.5 * Double.init(1 + self.size)
         let center: (north: Vector2, south: Vector2) = (
             north: .init(-radius, 0),
             south: .init(+radius, 0),
@@ -133,16 +133,25 @@ extension PlanetContext {
 
         var cells: [PlanetGridCell] = [] ; cells.reserveCapacity(self.cells.count)
         for (id, cell): (HexCoordinate, Cell) in self.cells {
-            let c: Vector2
+            let shape: (HexagonPath, HexagonPath?)
 
-            switch id.hemisphere {
-            case .north: c = center.north
-            case .south: c = center.south
+            switch id {
+            case .n(let q, let r):
+                shape.0 = .init(c: center.north, q: q, r: r, size: 1)
+                shape.1 = nil
+
+            case .e(let φ):
+                shape.0 = .init(c: center.north, φ: φ, z: self.size, size: 1)
+                shape.1 = .init(c: center.south, φ: φ > 2 ? 8 - φ : 2 - φ, z: self.size, size: 1)
+
+            case .s(let q, let r):
+                shape.0 = .init(c: center.south, q: q, r: r, size: 1)
+                shape.1 = nil
             }
 
             let cell: PlanetGridCell = .init(
                 id: id,
-                shape: .init(c: c, q: Int.init(id.q), r: Int.init(id.r), size: 1),
+                shape: shape,
                 color: cell.type.color
             )
 

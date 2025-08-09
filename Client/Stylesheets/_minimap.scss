@@ -59,7 +59,7 @@
 
 
     svg {
-        height: 15.5rem;
+        // height: 15.5rem;
 
         g.cells {
             pointer-events: none;
@@ -68,10 +68,12 @@
             path {
                 fill: transparent;
 
-                &:hover {
-                    stroke: red;
-                    stroke-width: 0.06px;
-                }
+            }
+
+            g:hover path,
+            a:hover path {
+                stroke: red;
+                stroke-width: 0.06px;
             }
 
             a.selected path {
