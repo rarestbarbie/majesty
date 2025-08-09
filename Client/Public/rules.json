@@ -1,0 +1,344 @@
+{
+    "resources": {
+        "Livestock": {
+            "emoji": "🐄",
+            "color": "#7c566c"
+        },
+        "Beef": {
+            "emoji": "🍖",
+            "color": "#a1442d"
+        },
+        "Poultry": {
+            "emoji": "🍗",
+            "color": "#da9669"
+        },
+        "Produce": {
+            "emoji": "🥬",
+            "color": "#7ed157"
+        },
+        "Wheat": {
+            "emoji": "🌾",
+            "color": "#beaa66"
+        },
+        "Fertilizer": {
+            "emoji": "🌱",
+            "color": "#8bc34a"
+        },
+        "Bauxite": {
+            "emoji": "🪨",
+            "color": "#b0b0b0"
+        },
+        "Graphite": {
+            "emoji": "✏️",
+            "color": "#161616"
+        },
+        "Gold": {
+            "emoji": "💰",
+            "color": "#ffe2a4"
+        },
+
+        "Aluminium": {
+            "emoji": "🔩",
+            "color": "#d0d0d0"
+        },
+        "Ammonia": {
+            "emoji": "💨",
+            "color": "#1b7760"
+        },
+        "Appliances": {
+            "emoji": "🖥️",
+            "color": "#505253"
+        },
+        "Autocomplete": {
+            "emoji": "🤖",
+            "color": "#9ab3c4"
+        },
+        "Machine Parts": {
+            "emoji": "⚙️",
+            "color": "#a0a0a0"
+        },
+        "Phosphate": {
+            "emoji": "🧂",
+            "color": "#cecece"
+        },
+        "Potash": {
+            "emoji": "🪨",
+            "color": "#d4a0a0"
+        },
+        "Storage": {
+            "emoji": "💾",
+            "color": "#d4b0f7"
+        },
+        "Sulfur": {
+            "emoji": "🟡",
+            "color": "#f4d03f"
+        },
+        "Electricity": {
+            "emoji": "⚡",
+            "color": "#FFFF00"
+        },
+        "Water": {
+            "emoji": "💧",
+            "color": "#5ea9ff"
+        },
+        "Cocaine": {
+            "emoji": "❄️",
+            "color": "#FFFFFF"
+        },
+        "Ice": {
+            "emoji": "🧊",
+            "color": "#A0FFFF"
+        },
+        "Uranium": {
+            "emoji": "☢️",
+            "color": "#80FF30"
+        },
+        "Vehicles": {
+            "emoji": "🛻",
+            "color": "#91091b"
+        },
+        "Instruments": {
+            "emoji": "🎸",
+            "color": "#ff304c"
+        }
+    },
+    "factory_costs": {
+        "*": {
+            "Appliances":  100000,
+            "Storage":     100000,
+            "Instruments":  40000,
+            "Vehicles":     40000
+        }
+    },
+    "factory_maintenance": {
+        "*": {
+            "Electricity": 100000,
+            "Storage":     100000,
+            "Ice":           1000,
+            "Machine Parts": 1000,
+            "Autocomplete":  1000,
+            "Instruments":     50,
+            "Vehicles":        50
+        }
+    },
+    "factories": {
+        "Water Treatment Plant": {
+            "inputs": {
+                "Electricity": 8
+            },
+            "output": {
+                "Water": 16
+            },
+            "workers": {
+                "Driver": 30000,
+                "Engineer": 20000
+            }
+        },
+        "Slaughterhouse": {
+            "inputs": {
+                "Livestock": 16,
+                "Water": 2
+            },
+            "output": {
+                "Poultry": 12,
+                "Beef": 8
+            },
+            "workers": {
+                "Driver": 100000,
+                "Engineer": 30000
+            }
+        },
+        "Plantation": {
+            "inputs": {
+                "Water": 4,
+                "Fertilizer": 1
+            },
+            "output": {
+                "Produce": 8
+            },
+            "workers": {
+                "Driver": 100000,
+                "Farmer": 30000
+            }
+        },
+        "Cereal Farm": {
+            "inputs": {
+                "Water": 4,
+                "Fertilizer": 1
+            },
+            "output": {
+                "Wheat": 8
+            },
+            "workers": {
+                "Driver": 100000,
+                "Farmer": 30000
+            }
+        },
+        "Hydroponic Farm": {
+            "inputs": {
+                "Water": 1,
+                "Fertilizer": 2
+            },
+            "output": {
+                "Produce": 4,
+                "Wheat": 4
+            },
+            "workers": {
+                "Driver": 100000,
+                "Engineer": 30000
+            }
+        },
+        "Fertilizer Plant": {
+            "inputs": {
+                "Electricity": 2
+            },
+            "output": {
+                "Fertilizer": 8
+            },
+            "workers": {
+                "Driver": 100000,
+                "Engineer": 30000
+            }
+        },
+        "Uranium Enrichment Facility": {
+            "inputs": {
+                "Electricity": 4
+            },
+            "output": {
+                "Uranium": 2
+            },
+            "workers": {
+                "Driver": 50000,
+                "Engineer": 20000
+            }
+        },
+        "Nuclear Power Plant": {
+            "inputs": {
+                "Uranium": 1
+            },
+            "output": {
+                "Electricity": 24
+            },
+            "workers": {
+                "Driver": 50000,
+                "Engineer": 50000
+            }
+        },
+        "Data Center": {
+            "inputs": {
+                "Electricity": 24
+            },
+            "output": {
+                "Storage": 128
+            },
+            "workers": {
+                "Driver": 50000,
+                "Engineer": 50000
+            }
+        }
+    },
+    "pops": {
+        "*": {
+            "l": {
+                "Electricity": 1,
+                "Poultry": 3,
+                "Wheat": 3
+            },
+            "e": {
+                "Produce": 6,
+                "Beef": 6
+            },
+            "x": {
+                "Cocaine": 12
+            }
+        },
+        "Livestock": {
+            "l": {
+            },
+            "e": {
+            },
+            "x": {
+                "Cocaine": 1
+            },
+            "output": {
+                "Livestock": 12,
+                "Poultry": 4
+            }
+        }
+    },
+    "technologies": {
+        "Mechanized Production": {
+            "starter": true,
+            "effects": {
+                "factory_productivity": {
+                    "*": 1
+                }
+            },
+            "summary": "The definition of stupidity is doing the same thing over and over again and expecting different results."
+        }
+    },
+    "terrains": {
+        "Ocean": {
+            "color": "#345fbb"
+        },
+        "Rainforest": {
+            "color": "#284226"
+        },
+        "Forest": {
+            "color": "#4f6d36"
+        },
+        "Steppe": {
+            "color": "#9abd6e"
+        },
+        "Arctic": {
+            "color": "#8fe5ff"
+        },
+        "Antarctic": {
+            "color": "#e6e6e6"
+        },
+        "Tundra": {
+            "color": "#80968c"
+        },
+        "Taiga": {
+            "color": "#3a4942"
+        },
+        "Desert": {
+            "color": "#ccb295"
+        },
+        "Mountain": {
+            "color": "#7c5a43"
+        },
+        "Volcanic": {
+            "color": "#1b1b1b"
+        },
+
+        "Arctic Barren": {
+            "color": "#b5ceda"
+        },
+        "Frozen Barren": {
+            "color": "#948b7e"
+        },
+        "Desert Barren": {
+            "color": "#70624f"
+        },
+        "Mountain Barren": {
+            "color": "#4e3b2e"
+        },
+
+        "Arctic Vacuum": {
+            "color": "#9eb0b6"
+        },
+        "Frozen Vacuum": {
+            "color": "#a3a3a3"
+        },
+        "Desert Vacuum": {
+            "color": "#535353"
+        },
+        "Mountain Vacuum": {
+            "color": "#363636"
+        },
+        "Space Vacuum": {
+            "color": "#000000"
+        }
+    }
+}

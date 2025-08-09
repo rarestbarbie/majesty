@@ -1,0 +1,35 @@
+ul.factors {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    > li {
+        display: flex;
+
+        > *.label {
+            text-wrap: nowrap;
+
+            &::after {
+                content: ':';
+                margin-right: 0.5em;
+            }
+        }
+
+        > span {
+            display: inline-block;
+        }
+
+        [data-factor='bonus'][data-sign='pos'],
+        [data-factor='malus'][data-sign='neg'] {
+            color: var(--color-pos-text);
+        }
+        [data-factor='malus'][data-sign='pos'],
+        [data-factor='bonus'][data-sign='neg'] {
+            color: var(--color-neg-text);
+        }
+    }
+
+    > li:not([data-indent]) > span {
+        font-weight: bold;
+    }
+}

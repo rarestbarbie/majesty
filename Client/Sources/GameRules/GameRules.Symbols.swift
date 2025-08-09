@@ -1,0 +1,43 @@
+import GameEconomy
+import JavaScriptInterop
+
+extension GameRules {
+    @frozen public struct Symbols {
+        /// Pop types are not moddable.
+        let pops: SymbolTable<PopType>
+
+        var factories: SymbolTable<FactoryType>
+        var resources: SymbolTable<Resource>
+        var technologies: SymbolTable<Technology>
+        @usableFromInline var terrains: SymbolTable<TerrainType>
+    }
+}
+extension GameRules.Symbols {
+    @inlinable public subscript(terrain symbol: String) -> TerrainType {
+        get throws {
+            let symbol: Symbol = .init(name: symbol)
+            return try self.terrains[symbol]
+        }
+    }
+}
+extension GameRules.Symbols: JavaScriptEncodable {
+    public func encode(to js: inout JavaScriptEncoder<GameRules.Namespace>) {
+        js[.factories] = self.factories
+        js[.resources] = self.resources
+        js[.technologies] = self.technologies
+        js[.terrains] = self.terrains
+    }
+}
+extension GameRules.Symbols: JavaScriptDecodable {
+    public init(from js: borrowing JavaScriptDecoder<GameRules.Namespace>) throws {
+        self.init(
+            pops: .init(index: PopType.allCases.reduce(into: [:]) {
+                $0[.init(name: $1.singular)] = $1
+            }),
+            factories: try js[.factories]?.decode() ?? [:],
+            resources: try js[.resources]?.decode() ?? [:],
+            technologies: try js[.technologies]?.decode() ?? [:],
+            terrains: try js[.terrains]?.decode() ?? [:],
+        )
+    }
+}

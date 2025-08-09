@@ -1,0 +1,40 @@
+extension GameAPI {
+    enum Symbol: String {
+        /// Load the game state from a file.
+        case load
+        case loadTerrain
+        case editTerrain
+        case saveTerrain
+
+        /// Sequence a player event.
+        case push
+
+        case gregorian
+        /// Render a celestial orbit to a `[Float32]` array of coordinates.
+        case orbit
+
+        case openPlanet
+
+        /// Switch to the Production screen and return its initial state.
+        case openProduction
+        /// Switch to the Population screen and return its initial state.
+        case openPopulation
+        /// Switch to the Budget screen and return its initial state.
+        case openBudget
+        /// Switch to the Trade screen and return its initial state.
+        case openTrade
+
+        case closeScreen
+
+        case focusPlanet
+        /// Open a celestial view and return its initial state.
+        case view
+
+        case `switch`
+
+        case tooltip
+    }
+}
+extension GameAPI.Symbol: CustomStringConvertible {
+    var description: String { self.rawValue }
+}

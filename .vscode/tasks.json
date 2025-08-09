@@ -1,0 +1,140 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build (release, noassert)",
+            "detail": "swift package js",
+            "type": "shell",
+            "command": [
+                "swift package",
+                "--scratch-path .build.wasm",
+                "--swift-sdk wasm32-unknown-wasi",
+                "js",
+                "--product engine",
+                "-c release",
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/Client",
+                "env": {
+                    "SWIFT_WASM_SIMD128": "1",
+                }
+            }
+        },
+        {
+            "label": "Build (release)",
+            "detail": "swift package js",
+            "type": "shell",
+            "command": [
+                "swift package",
+                "--scratch-path .build.wasm",
+                "--swift-sdk wasm32-unknown-wasi",
+                "js",
+                "--product engine",
+                "-c release",
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/Client",
+                "env": {
+                    "SWIFT_TESTABLE": "1",
+                    "SWIFT_WASM_SIMD128": "1",
+                }
+            }
+        },
+        {
+            "label": "Build (debug)",
+            "detail": "swift package js",
+            "type": "shell",
+            "command": [
+                "swift package",
+                "--scratch-path .build.wasm",
+                "--swift-sdk wasm32-unknown-wasi",
+                "js",
+                "--product engine",
+                "-c debug",
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/Client",
+                "env": {
+                    "SWIFT_TESTABLE": "1",
+                    "SWIFT_WASM_SIMD128": "1",
+                }
+            }
+        },
+
+        {
+            "label": "Build (debug, host)",
+            "detail": "swift build",
+            "type": "shell",
+            "command": [
+                "swift build -c debug --build-tests",
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/Client",
+                "env": {
+                    "SWIFT_TESTABLE": "1",
+                }
+            }
+        },
+
+        {
+            "label": "Build Integration Tests (debug)",
+            "detail": "swift package js",
+            "type": "shell",
+            "command": [
+                "swift package",
+                "--scratch-path ../ClientIntegrationTests/.build.wasm",
+                "--swift-sdk wasm32-unknown-wasi",
+                "js",
+                "--product integration-tests",
+                "-c debug",
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/Client",
+                "env": {
+                    "SWIFT_TESTABLE": "1",
+                    "SWIFT_WASM_SIMD128": "1",
+                }
+            }
+        },
+        {
+            "label": "Build Integration Tests (release)",
+            "detail": "swift package js",
+            "type": "shell",
+            "command": [
+                "swift package",
+                "--scratch-path ../ClientIntegrationTests/.build.wasm",
+                "--swift-sdk wasm32-unknown-wasi",
+                "js",
+                "--product integration-tests",
+                "-c release",
+            ],
+            "group": {
+                "kind": "build"
+            },
+            "options": {
+                "cwd": "${workspaceFolder}/Client",
+                "env": {
+                    "SWIFT_TESTABLE": "1",
+                    "SWIFT_WASM_SIMD128": "1",
+                }
+            }
+        },
+    ]
+}

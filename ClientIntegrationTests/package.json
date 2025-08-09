@@ -1,0 +1,16 @@
+{
+    "name": "integration-tests",
+    "version": "1.0.0",
+    "type": "module",
+    "private": true,
+    "scripts": {
+        "test": "node .build/main.test.js"
+    },
+    "dependencies": {
+        "@bjorn3/browser_wasi_shim": "^0.4.1"
+    },
+    "devDependencies": {
+        "@types/node": "^20.14.9",
+        "typescript": "^5.5.3"
+    }
+}

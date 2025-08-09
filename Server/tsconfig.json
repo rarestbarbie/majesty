@@ -1,0 +1,20 @@
+{
+    "compilerOptions": {
+        "target": "ES2020",
+        "module": "Node16",
+        "moduleResolution": "node16",
+        "esModuleInterop": true,
+        "skipLibCheck": true,
+        "strict": true,
+        "types": [
+            "node"
+        ], // Add this to include Node.js type definitions
+        "outDir": "./build"
+    },
+    "include": [
+        "./**/*.ts"
+    ], // Include all .ts files in the project
+    "exclude": [
+        "node_modules"
+    ]
+}

@@ -1,0 +1,57 @@
+div.candlesticks {
+    display: flex;
+    height: 300px;
+
+    direction: rtl;
+    overflow-x: scroll;
+    overflow-y: hidden;
+    scrollbar-gutter: auto;
+
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    border-radius: 4px;
+    background-color: rgba(0, 0, 0, 0.2);
+
+    --y: calc(100% / (var(--y-max) - var(--y-min)));
+
+    div.candle {
+        flex-shrink: 0;
+
+        position: relative;
+        height: 100%;
+        width: 5px;
+
+        &:hover::before {
+            display: inline-block;
+            position: absolute;
+            content: '';
+            height: 100%;
+            border-left: 1px dashed rgba(255, 255, 255, 0.2);
+            left: 2px;
+        }
+
+        &[data-change='pos'] > div {
+            background-color: var(--color-pos-fill)
+        }
+        &[data-change='neg'] > div {
+            background-color: var(--color-neg-fill);
+        }
+        &[data-change='zero'] > div {
+            background-color: var(--color-neu-fill);
+        }
+
+        div:nth-child(1) {
+            position: absolute;
+            margin: 0 1px;
+            width: 3px;
+            bottom: calc(var(--y) * (min(var(--c), var(--o)) - var(--y-min)));
+            height: calc(max(1px, var(--y) * (abs(var(--c) - var(--o)))));
+        }
+        div:nth-child(2) {
+            position: absolute;
+            margin: 0 2px;
+            width: 1px;
+            bottom: calc(var(--y) * (var(--l) - var(--y-min)));
+            height: calc(max(1px, var(--y) * (var(--h) - var(--l))));
+        }
+    }
+}

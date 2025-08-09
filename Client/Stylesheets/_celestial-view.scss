@@ -1,0 +1,60 @@
+div.celestial-view {
+    position: relative;
+    overflow: hidden;
+    height: 100vh;
+
+    /// Camera controls
+    *.touch {
+        height: 100%;
+        width: 100%;
+    }
+
+    [data-planet] {
+        position: absolute;
+
+        *.name {
+            color: rgba(255, 255, 255, 0.85);
+            mix-blend-mode: screen;
+            /* background-color: rgba(255, 255, 255, 0.5); */
+            padding: 0.2rem 0.5rem;
+
+            pointer-events: none;
+        }
+
+        *.circle {
+            position: absolute;
+            // This makes it so that the circle is always centered on the planet
+            box-sizing: border-box;
+            left: calc(-1 * var(--ui-radius));
+            top: calc(-1 * var(--ui-radius));
+            width: calc(2 * var(--ui-radius));
+            height: calc(2 * var(--ui-radius));
+
+            border-radius: 50%;
+            border: 2px solid transparent;
+
+            mix-blend-mode: screen;
+        }
+    }
+
+    [data-planet].primary {
+        *.name {
+            margin-top: 0.5em;
+            margin-left: 0.5em;
+        }
+        *.circle {
+            opacity: 0;
+        }
+    }
+
+    [data-planet].selected {
+        *.circle {
+            border-color: var(--ui-color);
+        }
+
+        *.name {
+            color: rgba(255, 255, 255, 1);
+            text-shadow: 0 0.05em 1em white;
+        }
+    }
+}

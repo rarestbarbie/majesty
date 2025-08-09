@@ -1,0 +1,369 @@
+@use 'celestial-view';
+@use 'candlesticks';
+@use 'clock';
+@use 'conditions';
+@use 'devtools';
+@use 'factors';
+@use 'hud';
+@use 'minimap';
+@use 'screen';
+@use 'tooltip';
+
+div.pie-chart {
+    --pie-diameter: 6rem;
+
+    position: relative;
+    display: block;
+
+    height: var(--pie-diameter);
+    width: var(--pie-diameter);
+}
+div.pie-chart::before {
+    position: absolute;
+    display: block;
+
+    content: '';
+
+    height: var(--pie-diameter);
+    width: var(--pie-diameter);
+
+    font-size: calc(var(--pie-diameter) / 10);
+
+    transition: box-shadow .1s ease-out;
+    pointer-events: none;
+    border-radius: 50%;
+    box-shadow:
+        inset 0 -0.5em 0.75em -0.75em rgba(255, 255, 255, 0.2),
+        inset 0 -0.4em 0.5px 0.1em rgba(0 , 0, 0, 0.34),
+        inset 0 -1.3em 5em 0.1em rgba(0 , 0, 0, 0.15);
+}
+div.pie-chart:hover::before {
+    box-shadow:
+        inset 0 -0.5em 1.5em -0.75em rgba(255, 255, 255, 0.1),
+        inset 0 -0.4em 0.5px 0.1em rgba(0, 0, 0, 0.18),
+        inset 0 -1.3em 5em 0.1em rgba(0, 0, 0, 0.05)
+}
+
+
+[data-count] > span:nth-child(2)::before {
+    content: '/';
+}
+[data-count='bonus'] > [data-sign='zero'] {
+    color: var(--color-pos-text);
+}
+[data-count='malus'] > [data-sign='zero'],
+[data-count='malus'] > [data-sign='pos'],
+[data-count='bonus'] > [data-sign='pos'] {
+    color: var(--color-neg-text);
+}
+
+
+[data-ticker] [data-sign]::before {
+    margin: 0 0.25em 0 0.25em;
+}
+
+[data-ticker] [data-sign='zero'],
+[data-ticker] [data-sign='zero'] {
+    display: none;
+    color: rgba(255, 255, 255, 0.5);
+}
+
+[data-ticker='bonus'] [data-sign='pos'],
+[data-ticker='malus'] [data-sign='neg'] {
+    color: var(--color-pos-text);
+}
+[data-ticker='bonus'] [data-sign='neg'],
+[data-ticker='malus'] [data-sign='pos'] {
+    color: var(--color-neg-text);
+}
+
+[data-ticker] [data-sign='pos']::before {
+    content: '\00a0▴';
+}
+[data-ticker] [data-sign='neg']::before {
+    content: '\00a0▾';
+}
+
+
+
+a {
+    text-decoration: none;
+    color: inherit;
+}
+
+#tabs {
+    color: white;
+    width: 100%;
+    display: flex;
+}
+
+#tabs > a {
+    width: 10rem;
+    padding: 1rem;
+
+    --bg: rgba(25, 25, 25, 0.5);
+    --blur-filter: blur(10px) saturate(180%);
+
+    background-color: var(--bg);
+    backdrop-filter: var(--blur-filter);
+    -webkit-backdrop-filter: var(--blur-filter);
+
+    cursor: pointer;
+}
+#tabs > a:hover,
+#tabs > a:focus {
+    background-color: rgba(45, 45, 45, 0.5);
+}
+#tabs > a:active {
+    background-color: rgba(65, 65, 65, 0.5);
+}
+#tabs > a:last-child {
+    border-radius: 0 0 0.5rem 0;
+}
+
+
+div.tabs {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+
+    --tab-height: 2rem;
+}
+div.tabs > * {
+    flex-grow: 1;
+}
+div.tabs > * > label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: var(--tab-height);
+    width: 100%;
+
+    cursor: pointer;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+div.tabs > * > label:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+div.tabs > * > input[type=radio] {
+    display: none;
+}
+div.tabs > * > input[type=radio]:not(:checked) + label + *.tabcontent {
+    display: none;
+}
+div.tabs > * > input[type=radio]:checked + label + *.tabcontent {
+    display: block;
+
+    position: absolute;
+    top: var(--tab-height);
+    left: 0;
+
+    margin-top: 1rem;
+    width: 100%;
+}
+div.tabs > * > input[type=radio]:checked + label {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+}
+
+[data-table] {
+    display: grid;
+    align-content: start;
+    overflow-y: scroll;
+}
+[data-table] > * {
+    display: grid;
+    grid-template-columns: subgrid;
+    grid-column: 1 / -1;
+    column-gap: 0.5rem;
+    padding: 2px 0.5rem;
+}
+[data-table] > * > * {
+    height: 1.4rem;
+    line-height: 1.5rem;
+}
+[data-table] > header:first-child {
+    font-weight: bold;
+}
+
+[data-table] > a:hover {
+    background-color: rgba(255, 255, 255, 0.05);
+}
+[data-table] > a.selected {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+
+[data-table='Factories'] {
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    height: 50%;
+}
+[data-table='Pops'] {
+    grid-template-columns: 2fr 0.5fr 1fr 1fr 1fr 1fr 1fr 1.5fr 0.5fr 0.5fr 0.5fr 0.5fr;
+    height: 50%;
+}
+
+[data-table='Pops'] > * > [data-cell='progress'].needs-cup > *:first-child::before {
+    opacity: 0.25;
+}
+[data-table='Pops'] > *:hover    > [data-cell='progress'].needs-cup,
+[data-table='Pops'] > *.selected > [data-cell='progress'].needs-cup {
+    background-color: transparent;
+}
+[data-table='Pops'] > *:hover    > [data-cell='progress'].needs-cup > *:first-child::before,
+[data-table='Pops'] > *.selected > [data-cell='progress'].needs-cup > *:first-child::before {
+    opacity: 0.5;
+}
+
+[data-table='Pops'] > * > [data-cell='progress']:nth-last-child(3) > *:first-child::before {
+    background-color: rgb(0, 153, 255);
+}
+[data-table='Pops'] > * > [data-cell='progress']:nth-last-child(2) > *:first-child::before {
+    background-color: rgb(255, 145, 0);
+}
+[data-table='Pops'] > * > [data-cell='progress']:nth-last-child(1) > *:first-child::before {
+    background-color: rgb(255, 0, 106);
+}
+
+[data-table='Needs'] {
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 1fr;
+}
+[data-table='Needs'] > [data-tier='i'] {
+    --color: rgb(104, 104, 104);
+}
+[data-table='Needs'] > [data-tier='v'] {
+    --color: rgb(252, 183, 35);
+}
+[data-table='Needs'] > [data-tier='l'] {
+    --color: rgb(58, 145, 204);
+}
+[data-table='Needs'] > [data-tier='e'] {
+    --color: rgb(255, 145, 0);
+}
+[data-table='Needs'] > [data-tier='x'] {
+    --color: rgb(214, 0, 89);
+}
+[data-table='Needs'] > [data-tier]:not([data-tier='v']) + [data-tier='v'],
+[data-table='Needs'] > [data-tier]:not([data-tier='e']) + [data-tier='e'],
+[data-table='Needs'] > [data-tier]:not([data-tier='x']) + [data-tier='x'] {
+    margin-top: 1rem;
+}
+[data-table='Needs'] > * > *:nth-child(2) {
+    border-left: 3px solid var(--color);
+    padding-left: 0.5rem;
+}
+
+[data-table='Markets'] {
+    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 2fr;
+    height: 50%;
+}
+
+[data-table='Pops'] > * > * {
+    text-align: left;
+}
+[data-table='Pops'] > * > *:nth-child(1) {
+    text-align: right;
+    direction: rtl;
+}
+[data-table='Pops'] > * > *:nth-child(3) {
+    border-left: 3px solid var(--color);
+    padding-left: 0.5em;
+}
+
+
+[data-table] > * > [data-cell='shortage'] {
+    background-color: rgba(255, 0, 0, 0.15);
+}
+[data-table] > * > [data-cell='progress'] > *:first-child {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+}
+
+[data-table] > * > [data-cell='progress'] > *:first-child::before {
+    content: '';
+    position: absolute;
+    width: var(--progress);
+    top: 0;
+    height: 100%;
+
+    background-color: white;
+    opacity: 0.1;
+
+    z-index: -1;
+}
+
+[data-table] > *:hover > [data-cell='progress'],
+[data-table] > *.selected > [data-cell='progress'] {
+    background-color: rgba(0, 0, 0, 0.2);
+}
+[data-table] > *:hover > [data-cell='progress'] > *:first-child::before,
+[data-table] > *.selected > [data-cell='progress'] > *:first-child::before {
+    opacity: 0.2;
+}
+
+
+[data-boxes='Sales'] {
+    display: flex;
+    gap: 1rem;
+}
+[data-boxes='Sales'] > * {
+    padding: 1rem 0;
+    flex-grow: 1;
+}
+[data-boxes='Sales'] > * > *:nth-child(1) {
+    font-size: 2rem;
+    float: left;
+    margin: 0 1rem 1rem 0;
+}
+[data-boxes='Sales'] > * > *:nth-child(2) {
+    font-size: 1.25rem;
+}
+[data-boxes='Sales'] > * > *:nth-child(3)::after {
+    content: ' sold yesterday';
+}
+[data-boxes='Sales'] > * > *:nth-child(4) {
+    clear: left;
+}
+[data-boxes='Sales'] > * > *:nth-child(4)::before {
+    content: '🗑️';
+    margin-right: 0.6em;
+}
+[data-boxes='Sales'] > * > *:nth-child(5)::before {
+    content: '💵';
+    margin-right: 0.6em;
+}
+
+body {
+    background-color: #000000;
+    color: white;
+
+    --color-pos-fill: #20d08d;
+    --color-pos-text: #26e99e;
+    --color-neg-fill: #f52b4d;
+    --color-neg-text: #ff3d5d;
+    --color-neu-fill: #dbc491;
+    --color-neu-text: #ffe3a8;
+
+    --color-em-text: #ffd781;
+
+    /* This is needed for the left-border on table header cells */
+    --color: transparent;
+
+    overflow: hidden;
+}
+
+body > canvas {
+    position: absolute;
+}
+
+body > main {
+    display: flex;
+
+    > div {
+        flex-grow: 1;
+    }
+}
