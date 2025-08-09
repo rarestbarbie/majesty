@@ -1,0 +1,67 @@
+#clock {
+    color: white;
+    display: flex;
+    align-items: center;
+
+    font-size: 1.2rem;
+    padding: 0.5rem;
+
+    #flag {
+        width: 2rem;
+        height: 2rem;
+        border-radius: 50%;
+
+        margin-right: 1em;
+    }
+
+    &[data-ticks='1'] {
+        --symbol: '⏯';
+        --spacing: -0.1em;
+    }
+    &[data-ticks='2'] {
+        --symbol: '⏭';
+        --spacing: -0.1em;
+    }
+    &[data-ticks='3'] {
+        --symbol: '⏵⏵⏵';
+    }
+    &[data-ticks='4'] {
+        --symbol: '⏵⏵';
+    }
+    &[data-ticks='5'] {
+        --symbol: '⏵';
+    }
+    &.paused {
+        --symbol: '⏸';
+        --spacing: -0.1em;
+
+        color: #aaaaaa;
+    }
+
+    #date {
+        width: 12rem;
+        height: 1.5rem;
+        display: flex;
+        justify-content: space-between;
+
+        cursor: pointer;
+
+        &::after {
+            font-size: 1rem;
+            padding: 0 1em 0 0;
+            content: var(--symbol);
+            letter-spacing: var(--spacing, -0.3em);
+        }
+    }
+
+    button {
+        width: 2rem;
+
+        &:first-of-type::before {
+            content: '–'
+        }
+        &:last-of-type::before {
+            content: '+'
+        }
+    }
+}

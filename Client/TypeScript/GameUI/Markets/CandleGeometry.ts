@@ -1,0 +1,47 @@
+import {
+    DiffableListElement,
+} from '../../DOM/exports.js';
+import { GameDate } from '../../GameEngine/exports.js';
+import { MarketInterval, ScreenType } from "../exports.js";
+
+export class CandleGeometry implements DiffableListElement<GameDate> {
+    public readonly id: GameDate;
+    public readonly node: HTMLDivElement;
+    private readonly body: HTMLDivElement;
+    private readonly wick: HTMLDivElement;
+
+    constructor(candle: MarketInterval) {
+        this.id = candle.id;
+        this.node = document.createElement('div');
+        this.body = document.createElement('div');
+        this.wick = document.createElement('div');
+
+        this.node.classList.add('candle');
+
+        this.node.appendChild(this.wick);
+        this.node.appendChild(this.body);
+    }
+
+    public update(candle: MarketInterval): void {
+        const { o: open, h: high, l: low, c: close } = candle.c;
+
+        this.node.style.setProperty('--o', open.toString());
+        this.node.style.setProperty('--c', close.toString());
+        this.node.style.setProperty('--l', low.toString());
+        this.node.style.setProperty('--h', high.toString());
+
+        this.body.dataset['o'] = open.toString();
+        this.body.dataset['c'] = close.toString();
+
+        this.wick.dataset['l'] = low.toString();
+        this.wick.dataset['h'] = high.toString();
+
+        if (close > open) {
+            this.node.dataset['change'] = 'pos';
+        } else if (close < open) {
+            this.node.dataset['change'] = 'neg';
+        } else {
+            this.node.dataset['change'] = 'zero';
+        }
+    }
+}

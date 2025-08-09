@@ -1,0 +1,16 @@
+node_modules
+package-lock.json
+*.svg
+
+/Client/.build
+/Client/.build.*
+/ClientIntegrationTests/.build/
+/ClientIntegrationTests/.build.*
+
+/Server/build/
+
+/DataExtract/dist
+/DataExtract/output.json
+
+/.vscode/launch.json
+/*.code-workspace

@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        body { background-color: #1a1a1a; font-family: sans-serif; }
+        #login-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            text-align: center;
+            background: #333;
+            padding: 2rem;
+            border-radius: 8px;
+        }
+        input { display: block; margin: 1rem auto; padding: 0.5rem; width: 200px; }
+        button { padding: 0.5rem 1rem; margin: 0 0.5rem; cursor: pointer; }
+    </style>
+</head>
+<body>
+    <div id="login-container">
+        <h2>Welcome</h2>
+        <input type="email" id="email" placeholder="Email" />
+        <input type="password" id="password" placeholder="Password" />
+        <button id="loginBtn">Login</button>
+        <button id="signupBtn">Sign Up</button>
+        <p id="error-message" style="color: red;"></p>
+    </div>
+
+    <script type="module" src="/TypeScript/login.ts"></script>
+</body>
+</html>

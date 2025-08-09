@@ -1,0 +1,83 @@
+@use 'mixins/blur';
+
+#tile {
+    position: absolute;
+
+    width: 15rem;
+    bottom: 0;
+    left: 0;
+
+    header {
+        font-size: 1.25rem;
+        padding: 0.1em 0.25em;
+        color: white;
+        text-shadow: 0 1px 0.3em rgb(0, 0, 0);
+    }
+
+    > div {
+        height: 16rem;
+
+        --bg: rgba(25, 25, 25, 0.1);
+        --blur-filter: blur(10px) saturate(180%);
+
+        @include blur.background;
+
+        border-top: 2px solid rgba(255, 255, 255, 0.2);
+        border-right: 2px solid rgba(255, 255, 255, 0.2);
+    }
+}
+
+
+#minimap {
+    position: absolute;
+
+    width: 30rem;
+    bottom: 0;
+    right: 0;
+    // background-color: rgba(255, 255, 255, 0.1);
+
+    display: block;
+
+    header {
+        font-size: 1.25rem;
+        padding: 0.1em 0.25em;
+        color: white;
+        text-shadow: 0 1px 0.3em rgb(0, 0, 0);
+    }
+
+    div.hex-grid {
+        display: block;
+        border-top: 2px solid rgba(255, 255, 255, 0.2);
+        border-left: 2px solid rgba(255, 255, 255, 0.2);
+        padding: 0.5rem;
+
+        --bg: rgba(25, 25, 25, 0.1);
+        --blur-filter: blur(10px) saturate(180%);
+
+        @include blur.background;
+    }
+
+
+    svg {
+        height: 15.5rem;
+
+        g.cells {
+            pointer-events: none;
+        }
+        g.lines {
+            path {
+                fill: transparent;
+
+                &:hover {
+                    stroke: red;
+                    stroke-width: 0.06px;
+                }
+            }
+
+            a.selected path {
+                stroke: rgb(255, 87, 185);
+                stroke-width: 0.1px;
+            }
+        }
+    }
+}

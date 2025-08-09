@@ -1,0 +1,44 @@
+#!/bin/bash
+
+BUCKET_PATH="tayloraswift-apps/wasm-test"
+BUILD_FOLDER=".build.vite"
+
+# Step 1: Sync all non-compressible assets (HTML, images, etc.)
+# We explicitly exclude the compressed assets because they need special handling.
+echo "Uploading non-compressible assets..."
+aws s3 sync "$BUILD_FOLDER" "s3://$BUCKET_PATH" --delete --exclude "*.gz"
+
+# Step 2: Upload compressed files with the correct headers
+echo "Uploading compressed assets..."
+
+# Find all .gz files and loop through them
+find "$BUILD_FOLDER" -name "*.gz" | while read file; do
+  # Get the S3 destination path by removing the .gz and the local folder path
+  s3_key=$(echo "$file" | sed "s|^$BUILD_FOLDER/||; s|\.gz$||")
+
+  # Determine the correct Content-Type based on the original extension
+  content_type=""
+  if [[ "$s3_key" == *.js ]]; then
+    content_type="application/javascript"
+  elif [[ "$s3_key" == *.css ]]; then
+    content_type="text/css"
+  elif [[ "$s3_key" == *.html ]]; then
+    content_type="text/html"
+  elif [[ "$s3_key" == *.json ]]; then
+    content_type="application/json"
+  elif [[ "$s3_key" == *.wasm ]]; then
+    content_type="application/wasm"
+  else
+    echo "Skipping unknown file type: $file"
+    continue
+  fi
+
+  echo "Uploading: $s3_key"
+  aws s3 cp "$file" "s3://$BUCKET_PATH/$s3_key" \
+    --content-type "$content_type" \
+    --content-encoding "gzip" &
+done
+
+# Wait for all background uploads to finish
+wait
+echo "Deployment complete!"

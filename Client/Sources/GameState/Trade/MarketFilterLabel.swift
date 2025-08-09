@@ -1,0 +1,36 @@
+import GameEconomy
+import JavaScriptKit
+import JavaScriptInterop
+
+enum MarketFilterLabel {
+    case currency(CurrencyLabel)
+    case resource(ResourceLabel)
+}
+extension MarketFilterLabel: Identifiable {
+    var id: Market.Asset {
+        switch self {
+        case .currency(let label): .fiat(label.id)
+        case .resource(let label): .good(label.id)
+        }
+    }
+}
+extension MarketFilterLabel: JavaScriptEncodable {
+    enum ObjectKey: JSString, Sendable {
+        case id
+        case icon
+        case name
+    }
+
+    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+        js[.id] = self.id
+        switch self {
+        case .currency(let self):
+            js[.icon] = ""
+            js[.name] = self.name
+
+        case .resource(let self):
+            js[.icon] = self.icon
+            js[.name] = self.name
+        }
+    }
+}

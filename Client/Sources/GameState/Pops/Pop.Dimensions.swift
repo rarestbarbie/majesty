@@ -1,0 +1,19 @@
+extension Pop {
+    struct Dimensions {
+        var size: Int64
+        var mil: Double
+        var con: Double
+        var fl: Double
+        var fe: Double
+        var fx: Double
+    }
+}
+extension Pop.Dimensions {
+    init() {
+        self.init(size: 0, mil: 0, con: 0, fl: 0, fe: 0, fx: 0)
+    }
+}
+
+#if TESTABLE
+extension Pop.Dimensions: Equatable, Hashable {}
+#endif

@@ -1,0 +1,68 @@
+@use 'mixins/blur';
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+[data-tooltip] {
+    position: absolute;
+    pointer-events: none;
+
+    > aside {
+        position: relative;
+        z-index: 1;
+
+
+        margin-top: 1rem;
+        line-height: 1.2rem;
+
+        display: flex;
+        flex-direction: row;
+        gap: 1rem;
+
+        padding: 0.75rem 1rem;
+        border-radius: 0.25rem;
+
+        --bg: rgba(0, 0, 0, 0.05);
+        --blur-filter: blur(20px) saturate(200%) brightness(0.5);
+
+        @include blur.background;
+
+        background-color: var(--bg);
+
+        box-shadow: 0 0.5rem 3rem rgba(0, 0, 0, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    > aside.borderless {
+        border: none;
+        box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.8);
+
+        --bg: rgba(25, 25, 25, 0.5);
+        --blur-filter: blur(20px) saturate(180%);
+    }
+
+    ul > li {
+        padding-left: calc(var(--indent, 0) * 1.5em);
+
+        &:not([data-indent]) + li[data-indent] {
+            margin-top: 0.25rem;
+        }
+        &[data-indent] + li:not([data-indent]) {
+            margin-top: 0.5rem;
+        }
+    }
+}
+
+[data-tooltip='hidden'] > aside {
+    opacity: 0;
+}
+[data-tooltip='floating'] > aside {
+    animation: fade-in 0.25s;
+}

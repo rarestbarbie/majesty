@@ -1,0 +1,6 @@
+{
+    "plugins": ["@typescript-eslint"],
+    "rules": {
+        "@typescript-eslint/no-floating-promises": "error"
+    }
+}
