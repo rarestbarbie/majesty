@@ -10,8 +10,8 @@ extension Vector2 {
         self.init(storage: .init(x, y))
     }
 
-    @inlinable public init(radians: Double, radius: Double = 1.0) {
-        self.init(radius * _cos(radians), radius * -_sin(radians))
+    @inlinable public init(radians: Double) {
+        self.init(_cos(radians), -_sin(radians))
     }
 }
 extension Vector2 {

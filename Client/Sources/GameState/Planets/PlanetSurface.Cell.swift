@@ -1,5 +1,4 @@
-import GameEngine
-import GameEconomy
+import HexGrids
 import JavaScriptInterop
 import JavaScriptKit
 

@@ -1,4 +1,5 @@
 import GameEngine
+import HexGrids
 import JavaScriptKit
 import JavaScriptInterop
 import VectorCharts

@@ -18,10 +18,12 @@ extension Vector2 {
 }
 extension Vector2.ArcGeometry {
     @inlinable init(share: Double, from start: Vector2, to end: Double) {
-        self.init(share: share,
-                  startArc: start,
-                  endArc: .init(radians: end),
-                  end: end)
+        self.init(
+            share: share,
+            startArc: start,
+            endArc: .init(radians: end),
+            end: end
+        )
     }
 }
 extension Vector2.ArcGeometry {
@@ -46,12 +48,12 @@ extension Vector2.ArcGeometry {
         } else if
             self.endArc.x >= 0,
             self.endArc.y >= 0 {
-            var fringe: Vector2 = .init(radians: self.end + 0.1, radius: 0.5)
+            var fringe: Vector2 = .init(radians: self.end + 0.1) * 0.5
             fringe.y = max(fringe.y, 0)
 
             d += " L \(fringe) Z"
         } else {
-            let fringe: Vector2 = .init(radians: self.end + 0.1, radius: 0.5)
+            let fringe: Vector2 = .init(radians: self.end + 0.1) * 0.5
             d += " L \(fringe) Z"
         }
 

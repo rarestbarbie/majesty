@@ -42,7 +42,7 @@ extension GameContext {
         }
 
         self.planets[editor.on]?.reshape(size: editor.size, terrainDefault: terrain)
-        self.planets[editor.on]?.cells[editor.id] = .init(
+        self.planets[editor.on]?.cells[editor.id]?.self = .init(
             id: editor.id,
             type: terrain,
             tile: editor.tile

@@ -103,11 +103,26 @@ let package: Package = .init(
                 .target(name: "GameEngine"),
                 .target(name: "GameEconomy"),
                 .target(name: "GameRules"),
+                .target(name: "HexGrids"),
                 .target(name: "JavaScriptInterop"),
                 .target(name: "Random"),
                 .target(name: "Vector"),
                 .target(name: "VectorCharts"),
                 .target(name: "VectorCharts_JavaScript"),
+            ]
+        ),
+
+        .target(name: "HexGrids",
+            dependencies: [
+                .target(name: "Vector"),
+            ],
+        ),
+
+        .target(
+            name: "JavaScriptInterop",
+            dependencies: [
+                .product(name: "JavaScriptBigIntSupport", package: "JavaScriptKit"),
+                .product(name: "JavaScriptKit", package: "JavaScriptKit"),
             ]
         ),
 
@@ -153,14 +168,6 @@ let package: Package = .init(
             dependencies: [
                 .target(name: "VectorCharts"),
                 .target(name: "JavaScriptInterop"),
-            ]
-        ),
-
-        .target(
-            name: "JavaScriptInterop",
-            dependencies: [
-                .product(name: "JavaScriptBigIntSupport", package: "JavaScriptKit"),
-                .product(name: "JavaScriptKit", package: "JavaScriptKit"),
             ]
         ),
     ]

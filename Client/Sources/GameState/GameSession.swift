@@ -1,6 +1,7 @@
 import GameEconomy
 import GameEngine
 import GameRules
+import HexGrids
 import JavaScriptKit
 
 public struct GameSession: ~Copyable {

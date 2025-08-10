@@ -1,5 +1,4 @@
-import GameEngine
-import GameRules
+import HexGrids
 import JavaScriptKit
 import JavaScriptInterop
 
