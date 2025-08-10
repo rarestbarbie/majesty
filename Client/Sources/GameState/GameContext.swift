@@ -41,11 +41,15 @@ extension GameContext {
             return
         }
 
-        self.planets[editor.on]?.reshape(size: editor.size, terrainDefault: terrain)
         self.planets[editor.on]?.cells[editor.id]?.self = .init(
             id: editor.id,
             type: terrain,
             tile: editor.tile
+        )
+        self.planets[editor.on]?.resurface(
+            rotate: editor.rotate,
+            size: editor.size,
+            terrainDefault: terrain
         )
     }
 

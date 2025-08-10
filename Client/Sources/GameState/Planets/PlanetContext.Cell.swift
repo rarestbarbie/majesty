@@ -6,7 +6,13 @@ import HexGrids
 extension PlanetContext {
     struct Cell: Identifiable {
         let id: HexCoordinate
-        let type: TerrainMetadata
-        let tile: PlanetTile
+        var type: TerrainMetadata
+        var tile: PlanetTile
+    }
+}
+extension PlanetContext.Cell {
+    mutating func copy(from source: Self) {
+        self.type = source.type
+        self.tile = source.tile
     }
 }
