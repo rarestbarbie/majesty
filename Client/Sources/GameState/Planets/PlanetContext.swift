@@ -1,5 +1,6 @@
 import GameEngine
 import GameRules
+import HexGrids
 import OrderedCollections
 import Vector
 import VectorCharts
@@ -108,19 +109,17 @@ extension PlanetContext {
         size: Int8,
         terrainDefault: TerrainMetadata
     ) {
-        guard self.size != size else {
-            return
-        }
+        if  self.size != size {
+            let template: HexGrid = .init(radius: size)
 
-        let template: HexGrid = .init(radius: size)
-
-        self.size = size
-        self.cells = template.reduce(into: [:]) {
-            $0[$1] = self.cells[$1] ?? PlanetContext.Cell.init(
-                id: $1,
-                type: terrainDefault,
-                tile: .init()
-            )
+            self.size = size
+            self.cells = template.reduce(into: [:]) {
+                $0[$1] = self.cells[$1] ?? PlanetContext.Cell.init(
+                    id: $1,
+                    type: terrainDefault,
+                    tile: .init()
+                )
+            }
         }
     }
 
@@ -131,21 +130,24 @@ extension PlanetContext {
             south: .init(+radius, 0),
         )
 
+        let tilt: HexRotation? = self.size > 2 ? .cw : nil
+
         var cells: [PlanetGridCell] = [] ; cells.reserveCapacity(self.cells.count)
         for (id, cell): (HexCoordinate, Cell) in self.cells {
             let shape: (HexagonPath, HexagonPath?)
 
             switch id {
             case .n(let q, let r):
-                shape.0 = .init(c: center.north, q: q, r: r, size: 1)
+                shape.0 = .init(c: center.north, q: q, r: r, tilt: tilt)
                 shape.1 = nil
 
             case .e(let φ):
-                shape.0 = .init(c: center.north, φ: φ, z: self.size, size: 1)
-                shape.1 = .init(c: center.south, φ: φ > 2 ? 8 - φ : 2 - φ, z: self.size, size: 1)
+                let θ: Int8 = φ > 2 ? 8 - φ : 2 - φ
+                shape.0 = .init(c: center.north, φ: φ, z: self.size, tilt: tilt)
+                shape.1 = .init(c: center.south, φ: θ, z: self.size, tilt: tilt?.inverted)
 
             case .s(let q, let r):
-                shape.0 = .init(c: center.south, q: q, r: r, size: 1)
+                shape.0 = .init(c: center.south, q: q, r: r, tilt: tilt?.inverted)
                 shape.1 = nil
             }
 
