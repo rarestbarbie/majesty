@@ -6,6 +6,7 @@ export class PlanetTileEditor {
     public readonly node: HTMLDivElement;
     private readonly nameInput: HTMLInputElement;
     private readonly sizeInput: HTMLInputElement;
+    private readonly rotateInput: HTMLInputElement;
     private readonly terrainSelect: HTMLSelectElement;
     private readonly applyButton: HTMLButtonElement;
 
@@ -37,6 +38,14 @@ export class PlanetTileEditor {
         this.sizeInput.min = "0";
         sizeLabel.appendChild(this.sizeInput);
         this.node.appendChild(sizeLabel);
+
+        // Rotate Tile
+        const rotateLabel = document.createElement('label');
+        rotateLabel.textContent = 'Rotate Tiles';
+        this.rotateInput = document.createElement('input');
+        this.rotateInput.type = 'checkbox';
+        rotateLabel.appendChild(this.rotateInput);
+        this.node.appendChild(rotateLabel);
 
         // Terrain Type
         const terrainLabel = document.createElement('label');
@@ -73,6 +82,7 @@ export class PlanetTileEditor {
 
         this.nameInput.value = state.tile.name ?? '';
         this.sizeInput.value = state.size.toString();
+        this.rotateInput.checked = state.rotate ?? false;
 
         // Populate and set the terrain dropdown
         this.terrainSelect.innerHTML = '';
@@ -94,6 +104,7 @@ export class PlanetTileEditor {
         // Construct the object to send back, preserving the original structure
         const updatedEditorData: PlanetTileEditorState = {
             ...this.lastReceivedState, // Start with the last known state
+            rotate: this.rotateInput.checked ? true : undefined,
             size: parseInt(this.sizeInput.value, 10),
             type: parseInt(this.terrainSelect.value, 10),
             tile: {

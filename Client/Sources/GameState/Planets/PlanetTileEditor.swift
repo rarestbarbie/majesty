@@ -8,6 +8,7 @@ public struct PlanetTileEditor {
     let id: HexCoordinate
     let on: GameID<Planet>
 
+    let rotate: HexRotation?
     let size: Int8
     let tile: PlanetTile
     let type: TerrainType
@@ -19,6 +20,7 @@ extension PlanetTileEditor {
     @frozen public enum ObjectKey: JSString, Sendable {
         case id
         case on
+        case rotate
         case size
         case tile
         case type
@@ -30,6 +32,7 @@ extension PlanetTileEditor: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.on] = self.on
+        js[.rotate] = self.rotate
         js[.size] = self.size
         js[.tile] = self.tile
         js[.type] = self.type
@@ -42,6 +45,7 @@ extension PlanetTileEditor: JavaScriptDecodable {
         self.init(
             id: try js[.id].decode(),
             on: try js[.on].decode(),
+            rotate: try js[.rotate]?.decode(),
             size: try js[.size].decode(),
             tile: try js[.tile].decode(),
             type: try js[.type].decode(),

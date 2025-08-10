@@ -105,21 +105,53 @@ extension PlanetContext {
         }
     }
 
-    mutating func reshape(
+    mutating func resurface(
+        rotate: HexRotation?,
         size: Int8,
         terrainDefault: TerrainMetadata
     ) {
         if  self.size != size {
-            let template: HexGrid = .init(radius: size)
+            self.reshape(size: size, terrainDefault: terrainDefault)
+        }
+        if  let rotate: HexRotation {
+            /// OrderedDictionary is a value type, which does the Right Thing here, as we do
+            /// not want to copy data from newly updated cells.
+            for source: Cell in self.cells.values {
+                let id: HexCoordinate
+                switch rotate {
+                case .ccw:
+                    switch source.id {
+                    case .n(let q, let r):  id = .n(r + q, -q)
+                    case .e(let φ):         id = .e(φ == 5 ? 0 : φ + 1)
+                    case .s(let q, let r):  id = .s(r + q, -q)
+                    }
 
-            self.size = size
-            self.cells = template.reduce(into: [:]) {
-                $0[$1] = self.cells[$1] ?? PlanetContext.Cell.init(
-                    id: $1,
-                    type: terrainDefault,
-                    tile: .init()
-                )
+                case .cw:
+                    switch source.id {
+                    case .n(let q, let r):  id = .n(-r, r + q)
+                    case .e(let φ):         id = .e(φ == 0 ? 5 : φ - 1)
+                    case .s(let q, let r):  id = .s(-r, r + q)
+                    }
+                }
+
+                self.cells[id]?.copy(from: source)
             }
+        }
+    }
+
+    private mutating func reshape(
+        size: Int8,
+        terrainDefault: TerrainMetadata
+    ) {
+        let template: HexGrid = .init(radius: size)
+
+        self.size = size
+        self.cells = template.reduce(into: [:]) {
+            $0[$1] = self.cells[$1] ?? PlanetContext.Cell.init(
+                id: $1,
+                type: terrainDefault,
+                tile: .init()
+            )
         }
     }
 
@@ -130,7 +162,7 @@ extension PlanetContext {
             south: .init(+radius, 0),
         )
 
-        let tilt: HexRotation? = self.size > 2 ? .cw : nil
+        let tilt: HexRotation? = self.size > 2 ? .ccw : nil
 
         var cells: [PlanetGridCell] = [] ; cells.reserveCapacity(self.cells.count)
         for (id, cell): (HexCoordinate, Cell) in self.cells {
@@ -147,6 +179,8 @@ extension PlanetContext {
                 shape.1 = .init(c: center.south, φ: θ, z: self.size, tilt: tilt?.inverted)
 
             case .s(let q, let r):
+                /// Project the southern hemisphere as if it were viewed from the south pole.
+                let (q, r): (Int8, Int8) = (-q, r + q)
                 shape.0 = .init(c: center.south, q: q, r: r, tilt: tilt?.inverted)
                 shape.1 = nil
             }

@@ -44,6 +44,7 @@ extension GameSession {
         return .init(
             id: cell.id,
             on: planet.state.id,
+            rotate: nil,
             size: planet.size,
             tile: cell.tile,
             type: cell.type.id,
