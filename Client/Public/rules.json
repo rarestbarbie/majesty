@@ -279,7 +279,10 @@
     },
     "terrains": {
         "Ocean": {
-            "color": "#345fbb"
+            "color": "#1e3e83"
+        },
+        "Archipelago": {
+            "color": "#3485bb"
         },
         "Rainforest": {
             "color": "#284226"
@@ -306,7 +309,13 @@
             "color": "#ccb295"
         },
         "Mountain": {
-            "color": "#7c5a43"
+            "color": "#6d615a"
+        },
+        "Mountain Jungle": {
+            "color": "#2c382c"
+        },
+        "Megaswamp": {
+            "color": "#203129"
         },
         "Volcanic": {
             "color": "#1b1b1b"
@@ -319,7 +328,7 @@
             "color": "#948b7e"
         },
         "Desert Barren": {
-            "color": "#70624f"
+            "color": "#614230"
         },
         "Mountain Barren": {
             "color": "#4e3b2e"
@@ -338,7 +347,7 @@
             "color": "#363636"
         },
         "Space Vacuum": {
-            "color": "#000000"
+            "color": "#19172c"
         }
     }
 }
