@@ -402,7 +402,7 @@ extension GameSession {
             guard let pop: Pop = self.context.state.pops[$1.id] else {
                 return
             }
-            if case country.id? = self.context.planets[pop.home]?.occupied {
+            if case country.id? = self.context.planets[pop.home.planet]?.occupied {
                 $0.share += $1.count
             }
             $0.total += $1.count
@@ -580,7 +580,7 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let pop: PopContext = self.context.pops.table[id],
-        let country: GameID<Country> = context.planets[pop.state.home]?.occupied,
+        let country: GameID<Country> = context.planets[pop.state.home.planet]?.occupied,
         let country: Country = self.context.state.countries[country]
         else {
             return nil

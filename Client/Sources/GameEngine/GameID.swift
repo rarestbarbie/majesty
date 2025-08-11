@@ -25,3 +25,16 @@ extension GameID: ExpressibleByIntegerLiteral {
         self.init(rawValue: integerLiteral)
     }
 }
+extension GameID: CustomStringConvertible {
+    @inlinable public var description: String {
+        "\(self.rawValue)"
+    }
+}
+extension GameID: LosslessStringConvertible {
+    @inlinable public init?(_ description: some StringProtocol) {
+        guard let rawValue: Int32 = .init(description) else {
+            return nil
+        }
+        self.init(rawValue: rawValue)
+    }
+}

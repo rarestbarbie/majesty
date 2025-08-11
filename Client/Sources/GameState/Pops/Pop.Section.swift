@@ -5,6 +5,6 @@ extension Pop {
     struct Section: Equatable, Hashable, Sendable {
         let culture: String
         let type: PopType
-        let home: GameID<Planet>
+        let home: Address
     }
 }

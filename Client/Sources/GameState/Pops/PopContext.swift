@@ -160,7 +160,7 @@ extension PopContext: RuntimeContext {
 
     mutating func advance(in context: GameContext, on map: inout GameMap) throws {
         guard
-        let country: GameID<Country> = context.planets[self.state.home]?.occupied,
+        let country: GameID<Country> = context.planets[self.state.home.planet]?.occupied,
         let country: Country = context.self.state.countries[country] else {
             return
         }

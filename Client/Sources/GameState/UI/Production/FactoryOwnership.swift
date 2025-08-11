@@ -24,7 +24,7 @@ extension FactoryOwnership {
             guard let pop: Pop = context.state.pops[$1.id] else {
                 return
             }
-            if  let country: GameID<Country> = context.planets[pop.home]?.occupied,
+            if  let country: GameID<Country> = context.planets[pop.home.planet]?.occupied,
                 let country: Country = context.state.countries[country] {
                 let label: PieChartLabel = .init(color: country.color, name: country.name)
                 $0.country[country.id, default: (0, label)].share += $1.count
