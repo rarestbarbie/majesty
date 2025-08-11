@@ -7,7 +7,7 @@ import OrderedCollections
 
 public struct Factory: CashAccountHolder, Turnable, Identifiable {
     public let id: GameID<Self>
-    let on: GameID<Planet>
+    let on: Address
     var type: FactoryType
     var grow: Int64
     var size: Int64
@@ -22,7 +22,7 @@ public struct Factory: CashAccountHolder, Turnable, Identifiable {
 
     init(
         id: GameID<Factory>,
-        on: GameID<Planet>,
+        on: Address,
         type: FactoryType,
         grow: Int64,
         size: Int64,

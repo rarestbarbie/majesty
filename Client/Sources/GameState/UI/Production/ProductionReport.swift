@@ -36,10 +36,10 @@ extension ProductionReport: PersistentReport {
 
         let include: Set<GameID<Planet>> = .init(country.state.territory)
         for factory: FactoryContext in context.factories where include.contains(
-            factory.state.on
+            factory.state.on.planet
         ) {
             guard
-            let location: Planet = context.state.planets[factory.state.on] else {
+            let location: Planet = context.state.planets[factory.state.on.planet] else {
                 continue
             }
 

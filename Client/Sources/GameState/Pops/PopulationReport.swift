@@ -27,9 +27,11 @@ extension PopulationReport: PersistentReport {
         }
 
         let include: Set<GameID<Planet>> = .init(country.state.territory)
-        for pop: PopContext in context.pops.table where include.contains(pop.state.home) {
+        for pop: PopContext in context.pops.table where include.contains(
+            pop.state.home.planet
+        ) {
             guard
-            let location: Planet = context.state.planets[pop.state.home],
+            let location: Planet = context.state.planets[pop.state.home.planet],
             let culture: Culture = context.state.cultures[pop.state.nat] else {
                 continue
             }

@@ -255,7 +255,7 @@ extension GameContext {
             let pop: Pop = self.pops.table.state[$1]
             let unemployed: Int64 = pop.unemployed
             if  unemployed > 0 {
-                let key: GameMap.Jobs.Key = .init(on: pop.home, type: pop.type)
+                let key: GameMap.Jobs.Key = .init(on: pop.home.planet, type: pop.type)
                 $0[key, default: []].append(($1, unemployed))
             }
         }

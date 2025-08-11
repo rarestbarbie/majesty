@@ -9,7 +9,7 @@ import OrderedCollections
 
 public struct Pop: CashAccountHolder, IdentityReplaceable {
     public var id: GameID<Self>
-    let home: GameID<Planet>
+    let home: Address
     let type: PopType
     let nat: String
 
