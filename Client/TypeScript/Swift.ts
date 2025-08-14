@@ -19,7 +19,7 @@ import { PlayerEvent } from './Multiplayer/exports.js';
 
 export class Swift {
     // Will be added by Swift WebAssembly
-    declare public static load: (state: Object, rules: Object, terrain: Object[]) => void;
+    declare public static load: (state: Object, rules: Object, terrain: Object[]) => boolean;
     declare public static push: (event: PlayerEvent, i: bigint) => void;
 
     declare public static orbit: (id: GameID) => Float32Array | null;

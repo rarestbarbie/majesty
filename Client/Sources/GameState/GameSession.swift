@@ -24,7 +24,6 @@ public struct GameSession: ~Copyable {
         let rules: GameRules = try .init(resolving: rules, with: &save.symbols)
         var context: GameContext = try .init(save: save, rules: rules)
         try context.loadTerrain(terrain)
-
         self.context = context
     }
 }

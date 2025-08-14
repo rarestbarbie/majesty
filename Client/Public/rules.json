@@ -328,10 +328,16 @@
             "color": "#948b7e"
         },
         "Desert Barren": {
-            "color": "#614230"
+            "color": "#ff00ea"
+        },
+        "Lowland Barren": {
+            "color": "#613630"
+        },
+        "Highland Barren": {
+            "color": "#4d4241"
         },
         "Mountain Barren": {
-            "color": "#4e3b2e"
+            "color": "#2e2624"
         },
 
         "Arctic Vacuum": {
@@ -340,11 +346,17 @@
         "Frozen Vacuum": {
             "color": "#a3a3a3"
         },
+        "Lowland Vacuum": {
+            "color": "#3a3a3a"
+        },
+        "Highland Vacuum": {
+            "color": "#838383"
+        },
         "Desert Vacuum": {
-            "color": "#535353"
+            "color": "#ff00ea"
         },
         "Mountain Vacuum": {
-            "color": "#363636"
+            "color": "#a7a7a7"
         },
         "Space Vacuum": {
             "color": "#19172c"
