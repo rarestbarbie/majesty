@@ -36,9 +36,15 @@ extension GameAPI {
         var game: GameSession? = nil
 
         self[.load] = {
-            var new: GameSession = try .init(save: $0, rules: $1, terrain: $2)
-            self.update(ui: try new.start())
-            game = consume new
+            do {
+                var new: GameSession = try .init(save: $0, rules: $1, terrain: $2)
+                self.update(ui: try new.start())
+                game = consume new
+                return true
+            } catch (let error) {
+                print("Error loading game: \(error)")
+                return false
+            }
         }
         self[.loadTerrain] = { try game?.loadTerrain(from: $0) }
         self[.editTerrain] = { game?.editTerrain() }

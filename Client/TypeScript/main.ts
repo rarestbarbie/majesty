@@ -55,7 +55,10 @@ async function main(user: Firebase.User): Promise<void> {
 
         await init();
 
-        Swift.load(await start, await rules, terrain);
+        if (!Swift.load(await start, await rules, terrain)) {
+            console.error("Failed to load game");
+            return;
+        }
 
         window.ui.view(0, 10 as GameID);
         window.ui.navigate();
@@ -108,7 +111,10 @@ async function main(user: Firebase.User): Promise<void> {
         await init();
 
         // Load the game state from the server.
-        Swift.load(await start, await rules, terrain);
+        if (!Swift.load(await start, await rules, terrain)) {
+            console.error("Failed to load game");
+            return;
+        }
 
         window.ui.view(0, 10 as GameID);
         window.ui.navigate();
