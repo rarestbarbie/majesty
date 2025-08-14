@@ -1,4 +1,3 @@
-
 import { Swift } from '../../Swift.js';
 import { PlanetTileEditorState } from '../exports.js';
 
@@ -6,7 +5,7 @@ export class PlanetTileEditor {
     public readonly node: HTMLDivElement;
     private readonly nameInput: HTMLInputElement;
     private readonly sizeInput: HTMLInputElement;
-    private readonly rotateInput: HTMLInputElement;
+    private readonly rotateFieldset: HTMLFieldSetElement;
     private readonly terrainSelect: HTMLSelectElement;
     private readonly applyButton: HTMLButtonElement;
 
@@ -22,37 +21,72 @@ export class PlanetTileEditor {
         title.textContent = 'Tile Editor';
         this.node.appendChild(title);
 
-        // Tile Name
+        // Group for "Selected Tile Properties"
+        const tilePropertiesGroup = document.createElement('div');
+        const tilePropertiesHeader = document.createElement('h5');
+        tilePropertiesHeader.textContent = 'Selected Tile Properties';
+        tilePropertiesGroup.appendChild(tilePropertiesHeader);
+
         const nameLabel = document.createElement('label');
         nameLabel.textContent = 'Name';
         this.nameInput = document.createElement('input');
         this.nameInput.type = 'text';
         nameLabel.appendChild(this.nameInput);
-        this.node.appendChild(nameLabel);
+        tilePropertiesGroup.appendChild(nameLabel);
 
-        // Planet Size
+        const terrainLabel = document.createElement('label');
+        terrainLabel.textContent = 'Terrain';
+        this.terrainSelect = document.createElement('select');
+        terrainLabel.appendChild(this.terrainSelect);
+        tilePropertiesGroup.appendChild(terrainLabel);
+        this.node.appendChild(tilePropertiesGroup);
+
+        // Group for "Global Grid Actions"
+        const gridActionsGroup = document.createElement('div');
+        const gridActionsHeader = document.createElement('h5');
+        gridActionsHeader.textContent = 'Global Grid Actions';
+        gridActionsGroup.appendChild(gridActionsHeader);
+
         const sizeLabel = document.createElement('label');
         sizeLabel.textContent = 'Size';
         this.sizeInput = document.createElement('input');
         this.sizeInput.type = 'number';
         this.sizeInput.min = "0";
         sizeLabel.appendChild(this.sizeInput);
-        this.node.appendChild(sizeLabel);
+        gridActionsGroup.appendChild(sizeLabel);
 
-        // Rotate Tile
-        const rotateLabel = document.createElement('label');
-        rotateLabel.textContent = 'Rotate Tiles';
-        this.rotateInput = document.createElement('input');
-        this.rotateInput.type = 'checkbox';
-        rotateLabel.appendChild(this.rotateInput);
-        this.node.appendChild(rotateLabel);
+        // Rotation Radio Buttons
+        this.rotateFieldset = document.createElement('fieldset');
+        const rotateLegend = document.createElement('legend');
+        rotateLegend.textContent = 'Rotate Tiles';
+        this.rotateFieldset.appendChild(rotateLegend);
 
-        // Terrain Type
-        const terrainLabel = document.createElement('label');
-        terrainLabel.textContent = 'Terrain';
-        this.terrainSelect = document.createElement('select');
-        terrainLabel.appendChild(this.terrainSelect);
-        this.node.appendChild(terrainLabel);
+        const rotations = [
+            { label: 'None', value: 'none', checked: true },
+            { label: 'Clockwise ↻', value: 'cw', checked: false },
+            { label: 'Counter-Clockwise ↺', value: 'ccw', checked: false }
+        ];
+
+        rotations.forEach(rot => {
+            const wrapper = document.createElement('div');
+            const input = document.createElement('input');
+            input.type = 'radio';
+            input.name = 'rotation';
+            input.id = `rotate-${rot.value}`;
+            input.value = rot.value;
+            input.checked = rot.checked;
+
+            const label = document.createElement('label');
+            label.htmlFor = `rotate-${rot.value}`;
+            label.textContent = rot.label;
+
+            wrapper.appendChild(input);
+            wrapper.appendChild(label);
+            this.rotateFieldset.appendChild(wrapper);
+        });
+        gridActionsGroup.appendChild(this.rotateFieldset);
+        this.node.appendChild(gridActionsGroup);
+
 
         this.applyButton = document.createElement('button');
         this.applyButton.textContent = 'Apply Settings';
@@ -80,9 +114,20 @@ export class PlanetTileEditor {
 
         this.lastReceivedState = state;
 
+        const polar: boolean = state.id === 'N0,0' || state.id === 'S0,0';
+
+        this.sizeInput.disabled = !polar;
+        this.rotateFieldset.disabled = !polar;
+
+        const disabledTooltip: string = 'Select a polar tile to modify the grid.';
+        this.sizeInput.title = polar ? '' : disabledTooltip;
+        this.rotateFieldset.title = polar ? '' : disabledTooltip;
+
         this.nameInput.value = state.tile.name ?? '';
         this.sizeInput.value = state.size.toString();
-        this.rotateInput.checked = state.rotate ?? false;
+
+        // Reset rotation to 'None'
+        (this.rotateFieldset.querySelector('input[value="none"]') as HTMLInputElement).checked = true;
 
         // Populate and set the terrain dropdown
         this.terrainSelect.innerHTML = '';
@@ -101,10 +146,20 @@ export class PlanetTileEditor {
     private applySettings(): void {
         if (!this.lastReceivedState) return;
 
+        const selectedRotation = (this.rotateFieldset.querySelector('input[name="rotation"]:checked') as HTMLInputElement).value;
+        let rotateValue: boolean | undefined;
+        if (selectedRotation === 'cw') {
+            rotateValue = false;
+        } else if (selectedRotation === 'ccw') {
+            rotateValue = true;
+        } else {
+            rotateValue = undefined;
+        }
+
         // Construct the object to send back, preserving the original structure
         const updatedEditorData: PlanetTileEditorState = {
             ...this.lastReceivedState, // Start with the last known state
-            rotate: this.rotateInput.checked ? true : undefined,
+            rotate: rotateValue,
             size: parseInt(this.sizeInput.value, 10),
             type: parseInt(this.terrainSelect.value, 10),
             tile: {
@@ -114,5 +169,13 @@ export class PlanetTileEditor {
         };
 
         Swift.loadTerrain(updatedEditorData);
+
+        // Visual feedback
+        this.applyButton.textContent = 'Applied!';
+        this.applyButton.style.backgroundColor = '#20d08d';
+        setTimeout(() => {
+            this.applyButton.textContent = 'Apply Settings';
+            this.applyButton.style.backgroundColor = '';
+        }, 1000);
     }
 }

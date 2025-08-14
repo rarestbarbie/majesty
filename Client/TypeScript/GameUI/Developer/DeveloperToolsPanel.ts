@@ -34,7 +34,7 @@ export class DeveloperToolsPanel {
         title.textContent = 'Developer Tools';
 
         const exportButton: HTMLButtonElement = document.createElement('button');
-        exportButton.textContent = 'Save terrain';
+        exportButton.textContent = 'Save to Cloud'; // Changed this line
         exportButton.addEventListener('click', () => this.exportTerrain(false));
 
         const downloadButton: HTMLButtonElement = document.createElement('button');
