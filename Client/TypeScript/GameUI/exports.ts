@@ -1,7 +1,5 @@
 export * from './ProgressCell.js';
-export * from './TooltipBuilderKey.js';
-export * from './TooltipOwner.js';
-export * from './TooltipOwnerCell.js';
+export * from './TooltipType.js';
 
 export * from './Developer/DeveloperToolsPanel.js';
 export * from './Developer/PlanetTile.js';
@@ -14,7 +12,6 @@ export * from './CashAccount.js';
 export * from './Charts/PieChart.js';
 export * from './Charts/PieChartComponent.js';
 export * from './Charts/PieChartSector.js';
-export * from './Charts/PieChartType.js';
 export * from './Factories/FactoryDetails.js';
 export * from './Factories/FactoryDetailsTab.js';
 export * from './Factories/FactoryInventory.js';

@@ -12,7 +12,7 @@ import {
     ResourceSaleBox,
     Resource,
     ScreenType,
-    TooltipBuilderKey,
+    TooltipType,
 } from '../exports.js';
 
 export class PopulationOverview extends ScreenContent {
@@ -95,8 +95,8 @@ export class PopulationOverview extends ScreenContent {
                 (need: ResourceNeed) => new ResourceNeedRow(
                     need,
                     id,
-                    TooltipBuilderKey.PopDemand,
-                    TooltipBuilderKey.PopStockpile,
+                    TooltipType.PopDemand,
+                    TooltipType.PopStockpile,
                 ),
                 (need: ResourceNeed, row: ResourceNeedRow) => row.update(need),
             );

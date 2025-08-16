@@ -4,7 +4,6 @@ import {
     HexGridCell,
     HexGridCellBackground,
     PlanetGridCell,
-    TooltipBuilderKey
 } from '../exports.js';
 
 export class HexGrid {

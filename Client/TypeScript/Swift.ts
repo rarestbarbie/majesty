@@ -13,7 +13,7 @@ import {
     PopulationReport,
     TradeReport,
     FactoryDetailsTab,
-    TooltipBuilderKey,
+    TooltipType,
 } from './GameUI/exports.js';
 import { PlayerEvent } from './Multiplayer/exports.js';
 
@@ -49,7 +49,7 @@ export class Swift {
     declare public static view: (index: number, system: GameID) => CelestialViewState;
 
     declare public static tooltip: (
-        type: TooltipBuilderKey,
+        type: TooltipType,
         arguments: any[]
     ) => TooltipInstructions | TooltipBreakdown | null;
 

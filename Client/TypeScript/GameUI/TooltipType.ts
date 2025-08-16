@@ -1,4 +1,4 @@
-export enum TooltipBuilderKey {
+export enum TooltipType {
     PlanetCell = 'PlanetCell',
 
     // Pop Tooltips
@@ -18,5 +18,5 @@ export enum TooltipBuilderKey {
     FactoryOwnershipCountry = 'FactoryOwnershipCountry',
     FactoryOwnershipCulture = 'FactoryOwnershipCulture',
 
-    PieChartSector = 'PieChartSector',
+    TileCulture = 'TileCulture',
 }

@@ -11,7 +11,7 @@ import {
     FactoryWorkersCell,
     ProgressCell,
     ScreenType,
-    TooltipBuilderKey,
+    TooltipType,
 } from '../exports.js';
 
 export class FactoryTableRow implements DiffableListElement<GameID> {
@@ -46,24 +46,24 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
         this.location = document.createElement('div');
 
         this.size = new ProgressCell();
-        this.size.node.setAttribute('data-tooltip-type', TooltipBuilderKey.FactorySize);
+        this.size.node.setAttribute('data-tooltip-type', TooltipType.FactorySize);
         this.size.node.setAttribute('data-tooltip-arguments', JSON.stringify([factory.id]));
 
         this.workers = new FactoryWorkersCell();
-        this.workers.node.setAttribute('data-tooltip-type', TooltipBuilderKey.FactoryWorkers);
+        this.workers.node.setAttribute('data-tooltip-type', TooltipType.FactoryWorkers);
         this.workers.node.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([factory.id, 'Worker'])
         );
         this.clerks = new FactoryWorkersCell();
-        this.clerks.node.setAttribute('data-tooltip-type', TooltipBuilderKey.FactoryWorkers);
+        this.clerks.node.setAttribute('data-tooltip-type', TooltipType.FactoryWorkers);
         this.clerks.node.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([factory.id, 'Clerk'])
         );
 
         this.cash = document.createElement('div');
-        this.cash.setAttribute('data-tooltip-type', TooltipBuilderKey.FactoryAccount);
+        this.cash.setAttribute('data-tooltip-type', TooltipType.FactoryAccount);
         this.cash.setAttribute('data-tooltip-arguments', JSON.stringify([factory.id]));
 
         this.fi = document.createElement('div');

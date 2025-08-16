@@ -13,7 +13,7 @@ import {
     GameUI,
     Screen,
     ScreenType,
-    TooltipBuilderKey,
+    TooltipType,
     Minimap,
     PlanetTileDetail,
     Navigator,
@@ -47,7 +47,7 @@ export class Application {
     private views: [CelestialView?, CelestialView?];
 
     // New tooltip properties
-    private readonly tooltip: Tooltip<TooltipBuilderKey>;
+    private readonly tooltip: Tooltip<TooltipType>;
     private readonly devtools: DeveloperToolsPanel;
 
     public readonly persistence: Persistence;
@@ -138,7 +138,7 @@ export class Application {
         hud.node.appendChild(hud.interface);
         hud.node.appendChild(hud.developer.node);
 
-        this.tooltip = new Tooltip<TooltipBuilderKey>();
+        this.tooltip = new Tooltip<TooltipType>();
         this.devtools = hud.developer;
 
         document.body.appendChild(this.renderer.domElement);
@@ -163,7 +163,7 @@ export class Application {
             }
 
             const unparsed: string | null = owner.getAttribute('data-tooltip-arguments');
-            const type: TooltipBuilderKey = owner.getAttribute('data-tooltip-type') as TooltipBuilderKey;
+            const type: TooltipType = owner.getAttribute('data-tooltip-type') as TooltipType;
             const list: any[] = unparsed ? JSON.parse(unparsed) : [];
 
             this.tooltip.show(Swift.tooltip(type, list));
