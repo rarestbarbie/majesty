@@ -9,7 +9,6 @@ import {
     FactoryTableRow,
     FactoryDetailsTab,
     PieChart,
-    PieChartType,
     ProductionReport,
     ResourceNeed,
     ResourceNeedRow,
@@ -17,7 +16,7 @@ import {
     ResourceSaleBox,
     Resource,
     ScreenType,
-    TooltipBuilderKey,
+    TooltipType,
 } from '../exports.js';
 
 export class ProductionOverview extends ScreenContent {
@@ -44,8 +43,8 @@ export class ProductionOverview extends ScreenContent {
         this.sales = new StaticList<ResourceSaleBox, Resource>(document.createElement('div'));
 
         this.charts = {
-            country: new PieChart<GameID>(PieChartType.Country),
-            culture: new PieChart<string>(PieChartType.Culture),
+            country: new PieChart<GameID>(TooltipType.FactoryOwnershipCountry),
+            culture: new PieChart<string>(TooltipType.FactoryOwnershipCulture),
         }
     }
 
@@ -138,8 +137,8 @@ export class ProductionOverview extends ScreenContent {
                 (need: ResourceNeed) => new ResourceNeedRow(
                     need,
                     id,
-                    TooltipBuilderKey.FactoryDemand,
-                    TooltipBuilderKey.FactoryStockpile,
+                    TooltipType.FactoryDemand,
+                    TooltipType.FactoryStockpile,
                 ),
                 (need: ResourceNeed, row: ResourceNeedRow) => row.update(need),
             );

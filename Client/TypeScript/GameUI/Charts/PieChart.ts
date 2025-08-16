@@ -6,12 +6,11 @@ import {
 import {
     PieChartComponent,
     PieChartSector,
-    PieChartType,
-    TooltipBuilderKey,
+    TooltipType,
 } from '../exports.js';
 
 export class PieChart<Sector> {
-    public readonly id: PieChartType;
+    public readonly type: TooltipType;
     public readonly node: HTMLDivElement;
 
     private readonly sectors: StaticList<PieChartComponent<Sector>, Sector>;
@@ -22,8 +21,8 @@ export class PieChart<Sector> {
         return document.createElementNS('http://www.w3.org/2000/svg', type);
     }
 
-    constructor(id: PieChartType) {
-        this.id = id;
+    constructor(type: TooltipType) {
+        this.type = type;
 
         const svg: SVGSVGElement = PieChart.element('svg');
         const g: SVGGElement = PieChart.element('g');
@@ -66,17 +65,7 @@ export class PieChart<Sector> {
 
                 element.geometry.setAttribute('fill', GameEngine.hex(sector.value.color));
 
-                let type: TooltipBuilderKey
-                switch (this.id) {
-                case PieChartType.Country:
-                    type = TooltipBuilderKey.FactoryOwnershipCountry;
-                    break;
-                case PieChartType.Culture:
-                    type = TooltipBuilderKey.FactoryOwnershipCulture;
-                    break;
-                }
-
-                element.node.setAttribute('data-tooltip-type', type);
+                element.node.setAttribute('data-tooltip-type', this.type);
                 element.node.setAttribute(
                     'data-tooltip-arguments',
                     JSON.stringify([...prefix, sector.id])

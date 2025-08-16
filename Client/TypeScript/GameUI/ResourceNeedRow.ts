@@ -7,7 +7,7 @@ import {
     Resource,
     ResourceNeed,
     ProgressCell,
-    TooltipBuilderKey,
+    TooltipType,
 } from './exports.js';
 
 export class ResourceNeedRow implements DiffableListElement<Resource> {
@@ -28,8 +28,8 @@ export class ResourceNeedRow implements DiffableListElement<Resource> {
     constructor(
         need: ResourceNeed,
         owner: GameID,
-        demand: TooltipBuilderKey,
-        stockpile: TooltipBuilderKey
+        demand: TooltipType,
+        stockpile: TooltipType
     ) {
         this.id = need.id;
         this.node = document.createElement('a');

@@ -11,7 +11,7 @@ import {
     ProgressCell,
     PopTableEntry,
     ScreenType,
-    TooltipBuilderKey,
+    TooltipType,
 } from '../exports.js';
 
 export class PopTableRow implements DiffableListElement<GameID> {
@@ -53,7 +53,7 @@ export class PopTableRow implements DiffableListElement<GameID> {
         this.size = new Ticker(Fortune.Bonus);
 
         this.type = document.createElement('div');
-        this.type.setAttribute('data-tooltip-type', TooltipBuilderKey.PopType);
+        this.type.setAttribute('data-tooltip-type', TooltipType.PopType);
         this.type.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
 
         this.location = document.createElement('div');
@@ -62,16 +62,16 @@ export class PopTableRow implements DiffableListElement<GameID> {
         this.con = new Ticker(Fortune.Malus);
 
         this.jobs = document.createElement('div');
-        this.jobs.setAttribute('data-tooltip-type', TooltipBuilderKey.PopJobs);
+        this.jobs.setAttribute('data-tooltip-type', TooltipType.PopJobs);
         this.jobs.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
 
         this.cash = document.createElement('div');
-        this.cash.setAttribute('data-tooltip-type', TooltipBuilderKey.PopAccount);
+        this.cash.setAttribute('data-tooltip-type', TooltipType.PopAccount);
         this.cash.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
 
         this.fl = new ProgressCell();
         this.fl.node.classList.add('needs-cup');
-        this.fl.node.setAttribute('data-tooltip-type', TooltipBuilderKey.PopNeeds);
+        this.fl.node.setAttribute('data-tooltip-type', TooltipType.PopNeeds);
         this.fl.node.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([pop.id, 'l'])
@@ -79,7 +79,7 @@ export class PopTableRow implements DiffableListElement<GameID> {
 
         this.fe = new ProgressCell();
         this.fe.node.classList.add('needs-cup');
-        this.fe.node.setAttribute('data-tooltip-type', TooltipBuilderKey.PopNeeds);
+        this.fe.node.setAttribute('data-tooltip-type', TooltipType.PopNeeds);
         this.fe.node.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([pop.id, 'e'])
@@ -87,7 +87,7 @@ export class PopTableRow implements DiffableListElement<GameID> {
 
         this.fx = new ProgressCell();
         this.fx.node.classList.add('needs-cup');
-        this.fx.node.setAttribute('data-tooltip-type', TooltipBuilderKey.PopNeeds);
+        this.fx.node.setAttribute('data-tooltip-type', TooltipType.PopNeeds);
         this.fx.node.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([pop.id, 'x'])
