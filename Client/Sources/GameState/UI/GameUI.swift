@@ -2,7 +2,7 @@ import GameEngine
 import JavaScriptKit
 import JavaScriptInterop
 
-@frozen public struct GameUI {
+public struct GameUI {
     private var player: Country?
     private var date: GameDate
 

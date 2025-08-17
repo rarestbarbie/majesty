@@ -1,3 +1,4 @@
+import Assert
 import GameEconomy
 import GameEngine
 import GameRules
@@ -114,27 +115,6 @@ extension GameContext {
     }
 }
 extension GameContext {
-    enum Resident {
-        case factory(Int)
-        case pop(Int)
-    }
-}
-extension GameContext.Resident {
-    var factory: Int? {
-        switch self {
-        case .factory(let i): i
-        case .pop: nil
-        }
-    }
-
-    var pop: Int? {
-        switch self {
-        case .factory: nil
-        case .pop(let i): i
-        }
-    }
-}
-extension GameContext {
     mutating func advance(_ map: inout GameMap) throws {
         self.date.increment()
 
@@ -205,6 +185,13 @@ extension GameContext {
             }
         }
 
+        for i: Int in self.planets.indices {
+            {
+                for j: Int in $0.cells.values.indices {
+                    $0.cells.values[j].startIndexCount()
+                }
+            } (&self.planets[i])
+        }
         for i: Int in self.factories.indices {
             self.factories[i].startIndexCount()
         }
@@ -212,6 +199,13 @@ extension GameContext {
             self.pops.table[i].startIndexCount()
         }
         for pop: PopContext in self.pops.table {
+            let home: Address = pop.state.home
+            let counted: ()? = self.planets[home.planet]?.cells[home.tile]?.addResidentCount(
+                pop: pop.state
+            )
+
+            #assert(counted != nil, "Pop \(pop.state.id) has no home tile!!!")
+
             for job: FactoryJob in pop.state.jobs.values {
                 self.factories[job.at]?.addWorkforceCount(pop: pop.state, job: job)
             }

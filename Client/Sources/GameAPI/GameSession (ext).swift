@@ -91,6 +91,24 @@ extension GameSession {
             self.tooltipPopType(
                 try arguments[0].decode(),
             )
+        case .TileCulture:
+            self.tooltipTileCulture(
+                try arguments[0].decode(),
+                culture: try arguments[1].decode(),
+            )
+        case .TilePopType:
+            fatalError("TilePopType tooltip not implemented")
         }
     }
 }
+
+/*
+Steadfast, Fickle
+Impressionistic, Analytical
+Thrifty, Generous
+
+Confrontational, Consensual
+Wary, Welcoming
+Unyielding, Forgiving
+Cruel, Impartial, Gentle
+*/

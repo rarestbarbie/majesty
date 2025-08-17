@@ -46,10 +46,13 @@ export * from './Markets/MarketTableRow.js';
 export * from './Markets/TradeReport.js';
 export * from './Markets/TradeOverview.js';
 
-export * from './Planets/Navigator.js';
+export * from './Planets/NavigatorState.js';
+export * from './Planets/NavigatorTile.js';
+export * from './Planets/NavigatorTileState.js';
 export * from './Planets/CelestialBody.js';
 export * from './Planets/CelestialView.js';
 export * from './Planets/Minimap.js';
+export * from './Planets/MinimapState.js';
 export * from './Planets/HexGrid.js';
 export * from './Planets/HexGridCell.js';
 export * from './Planets/HexGridCellBackground.js';
@@ -59,7 +62,6 @@ export * from './Planets/PlanetGrid.js';
 export * from './Planets/PlanetGridCell.js';
 export * from './Planets/PlanetReport.js';
 export * from './Planets/PlanetOverview.js';
-export * from './Planets/PlanetTileDetail.js';
 
 export * from './Planets/CelestialViewState.js';
 export * from './Planets/CelestialBodyState.js';

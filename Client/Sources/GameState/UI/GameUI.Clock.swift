@@ -1,5 +1,5 @@
 extension GameUI {
-    @frozen @usableFromInline struct Clock {
+    struct Clock {
         private(set) var speed: GameSpeed
         private(set) var phase: Int
 
