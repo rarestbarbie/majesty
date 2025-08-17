@@ -3,43 +3,49 @@ import HexGrids
 import JavaScriptInterop
 import JavaScriptKit
 
-@frozen public struct Navigator {
+public struct Navigator {
     private var cursor: [GameID<Planet>: HexCoordinate]
-    private var planet: Minimap?
-    private var tile: Tile?
+
+    private var minimap: Minimap?
+    private var tile: NavigatorTile?
 
     init() {
         self.cursor = [:]
-        self.planet = nil
+
+        self.minimap = nil
         self.tile = nil
     }
 }
 extension Navigator {
-    var current: (planet: GameID<Planet>, cell: HexCoordinate?)? {
-        self.planet.map { ($0.id, self.tile?.id)  }
+    var current: (planet: GameID<Planet>?, tile: Address?) {
+        (self.minimap?.id, self.tile?.id)
     }
 }
 extension Navigator {
     mutating func select(planet: GameID<Planet>, cell: HexCoordinate?) {
-        self.planet = .init(id: planet)
+        self.minimap = .init(id: planet)
 
         if let cell: HexCoordinate {
             self.cursor[planet] = cell
+            self.tile = .init(id: .init(planet: planet, tile: cell))
+        } else if let saved: HexCoordinate = self.cursor[planet] {
+            self.tile = .init(id: .init(planet: planet, tile: saved))
         }
     }
 
     mutating func update(in context: GameContext) {
-        self.tile = self.planet?.update(in: context, cursor: self.cursor)
+        self.minimap?.update(in: context)
+        self.tile?.update(in: context)
     }
 }
 extension Navigator: JavaScriptEncodable {
     @frozen public enum ObjectKey: JSString, Sendable {
-        case planet
+        case minimap
         case tile
     }
 
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.planet] = self.planet
+        js[.minimap] = self.minimap
         js[.tile] = self.tile
     }
 }

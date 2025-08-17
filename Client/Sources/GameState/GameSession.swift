@@ -34,9 +34,9 @@ extension GameSession {
 
     public func editTerrain() -> PlanetTileEditor? {
         guard
-        case (let planet, let cell?)? = self.ui.navigator.current,
-        let planet: PlanetContext = self.context.planets[planet],
-        let cell: PlanetContext.Cell = planet.cells[cell] else {
+        case (_, let current?) = self.ui.navigator.current,
+        let planet: PlanetContext = self.context.planets[current.planet],
+        let cell: PlanetContext.Cell = planet.cells[current.tile] else {
             return nil
         }
 
@@ -621,6 +621,35 @@ extension GameSession {
             }
 
             $0["Purchased today", +] = +?stock.purchased[/3]
+        }
+    }
+}
+extension GameSession {
+    public func tooltipTileCulture(
+        _ id: Address,
+        culture: String,
+    ) -> Tooltip? {
+        guard
+        let planet: PlanetContext = context.planets[id.planet],
+        let cell: PlanetContext.Cell = planet.cells[id.tile] else {
+            return nil
+        }
+
+        let (share, total): (share: Int64, total: Int64) = cell.pops.reduce(
+            into: (0, 0)
+        ) {
+            guard let pop: Pop = context.state.pops[$1] else {
+                return
+            }
+
+            if  culture == pop.nat {
+                $0.share += pop.today.size
+            }
+            $0.total += pop.today.size
+        }
+
+        return .instructions(style: .borderless) {
+            $0[culture] = (Double.init(share) / Double.init(total))[%3]
         }
     }
 }

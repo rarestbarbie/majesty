@@ -15,8 +15,8 @@ import {
     ScreenType,
     TooltipType,
     Minimap,
-    PlanetTileDetail,
-    Navigator,
+    NavigatorTile,
+    NavigatorState,
 } from './exports.js';
 import { Swift } from '../Swift.js';
 import { Socket } from "socket.io-client";
@@ -26,7 +26,7 @@ export class Application {
     public static mp?: Socket<any, any>;
 
 
-    private readonly tile: PlanetTileDetail;
+    private readonly tile: NavigatorTile;
     private readonly minimap: Minimap;
     private readonly screen: Screen;
     private readonly clock: {
@@ -91,7 +91,7 @@ export class Application {
         this.clock.faster.onclick = () => { Application.move({ id: PlayerEventID.Faster }); };
         this.clock.slower.onclick = () => { Application.move({ id: PlayerEventID.Slower }); };
 
-        this.tile = new PlanetTileDetail();
+        this.tile = new NavigatorTile();
         this.minimap = new Minimap();
         this.screen = new Screen();
         this.tabs = {
@@ -268,7 +268,7 @@ export class Application {
         this.clock.flag.title = state.player?.long ?? 'Observer';
         this.clock.date.innerText = `${month} ${date.d}, ${date.y}`
 
-        this.tile.update(state.navigator);
+        this.tile.update(state.navigator?.tile);
         this.minimap.update(state.navigator);
         this.screen.update(state.screen);
 
@@ -288,9 +288,9 @@ export class Application {
     }
 
     public focus(planet: GameID, cell: string | null) {
-        const state: Navigator = Swift.focusPlanet(planet, cell);
+        const state: NavigatorState = Swift.focusPlanet(planet, cell);
 
-        this.tile.update(state);
+        this.tile.update(state?.tile);
         this.minimap.update(state);
 
         this.devtools.refresh();

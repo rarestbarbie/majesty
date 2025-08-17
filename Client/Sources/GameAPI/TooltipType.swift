@@ -17,4 +17,7 @@ enum TooltipType: String, LoadableFromJSValue {
     case PopStockpile
     case PopNeeds
     case PopType
+
+    case TileCulture
+    case TilePopType
 }

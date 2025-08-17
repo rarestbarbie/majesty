@@ -1,5 +1,5 @@
 import { GameID } from '../../GameEngine/exports.js';
-import { Navigator, HexGrid } from '../exports.js';
+import { NavigatorState, HexGrid } from '../exports.js';
 
 export class Minimap {
     readonly node: HTMLDivElement;
@@ -17,14 +17,14 @@ export class Minimap {
         this.node.appendChild(this.grid.node);
     }
 
-    public update(navigator: Navigator): void {
-        if (!navigator.planet) {
+    public update(navigator: NavigatorState): void {
+        if (!navigator.minimap) {
             return;
         }
 
-        this.name.innerText = navigator.planet.name;
+        this.name.innerText = navigator.minimap.name;
 
-        const id: GameID = navigator.planet.id;
+        const id: GameID = navigator.minimap.id;
 
         if (this.id !== id) {
             this.id = id;
@@ -32,7 +32,7 @@ export class Minimap {
         }
 
         this.grid.update(
-            navigator.planet.grid,
+            navigator.minimap.grid,
             [id],
             (cell: string) => `#planet=${id}&cell=${cell}`,
             navigator.tile?.id,

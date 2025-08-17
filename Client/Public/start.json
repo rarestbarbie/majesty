@@ -1416,6 +1416,10 @@
             "color": "#66BBFF"
         },
         {
+            "id": "Penguin",
+            "color": "#3d3926"
+        },
+        {
             "id": "Whale",
             "color": "#202a31"
         },
@@ -1450,6 +1454,14 @@
         {
             "id": "Lunan",
             "color": "#d3bbb9"
+        },
+        {
+            "id": "North Venusian",
+            "color": "#ffcc24"
+        },
+        {
+            "id": "South Venusian",
+            "color": "#ffae18"
         },
         {
             "id": "Martian",
@@ -1705,7 +1717,15 @@
     "pops": [
         {
             "on": "399N-1,2",
-            "t_size": 3401954008,
+            "t_size": 11019408,
+            "type": "D",
+            "nat": "Earther",
+            "t_mil": 0.1,
+            "t_con": 0.1
+        },
+        {
+            "on": "399N0,2",
+            "t_size": 34020508,
             "type": "D",
             "nat": "Earther",
             "t_mil": 0.1,
@@ -1720,8 +1740,24 @@
             "t_con": 0.1
         },
         {
+            "on": "399S-1,-2",
+            "t_size": 4000000,
+            "type": "D",
+            "nat": "Earther",
+            "t_mil": 0.1,
+            "t_con": 0.1
+        },
+        {
+            "on": "399S-2,-1",
+            "t_size": 4000000,
+            "type": "D",
+            "nat": "Earther",
+            "t_mil": 0.1,
+            "t_con": 0.1
+        },
+        {
             "on": "399N-1,2",
-            "t_size": 828563964,
+            "t_size": 82856364,
             "type": "D",
             "nat": "Lunan",
             "t_mil": 3.3,
