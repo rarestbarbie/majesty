@@ -31,14 +31,15 @@ extension PopulationReport: PersistentReport {
             pop.state.home.planet
         ) {
             guard
-            let location: Planet = context.state.planets[pop.state.home.planet],
+            let planet: PlanetContext = context.planets[pop.state.home.planet],
+            let tile: PlanetTile = planet.cells[pop.state.home.tile]?.tile,
             let culture: Culture = context.state.cultures[pop.state.nat] else {
                 continue
             }
 
             self.pops.append(.init(
                 id: pop.state.id,
-                location: location.name,
+                location: tile.name ?? planet.state.name,
                 type: pop.state.type,
                 color: culture.color,
                 nat: pop.state.nat,
