@@ -184,6 +184,10 @@ div.tabs > * > input[type=radio]:checked + label {
 [data-table] > * > * {
     height: 1.4rem;
     line-height: 1.5rem;
+
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: '...';
 }
 [data-table] > header:first-child {
     font-weight: bold;
@@ -201,7 +205,7 @@ div.tabs > * > input[type=radio]:checked + label {
     height: 50%;
 }
 [data-table='Pops'] {
-    grid-template-columns: 2fr 0.5fr 1fr 1fr 1fr 1fr 1fr 1.5fr 0.5fr 0.5fr 0.5fr 0.5fr;
+    grid-template-columns: 2fr 0.4fr 1fr 1.5fr 1fr 1fr 1fr 1.5fr 0.5fr 0.5fr 0.5fr 0.5fr;
     height: 50%;
 }
 
