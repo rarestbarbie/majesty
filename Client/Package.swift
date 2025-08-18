@@ -20,7 +20,7 @@ let package: Package = .init(
         .executableTarget(
             name: "GameAPI",
             dependencies: [
-                .target(name: "GameState"),
+                .target(name: "GameEngine"),
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
             ],
         ),
@@ -28,7 +28,7 @@ let package: Package = .init(
         .executableTarget(
             name: "GameIntegrationTests",
             dependencies: [
-                .target(name: "GameState"),
+                .target(name: "GameEngine"),
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
             ],
             swiftSettings: [
@@ -98,12 +98,17 @@ let package: Package = .init(
         .target(
             name: "GameEngine",
             dependencies: [
-            ],
-        ),
-        .testTarget(
-            name: "GameEngineTests",
-            dependencies: [
-                .target(name: "GameEngine"),
+                .target(name: "Assert"),
+                .target(name: "GameConditions"),
+                .target(name: "GameEconomy"),
+                .target(name: "GameRules"),
+                .target(name: "GameState"),
+                .target(name: "HexGrids"),
+                .target(name: "JavaScriptInterop"),
+                .target(name: "Random"),
+                .target(name: "Vector"),
+                .target(name: "VectorCharts"),
+                .target(name: "VectorCharts_JavaScript"),
             ]
         ),
 
@@ -119,7 +124,18 @@ let package: Package = .init(
             name: "GameEconomyTests",
             dependencies: [
                 .target(name: "GameEconomy"),
-                .target(name: "GameEngine"),
+            ]
+        ),
+
+        .target(
+            name: "GameState",
+            dependencies: [
+            ],
+        ),
+        .testTarget(
+            name: "GameStateTests",
+            dependencies: [
+                .target(name: "GameState"),
             ]
         ),
 
@@ -127,26 +143,9 @@ let package: Package = .init(
             name: "GameRules",
             dependencies: [
                 .target(name: "Color"),
-                .target(name: "GameEngine"),
+                .target(name: "GameState"),
                 .target(name: "GameEconomy"),
                 .target(name: "JavaScriptInterop"),
-            ]
-        ),
-
-        .target(
-            name: "GameState",
-            dependencies: [
-                .target(name: "Assert"),
-                .target(name: "GameConditions"),
-                .target(name: "GameEngine"),
-                .target(name: "GameEconomy"),
-                .target(name: "GameRules"),
-                .target(name: "HexGrids"),
-                .target(name: "JavaScriptInterop"),
-                .target(name: "Random"),
-                .target(name: "Vector"),
-                .target(name: "VectorCharts"),
-                .target(name: "VectorCharts_JavaScript"),
             ]
         ),
 

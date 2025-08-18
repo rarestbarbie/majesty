@@ -1,4 +1,4 @@
-import GameEngine
+import GameState
 import JavaScriptInterop
 import JavaScriptKit
 

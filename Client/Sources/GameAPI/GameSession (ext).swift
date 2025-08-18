@@ -1,4 +1,4 @@
-import GameState
+import GameEngine
 import JavaScriptInterop
 
 extension GameSession {
