@@ -11,7 +11,10 @@ struct GameMap: ~Copyable {
     var exchange: Exchange
     var transfers: [GameID<Pop>: CashTransfers]
     var conversions: [(count: Int64, to: Pop.Section)]
-    var jobs: Jobs
+    var jobs: (
+        worker: Jobs<Address>,
+        clerk: Jobs<GameID<Planet>>
+    )
 
     init(markets: OrderedDictionary<Market.AssetPair, Market> = [:]) {
         self.random = .init(seed: 12345)
@@ -19,7 +22,7 @@ struct GameMap: ~Copyable {
         self.exchange = .init(table: markets, liq: 100_000_000_000)
         self.transfers = [:]
         self.conversions = []
-        self.jobs = .init()
+        self.jobs = (.init(), .init())
     }
 }
 extension GameMap {

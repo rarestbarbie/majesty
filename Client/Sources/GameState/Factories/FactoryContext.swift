@@ -266,7 +266,7 @@ extension FactoryContext: RuntimeContext {
             )
 
             if  bid.size > 0 {
-                map.jobs[self.state.on.planet, self.type.workers.unit].append(bid)
+                map.jobs.worker[self.state.on, self.type.workers.unit].append(bid)
             }
         }
 
@@ -303,7 +303,7 @@ extension FactoryContext: RuntimeContext {
             )
 
             if  bid.size > 0 {
-                map.jobs[self.state.on.planet, self.type.clerks.unit].append(bid)
+                map.jobs.clerk[self.state.on.planet, self.type.clerks.unit].append(bid)
             }
         }
 

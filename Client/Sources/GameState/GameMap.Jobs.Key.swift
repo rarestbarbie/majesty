@@ -3,7 +3,7 @@ import GameRules
 
 extension GameMap.Jobs {
     struct Key: Hashable {
-        let on: GameID<Planet>
+        let location: Location
         let type: PopType
     }
 }
