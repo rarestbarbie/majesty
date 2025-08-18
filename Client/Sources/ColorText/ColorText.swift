@@ -1,3 +1,5 @@
+import D
+
 @frozen public struct ColorText: Equatable, Sendable {
     @usableFromInline var buffer: String
 

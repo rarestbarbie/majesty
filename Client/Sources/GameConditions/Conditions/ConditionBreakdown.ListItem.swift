@@ -1,3 +1,5 @@
+import ColorText
+
 extension ConditionBreakdown {
     @frozen public struct ListItem: Equatable, Sendable {
         public let fulfilled: Bool

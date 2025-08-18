@@ -1,3 +1,5 @@
+import ColorText
+
 extension ConditionEvaluator {
     @frozen public struct MatrixEncoder<T> where T: ConditionMatrixAccumulator {
         @usableFromInline var reduced: T

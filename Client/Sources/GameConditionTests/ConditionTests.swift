@@ -1,4 +1,5 @@
-import GameEngine
+import D
+import GameConditions
 import Testing
 
 @Suite struct ConditionTests {

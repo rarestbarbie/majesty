@@ -1,3 +1,5 @@
+import ColorText
+
 extension ConditionBreakdown {
     @frozen public struct LogicalEncoder<Reduction> where Reduction: LogicalReduction {
         @usableFromInline let expected: Bool

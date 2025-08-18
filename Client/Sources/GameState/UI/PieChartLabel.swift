@@ -1,4 +1,4 @@
-import GameEngine
+import Color
 import JavaScriptKit
 import JavaScriptInterop
 

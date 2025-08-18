@@ -1,4 +1,4 @@
-import GameEngine
+import Color
 
 public final class TerrainMetadata: Identifiable {
     public let id: TerrainType

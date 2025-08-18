@@ -57,11 +57,47 @@ let package: Package = .init(
             dependencies: ["AssertMacro"]
         ),
 
+        .target(
+            name: "Color",
+        ),
+
+        .target(
+            name: "ColorText",
+            dependencies: [
+                .target(name: "D"),
+            ],
+        ),
+
+        .target(
+            name: "D",
+            dependencies: [
+                .product(name: "RealModule", package: "swift-numerics"),
+            ],
+        ),
+        .testTarget(
+            name: "DTests",
+            dependencies: [
+                .target(name: "D"),
+            ]
+        ),
+
+        .target(
+            name: "GameConditions",
+            dependencies: [
+                .target(name: "ColorText"),
+                .target(name: "D"),
+            ],
+        ),
+        .testTarget(
+            name: "GameConditionTests",
+            dependencies: [
+                .target(name: "GameConditions"),
+            ]
+        ),
 
         .target(
             name: "GameEngine",
             dependencies: [
-                .product(name: "RealModule", package: "swift-numerics"),
             ],
         ),
         .testTarget(
@@ -90,6 +126,7 @@ let package: Package = .init(
         .target(
             name: "GameRules",
             dependencies: [
+                .target(name: "Color"),
                 .target(name: "GameEngine"),
                 .target(name: "GameEconomy"),
                 .target(name: "JavaScriptInterop"),
@@ -100,6 +137,7 @@ let package: Package = .init(
             name: "GameState",
             dependencies: [
                 .target(name: "Assert"),
+                .target(name: "GameConditions"),
                 .target(name: "GameEngine"),
                 .target(name: "GameEconomy"),
                 .target(name: "GameRules"),

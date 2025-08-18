@@ -1,4 +1,4 @@
-import GameEngine
+import D
 import Testing
 
 @Suite struct DecimalSemanticsTests {
