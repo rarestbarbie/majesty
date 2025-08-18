@@ -1,5 +1,7 @@
+import ColorText
+import D
+import GameConditions
 import GameEconomy
-import GameEngine
 import GameRules
 
 extension [ResourceNeed] {

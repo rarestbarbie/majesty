@@ -1,4 +1,5 @@
-import GameEngine
+import ColorText
+import D
 import GameEconomy
 
 struct TooltipInstructionEncoder: ~Copyable {

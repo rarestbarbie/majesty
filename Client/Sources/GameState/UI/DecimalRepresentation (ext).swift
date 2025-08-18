@@ -1,4 +1,4 @@
-import GameEngine
+import D
 
 extension DecimalRepresentation where Value: DecimalFormattable & AdditiveArithmetic {
     static func <- (self: Self, before: Value) -> TooltipInstruction.Ticker {

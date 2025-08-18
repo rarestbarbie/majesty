@@ -1,3 +1,5 @@
+import D
+
 @frozen public struct ConditionStack<Effect, Value>  {
     @usableFromInline let parameter: Value
     @usableFromInline var bracket: (Effect, Value)?

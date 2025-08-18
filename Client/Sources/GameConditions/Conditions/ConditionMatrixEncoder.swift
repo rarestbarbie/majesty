@@ -1,3 +1,5 @@
+import ColorText
+
 public protocol ConditionMatrixEncoder<Effect>  {
     associatedtype Effect
     associatedtype ConditionNodes

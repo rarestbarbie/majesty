@@ -20,9 +20,7 @@ extension DecimalLog {
         }
     }
 }
-extension DecimalLog: ConditionMatrixAccumulator {
-    public typealias AccumulatorInput = Decimal
-
+extension DecimalLog{
     @inlinable public static func += (self: inout Self, change: Decimal) {
         guard let value: Double = self.value else {
             return

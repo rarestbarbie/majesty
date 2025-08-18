@@ -1,4 +1,4 @@
-import GameEngine
+import Color
 import HexGrids
 import JavaScriptKit
 import JavaScriptInterop

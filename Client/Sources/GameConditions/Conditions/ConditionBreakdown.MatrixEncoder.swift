@@ -1,3 +1,5 @@
+import ColorText
+
 extension ConditionBreakdown {
     @frozen public struct MatrixEncoder<T> where T: ConditionMatrixAccumulator {
         @usableFromInline var factors: [Node]

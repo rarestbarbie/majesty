@@ -163,7 +163,7 @@ extension Decimal: AdditiveArithmetic {
         return .init(units: a - b, power: power)
     }
 }
-extension Decimal: ConditionMatrixAccumulator {
+extension Decimal {
     @inlinable public static func += (self: inout Self, other: Self) {
         self = self + other
     }

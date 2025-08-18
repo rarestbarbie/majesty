@@ -1,4 +1,5 @@
 import Assert
+import GameConditions
 import GameEconomy
 import GameEngine
 import GameRules

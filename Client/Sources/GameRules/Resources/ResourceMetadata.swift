@@ -1,4 +1,4 @@
-import GameEngine
+import Color
 
 public final class ResourceMetadata: Identifiable {
     public let name: String
