@@ -1,7 +1,7 @@
 import GameEngine
 import GameRules
 
-public struct GameState {
+public struct GameSnapshot {
     let date: GameDate
     let player: GameID<Country>
     let planets: Table<PlanetContext>

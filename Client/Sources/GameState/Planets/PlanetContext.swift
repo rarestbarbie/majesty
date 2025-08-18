@@ -27,7 +27,7 @@ struct PlanetContext {
     }
 }
 extension PlanetContext: RuntimeContext {
-    mutating func compute(in context: GameState) throws {
+    mutating func compute(in context: GameSnapshot) throws {
         if  let orbit: CelestialOrbit = self.state.orbit,
             let orbits: Planet = context.planets[orbit.orbits] {
             let motion: CelestialMotion = .init(

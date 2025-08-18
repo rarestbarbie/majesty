@@ -21,7 +21,7 @@ extension CountryContext {
     }
 }
 extension CountryContext: RuntimeContext {
-    mutating func compute(in context: GameState) throws {
+    mutating func compute(in context: GameSnapshot) throws {
         self.factories = .init()
         for id: Technology in self.state.researched {
             guard let technology: TechnologyMetadata = context.rules.technologies[id] else {

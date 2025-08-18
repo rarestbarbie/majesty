@@ -10,7 +10,7 @@ struct CultureContext {
     }
 }
 extension CultureContext: RuntimeContext {
-    mutating func compute(in context: GameState) throws {
+    mutating func compute(in context: GameSnapshot) throws {
     }
 
     mutating func advance(in context: GameContext, on map: inout GameMap) throws {
