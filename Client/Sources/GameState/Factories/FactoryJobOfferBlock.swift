@@ -6,14 +6,14 @@ struct FactoryJobOfferBlock {
     var size: Int64
 }
 extension FactoryJobOfferBlock {
-    consuming func matched(with workers: inout Int64) -> (size: Int64, remaining: Self?) {
+    consuming func matched(with workers: inout Int64) -> (count: Int64, remaining: Self?) {
         if  self.size <= workers {
             workers -= self.size
-            return (size: self.size, remaining: nil)
+            return (count: self.size, remaining: nil)
         } else {
             self.size -= workers
             defer { workers = 0 }
-            return (size: workers, remaining: self)
+            return (count: workers, remaining: self)
         }
     }
 }

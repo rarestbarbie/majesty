@@ -2,7 +2,7 @@ import GameEngine
 import GameRules
 
 extension GameMap {
-    struct Jobs {
+    struct Jobs<Location> where Location: Hashable {
         private(set) var blocks: [Key: [FactoryJobOfferBlock]]
 
         init() {
@@ -11,13 +11,15 @@ extension GameMap {
     }
 }
 extension GameMap.Jobs {
-    subscript(planet: GameID<Planet>, type: PopType) -> [FactoryJobOfferBlock] {
-        _read   { yield  self.blocks[Key.init(on: planet, type: type), default: []] }
-        _modify { yield &self.blocks[Key.init(on: planet, type: type), default: []] }
+    subscript(location: Location, type: PopType) -> [FactoryJobOfferBlock] {
+        _read   { yield  self.blocks[Key.init(location: location, type: type), default: []] }
+        _modify { yield &self.blocks[Key.init(location: location, type: type), default: []] }
     }
 }
 extension GameMap.Jobs {
-    mutating func turn(_ yield: (Key, inout [FactoryJobOfferBlock]) -> ()) -> Self {
+    mutating func turn(
+        _ yield: (Key, inout [FactoryJobOfferBlock]) -> ()
+    ) -> [(PopType, [FactoryJobOfferBlock])] {
         var i: Dictionary<Key, [FactoryJobOfferBlock]>.Index = self.blocks.startIndex
         while i < self.blocks.endIndex {
             let key: Key = self.blocks.keys[i]
@@ -28,6 +30,6 @@ extension GameMap.Jobs {
             i = self.blocks.index(after: i)
         }
         defer { self.blocks = [:] }
-        return self
+        return self.blocks.map { ($0.type, $1) }
     }
 }

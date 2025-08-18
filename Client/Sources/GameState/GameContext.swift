@@ -245,61 +245,43 @@ extension GameContext {
     }
 
     private mutating func postPopEmployment(_ map: inout GameMap, p: [Int]) {
-        let pops: [GameMap.Jobs.Key: [(Int, Int64)]] = p.reduce(into: [:]) {
+        let (workers, clerks): (
+            [GameMap.Jobs<Address>.Key: [(Int, Int64)]],
+            [GameMap.Jobs<GameID<Planet>>.Key: [(Int, Int64)]]
+        ) = p.reduce(into: (worker: [:], clerk: [:])) {
             let pop: Pop = self.pops.table.state[$1]
             let unemployed: Int64 = pop.unemployed
-            if  unemployed > 0 {
-                let key: GameMap.Jobs.Key = .init(on: pop.home.planet, type: pop.type)
-                $0[key, default: []].append(($1, unemployed))
-            }
-        }
-
-        let jobs: GameMap.Jobs = map.jobs.turn {
-            guard var pops: [(index: Int, unemployed: Int64)] = pops[$0] else {
-                // No unemployed pops for this job type.
+            if  unemployed <= 0 {
                 return
             }
-
-            /// We iterate through the pops for as many times as there are job offers. This
-            /// means pops near the front of the list are more likely to be visited multiple
-            /// times. However, since the pop index array is shuffled, this is fair over time.
-            let candidates: Int = pops.count
-            let iterations: Int = $1.count
-            var iteration: Int = 0
-            while let i: Int = $1.indices.last, iteration < iterations {
-                let block: FactoryJobOfferBlock = $1[i]
-                let interview: (Int, (size: Int64, remaining: FactoryJobOfferBlock?))? = {
-                    $0.unemployed > 0 ? ($0.index, block.matched(with: &$0.unemployed)) : nil
-                } (&pops[iteration % candidates])
-
-                iteration += 1
-
-                let match: Int
-                let count: Int64
-
-                switch interview {
-                case nil:
-                    // Pop has no more unemployed members.
-                    continue
-
-                case (let pop, (let workers, nil))?:
-                    $1.removeLast()
-                    match = pop
-                    count = workers
-
-                case (let pop, (let workers, let remaining?))?:
-                    $1[i] = remaining
-                    match = pop
-                    count = workers
-                }
-
-                self.pops.table[match].state.jobs[block.at, default: .init(at: block.at)].hire(
-                    count
+            if  pop.type.stratum <= .Worker {
+                let key: GameMap.Jobs<Address>.Key = .init(
+                    location: pop.home,
+                    type: pop.type
                 )
+                $0.worker[key, default: []].append(($1, unemployed))
+            } else {
+                let key: GameMap.Jobs<GameID<Planet>>.Key = .init(
+                    location: pop.home.planet,
+                    type: pop.type
+                )
+                $0.clerk[key, default: []].append(($1, unemployed))
             }
         }
 
-        for (key, unfilled): (GameMap.Jobs.Key, [FactoryJobOfferBlock]) in jobs.blocks {
+        let workersUnavailable: [(PopType, [FactoryJobOfferBlock])] = map.jobs.worker.turn {
+            if var pops: [(index: Int, unemployed: Int64)] = workers[$0] {
+                self.postPopEmployment(matching: &pops, with: &$1)
+            }
+        }
+        let clerksUnavailable: [(PopType, [FactoryJobOfferBlock])] = map.jobs.clerk.turn {
+            if var pops: [(index: Int, unemployed: Int64)] = clerks[$0] {
+                self.postPopEmployment(matching: &pops, with: &$1)
+            }
+        }
+
+        for (type, unfilled): (PopType, [FactoryJobOfferBlock])
+            in [clerksUnavailable, workersUnavailable].joined() {
             /// The last `q` factories will always raise wages. The next factory after the first
             /// `q` will raise wages with probability `r / 8`.
             let (q, r): (Int, remainder: Int) = unfilled.count.quotientAndRemainder(
@@ -317,12 +299,48 @@ extension GameContext {
                     probability = 0
                 }
 
-                if key.type.stratum <= .Worker {
+                if type.stratum <= .Worker {
                     self.factories[block.at]?.state.today.wf = probability
                 } else {
                     self.factories[block.at]?.state.today.cf = probability
                 }
             }
+        }
+    }
+
+    private mutating func postPopEmployment(
+        matching pops: inout [(index: Int, unemployed: Int64)],
+        with offers: inout [FactoryJobOfferBlock]
+    ) {
+        /// We iterate through the pops for as many times as there are job offers. This
+        /// means pops near the front of the list are more likely to be visited multiple
+        /// times. However, since the pop index array is shuffled, this is fair over time.
+        let candidates: Int = pops.count
+        let iterations: Int = offers.count
+        var iteration: Int = 0
+        while let i: Int = offers.indices.last, iteration < iterations {
+            let block: FactoryJobOfferBlock = offers[i]
+            let match: (id: Int, (count: Int64, remaining: FactoryJobOfferBlock?))? = {
+                $0.unemployed > 0 ? ($0.index, block.matched(with: &$0.unemployed)) : nil
+            } (&pops[iteration % candidates])
+
+            iteration += 1
+
+            guard
+            let (pop, (count, remaining)): (Int, (Int64, FactoryJobOfferBlock?)) = match else {
+                // Pop has no more unemployed members.
+                continue
+            }
+
+            if  let remaining: FactoryJobOfferBlock {
+                offers[i] = remaining
+            } else {
+                offers.removeLast()
+            }
+
+            self.pops.table[pop].state.jobs[block.at, default: .init(at: block.at)].hire(
+                count
+            )
         }
     }
 

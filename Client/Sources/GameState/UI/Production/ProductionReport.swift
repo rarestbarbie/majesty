@@ -39,13 +39,14 @@ extension ProductionReport: PersistentReport {
             factory.state.on.planet
         ) {
             guard
-            let location: Planet = context.state.planets[factory.state.on.planet] else {
+            let planet: PlanetContext = context.planets[factory.state.on.planet],
+            let tile: PlanetTile = planet.cells[factory.state.on.tile]?.tile else {
                 continue
             }
 
             self.factories.append(.init(
                 id: factory.state.id,
-                location: location.name,
+                location: tile.name ?? planet.state.name,
                 type: factory.type.name,
                 grow: factory.state.grow,
                 size: factory.state.size,
