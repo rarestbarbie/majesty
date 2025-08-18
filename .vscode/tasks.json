@@ -78,6 +78,7 @@
             "type": "shell",
             "command": [
                 "swift build -c debug --build-tests",
+                "--explicit-target-dependency-import-check=error"
             ],
             "group": {
                 "kind": "build"
