@@ -32,7 +32,7 @@ extension GameContext.Table {
     }
 }
 extension GameContext.Table {
-    var state: GameState.Table<ElementContext> { .init(index: self.index) }
+    var state: GameSnapshot.Table<ElementContext> { .init(index: self.index) }
 }
 extension GameContext.Table where ElementContext.State: Turnable {
     mutating func turnAll() {

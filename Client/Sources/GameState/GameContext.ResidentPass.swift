@@ -8,8 +8,8 @@ extension GameContext {
         let planets: Table<PlanetContext>
         let cultures: Table<CultureContext>
         let countries: Table<CountryContext>
-        let factories: GameState.Table<FactoryContext>
-        let pops: GameState.Table<PopContext>
+        let factories: GameSnapshot.Table<FactoryContext>
+        let pops: GameSnapshot.Table<PopContext>
         let rules: GameRules
     }
 }

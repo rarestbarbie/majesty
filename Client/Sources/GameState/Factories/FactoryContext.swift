@@ -93,6 +93,9 @@ extension FactoryContext: RuntimeContext {
         self.state.today.cn = max(self.state.today.cn, country.minwage)
         self.state.today.cu = max(self.state.today.cu, country.minwage)
 
+        // Input efficiency, set to 1 for now.
+        self.state.today.ei = 1
+
         /// Use 1/3 of current balance to pay clerk salaries, 1/3 to buy inputs for today,
         /// and set aside the rest for worker wages. Pay clerks salaries first, in case there
         /// are leftover funds, which will be evenly split between inputs and worker wages.
@@ -161,7 +164,7 @@ extension FactoryContext: RuntimeContext {
         // funds available to pay them.
         hoursWorked.u = min(
             min(self.workers.u.count, hoursWorkable),
-            self.state.cash.balance / self.state.today.wu
+            wagesBudget / self.state.today.wu
         )
 
         wagesPaid.u = map.pay(
@@ -178,7 +181,7 @@ extension FactoryContext: RuntimeContext {
         // work available for them and funds to pay them.
         hoursWorked.n = min(
             min(self.workers.n.count, hoursWorkable - hoursWorked.u),
-            self.state.cash.balance / self.state.today.wn
+            (wagesBudget - wagesPaid.u) / self.state.today.wn
         )
 
         wagesPaid.n = map.pay(
@@ -202,7 +205,6 @@ extension FactoryContext: RuntimeContext {
             ? 1 + Double.init(self.clerks.present) / Double.init(clerksOptimal)
             : 2
 
-        self.state.today.ei = 1
         self.state.today.eo = clerksBonus
 
         /// On some days, the factory purchases more inputs than others. To get a more accurate

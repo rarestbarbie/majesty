@@ -3,7 +3,7 @@ import JavaScriptKit
 import JavaScriptInterop
 import OrderedCollections
 
-extension GameState {
+extension GameSnapshot {
     /// A read-only view of ``GameContext.Table``, which only permits access to the state of
     /// each object.
     struct Table<ElementContext> where ElementContext: RuntimeContext {
@@ -14,17 +14,17 @@ extension GameState {
         }
     }
 }
-extension GameState.Table: Equatable where ElementContext.State: Equatable {
+extension GameSnapshot.Table: Equatable where ElementContext.State: Equatable {
     static func == (a: Self, b: Self) -> Bool { a.elementsEqual(b) }
 }
-extension GameState.Table: Hashable where ElementContext.State: Hashable {
+extension GameSnapshot.Table: Hashable where ElementContext.State: Hashable {
     func hash(into hasher: inout Hasher) {
         for state: ElementContext.State in self {
             state.hash(into: &hasher)
         }
     }
 }
-extension GameState.Table: Collection {
+extension GameSnapshot.Table: Collection {
     var startIndex: Int {
         self.index.values.startIndex
     }
@@ -41,7 +41,7 @@ extension GameState.Table: Collection {
         self.index.values[position].state
     }
 }
-extension GameState.Table {
+extension GameSnapshot.Table {
     subscript(id: ElementContext.State.ID) -> ElementContext.State? {
         self.index[id]?.state
     }

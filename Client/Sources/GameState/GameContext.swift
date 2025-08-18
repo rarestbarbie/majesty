@@ -88,7 +88,7 @@ extension GameContext {
     }
 }
 extension GameContext {
-    var state: GameState {
+    var state: GameSnapshot {
         .init(
             date: self.date,
             player: self.player,
