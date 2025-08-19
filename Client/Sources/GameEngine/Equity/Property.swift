@@ -2,14 +2,15 @@ import GameState
 import JavaScriptKit
 import JavaScriptInterop
 
-@frozen public struct Property<Instrument>: Identifiable, Equatable, Hashable {
-    public let id: GameID<Instrument>
+@frozen public struct Property<Instrument>: Identifiable, Equatable, Hashable
+    where Instrument: Identifiable, Instrument.ID: ConvertibleToJSValue & LoadableFromJSValue {
+    public let id: Instrument.ID
     private(set) var shares: Int64
     private(set) var bought: Int64
     private(set) var sold: Int64
 }
 extension Property {
-    init(id: GameID<Instrument>) {
+    init(id: Instrument.ID) {
         self.init(id: id, shares: 0, bought: 0, sold: 0)
     }
 

@@ -1,42 +1,38 @@
-import GameState
+@frozen public struct SectionedContextTable<ElementContext>
+    where ElementContext: RuntimeContext, ElementContext.State: Sectionable {
 
-extension GameContext {
-    struct Sectioned<ElementContext>
-        where ElementContext: RuntimeContext, ElementContext.State: Sectionable {
+    public var table: RuntimeContextTable<ElementContext>
+    @usableFromInline var indices: [ElementContext.State.Section: Int]
+    @usableFromInline var highest: ElementContext.State.ID
 
-        var table: Table<ElementContext>
-        private var indices: [ElementContext.State.Section: Int]
-        private var highest: GameID<ElementContext.State>
-
-        private init(
-            table: Table<ElementContext>,
-            indices: [ElementContext.State.Section: Int],
-            highest: GameID<ElementContext.State>
-        ) {
-            self.table = table
-            self.indices = indices
-            self.highest = highest
-        }
+    @inlinable init(
+        table: RuntimeContextTable<ElementContext>,
+        indices: [ElementContext.State.Section: Int],
+        highest: ElementContext.State.ID
+    ) {
+        self.table = table
+        self.indices = indices
+        self.highest = highest
     }
 }
-extension GameContext.Sectioned {
-    init(
+extension SectionedContextTable {
+    @inlinable public init(
         states: [ElementContext.State],
         metadata: (ElementContext.State) -> ElementContext.Metadata?
     ) throws {
-        let table: GameContext.Table<ElementContext> = try .init(
+        let table: RuntimeContextTable<ElementContext> = try .init(
             states: states,
             metadata: metadata
         )
         let indices: [ElementContext.State.Section: Int] = table.indices.reduce(into: [:]) {
             $0[table[$1].state.section] = $1
         }
-        let highest: GameID<ElementContext.State> = table.reduce(0) { max($0, $1.state.id) }
+        let highest: ElementContext.State.ID = table.reduce(0) { max($0, $1.state.id) }
         self.init(table: table, indices: indices, highest: highest)
     }
 }
-extension GameContext.Sectioned {
-    mutating func with<T>(
+extension SectionedContextTable {
+    @inlinable public mutating func with<T>(
         section: ElementContext.State.Section,
         create: (ElementContext.State) -> ElementContext.Metadata?,
         update: (inout ElementContext.State) throws -> T,

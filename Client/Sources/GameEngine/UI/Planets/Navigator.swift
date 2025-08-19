@@ -4,7 +4,7 @@ import JavaScriptInterop
 import JavaScriptKit
 
 public struct Navigator {
-    private var cursor: [GameID<Planet>: HexCoordinate]
+    private var cursor: [PlanetID: HexCoordinate]
 
     private var minimap: Minimap?
     private var tile: NavigatorTile?
@@ -17,12 +17,12 @@ public struct Navigator {
     }
 }
 extension Navigator {
-    var current: (planet: GameID<Planet>?, tile: Address?) {
+    var current: (planet: PlanetID?, tile: Address?) {
         (self.minimap?.id, self.tile?.id)
     }
 }
 extension Navigator {
-    mutating func select(planet: GameID<Planet>, cell: HexCoordinate?) {
+    mutating func select(planet: PlanetID, cell: HexCoordinate?) {
         self.minimap = .init(id: planet)
 
         if let cell: HexCoordinate {

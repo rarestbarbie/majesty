@@ -6,7 +6,7 @@ import JavaScriptInterop
 
 public struct PlanetTileEditor {
     let id: HexCoordinate
-    let on: GameID<Planet>
+    let on: PlanetID
 
     let rotate: HexRotation?
     let size: Int8

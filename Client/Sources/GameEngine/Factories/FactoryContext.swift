@@ -69,7 +69,7 @@ extension FactoryContext: RuntimeContext {
         self.clerks.limit = self.type.clerks.amount * self.state.size
 
         guard
-        let country: GameID<Country> = pass.planets[self.state.on.planet]?.occupied,
+        let country: CountryID = pass.planets[self.state.on.planet]?.occupied,
         let modifiers: FactoryModifiers = pass.countries[country]?.factories else {
             return
         }
@@ -79,7 +79,7 @@ extension FactoryContext: RuntimeContext {
 
     mutating func advance(in context: GameContext, on map: inout GameMap) throws {
         guard
-        let country: GameID<Country> = context.planets[self.state.on.planet]?.occupied,
+        let country: CountryID = context.planets[self.state.on.planet]?.occupied,
         let country: Country = context.state.countries[country] else {
             return
         }

@@ -5,11 +5,11 @@ import JavaScriptKit
 import JavaScriptInterop
 
 struct PopDetails {
-    let id: GameID<Pop>
+    let id: PopID
     var needs: [ResourceNeed]
     var sales: [ResourceSale]
 
-    init(id: GameID<Pop>) {
+    init(id: PopID) {
         self.id = id
         self.needs = []
         self.sales = []

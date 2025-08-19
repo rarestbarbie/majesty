@@ -5,7 +5,7 @@ import VectorCharts
 import VectorCharts_JavaScript
 
 struct FactoryOwnership {
-    var country: PieChart<GameID<Country>, PieChartLabel>?
+    var country: PieChart<CountryID, PieChartLabel>?
     var culture: PieChart<String, PieChartLabel>?
 
     init() {
@@ -16,7 +16,7 @@ struct FactoryOwnership {
 extension FactoryOwnership {
     mutating func update(from factory: FactoryContext, in context: GameContext) {
         let (country, culture): (
-            country: [GameID<Country>: (share: Int64, PieChartLabel)],
+            country: [CountryID: (share: Int64, PieChartLabel)],
             culture: [String: (share: Int64, PieChartLabel)]
         ) = factory.equity.owners.reduce(
             into: ([:], [:])
@@ -24,7 +24,7 @@ extension FactoryOwnership {
             guard let pop: Pop = context.state.pops[$1.id] else {
                 return
             }
-            if  let country: GameID<Country> = context.planets[pop.home.planet]?.occupied,
+            if  let country: CountryID = context.planets[pop.home.planet]?.occupied,
                 let country: Country = context.state.countries[country] {
                 let label: PieChartLabel = .init(color: country.color, name: country.name)
                 $0.country[country.id, default: (0, label)].share += $1.count

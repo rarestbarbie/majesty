@@ -2,7 +2,7 @@ import GameState
 
 extension FactoryContext {
     struct Employees {
-        var pops: [(id: GameID<Pop>, count: Int64)]
+        var pops: [(id: PopID, count: Int64)]
         var count: Int64
         var xp: Int64
 

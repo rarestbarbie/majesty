@@ -5,8 +5,8 @@ import GameState
 import JavaScriptInterop
 import JavaScriptKit
 
-@frozen public struct Country: IdentityReplaceable {
-    public var id: GameID<Self>
+struct Country: IdentityReplaceable {
+    var id: CountryID
     var currency: Currency
     /// The word “The”, if it precedes the name of the country.
     var article: String?
@@ -24,12 +24,12 @@ import JavaScriptKit
     /// “Lunan” as an accepted culture.
     var accepted: [String]
     /// The celestial bodies that this country controls.
-    var territory: [GameID<Planet>]
+    var territory: [PlanetID]
     var researched: [Technology]
     var minwage: Int64
 }
 extension Country {
-    @frozen public enum ObjectKey: JSString, Sendable {
+    enum ObjectKey: JSString, Sendable {
         case id
         case currency
         case article
@@ -44,7 +44,7 @@ extension Country {
     }
 }
 extension Country: JavaScriptEncodable {
-    public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.currency] = self.currency
         js[.article] = self.article
@@ -59,7 +59,7 @@ extension Country: JavaScriptEncodable {
     }
 }
 extension Country: JavaScriptDecodable {
-    public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+    init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             id: try js[.id].decode(),
             currency: try js[.currency].decode(),

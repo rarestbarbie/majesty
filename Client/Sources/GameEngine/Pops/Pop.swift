@@ -8,8 +8,8 @@ import JavaScriptInterop
 import Random
 import OrderedCollections
 
-public struct Pop: CashAccountHolder, IdentityReplaceable {
-    public var id: GameID<Self>
+struct Pop: CashAccountHolder, IdentityReplaceable {
+    var id: PopID
     let home: Address
     let type: PopType
     let nat: String
@@ -28,12 +28,12 @@ public struct Pop: CashAccountHolder, IdentityReplaceable {
     var yesterday: Dimensions
     var today: Dimensions
 
-    var stocks: OrderedDictionary<GameID<Factory>, Property<Factory>>
-    var slaves: OrderedDictionary<GameID<Pop>, Property<Pop>>
-    var jobs: OrderedDictionary<GameID<Factory>, FactoryJob>
+    var stocks: OrderedDictionary<FactoryID, Property<Factory>>
+    var slaves: OrderedDictionary<PopID, Property<Pop>>
+    var jobs: OrderedDictionary<FactoryID, FactoryJob>
 }
 extension Pop: Sectionable {
-    init(id: GameID<Self>, section: Section) {
+    init(id: PopID, section: Section) {
         self.init(
             id: id,
             home: section.home,
@@ -143,7 +143,7 @@ extension Pop {
     }
 }
 extension Pop {
-    @frozen public enum ObjectKey: JSString, Sendable {
+    enum ObjectKey: JSString, Sendable {
         case id
         case home = "on"
         case type
@@ -174,7 +174,7 @@ extension Pop {
     }
 }
 extension Pop: JavaScriptEncodable {
-    public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.home] = self.home
         js[.type] = self.type
@@ -205,7 +205,7 @@ extension Pop: JavaScriptEncodable {
     }
 }
 extension Pop: JavaScriptDecodable {
-    public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+    init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         let today: Dimensions = .init(
             size: try js[.today_size].decode(),
             mil: try js[.today_mil]?.decode() ?? 0,

@@ -3,7 +3,7 @@ import JavaScriptInterop
 import JavaScriptKit
 
 @frozen public struct CelestialOrbit {
-    public let orbits: GameID<Planet>
+    public let orbits: PlanetID
     /// Semi-major axis
     public let a: Double
     /// Eccentricity

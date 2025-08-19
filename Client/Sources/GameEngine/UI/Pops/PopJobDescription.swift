@@ -2,7 +2,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 struct PopJobDescription {
-    // let id: GameID<Factory>
+    // let id: FactoryID
     let name: String
     let size: Int64
     let hire: Int64

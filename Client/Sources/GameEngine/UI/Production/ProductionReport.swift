@@ -14,11 +14,11 @@ public struct ProductionReport {
 }
 extension ProductionReport: PersistentReport {
     mutating func select(
-        subject: GameID<Factory>?,
+        subject: FactoryID?,
         details: FactoryDetailsTab?,
         filter: Never?
     ) {
-        if  let subject: GameID<Factory> {
+        if  let subject: FactoryID {
             self.factory = .init(id: subject, open: self.factory?.open ?? .Inventory)
         }
         if  let details: FactoryDetailsTab {
@@ -34,7 +34,7 @@ extension ProductionReport: PersistentReport {
             return
         }
 
-        let include: Set<GameID<Planet>> = .init(country.state.territory)
+        let include: Set<PlanetID> = .init(country.state.territory)
         for factory: FactoryContext in context.factories where include.contains(
             factory.state.on.planet
         ) {

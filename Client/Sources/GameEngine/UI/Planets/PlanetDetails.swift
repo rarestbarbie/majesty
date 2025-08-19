@@ -3,11 +3,11 @@ import JavaScriptKit
 import JavaScriptInterop
 
 struct PlanetDetails {
-    let id: GameID<Planet>
+    let id: PlanetID
     var open: PlanetDetailsTab
     var grid: PlanetGrid
 
-    init(id: GameID<Planet>, open: PlanetDetailsTab) {
+    init(id: PlanetID, open: PlanetDetailsTab) {
         self.id = id
         self.open = open
         self.grid = .init()

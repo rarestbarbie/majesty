@@ -3,7 +3,7 @@ import JavaScriptInterop
 import JavaScriptKit
 
 @frozen public struct PlanetSurface {
-    let id: GameID<Planet>
+    let id: PlanetID
     let size: Int8
     let grid: [Cell]
 }

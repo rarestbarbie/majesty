@@ -1,13 +1,13 @@
 import GameRules
 import GameState
 
-public struct GameSnapshot {
+struct GameSnapshot {
     let date: GameDate
-    let player: GameID<Country>
-    let planets: Table<PlanetContext>
-    let cultures: Table<CultureContext>
-    let countries: Table<CountryContext>
-    let factories: Table<FactoryContext>
-    let pops: Table<PopContext>
+    let player: CountryID
+    let planets: RuntimeStateTable<PlanetContext>
+    let cultures: RuntimeStateTable<CultureContext>
+    let countries: RuntimeStateTable<CountryContext>
+    let factories: RuntimeStateTable<FactoryContext>
+    let pops: RuntimeStateTable<PopContext>
     let rules: GameRules
 }

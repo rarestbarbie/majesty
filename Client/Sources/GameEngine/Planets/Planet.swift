@@ -3,14 +3,14 @@ import GameState
 import JavaScriptInterop
 import JavaScriptKit
 
-/// In SoP, everything is a planet, even stars and moons.
-@frozen public struct Planet: IdentityReplaceable {
-    public var id: GameID<Self>
+/// In Majesty, everything is a planet, even stars and moons.
+struct Planet: IdentityReplaceable {
+    var id: PlanetID
     let name: String
     let type: PlanetType
     let color: Color
     let orbit: CelestialOrbit?
-    let opposes: GameID<Self>?
+    let opposes: PlanetID?
     let mass: Double
     let tilt: Double?
     let radius: Double
@@ -18,7 +18,7 @@ import JavaScriptKit
 }
 
 extension Planet {
-    @frozen public enum ObjectKey: JSString, Sendable {
+    enum ObjectKey: JSString, Sendable {
         case id
         case name
         case type
@@ -35,7 +35,7 @@ extension Planet {
     }
 }
 extension Planet: JavaScriptEncodable {
-    public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.name] = self.name
         js[.type] = self.type
@@ -52,7 +52,7 @@ extension Planet: JavaScriptEncodable {
     }
 }
 extension Planet: JavaScriptDecodable {
-    public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+    init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             id: try js[.id].decode(),
             name: try js[.name].decode(),

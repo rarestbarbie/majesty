@@ -6,7 +6,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 struct PopTableEntry {
-    let id: GameID<Pop>
+    let id: PopID
     let location: String
     let type: PopType
     let color: Color

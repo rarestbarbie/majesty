@@ -11,7 +11,7 @@ extension PlanetContext {
 
         // Computed statistics
 
-        private(set) var pops: [GameID<Pop>]
+        private(set) var pops: [PopID]
 
         init(id: HexCoordinate, type: TerrainMetadata, tile: PlanetTile) {
             self.id = id

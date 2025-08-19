@@ -1,7 +1,7 @@
 import GameState
 
 struct FactoryJobOfferBlock {
-    let at: GameID<Factory>
+    let at: FactoryID
     let bid: Int64
     var size: Int64
 }
