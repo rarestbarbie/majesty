@@ -5,7 +5,8 @@ import {
 import { GameID, GameDate, GameDateComponents } from './GameEngine/exports.js';
 import {
     CelestialViewState,
-    Navigator,
+    MinimapLayer,
+    NavigatorState,
     PlanetDetailsTab,
     PlanetReport,
     PlanetTileEditorState,
@@ -42,10 +43,11 @@ export class Swift {
 
     declare public static switch: (planet: GameID) => void;
 
-    declare public static focusPlanet: (
-        id: GameID,
+    declare public static minimap: (
+        planet: GameID,
+        layer: MinimapLayer | null,
         cell: string | null
-    ) => Navigator;
+    ) => NavigatorState;
     declare public static view: (index: number, system: GameID) => CelestialViewState;
 
     declare public static tooltip: (

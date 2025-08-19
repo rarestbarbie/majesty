@@ -174,8 +174,12 @@ extension GameSession {
         )
     }
 
-    public mutating func focusPlanet(_ id: PlanetID, cell: HexCoordinate?) -> Navigator {
-        self.ui.navigator.select(planet: id, cell: cell)
+    public mutating func minimap(
+        planet: PlanetID,
+        layer: MinimapLayer?,
+        cell: HexCoordinate?
+    ) -> Navigator {
+        self.ui.navigator.select(planet: planet, layer: layer, cell: cell)
         self.ui.navigator.update(in: self.context)
         return self.ui.navigator
     }

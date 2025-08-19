@@ -288,7 +288,7 @@ export class Application {
     }
 
     public focus(planet: GameID, cell: string | null) {
-        const state: NavigatorState = Swift.focusPlanet(planet, cell);
+        const state: NavigatorState = Swift.minimap(planet, null, cell);
 
         this.tile.update(state?.tile);
         this.minimap.update(state);

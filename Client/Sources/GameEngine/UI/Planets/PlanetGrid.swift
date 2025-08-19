@@ -13,7 +13,7 @@ struct PlanetGrid {
 }
 extension PlanetGrid {
     mutating func update(from planet: PlanetContext, in _: GameContext) {
-        self.cells = planet.grid
+        self.cells = planet.grid { $0.type.color }
     }
 }
 extension PlanetGrid {

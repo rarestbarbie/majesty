@@ -1,5 +1,5 @@
 import { GameDate } from '../GameEngine/exports.js';
-import { Country, Navigator, PersistentReport, CelestialViewState } from './exports.js';
+import { Country, NavigatorState, PersistentReport, CelestialViewState } from './exports.js';
 
 export interface GameUI {
     readonly speed: {
@@ -10,6 +10,6 @@ export interface GameUI {
     readonly views: (CelestialViewState | null)[];
     readonly player?: Country;
 
-    readonly navigator: Navigator;
+    readonly navigator: NavigatorState;
     readonly screen?: PersistentReport;
 }

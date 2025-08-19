@@ -1,4 +1,4 @@
-import { MinimapState, NavigatorTileState  } from "../exports.js";
+import { MinimapState, NavigatorTileState  } from '../exports.js';
 
 export interface NavigatorState {
     readonly minimap?: MinimapState;

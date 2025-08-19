@@ -57,7 +57,7 @@ extension GameAPI {
         self[.openPopulation] = { try game?.openPopulation(subject: $0) }
         self[.openTrade] = { try game?.openTrade(subject: $0, filter: $1) }
         self[.closeScreen] = { game?.open(nil) }
-        self[.focusPlanet] = { game?.focusPlanet($0, cell: $1) }
+        self[.minimap] = { game?.minimap(planet: $0, layer: $1, cell: $2) }
         self[.view] = { try game?.view($0, to: $1) }
         self[.switch] = {
             if let ui: GameUI = try game?.switch(to: $0) {

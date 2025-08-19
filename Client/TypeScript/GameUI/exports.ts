@@ -52,6 +52,7 @@ export * from './Planets/NavigatorTileState.js';
 export * from './Planets/CelestialBody.js';
 export * from './Planets/CelestialView.js';
 export * from './Planets/Minimap.js';
+export * from './Planets/MinimapLayer.js';
 export * from './Planets/MinimapState.js';
 export * from './Planets/HexGrid.js';
 export * from './Planets/HexGridCell.js';

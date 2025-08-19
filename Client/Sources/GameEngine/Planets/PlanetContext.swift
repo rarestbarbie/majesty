@@ -1,3 +1,4 @@
+import Color
 import GameRules
 import GameState
 import HexGrids
@@ -155,7 +156,7 @@ extension PlanetContext {
         }
     }
 
-    var grid: [PlanetGridCell] {
+    func grid(_ color: (Cell) -> Color) -> [PlanetGridCell] {
         let radius: Double = 1.5 * Double.init(1 + self.size)
         let center: (north: Vector2, south: Vector2) = (
             north: .init(-radius, 0),
@@ -188,7 +189,7 @@ extension PlanetContext {
             let cell: PlanetGridCell = .init(
                 id: id,
                 shape: shape,
-                color: cell.type.color
+                color: color(cell)
             )
 
             cells.append(cell)
