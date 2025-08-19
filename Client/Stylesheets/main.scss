@@ -358,6 +358,8 @@ body {
     --color: transparent;
 
     overflow: hidden;
+
+    -webkit-font-smoothing: antialiased;
 }
 
 body > canvas {

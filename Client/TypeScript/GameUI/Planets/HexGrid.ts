@@ -1,8 +1,8 @@
-import * as GameEngine from '../../GameEngine/exports.js';
 import { StaticList } from '../../DOM/exports.js';
 import {
     HexGridCell,
     HexGridCellBackground,
+    MinimapLayer,
     PlanetGridCell,
 } from '../exports.js';
 
@@ -44,17 +44,19 @@ export class HexGrid {
 
     public update(
         cells: PlanetGridCell[],
+        layer: MinimapLayer,
         prefix: any[],
         target: (id: string) => string | null = (_: string) => null,
         selected?: string,
     ): void {
+        this.svg.setAttribute('data-layer', layer);
         this.cells.update(
             cells,
             (cell: PlanetGridCell) => new HexGridCellBackground(cell),
             (cell: PlanetGridCell, element: HexGridCellBackground) => {
                 element.path.setAttribute('d', cell.d0);
                 element.twin?.setAttribute('d', cell.d1 ?? '');
-                element.node.setAttribute('fill', GameEngine.hex(cell.color));
+                element.update(cell);
             }
         );
         this.lines.update(

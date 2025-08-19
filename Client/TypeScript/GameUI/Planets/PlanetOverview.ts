@@ -4,6 +4,7 @@ import {
     PlanetDetailsTab,
     PlanetGrid,
     PlanetReport,
+    MinimapLayer,
 } from '../exports.js';
 import { Swift } from '../../Swift.js';
 import { GameID } from '../../GameEngine/exports.js';
@@ -64,6 +65,6 @@ export class PlanetOverview extends ScreenContent {
 
         // The 'open' property contains the grid data, as per your extensible design.
         const grid: PlanetGrid = state.planet.open;
-        this.grid.update(grid.cells, [state.planet.id]);
+        this.grid.update(grid.cells, MinimapLayer.Terrain, [state.planet.id]);
     }
 }

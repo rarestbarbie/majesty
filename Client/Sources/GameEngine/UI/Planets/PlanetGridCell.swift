@@ -7,7 +7,10 @@ import VectorCharts
 @frozen @usableFromInline struct PlanetGridCell {
     let id: HexCoordinate
     let shape: (HexagonPath, HexagonPath?)
-    let color: Color
+    let color: Color?
+    let x: Double?
+    let y: Double?
+    let z: Double?
 }
 extension PlanetGridCell {
     @frozen @usableFromInline enum ObjectKey: JSString, Sendable {
@@ -15,6 +18,9 @@ extension PlanetGridCell {
         case d0
         case d1
         case color
+        case x
+        case y
+        case z
     }
 }
 extension PlanetGridCell: JavaScriptEncodable {
@@ -23,5 +29,8 @@ extension PlanetGridCell: JavaScriptEncodable {
         js[.d0] = self.shape.0.d
         js[.d1] = self.shape.1?.d
         js[.color] = self.color
+        js[.x] = self.x
+        js[.y] = self.y
+        js[.z] = self.z
     }
 }

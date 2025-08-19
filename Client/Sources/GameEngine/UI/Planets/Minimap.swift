@@ -32,36 +32,33 @@ extension Minimap {
             self.grid = planet.grid { $0.type.color }
 
         case .Population:
-            let maxPopulation: Double = .init(planet.cells.values.reduce(0) {
-                max($0, $1.population)
-            })
+            let scale: Double = .init(planet.cells.values.reduce(0) { max($0, $1.population) })
             self.grid = planet.grid {
-                let population: Double = .init($0.population)
-                let intensity: UInt8 = maxPopulation > 0 ?
-                    .init(255 * population / maxPopulation) : 0
-                return .init(r: intensity, g: intensity, b: intensity)
+                scale > 0 ? Double.init($0.population) / scale : 0
             }
 
         case .AverageMilitancy:
+            let scale: Double = .init(planet.cells.values.reduce(0) { max($0, $1.population) })
             self.grid = planet.grid {
                 guard $0.population > 0 else {
-                    return 0
+                    return (0, 0)
                 }
                 // Scale militancy (0-10) to a red color channel (0-255)
                 let population: Double = .init($0.population)
-                let militancy: UInt8 = .init(($0.weighted.mil / population) * 25.5)
-                return .init(r: militancy, g: 0, b: 0)
+                let value: Double = 0.1 * ($0.weighted.mil / population)
+                return (value, population / scale)
             }
 
         case .AverageConsciousness:
+            let scale: Double = .init(planet.cells.values.reduce(0) { max($0, $1.population) })
             self.grid = planet.grid {
                 guard $0.population > 0 else {
-                    return 0
+                    return (0, 0)
                 }
                 // Scale consciousness (0-10) to a blue color channel (0-255)
                 let population: Double = .init($0.population)
-                let consciousness: UInt8 = .init(($0.weighted.con / population) * 25.5)
-                return .init(r: 0, g: 0, b: consciousness)
+                let value: Double = 0.1 * ($0.weighted.con / population)
+                return (value, population / scale)
             }
         }
     }
