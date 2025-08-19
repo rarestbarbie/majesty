@@ -4,7 +4,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 struct FactoryTableEntry {
-    let id: GameID<Factory>
+    let id: FactoryID
     let location: String
     let type: String
     let grow: Int64

@@ -3,18 +3,18 @@ import JavaScriptKit
 import JavaScriptInterop
 
 public struct CelestialView {
-    private let subject: GameID<Planet>
+    private let subject: PlanetID
     private var bodies: [CelestialBody]
     private var radius: Double
 
-    init(subject: GameID<Planet>) {
+    init(subject: PlanetID) {
         self.subject = subject
         self.bodies = []
         self.radius = 0
     }
 }
 extension CelestialView {
-    static func open(subject: GameID<Planet>, in context: GameContext) throws -> Self {
+    static func open(subject: PlanetID, in context: GameContext) throws -> Self {
         var view: Self = .init(subject: subject)
         try view.update(in: context)
         return view

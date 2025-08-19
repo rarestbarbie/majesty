@@ -1,5 +1,4 @@
-import JavaScriptKit
-import JavaScriptInterop
+import GameState
 
 struct CultureContext {
     var state: Culture

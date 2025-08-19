@@ -6,13 +6,13 @@ import JavaScriptKit
 
 struct GameContext {
     var date: GameDate
-    var player: GameID<Country>
+    var player: CountryID
 
-    private(set) var planets: Table<PlanetContext>
-    private(set) var cultures: Table<CultureContext>
-    private(set) var countries: Table<CountryContext>
-    private(set) var factories: Table<FactoryContext>
-    private(set) var pops: Sectioned<PopContext>
+    private(set) var planets: RuntimeContextTable<PlanetContext>
+    private(set) var cultures: RuntimeContextTable<CultureContext>
+    private(set) var countries: RuntimeContextTable<CountryContext>
+    private(set) var factories: RuntimeContextTable<FactoryContext>
+    private(set) var pops: SectionedContextTable<PopContext>
 
     let symbols: GameRules.Symbols
     let rules: GameRules
@@ -60,7 +60,7 @@ extension GameContext {
         let terrainDefault: TerrainMetadata = self.rules.terrains.values.first else {
             fatalError("No terrain metadata found in rules!!!")
         }
-        let defined: [GameID<Planet>: PlanetSurface] = surfaces.reduce(into: [:]) {
+        let defined: [PlanetID: PlanetSurface] = surfaces.reduce(into: [:]) {
             $0[$1.id] = $1
         }
         for i: Int in self.planets.indices {
@@ -180,7 +180,7 @@ extension GameContext {
 extension GameContext {
     private mutating func index() {
         for country: CountryContext in self.countries {
-            for planet: GameID<Planet> in country.state.territory {
+            for planet: PlanetID in country.state.territory {
                 self.planets[planet]?.occupied = country.state.id
             }
         }
@@ -239,7 +239,7 @@ extension GameContext {
         defer {
             map.transfers.removeAll(keepingCapacity: true)
         }
-        for (pop, ct): (GameID<Pop>, CashTransfers) in map.transfers {
+        for (pop, ct): (PopID, CashTransfers) in map.transfers {
             self.pops.table[pop]?.state.cash += ct
         }
     }
@@ -247,7 +247,7 @@ extension GameContext {
     private mutating func postPopEmployment(_ map: inout GameMap, p: [Int]) {
         let (workers, clerks): (
             [GameMap.Jobs<Address>.Key: [(Int, Int64)]],
-            [GameMap.Jobs<GameID<Planet>>.Key: [(Int, Int64)]]
+            [GameMap.Jobs<PlanetID>.Key: [(Int, Int64)]]
         ) = p.reduce(into: (worker: [:], clerk: [:])) {
             let pop: Pop = self.pops.table.state[$1]
             let unemployed: Int64 = pop.unemployed
@@ -261,7 +261,7 @@ extension GameContext {
                 )
                 $0.worker[key, default: []].append(($1, unemployed))
             } else {
-                let key: GameMap.Jobs<GameID<Planet>>.Key = .init(
+                let key: GameMap.Jobs<PlanetID>.Key = .init(
                     location: pop.home.planet,
                     type: pop.type
                 )

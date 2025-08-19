@@ -34,7 +34,7 @@ extension CelestialMotion {
         self.init(a: a, e: e, i: i, ω: ω, Ω: Ω, t: 0, n: n)
     }
 
-    init(orbit: CelestialOrbit, of world: GameID<Planet>, around mass: Double) {
+    init(orbit: CelestialOrbit, of world: PlanetID, around mass: Double) {
         self.init(
             a: orbit.a,
             e: orbit.e,

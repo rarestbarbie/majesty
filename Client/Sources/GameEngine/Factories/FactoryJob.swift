@@ -5,7 +5,7 @@ import JavaScriptKit
 import Random
 
 @frozen public struct FactoryJob {
-    public let at: GameID<Factory>
+    public let at: FactoryID
     public private(set) var hire: Int64
     public private(set) var fire: Int64
     public private(set) var quit: Int64
@@ -16,7 +16,7 @@ import Random
     public private(set) var strike: Bool
 }
 extension FactoryJob {
-    init(at: GameID<Factory>) {
+    init(at: FactoryID) {
         self.init(at: at, hire: 0, fire: 0, quit: 0, u: 0, n: 0, ux: 0, nx: 0, strike: false)
     }
 
@@ -71,7 +71,7 @@ extension FactoryJob {
     }
 }
 extension FactoryJob: Identifiable {
-    @inlinable public var id: GameID<Factory> { self.at }
+    @inlinable public var id: FactoryID { self.at }
 }
 extension FactoryJob {
     var employed: Int64 {

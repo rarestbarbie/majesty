@@ -58,8 +58,10 @@ extension GameSession {
     public func saveTerrain() -> [PlanetSurface] { self.context.saveTerrain() }
 }
 extension GameSession {
-    private static func address<T>(_ objects: inout [some IdentityReplaceable<GameID<T>>]) {
-        var highest: GameID<T> = objects.reduce(0) { max($0, $1.id) }
+    private static func address<ID>(
+        _ objects: inout [some IdentityReplaceable<ID>]
+    ) where ID: GameID {
+        var highest: ID = objects.reduce(0) { max($0, $1.id) }
         for i: Int in objects.indices {
             {
                 if  $0 == 0 {
@@ -70,15 +72,15 @@ extension GameSession {
     }
 }
 extension GameSession {
-    public mutating func `switch`(to planet: GameID<Planet>) throws -> GameUI {
-        if  let country: GameID<Country> = self.context.planets[planet]?.occupied {
+    public mutating func `switch`(to planet: PlanetID) throws -> GameUI {
+        if  let country: CountryID = self.context.planets[planet]?.occupied {
             self.context.player = country
             try self.ui.sync(with: self.map, in: self.context)
         }
         return self.ui
     }
 
-    private mutating func `switch`(to player: GameID<Country>) throws -> GameUI {
+    private mutating func `switch`(to player: CountryID) throws -> GameUI {
         self.context.player = player
         try self.ui.sync(with: self.map, in: self.context)
         return self.ui
@@ -120,7 +122,7 @@ extension GameSession {
     }
 
     public mutating func openPlanet(
-        subject: GameID<Planet>?,
+        subject: PlanetID?,
         details: PlanetDetailsTab? = nil
     ) throws -> PlanetReport {
         self.ui.screen = .Planet
@@ -134,7 +136,7 @@ extension GameSession {
     }
 
     public mutating func openProduction(
-        subject: GameID<Factory>?,
+        subject: FactoryID?,
         details: FactoryDetailsTab?
     ) throws -> ProductionReport {
         self.ui.screen = .Production
@@ -147,7 +149,7 @@ extension GameSession {
         )
     }
 
-    public mutating func openPopulation(subject: GameID<Pop>?) throws -> PopulationReport {
+    public mutating func openPopulation(subject: PopID?) throws -> PopulationReport {
         self.ui.screen = .Population
         return try self.ui.report.population.open(
             subject: subject,
@@ -172,13 +174,13 @@ extension GameSession {
         )
     }
 
-    public mutating func focusPlanet(_ id: GameID<Planet>, cell: HexCoordinate?) -> Navigator {
+    public mutating func focusPlanet(_ id: PlanetID, cell: HexCoordinate?) -> Navigator {
         self.ui.navigator.select(planet: id, cell: cell)
         self.ui.navigator.update(in: self.context)
         return self.ui.navigator
     }
 
-    public mutating func view(_ index: Int, to system: GameID<Planet>) throws -> CelestialView {
+    public mutating func view(_ index: Int, to system: PlanetID) throws -> CelestialView {
         let view: CelestialView = try .open(subject: system, in: self.context)
         switch index as Int {
         case 0: self.ui.views.0 = view
@@ -188,12 +190,12 @@ extension GameSession {
         return view
     }
 
-    public func orbit(_ id: GameID<Planet>) -> JSTypedArray<Float>? {
+    public func orbit(_ id: PlanetID) -> JSTypedArray<Float>? {
         self.context.planets[id]?.motion.global?.rendered()
     }
 }
 extension GameSession {
-    public func tooltipFactoryAccount(_ id: GameID<Factory>) -> Tooltip? {
+    public func tooltipFactoryAccount(_ id: FactoryID) -> Tooltip? {
         guard let factory: Factory = self.context.state.factories[id] else {
             return nil
         }
@@ -240,7 +242,7 @@ extension GameSession {
     }
 
     public func tooltipFactoryDemand(
-        _ id: GameID<Factory>,
+        _ id: FactoryID,
         _ tier: ResourceNeedTier,
         _ need: Resource,
     ) -> Tooltip? {
@@ -282,7 +284,7 @@ extension GameSession {
     }
 
     public func tooltipFactoryStockpile(
-        _ id: GameID<Factory>,
+        _ id: FactoryID,
         _ tier: ResourceNeedTier,
         _ need: Resource,
     ) -> Tooltip? {
@@ -308,7 +310,7 @@ extension GameSession {
         return Self.tooltipResourceStockpile(stock)
     }
 
-    public func tooltipFactorySize(_ id: GameID<Factory>) -> Tooltip? {
+    public func tooltipFactorySize(_ id: FactoryID) -> Tooltip? {
         guard let factory: Factory = self.context.state.factories[id] else {
             return nil
         }
@@ -318,7 +320,7 @@ extension GameSession {
     }
 
     public func tooltipFactoryWorkers(
-        _ id: GameID<Factory>,
+        _ id: FactoryID,
         _ stratum: PopStratum,
     ) -> Tooltip? {
         guard let factory: FactoryContext = self.context.factories[id] else {
@@ -362,7 +364,7 @@ extension GameSession {
     }
 
     public func tooltipFactoryOwnership(
-        _ id: GameID<Factory>,
+        _ id: FactoryID,
         culture: String,
     ) -> Tooltip? {
         guard
@@ -389,8 +391,8 @@ extension GameSession {
     }
 
     public func tooltipFactoryOwnership(
-        _ id: GameID<Factory>,
-        country: GameID<Country>,
+        _ id: FactoryID,
+        country: CountryID,
     ) -> Tooltip? {
         guard
         let factory: FactoryContext = self.context.factories[id],
@@ -416,7 +418,7 @@ extension GameSession {
     }
 }
 extension GameSession {
-    public func tooltipPlanetCell(_ id: GameID<Planet>, _ cell: HexCoordinate) -> Tooltip? {
+    public func tooltipPlanetCell(_ id: PlanetID, _ cell: HexCoordinate) -> Tooltip? {
         guard
         let planet: PlanetContext = self.context.planets[id],
         let cell: PlanetContext.Cell = planet.cells[cell] else {
@@ -429,7 +431,7 @@ extension GameSession {
     }
 }
 extension GameSession {
-    public func tooltipPopAccount(_ id: GameID<Pop>) -> Tooltip? {
+    public func tooltipPopAccount(_ id: PopID) -> Tooltip? {
         guard let pop: Pop = self.context.state.pops[id] else {
             return nil
         }
@@ -449,7 +451,7 @@ extension GameSession {
         }
     }
 
-    public func tooltipPopJobs(_ id: GameID<Pop>) -> Tooltip? {
+    public func tooltipPopJobs(_ id: PopID) -> Tooltip? {
         guard let pop: Pop = self.context.state.pops[id] else {
             return nil
         }
@@ -485,7 +487,7 @@ extension GameSession {
     }
 
     public func tooltipPopNeeds(
-        _ id: GameID<Pop>,
+        _ id: PopID,
         _ tier: ResourceNeedTier
     ) -> Tooltip? {
         guard let pop: Pop = self.context.state.pops[id] else {
@@ -506,7 +508,7 @@ extension GameSession {
     }
 
     public func tooltipPopDemand(
-        _ id: GameID<Pop>,
+        _ id: PopID,
         _ tier: ResourceNeedTier,
         _ need: Resource,
     ) -> Tooltip? {
@@ -549,7 +551,7 @@ extension GameSession {
     }
 
     public func tooltipPopStockpile(
-        _ id: GameID<Pop>,
+        _ id: PopID,
         _ tier: ResourceNeedTier,
         _ need: Resource,
     ) -> Tooltip? {
@@ -578,11 +580,11 @@ extension GameSession {
     }
 
     public func tooltipPopType(
-        _ id: GameID<Pop>,
+        _ id: PopID,
     ) -> Tooltip? {
         guard
         let pop: PopContext = self.context.pops.table[id],
-        let country: GameID<Country> = context.planets[pop.state.home.planet]?.occupied,
+        let country: CountryID = context.planets[pop.state.home.planet]?.occupied,
         let country: Country = self.context.state.countries[country]
         else {
             return nil

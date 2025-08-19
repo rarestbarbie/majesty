@@ -4,11 +4,11 @@ import JavaScriptInterop
 import JavaScriptKit
 
 struct Minimap {
-    let id: GameID<Planet>
+    let id: PlanetID
     var name: String
     var grid: [PlanetGridCell]
 
-    init(id: GameID<Planet>) {
+    init(id: PlanetID) {
         self.id = id
         self.name = ""
         self.grid = []

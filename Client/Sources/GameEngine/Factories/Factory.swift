@@ -5,8 +5,8 @@ import GameRules
 import GameState
 import OrderedCollections
 
-public struct Factory: CashAccountHolder, Turnable, Identifiable {
-    public let id: GameID<Self>
+struct Factory: CashAccountHolder, Turnable, Identifiable {
+    let id: FactoryID
     let on: Address
     var type: FactoryType
     var grow: Int64
@@ -21,7 +21,7 @@ public struct Factory: CashAccountHolder, Turnable, Identifiable {
     var today: Dimensions
 
     init(
-        id: GameID<Factory>,
+        id: FactoryID,
         on: Address,
         type: FactoryType,
         grow: Int64,
@@ -49,7 +49,7 @@ public struct Factory: CashAccountHolder, Turnable, Identifiable {
     }
 }
 extension Factory {
-    @frozen public enum ObjectKey: JSString, Sendable {
+    enum ObjectKey: JSString, Sendable {
         case id
         case on
         case type
@@ -93,7 +93,7 @@ extension Factory {
     }
 }
 extension Factory: JavaScriptEncodable {
-    public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.on] = self.on
         js[.type] = self.type.rawValue
@@ -138,7 +138,7 @@ extension Factory: JavaScriptEncodable {
     }
 }
 extension Factory: JavaScriptDecodable {
-    public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+    init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         let today: Dimensions = .init(
             vi: try js[.today_vi]?.decode() ?? 0,
             vv: try js[.today_vv]?.decode() ?? 0,

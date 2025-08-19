@@ -4,12 +4,12 @@ import GameRules
 extension GameContext {
     struct ResidentPass {
         let date: GameDate
-        let player: GameID<Country>
-        let planets: Table<PlanetContext>
-        let cultures: Table<CultureContext>
-        let countries: Table<CountryContext>
-        let factories: GameSnapshot.Table<FactoryContext>
-        let pops: GameSnapshot.Table<PopContext>
+        let player: CountryID
+        let planets: RuntimeContextTable<PlanetContext>
+        let cultures: RuntimeContextTable<CultureContext>
+        let countries: RuntimeContextTable<CountryContext>
+        let factories: RuntimeStateTable<FactoryContext>
+        let pops: RuntimeStateTable<PopContext>
         let rules: GameRules
     }
 }

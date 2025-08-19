@@ -9,11 +9,11 @@ struct GameMap: ~Copyable {
     var random: PseudoRandom
 
     var exchange: Exchange
-    var transfers: [GameID<Pop>: CashTransfers]
+    var transfers: [PopID: CashTransfers]
     var conversions: [(count: Int64, to: Pop.Section)]
     var jobs: (
         worker: Jobs<Address>,
-        clerk: Jobs<GameID<Planet>>
+        clerk: Jobs<PlanetID>
     )
 
     init(markets: OrderedDictionary<Market.AssetPair, Market> = [:]) {
@@ -27,7 +27,7 @@ struct GameMap: ~Copyable {
 }
 extension GameMap {
     mutating func payscale(
-        shuffling pops: [(id: GameID<Pop>, count: Int64)],
+        shuffling pops: [(id: PopID, count: Int64)],
         rate: Int64
     ) -> Payscale {
         .init(pops: pops.shuffled(using: &self.random.generator), rate: rate)
@@ -76,7 +76,7 @@ extension GameMap {
 
     mutating func pay(
         dividend: Int64,
-        to shareholders: [(id: GameID<Pop>, count: Int64)]
+        to shareholders: [(id: PopID, count: Int64)]
     ) -> Int64 {
         guard let payments: [Int64] = shareholders.distribute(
             funds: { _ in dividend },

@@ -9,7 +9,7 @@ public struct GameSave {
     var symbols: GameRules.Symbols
 
     let date: GameDate
-    let player: GameID<Country>
+    let player: CountryID
 
     let terrain: [PlanetSurface]?
     var planets: [Planet]

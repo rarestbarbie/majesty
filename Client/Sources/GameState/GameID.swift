@@ -1,8 +1,32 @@
-@frozen public struct GameID<T>: RawRepresentable, Equatable, Hashable {
-    public var rawValue: Int32
-
-    @inlinable public init(rawValue: Int32) {
-        self.rawValue = rawValue
+public protocol GameID: RawRepresentable<Int32>,
+    Equatable,
+    Hashable,
+    Comparable,
+    CustomStringConvertible,
+    LosslessStringConvertible,
+    ExpressibleByIntegerLiteral {
+    init(rawValue: Int32)
+    var rawValue: Int32 { get set }
+}
+extension GameID {
+    @inlinable public static func < (a: Self, b: Self) -> Bool {
+        a.rawValue < b.rawValue
+    }
+}
+extension GameID {
+    @inlinable public init(integerLiteral: Int32) {
+        self.init(rawValue: integerLiteral)
+    }
+}
+extension GameID {
+    @inlinable public var description: String {
+        "\(self.rawValue)"
+    }
+    @inlinable public init?(_ description: some StringProtocol) {
+        guard let rawValue: Int32 = .init(description) else {
+            return nil
+        }
+        self.init(rawValue: rawValue)
     }
 }
 extension GameID {
@@ -13,28 +37,5 @@ extension GameID {
     @inlinable public mutating func increment() -> Self {
         self.rawValue += 1
         return self
-    }
-}
-extension GameID: Comparable {
-    @inlinable public static func < (a: Self, b: Self) -> Bool {
-        a.rawValue < b.rawValue
-    }
-}
-extension GameID: ExpressibleByIntegerLiteral {
-    @inlinable public init(integerLiteral: Int32) {
-        self.init(rawValue: integerLiteral)
-    }
-}
-extension GameID: CustomStringConvertible {
-    @inlinable public var description: String {
-        "\(self.rawValue)"
-    }
-}
-extension GameID: LosslessStringConvertible {
-    @inlinable public init?(_ description: some StringProtocol) {
-        guard let rawValue: Int32 = .init(description) else {
-            return nil
-        }
-        self.init(rawValue: rawValue)
     }
 }

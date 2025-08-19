@@ -10,7 +10,7 @@ struct PlanetContext {
 
     var motion: (global: CelestialMotion?, local: CelestialMotion?)
     var position: (global: Vector3, local: Vector3)
-    var occupied: GameID<Country>?
+    var occupied: CountryID?
 
     var cells: OrderedDictionary<HexCoordinate, Cell>
     var size: Int8
@@ -40,7 +40,7 @@ extension PlanetContext: RuntimeContext {
             self.motion.global = motion
         }
 
-        if  let opposes: GameID<Planet> = self.state.opposes,
+        if  let opposes: PlanetID = self.state.opposes,
             let opposes: Planet = context.planets[opposes],
             let orbit: CelestialOrbit = opposes.orbit {
             let orbit: CelestialMotion = .init(

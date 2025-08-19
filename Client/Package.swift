@@ -130,7 +130,16 @@ let package: Package = .init(
         .target(
             name: "GameState",
             dependencies: [
+                .target(name: "GameStateMacros"),
+                .product(name: "OrderedCollections", package: "swift-collections"),
             ],
+        ),
+        .macro(
+            name: "GameStateMacros",
+            dependencies: [
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+            ]
         ),
         .testTarget(
             name: "GameStateTests",

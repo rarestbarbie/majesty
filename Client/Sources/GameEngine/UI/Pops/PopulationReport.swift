@@ -12,8 +12,8 @@ public struct PopulationReport {
     }
 }
 extension PopulationReport: PersistentReport {
-    mutating func select(subject: GameID<Pop>?, details: Never?, filter: Never?) {
-        if  let subject: GameID<Pop> {
+    mutating func select(subject: PopID?, details: Never?, filter: Never?) {
+        if  let subject: PopID {
             self.pop = .init(id: subject)
         }
     }
@@ -26,7 +26,7 @@ extension PopulationReport: PersistentReport {
             return
         }
 
-        let include: Set<GameID<Planet>> = .init(country.state.territory)
+        let include: Set<PlanetID> = .init(country.state.territory)
         for pop: PopContext in context.pops.table where include.contains(
             pop.state.home.planet
         ) {

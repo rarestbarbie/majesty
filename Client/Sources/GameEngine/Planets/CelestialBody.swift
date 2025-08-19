@@ -5,7 +5,7 @@ import JavaScriptInterop
 import Vector
 
 struct CelestialBody {
-    let id: GameID<Planet>
+    let id: PlanetID
     let at: Vector3
 
     let name: String

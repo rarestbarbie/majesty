@@ -4,12 +4,12 @@ import JavaScriptKit
 import JavaScriptInterop
 
 struct FactoryDetails {
-    let id: GameID<Factory>
+    let id: FactoryID
     var open: FactoryDetailsTab
     var inventory: FactoryInventory
     var ownership: FactoryOwnership
 
-    init(id: GameID<Factory>, open: FactoryDetailsTab) {
+    init(id: FactoryID, open: FactoryDetailsTab) {
         self.id = id
         self.open = open
 

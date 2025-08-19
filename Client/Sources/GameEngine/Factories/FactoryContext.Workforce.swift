@@ -29,7 +29,7 @@ extension FactoryContext.Workforce {
     /// Total number of workers, including those on strike.
     var total: Int64 { self.n.count + self.u.count + self.s.count }
 
-    mutating func count(pop: GameID<Pop>, job: FactoryJob) {
+    mutating func count(pop: PopID, job: FactoryJob) {
         self.hire += job.hire
         self.fire += job.fire
         self.quit += job.quit

@@ -12,11 +12,11 @@ public struct PlanetReport {
 }
 extension PlanetReport: PersistentReport {
     mutating func select(
-        subject: GameID<Planet>?,
+        subject: PlanetID?,
         details: PlanetDetailsTab?,
         filter: Never?
     ) {
-        if  let subject: GameID<Planet> {
+        if  let subject: PlanetID {
             self.planet = .init(id: subject, open: .Grid)
         }
         if  let details: PlanetDetailsTab {
