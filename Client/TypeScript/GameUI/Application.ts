@@ -17,6 +17,7 @@ import {
     Minimap,
     NavigatorTile,
     NavigatorState,
+    MinimapLayer,
 } from './exports.js';
 import { Swift } from '../Swift.js';
 import { Socket } from "socket.io-client";
@@ -223,7 +224,11 @@ export class Application {
 
         const planet: GameID | null = parseInt(action.get('planet') ?? '', 10) as GameID | null;
         if (planet) {
-            this.focus(planet, action.get('cell'));
+            this.focus(
+                planet,
+                action.get('layer') as MinimapLayer | null,
+                action.get('cell'),
+            );
             return;
         }
     }
@@ -287,8 +292,8 @@ export class Application {
         }
     }
 
-    public focus(planet: GameID, cell: string | null) {
-        const state: NavigatorState = Swift.minimap(planet, null, cell);
+    public focus(planet: GameID, layer: MinimapLayer | null, cell: string | null) {
+        const state: NavigatorState = Swift.minimap(planet, layer, cell);
 
         this.tile.update(state?.tile);
         this.minimap.update(state);

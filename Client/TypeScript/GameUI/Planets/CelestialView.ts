@@ -174,7 +174,7 @@ export class CelestialView {
                     this.context.view(1, this.system === id ? null : id);
                 }
 
-                this.context.focus(id, null);
+                this.context.focus(id, null, null);
             }
         }
 
