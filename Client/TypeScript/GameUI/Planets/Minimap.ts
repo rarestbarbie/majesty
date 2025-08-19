@@ -45,6 +45,7 @@ export class Minimap {
 
         this.grid.update(
             minimap.grid,
+            minimap.layer,
             [id],
             (cell: string) => `#planet=${id}&cell=${cell}`,
             navigator.tile?.id,

@@ -157,6 +157,27 @@ extension PlanetContext {
     }
 
     func grid(_ color: (Cell) -> Color) -> [PlanetGridCell] {
+        self.grid { (color($0), nil, nil, nil) }
+    }
+    func grid(_ color: (Cell) -> Double) -> [PlanetGridCell] {
+        self.grid { (nil, color($0), nil, nil) }
+    }
+    func grid(_ color: (Cell) -> (x: Double, y: Double)) -> [PlanetGridCell] {
+        self.grid {
+            let (x, y): (Double, Double) = color($0)
+            return (nil, x, y, nil)
+        }
+    }
+    func grid(_ color: (Cell) -> (x: Double, y: Double, z: Double)) -> [PlanetGridCell] {
+        self.grid {
+            let (x, y, z): (Double, Double, Double) = color($0)
+            return (nil, x, y, z)
+        }
+    }
+
+    private func grid(
+        _ color: (Cell) -> (color: Color?, x: Double?, y: Double?, z: Double?)
+    ) -> [PlanetGridCell] {
         let radius: Double = 1.5 * Double.init(1 + self.size)
         let center: (north: Vector2, south: Vector2) = (
             north: .init(-radius, 0),
@@ -186,10 +207,14 @@ extension PlanetContext {
                 shape.1 = nil
             }
 
+            let (color, x, y, z): (Color?, Double?, Double?, Double?) = color(cell)
             let cell: PlanetGridCell = .init(
                 id: id,
                 shape: shape,
-                color: color(cell)
+                color: color,
+                x: x,
+                y: y,
+                z: z
             )
 
             cells.append(cell)

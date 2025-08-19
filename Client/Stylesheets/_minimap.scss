@@ -27,6 +27,57 @@
     }
 }
 
+$gradients: (
+    'magma': (
+        rgb(5, 0, 20),
+        rgb(29, 17, 71),
+        rgb(81, 18, 124),
+        rgb(130, 37, 129),
+        rgb(182, 54, 121),
+        rgb(230, 81, 100),
+        rgb(251, 136, 97),
+        rgb(254, 194, 135),
+        rgb(252, 253, 191),
+    ),
+    'sunset': (
+        rgb(166, 227, 255),
+        rgb(255, 255, 243),
+        rgb(255, 230, 162),
+        rgb(251, 136, 97),
+        rgb(230, 81, 100),
+    ),
+);
+
+@mixin apply-gradient($stops) {
+    // 1. Generate CSS variables for each R, G, B channel of each stop
+    @for $i from 1 through length($stops) {
+        $color: nth($stops, $i);
+        --stop-#{$i - 1}-r: #{red($color)};
+        --stop-#{$i - 1}-g: #{green($color)};
+        --stop-#{$i - 1}-b: #{blue($color)};
+    }
+
+    // 2. Generate the interpolation logic using the CSS variables
+    $segments: length($stops) - 1;
+    --t-scaled: calc(var(--t) * #{$segments});
+
+    $r-calc: '';
+    $g-calc: '';
+    $b-calc: '';
+
+    @for $i from 0 through $segments {
+        $weight: 'clamp(0, 1 - abs(var(--t-scaled) - #{$i}), 1)';
+        $r-calc: $r-calc + 'var(--stop-#{$i}-r) * #{$weight}' + if($i < $segments, ' + ', '');
+        $g-calc: $g-calc + 'var(--stop-#{$i}-g) * #{$weight}' + if($i < $segments, ' + ', '');
+        $b-calc: $b-calc + 'var(--stop-#{$i}-b) * #{$weight}' + if($i < $segments, ' + ', '');
+    }
+
+    --r0: calc(#{$r-calc});
+    --g0: calc(#{$g-calc});
+    --b0: calc(#{$b-calc});
+
+    --gradient-color: rgb(var(--r0), var(--g0), var(--b0));
+}
 
 #minimap {
     position: absolute;
@@ -80,6 +131,36 @@
                 stroke: rgb(255, 87, 185);
                 stroke-width: 0.1px;
             }
+        }
+    }
+
+    svg[data-layer='Population'] {
+        g.cells g {
+            --t: calc(sqrt(var(--value-x)));
+            @include apply-gradient(map-get($gradients, 'magma'));
+            fill: var(--gradient-color);
+        }
+    }
+    svg[data-layer='AverageMilitancy'] {
+        g.cells g {
+            --t: calc(sqrt(var(--value-x)));
+            @include apply-gradient(map-get($gradients, 'sunset'));
+            fill: color-mix(
+                in srgb,
+                rgb(20, 20, 20),
+                var(--gradient-color) calc(sqrt(var(--value-y)) * 100%)
+            );
+        }
+    }
+    svg[data-layer='AverageConsciousness'] {
+        g.cells g {
+            --t: calc(sqrt(var(--value-x)));
+            @include apply-gradient(map-get($gradients, 'sunset'));
+            fill: color-mix(
+                in srgb,
+                rgb(20, 20, 20),
+                var(--gradient-color) calc(sqrt(var(--value-y)) * 100%)
+            );
         }
     }
 
