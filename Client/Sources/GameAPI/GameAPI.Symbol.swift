@@ -26,7 +26,7 @@ extension GameAPI {
 
         case closeScreen
 
-        case focusPlanet
+        case minimap
         /// Open a celestial view and return its initial state.
         case view
 
