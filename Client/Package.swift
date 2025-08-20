@@ -11,8 +11,8 @@ let package: Package = .init(
         .executable(name: "integration-tests", targets: ["GameIntegrationTests"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.0"),
-        .package(url: "https://github.com/swiftwasm/JavaScriptKit", from: "0.31.2"),
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1"),
+        .package(url: "https://github.com/swiftwasm/JavaScriptKit", from: "0.33.1"),
         .package(url: "https://github.com/apple/swift-numerics", from: "1.0.3"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.2.0"),
     ],

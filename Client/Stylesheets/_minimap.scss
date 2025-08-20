@@ -1,4 +1,7 @@
 @use 'mixins/blur';
+@use 'sass:color';
+@use 'sass:list';
+@use 'sass:map';
 
 #tile {
     position: absolute;
@@ -50,15 +53,15 @@ $gradients: (
 
 @mixin apply-gradient($stops) {
     // 1. Generate CSS variables for each R, G, B channel of each stop
-    @for $i from 1 through length($stops) {
-        $color: nth($stops, $i);
-        --stop-#{$i - 1}-r: #{red($color)};
-        --stop-#{$i - 1}-g: #{green($color)};
-        --stop-#{$i - 1}-b: #{blue($color)};
+    @for $i from 1 through list.length($stops) {
+        $color: list.nth($stops, $i);
+        --stop-#{$i - 1}-r: #{color.channel($color, 'red', $space: rgb)};
+        --stop-#{$i - 1}-g: #{color.channel($color, 'green', $space: rgb)};
+        --stop-#{$i - 1}-b: #{color.channel($color, 'blue', $space: rgb)};
     }
 
     // 2. Generate the interpolation logic using the CSS variables
-    $segments: length($stops) - 1;
+    $segments: list.length($stops) - 1;
     --t-scaled: calc(var(--t) * #{$segments});
 
     $r-calc: '';
@@ -137,14 +140,14 @@ $gradients: (
     svg[data-layer='Population'] {
         g.cells g {
             --t: calc(sqrt(var(--value-x)));
-            @include apply-gradient(map-get($gradients, 'magma'));
+            @include apply-gradient(map.get($gradients, 'magma'));
             fill: var(--gradient-color);
         }
     }
     svg[data-layer='AverageMilitancy'] {
         g.cells g {
             --t: calc(sqrt(var(--value-x)));
-            @include apply-gradient(map-get($gradients, 'sunset'));
+            @include apply-gradient(map.get($gradients, 'sunset'));
             fill: color-mix(
                 in srgb,
                 rgb(20, 20, 20),
@@ -155,7 +158,7 @@ $gradients: (
     svg[data-layer='AverageConsciousness'] {
         g.cells g {
             --t: calc(sqrt(var(--value-x)));
-            @include apply-gradient(map-get($gradients, 'sunset'));
+            @include apply-gradient(map.get($gradients, 'sunset'));
             fill: color-mix(
                 in srgb,
                 rgb(20, 20, 20),

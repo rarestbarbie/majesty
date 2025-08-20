@@ -11,6 +11,7 @@ export class NavigatorTile {
 
     private readonly charts: {
         readonly culture: PieChart<string>;
+        readonly popType: PieChart<string>;
     };
 
     constructor() {
@@ -18,10 +19,12 @@ export class NavigatorTile {
 
         this.charts = {
             culture: new PieChart<string>(TooltipType.TileCulture),
+            popType: new PieChart<string>(TooltipType.TilePopType),
         };
 
         this.detail = document.createElement('div');
         this.detail.appendChild(this.charts.culture.node);
+        this.detail.appendChild(this.charts.popType.node);
 
         this.node = document.createElement('div');
         this.node.id = 'tile';
@@ -43,6 +46,9 @@ export class NavigatorTile {
 
         if (tile.culture !== undefined) {
             this.charts.culture.update([tile.id], tile.culture);
+        }
+        if (tile.popType !== undefined) {
+            this.charts.popType.update([tile.id], tile.popType);
         }
     }
 }

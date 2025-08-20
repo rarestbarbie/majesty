@@ -253,6 +253,7 @@
             }
         },
         "Livestock": {
+            "color": "#b48f9e",
             "l": {
             },
             "e": {
@@ -264,6 +265,27 @@
                 "Livestock": 12,
                 "Poultry": 4
             }
+        },
+        "Miner": {
+            "color": "#2d2d4b"
+        },
+        "Editor": {
+            "color": "#71bac7"
+        },
+        "Server": {
+            "color": "#ffa4d2"
+        },
+        "Driver": {
+            "color": "#586da7"
+        },
+        "Engineer": {
+            "color": "#e4e4e4"
+        },
+        "Farmer": {
+            "color": "#c6e277"
+        },
+        "Capitalist": {
+            "color": "#ffab3e"
         }
     },
     "technologies": {

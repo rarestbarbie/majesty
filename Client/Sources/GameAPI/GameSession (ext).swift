@@ -94,10 +94,13 @@ extension GameSession {
         case .TileCulture:
             self.tooltipTileCulture(
                 try arguments[0].decode(),
-                culture: try arguments[1].decode(),
+                try arguments[1].decode(),
             )
         case .TilePopType:
-            fatalError("TilePopType tooltip not implemented")
+            self.tooltipTilePopType(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+            )
         }
     }
 }
