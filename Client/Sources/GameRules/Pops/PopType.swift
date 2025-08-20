@@ -1,23 +1,22 @@
+import Bijection
 import JavaScriptInterop
 import JavaScriptKit
 
-@frozen public enum PopType: Unicode.Scalar, CaseIterable,
-    ConvertibleToJSValue,
-    LoadableFromJSValue {
+@frozen public enum PopType: CaseIterable, Comparable {
     // Slaves
     // case fauna
     // case indigent
-    case Livestock = "A"
+    case Livestock
 
     // Workers
-    case Driver = "D"
-    case Editor = "E"
-    case Miner = "M"
-    case Server = "S"
+    case Miner
+    case Editor
+    case Server
+    case Driver
 
     // Clerks
-    case Engineer = "G"
-    case Farmer = "F"
+    case Engineer
+    case Farmer
     // case academic
     // case bureaucrat
     // case manager
@@ -25,9 +24,25 @@ import JavaScriptKit
     // case therapist
 
     // Owners
-    case Capitalist = "O"
+    case Capitalist
     // case influencer
 }
+extension PopType: RawRepresentable {
+    @Bijection(label: "rawValue")
+    @inlinable public var rawValue: Unicode.Scalar {
+        switch self {
+        case .Livestock:    "A"
+        case .Driver:       "D"
+        case .Editor:       "E"
+        case .Miner:        "M"
+        case .Server:       "S"
+        case .Engineer:     "G"
+        case .Farmer:       "F"
+        case .Capitalist:   "O"
+        }
+    }
+}
+extension PopType: ConvertibleToJSValue, LoadableFromJSValue {}
 extension PopType {
     @inlinable public var stratum: PopStratum {
         switch self {
@@ -40,11 +55,6 @@ extension PopType {
         case .Farmer:       .Clerk
         case .Capitalist:   .Owner
         }
-    }
-}
-extension PopType: Comparable {
-    @inlinable public static func < (a: Self, b: Self) -> Bool {
-        (a.stratum, a.rawValue) < (b.stratum, b.rawValue)
     }
 }
 extension PopType {

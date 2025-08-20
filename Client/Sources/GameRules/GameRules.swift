@@ -1,3 +1,4 @@
+import Color
 import GameEconomy
 import OrderedCollections
 
@@ -81,14 +82,19 @@ extension GameRules {
                 $0[$1.key] = .init(id: $1.key, name: $1.value.0.name, color: $1.value.1.color)
             },
             pops: try PopType.allCases.reduce(into: [:]) {
-                let pop: PopDescription = try pops[$1] ?? pops[*]
+                let pop: PopDescription? = pops[$1]
+                let l: SymbolTable<Int64> = try pop?.l ?? pops[*].l ?? [:]
+                let e: SymbolTable<Int64> = try pop?.e ?? pops[*].e ?? [:]
+                let x: SymbolTable<Int64> = try pop?.x ?? pops[*].x ?? [:]
+                let output: SymbolTable<Int64> = try pop?.output ?? pops[*].output ?? [:]
                 $0[$1] = .init(
                     singular: $1.singular,
                     plural: $1.plural,
-                    l: try symbols.resources.resolve(pop.l),
-                    e: try symbols.resources.resolve(pop.e),
-                    x: try symbols.resources.resolve(pop.x),
-                    output: try symbols.resources.resolve(pop.output)
+                    color: try pop?.color ?? pops[*].color ?? 0xFFFFFF,
+                    l: try symbols.resources.resolve(l),
+                    e: try symbols.resources.resolve(e),
+                    x: try symbols.resources.resolve(x),
+                    output: try symbols.resources.resolve(output)
                 )
             },
         )

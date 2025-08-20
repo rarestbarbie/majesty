@@ -1,3 +1,4 @@
+import GameRules
 import HexGrids
 import JavaScriptInterop
 import JavaScriptKit
@@ -9,12 +10,14 @@ struct NavigatorTile {
     private var name: String
     private var terrain: String
     private var culture: PieChart<String, PieChartLabel>?
+    private var popType: PieChart<PopType, PieChartLabel>?
 
     init(id: Address) {
         self.id = id
         self.name = ""
         self.terrain = ""
         self.culture = nil
+        self.popType = nil
     }
 }
 extension NavigatorTile {
@@ -28,25 +31,29 @@ extension NavigatorTile {
         self.name = "\(cell.tile.name ?? cell.type.name) (\(planet.state.name))"
         self.terrain = cell.type.name
 
-        let (_, culture): (
-            _: Never?,
-            culture: [String: (share: Int64, PieChartLabel)]
+        let (culture, popType): (
+            [String: (share: Int64, PieChartLabel)],
+            [PopType: (share: Int64, PieChartLabel)]
         ) = cell.pops.reduce(
-            into: (nil, [:])
+            into: (culture: [:], popType: [:])
         ) {
-            guard let pop: Pop = context.state.pops[$1] else {
+            guard
+            let pop: PopContext = context.pops.table[$1] else {
                 return
             }
 
-            if  let culture: Culture = context.state.cultures[pop.nat] {
+            if  let culture: Culture = context.state.cultures[pop.state.nat] {
                 let label: PieChartLabel = .init(color: culture.color, name: culture.id)
-                $0.culture[culture.id, default: (0, label)].share += pop.today.size
+                $0.culture[culture.id, default: (0, label)].share += pop.state.today.size
+            }
+            do {
+                let label: PieChartLabel = .init(color: pop.type.color, name: pop.type.singular)
+                $0.popType[pop.state.type, default: (0, label)].share += pop.state.today.size
             }
         }
 
-        self.culture = .init(
-            values: culture.sorted { $0.key < $1.key }
-        )
+        self.culture = .init(values: culture.sorted { $0.key < $1.key })
+        self.popType = .init(values: popType.sorted { $0.key > $1.key })
     }
 }
 extension NavigatorTile: JavaScriptEncodable {
@@ -55,6 +62,7 @@ extension NavigatorTile: JavaScriptEncodable {
         case name
         case terrain
         case culture
+        case popType
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
@@ -62,5 +70,6 @@ extension NavigatorTile: JavaScriptEncodable {
         js[.name] = self.name
         js[.terrain] = self.terrain
         js[.culture] = self.culture
+        js[.popType] = self.popType
     }
 }

@@ -636,7 +636,7 @@ extension GameSession {
 extension GameSession {
     public func tooltipTileCulture(
         _ id: Address,
-        culture: String,
+        _ culture: String,
     ) -> Tooltip? {
         guard
         let planet: PlanetContext = context.planets[id.planet],
@@ -659,6 +659,33 @@ extension GameSession {
 
         return .instructions(style: .borderless) {
             $0[culture] = (Double.init(share) / Double.init(total))[%3]
+        }
+    }
+    public func tooltipTilePopType(
+        _ id: Address,
+        _ type: PopType,
+    ) -> Tooltip? {
+        guard
+        let planet: PlanetContext = context.planets[id.planet],
+        let cell: PlanetContext.Cell = planet.cells[id.tile] else {
+            return nil
+        }
+
+        let (share, total): (share: Int64, total: Int64) = cell.pops.reduce(
+            into: (0, 0)
+        ) {
+            guard let pop: Pop = context.state.pops[$1] else {
+                return
+            }
+
+            if  type == pop.type {
+                $0.share += pop.today.size
+            }
+            $0.total += pop.today.size
+        }
+
+        return .instructions(style: .borderless) {
+            $0[type.plural] = (Double.init(share) / Double.init(total))[%3]
         }
     }
 }
