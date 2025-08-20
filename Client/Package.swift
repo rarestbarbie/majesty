@@ -51,10 +51,25 @@ let package: Package = .init(
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
             ]
         ),
-
         .target(
             name: "Assert",
             dependencies: ["AssertMacro"]
+        ),
+
+        .macro(
+            name: "BijectionMacro",
+            dependencies: [
+                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
+                .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
+            ]
+        ),
+        .target(
+            name: "Bijection",
+            dependencies: ["BijectionMacro"]
+        ),
+        .testTarget(
+            name: "BijectionTests",
+            dependencies: ["Bijection"]
         ),
 
         .target(
@@ -151,6 +166,7 @@ let package: Package = .init(
         .target(
             name: "GameRules",
             dependencies: [
+                .target(name: "Bijection"),
                 .target(name: "Color"),
                 .target(name: "GameState"),
                 .target(name: "GameEconomy"),
