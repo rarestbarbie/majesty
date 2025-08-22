@@ -15,9 +15,9 @@ import {
 const __filename: string = fileURLToPath(import.meta.url);
 const __dirname: string = path.dirname(__filename);
 
-const start: string = path.resolve(__dirname, "../../Client/start.json");
-const rules: string = path.resolve(__dirname, "../../Client/rules.json");
-const terrain: string = path.resolve(__dirname, "../../Client/terrain.json");
+const start: string = path.resolve(__dirname, "../../Client/Public/start.json");
+const rules: string = path.resolve(__dirname, "../../Client/Public/rules.json");
+const terrain: string = path.resolve(__dirname, "../../Client/Public/terrain.json");
 
 declare global {
     var start: any;

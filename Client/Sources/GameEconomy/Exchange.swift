@@ -58,6 +58,12 @@ extension Exchange {
         }
     }
 
+    @inlinable public func price(of resource: Resource, in currency: Fiat) -> Double {
+        self.table[resource / currency]?.current.c ?? Double.init(
+            LiquidityPool.init(liq: (self.liq, self.liq)).ratio
+        )
+    }
+
     public mutating func turn(history: Int) {
         for i: Int in self.table.values.indices {
             self.table.values[i].turn(history: history)

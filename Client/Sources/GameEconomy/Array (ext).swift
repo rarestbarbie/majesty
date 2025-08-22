@@ -39,10 +39,10 @@ extension [ResourceInput] {
         in currency: Fiat,
         on exchange: inout Exchange,
     ) -> Int64 {
-        guard let budgets: [Int64] = self.distribute(
-            funds: { _ in budget },
-            share: \.needed
-        ) else {
+        let weights: [Double] = self.map {
+            Double.init($0.needed) * exchange.price(of: $0.id, in: currency)
+        }
+        guard let budgets: [Int64] = weights.distribute(budget) else {
             return 0
         }
 
