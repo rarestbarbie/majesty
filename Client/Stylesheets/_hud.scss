@@ -35,3 +35,33 @@
         right: 1rem;
     }
 }
+#hud #tabs {
+    color: white;
+    width: 100%;
+    display: flex;
+}
+#hud #tabs {
+    > a {
+        width: 10rem;
+        padding: 1rem;
+
+        --bg: rgba(25, 25, 25, 0.5);
+        --blur-filter: blur(10px) saturate(180%);
+
+        background-color: var(--bg);
+        backdrop-filter: var(--blur-filter);
+        -webkit-backdrop-filter: var(--blur-filter);
+
+        cursor: pointer;
+    }
+    > a:hover,
+    > a:focus {
+        background-color: rgba(45, 45, 45, 0.5);
+    }
+    > a:active {
+        background-color: rgba(65, 65, 65, 0.5);
+    }
+    > a:last-child {
+        border-radius: 0 0 0.5rem 0;
+    }
+}

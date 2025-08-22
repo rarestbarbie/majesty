@@ -1,10 +1,19 @@
+@use 'mixins/blur';
+
 #clock {
+    background-color: rgba(25, 25, 25, 0.45);
+    --blur-filter: blur(10px) saturate(180%);
+
+    @include blur.background;
+
+    width: 24rem;
     color: white;
     display: flex;
     align-items: center;
 
     font-size: 1.2rem;
     padding: 0.5rem;
+    border-radius: 0 0 0.5rem 0;
 
     #flag {
         width: 2rem;
@@ -38,13 +47,27 @@
         color: #aaaaaa;
     }
 
-    #date {
-        width: 12rem;
+    time {
+        // This is dynamically updated on almost every frame, so if we do not disable pointer
+        // events, mouse clicks will get swallowed on Safari
+        pointer-events: none;
+    }
+
+    button {
+        all: unset;
+        cursor: pointer;
+    }
+
+    button:first-of-type {
         height: 1.5rem;
+        flex-grow: 1;
         display: flex;
         justify-content: space-between;
+        color: inherit;
 
-        cursor: pointer;
+        &:hover {
+            color: white;
+        }
 
         &::after {
             font-size: 1rem;
@@ -54,14 +77,21 @@
         }
     }
 
-    button {
+    button:not(:first-of-type) {
         width: 2rem;
+        display: flex;
+        justify-content: center;
+        color: #aaaaaa;
 
-        &:first-of-type::before {
-            content: '–'
+        &:hover {
+            color: white;
         }
-        &:last-of-type::before {
-            content: '+'
-        }
+    }
+
+    #slower::before {
+        content: '–'
+    }
+    #faster::before {
+        content: '+'
     }
 }

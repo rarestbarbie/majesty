@@ -4,11 +4,12 @@ import {
     WebGLRenderer
 } from 'three';
 import { Persistence } from '../DB/exports.js';
-import { Color, GameDateComponents, GameID, hex } from '../GameEngine/exports.js';
+import { GameID } from '../GameEngine/exports.js';
 import { PlayerEvent, PlayerEventID } from '../Multiplayer/exports.js';
 import {
     CelestialView,
     CelestialViewState,
+    Clock,
     DeveloperToolsPanel,
     GameUI,
     Screen,
@@ -30,13 +31,7 @@ export class Application {
     private readonly tile: NavigatorTile;
     private readonly minimap: Minimap;
     private readonly screen: Screen;
-    private readonly clock: {
-        root: HTMLElement;
-        flag: HTMLElement;
-        date: HTMLElement;
-        faster: HTMLElement;
-        slower: HTMLElement;
-    };
+    private readonly clock: Clock;
     private readonly tabs: {
         production: HTMLElement;
         population: HTMLElement;
@@ -73,22 +68,8 @@ export class Application {
         this.sprites.colorSpace = SRGBColorSpace;
         //this.sprites.magFilter = LinearMipmapNearestFilter;
 
-        this.clock = {
-            root: document.createElement('div'),
-            flag: document.createElement('div'),
-            date: document.createElement('div'),
-            faster: document.createElement('button'),
-            slower: document.createElement('button')
-        }
-        this.clock.root.id = 'clock';
-        this.clock.flag.id = 'flag';
-        this.clock.date.id = 'date';
-
-        this.clock.root.appendChild(this.clock.flag);
-        this.clock.root.appendChild(this.clock.date);
-        this.clock.root.appendChild(this.clock.slower);
-        this.clock.root.appendChild(this.clock.faster);
-        this.clock.date.onclick = () => { Application.move({ id: PlayerEventID.Pause }); };
+        this.clock = new Clock();
+        this.clock.pause.onclick = () => { Application.move({ id: PlayerEventID.Pause }); };
         this.clock.faster.onclick = () => { Application.move({ id: PlayerEventID.Faster }); };
         this.clock.slower.onclick = () => { Application.move({ id: PlayerEventID.Slower }); };
 
@@ -101,7 +82,6 @@ export class Application {
             budget: Application._tab(ScreenType.Budget, 'budget-tab'),
             trade: Application._tab(ScreenType.Trade, 'trade-tab')
         };
-
 
         this.main = document.createElement('main');
 
@@ -130,7 +110,7 @@ export class Application {
         });
 
         hud.interface.appendChild(header);
-        hud.interface.appendChild(this.clock.root);
+        hud.interface.appendChild(this.clock.node);
         hud.interface.appendChild(this.tile.node);
         hud.interface.appendChild(this.minimap.node);
         hud.interface.appendChild(devtools);
@@ -249,30 +229,7 @@ export class Application {
     };
 
     public update(state: GameUI) {
-        const date: GameDateComponents = Swift.gregorian(state.date);
-        let month: string = '';
-        switch (date.m) {
-            case 1: month = 'January'; break;
-            case 2: month = 'February'; break;
-            case 3: month = 'March'; break;
-            case 4: month = 'April'; break;
-            case 5: month = 'May'; break;
-            case 6: month = 'June'; break;
-            case 7: month = 'July'; break;
-            case 8: month = 'August'; break;
-            case 9: month = 'September'; break;
-            case 10: month = 'October'; break;
-            case 11: month = 'November'; break;
-            case 12: month = 'December'; break;
-        }
-
-        this.clock.root.classList.toggle('paused', state.speed.paused);
-        this.clock.root.dataset.ticks = `${state.speed.ticks}`;
-        // Convert Int32 color to CSS hex string
-        this.clock.flag.style.backgroundColor = hex(state.player?.color ?? 0x000000 as Color);
-        this.clock.flag.title = state.player?.long ?? 'Observer';
-        this.clock.date.innerText = `${month} ${date.d}, ${date.y}`
-
+        this.clock.update(state);
         this.tile.update(state.navigator?.tile);
         this.minimap.update(state.navigator);
         this.screen.update(state.screen);

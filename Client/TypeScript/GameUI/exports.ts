@@ -67,6 +67,7 @@ export * from './Planets/PlanetOverview.js';
 export * from './Planets/CelestialViewState.js';
 export * from './Planets/CelestialBodyState.js';
 
+export * from './Clock.js';
 export * from './Country.js';
 export * from './Screen.js';
 export * from './ScreenLayout.js';
