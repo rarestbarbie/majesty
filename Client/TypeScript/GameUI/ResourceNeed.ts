@@ -10,5 +10,4 @@ export interface ResourceNeed {
     readonly demanded: bigint;
     readonly consumed: bigint;
     readonly purchased: bigint;
-    readonly fundsLacking: boolean;
 }

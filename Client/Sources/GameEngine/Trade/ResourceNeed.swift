@@ -12,8 +12,6 @@ struct ResourceNeed {
     let demanded: Int64
     let consumed: Int64
     let purchased: Int64
-
-    let fundsLacking: Bool
 }
 extension ResourceNeed {
     init(label: ResourceLabel, input: ResourceInput, tier: ResourceNeedTier) {
@@ -25,7 +23,6 @@ extension ResourceNeed {
             demanded: input.demanded,
             consumed: input.consumed,
             purchased: input.purchased,
-            fundsLacking: input.fundsLacking
         )
     }
 }
@@ -40,7 +37,6 @@ extension ResourceNeed: JavaScriptEncodable {
         case demanded
         case consumed
         case purchased
-        case fundsLacking
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
@@ -53,6 +49,5 @@ extension ResourceNeed: JavaScriptEncodable {
         js[.demanded] = self.demanded
         js[.consumed] = self.consumed
         js[.purchased] = self.purchased
-        js[.fundsLacking] = self.fundsLacking
     }
 }
