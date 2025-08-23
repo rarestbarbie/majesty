@@ -12,8 +12,6 @@ extension ResourceInput {
 
         case consumed = "c"
         case purchased = "b"
-
-        case fundsLacking = "f"
     }
 }
 extension ResourceInput: JavaScriptEncodable {
@@ -25,7 +23,6 @@ extension ResourceInput: JavaScriptEncodable {
         js[.demanded] = self.demanded
         js[.consumed] = self.consumed
         js[.purchased] = self.purchased
-        js[.fundsLacking] = self.fundsLacking ? true : nil
     }
 }
 extension ResourceInput: JavaScriptDecodable {
@@ -38,7 +35,6 @@ extension ResourceInput: JavaScriptDecodable {
             demanded: try js[.demanded].decode(),
             consumed: try js[.consumed].decode(),
             purchased: try js[.purchased].decode(),
-            fundsLacking: try js[.fundsLacking]?.decode() ?? false
         )
     }
 }

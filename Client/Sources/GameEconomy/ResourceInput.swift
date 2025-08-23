@@ -22,8 +22,6 @@
     public var consumed: Int64
     public var purchased: Int64
 
-    public var fundsLacking: Bool
-
     @inlinable public init(
         id: Resource,
         acquiredValue: Int64,
@@ -32,7 +30,6 @@
         demanded: Int64,
         consumed: Int64,
         purchased: Int64,
-        fundsLacking: Bool
     ) {
         self.id = id
         self.acquiredValue = acquiredValue
@@ -41,7 +38,6 @@
         self.demanded = demanded
         self.consumed = consumed
         self.purchased = purchased
-        self.fundsLacking = fundsLacking
     }
 }
 extension ResourceInput: ResourceStockpile {
@@ -54,7 +50,6 @@ extension ResourceInput: ResourceStockpile {
             demanded: 0,
             consumed: 0,
             purchased: 0,
-            fundsLacking: false
         )
     }
 }
@@ -69,8 +64,6 @@ extension ResourceInput {
 
         self.consumed = 0
         self.purchased = 0
-
-        self.fundsLacking = false
     }
 
     @inlinable public mutating func sync(
@@ -87,8 +80,6 @@ extension ResourceInput {
 
         self.consumed = 0
         self.purchased = 0
-
-        self.fundsLacking = false
     }
 
     /// Returns the approximate value of the resource consumed.
@@ -141,14 +132,11 @@ extension ResourceInput {
             return 0
         }
         if  budget <= 0 {
-            self.fundsLacking = true
             return 0
         } else {
             var funds: Int64 = budget
             let acquired: Int64 = exchange[self.id / currency].buy(needed, with: &funds)
             let fundsSpent: Int64 = budget - funds
-
-            self.fundsLacking = funds < 0 && acquired < needed
 
             self.purchased += acquired
             self.acquired += acquired
