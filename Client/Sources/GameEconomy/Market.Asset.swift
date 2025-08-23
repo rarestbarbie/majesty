@@ -10,11 +10,11 @@ extension Market {
 extension Market.Asset {
     @inlinable public static func code(_ code: some StringProtocol) -> Self? {
         if case "F"? = code.first,
-            let fiat: Int16 = .init(code[code.index(after: code.startIndex)...]) {
-            return .fiat(.init(rawValue: fiat))
+            let fiat: Fiat = .init(code[code.index(after: code.startIndex)...]) {
+            return .fiat(fiat)
         } else if
-            let good: Int16 = .init(code) {
-            return .good(.init(rawValue: good))
+            let good: Resource = .init(code) {
+            return .good(good)
         } else {
             return nil
         }
@@ -22,8 +22,8 @@ extension Market.Asset {
 
     @inlinable public var code: String {
         switch self {
-        case .fiat(let fiat):   "F\(fiat.rawValue)"
-        case .good(let good):   "\(good.rawValue)"
+        case .fiat(let fiat):   "F\(fiat)"
+        case .good(let good):   "\(good)"
         }
     }
 }

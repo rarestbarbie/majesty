@@ -9,7 +9,7 @@ extension ResourceInput {
         case acquired = "a"
         case capacity = "s"
         case demanded = "d"
-
+        case consumedValue = "C"
         case consumed = "c"
         case purchased = "b"
     }
@@ -21,6 +21,7 @@ extension ResourceInput: JavaScriptEncodable {
         js[.acquired] = self.acquired
         js[.capacity] = self.capacity
         js[.demanded] = self.demanded
+        js[.consumedValue] = self.consumedValue
         js[.consumed] = self.consumed
         js[.purchased] = self.purchased
     }
@@ -33,6 +34,7 @@ extension ResourceInput: JavaScriptDecodable {
             acquired: try js[.acquired].decode(),
             capacity: try js[.capacity].decode(),
             demanded: try js[.demanded].decode(),
+            consumedValue: try js[.consumedValue].decode(),
             consumed: try js[.consumed].decode(),
             purchased: try js[.purchased].decode(),
         )

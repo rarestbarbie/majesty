@@ -24,6 +24,7 @@ export class ProductionOverview extends ScreenContent {
     private readonly needs: StaticList<ResourceNeedRow, Resource>;
     private readonly sales: StaticList<ResourceSaleBox, Resource>;
     private readonly charts: {
+        readonly spending: PieChart<string>;
         readonly country: PieChart<GameID>;
         readonly culture: PieChart<string>;
     };
@@ -43,6 +44,7 @@ export class ProductionOverview extends ScreenContent {
         this.sales = new StaticList<ResourceSaleBox, Resource>(document.createElement('div'));
 
         this.charts = {
+            spending: new PieChart<string>(TooltipType.FactoryStatementItem),
             country: new PieChart<GameID>(TooltipType.FactoryOwnershipCountry),
             culture: new PieChart<string>(TooltipType.FactoryOwnershipCulture),
         }
@@ -88,6 +90,7 @@ export class ProductionOverview extends ScreenContent {
         case FactoryDetailsTab.Inventory:
             this.dom.stats.appendChild(this.needs.node);
             this.dom.stats.appendChild(this.sales.node);
+            this.dom.stats.appendChild(this.charts.spending.node);
             break;
 
         case FactoryDetailsTab.Ownership:
@@ -147,6 +150,8 @@ export class ProductionOverview extends ScreenContent {
                 (sale: ResourceSale) => new ResourceSaleBox(sale),
                 (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
             );
+
+            this.charts.spending.update([id], state.factory.open.spending ?? []);
             break;
 
         case FactoryDetailsTab.Ownership:

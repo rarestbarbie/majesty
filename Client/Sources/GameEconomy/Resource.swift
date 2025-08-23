@@ -88,8 +88,14 @@ extension Resource: Comparable {
     }
 }
 extension Resource: CustomStringConvertible {
-    @inlinable public var description: String {
-        "[\(self.rawValue)]"
+    @inlinable public var description: String { "\(self.rawValue)" }
+}
+extension Resource: LosslessStringConvertible {
+    @inlinable public init?(_ description: some StringProtocol) {
+        guard let rawValue: Int16 = .init(description) else {
+            return nil
+        }
+        self.init(rawValue: rawValue)
     }
 }
 // extension Resource {

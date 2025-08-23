@@ -57,6 +57,11 @@ extension GameSession {
                 try arguments[0].decode(),
                 culture: try arguments[1].decode(),
             )
+        case .FactoryStatementItem:
+            self.tooltipFactoryStatementItem(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+            )
         case .PlanetCell:
             self.tooltipPlanetCell(
                 try arguments[0].decode(),
@@ -90,6 +95,11 @@ extension GameSession {
         case .PopType:
             self.tooltipPopType(
                 try arguments[0].decode(),
+            )
+        case .PopStatementItem:
+            self.tooltipPopStatementItem(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
             )
         case .TileCulture:
             self.tooltipTileCulture(

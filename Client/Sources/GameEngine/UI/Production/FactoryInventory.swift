@@ -1,10 +1,19 @@
 import GameEconomy
 import JavaScriptInterop
 import JavaScriptKit
+import VectorCharts
 
 struct FactoryInventory {
     var needs: [ResourceNeed]
     var sales: [ResourceSale]
+
+    var spending: PieChart<CashFlowItem, PieChartLabel>?
+
+    init() {
+        self.needs = []
+        self.sales = []
+        self.spending = nil
+    }
 }
 extension FactoryInventory {
     mutating func update(from factory: FactoryContext, in context: GameContext) {
@@ -24,6 +33,8 @@ extension FactoryInventory {
                 proceeds: output.proceeds,
             ))
         }
+
+        self.spending = factory.cashFlow.chart(rules: context.rules)
     }
 }
 extension FactoryInventory: JavaScriptEncodable {
@@ -31,11 +42,13 @@ extension FactoryInventory: JavaScriptEncodable {
         case type
         case needs
         case sales
+        case spending
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.type] = FactoryDetailsTab.Inventory
         js[.needs] = self.needs
         js[.sales] = self.sales
+        js[.spending] = self.spending
     }
 }

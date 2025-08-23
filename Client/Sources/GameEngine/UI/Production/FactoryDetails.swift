@@ -13,7 +13,7 @@ struct FactoryDetails {
         self.id = id
         self.open = open
 
-        self.inventory = .init(needs: [], sales: [])
+        self.inventory = .init()
         self.ownership = .init()
     }
 }

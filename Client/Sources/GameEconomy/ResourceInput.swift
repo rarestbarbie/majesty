@@ -19,6 +19,7 @@
     public var capacity: Int64
     public var demanded: Int64
 
+    public var consumedValue: Int64
     public var consumed: Int64
     public var purchased: Int64
 
@@ -28,6 +29,7 @@
         acquired: Int64,
         capacity: Int64,
         demanded: Int64,
+        consumedValue: Int64,
         consumed: Int64,
         purchased: Int64,
     ) {
@@ -36,6 +38,7 @@
         self.acquired = acquired
         self.capacity = capacity
         self.demanded = demanded
+        self.consumedValue = consumedValue
         self.consumed = consumed
         self.purchased = purchased
     }
@@ -48,6 +51,7 @@ extension ResourceInput: ResourceStockpile {
             acquired: 0,
             capacity: 0,
             demanded: 0,
+            consumedValue: 0,
             consumed: 0,
             purchased: 0,
         )
@@ -62,6 +66,7 @@ extension ResourceInput {
         self.demanded = multiplier * required.amount
         self.capacity = stockpile * self.demanded
 
+        self.consumedValue = 0
         self.consumed = 0
         self.purchased = 0
     }
@@ -78,6 +83,7 @@ extension ResourceInput {
         self.demanded = .init((Double.init(demanded) * efficiency).rounded(.up))
         self.capacity = .init((Double.init(capacity) * efficiency).rounded(.up))
 
+        self.consumedValue = 0
         self.consumed = 0
         self.purchased = 0
     }
@@ -92,11 +98,12 @@ extension ResourceInput {
             Int64.init((Double.init(amount) * efficiency).rounded(.up)),
             self.acquired
         )
-        let consumedValue: Int64 = self.acquired != 0
+
+        self.consumedValue = self.acquired != 0
             ? (consumed %/ self.acquired) *< self.acquiredValue
             : 0
 
-        self.acquiredValue -= consumedValue
+        self.acquiredValue -= self.consumedValue
         self.acquired -= consumed
         self.consumed += consumed
 
@@ -105,7 +112,12 @@ extension ResourceInput {
 }
 extension ResourceInput {
     @inlinable public var averageCost: Double {
-        self.acquired == 0 ? 0 : Double.init(self.acquiredValue) / Double.init(self.acquired)
+        let quantity: Int64 = self.acquired + self.consumed
+        if  quantity == 0 {
+            return 0
+        } else {
+            return Double.init(self.acquiredValue + self.consumedValue) / Double.init(quantity)
+        }
     }
 
     @inlinable public var fulfilled: Double {

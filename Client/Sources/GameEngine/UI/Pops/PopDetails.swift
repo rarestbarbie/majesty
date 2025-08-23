@@ -3,16 +3,20 @@ import GameState
 import GameRules
 import JavaScriptKit
 import JavaScriptInterop
+import VectorCharts
 
 struct PopDetails {
     let id: PopID
     var needs: [ResourceNeed]
     var sales: [ResourceSale]
 
+    var spending: PieChart<CashFlowItem, PieChartLabel>?
+
     init(id: PopID) {
         self.id = id
         self.needs = []
         self.sales = []
+        self.spending = nil
     }
 }
 extension PopDetails {
@@ -41,6 +45,8 @@ extension PopDetails {
                 proceeds: output.proceeds
             ))
         }
+
+        self.spending = pop.cashFlow.chart(rules: context.rules)
     }
 }
 extension PopDetails: JavaScriptEncodable {
@@ -48,11 +54,13 @@ extension PopDetails: JavaScriptEncodable {
         case id
         case needs
         case sales
+        case spending
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.needs] = self.needs
         js[.sales] = self.sales
+        js[.spending] = self.spending
     }
 }

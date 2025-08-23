@@ -16,8 +16,14 @@ extension Fiat: ExpressibleByIntegerLiteral {
     }
 }
 extension Fiat: CustomStringConvertible {
-    @inlinable public var description: String {
-        "[\(self.rawValue)]"
+    @inlinable public var description: String { "\(self.rawValue)" }
+}
+extension Fiat: LosslessStringConvertible {
+    @inlinable public init?(_ description: some StringProtocol) {
+        guard let rawValue: Int16 = .init(description) else {
+            return nil
+        }
+        self.init(rawValue: rawValue)
     }
 }
 extension Fiat {
