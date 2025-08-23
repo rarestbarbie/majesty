@@ -3,6 +3,7 @@ import { GameID } from "../../GameEngine/GameID.js";
 import { ScreenContent } from "../ScreenContent.js";
 import { Swift } from "../../Swift.js";
 import {
+    PieChart,
     PopulationReport,
     PopTableEntry,
     PopTableRow,
@@ -18,6 +19,10 @@ import {
 export class PopulationOverview extends ScreenContent {
     private needs: StaticList<ResourceNeedRow, Resource>;
     private sales: StaticList<ResourceSaleBox, Resource>;
+    private readonly charts: {
+        readonly spending: PieChart<string>;
+    };
+
     private pops: StaticList<PopTableRow, GameID>;
     private dom?: {
         readonly index: HTMLUListElement;
@@ -33,6 +38,9 @@ export class PopulationOverview extends ScreenContent {
 
         this.needs = new StaticList<ResourceNeedRow, Resource>(document.createElement("div"));
         this.sales = new StaticList<ResourceSaleBox, Resource>(document.createElement("div"));
+        this.charts = {
+            spending: new PieChart<string>(TooltipType.PopStatementItem),
+        };
     }
 
     public override attach(root: HTMLElement | null, parameters: URLSearchParams): void {
@@ -54,6 +62,7 @@ export class PopulationOverview extends ScreenContent {
 
             this.dom.stats.appendChild(this.needs.node);
             this.dom.stats.appendChild(this.sales.node);
+            this.dom.stats.appendChild(this.charts.spending.node);
 
             this.dom.panel.appendChild(this.dom.stats);
             this.dom.panel.appendChild(this.pops.node);
@@ -106,6 +115,8 @@ export class PopulationOverview extends ScreenContent {
                 (sale: ResourceSale) => new ResourceSaleBox(sale),
                 (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
             );
+
+            this.charts.spending.update([id], state.pop.spending ?? []);
         }
     }
 }

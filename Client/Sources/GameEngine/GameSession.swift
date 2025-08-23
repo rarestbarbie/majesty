@@ -420,6 +420,13 @@ extension GameSession {
             $0[country.name] = (Double.init(share) / Double.init(total))[%3]
         }
     }
+
+    public func tooltipFactoryStatementItem(
+        _ id: FactoryID,
+        _ item: CashFlowItem,
+    ) -> Tooltip? {
+        self.context.factories[id]?.cashFlow.tooltip(rules: self.context.rules, item: item)
+    }
 }
 extension GameSession {
     public func tooltipPlanetCell(_ id: PlanetID, _ cell: HexCoordinate) -> Tooltip? {
@@ -614,6 +621,13 @@ extension GameSession {
                 breakdown: demotion
             ),
         )
+    }
+
+    public func tooltipPopStatementItem(
+        _ id: PopID,
+        _ item: CashFlowItem,
+    ) -> Tooltip? {
+        self.context.pops.table[id]?.cashFlow.tooltip(rules: self.context.rules, item: item)
     }
 }
 extension GameSession {

@@ -8,6 +8,7 @@ export enum TooltipType {
     PopStockpile = 'PopStockpile',
     PopNeeds = 'PopNeeds',
     PopType = 'PopType',
+    PopStatementItem = 'PopStatementItem',
 
     // Factory Tooltips
     FactoryAccount = 'FactoryAccount',
@@ -17,6 +18,7 @@ export enum TooltipType {
     FactoryWorkers = 'FactoryWorkers',
     FactoryOwnershipCountry = 'FactoryOwnershipCountry',
     FactoryOwnershipCulture = 'FactoryOwnershipCulture',
+    FactoryStatementItem = 'FactoryStatementItem',
 
     TileCulture = 'TileCulture',
     TilePopType = 'TilePopType',

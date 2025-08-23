@@ -17,6 +17,8 @@ struct FactoryContext {
     private(set) var clerks: Workforce
     private(set) var equity: Equity
 
+    private(set) var cashFlow: CashFlowStatement
+
     init(type: FactoryMetadata, state: Factory) {
         self.type = type
         self.state = state
@@ -25,6 +27,8 @@ struct FactoryContext {
         self.workers = .init()
         self.clerks = .init()
         self.equity = .init()
+
+        self.cashFlow = .init()
     }
 }
 extension FactoryContext {
@@ -75,6 +79,9 @@ extension FactoryContext: RuntimeContext {
         }
 
         self.productivity = modifiers.productivity[self.state.type]
+
+        self.cashFlow.reset()
+        self.cashFlow.update(with: self.state.ni)
     }
 
     mutating func advance(in context: GameContext, on map: inout GameMap) throws {

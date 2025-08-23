@@ -15,12 +15,15 @@ struct PopContext {
     private(set) var unemployment: Double
     private(set) var equity: Equity
 
+    private(set) var cashFlow: CashFlowStatement
+
     public init(type: PopMetadata, state: Pop) {
         self.type = type
         self.state = state
 
         self.unemployment = 0
         self.equity = .init()
+        self.cashFlow = .init()
     }
 }
 extension PopContext {
@@ -157,6 +160,11 @@ extension PopContext: RuntimeContext {
     mutating func compute(in context: GameContext.ResidentPass) throws {
         let unemployed: Int64 = self.state.unemployed
         self.unemployment = Double.init(unemployed) / Double.init(self.state.today.size)
+
+        self.cashFlow.reset()
+        self.cashFlow.update(with: self.state.nl)
+        self.cashFlow.update(with: self.state.ne)
+        self.cashFlow.update(with: self.state.nx)
     }
 
     mutating func advance(in context: GameContext, on map: inout GameMap) throws {
