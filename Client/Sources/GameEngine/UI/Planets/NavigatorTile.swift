@@ -42,7 +42,7 @@ extension NavigatorTile {
                 return
             }
 
-            if  let culture: Culture = context.state.cultures[pop.state.nat] {
+            if  let culture: Culture = context.cultures.state[pop.state.nat] {
                 let label: PieChartLabel = .init(color: culture.color, name: culture.id)
                 $0.culture[culture.id, default: (0, label)].share += pop.state.today.size
             }

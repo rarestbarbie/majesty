@@ -1,13 +1,12 @@
-import GameRules
-import GameState
+import GameEconomy
+import OrderedCollections
 
-struct GameSnapshot {
-    let date: GameDate
-    let player: CountryID
-    let planets: RuntimeStateTable<PlanetContext>
-    let cultures: RuntimeStateTable<CultureContext>
-    let countries: RuntimeStateTable<CountryContext>
-    let factories: RuntimeStateTable<FactoryContext>
-    let pops: RuntimeStateTable<PopContext>
-    let rules: GameRules
+@dynamicMemberLookup struct GameSnapshot: ~Copyable {
+    let context: GameContext
+    let markets: OrderedDictionary<Market.AssetPair, Market>
+}
+extension GameSnapshot {
+    subscript<T>(dynamicMember keyPath: KeyPath<GameContext, T>) -> T {
+        self.context[keyPath: keyPath]
+    }
 }

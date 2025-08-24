@@ -42,6 +42,12 @@ extension GameSession {
                 try arguments[1].decode(),
                 try arguments[2].decode(),
             )
+        case .FactoryExplainPrice:
+            self.tooltipFactoryExplainPrice(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+                try arguments[2].decode(),
+            )
         case .FactoryWorkers:
             self.tooltipFactoryWorkers(
                 try arguments[0].decode(),
@@ -83,6 +89,12 @@ extension GameSession {
             )
         case .PopStockpile:
             self.tooltipPopStockpile(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+                try arguments[2].decode(),
+            )
+        case .PopExplainPrice:
+            self.tooltipPopExplainPrice(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
                 try arguments[2].decode(),

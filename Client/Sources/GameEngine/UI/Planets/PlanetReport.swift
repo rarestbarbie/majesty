@@ -24,8 +24,8 @@ extension PlanetReport: PersistentReport {
         }
     }
 
-    mutating func update(on map: borrowing GameMap, in context: GameContext) {
-        self.planet?.update(in: context)
+    mutating func update(from snapshot: borrowing GameSnapshot) {
+        self.planet?.update(in: snapshot.context)
     }
 }
 extension PlanetReport {

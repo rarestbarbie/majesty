@@ -202,7 +202,7 @@ div.tabs > * > input[type=radio]:checked + label {
 }
 
 [data-table='Needs'] {
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
 }
 [data-table='Needs'] > [data-tier='i'] {
     --color: rgb(104, 104, 104);

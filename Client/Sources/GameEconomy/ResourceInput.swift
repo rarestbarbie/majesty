@@ -1,16 +1,3 @@
-@frozen public struct Volume {
-    public var resource: (i: Int64, o: Int64)
-    public var currency: (i: Int64, o: Int64)
-
-    @inlinable public init(
-        resource: (i: Int64, o: Int64) = (0, 0),
-        currency: (i: Int64, o: Int64) = (0, 0)
-    ) {
-        self.resource = resource
-        self.currency = currency
-    }
-}
-
 @frozen public struct ResourceInput {
     public let id: Resource
 
@@ -23,6 +10,8 @@
     public var consumed: Int64
     public var purchased: Int64
 
+    public var price: Double
+
     @inlinable public init(
         id: Resource,
         acquiredValue: Int64,
@@ -32,6 +21,7 @@
         consumedValue: Int64,
         consumed: Int64,
         purchased: Int64,
+        price: Double
     ) {
         self.id = id
         self.acquiredValue = acquiredValue
@@ -41,6 +31,7 @@
         self.consumedValue = consumedValue
         self.consumed = consumed
         self.purchased = purchased
+        self.price = price
     }
 }
 extension ResourceInput: ResourceStockpile {
@@ -54,7 +45,15 @@ extension ResourceInput: ResourceStockpile {
             consumedValue: 0,
             consumed: 0,
             purchased: 0,
+            price: 0,
         )
+    }
+}
+extension ResourceInput {
+    @inlinable mutating func turn() {
+        self.consumedValue = 0
+        self.consumed = 0
+        self.purchased = 0
     }
 }
 extension ResourceInput {
@@ -66,9 +65,7 @@ extension ResourceInput {
         self.demanded = multiplier * required.amount
         self.capacity = stockpile * self.demanded
 
-        self.consumedValue = 0
-        self.consumed = 0
-        self.purchased = 0
+        self.turn()
     }
 
     @inlinable public mutating func sync(
@@ -83,9 +80,7 @@ extension ResourceInput {
         self.demanded = .init((Double.init(demanded) * efficiency).rounded(.up))
         self.capacity = .init((Double.init(capacity) * efficiency).rounded(.up))
 
-        self.consumedValue = 0
-        self.consumed = 0
-        self.purchased = 0
+        self.turn()
     }
 
     /// Returns the approximate value of the resource consumed.
@@ -138,23 +133,34 @@ extension ResourceInput {
         with budget: Int64,
         in currency: Fiat,
         on exchange: inout Exchange) -> Int64 {
-        let target: Int64 = self.demanded * stockpile
-        let needed: Int64 = self.needed(target)
-        if  needed <= 0 {
-            return 0
-        }
-        if  budget <= 0 {
-            return 0
-        } else {
-            var funds: Int64 = budget
-            let acquired: Int64 = exchange[self.id / currency].buy(needed, with: &funds)
-            let fundsSpent: Int64 = budget - funds
+        {
+            let target: Int64 = self.demanded * stockpile
+            let needed: Int64 = self.needed(target)
 
-            self.purchased += acquired
-            self.acquired += acquired
-            self.acquiredValue += fundsSpent
-            return fundsSpent
-        }
+            if  needed <= 0 {
+                self.price = Double.init($0.ratio)
+                return 0
+            }
+            if  budget <= 0 {
+                self.price = Double.init($0.ratio)
+                return 0
+            } else {
+                var funds: Int64 = budget
+                let acquired: Int64 = $0.buy(needed, with: &funds)
+                let fundsSpent: Int64 = budget - funds
+
+                self.purchased += acquired
+                self.acquired += acquired
+                self.acquiredValue += fundsSpent
+
+                // Compute actual price, if at least one unit was purchased, otherwise
+                // theoretical market price
+                self.price = acquired != 0
+                    ? Double.init(fundsSpent %/ acquired)
+                    : Double.init($0.ratio)
+                return fundsSpent
+            }
+        } (&exchange[self.id / currency])
     }
 }
 

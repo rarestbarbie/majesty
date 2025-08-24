@@ -56,17 +56,17 @@ extension TradeReport: PersistentReport {
         }
     }
 
-    mutating func update(on map: borrowing GameMap, in context: GameContext) {
+    mutating func update(from snapshot: borrowing GameSnapshot) {
         self.markets.removeAll()
 
         var resourcesTraded: [Resource: ResourceLabel] = [:]
         var currenciesTraded: [Fiat: CurrencyLabel] = [:]
-        let currencies: [Fiat: Country.Currency] = context.state.countries.reduce(
+        let currencies: [Fiat: Country.Currency] = snapshot.countries.state.reduce(
             into: [:]
         ) { $0[$1.currency.id] = $1.currency }
-        let currencyPlayer: Fiat? = context.state.countries[context.player]?.currency.id
+        let currencyPlayer: Fiat? = snapshot.countries.state[snapshot.player]?.currency.id
 
-        for market: Market in map.exchange.markets {
+        for market: Market in snapshot.markets.values {
             guard
             case .good(let good) = market.id.x,
             case .fiat(let fiat) = market.id.y,
@@ -74,7 +74,7 @@ extension TradeReport: PersistentReport {
                 continue
             }
 
-            let resource: ResourceLabel = context.rules[good]
+            let resource: ResourceLabel = snapshot.rules[good]
 
             resourcesTraded[good] = resource
             currenciesTraded[fiat] = currency.label
@@ -109,7 +109,7 @@ extension TradeReport: PersistentReport {
                 fallthrough
 
             case market.id?:
-                self.market?.update(in: context, from: market)
+                self.market?.update(in: snapshot.context, from: market)
 
             case _?:
                 continue

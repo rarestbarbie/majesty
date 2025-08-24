@@ -18,22 +18,22 @@ extension PopulationReport: PersistentReport {
         }
     }
 
-    mutating func update(on map: borrowing GameMap, in context: GameContext) {
+    mutating func update(from snapshot: borrowing GameSnapshot) {
         self.pops.removeAll()
 
         guard
-        let country: CountryContext = context.countries[context.player] else {
+        let country: CountryContext = snapshot.countries[snapshot.player] else {
             return
         }
 
         let include: Set<PlanetID> = .init(country.state.territory)
-        for pop: PopContext in context.pops.table where include.contains(
+        for pop: PopContext in snapshot.pops.table where include.contains(
             pop.state.home.planet
         ) {
             guard
-            let planet: PlanetContext = context.planets[pop.state.home.planet],
+            let planet: PlanetContext = snapshot.planets[pop.state.home.planet],
             let tile: PlanetTile = planet.cells[pop.state.home.tile]?.tile,
-            let culture: Culture = context.state.cultures[pop.state.nat] else {
+            let culture: Culture = snapshot.cultures.state[pop.state.nat] else {
                 continue
             }
 
@@ -48,7 +48,7 @@ extension PopulationReport: PersistentReport {
                 today: pop.state.today,
                 jobs: pop.state.jobs.values.map {
                     .init(
-                        name: context.factories[$0.at]?.type.name ?? "Unknown",
+                        name: snapshot.factories[$0.at]?.type.name ?? "Unknown",
                         size: $0.employed,
                         hire: $0.hire,
                         fire: $0.fire,
@@ -59,7 +59,7 @@ extension PopulationReport: PersistentReport {
             ))
         }
 
-        self.pop?.update(in: context)
+        self.pop?.update(from: snapshot)
     }
 }
 extension PopulationReport {

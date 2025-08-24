@@ -1,3 +1,4 @@
+import GameRules
 import GameEconomy
 import JavaScriptInterop
 import JavaScriptKit
@@ -16,25 +17,35 @@ struct FactoryInventory {
     }
 }
 extension FactoryInventory {
-    mutating func update(from factory: FactoryContext, in context: GameContext) {
+    mutating func update(from factory: FactoryContext, in snapshot: borrowing GameSnapshot) {
         self.needs.removeAll(keepingCapacity: true)
         self.needs.reserveCapacity(factory.state.ni.count + factory.state.nv.count)
-        self.needs.update(inputs: factory.state.ni, tier: .i, rules: context.rules)
-        self.needs.update(inputs: factory.state.nv, tier: .v, rules: context.rules)
+        self.needs.update(
+            inputs: factory.state.ni,
+            currency: factory.policy?.currency,
+            tier: .i,
+            from: snapshot
+        )
+        self.needs.update(
+            inputs: factory.state.nv,
+            currency: factory.policy?.currency,
+            tier: .v,
+            from: snapshot
+        )
 
         self.sales.removeAll(keepingCapacity: true)
         self.sales.reserveCapacity(factory.state.out.count)
 
         for output: ResourceOutput in factory.state.out {
             self.sales.append(.init(
-                label: context.rules[output.id],
+                label: snapshot.rules[output.id],
                 quantity: output.quantity,
                 leftover: output.leftover,
                 proceeds: output.proceeds,
             ))
         }
 
-        self.spending = factory.cashFlow.chart(rules: context.rules)
+        self.spending = factory.cashFlow.chart(rules: snapshot.rules)
     }
 }
 extension FactoryInventory: JavaScriptEncodable {

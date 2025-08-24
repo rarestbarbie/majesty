@@ -116,6 +116,7 @@ export class PopulationOverview extends ScreenContent {
                     id,
                     TooltipType.PopDemand,
                     TooltipType.PopStockpile,
+                    TooltipType.PopExplainPrice,
                 ),
                 (need: ResourceNeed, row: ResourceNeedRow) => row.update(need),
             );

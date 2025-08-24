@@ -18,16 +18,16 @@ struct FactoryDetails {
     }
 }
 extension FactoryDetails {
-    mutating func update(in context: GameContext) {
+    mutating func update(from snapshot: borrowing GameSnapshot) {
         guard
-        let factory: FactoryContext = context.factories[self.id]
+        let factory: FactoryContext = snapshot.factories[self.id]
         else {
             return
         }
 
         switch self.open {
-        case .Inventory: self.inventory.update(from: factory, in: context)
-        case .Ownership: self.ownership.update(from: factory, in: context)
+        case .Inventory: self.inventory.update(from: factory, in: snapshot)
+        case .Ownership: self.ownership.update(from: factory, in: snapshot.context)
         }
     }
 }
