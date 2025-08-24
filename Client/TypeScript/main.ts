@@ -33,13 +33,13 @@ async function json(path: string): Promise<any> {
 async function main(user: Firebase.User): Promise<void> {
     const persistence: Persistence = new Persistence(user);
 
-    const sprites: Promise<Texture> = texture('/CelestialBodies.png');
-    const start: Promise<any> = json('/start.json');
-    const rules: Promise<any> = json('/rules.json');
+    const sprites: Promise<Texture> = texture('/majesty/CelestialBodies.png');
+    const start: Promise<any> = json('/majesty/start.json');
+    const rules: Promise<any> = json('/majesty/rules.json');
     let terrain: any[] | null = await persistence.loadTerrain();
     if (terrain === null) {
         // User does not have terrain saved, load default terrain
-        terrain = await json('/terrain.json') as any[];
+        terrain = await json('/majesty/terrain.json') as any[];
     }
 
     window.swift = new Swift();
@@ -47,8 +47,8 @@ async function main(user: Firebase.User): Promise<void> {
 
     // Parse path components to determine the current page
     const path: string[] = window.location.pathname.split('/').filter(Boolean);
-    const game: string | undefined = path[1];
-    if (path[0] == 'mp', game) {
+    const game: string | undefined = path[2];
+    if (path[1] == 'mp', game) {
         console.log(`Running in Multiplayer Mode`);
 
         const mp: Socket<any, any> = io('http://localhost:3000');
@@ -128,6 +128,6 @@ Firebase.onAuthStateChanged(Persistence.auth, (user: Firebase.User | null) => {
     if (user) {
         main(user);
     } else {
-        window.location.href = '/login.html';
+        window.location.href = '/majesty/login';
     }
 });
