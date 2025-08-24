@@ -12,6 +12,8 @@ struct PopContext {
     let type: PopMetadata
     var state: Pop
 
+    private(set) var policy: CountryPolicies?
+
     private(set) var unemployment: Double
     private(set) var equity: Equity
 
@@ -20,6 +22,8 @@ struct PopContext {
     public init(type: PopMetadata, state: Pop) {
         self.type = type
         self.state = state
+
+        self.policy = nil
 
         self.unemployment = 0
         self.equity = .init()
@@ -43,7 +47,7 @@ extension PopContext {
 
 extension PopContext {
     func buildDemotionMatrix<Matrix>(
-        country: Country,
+        country: CountryPolicies,
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
@@ -85,17 +89,17 @@ extension PopContext {
 
             default:
                 $0[self.state.nat] {
-                    $0[$1 != country.white] = +100%
+                    $0[$1 != country.culture] = +100%
                 } = { "\(+$0[%]): Culture is not \(em: $1)" }
                 $0[self.state.nat] {
-                    $0[$1 == country.white] = -5%
+                    $0[$1 == country.culture] = -5%
                 } = { "\(+$0[%]): Culture is \(em: $1)" }
             }
         }
     }
 
     func buildPromotionMatrix<Matrix>(
-        country: Country,
+        country: CountryPolicies,
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
@@ -146,10 +150,10 @@ extension PopContext {
 
             default:
                 $0[self.state.nat] {
-                    $0[$1 != country.white] = -75%
+                    $0[$1 != country.culture] = -75%
                 } = { "\(+$0[%]): Culture is not \(em: $1)" }
                 $0[self.state.nat] {
-                    $0[$1 == country.white] = +5%
+                    $0[$1 == country.culture] = +5%
                 } = { "\(+$0[%]): Culture is \(em: $1)" }
             }
 
@@ -158,6 +162,12 @@ extension PopContext {
 }
 extension PopContext: RuntimeContext {
     mutating func compute(in context: GameContext.ResidentPass) throws {
+        guard
+        let country: CountryID = context.planets[self.state.home.planet]?.occupied,
+        let country: Country = context.countries.state[country] else {
+            return
+        }
+
         let unemployed: Int64 = self.state.unemployed
         self.unemployment = Double.init(unemployed) / Double.init(self.state.today.size)
 
@@ -165,12 +175,13 @@ extension PopContext: RuntimeContext {
         self.cashFlow.update(with: self.state.nl)
         self.cashFlow.update(with: self.state.ne)
         self.cashFlow.update(with: self.state.nx)
+
+        self.policy = country.policies
     }
 
     mutating func advance(in context: GameContext, on map: inout GameMap) throws {
         guard
-        let country: CountryID = context.planets[self.state.home.planet]?.occupied,
-        let country: Country = context.self.state.countries[country] else {
+        let country: CountryPolicies = self.policy else {
             return
         }
 
@@ -220,7 +231,7 @@ extension PopContext: RuntimeContext {
                 let spent: Int64 = self.state.nl.buy(
                     days: stockpileTarget,
                     with: budget,
-                    in: country.currency.id,
+                    in: country.currency,
                     on: &map.exchange,
                 )
 
@@ -236,7 +247,7 @@ extension PopContext: RuntimeContext {
                 let spent: Int64 = self.state.ne.buy(
                     days: stockpileTarget,
                     with: budget,
-                    in: country.currency.id,
+                    in: country.currency,
                     on: &map.exchange,
                 )
 
@@ -252,7 +263,7 @@ extension PopContext: RuntimeContext {
                 let spent: Int64 = self.state.nx.buy(
                     days: stockpileTarget,
                     with: budget,
-                    in: country.currency.id,
+                    in: country.currency,
                     on: &map.exchange,
                 )
                 self.state.cash.b -= spent
@@ -269,7 +280,7 @@ extension PopContext: RuntimeContext {
         }
         // This comes at the end, mostly because worker and clerk pops don’t get paid until
         // after the turn is over, and we want all payments to happen at the same logical stage.
-        self.state.cash.r += self.state.out.sell(in: country.currency.id, on: &map.exchange)
+        self.state.cash.r += self.state.out.sell(in: country.currency, on: &map.exchange)
         switch self.state.type.stratum {
         case .Ward:
             // Pay dividends to shareholders, if any.
@@ -312,7 +323,7 @@ extension PopContext: RuntimeContext {
         let w0: Double = .init(country.minwage)
         for i: Int in jobs {
             {
-                guard let factory: Factory = context.state.factories[$0.at] else {
+                guard let factory: Factory = context.factories.state[$0.at] else {
                     // Factory has gone bankrupt or been destroyed.
                     $0.fireAll()
                     return

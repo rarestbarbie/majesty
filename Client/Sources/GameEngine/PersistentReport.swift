@@ -6,18 +6,17 @@ protocol PersistentReport<Subject> {
     init()
 
     mutating func select(subject: Subject, details: Details?, filter: Filter?) throws
-    mutating func update(on map: borrowing GameMap, in context: GameContext) throws
+    mutating func update(from snapshot: borrowing GameSnapshot) throws
 }
 extension PersistentReport {
     mutating func open(
         subject: Subject,
         details: Details?,
         filter: Filter?,
-        on map: borrowing GameMap,
-        in context: GameContext
+        snapshot: borrowing GameSnapshot
     ) throws -> Self {
         try self.select(subject: subject, details: details, filter: filter)
-        try self.update(on: map, in: context)
+        try self.update(from: snapshot)
         return self
     }
 }

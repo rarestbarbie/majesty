@@ -11,6 +11,8 @@ struct FactoryContext {
     let type: FactoryMetadata
     var state: Factory
 
+    private(set) var policy: CountryPolicies?
+
     private var productivity: Int64
 
     private(set) var workers: Workforce
@@ -24,6 +26,8 @@ struct FactoryContext {
         self.state = state
 
         self.productivity = 0
+        self.policy = nil
+
         self.workers = .init()
         self.clerks = .init()
         self.equity = .init()
@@ -74,11 +78,12 @@ extension FactoryContext: RuntimeContext {
 
         guard
         let country: CountryID = pass.planets[self.state.on.planet]?.occupied,
-        let modifiers: FactoryModifiers = pass.countries[country]?.factories else {
+        let country: CountryContext = pass.countries[country] else {
             return
         }
 
-        self.productivity = modifiers.productivity[self.state.type]
+        self.productivity = country.factories.productivity[self.state.type]
+        self.policy = country.state.policies
 
         self.cashFlow.reset()
         self.cashFlow.update(with: self.state.ni)
@@ -86,8 +91,7 @@ extension FactoryContext: RuntimeContext {
 
     mutating func advance(in context: GameContext, on map: inout GameMap) throws {
         guard
-        let country: CountryID = context.planets[self.state.on.planet]?.occupied,
-        let country: Country = context.state.countries[country] else {
+        let country: CountryPolicies = self.policy else {
             return
         }
 
@@ -142,7 +146,7 @@ extension FactoryContext: RuntimeContext {
         let inputSpend: Int64 = self.state.ni.buy(
             days: stockpileTarget,
             with: inputBudget,
-            in: country.currency.id,
+            in: country.currency,
             on: &map.exchange,
         )
 
@@ -232,7 +236,7 @@ extension FactoryContext: RuntimeContext {
         }
 
         // Sell outputs.
-        self.state.cash.r += self.state.out.sell(in: country.currency.id, on: &map.exchange)
+        self.state.cash.r += self.state.out.sell(in: country.currency, on: &map.exchange)
 
         #assert(self.state.cash.balance >= 0, "Factory has negative cash! (\(self.state.cash))")
 
@@ -331,7 +335,7 @@ extension FactoryContext: RuntimeContext {
             self.state.cash.v -= self.state.nv.buy(
                 days: stockpileTarget,
                 with: investmentBudget,
-                in: country.currency.id,
+                in: country.currency,
                 on: &map.exchange,
             )
 

@@ -21,15 +21,15 @@ extension FactoryOwnership {
         ) = factory.equity.owners.reduce(
             into: ([:], [:])
         ) {
-            guard let pop: Pop = context.state.pops[$1.id] else {
+            guard let pop: Pop = context.pops.table.state[$1.id] else {
                 return
             }
             if  let country: CountryID = context.planets[pop.home.planet]?.occupied,
-                let country: Country = context.state.countries[country] {
+                let country: Country = context.countries.state[country] {
                 let label: PieChartLabel = .init(color: country.color, name: country.name)
                 $0.country[country.id, default: (0, label)].share += $1.count
             }
-            if  let culture: Culture = context.state.cultures[pop.nat] {
+            if  let culture: Culture = context.cultures.state[pop.nat] {
                 let label: PieChartLabel = .init(color: culture.color, name: culture.id)
                 $0.culture[culture.id, default: (0, label)].share += $1.count
             }

@@ -20,9 +20,9 @@ struct PopDetails {
     }
 }
 extension PopDetails {
-    mutating func update(in context: GameContext) {
+    mutating func update(from snapshot: borrowing GameSnapshot) {
         guard
-        let pop: PopContext = context.pops.table[self.id]
+        let pop: PopContext = snapshot.pops.table[self.id]
         else {
             return
         }
@@ -30,23 +30,38 @@ extension PopDetails {
         self.needs.removeAll(keepingCapacity: true)
         self.needs.reserveCapacity(pop.state.nl.count + pop.state.ne.count + pop.state.nx.count)
 
-        self.needs.update(inputs: pop.state.nl, tier: .l, rules: context.rules)
-        self.needs.update(inputs: pop.state.ne, tier: .e, rules: context.rules)
-        self.needs.update(inputs: pop.state.nx, tier: .x, rules: context.rules)
+        self.needs.update(
+            inputs: pop.state.nl,
+            currency: pop.policy?.currency,
+            tier: .l,
+            from: snapshot
+        )
+        self.needs.update(
+            inputs: pop.state.ne,
+            currency: pop.policy?.currency,
+            tier: .e,
+            from: snapshot
+        )
+        self.needs.update(
+            inputs: pop.state.nx,
+            currency: pop.policy?.currency,
+            tier: .x,
+            from: snapshot
+        )
 
         self.sales.removeAll(keepingCapacity: true)
         self.sales.reserveCapacity(pop.state.out.count)
 
         for output: ResourceOutput in pop.state.out {
             self.sales.append(.init(
-                label: context.rules[output.id],
+                label: snapshot.rules[output.id],
                 quantity: output.quantity,
                 leftover: output.leftover,
                 proceeds: output.proceeds
             ))
         }
 
-        self.spending = pop.cashFlow.chart(rules: context.rules)
+        self.spending = pop.cashFlow.chart(rules: snapshot.rules)
     }
 }
 extension PopDetails: JavaScriptEncodable {

@@ -26,20 +26,20 @@ extension ProductionReport: PersistentReport {
         }
     }
 
-    mutating func update(on map: borrowing GameMap, in context: GameContext) {
+    mutating func update(from snapshot: borrowing GameSnapshot) {
         self.factories.removeAll()
 
         guard
-        let country: CountryContext = context.countries[context.player] else {
+        let country: CountryContext = snapshot.countries[snapshot.player] else {
             return
         }
 
         let include: Set<PlanetID> = .init(country.state.territory)
-        for factory: FactoryContext in context.factories where include.contains(
+        for factory: FactoryContext in snapshot.factories where include.contains(
             factory.state.on.planet
         ) {
             guard
-            let planet: PlanetContext = context.planets[factory.state.on.planet],
+            let planet: PlanetContext = snapshot.planets[factory.state.on.planet],
             let tile: PlanetTile = planet.cells[factory.state.on.tile]?.tile else {
                 continue
             }
@@ -64,7 +64,7 @@ extension ProductionReport: PersistentReport {
             ))
         }
 
-        self.factory?.update(in: context)
+        self.factory?.update(from: snapshot)
     }
 }
 extension ProductionReport {

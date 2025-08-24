@@ -1,5 +1,7 @@
 import {
     DiffableListElement,
+    Fortune,
+    Ticker,
     UpdateBigInt,
 } from '../DOM/exports.js';
 import { GameID } from '../GameEngine/exports.js';
@@ -16,12 +18,14 @@ export class ResourceNeedRow implements DiffableListElement<Resource> {
 
     private readonly demand: ProgressCell;
     private readonly stockpile: HTMLElement;
+    private readonly price: Ticker;
 
     public static get columns(): string[] {
         return [
             "Resource",
             "Demand",
             "Stockpile",
+            "Price",
         ];
     }
 
@@ -29,7 +33,8 @@ export class ResourceNeedRow implements DiffableListElement<Resource> {
         need: ResourceNeed,
         owner: GameID,
         demand: TooltipType,
-        stockpile: TooltipType
+        stockpile: TooltipType,
+        explainPrice: TooltipType,
     ) {
         this.id = need.id;
         this.node = document.createElement('a');
@@ -51,9 +56,17 @@ export class ResourceNeedRow implements DiffableListElement<Resource> {
             JSON.stringify([owner, need.tier, need.id]),
         );
 
+        this.price = new Ticker(Fortune.Malus);
+        this.price.outer.setAttribute('data-tooltip-type', explainPrice);
+        this.price.outer.setAttribute(
+            'data-tooltip-arguments',
+            JSON.stringify([owner, need.tier, need.id]),
+        );
+
         this.node.appendChild(label);
         this.node.appendChild(this.demand.node);
         this.node.appendChild(this.stockpile);
+        this.node.appendChild(this.price.outer);
         this.node.dataset['tier'] = need.tier;
     }
 
@@ -78,5 +91,7 @@ export class ResourceNeedRow implements DiffableListElement<Resource> {
         } else {
             delete this.stockpile.dataset['cell'];
         }
+
+        this.price.updatePriceChange(need.price.o, need.price.c, 2);
     }
 }

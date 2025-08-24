@@ -1,4 +1,4 @@
-import { Candle } from "./Candle.js";
+import { Candle } from '../exports.js';
 
 export interface MarketTableEntry {
     readonly id: string;

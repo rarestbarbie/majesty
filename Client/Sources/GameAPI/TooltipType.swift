@@ -5,6 +5,7 @@ enum TooltipType: String, LoadableFromJSValue {
     case FactorySize
     case FactoryDemand
     case FactoryStockpile
+    case FactoryExplainPrice
     case FactoryOwnershipCountry
     case FactoryOwnershipCulture
     case FactoryWorkers
@@ -16,6 +17,7 @@ enum TooltipType: String, LoadableFromJSValue {
     case PopJobs
     case PopDemand
     case PopStockpile
+    case PopExplainPrice
     case PopNeeds
     case PopType
     case PopStatementItem

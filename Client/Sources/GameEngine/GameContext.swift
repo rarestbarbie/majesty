@@ -88,7 +88,7 @@ extension GameContext {
     }
 }
 extension GameContext {
-    var state: GameSnapshot {
+    var territoryPass: TerritoryPass {
         .init(
             date: self.date,
             player: self.player,
@@ -158,13 +158,13 @@ extension GameContext {
 
     mutating func compute() throws {
         for i: Int in self.planets.indices {
-            try self.planets[i].compute(in: self.state)
+            try self.planets[i].compute(in: self.territoryPass)
         }
         for i: Int in self.cultures.indices {
-            try self.cultures[i].compute(in: self.state)
+            try self.cultures[i].compute(in: self.territoryPass)
         }
         for i: Int in self.countries.indices {
-            try self.countries[i].compute(in: self.state)
+            try self.countries[i].compute(in: self.territoryPass)
         }
 
         self.index()

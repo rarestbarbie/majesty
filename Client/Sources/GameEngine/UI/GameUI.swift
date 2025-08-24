@@ -34,23 +34,23 @@ public struct GameUI {
     }
 }
 extension GameUI {
-    mutating func sync(with map: borrowing GameMap, in context: GameContext) throws {
-        self.player = context.state.countries[context.state.player]
-        self.date = context.date
+    mutating func sync(with snapshot: borrowing GameSnapshot) throws {
+        self.player = snapshot.countries.state[snapshot.player]
+        self.date = snapshot.date
 
-        self.navigator.update(in: context)
+        self.navigator.update(in: snapshot.context)
 
         // Only update screens that are currently open
         switch self.screen {
-        case .Planet?:      self.report.planet.update(on: map, in: context)
-        case .Production?:  self.report.production.update(on: map, in: context)
-        case .Population?:  self.report.population.update(on: map, in: context)
-        case .Trade?:       self.report.trade.update(on: map, in: context)
+        case .Planet?:      self.report.planet.update(from: snapshot)
+        case .Production?:  self.report.production.update(from: snapshot)
+        case .Population?:  self.report.population.update(from: snapshot)
+        case .Trade?:       self.report.trade.update(from: snapshot)
         case nil:           break
         }
 
-        try self.views.0?.update(in: context)
-        try self.views.1?.update(in: context)
+        try self.views.0?.update(in: snapshot.context)
+        try self.views.1?.update(in: snapshot.context)
     }
 }
 extension GameUI {

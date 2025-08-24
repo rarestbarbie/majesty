@@ -43,7 +43,9 @@ export class TooltipRenderer {
             switch (instruction.type) {
                 case TooltipInstructionType.Header: {
                     li = document.createElement('li');
-                    li.innerHTML = instruction.html;
+                    const p: HTMLParagraphElement = document.createElement('p');
+                    p.innerHTML = instruction.html;
+                    li.appendChild(p);
                     li.classList.add('header');
                     break;
                 }

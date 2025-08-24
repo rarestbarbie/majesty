@@ -151,6 +151,7 @@ export class ProductionOverview extends ScreenContent {
                     id,
                     TooltipType.FactoryDemand,
                     TooltipType.FactoryStockpile,
+                    TooltipType.FactoryExplainPrice,
                 ),
                 (need: ResourceNeed, row: ResourceNeedRow) => row.update(need),
             );

@@ -71,8 +71,8 @@ extension Exchange {
     }
 }
 extension Exchange {
-    @inlinable public var markets: [Market] {
-        self.table.values.elements
+    @inlinable public var markets: OrderedDictionary<Market.AssetPair, Market> {
+        self.table
     }
 }
 extension Exchange {

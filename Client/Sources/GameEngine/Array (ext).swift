@@ -7,11 +7,20 @@ import GameRules
 extension [ResourceNeed] {
     mutating func update(
         inputs: [ResourceInput],
+        currency: Fiat?,
         tier: ResourceNeedTier,
-        rules: GameRules,
+        from snapshot: borrowing GameSnapshot,
     ) {
         for input: ResourceInput in inputs {
-            self.append(ResourceNeed.init(label: rules[input.id], input: input, tier: tier))
+            let market: Market? = currency.map { snapshot.markets[input.id / $0] } ?? nil
+            self.append(
+                ResourceNeed.init(
+                    label: snapshot.rules[input.id],
+                    input: input,
+                    price: market?.history.last ?? market?.current ?? .open(0),
+                    tier: tier
+                )
+            )
         }
     }
 }
