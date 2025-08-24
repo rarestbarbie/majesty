@@ -28,6 +28,7 @@ export class PopulationOverview extends ScreenContent {
         readonly index: HTMLUListElement;
         readonly panel: HTMLDivElement;
         readonly stats: HTMLDivElement;
+        readonly nav: HTMLElement;
     };
 
     constructor() {
@@ -58,14 +59,23 @@ export class PopulationOverview extends ScreenContent {
                 index: document.createElement("ul"),
                 panel: document.createElement("div"),
                 stats: document.createElement("div"),
+                nav: document.createElement("nav"),
             }
 
-            this.dom.stats.appendChild(this.needs.node);
-            this.dom.stats.appendChild(this.sales.node);
-            this.dom.stats.appendChild(this.charts.spending.node);
+            const upper: HTMLDivElement = document.createElement('div');
+            upper.appendChild(this.dom.stats);
+            upper.appendChild(this.dom.nav);
 
-            this.dom.panel.appendChild(this.dom.stats);
+            this.dom.panel.appendChild(upper);
             this.dom.panel.appendChild(this.pops.node);
+
+            const right: HTMLDivElement = document.createElement('div');
+            right.appendChild(this.sales.node);
+            right.appendChild(this.charts.spending.node);
+
+            this.dom.stats.setAttribute('data-subscreen', 'Inventory');
+            this.dom.stats.appendChild(this.needs.node);
+            this.dom.stats.appendChild(right);
         }
         if (root) {
             root.appendChild(this.dom.index);

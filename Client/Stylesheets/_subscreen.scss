@@ -1,0 +1,8 @@
+[data-subscreen='Inventory'] {
+    display: flex;
+    flex-direction: row;
+
+    > * {
+        flex: 0 1 50%;
+    }
+}
