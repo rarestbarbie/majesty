@@ -4,7 +4,7 @@ import PackageDescription
 import typealias Foundation.ProcessInfo
 
 let package: Package = .init(
-    name: "test",
+    name: "majesty",
     products: [
         .executable(name: "engine", targets: ["GameAPI"]),
         .executable(name: "vector", targets: ["VectorTest"]),

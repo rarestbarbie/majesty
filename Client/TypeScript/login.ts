@@ -40,7 +40,7 @@ signupBtn.onclick = async () => {
 Firebase.onAuthStateChanged(Persistence.auth, (user: Firebase.User | null) => {
     if (user) {
         console.log("User authenticated, redirecting to main app...");
-        window.location.href = '/index.html';
+        window.location.href = '/majesty/play';
     }
     // If user is null, do nothing and let them use the form.
 });
