@@ -4,6 +4,7 @@ package-lock.json
 
 /Client/.build
 /Client/.build.*
+/Client/Art/Pops/Icons/*.png
 /ClientIntegrationTests/.build/
 /ClientIntegrationTests/.build.*
 
