@@ -11,7 +11,9 @@
     "devDependencies": {
         "@typescript-eslint/eslint-plugin": "^8.32.1",
         "firebase-tools": "^14.12.0",
+        "fs-extra": "^11.3.1",
         "sass": "^1.89.2",
+        "spritesmith": "^3.5.1",
         "vite": "^6.3.5",
         "vite-plugin-compression": "^0.5.1"
     }

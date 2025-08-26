@@ -1,0 +1,43 @@
+#!/bin/bash
+
+SPRITE_WIDTH=56
+CONFIG_FILE="crop.cfg"
+
+cd Art/Pops/
+
+for file in Sources/*.png; do
+    filename=$(basename "$file" .png)
+
+    # --- Read settings from config file ---
+    config_line=$(grep "^${filename}," "$CONFIG_FILE" || echo "")
+
+    # Default crop is 0 pixels from each side
+    crop_t=0; crop_r=0; crop_b=0; crop_l=0
+
+    if [[ -n "$config_line" ]]; then
+        # If a config is found, parse it
+        crop_t=$(echo "$config_line" | cut -d',' -f2)
+        crop_r=$(echo "$config_line" | cut -d',' -f3)
+        crop_b=$(echo "$config_line" | cut -d',' -f4)
+        crop_l=$(echo "$config_line" | cut -d',' -f5)
+    fi
+
+    echo "Processing $filename with crop (T,R,B,L): ${crop_t},${crop_r},${crop_b},${crop_l}"
+
+    convert "$file" \
+        -fuzz 5% \
+        -fill none -draw "color 0,0 floodfill" \
+        -gravity North -chop "0x${crop_t}" \
+        -gravity East -chop "${crop_r}x0" \
+        -gravity South -chop "0x${crop_b}" \
+        -gravity West -chop "${crop_l}x0" +repage \
+        -morphology Erode Diamond:1 \
+        -filter box -resize ${SPRITE_WIDTH} \
+        "Icons/${filename}.png"
+done
+
+cd ..
+cd ..
+
+mkdir -p Public/Icons
+node Scripts/spritesheet.js

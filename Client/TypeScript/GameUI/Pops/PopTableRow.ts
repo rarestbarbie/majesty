@@ -14,12 +14,24 @@ import {
     TooltipType,
 } from '../exports.js';
 
+
+export class _Icon {
+    readonly node: HTMLDivElement;
+    readonly icon: HTMLSpanElement;
+
+    constructor() {
+        this.node = document.createElement('div');
+        this.icon = document.createElement('span');
+        this.node.appendChild(this.icon);
+    }
+}
+
 export class PopTableRow implements DiffableListElement<GameID> {
     public readonly id: GameID;
     public readonly node: HTMLAnchorElement;
 
     private readonly size: Ticker;
-    private readonly type: HTMLElement;
+    private readonly type: _Icon;
     private readonly location: HTMLElement;
     private readonly nat: HTMLElement;
     private readonly mil: Ticker;
@@ -52,9 +64,9 @@ export class PopTableRow implements DiffableListElement<GameID> {
 
         this.size = new Ticker(Fortune.Bonus);
 
-        this.type = document.createElement('div');
-        this.type.setAttribute('data-tooltip-type', TooltipType.PopType);
-        this.type.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
+        this.type = new _Icon();
+        this.type.node.setAttribute('data-tooltip-type', TooltipType.PopType);
+        this.type.node.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
 
         this.location = document.createElement('div');
         this.nat = document.createElement('div');
@@ -95,7 +107,7 @@ export class PopTableRow implements DiffableListElement<GameID> {
 
         this.node.href = `#screen=${ScreenType.Population}&id=${pop.id}`;
         this.node.appendChild(this.size.outer);
-        this.node.appendChild(this.type);
+        this.node.appendChild(this.type.node);
         this.node.appendChild(this.nat); // Comes before location!
         this.node.appendChild(this.location);
         this.node.appendChild(this.mil.outer);
@@ -111,7 +123,7 @@ export class PopTableRow implements DiffableListElement<GameID> {
         this.node.style.setProperty('--color', hex(pop.color));
 
         this.size.updateBigIntChange(pop.y_size, pop.t_size);
-        UpdateText(this.type, pop.type);
+        this.type.node.setAttribute('data-pop-type', pop.type);
         UpdateText(this.nat, pop.nat);
         UpdateText(this.location, pop.location);
 

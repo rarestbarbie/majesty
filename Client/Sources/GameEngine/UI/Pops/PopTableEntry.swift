@@ -47,16 +47,7 @@ extension PopTableEntry: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.location] = self.location
-        js[.type] = switch self.type {
-        case .Livestock:    "🐖"
-        case .Driver:       "🚀"
-        case .Miner:        "📡"
-        case .Editor:       "🖊️"
-        case .Server:       "🍹"
-        case .Engineer:     "🎛️"
-        case .Farmer:       "📋"
-        case .Capitalist:   "🏌️‍♀️"
-        }
+        js[.type] = self.type
         js[.color] = self.color
         js[.nat] = self.nat
         js[.une] = self.une
