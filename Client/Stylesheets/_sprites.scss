@@ -17,6 +17,9 @@
     }
 }
 
+[data-pop-type='A'] > span {
+    @include sprite(inmate);
+}
 [data-pop-type='S'] > span {
     @include sprite(maid);
 }
