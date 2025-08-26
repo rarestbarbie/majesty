@@ -1,0 +1,56 @@
+@use 'sass:map';
+@import 'generated/_sprite';
+
+@mixin sprite($name) {
+    $icon: map.get($sprites, $name);
+
+    @if $icon {
+        background-repeat: no-repeat;
+        $x: map.get($icon, 'x');
+        $y: map.get($icon, 'y');
+
+        background-position:
+            calc(#{$x} + var(--sprite-offset-x, 0px))
+            calc(#{$y} + var(--sprite-offset-y, 0px));
+    } @else {
+        @warn "Sprite `#{$name}` not found in $sprites map.";
+    }
+}
+
+[data-pop-type='S'] > span {
+    @include sprite(maid);
+}
+[data-pop-type='G'] > span {
+    @include sprite(doctor);
+}
+[data-pop-type='D'] > span {
+    @include sprite(driver);
+}
+[data-pop-type='E'] > span {
+    @include sprite(editor);
+}
+[data-pop-type='F'] > span {
+    @include sprite(farmer);
+}
+[data-pop-type='M'] > span {
+    @include sprite(astronaut);
+}
+[data-pop-type='O'] > span {
+    @include sprite(businesswoman);
+}
+[data-pop-type] > span {
+    display: block;
+    height: 30px;
+    width: 30px;
+
+    background-image: url('/Icons/Pops.png');
+    --sprite-offset-x: -13px;
+}
+[data-pop-type] {
+    display: block;
+    width: 30px;
+    background: radial-gradient(
+        rgba(211, 223, 255, 0.5),
+        transparent 75%,
+    );
+}

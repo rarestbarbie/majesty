@@ -1,0 +1,25 @@
+
+[data-table='Pops'] > a {
+    padding-top: 0;
+    padding-bottom: 0;
+}
+[data-table='Pops'] > a > * {
+    margin-top: 4px;
+    margin-bottom: 4px;
+}
+[data-table='Pops'] > a > * {
+    text-align: left;
+}
+[data-table='Pops'] > a > *:nth-child(1) {
+    text-align: right;
+    direction: rtl;
+}
+[data-table='Pops'] > a > [data-pop-type] {
+    // Needed for sprite display
+    height: 30px;
+    margin: 0;
+}
+[data-table='Pops'] > a > *:nth-child(3) {
+    border-left: 3px solid var(--color);
+    padding-left: 0.5em;
+}

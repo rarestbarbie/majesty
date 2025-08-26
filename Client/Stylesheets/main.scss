@@ -6,7 +6,9 @@
 @use 'factors';
 @use 'hud';
 @use 'minimap';
+@use 'pops';
 @use 'screen';
+@use 'sprites';
 @use 'subscreen';
 @use 'tooltip';
 
@@ -232,18 +234,6 @@ div.tabs > * > input[type=radio]:checked + label {
 [data-table='Markets'] {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 2fr;
     height: 50%;
-}
-
-[data-table='Pops'] > * > * {
-    text-align: left;
-}
-[data-table='Pops'] > * > *:nth-child(1) {
-    text-align: right;
-    direction: rtl;
-}
-[data-table='Pops'] > * > *:nth-child(3) {
-    border-left: 3px solid var(--color);
-    padding-left: 0.5em;
 }
 
 
