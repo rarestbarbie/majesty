@@ -1,7 +1,7 @@
 import GameRules
 import GameState
 
-extension GameMap.Jobs {
+extension GameMap.Jobs.Hire {
     struct Key: Hashable {
         let location: Location
         let type: PopType

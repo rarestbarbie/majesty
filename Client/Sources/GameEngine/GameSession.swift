@@ -363,37 +363,31 @@ extension GameSession {
 
         let workforce: FactoryContext.Workforce
         let type: PopType
-        let wage: (y: Int64, t: Int64)
 
         if case .Worker = stratum {
             workforce = factory.workers
             type = factory.type.workers.unit
-            wage = (factory.state.yesterday.wu, factory.state.today.wu)
+        } else if
+            let clerks: FactoryContext.Workforce = factory.clerks,
+            let clerkTeam: Quantity<PopType> = factory.type.clerks {
+            workforce = clerks
+            type = clerkTeam.unit
         } else {
-            workforce = factory.clerks
-            type = factory.type.clerks.unit
-            wage = (factory.state.yesterday.cu, factory.state.today.cu)
+            return nil
         }
 
         return .instructions {
-            $0[type.plural] = workforce.total[/3] / workforce.limit
-            $0[>] {
-                $0["Non-union workers"] = workforce.n.count[/3]
-                $0["Union workers"] = workforce.u.count[/3]
-                $0["On strike", -] = ??(-workforce.s.count)[/3]
-            }
+            $0[type.plural] = workforce.count[/3] / workforce.limit
 
             $0["Today’s change", +] = +?(
-                workforce.hire - workforce.fire - workforce.quit
+                workforce.hired - workforce.fired - workforce.quit
             )[/3]
 
             $0[>] {
-                $0["Hired", +] = +?workforce.hire[/3]
-                $0["Fired", +] = ??(-workforce.fire)[/3]
+                $0["Hired", +] = +?workforce.hired[/3]
+                $0["Fired", +] = ??(-workforce.fired)[/3]
                 $0["Quit", +] = ??(-workforce.quit)[/3]
             }
-
-            $0["Union wage", +] = wage.t[/3] <- wage.y
         }
     }
 
@@ -499,13 +493,13 @@ extension GameSession {
 
         let total: (
             count: Int64,
-            hire: Int64,
-            fire: Int64,
+            hired: Int64,
+            fired: Int64,
             quit: Int64
         ) = pop.jobs.values.reduce(into: (0, 0, 0, 0)) {
-            $0.count += $1.employed
-            $0.hire += $1.hire
-            $0.fire += $1.fire
+            $0.count += $1.count
+            $0.hired += $1.hired
+            $0.fired += $1.fired
             $0.quit += $1.quit
         }
 
@@ -513,15 +507,15 @@ extension GameSession {
             $0["Total employment"] = total.count[/3]
             $0[>] {
                 for job: FactoryJob in pop.jobs.values {
-                    let change: Int64 = job.hire - job.fire - job.quit
+                    let change: Int64 = job.hired - job.fired - job.quit
                     let name: String = self.context.factories[job.at]?.type.name ?? "Unknown"
-                    $0[name, +] = job.employed[/3] <- job.employed - change
+                    $0[name, +] = job.count[/3] <- job.count - change
                 }
             }
-            $0["Today’s change", +] = +?(total.hire - total.fire - total.quit)[/3]
+            $0["Today’s change", +] = +?(total.hired - total.fired - total.quit)[/3]
             $0[>] {
-                $0["Hired today", +] = +?total.hire[/3]
-                $0["Fired today", +] = ??(-total.fire)[/3]
+                $0["Hired today", +] = +?total.hired[/3]
+                $0["Fired today", +] = ??(-total.fired)[/3]
                 $0["Quit today", +] = ??(-total.quit)[/3]
             }
         }

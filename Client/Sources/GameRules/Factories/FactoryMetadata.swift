@@ -6,7 +6,7 @@ public final class FactoryMetadata: Identifiable, Sendable {
     public let inputs: [Quantity<Resource>]
     public let output: [Quantity<Resource>]
     public let workers: Quantity<PopType>
-    public let clerks: Quantity<PopType>
+    public let clerks: Quantity<PopType>?
 
     init(
         name: String,
@@ -26,12 +26,12 @@ public final class FactoryMetadata: Identifiable, Sendable {
         guard workers.count == 1 else {
             throw FactoryMetadataError.workers(workers.map { $0.unit })
         }
-        guard clerks.count == 1 else {
+        guard clerks.count <= 1 else {
             throw FactoryMetadataError.clerks(clerks.map { $0.unit })
         }
 
         self.workers = workers[0]
-        self.clerks = clerks[0]
+        self.clerks = clerks.first
     }
 }
 extension FactoryMetadata {

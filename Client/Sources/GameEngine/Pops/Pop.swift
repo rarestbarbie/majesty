@@ -62,7 +62,7 @@ extension Pop: Turnable {
         for i: Int in self.jobs.values.indices {
             {
                 $0.turn()
-                if $0.employed <= 0 {
+                if $0.count <= 0 {
                     remove.append(i)
                 }
             } (&self.jobs.values[i])
@@ -130,7 +130,7 @@ extension Pop {
     /// It is better to compute this dynamically, as the pop count itself can change, and that
     /// might invalidate cached values for unemployment!
     var unemployed: Int64 {
-        self.jobs.values.reduce(self.today.size) { $0 - $1.employed }
+        self.jobs.values.reduce(self.today.size) { $0 - $1.count }
     }
 
     var needsPerCapita: (l: Double, e: Double, x: Double) {
