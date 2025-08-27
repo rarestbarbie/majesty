@@ -17,7 +17,6 @@ export class FactoryWorkersCell extends ProgressCell {
     }
 
     public update(workers: FactoryWorkers): void {
-        const employed: bigint = workers.union + workers.nonunion + workers.striking;
-        this.set(100n * employed / workers.limit);
+        this.set(100n * workers.count / workers.limit);
     }
 }

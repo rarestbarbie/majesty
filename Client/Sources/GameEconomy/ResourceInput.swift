@@ -119,10 +119,6 @@ extension ResourceInput {
         self.demanded == 0 ? 0 : Double.init(self.acquired) / Double.init(self.demanded)
     }
 
-    @inlinable var needed: Int64 {
-        self.needed(self.capacity)
-    }
-
     @inlinable func needed(_ target: Int64) -> Int64 {
         self.acquired < target ? target - self.acquired : 0
     }

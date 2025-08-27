@@ -330,21 +330,17 @@ extension PopContext: RuntimeContext {
                 }
 
                 let wn: Double
-                let wu: Double
 
                 if self.state.type.stratum <= .Worker {
-                    wn = factory.yesterday.wna
-                    wu = factory.yesterday.wua
+                    wn = factory.yesterday.wa
                 } else {
-                    wn = factory.yesterday.caa
-                    wu = factory.yesterday.caa
+                    wn = factory.yesterday.ca
                 }
 
                 /// At this rate, if the factory pays minimum wage or less, about half of
                 /// non-union workers, and one third of union workers, will quit every year.
                 $0.quit(
-                    nonunionRate: 0.002 * w0 / max(w0, wn),
-                    unionRate: 0.001 * w0 / max(w0, wu),
+                    rate: 0.002 * w0 / max(w0, wn),
                     using: &map.random.generator
                 )
             } (&self.state.jobs.values[i])
@@ -365,7 +361,7 @@ extension PopContext: RuntimeContext {
                 }
 
                 {
-                    let quit: Int64 = min(nonexistent, $0.n + $0.u)
+                    let quit: Int64 = min(nonexistent, $0.count)
                     $0.quit(quit)
                     nonexistent -= quit
                 } (&self.state.jobs.values[i])

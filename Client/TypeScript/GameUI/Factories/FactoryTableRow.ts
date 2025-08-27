@@ -91,18 +91,7 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
         this.clerks.wn.updateBigIntChange(factory.y_cn, factory.t_cn);
         this.clerks.update(factory.clerks);
 
-        const cash: CashAccount = factory.cash;
-        const liq: bigint = cash.liq +
-            cash.v +
-            cash.b +
-            cash.r +
-            cash.s +
-            cash.c +
-            cash.w +
-            cash.i;
-
-        UpdateBigInt(this.cash, liq + factory.t_vi + factory.t_vv);
-
+        UpdateBigInt(this.cash, factory.valuation);
         UpdatePrice(this.fi, factory.t_fi * 100, 1);
     }
 }

@@ -33,15 +33,33 @@ extension Array where Element: ResourceStockpile {
 }
 extension [ResourceInput] {
     /// Returns the amount of funds actually spent.
-    public mutating func buy(
+    @inlinable public mutating func buy(
         days stockpile: Int64,
         with budget: Int64,
         in currency: Fiat,
         on exchange: inout Exchange,
     ) -> Int64 {
         let weights: [Double] = self.map {
-            Double.init($0.needed) * exchange.price(of: $0.id, in: currency)
+            Double.init($0.needed($0.capacity)) * exchange.price(of: $0.id, in: currency)
         }
+
+        return self.buy(
+            days: stockpile,
+            with: budget,
+            in: currency,
+            on: &exchange,
+            weights: weights[...]
+        )
+    }
+
+    /// Returns the amount of funds actually spent.
+    @usableFromInline mutating func buy(
+        days stockpile: Int64,
+        with budget: Int64,
+        in currency: Fiat,
+        on exchange: inout Exchange,
+        weights: ArraySlice<Double>,
+    ) -> Int64 {
         guard let budgets: [Int64] = weights.distribute(budget) else {
             return 0
         }

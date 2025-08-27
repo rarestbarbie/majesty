@@ -151,6 +151,8 @@ extension GameContext {
 
         self.postCashTransfers(&map)
         self.postPopEmployment(&map, p: order.compactMap(\.pop))
+        self.postPopLayoffs(&map, p: order.compactMap(\.pop))
+
         try self.postPopConversions(&map)
 
         map.exchange.turn(history: 365)
@@ -244,10 +246,34 @@ extension GameContext {
         }
     }
 
+    private mutating func postPopLayoffs(_ map: inout GameMap, p: [Int]) {
+        var layoffs: (
+            workers: [FactoryID: FactoryJobLayoffBlock],
+            clerks: [FactoryID: FactoryJobLayoffBlock]
+        ) = (
+            map.jobs.fire.worker.turn(),
+            map.jobs.fire.clerk.turn()
+        )
+
+        for p: Int in p {
+            {
+                let stratum: PopStratum = $0.state.type.stratum
+                for j: Int in $0.state.jobs.values.indices {
+                    {
+                        if stratum <= .Worker {
+                            $0.fire(&layoffs.workers[$0.at])
+                        } else {
+                            $0.fire(&layoffs.clerks[$0.at])
+                        }
+                    } (&$0.state.jobs.values[j])
+                }
+            } (&self.pops.table[p])
+        }
+    }
     private mutating func postPopEmployment(_ map: inout GameMap, p: [Int]) {
         let (workers, clerks): (
-            [GameMap.Jobs<Address>.Key: [(Int, Int64)]],
-            [GameMap.Jobs<PlanetID>.Key: [(Int, Int64)]]
+            [GameMap.Jobs.Hire<Address>.Key: [(Int, Int64)]],
+            [GameMap.Jobs.Hire<PlanetID>.Key: [(Int, Int64)]]
         ) = p.reduce(into: (worker: [:], clerk: [:])) {
             let pop: Pop = self.pops.table.state[$1]
             let unemployed: Int64 = pop.unemployed
@@ -255,13 +281,13 @@ extension GameContext {
                 return
             }
             if  pop.type.stratum <= .Worker {
-                let key: GameMap.Jobs<Address>.Key = .init(
+                let key: GameMap.Jobs.Hire<Address>.Key = .init(
                     location: pop.home,
                     type: pop.type
                 )
                 $0.worker[key, default: []].append(($1, unemployed))
             } else {
-                let key: GameMap.Jobs<PlanetID>.Key = .init(
+                let key: GameMap.Jobs.Hire<PlanetID>.Key = .init(
                     location: pop.home.planet,
                     type: pop.type
                 )
@@ -269,12 +295,12 @@ extension GameContext {
             }
         }
 
-        let workersUnavailable: [(PopType, [FactoryJobOfferBlock])] = map.jobs.worker.turn {
+        let workersUnavailable: [(PopType, [FactoryJobOfferBlock])] = map.jobs.hire.worker.turn {
             if var pops: [(index: Int, unemployed: Int64)] = workers[$0] {
                 self.postPopEmployment(matching: &pops, with: &$1)
             }
         }
-        let clerksUnavailable: [(PopType, [FactoryJobOfferBlock])] = map.jobs.clerk.turn {
+        let clerksUnavailable: [(PopType, [FactoryJobOfferBlock])] = map.jobs.hire.clerk.turn {
             if var pops: [(index: Int, unemployed: Int64)] = clerks[$0] {
                 self.postPopEmployment(matching: &pops, with: &$1)
             }
