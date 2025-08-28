@@ -16,12 +16,12 @@ extension Market {
 extension Market: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
-        js[.bl] = self.pool.liq.base
-        js[.bi] = self.pool.vol.base.i
-        js[.bo] = self.pool.vol.base.o
-        js[.ql] = self.pool.liq.quote
-        js[.qi] = self.pool.vol.quote.i
-        js[.qo] = self.pool.vol.quote.o
+        js[.bl] = self.pool.assets.base
+        js[.bi] = self.pool.volume.base.i
+        js[.bo] = self.pool.volume.base.o
+        js[.ql] = self.pool.assets.quote
+        js[.qi] = self.pool.volume.quote.i
+        js[.qo] = self.pool.volume.quote.o
     }
 }
 extension Market: JavaScriptDecodable {
@@ -29,8 +29,8 @@ extension Market: JavaScriptDecodable {
         self.init(
             id: try js[.id].decode(),
             pool: .init(
-                liq: (base: try js[.bl].decode(), quote: try js[.ql].decode()),
-                vol: (
+                assets: .init(base: try js[.bl].decode(), quote: try js[.ql].decode()),
+                volume: .init(
                     base:  (i: try js[.bi]?.decode() ?? 0, o: try js[.bo]?.decode() ?? 0),
                     quote: (i: try js[.qi]?.decode() ?? 0, o: try js[.qo]?.decode() ?? 0)
                 )

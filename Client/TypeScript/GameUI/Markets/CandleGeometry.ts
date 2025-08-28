@@ -2,7 +2,7 @@ import {
     DiffableListElement,
 } from '../../DOM/exports.js';
 import { GameDate } from '../../GameEngine/exports.js';
-import { MarketInterval, ScreenType } from "../exports.js";
+import { CandlestickChartInterval } from '../exports.js';
 
 export class CandleGeometry implements DiffableListElement<GameDate> {
     public readonly id: GameDate;
@@ -10,8 +10,8 @@ export class CandleGeometry implements DiffableListElement<GameDate> {
     private readonly body: HTMLDivElement;
     private readonly wick: HTMLDivElement;
 
-    constructor(candle: MarketInterval) {
-        this.id = candle.id;
+    constructor(interval: CandlestickChartInterval) {
+        this.id = interval.id;
         this.node = document.createElement('div');
         this.body = document.createElement('div');
         this.wick = document.createElement('div');
@@ -22,8 +22,8 @@ export class CandleGeometry implements DiffableListElement<GameDate> {
         this.node.appendChild(this.body);
     }
 
-    public update(candle: MarketInterval): void {
-        const { o: open, h: high, l: low, c: close } = candle.c;
+    public update(interval: CandlestickChartInterval): void {
+        const { o: open, h: high, l: low, c: close } = interval.c;
 
         this.node.style.setProperty('--o', open.toString());
         this.node.style.setProperty('--c', close.toString());

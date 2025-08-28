@@ -89,8 +89,8 @@ extension TradeReport: PersistentReport {
             self.markets.append(.init(
                 id: market.id,
                 name: "\(resource.nameWithIcon) / \(currency.name)",
-                price: market.history.last ?? market.current,
-                liq: market.pool.liq
+                price: market.history.last?.prices ?? market.current,
+                assets: market.pool.assets
             ))
 
             switch self.market?.id {

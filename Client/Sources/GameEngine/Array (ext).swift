@@ -17,7 +17,7 @@ extension [ResourceNeed] {
                 ResourceNeed.init(
                     label: snapshot.rules[input.id],
                     input: input,
-                    price: market?.history.last ?? market?.current ?? .open(0),
+                    price: market?.history.last?.prices ?? market?.current ?? .open(0),
                     tier: tier
                 )
             )

@@ -3,18 +3,21 @@ import GameState
 import JavaScriptKit
 import JavaScriptInterop
 
-struct MarketInterval {
+struct CandlestickChartInterval {
     public let id: GameDate
-    public let candle: Candle<Double>
+    public let prices: Candle<Double>
+    public let volume: Int64
 }
-extension MarketInterval: JavaScriptEncodable {
+extension CandlestickChartInterval: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
         case id
         case c
+        case v
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
-        js[.c] = self.candle
+        js[.c] = self.prices
+        js[.v] = self.volume
     }
 }
