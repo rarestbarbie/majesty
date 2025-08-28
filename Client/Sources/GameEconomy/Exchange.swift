@@ -35,8 +35,9 @@ import OrderedCollections
 }
 extension Exchange {
     private func new(_ pair: Market.AssetPair) -> Market {
-        .init(id: pair, pool: .init(liq: (self.liq, self.liq)))
+        .init(id: pair, pool: .init(assets: .init(base: self.liq, quote: self.liq)))
     }
+
     public subscript(_ pair: Market.AssetPair) -> LiquidityPool {
         get {
             self.table[pair]?.canonical ??
@@ -59,9 +60,7 @@ extension Exchange {
     }
 
     @inlinable public func price(of resource: Resource, in currency: Fiat) -> Double {
-        self.table[resource / currency]?.current.c ?? Double.init(
-            LiquidityPool.init(liq: (self.liq, self.liq)).ratio
-        )
+        self.table[resource / currency]?.current.c ?? 1
     }
 
     public mutating func turn(history: Int) {
@@ -128,7 +127,9 @@ extension Exchange {
     ) -> ResourceArbitrage? {
         /// This is the maximum amount of `resource` that we can export from the local market,
         /// and how much of the `capital` it would cost.
-        let export: (cost: Int64, amount: Int64) = self[currency / resource].quote(capital)
+        let export: (cost: Int64, amount: Int64) = self[currency / resource].assets.quote(
+            capital
+        )
         var best: ResourceArbitrage.Opportunity? = nil
 
         for foreign: Fiat in partners {
@@ -139,22 +140,27 @@ extension Exchange {
 
             /// This is how much we would receive (`f`) in foreign currency. Some of the
             /// exported resource might not get sold.
-            let (e, f): (cost: Int64, Int64) = self[resource / foreign].quote(export.amount)
+            let (e, f): (cost: Int64, Int64) = self[resource / foreign].assets.quote(
+                export.amount
+            )
             /// This is how much we would receive (`l`) in the local currency after converting
             /// the proceeds (`f`). Some of the foreign currency might not get sold.
-            let (k, l): (cost: Int64, Int64) = self[foreign / currency].quote(f)
+            let (k, l): (cost: Int64, Int64) = self[foreign / currency].assets.quote(f)
 
             /// Compute how much `resource` we would have to sell in this market to get the
             /// amount of foreign currency that we can actually convert back, which may be less
             /// than the total exportable amount, or even the exportable amount in this market.
             let bottleneckedOnForex: Bool = k < f
             let volume: Int64 = bottleneckedOnForex
-                ? self[resource / foreign].quote(.max, limit: k).cost
+                ? self[resource / foreign].assets.quote(.max, limit: k).cost
                 : e
 
             /// Now let’s compute how much it would actually cost just to buy the amount of
             /// `resource` that we can actually export to this market.
-            let actual: (cost: Int64, _) = self[currency / resource].quote(.max, limit: volume)
+            let actual: (cost: Int64, _) = self[currency / resource].assets.quote(
+                .max,
+                limit: volume
+            )
 
             assert(volume <= e)
             assert(actual.cost <= export.cost)

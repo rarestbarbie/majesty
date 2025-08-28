@@ -3,18 +3,18 @@ import DequeModule
 @frozen public struct Market: Identifiable {
     public let id: Market.AssetPair
     public var pool: LiquidityPool
-    public var history: Deque<Candle<Double>>
+    public var history: Deque<Interval>
     public var current: Candle<Double>
 
     @inlinable public init(
         id: Market.AssetPair,
-        pool: LiquidityPool = .init(liq: (2, 2)),
-        history: Deque<Candle<Double>> = []
+        pool: LiquidityPool = .init(assets: .init(base: 2, quote: 2)),
+        history: Deque<Interval> = []
     ) {
         self.id = id
         self.pool = pool
         self.history = history
-        self.current = .open(Double.init(self.pool.ratio))
+        self.current = .open(self.pool.price)
     }
 }
 extension Market {
@@ -25,7 +25,7 @@ extension Market {
         }
         _modify {
             yield &self.pool
-            self.current.update(Double.init(self.pool.ratio))
+            self.current.update(self.pool.price)
         }
     }
 
@@ -36,7 +36,7 @@ extension Market {
         }
         _modify {
             yield &self.pool.conjugated
-            self.current.update(Double.init(self.pool.ratio))
+            self.current.update(self.pool.price)
         }
     }
 }
@@ -45,7 +45,15 @@ extension Market {
         if  self.history.count >= history {
             self.history.removeFirst(self.history.count - history + 1)
         }
-        self.history.append(self.current)
-        self.current = .open(Double.init(self.pool.ratio))
+
+        let interval: Interval = .init(
+            prices: self.current,
+            volume: self.pool.volume.base.i + self.pool.volume.base.o
+        )
+
+        self.current = .open(self.pool.price)
+        self.pool.volume.reset()
+
+        self.history.append(interval)
     }
 }

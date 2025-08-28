@@ -341,7 +341,7 @@ extension GameSession {
             return nil
         }
 
-        return Self.tooltipExplainPrice(market.history.last ?? market.current, stock)
+        return Self.tooltipExplainPrice(market.history.last?.prices ?? market.current, stock)
     }
 
     public func tooltipFactorySize(_ id: FactoryID) -> Tooltip? {
@@ -643,7 +643,7 @@ extension GameSession {
             return nil
         }
 
-        return Self.tooltipExplainPrice(market.history.last ?? market.current, stock)
+        return Self.tooltipExplainPrice(market.history.last?.prices ?? market.current, stock)
     }
 
     public func tooltipPopType(

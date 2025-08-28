@@ -134,11 +134,11 @@ extension ResourceInput {
             let needed: Int64 = self.needed(target)
 
             if  needed <= 0 {
-                self.price = Double.init($0.ratio)
+                self.price = $0.price
                 return 0
             }
             if  budget <= 0 {
-                self.price = Double.init($0.ratio)
+                self.price = $0.price
                 return 0
             } else {
                 var funds: Int64 = budget
@@ -151,9 +151,7 @@ extension ResourceInput {
 
                 // Compute actual price, if at least one unit was purchased, otherwise
                 // theoretical market price
-                self.price = acquired != 0
-                    ? Double.init(fundsSpent %/ acquired)
-                    : Double.init($0.ratio)
+                self.price = acquired != 0 ? Double.init(fundsSpent %/ acquired) : $0.price
                 return fundsSpent
             }
         } (&exchange[self.id / currency])

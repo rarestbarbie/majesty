@@ -1,6 +1,10 @@
 import GameEconomy
 
 extension LiquidityPool {
+    init(liquidity: (base: Int64, quote: Int64)) {
+        self.init(assets: .init(base: liquidity.base, quote: liquidity.quote))
+    }
+
     mutating func buy(_ base: Int64) -> (bought: Int64, for: Int64) {
         var q: Int64 = .max
         let b: Int64 = self.buy(base, with: &q)
