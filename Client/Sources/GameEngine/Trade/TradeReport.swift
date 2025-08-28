@@ -68,6 +68,7 @@ extension TradeReport: PersistentReport {
 
         for market: Market in snapshot.markets.values {
             guard
+            let today: Market.Interval = market.history.last,
             case .good(let good) = market.id.x,
             case .fiat(let fiat) = market.id.y,
             let currency: Country.Currency = currencies[fiat] else {
@@ -89,8 +90,8 @@ extension TradeReport: PersistentReport {
             self.markets.append(.init(
                 id: market.id,
                 name: "\(resource.nameWithIcon) / \(currency.name)",
-                price: market.history.last?.prices ?? market.current,
-                assets: market.pool.assets
+                price: today.prices,
+                volume: today.volume.unsigned
             ))
 
             switch self.market?.id {

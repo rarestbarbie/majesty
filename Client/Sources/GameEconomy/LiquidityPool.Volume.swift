@@ -25,6 +25,10 @@ extension LiquidityPool.Volume {
         .init(base: self.quote, quote: self.base)
     }
 
+    @inlinable public var unsigned: Int64 {
+        self.base.i + self.base.o
+    }
+
     @inlinable public mutating func reset() {
         self.base = (0, 0)
         self.quote = (0, 0)

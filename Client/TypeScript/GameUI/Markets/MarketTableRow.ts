@@ -7,7 +7,8 @@ import {
 } from '../../DOM/exports.js';
 import {
     MarketTableEntry,
-    ScreenType
+    ScreenType,
+    TooltipType,
 } from "../exports.js";
 
 export class MarketTableRow implements DiffableListElement<string> {
@@ -18,7 +19,7 @@ export class MarketTableRow implements DiffableListElement<string> {
     private readonly open: HTMLElement;
     private readonly low: HTMLElement;
     private readonly high: HTMLElement;
-    private readonly liq: HTMLElement;
+    private readonly volume: HTMLElement;
 
     public static get columns(): string[] {
         return [
@@ -27,7 +28,7 @@ export class MarketTableRow implements DiffableListElement<string> {
             "Open",
             "Low",
             "High",
-            "Liquidity"
+            "Volume"
         ];
     }
 
@@ -39,7 +40,7 @@ export class MarketTableRow implements DiffableListElement<string> {
         this.open = document.createElement('div');
         this.low = document.createElement('div');
         this.high = document.createElement('div');
-        this.liq = document.createElement('div');
+        this.volume = document.createElement('div');
 
         this.name.textContent = market.name;
 
@@ -49,7 +50,10 @@ export class MarketTableRow implements DiffableListElement<string> {
         this.node.appendChild(this.open);
         this.node.appendChild(this.low);
         this.node.appendChild(this.high);
-        this.node.appendChild(this.liq);
+        this.node.appendChild(this.volume);
+
+        this.volume.setAttribute('data-tooltip-type', TooltipType.MarketLiquidity);
+        this.volume.setAttribute('data-tooltip-arguments', JSON.stringify([market.id]));
     }
 
     public update(market: MarketTableEntry): void {
@@ -58,9 +62,6 @@ export class MarketTableRow implements DiffableListElement<string> {
         UpdatePrice(this.open, market.price.o, 2);
         UpdatePrice(this.low, market.price.l, 2);
         UpdatePrice(this.high, market.price.h, 2);
-        UpdateText(
-            this.liq,
-            `${market.liq_base.toLocaleString()} / ${market.liq_quote.toLocaleString()}`
-        );
+        UpdateText(this.volume, market.volume.toLocaleString());
     }
 }

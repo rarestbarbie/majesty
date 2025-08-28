@@ -22,6 +22,8 @@ export enum TooltipType {
     FactoryOwnershipCulture = 'FactoryOwnershipCulture',
     FactoryStatementItem = 'FactoryStatementItem',
 
+    MarketLiquidity = 'MarketLiquidity',
+
     TileCulture = 'TileCulture',
     TilePopType = 'TilePopType',
 }

@@ -48,7 +48,7 @@ extension Market {
 
         let interval: Interval = .init(
             prices: self.current,
-            volume: self.pool.volume.base.i + self.pool.volume.base.o
+            volume: self.pool.volume,
         )
 
         self.current = .open(self.pool.price)
