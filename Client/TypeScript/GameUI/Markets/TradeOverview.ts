@@ -9,6 +9,7 @@ import {
     TradeReport,
     MarketFilter,
     MarketFilterLabel,
+    CandlestickChart,
     CandlestickChartInterval,
     MarketTableRow,
     MarketTableEntry,
@@ -132,7 +133,6 @@ export class TradeOverview extends ScreenContent {
         );
 
         if (state.market) {
-            // Update the history
             this.history.update(
                 state.market.chart.history,
                 (interval: CandlestickChartInterval) => new CandleGeometry(interval),
@@ -142,6 +142,7 @@ export class TradeOverview extends ScreenContent {
 
             this.history.node.style.setProperty('--y-min', state.market.chart.min.toString());
             this.history.node.style.setProperty('--y-max', state.market.chart.max.toString());
+            this.history.node.style.setProperty('--y-maxv', state.market.chart.maxv.toString());
         }
     }
 }

@@ -1,6 +1,6 @@
 div.candlesticks {
     display: flex;
-    height: 300px;
+    height: 325px;
 
     direction: rtl;
     overflow-x: scroll;
@@ -11,7 +11,12 @@ div.candlesticks {
     border-radius: 4px;
     background-color: rgba(0, 0, 0, 0.2);
 
-    --y: calc(100% / (var(--y-max) - var(--y-min)));
+    padding: 0 0 1rem;
+
+    --vh: 25%;
+
+    --y: calc((100% - var(--vh)) / (var(--y-max) - var(--y-min)));
+    --yv: calc(var(--vh) / var(--y-maxv));
 
     div.candle {
         flex-shrink: 0;
@@ -43,14 +48,27 @@ div.candlesticks {
             position: absolute;
             margin: 0 1px;
             width: 3px;
-            bottom: calc(var(--y) * (min(var(--c), var(--o)) - var(--y-min)));
+            background-color: rgb(61, 61, 61);
+            bottom: 0;
+            height: calc(var(--yv) * var(--v));
+        }
+
+        &:hover div:nth-child(1) {
+            background-color: rgb(117, 117, 117);
+        }
+
+        div:nth-child(2) {
+            position: absolute;
+            margin: 0 1px;
+            width: 3px;
+            bottom: calc(var(--vh) + var(--y) * (min(var(--c), var(--o)) - var(--y-min)));
             height: calc(max(1px, var(--y) * (abs(var(--c) - var(--o)))));
         }
-        div:nth-child(2) {
+        div:nth-child(3) {
             position: absolute;
             margin: 0 2px;
             width: 1px;
-            bottom: calc(var(--y) * (var(--l) - var(--y-min)));
+            bottom: calc(var(--vh) + var(--y) * (var(--l) - var(--y-min)));
             height: calc(max(1px, var(--y) * (var(--h) - var(--l))));
         }
     }
