@@ -32,7 +32,7 @@ extension CandlestickChart {
         self.history.reserveCapacity(market.history.count)
         self.min = firstCandle.l
         self.max = firstCandle.h
-        self.maxv = Swift.max(first.volume, 1)
+        self.maxv = Swift.max(first.volume.unsigned, 1)
 
         var date: GameDate = date
 
@@ -40,7 +40,7 @@ extension CandlestickChart {
             let interval: CandlestickChartInterval = .init(
                 id: date,
                 prices: interval.prices.log10,
-                volume: interval.volume
+                volume: interval.volume.unsigned
             )
 
             self.history.append(interval)

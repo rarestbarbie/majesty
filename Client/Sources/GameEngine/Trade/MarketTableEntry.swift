@@ -6,22 +6,20 @@ struct MarketTableEntry {
     let id: Market.AssetPair
     let name: String
     let price: Candle<Double>
-    let assets: LiquidityPool.Assets
+    let volume: Int64
 }
 extension MarketTableEntry: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
         case id
         case name
         case price
-        case liq_base
-        case liq_quote
+        case volume
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.name] = self.name
         js[.price] = self.price
-        js[.liq_base] = self.assets.base
-        js[.liq_quote] = self.assets.quote
+        js[.volume] = self.volume
     }
 }

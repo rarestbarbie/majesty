@@ -337,11 +337,12 @@ extension GameSession {
         }
 
         guard
-        let stock: ResourceInput else {
+        let stock: ResourceInput,
+        let price: Candle<Double> = market.history.last?.prices else {
             return nil
         }
 
-        return Self.tooltipExplainPrice(market.history.last?.prices ?? market.current, stock)
+        return Self.tooltipExplainPrice(price, stock)
     }
 
     public func tooltipFactorySize(_ id: FactoryID) -> Tooltip? {
@@ -639,11 +640,12 @@ extension GameSession {
         }
 
         guard
-        let stock: ResourceInput else {
+        let stock: ResourceInput,
+        let price: Candle<Double> = market.history.last?.prices else {
             return nil
         }
 
-        return Self.tooltipExplainPrice(market.history.last?.prices ?? market.current, stock)
+        return Self.tooltipExplainPrice(price, stock)
     }
 
     public func tooltipPopType(
@@ -684,6 +686,42 @@ extension GameSession {
         _ item: CashFlowItem,
     ) -> Tooltip? {
         self.context.pops.table[id]?.cashFlow.tooltip(rules: self.context.rules, item: item)
+    }
+}
+extension GameSession {
+    public func tooltipMarketLiquidity(
+        _ id: Market.AssetPair
+    ) -> Tooltip? {
+        guard
+        let market: Market = self.map.exchange.markets[id],
+        let last: Market.Interval = market.history.last
+        else {
+            return nil
+        }
+
+        let flow: (quote: Int64, base: Int64) = (
+            last.volume.quote.i - last.volume.quote.o,
+            last.volume.base.i - last.volume.base.o
+        )
+
+        let today: (quote: Int64, base: Int64, sqrt: Double)
+        let yesterday: (quote: Int64, base: Int64, sqrt: Double)
+
+        today.quote = market.pool.assets.quote
+        today.base = market.pool.assets.base
+        today.sqrt = .sqrt(Double.init(today.quote) * Double.init(today.base))
+
+        yesterday.quote = today.quote - flow.quote
+        yesterday.base = today.base - flow.base
+        yesterday.sqrt = .sqrt(Double.init(yesterday.quote) * Double.init(yesterday.base))
+
+        return .instructions {
+            $0["Available liquidity", +] = today.sqrt[..3] <- yesterday.sqrt
+            $0[>] {
+                $0["Base instrument", -] = today.base[/3] <- yesterday.base
+                $0["Quote instrument", +] = today.quote[/3] <- yesterday.quote
+            }
+        }
     }
 }
 extension GameSession {
