@@ -178,6 +178,8 @@ extension FactoryContext: RuntimeContext {
 
         self.cashFlow.reset()
         self.cashFlow.update(with: self.state.ni)
+        self.cashFlow[.workers] = -self.state.cash.w
+        self.cashFlow[.clerks] = -self.state.cash.c
     }
 
     mutating func advance(in context: GameContext, on map: inout GameMap) throws {
