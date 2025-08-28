@@ -4,12 +4,16 @@ import JavaScriptInterop
 
 @frozen public enum CashFlowItem: Equatable, Hashable, Comparable {
     case resource(Resource)
+    case workers
+    case clerks
     // TODO: include wages, labor cost, etc.
 }
 extension CashFlowItem {
     @inlinable var type: CashFlowItemType {
         switch self {
         case .resource: .resource
+        case .workers: .workers
+        case .clerks: .clerks
         }
     }
 }
@@ -17,6 +21,8 @@ extension CashFlowItem: CustomStringConvertible {
     @inlinable public var description: String {
         switch self {
         case .resource(let resource): "\(self.type.rawValue)\(resource)"
+        case .workers: "\(self.type.rawValue)"
+        case .clerks: "\(self.type.rawValue)"
         }
     }
 }
@@ -38,6 +44,12 @@ extension CashFlowItem: LosslessStringConvertible {
                 return nil
             }
             self = .resource(resource)
+
+        case .workers:
+            self = .workers
+
+        case .clerks:
+            self = .clerks
         }
     }
 }

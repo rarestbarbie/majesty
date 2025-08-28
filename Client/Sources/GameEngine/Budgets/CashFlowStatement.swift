@@ -19,6 +19,11 @@ extension CashFlowStatement {
             self.items[.resource(input.id), default: 0] += input.consumedValue
         }
     }
+
+    subscript(item: CashFlowItem) -> Int64 {
+        get { self.items[item] ?? 0 }
+        set { self.items[item] = newValue == 0 ? nil : newValue }
+    }
 }
 extension CashFlowStatement {
     func tooltip(rules: GameRules, item: CashFlowItem) -> Tooltip {
@@ -32,6 +37,8 @@ extension CashFlowStatement {
         let label: String
         switch item {
         case .resource(let id): label = rules.resources[id]?.name ?? "???"
+        case .workers: label = "Workers"
+        case .clerks: label = "Clerks"
         }
 
         return .instructions(style: .borderless) {
@@ -49,6 +56,8 @@ extension CashFlowStatement {
 
             switch $0 {
             case .resource(let id): label = rules.resources[id]?.label
+            case .workers: label = .init(color: 0x7A8AFF, name: "Workers")
+            case .clerks: label = .init(color: 0xAAAAAA, name: "Clerks")
             }
 
             return ($0, ($1, label ?? .init(color: 0xFFFFFF, name: "???")))
