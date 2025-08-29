@@ -28,16 +28,16 @@ import Testing
         /// There should be an excess of XAU in the Martian market, and an excess of UNB in the
         /// Earth market.
         #expect(exchange[XAU / MAR].assets == (base: 4, quote: 1))
-        #expect(exchange[XAU / MAR].volume.base == (i: 2, o: 0))
-        #expect(exchange[XAU / MAR].volume.quote == (i: 0, o: 1))
+        #expect(exchange[XAU / MAR].volume.base.total == 2)
+        #expect(exchange[XAU / MAR].volume.quote.total == 1)
 
         #expect(exchange[XAU / UNB].assets == (base: 1, quote: 4))
-        #expect(exchange[XAU / UNB].volume.base == (i: 0, o: 1))
-        #expect(exchange[XAU / UNB].volume.quote == (i: 2, o: 0))
+        #expect(exchange[XAU / UNB].volume.base.total == 1)
+        #expect(exchange[XAU / UNB].volume.quote.total == 2)
 
-        /// Stake the remaining resources in their respective markets.
-        _ = exchange[XAU / MAR].stake(xau)
-        _ = exchange[UNB / XAU].stake(unb)
+        /// Dump the remaining resources in their respective markets, for testing purposes.
+        exchange[XAU / MAR].assets.base += xau
+        exchange[UNB / XAU].assets.base += unb
 
         exchange[XAU / MAR].volume.reset()
         exchange[UNB / XAU].volume.reset()
@@ -75,17 +75,17 @@ import Testing
         /// Some of the Martian gold should have left Mars. Its local price should be higher
         /// than it was before.
         #expect(exchange[XAU / MAR].assets == (base: 904, quote: 2))
-        #expect(exchange[XAU / MAR].volume.base == (i: 0, o: 98))
-        #expect(exchange[XAU / MAR].volume.quote == (i: 1, o: 0))
+        #expect(exchange[XAU / MAR].volume.base.total == 98)
+        #expect(exchange[XAU / MAR].volume.quote.total == 1)
         /// Most of the UNB should have left Earth, and been used to import the Martian gold.
         /// The local price of gold should be lower than it was before.
         #expect(exchange[XAU / UNB].assets == (base: 99, quote: 102))
-        #expect(exchange[XAU / UNB].volume.base == (i: 98, o: 0))
-        #expect(exchange[XAU / UNB].volume.quote == (i: 0, o: 9_900))
+        #expect(exchange[XAU / UNB].volume.base.total == 98)
+        #expect(exchange[XAU / UNB].volume.quote.total == 9_900)
         /// The Martian Rand should have strengthened against the UNB.
         #expect(exchange[MAR / UNB].assets == (base: 1, quote: 10_000))
-        #expect(exchange[MAR / UNB].volume.base == (i: 0, o: 99))
-        #expect(exchange[MAR / UNB].volume.quote == (i: 9900, o: 0))
+        #expect(exchange[MAR / UNB].volume.base.total == 99)
+        #expect(exchange[MAR / UNB].volume.quote.total == 9_900)
 
         /// The trader should have made a sizable profit from the exchange.
         #expect(capital == 108)

@@ -60,4 +60,17 @@ extension LiquidityPool.Assets {
         self.base += base
         self.quote -= quote
     }
+
+    @discardableResult
+    @inlinable mutating func drain(_ fraction: Fraction) -> Self {
+        let drained: Self = .init(
+            base: self.base <> fraction,
+            quote: self.quote <> fraction
+        )
+
+        self.base -= drained.base
+        self.quote -= drained.quote
+
+        return drained
+    }
 }

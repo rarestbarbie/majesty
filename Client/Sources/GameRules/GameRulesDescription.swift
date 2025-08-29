@@ -8,6 +8,7 @@ public struct GameRulesDescription {
     let pops: SymbolTable<PopDescription>
     let technologies: SymbolTable<TechnologyDescription>
     let terrains: SymbolTable<TerrainDescription>
+    let exchange: Exchange.Settings
 }
 extension GameRulesDescription: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<GameRules.Namespace>) throws {
@@ -18,6 +19,7 @@ extension GameRulesDescription: JavaScriptDecodable {
             pops: try js[.pops].decode(),
             technologies: try js[.technologies].decode(),
             terrains: try js[.terrains].decode(),
+            exchange: try js[.exchange].decode(),
         )
     }
 }

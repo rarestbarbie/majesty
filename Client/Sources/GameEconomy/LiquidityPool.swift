@@ -2,22 +2,32 @@
     public var assets: Assets
     public var volume: Volume
 
+    public var fee: Fraction
+
+    @inlinable public init() {
+        self.assets = .init(base: 2, quote: 2)
+        self.volume = .init()
+        self.fee = 0 %/ 1
+    }
     @inlinable public init(
-        assets: Assets = .init(base: 2, quote: 2),
-        volume: Volume = .init()
+        assets: Assets,
+        volume: Volume,
+        fee: Fraction,
     ) {
         self.assets = assets
         self.volume = volume
+        self.fee = fee
     }
 }
 extension LiquidityPool {
     @inlinable public var conjugated: Self {
         get {
-            .init(assets: self.assets.conjugated, volume: self.volume.conjugated)
+            .init(assets: self.assets.conjugated, volume: self.volume.conjugated, fee: self.fee)
         }
         set(value) {
             self.assets = value.assets.conjugated
             self.volume = value.volume.conjugated
+            self.fee = value.fee
         }
     }
 }
@@ -35,13 +45,12 @@ extension LiquidityPool {
     private mutating func swap(base: Int64, for quote: Int64) -> Int64 {
         self.assets.swap(base: base, for: quote)
         self.volume.swap(base: base, for: quote)
-        return quote
-    }
-}
-extension LiquidityPool {
-    public mutating func stake(_ base: Int64) -> Fraction {
-        self.assets.base += base
-        return base %/ self.assets.base
+
+        let fee: Int64 = quote <> self.fee
+        self.assets.quote += fee
+        // self.volume.quote.fees += fee
+
+        return quote - fee
     }
 }
 extension LiquidityPool {

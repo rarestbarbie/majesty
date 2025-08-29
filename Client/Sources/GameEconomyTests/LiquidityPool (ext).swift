@@ -2,7 +2,11 @@ import GameEconomy
 
 extension LiquidityPool {
     init(liquidity: (base: Int64, quote: Int64)) {
-        self.init(assets: .init(base: liquidity.base, quote: liquidity.quote))
+        self.init(
+            assets: .init(base: liquidity.base, quote: liquidity.quote),
+            volume: .init(),
+            fee: 0 %/ 1
+        )
     }
 
     mutating func buy(_ base: Int64) -> (bought: Int64, for: Int64) {

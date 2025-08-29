@@ -91,7 +91,7 @@ extension TradeReport: PersistentReport {
                 id: market.id,
                 name: "\(resource.nameWithIcon) / \(currency.name)",
                 price: today.prices,
-                volume: today.volume.unsigned
+                volume: today.volume.base.total
             ))
 
             switch self.market?.id {

@@ -7,22 +7,53 @@
         self.d = d
     }
 }
+extension Fraction: CustomStringConvertible {
+    @inlinable public var description: String { "\(self.n)/\(self.d)" }
+}
+extension Fraction: LosslessStringConvertible {
+    @inlinable public init?(_ string: some StringProtocol) {
+        guard
+        let i: String.Index = string.firstIndex(of: "/"),
+        let n: Int64 = .init(string[..<i]),
+        let d: Int64 = .init(string[string.index(after: i)...]) else {
+            return nil
+        }
+        self.init(n, d)
+    }
+}
 extension Fraction {
-    @inlinable public static func *< (self: Self, a: Int64) -> Int64 {
+    /// Multiply the operand by this fraction, rounding away from zero.
+    @inlinable public static func >< (self: Self, a: Int64) -> Int64 {
         let (d, r): (Int64, Int64) = self.d.dividingFullWidth(self.n.multipliedFullWidth(by: a))
         return r > 0 ? d + 1 : (r == 0 ? d : d - 1)
     }
-    @inlinable public static func *> (self: Self, a: Int64) -> Int64 {
+    /// Multiply the operand by this fraction, rounding toward zero.
+    @inlinable public static func <> (self: Self, a: Int64) -> Int64 {
         let (d, _): (Int64, Int64) = self.d.dividingFullWidth(self.n.multipliedFullWidth(by: a))
         return d
     }
 }
 extension Fraction {
-    @inlinable public static func *> (a: Int64, self: Self) -> Int64 {
-        self *> a
+    @inlinable public static func >< (a: Int64, self: Self) -> Int64 { self >< a }
+    @inlinable public static func <> (a: Int64, self: Self) -> Int64 { self <> a }
+}
+extension Fraction {
+    @available(*, deprecated, message: "Use >< instead")
+    @inlinable public static func *< (self: Self, a: Int64) -> Int64 {
+        self >< a
     }
+    @available(*, deprecated, message: "Use <> instead")
+    @inlinable public static func *> (self: Self, a: Int64) -> Int64 {
+        self <> a
+    }
+
+    @available(*, deprecated, message: "Use >< instead")
+    @inlinable public static func *> (a: Int64, self: Self) -> Int64 {
+        self <> a
+    }
+    @available(*, deprecated, message: "Use >< instead")
     @inlinable public static func *< (a: Int64, self: Self) -> Int64 {
-        self *< a
+        self >< a
     }
 }
 extension Fraction: Equatable {

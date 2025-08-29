@@ -8,12 +8,17 @@ extension LiquidityPool {
     /// Signed volume is only meaningful when the inflow on one side of the market is multiplied
     /// with the outflow on the other side of the market. Thus, it has units of `base * quote`.
     @frozen public struct Volume {
-        public var base: (i: Int64, o: Int64)
-        public var quote: (i: Int64, o: Int64)
+        public var base: Side
+        public var quote: Side
+
+        @inlinable public init() {
+            self.base = .init()
+            self.quote = .init()
+        }
 
         @inlinable public init(
-            base: (i: Int64, o: Int64) = (0, 0),
-            quote: (i: Int64, o: Int64) = (0, 0)
+            base: Side,
+            quote: Side
         ) {
             self.base = base
             self.quote = quote
@@ -25,13 +30,9 @@ extension LiquidityPool.Volume {
         .init(base: self.quote, quote: self.base)
     }
 
-    @inlinable public var unsigned: Int64 {
-        self.base.i + self.base.o
-    }
-
     @inlinable public mutating func reset() {
-        self.base = (0, 0)
-        self.quote = (0, 0)
+        self.base.reset()
+        self.quote.reset()
     }
 }
 extension LiquidityPool.Volume {

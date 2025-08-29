@@ -8,5 +8,7 @@ extension GameRules {
         case pops
         case technologies
         case terrains
+
+        case exchange
     }
 }

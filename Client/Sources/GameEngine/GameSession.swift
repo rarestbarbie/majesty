@@ -21,13 +21,14 @@ public struct GameSession: ~Copyable {
         Self.address(&save.countries)
         Self.address(&save.pops)
 
-        self.map = .init(markets: save.markets)
-        self.ui = .init()
-
         let rules: GameRules = try .init(resolving: rules, with: &save.symbols)
+
         var context: GameContext = try .init(save: save, rules: rules)
         try context.loadTerrain(terrain)
+
         self.context = context
+        self.map = .init(settings: rules.settings, markets: save.markets)
+        self.ui = .init()
     }
 }
 extension GameSession {
@@ -694,29 +695,33 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let market: Market = self.map.exchange.markets[id],
-        let last: Market.Interval = market.history.last
+        let last: Int = market.history.indices.last
         else {
             return nil
         }
 
+        let interval: (Market.Interval, Market.Interval)
+        interval.1 = market.history[last]
+        interval.0 = last != market.history.startIndex
+            ? market.history[market.history.index(before: last)]
+            : interval.1
+
         let flow: (quote: Int64, base: Int64) = (
-            last.volume.quote.i - last.volume.quote.o,
-            last.volume.base.i - last.volume.base.o
+            interval.1.volume.quote.i - interval.1.volume.quote.o,
+            interval.1.volume.base.i - interval.1.volume.base.o
         )
 
-        let today: (quote: Int64, base: Int64, sqrt: Double)
-        let yesterday: (quote: Int64, base: Int64, sqrt: Double)
+        let today: (quote: Int64, base: Int64)
+        let yesterday: (quote: Int64, base: Int64)
 
         today.quote = market.pool.assets.quote
         today.base = market.pool.assets.base
-        today.sqrt = .sqrt(Double.init(today.quote) * Double.init(today.base))
 
         yesterday.quote = today.quote - flow.quote
         yesterday.base = today.base - flow.base
-        yesterday.sqrt = .sqrt(Double.init(yesterday.quote) * Double.init(yesterday.base))
 
         return .instructions {
-            $0["Available liquidity", +] = today.sqrt[..3] <- yesterday.sqrt
+            $0["Available liquidity", +] = interval.1.liquidity[..3] <- interval.0.liquidity
             $0[>] {
                 $0["Base instrument", -] = today.base[/3] <- yesterday.base
                 $0["Quote instrument", +] = today.quote[/3] <- yesterday.quote

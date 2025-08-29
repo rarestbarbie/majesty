@@ -95,7 +95,7 @@ extension ResourceInput {
         )
 
         self.consumedValue = self.acquired != 0
-            ? (consumed %/ self.acquired) *< self.acquiredValue
+            ? (consumed %/ self.acquired) >< self.acquiredValue
             : 0
 
         self.acquiredValue -= self.consumedValue

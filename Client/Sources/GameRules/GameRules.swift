@@ -10,24 +10,29 @@ import OrderedCollections
 
     public let pops: [PopType: PopMetadata]
 
+    public let settings: Settings
+
     @inlinable public init(
         resources: OrderedDictionary<Resource, ResourceMetadata>,
         factories: OrderedDictionary<FactoryType, FactoryMetadata>,
         technologies: OrderedDictionary<Technology, TechnologyMetadata>,
         terrains: OrderedDictionary<TerrainType, TerrainMetadata>,
         pops: [PopType: PopMetadata],
+        settings: Settings
     ) {
         self.resources = resources
         self.factories = factories
         self.technologies = technologies
         self.terrains = terrains
         self.pops = pops
+        self.settings = settings
     }
 }
 extension GameRules {
     public init(
         resolving rules: GameRulesDescription,
-        with symbols: inout GameRules.Symbols) throws {
+        with symbols: inout GameRules.Symbols
+    ) throws {
         try self.init(
             resolving: rules,
             resources: try symbols.resources.extend(over: rules.resources),
@@ -36,6 +41,9 @@ extension GameRules {
             terrains: try symbols.terrains.extend(over: rules.terrains),
             pops: try symbols.pops.resolve(rules.pops),
             symbols: symbols,
+            settings: .init(
+                exchange: rules.exchange
+            )
         )
     }
 
@@ -49,6 +57,7 @@ extension GameRules {
         terrains: OrderedDictionary<TerrainType, (Symbol, TerrainDescription)>,
         pops: EffectsTable<PopType, PopDescription>,
         symbols: GameRules.Symbols,
+        settings: Settings
     ) throws {
         let factoryCosts: EffectsTable<FactoryType, SymbolTable<Int64>> = try symbols.factories.resolve(
             rules.factory_costs
@@ -97,6 +106,7 @@ extension GameRules {
                     output: try symbols.resources.resolve(output)
                 )
             },
+            settings: settings
         )
     }
 }
@@ -104,6 +114,8 @@ extension GameRules {
     /// Compute a slow hash of the game rules, used for checking mod compatibility.
     public var hash: Int {
         var hasher: Hasher = .init()
+
+        // TODO: hash settings
 
         for (key, value): (Resource, ResourceMetadata) in self.resources {
             key.hash(into: &hasher)

@@ -22,26 +22,22 @@ import OrderedCollections
 /// $0[resource / currency].swap(&resourceAmount, limit: currencyAmount)
 /// ```
 @frozen public struct Exchange: ~Copyable {
+    @usableFromInline let settings: Settings
     @usableFromInline var table: OrderedDictionary<Market.AssetPair, Market>
-    @usableFromInline var liq: Int64
 
     @inlinable public init(
+        settings: Settings = .default,
         table: OrderedDictionary<Market.AssetPair, Market> = [:],
-        liq: Int64 = 2
     ) {
+        self.settings = settings
         self.table = table
-        self.liq = liq
     }
 }
 extension Exchange {
-    private func new(_ pair: Market.AssetPair) -> Market {
-        .init(id: pair, pool: .init(assets: .init(base: self.liq, quote: self.liq)))
-    }
-
     public subscript(_ pair: Market.AssetPair) -> LiquidityPool {
         get {
             self.table[pair]?.canonical ??
-            self.table[pair.conjugated, default: self.new(pair.conjugated)].conjugate
+            self.table[pair.conjugated, default: self.settings.new(pair.conjugated)].conjugate
         }
         _modify {
             if  let i: Int = self.table.index(forKey: pair) {
@@ -50,10 +46,10 @@ extension Exchange {
                 let i: Int = self.table.index(forKey: pair.conjugated) {
                 yield &self.table.values[i].conjugate
             } else if pair.x < pair.y {
-                let new: Market = self.new(pair)
+                let new: Market = self.settings.new(pair)
                 yield &self.table[pair, default: new].canonical
             } else {
-                let new: Market = self.new(pair.conjugated)
+                let new: Market = self.settings.new(pair.conjugated)
                 yield &self.table[pair.conjugated, default: new].conjugate
             }
         }
@@ -63,9 +59,9 @@ extension Exchange {
         self.table[resource / currency]?.current.c ?? 1
     }
 
-    public mutating func turn(history: Int) {
+    public mutating func turn() {
         for i: Int in self.table.values.indices {
-            self.table.values[i].turn(history: history)
+            self.table.values[i].turn(history: self.settings.history)
         }
     }
 }
