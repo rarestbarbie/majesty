@@ -133,6 +133,7 @@ let package: Package = .init(
                 .target(name: "Assert"),
                 .product(name: "DequeModule", package: "swift-collections"),
                 .product(name: "OrderedCollections", package: "swift-collections"),
+                .product(name: "RealModule", package: "swift-numerics"),
             ]
         ),
         .testTarget(
