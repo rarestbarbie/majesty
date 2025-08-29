@@ -155,7 +155,7 @@ extension GameContext {
 
         try self.postPopConversions(&map)
 
-        map.exchange.turn(history: 365)
+        map.exchange.turn()
     }
 
     mutating func compute() throws {

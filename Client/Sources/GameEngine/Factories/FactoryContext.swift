@@ -210,7 +210,7 @@ extension FactoryContext: RuntimeContext {
             let clerkTeam: Quantity<PopType> = self.type.clerks {
 
             let clerkRatio: Fraction = clerkTeam.amount %/ self.type.workers.amount
-            let clerksOptimal: Int64 = self.workers.count *< clerkRatio
+            let clerksOptimal: Int64 = self.workers.count >< clerkRatio
 
             // Compute clerk bonus in effect for today
             self.state.today.eo = clerks.count < clerksOptimal
@@ -239,7 +239,7 @@ extension FactoryContext: RuntimeContext {
                 }
 
                 let retention: Fraction = salariesPaid %/ salariesOwed
-                let retained: Int64 = clerks.count *> retention
+                let retained: Int64 = clerks.count <> retention
 
                 let layoff: FactoryJobLayoffBlock = .init(
                     size: clerks.count - retained
@@ -349,7 +349,7 @@ extension FactoryContext: RuntimeContext {
         }
 
         let investmentRatio: Fraction = (self.workers.count %/ (10 * self.workers.limit))
-        let investmentBudget: Int64 = investmentRatio *> profit
+        let investmentBudget: Int64 = investmentRatio <> profit
         expansion:
         if  investmentBudget > 0 {
             self.state.cash.v -= self.state.nv.buy(
@@ -383,7 +383,7 @@ extension FactoryContext: RuntimeContext {
 
         // Pay dividends to shareholders, if any.
         self.state.cash.i -= map.pay(
-            dividend: self.state.cash.balance *> (2 %/ 10_000),
+            dividend: self.state.cash.balance <> (2 %/ 10_000),
             to: self.equity.owners.shuffled(using: &map.random.generator)
         )
 

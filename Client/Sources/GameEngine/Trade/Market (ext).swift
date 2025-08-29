@@ -11,6 +11,8 @@ extension Market {
         case ql
         case qi
         case qo
+        case dividend
+        case fee
     }
 }
 extension Market: JavaScriptEncodable {
@@ -22,18 +24,22 @@ extension Market: JavaScriptEncodable {
         js[.ql] = self.pool.assets.quote
         js[.qi] = self.pool.volume.quote.i
         js[.qo] = self.pool.volume.quote.o
+        js[.dividend] = self.dividend
+        js[.fee] = self.pool.fee
     }
 }
 extension Market: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             id: try js[.id].decode(),
+            dividend: try js[.dividend].decode(),
             pool: .init(
                 assets: .init(base: try js[.bl].decode(), quote: try js[.ql].decode()),
                 volume: .init(
-                    base:  (i: try js[.bi]?.decode() ?? 0, o: try js[.bo]?.decode() ?? 0),
-                    quote: (i: try js[.qi]?.decode() ?? 0, o: try js[.qo]?.decode() ?? 0)
-                )
+                    base:  .init(i: try js[.bi].decode(), o: try js[.bo].decode()),
+                    quote: .init(i: try js[.qi].decode(), o: try js[.qo].decode()),
+                ),
+                fee: try js[.fee].decode() ?? 0 %/ 1
             )
         )
     }

@@ -1,5 +1,15 @@
 {
+    "exchange": {
+        "dividend": "1/100000",
+        "fee": "1/500",
+        "capital": "10000000000/10000000000",
+        "history": 365
+    },
     "resources": {
+        "Personal Services": {
+            "emoji": "🐄",
+            "color": "#242753"
+        },
         "Livestock": {
             "emoji": "🐄",
             "color": "#7c566c"

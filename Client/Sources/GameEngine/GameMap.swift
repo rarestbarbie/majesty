@@ -16,10 +16,13 @@ struct GameMap: ~Copyable {
         fire: (worker: Jobs.Fire, clerk: Jobs.Fire)
     )
 
-    init(markets: OrderedDictionary<Market.AssetPair, Market> = [:]) {
+    init(
+        settings: GameRules.Settings,
+        markets: OrderedDictionary<Market.AssetPair, Market> = [:]
+    ) {
         self.random = .init(seed: 12345)
 
-        self.exchange = .init(table: markets, liq: 100_000_000_000)
+        self.exchange = .init(settings: settings.exchange, table: markets)
         self.transfers = [:]
         self.conversions = []
         self.jobs = ((.init(), .init()), (.init(), .init()))

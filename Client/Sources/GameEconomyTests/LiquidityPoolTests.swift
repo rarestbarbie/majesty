@@ -72,16 +72,16 @@ import Testing
         // Selling 10 `x` should push down its price in `y`.
         #expect(x.sell(10) == (10, for: 90))
         #expect(x.sell(10) == (10, for: 75))
-        #expect(x.volume.base == (i: 20, o: 0))
-        #expect(x.volume.quote == (i: 0, o: 165))
+        #expect(x.volume.base.total == 20)
+        #expect(x.volume.quote.total == 165)
 
         var y: LiquidityPool = .init(liquidity: (base: 1000, quote: 100))
 
         // Liquidity pool should be symmetric.
         #expect(y.conjugated.sell(10) == (10, for: 90))
         #expect(y.conjugated.sell(10) == (10, for: 75))
-        #expect(y.volume.quote == (i: 20, o: 0))
-        #expect(y.volume.base == (i: 0, o: 165))
+        #expect(y.volume.quote.total == 20)
+        #expect(y.volume.base.total == 165)
     }
 
     @Test static func purchases() {

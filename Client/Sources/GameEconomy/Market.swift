@@ -1,17 +1,21 @@
 import DequeModule
+import RealModule
 
 @frozen public struct Market: Identifiable {
-    public let id: Market.AssetPair
+    public let id: AssetPair
+    public let dividend: Fraction
     public var pool: LiquidityPool
     public var history: Deque<Interval>
     public var current: Candle<Double>
 
     @inlinable public init(
-        id: Market.AssetPair,
-        pool: LiquidityPool = .init(assets: .init(base: 2, quote: 2)),
+        id: AssetPair,
+        dividend: Fraction,
+        pool: LiquidityPool,
         history: Deque<Interval> = []
     ) {
         self.id = id
+        self.dividend = dividend
         self.pool = pool
         self.history = history
         self.current = .open(self.pool.price)
@@ -49,9 +53,13 @@ extension Market {
         let interval: Interval = .init(
             prices: self.current,
             volume: self.pool.volume,
+            liquidity: .sqrt(
+                Double.init(self.pool.assets.quote) * Double.init(self.pool.assets.base)
+            )
         )
 
         self.current = .open(self.pool.price)
+        self.pool.assets.drain(self.dividend)
         self.pool.volume.reset()
 
         self.history.append(interval)
