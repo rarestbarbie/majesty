@@ -6,8 +6,8 @@
         "history": 365
     },
     "resources": {
-        "Personal Services": {
-            "emoji": "🐄",
+        "(services)": {
+            "emoji": " ",
             "color": "#242753"
         },
         "Livestock": {
@@ -132,6 +132,17 @@
         }
     },
     "factories": {
+        "(service sector)": {
+            "inputs": {
+                "Electricity": 1
+            },
+            "output": {
+                "Personal Services": 1
+            },
+            "workers": {
+                "Server": 1
+            }
+        },
         "Water Treatment Plant": {
             "inputs": {
                 "Electricity": 8
