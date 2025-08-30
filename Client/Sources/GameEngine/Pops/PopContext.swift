@@ -178,8 +178,12 @@ extension PopContext: RuntimeContext {
 
         self.policy = country.policies
     }
+}
+extension PopContext: TransactingContext {
+    mutating func allocate(on map: borrowing GameMap) {
+    }
 
-    mutating func advance(in context: GameContext, on map: inout GameMap) throws {
+    mutating func transact(on map: inout GameMap) {
         guard
         let country: CountryPolicies = self.policy else {
             return
@@ -316,31 +320,37 @@ extension PopContext: RuntimeContext {
                 on: &map
             )
         }
+    }
 
+    mutating func advance(factories: RuntimeStateTable<FactoryContext>, on map: inout GameMap) {
+        guard
+        let country: CountryPolicies = self.policy else {
+            return
+        }
         // We do not need to remove jobs that have no employees left, that will be done
         // automatically by ``Pop.turn``.
         let jobs: Range<Int> = self.state.jobs.values.indices
         let w0: Double = .init(country.minwage)
         for i: Int in jobs {
             {
-                guard let factory: Factory = context.factories.state[$0.at] else {
+                guard let factory: Factory = factories[$0.at] else {
                     // Factory has gone bankrupt or been destroyed.
                     $0.fireAll()
                     return
                 }
 
-                let wn: Double
+                let earned: Double
 
                 if self.state.type.stratum <= .Worker {
-                    wn = factory.yesterday.wa
+                    earned = factory.yesterday.wa
                 } else {
-                    wn = factory.yesterday.ca
+                    earned = factory.yesterday.ca
                 }
 
                 /// At this rate, if the factory pays minimum wage or less, about half of
                 /// non-union workers, and one third of union workers, will quit every year.
                 $0.quit(
-                    rate: 0.002 * w0 / max(w0, wn),
+                    rate: 0.002 * w0 / max(w0, earned),
                     using: &map.random.generator
                 )
             } (&self.state.jobs.values[i])

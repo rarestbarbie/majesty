@@ -5,7 +5,7 @@ import GameRules
 import GameState
 import OrderedCollections
 
-struct Factory: CashAccountHolder, Turnable, Identifiable {
+struct Factory: CashAccountHolder, Identifiable {
     let id: FactoryID
     let on: Address
     var type: FactoryType
@@ -46,6 +46,11 @@ struct Factory: CashAccountHolder, Turnable, Identifiable {
         self.out = out
         self.yesterday = yesterday
         self.today = today
+    }
+}
+extension Factory: Turnable {
+    mutating func turn() {
+        self.cash.settle()
     }
 }
 extension Factory {

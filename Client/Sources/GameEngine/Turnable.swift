@@ -1,4 +1,4 @@
-public protocol Turnable<Dimensions> {
+protocol Turnable<Dimensions> {
     associatedtype Dimensions
 
     var yesterday: Dimensions { get set }
@@ -7,5 +7,7 @@ public protocol Turnable<Dimensions> {
     mutating func turn()
 }
 extension Turnable {
-    @inlinable public mutating func turn() {}
+    var Δ: TurnDelta<Dimensions> {
+        .init(yesterday: self.yesterday, today: self.today)
+    }
 }
