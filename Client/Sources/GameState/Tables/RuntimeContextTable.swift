@@ -30,10 +30,10 @@ extension RuntimeContextTable {
 extension RuntimeContextTable {
     @inlinable public var state: RuntimeStateTable<ElementContext> { .init(index: self.index) }
 }
-extension RuntimeContextTable where ElementContext.State: Turnable {
-    @inlinable public mutating func turnAll() {
+extension RuntimeContextTable {
+    @inlinable public mutating func turn(by turn: (inout ElementContext) -> Void) {
         for i: Int in self.index.values.indices {
-            self.index.values[i].turn()
+            turn(&self.index.values[i])
         }
     }
 }
@@ -58,7 +58,7 @@ extension RuntimeContextTable: Collection {
     @inlinable public subscript(position: Int) -> ElementContext {
         get { self.index.values[position] }
         set { self.index.values[position] = newValue }
-        // _modify { yield &self.index.values[position] }
+        _modify { yield &self.index.values[position] }
     }
 }
 extension RuntimeContextTable {

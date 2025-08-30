@@ -70,6 +70,8 @@ extension Pop: Turnable {
         for i: Int in remove.reversed() {
             self.jobs.remove(at: i)
         }
+
+        self.cash.settle()
     }
 }
 extension Pop {

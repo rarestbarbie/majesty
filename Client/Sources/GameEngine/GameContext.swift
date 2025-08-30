@@ -128,10 +128,8 @@ extension GameContext {
             try self.countries[i].advance(in: self, on: &map)
         }
 
-        self.settleCashTransfers()
-
-        self.factories.turnAll()
-        self.pops.table.turnAll()
+        self.factories.turn  { $0.turn(on: map) }
+        self.pops.table.turn { $0.turn(on: map) }
 
         var order: [Resident] = []
 
@@ -143,15 +141,21 @@ extension GameContext {
         for i: Resident in order {
             switch i {
             case .factory(let i):
-                try self.factories[i].advance(in: self, on: &map)
+                self.factories[i].transact(on: &map)
             case .pop(let i):
-                try self.pops.table[i].advance(in: self, on: &map)
+                self.pops.table[i].transact(on: &map)
             }
+        }
+
+        self.factories.turn {
+            $0.advance()
+        }
+        self.pops.table.turn {
+            $0.advance(factories: self.factories.state, on: &map)
         }
 
         self.postCashTransfers(&map)
         self.postPopEmployment(&map, p: order.compactMap(\.pop))
-        self.postPopLayoffs(&map, p: order.compactMap(\.pop))
 
         try self.postPopConversions(&map)
 
@@ -228,15 +232,6 @@ extension GameContext {
     }
 }
 extension GameContext {
-    private mutating func settleCashTransfers() {
-        for i: Int in self.factories.indices {
-            self.factories[i].state.cash.settle()
-        }
-        for i: Int in self.pops.table.indices {
-            self.pops.table[i].state.cash.settle()
-        }
-    }
-
     private mutating func postCashTransfers(_ map: inout GameMap) {
         defer {
             map.transfers.removeAll(keepingCapacity: true)
@@ -246,7 +241,12 @@ extension GameContext {
         }
     }
 
-    private mutating func postPopLayoffs(_ map: inout GameMap, p: [Int]) {
+    private mutating func postPopEmployment(_ map: inout GameMap, p: [Int]) {
+        self.postPopHirings(&map, p: p)
+        self.postPopFirings(&map, p: p)
+    }
+
+    private mutating func postPopFirings(_ map: inout GameMap, p: [Int]) {
         var layoffs: (
             workers: [FactoryID: FactoryJobLayoffBlock],
             clerks: [FactoryID: FactoryJobLayoffBlock]
@@ -270,7 +270,7 @@ extension GameContext {
             } (&self.pops.table[p])
         }
     }
-    private mutating func postPopEmployment(_ map: inout GameMap, p: [Int]) {
+    private mutating func postPopHirings(_ map: inout GameMap, p: [Int]) {
         let (workers, clerks): (
             [GameMap.Jobs.Hire<Address>.Key: [(Int, Int64)]],
             [GameMap.Jobs.Hire<PlanetID>.Key: [(Int, Int64)]]
@@ -297,12 +297,12 @@ extension GameContext {
 
         let workersUnavailable: [(PopType, [FactoryJobOfferBlock])] = map.jobs.hire.worker.turn {
             if var pops: [(index: Int, unemployed: Int64)] = workers[$0] {
-                self.postPopEmployment(matching: &pops, with: &$1)
+                self.postPopHirings(matching: &pops, with: &$1)
             }
         }
         let clerksUnavailable: [(PopType, [FactoryJobOfferBlock])] = map.jobs.hire.clerk.turn {
             if var pops: [(index: Int, unemployed: Int64)] = clerks[$0] {
-                self.postPopEmployment(matching: &pops, with: &$1)
+                self.postPopHirings(matching: &pops, with: &$1)
             }
         }
 
@@ -334,7 +334,7 @@ extension GameContext {
         }
     }
 
-    private mutating func postPopEmployment(
+    private mutating func postPopHirings(
         matching pops: inout [(index: Int, unemployed: Int64)],
         with offers: inout [FactoryJobOfferBlock]
     ) {
