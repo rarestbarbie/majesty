@@ -128,8 +128,12 @@ extension GameContext {
             try self.countries[i].advance(in: self, on: &map)
         }
 
-        self.factories.turn  { $0.turn(on: map) }
-        self.pops.table.turn { $0.turn(on: map) }
+        map.localMarkets.turn { $0.turn() }
+
+        self.factories.turn  { $0.turn(on: &map) }
+        self.pops.table.turn { $0.turn(on: &map) }
+
+        map.localMarkets.turn { $0.match() }
 
         var order: [Resident] = []
 
@@ -147,6 +151,8 @@ extension GameContext {
             }
         }
 
+        map.exchange.turn()
+
         self.factories.turn {
             $0.advance()
         }
@@ -158,8 +164,6 @@ extension GameContext {
         self.postPopEmployment(&map, p: order.compactMap(\.pop))
 
         try self.postPopConversions(&map)
-
-        map.exchange.turn()
     }
 
     mutating func compute() throws {

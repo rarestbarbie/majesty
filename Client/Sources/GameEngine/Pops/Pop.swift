@@ -135,9 +135,13 @@ extension Pop {
         self.jobs.values.reduce(self.today.size) { $0 - $1.count }
     }
 
-    var needsPerCapita: (l: Double, e: Double, x: Double) {
-        let decadence: Double = 0.1 * self.yesterday.con
-        return (
+    var decadence: Double {
+        0.1 * self.yesterday.con
+    }
+
+    var needsPerCapita: PopContext.Tiers {
+        let decadence: Double = self.decadence
+        return .init(
             l: 1 + decadence,
             e: 1 + decadence * 2,
             x: 1 + decadence * 3

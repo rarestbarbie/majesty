@@ -15,6 +15,7 @@ struct GameMap: ~Copyable {
         hire: (worker: Jobs.Hire<Address>, clerk: Jobs.Hire<PlanetID>),
         fire: (worker: Jobs.Fire, clerk: Jobs.Fire)
     )
+    var localMarkets: LocalMarkets<PopID>
 
     init(
         settings: GameRules.Settings,
@@ -26,6 +27,7 @@ struct GameMap: ~Copyable {
         self.transfers = [:]
         self.conversions = []
         self.jobs = ((.init(), .init()), (.init(), .init()))
+        self.localMarkets = .init()
     }
 }
 extension GameMap {
