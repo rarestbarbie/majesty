@@ -2,38 +2,38 @@ import GameEconomy
 
 extension PopBudget {
     struct Tier {
-        var trade: Int64
-        var local: Int64
+        var tradeable: Int64
+        var inelastic: Int64
 
-        init(trade: Int64 = 0, local: Int64 = 0) {
-            self.trade = trade
-            self.local = local
+        init(tradeable: Int64 = 0, inelastic: Int64 = 0) {
+            self.tradeable = tradeable
+            self.inelastic = inelastic
         }
     }
 }
 extension PopBudget.Tier {
-    var total: Int64 { self.trade + self.local }
+    var total: Int64 { self.tradeable + self.inelastic }
 }
 extension PopBudget.Tier {
     mutating func distribute(
         funds available: Int64,
-        local: Int64,
-        trade: Int64,
+        inelastic: Int64,
+        tradeable: Int64,
     ) -> Int64 {
         guard available > 0 else {
             return 0
         }
 
-        let total: Int64 = trade + local
+        let total: Int64 = tradeable + inelastic
         if  total <= available {
-            self.trade += trade
-            self.local += local
+            self.tradeable += tradeable
+            self.inelastic += inelastic
             return available - total
         }
 
-        if  let item: [Int64] = [trade, local].distribute(available) {
-            self.trade += item[0]
-            self.local += item[1]
+        if  let item: [Int64] = [tradeable, inelastic].distribute(available) {
+            self.tradeable += item[0]
+            self.inelastic += item[1]
             return 0
         }
         else {

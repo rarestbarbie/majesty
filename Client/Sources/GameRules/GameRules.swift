@@ -59,6 +59,10 @@ extension GameRules {
         symbols: GameRules.Symbols,
         settings: Settings
     ) throws {
+        let resources: OrderedDictionary<Resource, ResourceMetadata> = resources.mapValues {
+            .init(name: $0.name, color: $1.color, emoji: $1.emoji, local: $1.local)
+        }
+
         let factoryCosts: EffectsTable<FactoryType, SymbolTable<Int64>> = try symbols.factories.resolve(
             rules.factory_costs
         )
@@ -68,16 +72,25 @@ extension GameRules {
             let (type, (symbol, factory)): (FactoryType, (Symbol, FactoryDescription)) = $1
             $0[type] = try .init(
                 name: symbol.name,
-                costs: try symbols.resources.resolve(try factoryCosts[type] ?? factoryCosts[*]),
-                inputs: try symbols.resources.resolve(factory.inputs),
-                output: try symbols.resources.resolve(factory.output),
+                costs: .init(
+                    metadata: resources,
+                    quantity: try symbols.resources.resolve(
+                        try factoryCosts[type] ?? factoryCosts[*]
+                    )
+                ),
+                inputs: .init(
+                    metadata: resources,
+                    quantity: try symbols.resources.resolve(factory.inputs)
+                ),
+                output: .init(
+                    metadata: resources,
+                    quantity: try symbols.resources.resolve(factory.output)
+                ),
                 workers: try symbols.pops.resolve(factory.workers)
             )
         }
         self.init(
-            resources: resources.mapValues {
-                .init(name: $0.name, color: $1.color, emoji: $1.emoji)
-            },
+            resources: resources,
             factories: factories,
             technologies: try technologies.mapValues {
                 try .init(
@@ -100,10 +113,13 @@ extension GameRules {
                     singular: $1.singular,
                     plural: $1.plural,
                     color: try pop?.color ?? pops[*].color ?? 0xFFFFFF,
-                    l: try symbols.resources.resolve(l),
-                    e: try symbols.resources.resolve(e),
-                    x: try symbols.resources.resolve(x),
-                    output: try symbols.resources.resolve(output)
+                    l: .init(metadata: resources, quantity: try symbols.resources.resolve(l)),
+                    e: .init(metadata: resources, quantity: try symbols.resources.resolve(e)),
+                    x: .init(metadata: resources, quantity: try symbols.resources.resolve(x)),
+                    output: .init(
+                        metadata: resources,
+                        quantity: try symbols.resources.resolve(output)
+                    )
                 )
             },
             settings: settings

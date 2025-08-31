@@ -6,15 +6,18 @@ extension Collection<Int64> {
     ///     An array where each element represents the amount of funds allocated to the
     ///     corresponding shareholder.
     @inlinable public func distribute(_ funds: Int64) -> [Int64]? {
-        self.distribute(funds: { _ in funds }, share: \.self)
+        self.distribute(funds, share: \.self)
     }
 }
 extension Collection where Element: BinaryFloatingPoint {
     @inlinable public func distribute(_ funds: Int64) -> [Int64]? {
-        self.distribute(funds: { _ in funds }, share: \.self)
+        self.distribute(funds, share: \.self)
     }
 }
 extension Collection {
+    @inlinable public func distribute(_ funds: Int64, share: (Element) -> Int64) -> [Int64]? {
+        self.distribute(funds: { _ in funds }, share: share)
+    }
     /// Distributes funds proportionately among shareholders based on their holdings.
     ///
     /// -   Parameters:
@@ -39,6 +42,14 @@ extension Collection {
         }
 
         return self.distribute(funds(shares), shares: shares, share: share)
+    }
+
+
+    @inlinable public func distribute(
+        _ funds: Int64,
+        share: (Element) -> some BinaryFloatingPoint
+    ) -> [Int64]? {
+        self.distribute(funds: { _ in funds }, share: share)
     }
 
     /// Distributes funds proportionately among shareholders based on their holdings,
@@ -85,8 +96,7 @@ extension Collection {
         return allocations
     }
 
-    @inlinable
-    func distribute<Share>(
+    @inlinable func distribute<Share>(
         _ funds: Int64,
         shares: Share,
         share: (Element) -> Share

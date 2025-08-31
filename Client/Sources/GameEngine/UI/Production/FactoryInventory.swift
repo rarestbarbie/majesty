@@ -21,13 +21,13 @@ extension FactoryInventory {
         self.needs.removeAll(keepingCapacity: true)
         self.needs.reserveCapacity(factory.state.ni.count + factory.state.nv.count)
         self.needs.update(
-            inputs: factory.state.ni,
+            inputs: factory.state.ni.tradeable,
             currency: factory.policy?.currency,
             tier: .i,
             from: snapshot
         )
         self.needs.update(
-            inputs: factory.state.nv,
+            inputs: factory.state.nv.tradeable,
             currency: factory.policy?.currency,
             tier: .v,
             from: snapshot
@@ -36,7 +36,7 @@ extension FactoryInventory {
         self.sales.removeAll(keepingCapacity: true)
         self.sales.reserveCapacity(factory.state.out.count)
 
-        for output: ResourceOutput in factory.state.out {
+        for output: TradeableOutput in factory.state.out.tradeable {
             self.sales.append(.init(
                 label: snapshot.rules[output.id],
                 quantity: output.quantity,

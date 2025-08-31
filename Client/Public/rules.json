@@ -6,10 +6,22 @@
         "history": 365
     },
     "resources": {
-        "(services)": {
-            "emoji": " ",
-            "color": "#242753"
+        "Housing": {
+            "emoji": "🏠",
+            "color": "#575a7e",
+            "local": true
         },
+        "Services": {
+            "emoji": "💼",
+            "color": "#242753",
+            "local": true
+        },
+        "Culture": {
+            "emoji": "🏛️",
+            "color": "#873a8a",
+            "local": true
+        },
+
         "Livestock": {
             "emoji": "🐄",
             "color": "#7c566c"
@@ -132,17 +144,6 @@
         }
     },
     "factories": {
-        "(service sector)": {
-            "inputs": {
-                "Electricity": 1
-            },
-            "output": {
-                "Personal Services": 1
-            },
-            "workers": {
-                "Server": 1
-            }
-        },
         "Water Treatment Plant": {
             "inputs": {
                 "Electricity": 8
@@ -288,16 +289,19 @@
             }
         },
         "Miner": {
-            "color": "#2d2d4b"
+            "color": "#7a7674"
         },
         "Editor": {
-            "color": "#71bac7"
+            "color": "#502e28"
         },
         "Server": {
-            "color": "#ffa4d2"
+            "color": "#1f224b",
+            "output": {
+                "Services": 4
+            }
         },
         "Driver": {
-            "color": "#586da7"
+            "color": "#71bac7"
         },
         "Engineer": {
             "color": "#e4e4e4"

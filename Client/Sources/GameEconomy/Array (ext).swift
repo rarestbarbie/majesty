@@ -1,20 +1,20 @@
-import Assert
+import OrderedCollections
 
 extension Array where Element: ResourceStockpile {
     @inlinable public mutating func sync(
-        with coefficients: [Quantity<Resource>],
+        with coefficients: OrderedDictionary<Resource, Int64>,
         sync: (inout Element, Quantity<Resource>) -> Void
     ) {
         inplace: do {
             guard self.count == coefficients.count else {
                 break inplace
             }
-            for (i, c): (Element, Quantity<Resource>) in zip(self, coefficients)
-                where i.id != c.unit {
+            for (i, (id, _)): (Element, (Resource, Int64)) in zip(self, coefficients)
+                where i.id != id {
                 break inplace
             }
-            for (i, c): (Int, Quantity<Resource>) in zip(self.indices, coefficients) {
-                sync(&self[i], c)
+            for (i, (id, amount)): (Int, (Resource, Int64)) in zip(self.indices, coefficients) {
+                sync(&self[i], .init(amount: amount, unit: id))
             }
 
             return
@@ -25,71 +25,9 @@ extension Array where Element: ResourceStockpile {
             $0[$1.id] = $1
         }
         self = coefficients.map {
-            var element: Element = carryover[$0.unit] ?? .init(id: $0.unit)
-            sync(&element, $0)
+            var element: Element = carryover[$0] ?? .init(id: $0)
+            sync(&element, .init(amount: $1, unit: $0))
             return element
-        }
-    }
-}
-extension [ResourceInput] {
-    /// Returns the amount of funds actually spent.
-    @inlinable public mutating func buy(
-        days stockpile: Int64,
-        with budget: Int64,
-        in currency: Fiat,
-        on exchange: inout Exchange,
-    ) -> Int64 {
-        let weights: [Double] = self.map {
-            Double.init($0.needed($0.capacity)) * exchange.price(of: $0.id, in: currency)
-        }
-
-        return self.buy(
-            days: stockpile,
-            with: budget,
-            in: currency,
-            on: &exchange,
-            weights: weights[...]
-        )
-    }
-
-    /// Returns the amount of funds actually spent.
-    @usableFromInline mutating func buy(
-        days stockpile: Int64,
-        with budget: Int64,
-        in currency: Fiat,
-        on exchange: inout Exchange,
-        weights: ArraySlice<Double>,
-    ) -> Int64 {
-        guard let budgets: [Int64] = weights.distribute(budget) else {
-            return 0
-        }
-
-        var funds: Int64 = budget
-
-        for i: Int in self.indices {
-            funds -= self[i].buy(days: stockpile, with: budgets[i], in: currency, on: &exchange)
-        }
-
-        #assert(
-            0 ... budget ~= funds,
-            """
-            Spending is out of bounds: \(funds) not in [0, \(budget)] ?!?!
-            Inputs: \(self)
-            Budgets: \(budgets)
-            """
-        )
-
-        return budget - funds
-    }
-}
-extension [ResourceOutput] {
-    /// Returns the amount of funds actually received.
-    public mutating func sell(
-        in currency: Fiat,
-        on exchange: inout Exchange,
-    ) -> Int64 {
-        self.indices.reduce(into: 0) {
-            $0 += self[$1].sell(in: currency, on: &exchange)
         }
     }
 }

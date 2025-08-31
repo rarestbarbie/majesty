@@ -2,7 +2,7 @@ import GameEconomy
 import JavaScriptKit
 import JavaScriptInterop
 
-extension ResourceInput {
+extension TradeableInput {
     @frozen public enum ObjectKey: JSString, Sendable {
         case id
         case acquiredValue = "A"
@@ -15,7 +15,7 @@ extension ResourceInput {
         case price = "p"
     }
 }
-extension ResourceInput: JavaScriptEncodable {
+extension TradeableInput: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.acquiredValue] = self.acquiredValue
@@ -28,7 +28,7 @@ extension ResourceInput: JavaScriptEncodable {
         js[.price] = self.price
     }
 }
-extension ResourceInput: JavaScriptDecodable {
+extension TradeableInput: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             id: try js[.id].decode(),

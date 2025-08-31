@@ -1,4 +1,4 @@
-@frozen public struct ResourceOutput {
+@frozen public struct TradeableOutput {
     public let id: Resource
     public var quantity: Int64
     public var leftover: Int64
@@ -17,7 +17,7 @@
     }
 
 }
-extension ResourceOutput: ResourceStockpile {
+extension TradeableOutput: ResourceStockpile {
     @inlinable public init(id: Resource) {
         self.init(
             id: id,
@@ -27,7 +27,7 @@ extension ResourceOutput: ResourceStockpile {
         )
     }
 }
-extension ResourceOutput {
+extension TradeableOutput {
     @inlinable public mutating func deposit(_ amount: Int64, efficiency: Double) {
         let produced: Int64 = .init(Double.init(amount) * efficiency)
         self.quantity = produced
@@ -35,7 +35,7 @@ extension ResourceOutput {
         self.proceeds = 0
     }
 }
-extension ResourceOutput {
+extension TradeableOutput {
     public mutating func sell(
         in currency: Fiat,
         on exchange: inout Exchange,
@@ -51,5 +51,5 @@ extension ResourceOutput {
 }
 
 #if TESTABLE
-extension ResourceOutput: Equatable, Hashable {}
+extension TradeableOutput: Equatable, Hashable {}
 #endif

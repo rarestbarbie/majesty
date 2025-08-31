@@ -5,19 +5,19 @@ public final class PopMetadata: Identifiable, Sendable {
     public let singular: String
     public let plural: String
     public let color: Color
-    public let l: [Quantity<Resource>]
-    public let e: [Quantity<Resource>]
-    public let x: [Quantity<Resource>]
-    public let output: [Quantity<Resource>]
+    public let l: ResourceTier
+    public let e: ResourceTier
+    public let x: ResourceTier
+    public let output: ResourceTier
 
     init(
         singular: String,
         plural: String,
         color: Color,
-        l: [Quantity<Resource>],
-        e: [Quantity<Resource>],
-        x: [Quantity<Resource>],
-        output: [Quantity<Resource>]
+        l: ResourceTier,
+        e: ResourceTier,
+        x: ResourceTier,
+        output: ResourceTier,
     ) {
         self.singular = singular
         self.plural = plural

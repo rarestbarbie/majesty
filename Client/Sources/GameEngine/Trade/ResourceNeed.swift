@@ -5,7 +5,7 @@ import JavaScriptInterop
 
 struct ResourceNeed {
     let label: ResourceLabel
-    let tier: ResourceNeedTier
+    let tier: ResourceTierIdentifier
 
     let acquired: Int64
     let capacity: Int64
@@ -13,15 +13,14 @@ struct ResourceNeed {
     let consumed: Int64
     let purchased: Int64
 
-    let priceFilled: Double
     let price: Candle<Double>
 }
 extension ResourceNeed {
     init(
         label: ResourceLabel,
-        input: ResourceInput,
+        input: TradeableInput,
         price: Candle<Double>,
-        tier: ResourceNeedTier,
+        tier: ResourceTierIdentifier,
     ) {
         self.init(
             label: label,
@@ -31,7 +30,6 @@ extension ResourceNeed {
             demanded: input.demanded,
             consumed: input.consumed,
             purchased: input.purchased,
-            priceFilled: input.price,
             price: price,
         )
     }
@@ -47,7 +45,6 @@ extension ResourceNeed: JavaScriptEncodable {
         case demanded
         case consumed
         case purchased
-        case priceFilled
         case price
     }
 
@@ -61,7 +58,6 @@ extension ResourceNeed: JavaScriptEncodable {
         js[.demanded] = self.demanded
         js[.consumed] = self.consumed
         js[.purchased] = self.purchased
-        js[.priceFilled] = self.priceFilled
         js[.price] = self.price
     }
 }

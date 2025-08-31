@@ -31,19 +31,19 @@ extension PopDetails {
         self.needs.reserveCapacity(pop.state.nl.count + pop.state.ne.count + pop.state.nx.count)
 
         self.needs.update(
-            inputs: pop.state.nl,
+            inputs: pop.state.nl.tradeable,
             currency: pop.policy?.currency,
             tier: .l,
             from: snapshot
         )
         self.needs.update(
-            inputs: pop.state.ne,
+            inputs: pop.state.ne.tradeable,
             currency: pop.policy?.currency,
             tier: .e,
             from: snapshot
         )
         self.needs.update(
-            inputs: pop.state.nx,
+            inputs: pop.state.nx.tradeable,
             currency: pop.policy?.currency,
             tier: .x,
             from: snapshot
@@ -52,7 +52,7 @@ extension PopDetails {
         self.sales.removeAll(keepingCapacity: true)
         self.sales.reserveCapacity(pop.state.out.count)
 
-        for output: ResourceOutput in pop.state.out {
+        for output: TradeableOutput in pop.state.out.tradeable {
             self.sales.append(.init(
                 label: snapshot.rules[output.id],
                 quantity: output.quantity,

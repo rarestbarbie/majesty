@@ -17,13 +17,13 @@ struct Pop: CashAccountHolder, IdentityReplaceable {
     var cash: CashAccount
 
     /// Life Needs
-    var nl: [ResourceInput]
+    var nl: ResourceInputs
     /// Everyday Needs
-    var ne: [ResourceInput]
+    var ne: ResourceInputs
     /// Luxury Needs
-    var nx: [ResourceInput]
+    var nx: ResourceInputs
 
-    var out: [ResourceOutput]
+    var out: ResourceOutputs
 
     var yesterday: Dimensions
     var today: Dimensions
@@ -40,10 +40,10 @@ extension Pop: Sectionable {
             type: section.type,
             nat: section.culture,
             cash: .init(),
-            nl: [],
-            ne: [],
-            nx: [],
-            out: [],
+            nl: .init(),
+            ne: .init(),
+            nx: .init(),
+            out: .init(),
             yesterday: .init(),
             today: .init(),
             stocks: [:],
@@ -226,10 +226,10 @@ extension Pop: JavaScriptDecodable {
             type: try js[.type].decode(),
             nat: try js[.nat].decode(),
             cash: try js[.cash]?.decode() ?? .init(),
-            nl: try js[.nl]?.decode() ?? [],
-            ne: try js[.ne]?.decode() ?? [],
-            nx: try js[.nx]?.decode() ?? [],
-            out: try js[.out]?.decode() ?? [],
+            nl: try js[.nl]?.decode() ?? .init(),
+            ne: try js[.ne]?.decode() ?? .init(),
+            nx: try js[.nx]?.decode() ?? .init(),
+            out: try js[.out]?.decode() ?? .init(),
             yesterday: .init(
                 size: try js[.yesterday_size]?.decode() ?? today.size,
                 mil: try js[.yesterday_mil]?.decode() ?? today.mil,
