@@ -2,17 +2,17 @@ import GameEconomy
 
 public final class FactoryMetadata: Identifiable, Sendable {
     public let name: String
-    public let costs: [Quantity<Resource>]
-    public let inputs: [Quantity<Resource>]
-    public let output: [Quantity<Resource>]
+    public let costs: ResourceTier
+    public let inputs: ResourceTier
+    public let output: ResourceTier
     public let workers: Quantity<PopType>
     public let clerks: Quantity<PopType>?
 
     init(
         name: String,
-        costs: [Quantity<Resource>],
-        inputs: [Quantity<Resource>],
-        output: [Quantity<Resource>],
+        costs: ResourceTier,
+        inputs: ResourceTier,
+        output: ResourceTier,
         workers divisions: [Quantity<PopType>],
     ) throws {
         self.name = name

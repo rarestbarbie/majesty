@@ -248,102 +248,77 @@ extension GameSession {
 
     public func tooltipFactoryDemand(
         _ id: FactoryID,
-        _ tier: ResourceNeedTier,
+        _ tier: ResourceTierIdentifier,
         _ need: Resource,
     ) -> Tooltip? {
         guard let factory: FactoryContext = self.context.factories[id] else {
             return nil
         }
 
-        let input: Quantity<Resource>?
-        let stock: ResourceInput?
-        let scale: Double // TODO
         switch tier {
         case .i:
-            input = factory.type.inputs.first { $0.unit == need }
-            stock = factory.state.ni.first { $0.id == need }
-            scale = 1
+            return factory.state.ni.tooltipDemand(
+                need,
+                tier: factory.type.inputs,
+                unit: "worker",
+                factor: 1
+            )
         case .v:
-            input = factory.type.costs.first { $0.unit == need }
-            stock = factory.state.nv.first { $0.id == need }
-            scale = 1
+            return factory.state.nv.tooltipDemand(
+                need,
+                tier: factory.type.costs,
+                unit: "worker",
+                factor: 1
+            )
         default:
             return nil
-        }
-
-        guard
-        let input: Quantity<Resource>,
-        let stock: ResourceInput else {
-            return nil
-        }
-
-        return .instructions {
-            $0["Consumed today", +] = stock.consumed[/3] / stock.demanded
-
-            if case .i = tier {
-                $0[>] {
-                    $0["Demand per worker"] = (scale * Double.init(input.amount))[..3]
-                }
-            }
         }
     }
 
     public func tooltipFactoryStockpile(
         _ id: FactoryID,
-        _ tier: ResourceNeedTier,
+        _ tier: ResourceTierIdentifier,
         _ need: Resource,
     ) -> Tooltip? {
         guard let factory: FactoryContext = self.context.factories[id] else {
             return nil
         }
 
-        let stock: ResourceInput?
         switch tier {
         case .i:
-            stock = factory.state.ni.first { $0.id == need }
+            return factory.state.ni.tooltipStockpile(need)
         case .v:
-            stock = factory.state.nv.first { $0.id == need }
+            return factory.state.nv.tooltipStockpile(need)
         default:
             return nil
         }
-
-        guard
-        let stock: ResourceInput else {
-            return nil
-        }
-
-        return Self.tooltipResourceStockpile(stock)
     }
 
     public func tooltipFactoryExplainPrice(
         _ id: FactoryID,
-        _ tier: ResourceNeedTier,
+        _ tier: ResourceTierIdentifier,
         _ need: Resource,
     ) -> Tooltip? {
         guard
         let factory: FactoryContext = self.context.factories[id],
-        let currency: Fiat = factory.policy?.currency,
-        let market: Market = self.map.exchange.markets[need / currency] else {
-            return nil
-        }
-
-        let stock: ResourceInput?
-        switch tier {
-        case .i:
-            stock = factory.state.ni.first { $0.id == need }
-        case .v:
-            stock = factory.state.nv.first { $0.id == need }
-        default:
+        let currency: Fiat = factory.policy?.currency else {
             return nil
         }
 
         guard
-        let stock: ResourceInput,
+        let market: Market = self.map.exchange.markets[need / currency],
         let price: Candle<Double> = market.history.last?.prices else {
             return nil
         }
 
-        return Self.tooltipExplainPrice(price, stock)
+        switch tier {
+        case .i:
+            return factory.state.ni.tooltipExplainPrice(need, price)
+        case .v:
+            return factory.state.nv.tooltipExplainPrice(need, price)
+        default:
+            return nil
+        }
     }
 
     public func tooltipFactorySize(_ id: FactoryID) -> Tooltip? {
@@ -525,7 +500,7 @@ extension GameSession {
 
     public func tooltipPopNeeds(
         _ id: PopID,
-        _ tier: ResourceNeedTier
+        _ tier: ResourceTierIdentifier
     ) -> Tooltip? {
         guard let pop: Pop = self.context.pops.table.state[id] else {
             return nil
@@ -546,107 +521,87 @@ extension GameSession {
 
     public func tooltipPopDemand(
         _ id: PopID,
-        _ tier: ResourceNeedTier,
+        _ tier: ResourceTierIdentifier,
         _ need: Resource,
     ) -> Tooltip? {
         guard let pop: PopContext = self.context.pops.table[id] else {
             return nil
         }
 
-        let input: Quantity<Resource>?
-        let stock: ResourceInput?
-        let scale: Double
         switch tier {
         case .l:
-            input = pop.type.l.first { $0.unit == need }
-            stock = pop.state.nl.first { $0.id == need }
-            scale = pop.state.needsPerCapita.l
+            return pop.state.nl.tooltipDemand(
+                need,
+                tier: pop.type.l,
+                unit: "capita",
+                factor: pop.state.needsPerCapita.l
+            )
         case .e:
-            input = pop.type.e.first { $0.unit == need }
-            stock = pop.state.ne.first { $0.id == need }
-            scale = pop.state.needsPerCapita.e
+            return pop.state.ne.tooltipDemand(
+                need,
+                tier: pop.type.e,
+                unit: "capita",
+                factor: pop.state.needsPerCapita.e
+            )
         case .x:
-            input = pop.type.x.first { $0.unit == need }
-            stock = pop.state.nx.first { $0.id == need }
-            scale = pop.state.needsPerCapita.x
+            return pop.state.nx.tooltipDemand(
+                need,
+                tier: pop.type.x,
+                unit: "capita",
+                factor: pop.state.needsPerCapita.x
+            )
         default:
             return nil
-        }
-
-        guard
-        let input: Quantity<Resource>,
-        let stock: ResourceInput else {
-            return nil
-        }
-
-        return .instructions {
-            $0["Consumed today", +] = stock.consumed[/3] / stock.demanded
-            $0[>] {
-                $0["Demand per capita"] = (scale * Double.init(input.amount))[..3]
-            }
         }
     }
 
     public func tooltipPopStockpile(
         _ id: PopID,
-        _ tier: ResourceNeedTier,
+        _ tier: ResourceTierIdentifier,
         _ need: Resource,
     ) -> Tooltip? {
         guard let pop: PopContext = self.context.pops.table[id] else {
             return nil
         }
 
-        let stock: ResourceInput?
         switch tier {
         case .l:
-            stock = pop.state.nl.first { $0.id == need }
+            return pop.state.nl.tooltipStockpile(need)
         case .e:
-            stock = pop.state.ne.first { $0.id == need }
+            return pop.state.ne.tooltipStockpile(need)
         case .x:
-            stock = pop.state.nx.first { $0.id == need }
+            return pop.state.nx.tooltipStockpile(need)
         default:
             return nil
         }
-
-        guard
-        let stock: ResourceInput else {
-            return nil
-        }
-
-        return Self.tooltipResourceStockpile(stock)
     }
 
     public func tooltipPopExplainPrice(
         _ id: PopID,
-        _ tier: ResourceNeedTier,
+        _ tier: ResourceTierIdentifier,
         _ need: Resource,
     ) -> Tooltip? {
         guard
         let pop: PopContext = self.context.pops.table[id],
-        let currency: Fiat = pop.policy?.currency,
-        let market: Market = self.map.exchange.markets[need / currency] else {
+        let currency: Fiat = pop.policy?.currency else {
             return nil
         }
-
-        let stock: ResourceInput?
-        switch tier {
-        case .l:
-            stock = pop.state.nl.first { $0.id == need }
-        case .e:
-            stock = pop.state.ne.first { $0.id == need }
-        case .x:
-            stock = pop.state.nx.first { $0.id == need }
-        default:
-            return nil
-        }
-
         guard
-        let stock: ResourceInput,
+        let market: Market = self.map.exchange.markets[need / currency],
         let price: Candle<Double> = market.history.last?.prices else {
             return nil
         }
 
-        return Self.tooltipExplainPrice(price, stock)
+        switch tier {
+        case .l:
+            return pop.state.nl.tooltipExplainPrice(need, price)
+        case .e:
+            return pop.state.ne.tooltipExplainPrice(need, price)
+        case .x:
+            return pop.state.nx.tooltipExplainPrice(need, price)
+        default:
+            return nil
+        }
     }
 
     public func tooltipPopType(
@@ -726,39 +681,6 @@ extension GameSession {
                 $0["Base instrument", -] = today.base[/3] <- yesterday.base
                 $0["Quote instrument", +] = today.quote[/3] <- yesterday.quote
             }
-        }
-    }
-}
-extension GameSession {
-    private static func tooltipExplainPrice(
-        _ price: Candle<Double>,
-        _ input: ResourceInput,
-    ) -> Tooltip {
-        .instructions {
-            $0["Today’s closing price", -] = price.c[..2] <- price.o
-            $0[>] = input.price == price.c ? nil : """
-            Due to their position in line, and the available liquidity on the market, the \
-            average price they actually paid today was \(em: input.price[..2])
-            """
-            $0[>] = input.price <= price.l ? nil : """
-            The luckiest buyers paid \(em: price.l[..2]) today
-            """
-        }
-    }
-
-    private static func tooltipResourceStockpile(_ stock: ResourceInput) -> Tooltip {
-        .instructions {
-            let change: Int64 = stock.purchased - stock.consumed
-
-            $0["Total stockpile", +] = stock.acquired[/3] <- stock.acquired - change
-            $0[>] {
-                $0["Average cost"] = ??stock.averageCost[..2]
-                $0["Supply (days)"] = stock.acquired == 0
-                    ? nil
-                    : (Double.init(stock.acquired) / Double.init(stock.demanded))[..3]
-            }
-
-            $0["Purchased today", +] = +?stock.purchased[/3]
         }
     }
 }

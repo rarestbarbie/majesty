@@ -88,7 +88,7 @@ extension FactoryContext: RuntimeContext {
         self.policy = country.state.policies
 
         self.cashFlow.reset()
-        self.cashFlow.update(with: self.state.ni)
+        self.cashFlow.update(with: self.state.ni.tradeable)
         self.cashFlow[.workers] = -self.state.cash.w
         self.cashFlow[.clerks] = -self.state.cash.c
     }
@@ -118,7 +118,7 @@ extension FactoryContext: TransactingContext {
         /// curvature of the market.
         var inputsCostPerHour: Double = 0
 
-        self.state.ni.sync(with: self.type.inputs) {
+        self.state.ni.tradeable.sync(with: self.type.inputs.tradeable) {
             inputsCostPerHour += Double.init($1.amount) * map.exchange.price(
                 of: $0.id,
                 in: country.currency
@@ -200,13 +200,13 @@ extension FactoryContext: TransactingContext {
             /// estimate of the factory’s profitability, we need to credit the day’s balance with
             /// the amount of currency that was sunk into purchasing inputs, and subtract the
             /// approximate value of the inputs consumed today.
-            self.state.ni.sync(with: self.type.inputs) {
+            self.state.ni.tradeable.sync(with: self.type.inputs.tradeable) {
                 $0.consume(
                     self.productivity * $1.amount * hours,
                     efficiency: self.state.today.ei
                 )
             }
-            self.state.out.sync(with: self.type.output) {
+            self.state.out.tradeable.sync(with: self.type.output.tradeable) {
                 $0.deposit(
                     self.productivity * $1.amount * hours,
                     efficiency: self.state.today.eo
@@ -218,8 +218,8 @@ extension FactoryContext: TransactingContext {
 
             #assert(self.state.cash.balance >= 0, "Factory has negative cash! (\(self.state.cash))")
 
-            self.state.today.fi = self.state.ni.reduce(1) { min($0, $1.fulfilled) }
-            self.state.today.vi = self.state.ni.reduce(0) { $0 + $1.acquiredValue }
+            self.state.today.fi = self.state.ni.fulfilled
+            self.state.today.vi = self.state.ni.valuation
 
             profit = self.state.cash.change + self.state.Δ.vi
 
@@ -239,7 +239,7 @@ extension FactoryContext: TransactingContext {
             }
         }
 
-        self.state.nv.sync(with: self.type.costs) {
+        self.state.nv.tradeable.sync(with: self.type.costs.tradeable) {
             $0.sync(
                 coefficient: $1,
                 multiplier: self.productivity,
@@ -258,17 +258,14 @@ extension FactoryContext: TransactingContext {
                 on: &map.exchange,
             )
 
-            let growth: Int64 = zip(self.state.nv, self.type.costs).reduce(1) {
-                let (resource, input) : (ResourceInput, Quantity<Resource>) = $1
-                return min($0, resource.acquired / input.amount)
-            }
+            let growth: Int64 = self.state.nv.width(limit: 1, tier: self.type.costs)
 
             guard growth > 0 else {
                 break expansion
             }
 
             self.state.grow += growth
-            self.state.nv.sync(with: self.type.costs) {
+            self.state.nv.tradeable.sync(with: self.type.costs.tradeable) {
                 $0.consume($1.amount * self.productivity, efficiency: self.state.today.ei)
             }
 
@@ -278,7 +275,7 @@ extension FactoryContext: TransactingContext {
             }
         }
 
-        self.state.today.vv = self.state.nv.reduce(0) { $0 + $1.acquiredValue }
+        self.state.today.vv = self.state.nv.valuation
 
         // Pay dividends to shareholders, if any.
         self.state.cash.i -= map.pay(
@@ -406,12 +403,10 @@ extension FactoryContext {
         /// Compute hours workable, assuming each worker works 1 “hour” per day for mathematical
         /// convenience. This can be larger than the actual number of workers available, but it
         /// will never be larger than the number of workers that can fit in the factory.
-        let hoursWorkable: Int64 = zip(self.state.ni, self.type.inputs).reduce(
-            self.workers.limit
-        ) {
-            let (resource, input) : (ResourceInput, Quantity<Resource>) = $1
-            return min($0, resource.acquired / input.amount)
-        }
+        let hoursWorkable: Int64 = self.state.ni.width(
+            limit: self.workers.limit,
+            tier: self.type.inputs
+        )
 
         #assert(hoursWorkable >= 0, "Hours workable (\(hoursWorkable)) is negative?!?!")
 

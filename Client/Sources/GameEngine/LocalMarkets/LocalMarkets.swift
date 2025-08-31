@@ -1,3 +1,5 @@
+import GameEconomy
+
 struct LocalMarkets<LegalEntity> {
     private var markets: [Key: LocalMarket<LegalEntity>]
 
@@ -6,7 +8,7 @@ struct LocalMarkets<LegalEntity> {
     }
 }
 extension LocalMarkets {
-    subscript(location: Address, resource: LocalResource) -> LocalMarket<LegalEntity> {
+    subscript(location: Address, resource: Resource) -> LocalMarket<LegalEntity> {
         _read {
             yield  self.markets[.init(location: location, resource: resource), default: .init()]
         }

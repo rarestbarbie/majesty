@@ -10,6 +10,5 @@ export interface ResourceNeed {
     readonly demanded: bigint;
     readonly consumed: bigint;
     readonly purchased: bigint;
-    readonly priceFilled: number;
     readonly price: Candle<number>;
 }

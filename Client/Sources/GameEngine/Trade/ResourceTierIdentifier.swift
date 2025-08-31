@@ -1,7 +1,7 @@
 import JavaScriptKit
 import JavaScriptInterop
 
-@frozen public enum ResourceNeedTier: Unicode.Scalar,
+@frozen public enum ResourceTierIdentifier: Unicode.Scalar,
     LoadableFromJSValue,
     ConvertibleToJSValue {
     /// Pop, life need.

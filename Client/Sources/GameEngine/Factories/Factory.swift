@@ -14,9 +14,9 @@ struct Factory: CashAccountHolder, Identifiable {
     var subs: Bool
     var cash: CashAccount
 
-    var nv: [ResourceInput]
-    var ni: [ResourceInput]
-    var out: [ResourceOutput]
+    var nv: ResourceInputs
+    var ni: ResourceInputs
+    var out: ResourceOutputs
     var yesterday: Dimensions
     var today: Dimensions
 
@@ -28,9 +28,9 @@ struct Factory: CashAccountHolder, Identifiable {
         size: Int64,
         subs: Bool,
         cash: CashAccount,
-        nv: [ResourceInput],
-        ni: [ResourceInput],
-        out: [ResourceOutput],
+        nv: ResourceInputs,
+        ni: ResourceInputs,
+        out: ResourceOutputs,
         yesterday: Dimensions,
         today: Dimensions,
     ) {
@@ -159,9 +159,9 @@ extension Factory: JavaScriptDecodable {
             size: try js[.size]?.decode() ?? 1,
             subs: try js[.subs]?.decode() ?? false,
             cash: try js[.cash].decode(),
-            nv: try js[.nv]?.decode() ?? [],
-            ni: try js[.ni]?.decode() ?? [],
-            out: try js[.out]?.decode() ?? [],
+            nv: try js[.nv]?.decode() ?? .init(),
+            ni: try js[.ni]?.decode() ?? .init(),
+            out: try js[.out]?.decode() ?? .init(),
             yesterday: .init(
                 vi: try js[.yesterday_vi]?.decode() ?? today.vi,
                 vv: try js[.yesterday_vv]?.decode() ?? today.vv,
