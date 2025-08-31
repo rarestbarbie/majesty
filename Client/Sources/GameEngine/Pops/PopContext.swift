@@ -19,6 +19,8 @@ struct PopContext {
 
     private(set) var cashFlow: CashFlowStatement
 
+    private var budget: PopBudget?
+
     public init(type: PopMetadata, state: Pop) {
         self.type = type
         self.state = state
@@ -28,9 +30,14 @@ struct PopContext {
         self.unemployment = 0
         self.equity = .init()
         self.cashFlow = .init()
+
+        self.budget = nil
     }
 }
 extension PopContext {
+    private static var stockpileDays: Int64 { 3 }
+    private static var stockpileMax: Int64 { 7 }
+
     mutating func startIndexCount() {
         self.equity = .init()
     }
@@ -179,62 +186,214 @@ extension PopContext: RuntimeContext {
         self.policy = country.policies
     }
 }
-extension PopContext: TransactingContext {
-    mutating func allocate(on map: borrowing GameMap) {
+
+import Vector
+
+extension PopContext {
+    struct Tiers {
+        private var vector: Vector3
+    }
+}
+extension PopContext.Tiers {
+    init(l: Double, e: Double, x: Double) {
+        self.init(vector: .init(l, e, x))
+    }
+    init() {
+        self.init(vector: .init(0, 0, 0))
+    }
+}
+extension PopContext.Tiers {
+    var l: Double {
+        get {
+            self.vector.x
+        }
+        set(value) {
+            self.vector.x = value
+        }
     }
 
+    var e: Double {
+        get {
+            self.vector.y
+        }
+        set(value) {
+            self.vector.y = value
+        }
+    }
+
+    var x: Double {
+        get {
+            self.vector.z
+        }
+        set(value) {
+            self.vector.z = value
+        }
+    }
+}
+extension PopContext.Tiers {
+    static func + (a: Self, b: Self) -> Self {
+        .init(vector: a.vector + b.vector)
+    }
+    static func * (a: Self, b: Self) -> Self {
+        .init(vector: a.vector * b.vector)
+    }
+    static func * (self: Self, scale: Double) -> Self {
+        .init(vector: self.vector * scale)
+    }
+    static func * (scale: Double, self: Self) -> Self {
+        .init(vector: scale * self.vector)
+    }
+}
+extension PopContext: TransactingContext {
+    mutating func allocate(on map: inout GameMap) {
+        self.state.today.size += Binomial[self.state.today.size, 0.000_02].sample(
+            using: &map.random.generator
+        )
+
+        if  case .Ward = self.state.type.stratum {
+            return
+        }
+
+        let currency: Fiat = self.policy!.currency
+
+        var basePerCapita: (trade: Tiers, local: Tiers) = (.init(), .init())
+        let w: Tiers = self.state.needsPerCapita
+
+        self.state.nl.sync(with: self.type.l) {
+            basePerCapita.trade.l += Double.init($1.amount) * map.exchange.price(
+                of: $0.id,
+                in: currency
+            )
+            $0.sync(
+                coefficient: $1,
+                multiplier: self.state.today.size,
+                stockpile: Self.stockpileDays,
+                efficiency: w.l
+            )
+        }
+        self.state.ne.sync(with: self.type.e) {
+            basePerCapita.trade.e += Double.init($1.amount) * map.exchange.price(
+                of: $0.id,
+                in: currency
+            )
+            $0.sync(
+                coefficient: $1,
+                multiplier: self.state.today.size,
+                stockpile: Self.stockpileDays,
+                efficiency: w.e
+            )
+        }
+        self.state.nx.sync(with: self.type.x) {
+            basePerCapita.trade.x += Double.init($1.amount) * map.exchange.price(
+                of: $0.id,
+                in: currency
+            )
+            $0.sync(
+                coefficient: $1,
+                multiplier: self.state.today.size,
+                stockpile: Self.stockpileDays,
+                efficiency: w.x
+            )
+        }
+
+        for id: LocalResource in [.housing] {
+            basePerCapita.local.l = Double.init(
+                map.localMarkets[self.state.home, id].yesterday.price
+            )
+        }
+        for id: LocalResource in [.service] {
+            basePerCapita.local.e = Double.init(
+                map.localMarkets[self.state.home, id].yesterday.price
+            )
+        }
+        for id: LocalResource in [.culture] {
+            basePerCapita.local.x = Double.init(
+                map.localMarkets[self.state.home, id].yesterday.price
+            )
+        }
+
+        let costPerCapita: (trade: Tiers, local: Tiers, total: Tiers) = (
+            trade: w * basePerCapita.trade,
+            local: w * basePerCapita.local,
+            total: w * (basePerCapita.trade + basePerCapita.local)
+        )
+        let costPerPeriod: (trade: Tiers, local: Tiers) = (
+            trade: costPerCapita.trade * Double.init(Self.stockpileMax * self.state.today.size),
+            local: costPerCapita.local * Double.init(Self.stockpileMax * self.state.today.size)
+        )
+
+        if case .Server = self.state.type {
+            map.localMarkets[self.state.home, .service].ask(
+                4 * self.state.today.size,
+                by: self.state.id
+            )
+        }
+
+        var budget: PopBudget = .init()
+
+        let scale: Double = Double.init(self.state.today.size)
+        let costPerDay: (l: Double, e: Double) = (
+            l: scale * costPerCapita.total.l,
+            e: scale * costPerCapita.total.e
+        )
+
+        _ = budget.l.distribute(
+            funds: self.state.cash.balance / 7,
+            local: Int64.init(costPerPeriod.local.l.rounded(.up)),
+            trade: Int64.init(costPerPeriod.trade.l.rounded(.up)),
+        )
+
+        _ = budget.e.distribute(
+            funds: self.state.cash.balance / 30 - Int64.init(costPerDay.l.rounded(.up)),
+            local: Int64.init(costPerPeriod.local.e.rounded(.up)),
+            trade: Int64.init(costPerPeriod.trade.e.rounded(.up)),
+        )
+
+        _ = budget.x.distribute(
+            funds: self.state.cash.balance / 365 - Int64.init(
+                (costPerDay.l + costPerDay.e).rounded(.up)
+            ),
+            local: Int64.init(costPerPeriod.local.x.rounded(.up)),
+            trade: Int64.init(costPerPeriod.trade.x.rounded(.up)),
+        )
+
+        if  budget.l.local > 0 {
+            map.localMarkets[self.state.home, .housing].bid(budget.l.local, by: self.state.id)
+        }
+        if  budget.e.local > 0 {
+            map.localMarkets[self.state.home, .service].bid(budget.e.local, by: self.state.id)
+        }
+        if  budget.x.local > 0 {
+            map.localMarkets[self.state.home, .culture].bid(budget.e.local, by: self.state.id)
+        }
+
+        self.budget = budget
+    }
+}
+extension PopContext {
     mutating func transact(on map: inout GameMap) {
         guard
         let country: CountryPolicies = self.policy else {
             return
         }
 
-        self.state.today.size += Binomial[self.state.today.size, 0.000_02].sample(
-            using: &map.random.generator
+        self.state.out.sync(with: self.type.output) {
+            $0.deposit($1.amount * self.state.today.size, efficiency: 1)
+        }
+
+        self.state.cash.r += self.state.out.sell(
+            in: country.currency,
+            on: &map.exchange
         )
 
-        switch self.state.type.stratum {
-        case .Ward:
-            self.state.today.fl = 1
-            self.state.today.fe = 1
-            self.state.today.fx = 0
+        if  let budget: PopBudget = self.budget {
+            let target: Int64 = map.random.int64(in: Self.stockpileDays ... Self.stockpileMax)
+            let w: Tiers = self.state.needsPerCapita
 
-        default:
-            let w: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
-            let stockpileDays: Int64 = 3
-            let stockpileTarget: Int64 = map.random.int64(in: stockpileDays ... 7)
-
-            self.state.nl.sync(with: self.type.l) {
-                $0.sync(
-                    coefficient: $1,
-                    multiplier: self.state.today.size,
-                    stockpile: stockpileDays,
-                    efficiency: w.l
-                )
-            }
-            self.state.ne.sync(with: self.type.e) {
-                $0.sync(
-                    coefficient: $1,
-                    multiplier: self.state.today.size,
-                    stockpile: stockpileDays,
-                    efficiency: w.e
-                )
-            }
-            self.state.nx.sync(with: self.type.x) {
-                $0.sync(
-                    coefficient: $1,
-                    multiplier: self.state.today.size,
-                    stockpile: stockpileDays,
-                    efficiency: w.x
-                )
-            }
-
-            /// Pops will target 30 days of savings for their needs.
-            var budget: Int64 = self.state.cash.balance / 30
-            if  budget > 0 {
+            if  budget.l.trade > 0 {
                 let spent: Int64 = self.state.nl.buy(
-                    days: stockpileTarget,
-                    with: budget,
+                    days: target,
+                    with: budget.l.trade,
                     in: country.currency,
                     on: &map.exchange,
                 )
@@ -244,13 +403,13 @@ extension PopContext: TransactingContext {
 
             self.state.today.fl = self.state.nl.reduce(1) { min($0, $1.fulfilled) }
             self.state.nl.sync(with: self.type.l) {
-                budget -= $0.consume($1.amount * self.state.today.size, efficiency: w.l)
+                $0.consume($1.amount * self.state.today.size, efficiency: w.l)
             }
 
-            if budget > 0 {
+            if  budget.e.trade > 0 {
                 let spent: Int64 = self.state.ne.buy(
-                    days: stockpileTarget,
-                    with: budget,
+                    days: target,
+                    with: budget.e.trade,
                     in: country.currency,
                     on: &map.exchange,
                 )
@@ -260,13 +419,13 @@ extension PopContext: TransactingContext {
 
             self.state.today.fe = self.state.ne.reduce(1) { min($0, $1.fulfilled) }
             self.state.ne.sync(with: self.type.e) {
-                budget -= $0.consume($1.amount * self.state.today.size, efficiency: w.e)
+                $0.consume($1.amount * self.state.today.size, efficiency: w.e)
             }
 
-            if budget > 0 {
+            if  budget.x.trade > 0 {
                 let spent: Int64 = self.state.nx.buy(
-                    days: stockpileTarget,
-                    with: budget,
+                    days: target,
+                    with: budget.x.trade,
                     in: country.currency,
                     on: &map.exchange,
                 )
@@ -275,26 +434,29 @@ extension PopContext: TransactingContext {
 
             self.state.today.fx = self.state.nx.reduce(1) { min($0, $1.fulfilled) }
             self.state.nx.sync(with: self.type.x) {
-                budget -= $0.consume($1.amount * self.state.today.size, efficiency: w.x)
+                $0.consume($1.amount * self.state.today.size, efficiency: w.x)
             }
-        }
 
-        self.state.out.sync(with: self.type.output) {
-            $0.deposit($1.amount * self.state.today.size, efficiency: 1)
-        }
-        // This comes at the end, mostly because worker and clerk pops don’t get paid until
-        // after the turn is over, and we want all payments to happen at the same logical stage.
-        self.state.cash.r += self.state.out.sell(in: country.currency, on: &map.exchange)
-        switch self.state.type.stratum {
-        case .Ward:
+            // Welfare
+            self.state.cash.s += self.state.today.size * country.minwage / 10
+        } else {
+            // Pop is enslaved
+            self.state.today.fl = 1
+            self.state.today.fe = 1
+            self.state.today.fx = 0
+
             // Pay dividends to shareholders, if any.
             self.state.cash.i -= map.pay(
                 dividend: self.state.cash.balance,
                 to: self.equity.owners.shuffled(using: &map.random.generator)
             )
+        }
+    }
 
-        default:
-            self.state.cash.s += self.state.today.size * country.minwage / 10
+    mutating func advance(factories: RuntimeStateTable<FactoryContext>, on map: inout GameMap) {
+        guard
+        let country: CountryPolicies = self.policy else {
+            return
         }
 
         self.state.today.mil += 0.020 * (1.0 - self.state.today.fl)
@@ -320,13 +482,7 @@ extension PopContext: TransactingContext {
                 on: &map
             )
         }
-    }
 
-    mutating func advance(factories: RuntimeStateTable<FactoryContext>, on map: inout GameMap) {
-        guard
-        let country: CountryPolicies = self.policy else {
-            return
-        }
         // We do not need to remove jobs that have no employees left, that will be done
         // automatically by ``Pop.turn``.
         let jobs: Range<Int> = self.state.jobs.values.indices

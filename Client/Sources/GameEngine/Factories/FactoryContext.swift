@@ -94,7 +94,7 @@ extension FactoryContext: RuntimeContext {
     }
 }
 extension FactoryContext: TransactingContext {
-    mutating func allocate(on map: borrowing GameMap) {
+    mutating func allocate(on map: inout GameMap) {
         guard
         let country: CountryPolicies = self.policy else {
             return
@@ -111,11 +111,28 @@ extension FactoryContext: TransactingContext {
         self.state.today.wf = nil
         self.state.today.cf = nil
 
-        /// Compute budget item ratios
-        let inputsCostPerHour: Double = self.forecast(
-            currency: country.currency,
-            exchange: map.exchange
-        )
+        /// Update the resource demands of this factory, returning the estimated marginal cost of
+        /// input resources per worker-hour.
+        ///
+        /// This is a linear rate, and will slightly underestimate the true cost, due to the
+        /// curvature of the market.
+        var inputsCostPerHour: Double = 0
+
+        self.state.ni.sync(with: self.type.inputs) {
+            inputsCostPerHour += Double.init($1.amount) * map.exchange.price(
+                of: $0.id,
+                in: country.currency
+            )
+            // Compute input capacity. The stockpile target is computed relative to the number
+            // of workers available, minus workers on strike. This prevents the factory from
+            // spending all of its cash on inputs when there are not enough workers to process
+            // them.
+            $0.sync(
+                coefficient: $1,
+                multiplier: self.productivity * self.workers.count,
+                stockpile: Self.stockpileDays,
+            )
+        }
 
         self.budget = self.budget(inputsCostPerHour: inputsCostPerHour)
     }
@@ -276,37 +293,6 @@ extension FactoryContext: TransactingContext {
     }
 }
 extension FactoryContext {
-    /// Update the resource demands of this factory, returning the estimated marginal cost of
-    /// input resources per worker-hour.
-    ///
-    /// This is a linear rate, and will slightly underestimate the true cost, due to the
-    /// curvature of the market.
-    private mutating func forecast(
-        currency: Fiat,
-        exchange: borrowing Exchange
-    ) -> Double {
-        var inputsCostPerHour: Double = 0
-
-        self.state.ni.sync(with: self.type.inputs) {
-            inputsCostPerHour += Double.init($1.amount) * exchange.price(
-                of: $0.id,
-                in: currency
-            )
-            // Compute input capacity. The stockpile target is computed relative to the number
-            // of workers available, minus workers on strike. This prevents the factory from
-            // spending all of its cash on inputs when there are not enough workers to process
-            // them.
-            $0.sync(
-                coefficient: $1,
-                multiplier: self.productivity * self.workers.count,
-                stockpile: Self.stockpileDays,
-            )
-        }
-
-        return inputsCostPerHour
-    }
-}
-extension FactoryContext {
     private func budget(
         inputsCostPerHour: Double
     ) -> FactoryBudget {
@@ -318,7 +304,7 @@ extension FactoryContext {
         let w: Double = Double.init(self.state.today.wn * self.workers.limit)
 
 
-        if  let budget: [Int64] = [i, c, w].distribute(self.state.cash.balance) {
+        if  let budget: [Int64] = [i, c, w].distribute(self.state.cash.balance / 7) {
             return FactoryBudget.init(inputs: budget[0], clerks: budget[1], workers: budget[2])
         }
         else {
