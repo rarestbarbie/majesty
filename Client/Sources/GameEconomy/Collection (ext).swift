@@ -18,6 +18,20 @@ extension Collection {
     @inlinable public func distribute(_ funds: Int64, share: (Element) -> Int64) -> [Int64]? {
         self.distribute(funds: { _ in funds }, share: share)
     }
+    @inlinable public func distribute(
+        _ funds: Int64,
+        share: (Element) -> some BinaryFloatingPoint
+    ) -> [Int64]? {
+        self.distribute(funds: { _ in funds }, share: share)
+    }
+}
+extension Collection {
+    @inlinable public func split(limit: Int64, share: (Element) -> Int64) -> [Int64]? {
+        // TODO: optimization opportunity here where the sum of shares is under the limit?
+        self.distribute(funds: { Swift.min($0, limit) }, share: share)
+    }
+}
+extension Collection {
     /// Distributes funds proportionately among shareholders based on their holdings.
     ///
     /// -   Parameters:
@@ -31,7 +45,7 @@ extension Collection {
     /// -   Returns:
     ///     An array where each element represents the amount of funds allocated to the
     ///     corresponding shareholder.
-    @inlinable public func distribute(
+    @inlinable func distribute(
         funds: (Int64) -> Int64,
         share: (Element) -> Int64
     ) -> [Int64]? {
@@ -44,17 +58,9 @@ extension Collection {
         return self.distribute(funds(shares), shares: shares, share: share)
     }
 
-
-    @inlinable public func distribute(
-        _ funds: Int64,
-        share: (Element) -> some BinaryFloatingPoint
-    ) -> [Int64]? {
-        self.distribute(funds: { _ in funds }, share: share)
-    }
-
     /// Distributes funds proportionately among shareholders based on their holdings,
     /// using floating-point weights.
-    @inlinable public func distribute<Share>(
+    @inlinable func distribute<Share>(
         funds: (Share) -> Int64,
         share: (Element) -> Share
     ) -> [Int64]? where Share: BinaryFloatingPoint {

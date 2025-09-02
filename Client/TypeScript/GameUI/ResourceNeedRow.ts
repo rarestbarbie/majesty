@@ -3,6 +3,7 @@ import {
     Fortune,
     Ticker,
     UpdateBigInt,
+    UpdateText,
 } from '../DOM/exports.js';
 import { GameID } from '../GameEngine/exports.js';
 import {
@@ -71,27 +72,35 @@ export class ResourceNeedRow implements DiffableListElement<Resource> {
     }
 
     public update(need: ResourceNeed): void {
-        UpdateBigInt(this.demand.summary, need.demanded);
+        UpdateBigInt(this.demand.summary, need.unitsDemanded);
 
         let fraction: number;
-        if (need.demanded === 0n) {
+        if (need.unitsDemanded === 0n) {
             fraction = 0; // Avoid division by zero
-        } else if (need.consumed > need.demanded) {
+        } else if (need.unitsConsumed > need.unitsDemanded) {
             fraction = 1;
         } else {
-            fraction = Number(need.consumed) / Number(need.demanded);
+            fraction = Number(need.unitsConsumed) / Number(need.unitsDemanded);
         }
 
         this.demand.set(fraction * 100);
 
-        UpdateBigInt(this.stockpile, need.acquired);
+        if (need.unitsAcquired !== undefined) {
+            UpdateBigInt(this.stockpile, need.unitsAcquired);
+        } else {
+            UpdateText(this.stockpile, '');
+        }
 
-        if (need.acquired < need.demanded) {
+        if (need.unitsConsumed < need.unitsDemanded) {
             this.stockpile.dataset['cell'] = 'shortage';
         } else {
             delete this.stockpile.dataset['cell'];
         }
 
-        this.price.updatePriceChange(need.price.o, need.price.c, 2);
+        if (need.priceAtMarket !== undefined) {
+            this.price.updatePriceChange(need.priceAtMarket.o, need.priceAtMarket.c, 2);
+        } else if (need.price !== undefined) {
+            this.price.updateBigIntChange(need.price.o, need.price.c);
+        }
     }
 }

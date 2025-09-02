@@ -5,45 +5,44 @@ import JavaScriptKit
 import VectorCharts
 
 struct FactoryInventory {
-    var needs: [ResourceNeed]
-    var sales: [ResourceSale]
-
-    var spending: PieChart<CashFlowItem, PieChartLabel>?
+    private var inventory: ResourceInventory
+    private var spending: PieChart<CashFlowItem, PieChartLabel>?
 
     init() {
-        self.needs = []
-        self.sales = []
+        self.inventory = .init()
         self.spending = nil
     }
 }
 extension FactoryInventory {
     mutating func update(from factory: FactoryContext, in snapshot: borrowing GameSnapshot) {
-        self.needs.removeAll(keepingCapacity: true)
-        self.needs.reserveCapacity(factory.state.ni.count + factory.state.nv.count)
-        self.needs.update(
-            inputs: factory.state.ni.tradeable,
-            currency: factory.policy?.currency,
-            tier: .i,
-            from: snapshot
-        )
-        self.needs.update(
-            inputs: factory.state.nv.tradeable,
-            currency: factory.policy?.currency,
-            tier: .v,
-            from: snapshot
-        )
-
-        self.sales.removeAll(keepingCapacity: true)
-        self.sales.reserveCapacity(factory.state.out.count)
-
-        for output: TradeableOutput in factory.state.out.tradeable {
-            self.sales.append(.init(
-                label: snapshot.rules[output.id],
-                quantity: output.quantity,
-                leftover: output.leftover,
-                proceeds: output.proceeds,
-            ))
+        guard
+        let currency: Fiat = factory.policy?.currency else {
+            return
         }
+
+        self.inventory.reset(inputs: factory.state.ni.count + factory.state.nv.count)
+        self.inventory.update(
+            from: factory.state.ni,
+            tier: .i,
+            currency: currency,
+            location: factory.state.on,
+            snapshot: snapshot
+        )
+        self.inventory.update(
+            from: factory.state.nv,
+            tier: .v,
+            currency: currency,
+            location: factory.state.on,
+            snapshot: snapshot
+        )
+
+        self.inventory.reset(outputs: factory.state.out.count)
+        self.inventory.update(
+            from: factory.state.out,
+            currency: currency,
+            location: factory.state.on,
+            snapshot: snapshot
+        )
 
         self.spending = factory.cashFlow.chart(rules: snapshot.rules)
     }
@@ -58,8 +57,8 @@ extension FactoryInventory: JavaScriptEncodable {
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.type] = FactoryDetailsTab.Inventory
-        js[.needs] = self.needs
-        js[.sales] = self.sales
+        js[.needs] = self.inventory.needs
+        js[.sales] = self.inventory.sales
         js[.spending] = self.spending
     }
 }

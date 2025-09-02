@@ -1,9 +1,13 @@
 import GameEconomy
+import GameState
 import OrderedCollections
 
 @dynamicMemberLookup struct GameSnapshot: ~Copyable {
     let context: GameContext
-    let markets: OrderedDictionary<Market.AssetPair, Market>
+    let markets: (
+        tradeable: OrderedDictionary<Market.AssetPair, Market>,
+        inelastic: LocalMarkets<PopID>
+    )
 }
 extension GameSnapshot {
     subscript<T>(dynamicMember keyPath: KeyPath<GameContext, T>) -> T {

@@ -97,10 +97,7 @@ extension Pop {
         targets.shuffle(using: &map.random.generator)
 
         guard
-        let breakdown: [Int64] = targets.distribute(
-            funds: { _ in count },
-            share: \.weight
-        ) else {
+        let breakdown: [Int64] = targets.distribute(count, share: \.weight) else {
             return
         }
 
@@ -139,9 +136,9 @@ extension Pop {
         0.1 * self.yesterday.con
     }
 
-    var needsPerCapita: PopContext.Tiers {
+    var needsPerCapita: (l: Double, e: Double, x: Double) {
         let decadence: Double = self.decadence
-        return .init(
+        return (
             l: 1 + decadence,
             e: 1 + decadence * 2,
             x: 1 + decadence * 3

@@ -1,38 +1,38 @@
-@frozen public struct TradeableInput {
+@frozen public struct TradeableInput: Identifiable {
     public let id: Resource
 
-    public var acquiredValue: Int64
-    public var acquired: Int64
-    public var capacity: Int64
-    public var demanded: Int64
+    public var unitsAcquired: Int64
+    public var unitsCapacity: Int64
+    public var unitsConsumed: Int64
+    public var unitsDemanded: Int64
+    public var unitsPurchased: Int64
 
+    public var valueAcquired: Int64
     /// The “consumed value” is not a real valuation, but merely the fraction of the
-    /// acquired value of the resource that was consumed, rounded up to the nearest unit.
-    public var consumedValue: Int64
-    public var consumed: Int64
-    public var purchased: Int64
+    /// unitsAcquired value of the resource that was consumed, rounded up to the nearest unit.
+    public var valueConsumed: Int64
 
     public var price: Double
 
     @inlinable public init(
         id: Resource,
-        acquiredValue: Int64,
-        acquired: Int64,
-        capacity: Int64,
-        demanded: Int64,
-        consumedValue: Int64,
-        consumed: Int64,
-        purchased: Int64,
+        unitsAcquired: Int64,
+        unitsCapacity: Int64,
+        unitsConsumed: Int64,
+        unitsDemanded: Int64,
+        unitsPurchased: Int64,
+        valueAcquired: Int64,
+        valueConsumed: Int64,
         price: Double
     ) {
         self.id = id
-        self.acquiredValue = acquiredValue
-        self.acquired = acquired
-        self.capacity = capacity
-        self.demanded = demanded
-        self.consumedValue = consumedValue
-        self.consumed = consumed
-        self.purchased = purchased
+        self.valueAcquired = valueAcquired
+        self.unitsAcquired = unitsAcquired
+        self.unitsCapacity = unitsCapacity
+        self.unitsDemanded = unitsDemanded
+        self.valueConsumed = valueConsumed
+        self.unitsConsumed = unitsConsumed
+        self.unitsPurchased = unitsPurchased
         self.price = price
     }
 }
@@ -40,82 +40,66 @@ extension TradeableInput: ResourceStockpile, ResourceInput {
     @inlinable public init(id: Resource) {
         self.init(
             id: id,
-            acquiredValue: 0,
-            acquired: 0,
-            capacity: 0,
-            demanded: 0,
-            consumedValue: 0,
-            consumed: 0,
-            purchased: 0,
+            unitsAcquired: 0,
+            unitsCapacity: 0,
+            unitsConsumed: 0,
+            unitsDemanded: 0,
+            unitsPurchased: 0,
+            valueAcquired: 0,
+            valueConsumed: 0,
             price: 0,
         )
     }
 }
 extension TradeableInput {
-    @inlinable mutating func turn() {
-        self.consumedValue = 0
-        self.consumed = 0
-        self.purchased = 0
-    }
-}
-extension TradeableInput {
-    @inlinable public mutating func sync(
-        coefficient required: Quantity<Resource>,
-        multiplier: Int64,
-        stockpile: Int64,
-    ) {
-        self.demanded = multiplier * required.amount
-        self.capacity = stockpile * self.demanded
-
-        self.turn()
-    }
-
-    @inlinable public mutating func sync(
-        coefficient required: Quantity<Resource>,
-        multiplier: Int64,
-        stockpile: Int64,
+    mutating func turn(
+        unitsDemanded: Int64,
+        stockpileDays: Int64,
         efficiency: Double
     ) {
-        let demanded: Int64 = multiplier * required.amount
-        let capacity: Int64 = stockpile * demanded
-
-        self.demanded = .init((Double.init(demanded) * efficiency).rounded(.up))
-        self.capacity = .init((Double.init(capacity) * efficiency).rounded(.up))
-
-        self.turn()
-    }
-
-    @inlinable public mutating func consume(_ amount: Int64, efficiency: Double) {
-        let consumed: Int64 = min(
-            Int64.init((Double.init(amount) * efficiency).rounded(.up)),
-            self.acquired
+        self.unitsDemanded = .init((Double.init(unitsDemanded) * efficiency).rounded(.up))
+        self.unitsCapacity = .init(
+            (Double.init(unitsDemanded * stockpileDays) * efficiency).rounded(.up)
         )
 
-        self.consumedValue = self.acquired != 0
-            ? (consumed %/ self.acquired) >< self.acquiredValue
+        self.valueConsumed = 0
+        self.unitsConsumed = 0
+        self.unitsPurchased = 0
+    }
+
+    mutating func consume(_ amount: Int64, efficiency: Double) {
+        let unitsConsumed: Int64 = min(
+            Int64.init((Double.init(amount) * efficiency).rounded(.up)),
+            self.unitsAcquired
+        )
+
+        self.valueConsumed = self.unitsAcquired != 0
+            ? (unitsConsumed %/ self.unitsAcquired) >< self.valueAcquired
             : 0
 
-        self.acquiredValue -= self.consumedValue
-        self.acquired -= consumed
-        self.consumed += consumed
+        self.valueAcquired -= self.valueConsumed
+        self.unitsAcquired -= unitsConsumed
+        self.unitsConsumed += unitsConsumed
     }
 }
 extension TradeableInput {
     @inlinable public var averageCost: Double {
-        let quantity: Int64 = self.acquired + self.consumed
+        let quantity: Int64 = self.unitsAcquired + self.unitsConsumed
         if  quantity == 0 {
             return 0
         } else {
-            return Double.init(self.acquiredValue + self.consumedValue) / Double.init(quantity)
+            return Double.init(self.valueAcquired + self.valueConsumed) / Double.init(quantity)
         }
     }
 
     @inlinable public var fulfilled: Double {
-        self.demanded == 0 ? 0 : Double.init(self.acquired) / Double.init(self.demanded)
+        self.unitsDemanded == 0
+            ? 0
+            : Double.init(self.unitsAcquired) / Double.init(self.unitsDemanded)
     }
 
     @inlinable func needed(_ target: Int64) -> Int64 {
-        self.acquired < target ? target - self.acquired : 0
+        self.unitsAcquired < target ? target - self.unitsAcquired : 0
     }
 
     /// Returns the amount of funds actually spent.
@@ -125,7 +109,7 @@ extension TradeableInput {
         in currency: Fiat,
         on exchange: inout Exchange) -> Int64 {
         {
-            let target: Int64 = self.demanded * stockpile
+            let target: Int64 = self.unitsDemanded * stockpile
             let needed: Int64 = self.needed(target)
 
             if  needed <= 0 {
@@ -137,16 +121,18 @@ extension TradeableInput {
                 return 0
             } else {
                 var funds: Int64 = budget
-                let acquired: Int64 = $0.buy(needed, with: &funds)
+                let unitsAcquired: Int64 = $0.buy(needed, with: &funds)
                 let fundsSpent: Int64 = budget - funds
 
-                self.purchased += acquired
-                self.acquired += acquired
-                self.acquiredValue += fundsSpent
+                self.unitsPurchased += unitsAcquired
+                self.unitsAcquired += unitsAcquired
+                self.valueAcquired += fundsSpent
 
                 // Compute actual price, if at least one unit was purchased, otherwise
                 // theoretical market price
-                self.price = acquired != 0 ? Double.init(fundsSpent %/ acquired) : $0.price
+                self.price = unitsAcquired != 0
+                    ? Double.init(fundsSpent %/ unitsAcquired)
+                    : $0.price
                 return fundsSpent
             }
         } (&exchange[self.id / currency])

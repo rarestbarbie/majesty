@@ -18,10 +18,11 @@ extension LocalMarkets {
     }
 }
 extension LocalMarkets {
-    mutating func turn(by turn: (inout LocalMarket<LegalEntity>) -> ()) {
+    mutating func turn(by turn: (Resource, inout LocalMarket<LegalEntity>) -> ()) {
         var i: [Key: LocalMarket<LegalEntity>].Index = self.markets.startIndex
         while i < self.markets.endIndex {
-            turn(&self.markets.values[i])
+            let id: Key = self.markets.keys[i]
+            turn(id.resource, &self.markets.values[i])
             i = self.markets.index(after: i)
         }
     }

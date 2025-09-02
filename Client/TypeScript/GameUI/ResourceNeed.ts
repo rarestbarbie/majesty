@@ -4,11 +4,11 @@ export interface ResourceNeed {
     readonly id: Resource;
     readonly name: string;
     readonly icon: string;
-    readonly tier: 'l' | 'e' | 'x';
-    readonly acquired: bigint;
-    readonly capacity: bigint;
-    readonly demanded: bigint;
-    readonly consumed: bigint;
-    readonly purchased: bigint;
-    readonly price: Candle<number>;
+    readonly tier: 'l' | 'e' | 'x' | 'i' | 'v';
+    readonly unitsAcquired?: bigint
+    readonly unitsCapacity?: bigint
+    readonly unitsDemanded: bigint
+    readonly unitsConsumed: bigint
+    readonly priceAtMarket?: Candle<number>;
+    readonly price?: Candle<bigint>;
 }

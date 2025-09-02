@@ -89,7 +89,10 @@ extension GameSession {
 }
 extension GameSession {
     private var snapshot: GameSnapshot {
-        .init(context: self.context, markets: self.map.exchange.markets)
+        .init(
+            context: self.context,
+            markets: (self.map.exchange.markets, self.map.localMarkets)
+        )
     }
 
     public var rules: GameRules {

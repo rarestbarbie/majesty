@@ -1,10 +1,6 @@
 import GameEconomy
 import OrderedCollections
 
-@frozen public struct ResourceTier: Equatable, Hashable {
-    public let inelastic: OrderedDictionary<Resource, Int64>
-    public let tradeable: OrderedDictionary<Resource, Int64>
-}
 extension ResourceTier {
     init(
         metadata: OrderedDictionary<Resource, ResourceMetadata>,

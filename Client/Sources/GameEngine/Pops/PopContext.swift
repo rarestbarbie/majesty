@@ -179,9 +179,12 @@ extension PopContext: RuntimeContext {
         self.unemployment = Double.init(unemployed) / Double.init(self.state.today.size)
 
         self.cashFlow.reset()
-        self.cashFlow.update(with: self.state.nl.tradeable)
-        self.cashFlow.update(with: self.state.ne.tradeable)
-        self.cashFlow.update(with: self.state.nx.tradeable)
+        self.cashFlow.update(with: self.state.nl.tradeable.values.elements)
+        self.cashFlow.update(with: self.state.nl.inelastic.values.elements)
+        self.cashFlow.update(with: self.state.ne.tradeable.values.elements)
+        self.cashFlow.update(with: self.state.ne.inelastic.values.elements)
+        self.cashFlow.update(with: self.state.nx.tradeable.values.elements)
+        self.cashFlow.update(with: self.state.nx.inelastic.values.elements)
 
         self.policy = country.policies
     }
@@ -197,133 +200,185 @@ extension PopContext: TransactingContext {
         }
 
         let currency: Fiat = self.policy!.currency
-        /// Compute weights of inelastic demands, since we place bids at the same time we
-        /// compute the budget, instead of recalculating weights at the time of transaction.
+
+        /// Compute vertical weights.
+        let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
+
+        self.state.nl.sync(
+            with: self.type.l,
+            scalingFactor: (self.state.today.size, z.l),
+            stockpileDays: Self.stockpileDays,
+        )
+        self.state.ne.sync(
+            with: self.type.e,
+            scalingFactor: (self.state.today.size, z.e),
+            stockpileDays: Self.stockpileDays,
+        )
+        self.state.nx.sync(
+            with: self.type.x,
+            scalingFactor: (self.state.today.size, z.x),
+            stockpileDays: Self.stockpileDays,
+        )
+        self.state.out.sync(
+            with: self.type.output,
+            scalingFactor: (self.state.today.size, 1)
+        )
+
+        /// Compute horizontal weights.
         let weights: (
-            l: [(Resource, weight: Int64)],
-            e: [(Resource, weight: Int64)],
-            x: [(Resource, weight: Int64)]
-        ) = (
-            l: self.type.l.inelastic.map {
-                ($0, map.localMarkets[self.state.home, $0].yesterday.price * $1)
-            },
-            e: self.type.e.inelastic.map {
-                ($0, map.localMarkets[self.state.home, $0].yesterday.price * $1)
-            },
-            x: self.type.x.inelastic.map {
-                ($0, map.localMarkets[self.state.home, $0].yesterday.price * $1)
-            }
+            l: (tradeable: TradeableBudgetTier, inelastic: InelasticBudgetTier),
+            e: (tradeable: TradeableBudgetTier, inelastic: InelasticBudgetTier),
+            x: (tradeable: TradeableBudgetTier, inelastic: InelasticBudgetTier)
         )
 
-        var basePerCapita: (tradeable: Tiers, inelastic: Tiers) = (
-            tradeable: .init(),
-            inelastic: .init(
-                l: Double.init(weights.l.reduce(0) { $0 + $1.weight }),
-                e: Double.init(weights.e.reduce(0) { $0 + $1.weight }),
-                x: Double.init(weights.x.reduce(0) { $0 + $1.weight }),
-            )
+        weights.l.tradeable = .compute(
+            demands: self.state.nl.tradeable,
+            markets: map.exchange,
+            currency: currency,
         )
-        let w: Tiers = self.state.needsPerCapita
-
-        self.state.nl.tradeable.sync(with: self.type.l.tradeable) {
-            basePerCapita.tradeable.l += Double.init($1.amount) * map.exchange.price(
-                of: $0.id,
-                in: currency
-            )
-            $0.sync(
-                coefficient: $1,
-                multiplier: self.state.today.size,
-                stockpile: Self.stockpileDays,
-                efficiency: w.l
-            )
-        }
-        self.state.ne.tradeable.sync(with: self.type.e.tradeable) {
-            basePerCapita.tradeable.e += Double.init($1.amount) * map.exchange.price(
-                of: $0.id,
-                in: currency
-            )
-            $0.sync(
-                coefficient: $1,
-                multiplier: self.state.today.size,
-                stockpile: Self.stockpileDays,
-                efficiency: w.e
-            )
-        }
-        self.state.nx.tradeable.sync(with: self.type.x.tradeable) {
-            basePerCapita.tradeable.x += Double.init($1.amount) * map.exchange.price(
-                of: $0.id,
-                in: currency
-            )
-            $0.sync(
-                coefficient: $1,
-                multiplier: self.state.today.size,
-                stockpile: Self.stockpileDays,
-                efficiency: w.x
-            )
-        }
-
-        let scaleDaily: Double = .init(self.state.today.size)
-        let scaleMax: Double = .init(self.state.today.size * Self.stockpileMax)
-
-        let costPerCapita: (tradeable: Tiers, inelastic: Tiers, total: Tiers) = (
-            tradeable: w * basePerCapita.tradeable,
-            inelastic: w * basePerCapita.inelastic,
-            total: w * (basePerCapita.tradeable + basePerCapita.inelastic)
+        weights.e.tradeable = .compute(
+            demands: self.state.ne.tradeable,
+            markets: map.exchange,
+            currency: currency,
         )
-        let costPerPeriod: (tradeable: Tiers, inelastic: Tiers) = (
-            tradeable: costPerCapita.tradeable * scaleMax,
-            inelastic: costPerCapita.inelastic * scaleMax
+        weights.x.tradeable = .compute(
+            demands: self.state.nx.tradeable,
+            markets: map.exchange,
+            currency: currency,
+        )
+
+        weights.l.inelastic = .compute(
+            demands: self.state.nl.inelastic,
+            markets: map.localMarkets,
+            location: self.state.home,
+        )
+        weights.e.inelastic = .compute(
+            demands: self.state.ne.inelastic,
+            markets: map.localMarkets,
+            location: self.state.home,
+        )
+        weights.x.inelastic = .compute(
+            demands: self.state.nx.inelastic,
+            markets: map.localMarkets,
+            location: self.state.home,
         )
 
         var budget: PopBudget = .init()
 
-        let costPerDay: (l: Double, e: Double) = (
-            l: scaleDaily * costPerCapita.total.l,
-            e: scaleDaily * costPerCapita.total.e
+        let inelasticCostPerDay: (l: Int64, e: Int64, x: Int64) = (
+            l: weights.l.inelastic.total,
+            e: weights.e.inelastic.total,
+            x: weights.x.inelastic.total,
+        )
+        let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = (
+            l: Int64.init(weights.l.tradeable.total.rounded(.up)),
+            e: Int64.init(weights.e.tradeable.total.rounded(.up)),
+            x: Int64.init(weights.x.tradeable.total.rounded(.up)),
+        )
+        let totalCostPerDay: (l: Int64, e: Int64) = (
+            l: tradeableCostPerDay.l + inelasticCostPerDay.l,
+            e: tradeableCostPerDay.e + inelasticCostPerDay.e,
         )
 
-        _ = budget.l.distribute(
+        budget.l.distribute(
             funds: self.state.cash.balance / 7,
-            inelastic: Int64.init(costPerPeriod.inelastic.l.rounded(.up)),
-            tradeable: Int64.init(costPerPeriod.tradeable.l.rounded(.up)),
+            inelastic: inelasticCostPerDay.l * Self.stockpileMax,
+            tradeable: tradeableCostPerDay.l * Self.stockpileMax,
         )
 
-        _ = budget.e.distribute(
-            funds: self.state.cash.balance / 30 - Int64.init(costPerDay.l.rounded(.up)),
-            inelastic: Int64.init(costPerPeriod.inelastic.e.rounded(.up)),
-            tradeable: Int64.init(costPerPeriod.tradeable.e.rounded(.up)),
+        budget.e.distribute(
+            funds: self.state.cash.balance / 30 - totalCostPerDay.l,
+            inelastic: inelasticCostPerDay.e * Self.stockpileMax,
+            tradeable: tradeableCostPerDay.e * Self.stockpileMax,
         )
 
-        _ = budget.x.distribute(
-            funds: self.state.cash.balance / 365 - Int64.init(
-                (costPerDay.l + costPerDay.e).rounded(.up)
-            ),
-            inelastic: Int64.init(costPerPeriod.inelastic.x.rounded(.up)),
-            tradeable: Int64.init(costPerPeriod.tradeable.x.rounded(.up)),
+        budget.x.distribute(
+            funds: self.state.cash.balance / 365 - (totalCostPerDay.l + totalCostPerDay.e),
+            inelastic: inelasticCostPerDay.x * Self.stockpileMax,
+            tradeable: tradeableCostPerDay.x * Self.stockpileMax,
         )
 
-        for (budget, weights): (Int64, [(Resource, weight: Int64)]) in [
-            (budget.l.inelastic, weights.l),
-            (budget.e.inelastic, weights.e),
-            (budget.x.inelastic, weights.x),
+        for (budget, weights, tier):
+            (Int64, [InelasticBudgetTier.Weight], ResourceTierIdentifier) in [
+            (budget.l.inelastic, weights.l.inelastic.x, .l),
+            (budget.e.inelastic, weights.e.inelastic.x, .e),
+            (budget.x.inelastic, weights.x.inelastic.x, .x),
         ] {
             guard budget > 0,
-            let bids: [Int64] = weights.distribute(budget, share: \.weight) else {
+            let allocations: [Int64] = weights.distribute(budget, share: \.value) else {
                 continue
             }
-            for ((id, _), bid): ((Resource, _), Int64) in zip(weights, bids) where bid > 0 {
-                map.localMarkets[self.state.home, id].bid(bid, by: self.state.id)
+            for (allocation, x): (Int64, InelasticBudgetTier.Weight) in zip(
+                allocations,
+                weights
+            ) where allocation > 0 {
+                map.localMarkets[self.state.home, x.id].bid(
+                    budget: allocation,
+                    by: self.state.id,
+                    in: tier,
+                    limit: x.units
+                )
             }
         }
 
-        for (id, amount): (Resource, Int64) in self.type.output.inelastic {
-            map.localMarkets[self.state.home, id].ask(
-                amount * self.state.today.size,
-                by: self.state.id
-            )
+        for (id, output): (Resource, InelasticOutput) in self.state.out.inelastic {
+            let ask: Int64 = output.unitsProduced
+            if  ask > 0 {
+                map.localMarkets[self.state.home, id].ask(amount: ask, by: self.state.id)
+            }
         }
 
         self.budget = budget
+    }
+}
+extension PopContext {
+    mutating func credit(
+        inelastic resource: Resource,
+        units: Int64,
+        price: Int64
+    ) {
+        let value: Int64 = units * price
+        self.state.out.inelastic[resource]?.report(
+            unitsSold: units,
+            valueSold: value,
+        )
+        self.state.cash.r += value
+    }
+
+    mutating func debit(
+        inelastic resource: Resource,
+        units: Int64,
+        price: Int64,
+        in tier: ResourceTierIdentifier?
+    ) {
+        guard let tier: ResourceTierIdentifier else {
+            return
+        }
+
+        let value: Int64 = units * price
+
+        switch tier {
+        case .l:
+            self.state.nl.inelastic[resource]?.report(
+                unitsConsumed: units,
+                valueConsumed: value,
+            )
+        case .e:
+            self.state.ne.inelastic[resource]?.report(
+                unitsConsumed: units,
+                valueConsumed: value,
+            )
+        case .x:
+            self.state.nx.inelastic[resource]?.report(
+                unitsConsumed: units,
+                valueConsumed: value,
+            )
+
+        case _:
+            return
+        }
+
+        self.state.cash.b -= value
     }
 }
 extension PopContext {
@@ -333,9 +388,10 @@ extension PopContext {
             return
         }
 
-        self.state.out.tradeable.sync(with: self.type.output.tradeable) {
-            $0.deposit($1.amount * self.state.today.size, efficiency: 1)
-        }
+        self.state.out.deposit(
+            from: self.type.output,
+            scalingFactor: (self.state.today.size, 1)
+        )
 
         self.state.cash.r += self.state.out.sell(
             in: country.currency,
@@ -344,7 +400,7 @@ extension PopContext {
 
         if  let budget: PopBudget = self.budget {
             let target: Int64 = map.random.int64(in: Self.stockpileDays ... Self.stockpileMax)
-            let w: Tiers = self.state.needsPerCapita
+            let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
 
             if  budget.l.tradeable > 0 {
                 let spent: Int64 = self.state.nl.buy(
@@ -358,9 +414,10 @@ extension PopContext {
             }
 
             self.state.today.fl = self.state.nl.fulfilled
-            self.state.nl.tradeable.sync(with: self.type.l.tradeable) {
-                $0.consume($1.amount * self.state.today.size, efficiency: w.l)
-            }
+            self.state.nl.consume(
+                from: self.type.l,
+                scalingFactor: (self.state.today.size, z.l)
+            )
 
             if  budget.e.tradeable > 0 {
                 let spent: Int64 = self.state.ne.buy(
@@ -374,9 +431,10 @@ extension PopContext {
             }
 
             self.state.today.fe = self.state.ne.fulfilled
-            self.state.ne.tradeable.sync(with: self.type.e.tradeable) {
-                $0.consume($1.amount * self.state.today.size, efficiency: w.e)
-            }
+            self.state.ne.consume(
+                from: self.type.e,
+                scalingFactor: (self.state.today.size, z.e)
+            )
 
             if  budget.x.tradeable > 0 {
                 let spent: Int64 = self.state.nx.buy(
@@ -389,9 +447,10 @@ extension PopContext {
             }
 
             self.state.today.fx = self.state.nx.fulfilled
-            self.state.nx.tradeable.sync(with: self.type.x.tradeable) {
-                $0.consume($1.amount * self.state.today.size, efficiency: w.x)
-            }
+            self.state.nx.consume(
+                from: self.type.x,
+                scalingFactor: (self.state.today.size, z.x)
+            )
 
             // Welfare
             self.state.cash.s += self.state.today.size * country.minwage / 10

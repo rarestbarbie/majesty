@@ -15,8 +15,8 @@ extension CashFlowStatement {
         self.items.removeAll(keepingCapacity: true)
     }
     mutating func update<Input>(with inputs: [Input]) where Input: ResourceInput {
-        for input: Input in inputs where input.consumedValue > 0 {
-            self.items[.resource(input.id), default: 0] += input.consumedValue
+        for input: Input in inputs where input.valueConsumed > 0 {
+            self.items[.resource(input.id), default: 0] += input.valueConsumed
         }
     }
 

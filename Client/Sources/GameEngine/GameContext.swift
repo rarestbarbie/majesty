@@ -128,12 +128,34 @@ extension GameContext {
             try self.countries[i].advance(in: self, on: &map)
         }
 
-        map.localMarkets.turn { $0.turn() }
+        map.localMarkets.turn { $1.turn() }
 
         self.factories.turn  { $0.turn(on: &map) }
         self.pops.table.turn { $0.turn(on: &map) }
 
-        map.localMarkets.turn { $0.match() }
+        map.localMarkets.turn {
+            let price: Int64 = $1.today.price
+            let (asks, bids): (
+                asks: [LocalMarket<PopID>.Order],
+                bids: [LocalMarket<PopID>.Order]
+            ) = $1.match(using: &map.random)
+
+            for order: LocalMarket<PopID>.Order in asks {
+                self.pops.table[order.by]?.credit(
+                    inelastic: $0,
+                    units: order.filled,
+                    price: price
+                )
+            }
+            for order: LocalMarket<PopID>.Order in bids {
+                self.pops.table[order.by]?.debit(
+                    inelastic: $0,
+                    units: order.filled,
+                    price: price,
+                    in: order.tier
+                )
+            }
+        }
 
         var order: [Resident] = []
 

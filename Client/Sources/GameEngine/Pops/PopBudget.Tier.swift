@@ -19,22 +19,18 @@ extension PopBudget.Tier {
         funds available: Int64,
         inelastic: Int64,
         tradeable: Int64,
-    ) -> Int64 {
+    ) {
         guard available > 0 else {
-            return 0
+            return
         }
 
         let total: Int64 = tradeable + inelastic
         if  total <= available {
             self.tradeable += tradeable
             self.inelastic += inelastic
-            return available - total
-        }
-
-        if  let item: [Int64] = [tradeable, inelastic].distribute(available) {
+        } else if let item: [Int64] = [tradeable, inelastic].distribute(available) {
             self.tradeable += item[0]
             self.inelastic += item[1]
-            return 0
         }
         else {
             // All costs zero. This should be impossible, since 0 <= available!
