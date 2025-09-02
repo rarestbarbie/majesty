@@ -1,20 +1,53 @@
 import Assert
+import OrderedCollections
 
 @frozen public struct ResourceInputs {
-    public var tradeable: [TradeableInput]
-    public var inelastic: [InelasticInput]
+    public var tradeable: OrderedDictionary<Resource, TradeableInput>
+    public var inelastic: OrderedDictionary<Resource, InelasticInput>
 
-    @inlinable public init(tradeable: [TradeableInput], inelastic: [InelasticInput]) {
+    @inlinable public init(
+        tradeable: OrderedDictionary<Resource, TradeableInput>,
+        inelastic: OrderedDictionary<Resource, InelasticInput>
+    ) {
         self.tradeable = tradeable
         self.inelastic = inelastic
     }
     @inlinable public init() {
-        self.tradeable = []
-        self.inelastic = []
+        self.tradeable = [:]
+        self.inelastic = [:]
     }
 }
 extension ResourceInputs {
     @inlinable public var count: Int { self.tradeable.count + self.inelastic.count }
+}
+extension ResourceInputs {
+    public mutating func sync(
+        with resourceTier: ResourceTier,
+        scalingFactor: (x: Int64, z: Double),
+        stockpileDays: Int64,
+    ) {
+        self.tradeable.sync(with: resourceTier.tradeable) {
+            $0.turn(
+                unitsDemanded: $1 * scalingFactor.x,
+                stockpileDays: stockpileDays,
+                efficiency: scalingFactor.z
+            )
+        }
+        self.inelastic.sync(with: resourceTier.inelastic) {
+            $0.turn(
+                unitsDemanded: $1 * scalingFactor.x,
+                efficiency: scalingFactor.z
+            )
+        }
+    }
+    public mutating func consume(
+        from resourceTier: ResourceTier,
+        scalingFactor: (x: Int64, z: Double),
+    ) {
+        self.tradeable.sync(with: resourceTier.tradeable) {
+            $0.consume($1 * scalingFactor.x, efficiency: scalingFactor.z)
+        }
+    }
 }
 extension ResourceInputs {
     /// Returns the amount of funds actually spent.
@@ -24,8 +57,8 @@ extension ResourceInputs {
         in currency: Fiat,
         on exchange: inout Exchange,
     ) -> Int64 {
-        let weights: [Double] = self.tradeable.map {
-            Double.init($0.needed($0.capacity)) * exchange.price(of: $0.id, in: currency)
+        let weights: [Double] = self.tradeable.values.map {
+            Double.init($0.needed($0.unitsCapacity)) * exchange.price(of: $0.id, in: currency)
         }
 
         return self.buy(
@@ -51,8 +84,8 @@ extension ResourceInputs {
 
         var funds: Int64 = budget
 
-        for i: Int in self.tradeable.indices {
-            funds -= self.tradeable[i].buy(
+        for i: Int in self.tradeable.values.indices {
+            funds -= self.tradeable.values[i].buy(
                 days: stockpile,
                 with: budgets[i],
                 in: currency,

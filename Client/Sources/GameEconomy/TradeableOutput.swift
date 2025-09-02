@@ -1,52 +1,61 @@
-@frozen public struct TradeableOutput {
+@frozen public struct TradeableOutput: Identifiable {
     public let id: Resource
-    public var quantity: Int64
-    public var leftover: Int64
-    public var proceeds: Int64
+    public var unitsProduced: Int64
+    public var unitsSold: Int64
+    public var valueSold: Int64
+    public var price: Double
 
     @inlinable public init(
         id: Resource,
-        quantity: Int64,
-        leftover: Int64,
-        proceeds: Int64
+        unitsProduced: Int64,
+        unitsSold: Int64,
+        valueSold: Int64,
+        price: Double
     ) {
         self.id = id
-        self.quantity = quantity
-        self.leftover = leftover
-        self.proceeds = proceeds
+        self.unitsProduced = unitsProduced
+        self.unitsSold = unitsSold
+        self.valueSold = valueSold
+        self.price = price
     }
-
 }
 extension TradeableOutput: ResourceStockpile {
     @inlinable public init(id: Resource) {
         self.init(
             id: id,
-            quantity: 0,
-            leftover: 0,
-            proceeds: 0
+            unitsProduced: 0,
+            unitsSold: 0,
+            valueSold: 0,
+            price: 0
         )
     }
 }
 extension TradeableOutput {
-    @inlinable public mutating func deposit(_ amount: Int64, efficiency: Double) {
-        let produced: Int64 = .init(Double.init(amount) * efficiency)
-        self.quantity = produced
-        self.leftover = produced
-        self.proceeds = 0
+    mutating func deposit(unitsProduced: Int64, efficiency: Double) {
+        self.unitsProduced = unitsProduced
+        self.unitsSold = 0
+        self.valueSold = 0
     }
-}
-extension TradeableOutput {
-    public mutating func sell(
-        in currency: Fiat,
-        on exchange: inout Exchange,
-    ) -> Int64 {
-        if  0 < self.leftover {
-            self.proceeds = exchange[self.id / currency].sell(&self.leftover)
-        } else {
-            self.proceeds = 0
-        }
 
-        return self.proceeds
+    public mutating func sell(in currency: Fiat, on exchange: inout Exchange) -> Int64 {
+        {
+            let units: Int64 = self.unitsProduced - self.unitsSold
+            var unitsRemaining: Int64 = units
+            if  unitsRemaining > 0 {
+                let value: Int64 = $0.sell(&unitsRemaining)
+                let unitsSold: Int64 = units - unitsRemaining
+                self.unitsSold += unitsSold
+                self.valueSold += value
+
+                self.price = units != 0
+                    ? Double.init(value %/ unitsSold)
+                    : $0.price
+                return value
+            } else {
+                self.price = $0.price
+                return 0
+            }
+        } (&exchange[self.id / currency])
     }
 }
 

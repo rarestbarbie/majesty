@@ -5,26 +5,35 @@ import JavaScriptInterop
 
 struct ResourceSale {
     let label: ResourceLabel
-    let quantity: Int64
-    let leftover: Int64
-    let proceeds: Int64
+    let unitsProduced: Int64
+    let unitsSold: Int64
+    let valueSold: Int64
+
+    let priceAtMarket: Candle<Double>?
+    let price: Candle<Int64>?
 }
 extension ResourceSale: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
         case id
         case name
         case icon
-        case quantity
-        case leftover
-        case proceeds
+
+        case unitsProduced
+        case unitsSold
+        case valueSold
+
+        case priceAtMarket
+        case price
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.label.id
         js[.name] = self.label.name
         js[.icon] = self.label.icon
-        js[.quantity] = self.quantity
-        js[.leftover] = self.leftover
-        js[.proceeds] = self.proceeds
+        js[.unitsProduced] = self.unitsProduced
+        js[.unitsSold] = self.unitsSold
+        js[.valueSold] = self.valueSold
+        js[.priceAtMarket] = self.priceAtMarket
+        js[.price] = self.price
     }
 }

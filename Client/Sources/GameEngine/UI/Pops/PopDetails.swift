@@ -7,59 +7,56 @@ import VectorCharts
 
 struct PopDetails {
     let id: PopID
-    var needs: [ResourceNeed]
-    var sales: [ResourceSale]
-
-    var spending: PieChart<CashFlowItem, PieChartLabel>?
+    private var inventory: ResourceInventory
+    private var spending: PieChart<CashFlowItem, PieChartLabel>?
 
     init(id: PopID) {
         self.id = id
-        self.needs = []
-        self.sales = []
+        self.inventory = .init()
         self.spending = nil
     }
 }
 extension PopDetails {
     mutating func update(from snapshot: borrowing GameSnapshot) {
         guard
-        let pop: PopContext = snapshot.pops.table[self.id]
-        else {
+        let pop: PopContext = snapshot.pops.table[self.id],
+        let currency: Fiat = pop.policy?.currency else {
             return
         }
 
-        self.needs.removeAll(keepingCapacity: true)
-        self.needs.reserveCapacity(pop.state.nl.count + pop.state.ne.count + pop.state.nx.count)
+        self.inventory.reset(
+            inputs: pop.state.nl.count + pop.state.ne.count + pop.state.nx.count,
+        )
 
-        self.needs.update(
-            inputs: pop.state.nl.tradeable,
-            currency: pop.policy?.currency,
+        self.inventory.update(
+            from: pop.state.nl,
             tier: .l,
-            from: snapshot
+            currency: currency,
+            location: pop.state.home,
+            snapshot: snapshot
         )
-        self.needs.update(
-            inputs: pop.state.ne.tradeable,
-            currency: pop.policy?.currency,
+        self.inventory.update(
+            from: pop.state.ne,
             tier: .e,
-            from: snapshot
+            currency: currency,
+            location: pop.state.home,
+            snapshot: snapshot
         )
-        self.needs.update(
-            inputs: pop.state.nx.tradeable,
-            currency: pop.policy?.currency,
+        self.inventory.update(
+            from: pop.state.nx,
             tier: .x,
-            from: snapshot
+            currency: currency,
+            location: pop.state.home,
+            snapshot: snapshot
         )
 
-        self.sales.removeAll(keepingCapacity: true)
-        self.sales.reserveCapacity(pop.state.out.count)
-
-        for output: TradeableOutput in pop.state.out.tradeable {
-            self.sales.append(.init(
-                label: snapshot.rules[output.id],
-                quantity: output.quantity,
-                leftover: output.leftover,
-                proceeds: output.proceeds
-            ))
-        }
+        self.inventory.reset(outputs: pop.state.out.count)
+        self.inventory.update(
+            from: pop.state.out,
+            currency: currency,
+            location: pop.state.home,
+            snapshot: snapshot
+        )
 
         self.spending = pop.cashFlow.chart(rules: snapshot.rules)
     }
@@ -74,8 +71,8 @@ extension PopDetails: JavaScriptEncodable {
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
-        js[.needs] = self.needs
-        js[.sales] = self.sales
+        js[.needs] = self.inventory.needs
+        js[.sales] = self.inventory.sales
         js[.spending] = self.spending
     }
 }

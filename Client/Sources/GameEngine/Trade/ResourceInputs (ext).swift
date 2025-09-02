@@ -6,18 +6,20 @@ import JavaScriptInterop
 
 extension ResourceInputs {
     var fulfilled: Double {
-        // TODO: account for inelastic fulfillment
-        self.tradeable.reduce(1) { min($0, $1.fulfilled) }
+        min(
+            self.inelastic.values.reduce(1) { min($0, $1.fulfilled) },
+            self.tradeable.values.reduce(1) { min($0, $1.fulfilled) },
+        )
     }
 
     var valuation: Int64 {
-        self.tradeable.reduce(0) { $0 + $1.acquiredValue }
+        self.tradeable.values.reduce(0) { $0 + $1.valueAcquired }
     }
 
     func width(limit: Int64, tier: ResourceTier) -> Int64 {
-        zip(self.tradeable, tier.tradeable).reduce(limit) {
+        zip(self.tradeable.values, tier.tradeable).reduce(limit) {
             let (resource, (_, amount)) : (TradeableInput, (Resource, Int64)) = $1
-            return min($0, resource.acquired / amount)
+            return min($0, resource.unitsAcquired / amount)
         }
     }
 }
@@ -35,13 +37,13 @@ extension ResourceInputs {
         let consumed: Int64
         let demanded: Int64
 
-        if  let stock: TradeableInput = self.tradeable.first(where: { $0.id == id }) {
-            consumed = stock.consumed
-            demanded = stock.demanded
+        if  let input: TradeableInput = self.tradeable[id] {
+            consumed = input.unitsConsumed
+            demanded = input.unitsDemanded
         } else if
-            let _: InelasticInput = self.inelastic.first(where: { $0.id == id }) {
-            consumed = 0
-            demanded = 0
+            let input: InelasticInput = self.inelastic[id] {
+            consumed = input.unitsConsumed
+            demanded = input.unitsDemanded
         } else {
             return nil
         }
@@ -55,23 +57,20 @@ extension ResourceInputs {
     }
 
     func tooltipStockpile(_ id: Resource) -> Tooltip? {
-        if  let stock: TradeableInput = self.tradeable.first(where: { $0.id == id }) {
+        if  let stock: TradeableInput = self.tradeable[id] {
             return .instructions {
-                let change: Int64 = stock.purchased - stock.consumed
+                let change: Int64 = stock.unitsPurchased - stock.unitsConsumed
 
-                $0["Total stockpile", +] = stock.acquired[/3] <- stock.acquired - change
+                $0["Total stockpile", +] = stock.unitsAcquired[/3] <- stock.unitsAcquired - change
                 $0[>] {
                     $0["Average cost"] = ??stock.averageCost[..2]
-                    $0["Supply (days)"] = stock.acquired == 0
+                    $0["Supply (days)"] = stock.unitsAcquired == 0
                         ? nil
-                        : (Double.init(stock.acquired) / Double.init(stock.demanded))[..3]
+                        : (Double.init(stock.unitsAcquired) / Double.init(stock.unitsDemanded))[..3]
                 }
 
-                $0["Purchased today", +] = +?stock.purchased[/3]
+                $0["Purchased today", +] = +?stock.unitsPurchased[/3]
             }
-        } else if
-            let _: InelasticInput = self.inelastic.first(where: { $0.id == id }) {
-            return nil
         } else {
             return nil
         }
@@ -81,7 +80,7 @@ extension ResourceInputs {
         _ id: Resource,
         _ price: Candle<Double>,
     ) -> Tooltip? {
-        if  let actual: TradeableInput = self.tradeable.first(where: { $0.id == id }) {
+        if  let actual: TradeableInput = self.tradeable[id] {
             return .instructions {
                 $0["Today’s closing price", -] = price.c[..2] <- price.o
                 $0[>] = actual.price == price.c ? nil : """
@@ -93,7 +92,7 @@ extension ResourceInputs {
                 """
             }
         } else if
-            let _: InelasticInput = self.inelastic.first(where: { $0.id == id }) {
+            let _: InelasticInput = self.inelastic[id] {
             return nil
         } else {
             return nil

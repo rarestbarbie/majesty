@@ -16,6 +16,11 @@ export default defineConfig({
             },
         },
     },
+    server: {
+        watch: {
+            ignored: ['/.build/'], // Example for a large directory
+        },
+    },
     plugins: [
         viteCompression({
             // Use a regex to target .js, .css, and .wasm files

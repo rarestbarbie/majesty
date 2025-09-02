@@ -66,7 +66,7 @@ extension TradeReport: PersistentReport {
         ) { $0[$1.currency.id] = $1.currency }
         let currencyPlayer: Fiat? = snapshot.countries.state[snapshot.player]?.currency.id
 
-        for market: Market in snapshot.markets.values {
+        for market: Market in snapshot.markets.tradeable.values {
             guard
             let today: Market.Interval = market.history.last,
             case .good(let good) = market.id.x,

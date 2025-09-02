@@ -88,7 +88,7 @@ extension FactoryContext: RuntimeContext {
         self.policy = country.state.policies
 
         self.cashFlow.reset()
-        self.cashFlow.update(with: self.state.ni.tradeable)
+        self.cashFlow.update(with: self.state.ni.tradeable.values.elements)
         self.cashFlow[.workers] = -self.state.cash.w
         self.cashFlow[.clerks] = -self.state.cash.c
     }
@@ -116,23 +116,27 @@ extension FactoryContext: TransactingContext {
         ///
         /// This is a linear rate, and will slightly underestimate the true cost, due to the
         /// curvature of the market.
-        var inputsCostPerHour: Double = 0
-
-        self.state.ni.tradeable.sync(with: self.type.inputs.tradeable) {
-            inputsCostPerHour += Double.init($1.amount) * map.exchange.price(
-                of: $0.id,
-                in: country.currency
-            )
-            // Compute input capacity. The stockpile target is computed relative to the number
-            // of workers available, minus workers on strike. This prevents the factory from
-            // spending all of its cash on inputs when there are not enough workers to process
-            // them.
-            $0.sync(
-                coefficient: $1,
-                multiplier: self.productivity * self.workers.count,
-                stockpile: Self.stockpileDays,
-            )
+        let inputsCostPerHour: Double = self.state.today.ei * self.type.inputs.tradeable.reduce(
+            into: 0
+        ) {
+            $0 += Double.init($1.value) * map.exchange.price(of: $1.key, in: country.currency)
         }
+
+        // Compute input capacity. The stockpile target is computed relative to the number
+        // of workers available, minus workers on strike. This prevents the factory from
+        // spending all of its cash on inputs when there are not enough workers to process
+        // them.
+        self.state.ni.sync(
+            with: self.type.inputs,
+            scalingFactor: (self.productivity * self.workers.count, self.state.today.ei),
+            stockpileDays: Self.stockpileDays,
+        )
+
+        self.state.nv.sync(
+            with: self.type.costs,
+            scalingFactor: (self.productivity, self.state.today.ei),
+            stockpileDays: Self.stockpileDays,
+        )
 
         self.budget = self.budget(inputsCostPerHour: inputsCostPerHour)
     }
@@ -200,18 +204,14 @@ extension FactoryContext: TransactingContext {
             /// estimate of the factory’s profitability, we need to credit the day’s balance with
             /// the amount of currency that was sunk into purchasing inputs, and subtract the
             /// approximate value of the inputs consumed today.
-            self.state.ni.tradeable.sync(with: self.type.inputs.tradeable) {
-                $0.consume(
-                    self.productivity * $1.amount * hours,
-                    efficiency: self.state.today.ei
-                )
-            }
-            self.state.out.tradeable.sync(with: self.type.output.tradeable) {
-                $0.deposit(
-                    self.productivity * $1.amount * hours,
-                    efficiency: self.state.today.eo
-                )
-            }
+            self.state.ni.consume(
+                from: self.type.inputs,
+                scalingFactor: (self.productivity * hours, self.state.today.ei)
+            )
+            self.state.out.deposit(
+                from: self.type.output,
+                scalingFactor: (self.productivity * hours, self.state.today.eo)
+            )
 
             // Sell outputs.
             self.state.cash.r += self.state.out.sell(in: country.currency, on: &map.exchange)
@@ -239,14 +239,6 @@ extension FactoryContext: TransactingContext {
             }
         }
 
-        self.state.nv.tradeable.sync(with: self.type.costs.tradeable) {
-            $0.sync(
-                coefficient: $1,
-                multiplier: self.productivity,
-                stockpile: Self.stockpileDays,
-            )
-        }
-
         let investmentRatio: Fraction = (self.workers.count %/ (10 * self.workers.limit))
         let investmentBudget: Int64 = investmentRatio <> profit
         expansion:
@@ -265,9 +257,10 @@ extension FactoryContext: TransactingContext {
             }
 
             self.state.grow += growth
-            self.state.nv.tradeable.sync(with: self.type.costs.tradeable) {
-                $0.consume($1.amount * self.productivity, efficiency: self.state.today.ei)
-            }
+            self.state.nv.consume(
+                from: self.type.costs,
+                scalingFactor: (self.productivity, self.state.today.ei)
+            )
 
             if  self.state.grow >= 100 {
                 self.state.size += 1

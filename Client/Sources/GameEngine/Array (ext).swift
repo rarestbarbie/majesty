@@ -1,29 +1,7 @@
 import ColorText
 import D
 import GameConditions
-import GameEconomy
-import GameRules
 
-extension [ResourceNeed] {
-    mutating func update(
-        inputs: [TradeableInput],
-        currency: Fiat?,
-        tier: ResourceTierIdentifier,
-        from snapshot: borrowing GameSnapshot,
-    ) {
-        for input: TradeableInput in inputs {
-            let market: Market? = currency.map { snapshot.markets[input.id / $0] } ?? nil
-            self.append(
-                ResourceNeed.init(
-                    label: snapshot.rules[input.id],
-                    input: input,
-                    price: market?.history.last?.prices ?? market?.current ?? .open(0),
-                    tier: tier
-                )
-            )
-        }
-    }
-}
 extension [ConditionListItem] {
     static func list(_ headings: ColorText..., breakdown: ConditionBreakdown) -> Self {
         var list: Self = []

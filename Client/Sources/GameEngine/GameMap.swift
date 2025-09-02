@@ -39,8 +39,8 @@ extension GameMap {
     }
 
     mutating func pay(salariesBudget: Int64, salaries recipients: [Payscale]) -> Int64 {
-        guard let payments: [Int64] = recipients.joined().distribute(
-            funds: { min($0, salariesBudget) },
+        guard let payments: [Int64] = recipients.joined().split(
+            limit: salariesBudget,
             share: \.owed
         ) else {
             return 0
@@ -57,10 +57,7 @@ extension GameMap {
     }
 
     mutating func pay(wagesBudget: Int64, wages recipients: Payscale) -> Int64 {
-        guard let payments: [Int64] = recipients.distribute(
-            funds: { min($0, wagesBudget) },
-            share: \.owed
-        ) else {
+        guard let payments: [Int64] = recipients.split(limit: wagesBudget, share: \.owed) else {
             return 0
         }
 
@@ -83,10 +80,7 @@ extension GameMap {
         dividend: Int64,
         to shareholders: [(id: PopID, count: Int64)]
     ) -> Int64 {
-        guard let payments: [Int64] = shareholders.distribute(
-            funds: { _ in dividend },
-            share: \.count
-        ) else {
+        guard let payments: [Int64] = shareholders.distribute(dividend, share: \.count) else {
             return 0
         }
 
