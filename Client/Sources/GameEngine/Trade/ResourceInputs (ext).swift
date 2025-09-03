@@ -123,7 +123,7 @@ extension ResourceInputs {
                     """
                 } else {
                     $0[>] = """
-                    There are not enough producers in this region, and the price will increase
+                    There are not enough producers in this region, and the price will increase \
                     if the situation persists
                     """
                 }
