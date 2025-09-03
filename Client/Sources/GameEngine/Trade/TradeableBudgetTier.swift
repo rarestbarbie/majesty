@@ -13,9 +13,9 @@ extension TradeableBudgetTier {
         currency: Fiat
     ) -> Self {
         .init(
-            total: demands.reduce(into: 0) {
+            total: demands.reduce(0) {
                 let units: Int64 = $1.value.unitsDemanded
-                $0 += Double.init(units) * markets.price(of: $1.key, in: currency)
+                return $0 + Double.init(units) * markets.price(of: $1.key, in: currency)
             }
         )
     }

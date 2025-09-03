@@ -304,21 +304,24 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let factory: FactoryContext = self.context.factories[id],
-        let currency: Fiat = factory.policy?.currency else {
+        let country: CountryID = context.planets[factory.state.on.planet]?.occupied,
+        let country: Country = self.context.countries.state[country] else {
             return nil
         }
 
-        guard
-        let market: Market = self.map.exchange.markets[need / currency],
-        let price: Candle<Double> = market.history.last?.prices else {
-            return nil
-        }
+        let market: (
+            inelastic: (yesterday: LocalMarketState, today: LocalMarketState)?,
+            tradeable: Candle<Double>?
+        ) = (
+            nil, // self.map.localMarkets[factory.state.home, need].history,
+            self.map.exchange.markets[need / country.currency.id]?.history.last?.prices
+        )
 
         switch tier {
         case .i:
-            return factory.state.ni.tooltipExplainPrice(need, price)
+            return factory.state.ni.tooltipExplainPrice(need, market, country)
         case .v:
-            return factory.state.nv.tooltipExplainPrice(need, price)
+            return factory.state.nv.tooltipExplainPrice(need, market, country)
         default:
             return nil
         }
@@ -580,28 +583,32 @@ extension GameSession {
     }
 
     public func tooltipPopExplainPrice(
-        _ id: PopID,
+        _ pop: PopID,
         _ tier: ResourceTierIdentifier,
         _ need: Resource,
     ) -> Tooltip? {
         guard
-        let pop: PopContext = self.context.pops.table[id],
-        let currency: Fiat = pop.policy?.currency else {
-            return nil
-        }
-        guard
-        let market: Market = self.map.exchange.markets[need / currency],
-        let price: Candle<Double> = market.history.last?.prices else {
+        let pop: PopContext = self.context.pops.table[pop],
+        let country: CountryID = context.planets[pop.state.home.planet]?.occupied,
+        let country: Country = self.context.countries.state[country] else {
             return nil
         }
 
+        let market: (
+            inelastic: (yesterday: LocalMarketState, today: LocalMarketState)?,
+            tradeable: Candle<Double>?
+        ) = (
+            self.map.localMarkets[pop.state.home, need].history,
+            self.map.exchange.markets[need / country.currency.id]?.history.last?.prices
+        )
+
         switch tier {
         case .l:
-            return pop.state.nl.tooltipExplainPrice(need, price)
+            return pop.state.nl.tooltipExplainPrice(need, market, country)
         case .e:
-            return pop.state.ne.tooltipExplainPrice(need, price)
+            return pop.state.ne.tooltipExplainPrice(need, market, country)
         case .x:
-            return pop.state.nx.tooltipExplainPrice(need, price)
+            return pop.state.nx.tooltipExplainPrice(need, market, country)
         default:
             return nil
         }

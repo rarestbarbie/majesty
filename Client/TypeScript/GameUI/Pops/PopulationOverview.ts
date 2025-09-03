@@ -52,7 +52,8 @@ export class PopulationOverview extends ScreenContent {
 
         // We need to empty the upper content, as we will need to replace the IDs.
         this.needs.table('Needs', ResourceNeedRow.columns);
-        this.sales.boxes('Sales');
+        this.sales.clear();
+        this.sales.node.classList.add('sales');
 
         if (!this.dom) {
             this.dom = {

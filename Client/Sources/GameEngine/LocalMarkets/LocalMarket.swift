@@ -2,15 +2,15 @@ import GameEconomy
 import Random
 
 struct LocalMarket<LegalEntity> {
-    var yesterday: LocalMarketStats
-    var today: LocalMarketStats
+    var yesterday: LocalMarketState
+    var today: LocalMarketState
 
     var asks: [Order]
     var bids: [Order]
 
     init(
-        yesterday: LocalMarketStats,
-        today: LocalMarketStats,
+        yesterday: LocalMarketState,
+        today: LocalMarketState,
         asks: [Order],
         bids: [Order]
     ) {
@@ -36,6 +36,10 @@ extension LocalMarket {
             c: today.price,
         )
     }
+
+    var history: (yesterday: LocalMarketState, today: LocalMarketState)  {
+        (self.yesterday, self.today)
+    }
 }
 extension LocalMarket {
     mutating func ask(amount: Int64, by entity: LegalEntity) {
@@ -55,10 +59,10 @@ extension LocalMarket {
     }
 }
 extension LocalMarket {
-    mutating func turn() {
+    mutating func turn(minwage: Int64) {
         let price: Int64 = self.today.price + self.today.priceChange
         self.yesterday = self.today
-        self.today = .init(price: price)
+        self.today = .init(price: max(price, minwage))
     }
 
     mutating func match(using random: inout PseudoRandom) -> (asks: [Order], bids: [Order]) {

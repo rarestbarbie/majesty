@@ -203,34 +203,6 @@ div.tabs > * > input[type=radio]:checked + label {
     background-color: rgb(255, 0, 106);
 }
 
-[data-table='Needs'] {
-    grid-template-columns: 1fr 1fr 1fr 1fr;
-}
-[data-table='Needs'] > [data-tier='i'] {
-    --color: rgb(104, 104, 104);
-}
-[data-table='Needs'] > [data-tier='v'] {
-    --color: rgb(252, 183, 35);
-}
-[data-table='Needs'] > [data-tier='l'] {
-    --color: rgb(58, 145, 204);
-}
-[data-table='Needs'] > [data-tier='e'] {
-    --color: rgb(255, 145, 0);
-}
-[data-table='Needs'] > [data-tier='x'] {
-    --color: rgb(214, 0, 89);
-}
-[data-table='Needs'] > [data-tier]:not([data-tier='v']) + [data-tier='v'],
-[data-table='Needs'] > [data-tier]:not([data-tier='e']) + [data-tier='e'],
-[data-table='Needs'] > [data-tier]:not([data-tier='x']) + [data-tier='x'] {
-    margin-top: 1rem;
-}
-[data-table='Needs'] > * > *:nth-child(2) {
-    border-left: 3px solid var(--color);
-    padding-left: 0.5rem;
-}
-
 [data-table='Markets'] {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 2fr;
     height: 50%;
@@ -267,38 +239,6 @@ div.tabs > * > input[type=radio]:checked + label {
 [data-table] > *:hover > [data-cell='progress'] > *:first-child::before,
 [data-table] > *.selected > [data-cell='progress'] > *:first-child::before {
     opacity: 0.2;
-}
-
-
-[data-boxes='Sales'] {
-    display: flex;
-    gap: 1rem;
-}
-[data-boxes='Sales'] > * {
-    padding: 1rem 0;
-    flex-grow: 1;
-}
-[data-boxes='Sales'] > * > *:nth-child(1) {
-    font-size: 2rem;
-    float: left;
-    margin: 0 1rem 1rem 0;
-}
-[data-boxes='Sales'] > * > *:nth-child(2) {
-    font-size: 1.25rem;
-}
-[data-boxes='Sales'] > * > *:nth-child(3)::after {
-    content: ' produced today';
-}
-[data-boxes='Sales'] > * > *:nth-child(4) {
-    clear: left;
-}
-[data-boxes='Sales'] > * > *:nth-child(4)::before {
-    content: '🗑️';
-    margin-right: 0.6em;
-}
-[data-boxes='Sales'] > * > *:nth-child(5)::before {
-    content: '💵';
-    margin-right: 0.6em;
 }
 
 body {
