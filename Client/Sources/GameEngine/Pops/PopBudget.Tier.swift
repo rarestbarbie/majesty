@@ -24,17 +24,9 @@ extension PopBudget.Tier {
             return
         }
 
-        let total: Int64 = tradeable + inelastic
-        if  total <= available {
-            self.tradeable += tradeable
-            self.inelastic += inelastic
-        } else if let item: [Int64] = [tradeable, inelastic].distribute(available) {
+        if let item: [Int64] = [tradeable, inelastic].distribute(available) {
             self.tradeable += item[0]
             self.inelastic += item[1]
-        }
-        else {
-            // All costs zero. This should be impossible, since 0 <= available!
-            fatalError("unreachable")
         }
     }
 }

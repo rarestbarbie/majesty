@@ -34,7 +34,7 @@ export class ResourceSaleBox implements DiffableListElement<Resource> {
     }
 
     public update(sale: ResourceSale): void {
-        UpdateBigInt(this.unitsProduced, sale.unitsProduced);
+        UpdateBigInt(this.unitsProduced, sale.unitsSold);
         UpdateBigInt(this.unitsLeftover, sale.unitsProduced - sale.unitsSold);
         UpdateBigInt(this.valueSold, sale.valueSold);
     }

@@ -59,7 +59,8 @@ export class ProductionOverview extends ScreenContent {
         );
 
         this.needs.table('Needs', ResourceNeedRow.columns);
-        this.sales.boxes('Sales');
+        this.sales.clear();
+        this.sales.node.classList.add('sales');
 
         if (!this.dom) {
             this.dom = {

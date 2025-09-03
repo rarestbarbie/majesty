@@ -5,4 +5,64 @@
     > * {
         flex: 0 1 50%;
     }
+
+    [data-table='Needs'] {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+    }
+    [data-table='Needs'] > [data-tier='i'] {
+        --color: rgb(104, 104, 104);
+    }
+    [data-table='Needs'] > [data-tier='v'] {
+        --color: rgb(252, 183, 35);
+    }
+    [data-table='Needs'] > [data-tier='l'] {
+        --color: rgb(58, 145, 204);
+    }
+    [data-table='Needs'] > [data-tier='e'] {
+        --color: rgb(255, 145, 0);
+    }
+    [data-table='Needs'] > [data-tier='x'] {
+        --color: rgb(214, 0, 89);
+    }
+    [data-table='Needs'] > [data-tier]:not([data-tier='v']) + [data-tier='v'],
+    [data-table='Needs'] > [data-tier]:not([data-tier='e']) + [data-tier='e'],
+    [data-table='Needs'] > [data-tier]:not([data-tier='x']) + [data-tier='x'] {
+        margin-top: 1rem;
+    }
+    [data-table='Needs'] > * > *:nth-child(2) {
+        border-left: 3px solid var(--color);
+        padding-left: 0.5rem;
+    }
+
+    div.sales {
+        display: flex;
+        gap: 1rem;
+
+        > * {
+            padding: 1rem 0;
+            flex-grow: 1;
+        }
+        > * > *:nth-child(1) {
+            font-size: 2rem;
+            float: left;
+            margin: 0 1rem 1rem 0;
+        }
+        > * > *:nth-child(2) {
+            font-size: 1.25rem;
+        }
+        > * > *:nth-child(3)::after {
+            content: ' sold today';
+        }
+        > * > *:nth-child(4) {
+            clear: left;
+        }
+        > * > *:nth-child(4)::before {
+            content: '🗑️';
+            margin-right: 0.6em;
+        }
+        > * > *:nth-child(5)::before {
+            content: '💵';
+            margin-right: 0.6em;
+        }
+    }
 }

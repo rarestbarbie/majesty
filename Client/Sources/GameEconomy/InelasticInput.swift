@@ -54,6 +54,14 @@ extension InelasticInput {
             ? 0
             : Double.init(self.unitsConsumed) / Double.init(self.unitsDemanded)
     }
+
+    @inlinable public var averageCost: Double {
+        self.unitsConsumed == 0 ? 0 : Double.init(
+            self.valueConsumed
+        ) / Double.init(
+            self.unitsConsumed
+        )
+    }
 }
 
 #if TESTABLE

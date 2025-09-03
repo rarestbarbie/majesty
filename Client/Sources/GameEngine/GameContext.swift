@@ -128,7 +128,16 @@ extension GameContext {
             try self.countries[i].advance(in: self, on: &map)
         }
 
-        map.localMarkets.turn { $1.turn() }
+        map.localMarkets.turn {
+            /// Apply local minimum wages
+            guard
+            let country: CountryID = self.planets[$0.location.planet]?.occupied,
+            let country: Country = self.countries.state[country] else {
+                return
+            }
+
+            $1.turn(minwage: country.minwage)
+        }
 
         self.factories.turn  { $0.turn(on: &map) }
         self.pops.table.turn { $0.turn(on: &map) }
@@ -142,14 +151,14 @@ extension GameContext {
 
             for order: LocalMarket<PopID>.Order in asks {
                 self.pops.table[order.by]?.credit(
-                    inelastic: $0,
+                    inelastic: $0.resource,
                     units: order.filled,
                     price: price
                 )
             }
             for order: LocalMarket<PopID>.Order in bids {
                 self.pops.table[order.by]?.debit(
-                    inelastic: $0,
+                    inelastic: $0.resource,
                     units: order.filled,
                     price: price,
                     in: order.tier

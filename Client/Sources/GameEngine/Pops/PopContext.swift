@@ -280,20 +280,28 @@ extension PopContext: TransactingContext {
             e: tradeableCostPerDay.e + inelasticCostPerDay.e,
         )
 
+        let d: (l: Int64, e: Int64, x: Int64) = (7, 30, 365)
+        /// These are the minimum theoretical balances the pop would need to purchase 100% of
+        /// its needs in that tier on any particular day.
+        let min: (l: Int64, e: Int64) = (
+            l: totalCostPerDay.l * d.l,
+            e: totalCostPerDay.e * d.e,
+        )
+
         budget.l.distribute(
-            funds: self.state.cash.balance / 7,
+            funds: self.state.cash.balance / d.l,
             inelastic: inelasticCostPerDay.l * Self.stockpileMax,
             tradeable: tradeableCostPerDay.l * Self.stockpileMax,
         )
 
         budget.e.distribute(
-            funds: self.state.cash.balance / 30 - totalCostPerDay.l,
+            funds: (self.state.cash.balance - min.l) / d.e,
             inelastic: inelasticCostPerDay.e * Self.stockpileMax,
             tradeable: tradeableCostPerDay.e * Self.stockpileMax,
         )
 
         budget.x.distribute(
-            funds: self.state.cash.balance / 365 - (totalCostPerDay.l + totalCostPerDay.e),
+            funds: (self.state.cash.balance - min.l - min.e) / d.x,
             inelastic: inelasticCostPerDay.x * Self.stockpileMax,
             tradeable: tradeableCostPerDay.x * Self.stockpileMax,
         )
