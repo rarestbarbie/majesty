@@ -2,7 +2,6 @@
     public let id: Resource
 
     public var unitsAcquired: Int64
-    public var unitsCapacity: Int64
     public var unitsConsumed: Int64
     public var unitsDemanded: Int64
     public var unitsPurchased: Int64
@@ -17,7 +16,6 @@
     @inlinable public init(
         id: Resource,
         unitsAcquired: Int64,
-        unitsCapacity: Int64,
         unitsConsumed: Int64,
         unitsDemanded: Int64,
         unitsPurchased: Int64,
@@ -26,13 +24,12 @@
         price: Double
     ) {
         self.id = id
-        self.valueAcquired = valueAcquired
         self.unitsAcquired = unitsAcquired
-        self.unitsCapacity = unitsCapacity
-        self.unitsDemanded = unitsDemanded
-        self.valueConsumed = valueConsumed
         self.unitsConsumed = unitsConsumed
+        self.unitsDemanded = unitsDemanded
         self.unitsPurchased = unitsPurchased
+        self.valueAcquired = valueAcquired
+        self.valueConsumed = valueConsumed
         self.price = price
     }
 }
@@ -41,7 +38,6 @@ extension TradeableInput: ResourceStockpile, ResourceInput {
         self.init(
             id: id,
             unitsAcquired: 0,
-            unitsCapacity: 0,
             unitsConsumed: 0,
             unitsDemanded: 0,
             unitsPurchased: 0,
@@ -58,10 +54,6 @@ extension TradeableInput {
         efficiency: Double
     ) {
         self.unitsDemanded = .init((Double.init(unitsDemanded) * efficiency).rounded(.up))
-        self.unitsCapacity = .init(
-            (Double.init(unitsDemanded * stockpileDays) * efficiency).rounded(.up)
-        )
-
         self.valueConsumed = 0
         self.unitsConsumed = 0
         self.unitsPurchased = 0

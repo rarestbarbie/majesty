@@ -8,9 +8,8 @@ struct ResourceNeed {
     let tier: ResourceTierIdentifier
 
     let unitsAcquired: Int64?
-    let unitsCapacity: Int64?
-    let unitsDemanded: Int64
     let unitsConsumed: Int64
+    let unitsDemanded: Int64
 
     let priceAtMarket: Candle<Double>?
     let price: Candle<Int64>?
@@ -22,9 +21,8 @@ extension ResourceNeed: JavaScriptEncodable {
         case icon
         case tier
         case unitsAcquired
-        case unitsCapacity
-        case unitsDemanded
         case unitsConsumed
+        case unitsDemanded
         case priceAtMarket
         case price
     }
@@ -35,9 +33,8 @@ extension ResourceNeed: JavaScriptEncodable {
         js[.icon] = self.label.icon
         js[.tier] = self.tier
         js[.unitsAcquired] = self.unitsAcquired
-        js[.unitsCapacity] = self.unitsCapacity
-        js[.unitsDemanded] = self.unitsDemanded
         js[.unitsConsumed] = self.unitsConsumed
+        js[.unitsDemanded] = self.unitsDemanded
         js[.priceAtMarket] = self.priceAtMarket
         js[.price] = self.price
     }
