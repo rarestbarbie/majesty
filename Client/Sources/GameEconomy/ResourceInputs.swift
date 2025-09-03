@@ -52,17 +52,19 @@ extension ResourceInputs {
 extension ResourceInputs {
     /// Returns the amount of funds actually spent.
     @inlinable public mutating func buy(
-        days stockpile: Int64,
+        days stockpileTarget: ClosedRange<Int64>,
         with budget: Int64,
         in currency: Fiat,
         on exchange: inout Exchange,
     ) -> Int64 {
         let weights: [Double] = self.tradeable.values.map {
-            Double.init($0.needed($0.unitsCapacity)) * exchange.price(of: $0.id, in: currency)
+            Double.init(
+                $0.needed($0.unitsDemanded * stockpileTarget.lowerBound)
+            ) * exchange.price(of: $0.id, in: currency)
         }
 
         return self.buy(
-            days: stockpile,
+            days: stockpileTarget.upperBound,
             with: budget,
             in: currency,
             on: &exchange,

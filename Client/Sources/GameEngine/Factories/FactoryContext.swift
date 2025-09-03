@@ -41,6 +41,7 @@ struct FactoryContext {
 }
 extension FactoryContext {
     private static var stockpileDays: Int64 { 3 }
+    private static var stockpileMax: Int64 { 7 }
     static var pr: Int { 8 }
 
     mutating func startIndexCount() {
@@ -173,12 +174,14 @@ extension FactoryContext: TransactingContext {
             self.state.today.eo = 1
         }
 
-        let stockpileTarget: Int64 = map.random.int64(in: Self.stockpileDays ... 7)
+        let stockpileTargets: ClosedRange<Int64> = Self.stockpileDays ... map.random.int64(
+            in: Self.stockpileDays ... Self.stockpileMax
+        )
         let profit: Int64
 
         do {
             let inputSpend: Int64 = self.state.ni.buy(
-                days: stockpileTarget,
+                days: stockpileTargets,
                 with: budget.inputs,
                 in: country.currency,
                 on: &map.exchange,
@@ -244,7 +247,7 @@ extension FactoryContext: TransactingContext {
         expansion:
         if  investmentBudget > 0 {
             self.state.cash.v -= self.state.nv.buy(
-                days: stockpileTarget,
+                days: stockpileTargets,
                 with: investmentBudget,
                 in: country.currency,
                 on: &map.exchange,

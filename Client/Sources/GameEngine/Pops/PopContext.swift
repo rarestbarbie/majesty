@@ -407,7 +407,9 @@ extension PopContext {
         )
 
         if  let budget: PopBudget = self.budget {
-            let target: Int64 = map.random.int64(in: Self.stockpileDays ... Self.stockpileMax)
+            let target: ClosedRange<Int64> = Self.stockpileDays ... map.random.int64(
+                in: Self.stockpileDays ... Self.stockpileMax
+            )
             let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
 
             if  budget.l.tradeable > 0 {

@@ -6,7 +6,6 @@ export interface ResourceNeed {
     readonly icon: string;
     readonly tier: 'l' | 'e' | 'x' | 'i' | 'v';
     readonly unitsAcquired?: bigint
-    readonly unitsCapacity?: bigint
     readonly unitsDemanded: bigint
     readonly unitsConsumed: bigint
     readonly priceAtMarket?: Candle<number>;

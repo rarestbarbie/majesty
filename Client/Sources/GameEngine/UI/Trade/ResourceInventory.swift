@@ -34,9 +34,8 @@ extension ResourceInventory {
                     label: snapshot.rules[id],
                     tier: tier,
                     unitsAcquired: input.unitsAcquired,
-                    unitsCapacity: input.unitsCapacity,
-                    unitsDemanded: input.unitsDemanded,
                     unitsConsumed: input.unitsConsumed,
+                    unitsDemanded: input.unitsDemanded,
                     priceAtMarket: market?.history.last?.prices,
                     price: nil
                 )
@@ -49,9 +48,8 @@ extension ResourceInventory {
                     label: snapshot.rules[id],
                     tier: tier,
                     unitsAcquired: nil,
-                    unitsCapacity: nil,
-                    unitsDemanded: input.unitsDemanded,
                     unitsConsumed: input.unitsConsumed,
+                    unitsDemanded: input.unitsDemanded,
                     priceAtMarket: nil,
                     price: market?.price,
                 )

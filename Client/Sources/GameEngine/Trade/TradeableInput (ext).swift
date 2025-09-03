@@ -6,7 +6,6 @@ extension TradeableInput {
     @frozen public enum ObjectKey: JSString, Sendable {
         case id
         case unitsAcquired = "a"
-        case unitsCapacity = "s"
         case unitsConsumed = "c"
         case unitsDemanded = "d"
 
@@ -20,7 +19,6 @@ extension TradeableInput {
 extension TradeableInput: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
-        js[.unitsCapacity] = self.unitsCapacity
         js[.unitsAcquired] = self.unitsAcquired
         js[.unitsDemanded] = self.unitsDemanded
         js[.unitsConsumed] = self.unitsConsumed
@@ -35,7 +33,6 @@ extension TradeableInput: JavaScriptDecodable {
         self.init(
             id: try js[.id].decode(),
             unitsAcquired: try js[.unitsAcquired].decode(),
-            unitsCapacity: try js[.unitsCapacity].decode(),
             unitsConsumed: try js[.unitsConsumed].decode(),
             unitsDemanded: try js[.unitsDemanded].decode(),
             unitsPurchased: try js[.unitsPurchased].decode(),
