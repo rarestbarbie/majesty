@@ -278,6 +278,22 @@ extension GameSession {
         }
     }
 
+    public func tooltipFactorySupply(
+        _ id: FactoryID,
+        _ need: Resource,
+    ) -> Tooltip? {
+        guard let factory: FactoryContext = self.context.factories[id] else {
+            return nil
+        }
+
+        return factory.state.out.tooltipSupply(
+            need,
+            tier: factory.type.output,
+            unit: "worker",
+            factor: factory.state.today.eo
+        )
+    }
+
     public func tooltipFactoryStockpile(
         _ id: FactoryID,
         _ tier: ResourceTierIdentifier,
@@ -299,7 +315,7 @@ extension GameSession {
 
     public func tooltipFactoryExplainPrice(
         _ id: FactoryID,
-        _ tier: ResourceTierIdentifier,
+        _ tier: ResourceTierIdentifier?,
         _ need: Resource,
     ) -> Tooltip? {
         guard
@@ -318,10 +334,12 @@ extension GameSession {
         )
 
         switch tier {
-        case .i:
+        case .i?:
             return factory.state.ni.tooltipExplainPrice(need, market, country)
-        case .v:
+        case .v?:
             return factory.state.nv.tooltipExplainPrice(need, market, country)
+        case nil:
+            return factory.state.out.tooltipExplainPrice(need, market, country)
         default:
             return nil
         }
@@ -561,6 +579,22 @@ extension GameSession {
         }
     }
 
+    public func tooltipPopSupply(
+        _ id: PopID,
+        _ need: Resource,
+    ) -> Tooltip? {
+        guard let pop: PopContext = self.context.pops.table[id] else {
+            return nil
+        }
+
+        return pop.state.out.tooltipSupply(
+            need,
+            tier: pop.type.output,
+            unit: "worker",
+            factor: 1
+        )
+    }
+
     public func tooltipPopStockpile(
         _ id: PopID,
         _ tier: ResourceTierIdentifier,
@@ -584,7 +618,7 @@ extension GameSession {
 
     public func tooltipPopExplainPrice(
         _ pop: PopID,
-        _ tier: ResourceTierIdentifier,
+        _ tier: ResourceTierIdentifier?,
         _ need: Resource,
     ) -> Tooltip? {
         guard
@@ -603,12 +637,14 @@ extension GameSession {
         )
 
         switch tier {
-        case .l:
+        case .l?:
             return pop.state.nl.tooltipExplainPrice(need, market, country)
-        case .e:
+        case .e?:
             return pop.state.ne.tooltipExplainPrice(need, market, country)
-        case .x:
+        case .x?:
             return pop.state.nx.tooltipExplainPrice(need, market, country)
+        case nil:
+            return pop.state.out.tooltipExplainPrice(need, market, country)
         default:
             return nil
         }

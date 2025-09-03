@@ -34,22 +34,22 @@ extension ResourceInputs {
             return nil
         }
 
-        let consumed: Int64
-        let demanded: Int64
+        let unitsConsumed: Int64
+        let unitsDemanded: Int64
 
         if  let input: TradeableInput = self.tradeable[id] {
-            consumed = input.unitsConsumed
-            demanded = input.unitsDemanded
+            unitsConsumed = input.unitsConsumed
+            unitsDemanded = input.unitsDemanded
         } else if
             let input: InelasticInput = self.inelastic[id] {
-            consumed = input.unitsConsumed
-            demanded = input.unitsDemanded
+            unitsConsumed = input.unitsConsumed
+            unitsDemanded = input.unitsDemanded
         } else {
             return nil
         }
 
         return .instructions {
-            $0["Consumed today", +] = consumed[/3] / demanded
+            $0["Consumed today", +] = unitsConsumed[/3] / unitsDemanded
             $0[>] {
                 $0["Demand per \(unit)"] = (factor * Double.init(amount))[..3]
             }

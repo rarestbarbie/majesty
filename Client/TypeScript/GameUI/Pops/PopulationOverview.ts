@@ -124,7 +124,12 @@ export class PopulationOverview extends ScreenContent {
 
             this.sales.update(
                 state.pop.sales,
-                (sale: ResourceSale) => new ResourceSaleBox(sale),
+                (sale: ResourceSale) => new ResourceSaleBox(
+                    sale,
+                    id,
+                    TooltipType.PopSupply,
+                    TooltipType.PopExplainPrice,
+                ),
                 (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
             );
 

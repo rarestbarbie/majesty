@@ -158,7 +158,12 @@ export class ProductionOverview extends ScreenContent {
             );
             this.sales.update(
                 state.factory.open.sales,
-                (sale: ResourceSale) => new ResourceSaleBox(sale),
+                (sale: ResourceSale) => new ResourceSaleBox(
+                    sale,
+                    id,
+                    TooltipType.FactorySupply,
+                    TooltipType.FactoryExplainPrice,
+                ),
                 (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
             );
 
