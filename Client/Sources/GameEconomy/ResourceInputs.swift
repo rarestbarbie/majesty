@@ -51,60 +51,66 @@ extension ResourceInputs {
 }
 extension ResourceInputs {
     /// Returns the amount of funds actually spent.
-    @inlinable public mutating func buy(
-        days stockpileTarget: ClosedRange<Int64>,
-        with budget: Int64,
+    @inlinable public mutating func trade(
+        stockpileDays target: TradeableInput.StockpileTarget,
+        spendingLimit budget: Int64,
         in currency: Fiat,
         on exchange: inout Exchange,
-    ) -> Int64 {
+    ) -> (gain: Int64, loss: Int64) {
         let weights: [Double] = self.tradeable.values.map {
             Double.init(
-                $0.needed($0.unitsDemanded * stockpileTarget.lowerBound)
+                $0.needed($0.unitsDemanded * target.lower)
             ) * exchange.price(of: $0.id, in: currency)
         }
 
-        return self.buy(
-            days: stockpileTarget.upperBound,
-            with: budget,
+        return self.trade(
+            stockpileDays: target.today ... target.upper,
+            spendingLimit: budget,
             in: currency,
             on: &exchange,
             weights: weights[...]
         )
     }
 
-    /// Returns the amount of funds actually spent.
-    @usableFromInline mutating func buy(
-        days stockpile: Int64,
-        with budget: Int64,
+    /// Loss is negative, Gain is positive.
+    @usableFromInline mutating func trade(
+        stockpileDays: ClosedRange<Int64>,
+        spendingLimit: Int64,
         in currency: Fiat,
         on exchange: inout Exchange,
         weights: ArraySlice<Double>,
-    ) -> Int64 {
-        guard let budgets: [Int64] = weights.distribute(budget) else {
-            return 0
+    ) -> (gain: Int64, loss: Int64) {
+        guard let budget: [Int64] = weights.distribute(spendingLimit) else {
+            return (0, 0)
         }
 
-        var funds: Int64 = budget
+        var gain: Int64 = 0
+        var loss: Int64 = 0
 
         for i: Int in self.tradeable.values.indices {
-            funds -= self.tradeable.values[i].buy(
-                days: stockpile,
-                with: budgets[i],
+            let value: Int64 = self.tradeable.values[i].trade(
+                stockpileDays: stockpileDays,
+                budget: budget[i],
                 in: currency,
                 on: &exchange
             )
+            if  value > 0 {
+                gain += value
+            } else {
+                loss += value
+            }
         }
 
         #assert(
-            0 ... budget ~= funds,
+            0 ... spendingLimit ~= -loss,
             """
-            Spending is out of bounds: \(funds) not in [0, \(budget)] ?!?!
+            Spending is out of bounds: \(-loss) not in [0, \(spendingLimit)] ?!?!
             Inputs: \(self)
-            Budgets: \(budgets)
+            Budget: \(budget)
             """
         )
 
-        return budget - funds
+        return (gain: gain, loss: loss)
     }
 }
 

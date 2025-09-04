@@ -35,8 +35,7 @@ struct PopContext {
     }
 }
 extension PopContext {
-    private static var stockpileDays: Int64 { 3 }
-    private static var stockpileMax: Int64 { 7 }
+    private static var stockpileDays: ClosedRange<Int64> { 3 ... 7 }
 
     mutating func startIndexCount() {
         self.equity = .init()
@@ -207,17 +206,17 @@ extension PopContext: TransactingContext {
         self.state.nl.sync(
             with: self.type.l,
             scalingFactor: (self.state.today.size, z.l),
-            stockpileDays: Self.stockpileDays,
+            stockpileDays: Self.stockpileDays.lowerBound,
         )
         self.state.ne.sync(
             with: self.type.e,
             scalingFactor: (self.state.today.size, z.e),
-            stockpileDays: Self.stockpileDays,
+            stockpileDays: Self.stockpileDays.lowerBound,
         )
         self.state.nx.sync(
             with: self.type.x,
             scalingFactor: (self.state.today.size, z.x),
-            stockpileDays: Self.stockpileDays,
+            stockpileDays: Self.stockpileDays.lowerBound,
         )
         self.state.out.sync(
             with: self.type.output,
@@ -290,20 +289,20 @@ extension PopContext: TransactingContext {
 
         budget.l.distribute(
             funds: self.state.cash.balance / d.l,
-            inelastic: inelasticCostPerDay.l * Self.stockpileMax,
-            tradeable: tradeableCostPerDay.l * Self.stockpileMax,
+            inelastic: inelasticCostPerDay.l * Self.stockpileDays.upperBound,
+            tradeable: tradeableCostPerDay.l * Self.stockpileDays.upperBound,
         )
 
         budget.e.distribute(
             funds: (self.state.cash.balance - min.l) / d.e,
-            inelastic: inelasticCostPerDay.e * Self.stockpileMax,
-            tradeable: tradeableCostPerDay.e * Self.stockpileMax,
+            inelastic: inelasticCostPerDay.e * Self.stockpileDays.upperBound,
+            tradeable: tradeableCostPerDay.e * Self.stockpileDays.upperBound,
         )
 
         budget.x.distribute(
             funds: (self.state.cash.balance - min.l - min.e) / d.x,
-            inelastic: inelasticCostPerDay.x * Self.stockpileMax,
-            tradeable: tradeableCostPerDay.x * Self.stockpileMax,
+            inelastic: inelasticCostPerDay.x * Self.stockpileDays.upperBound,
+            tradeable: tradeableCostPerDay.x * Self.stockpileDays.upperBound,
         )
 
         for (budget, weights, tier):
@@ -407,20 +406,22 @@ extension PopContext {
         )
 
         if  let budget: PopBudget = self.budget {
-            let target: ClosedRange<Int64> = Self.stockpileDays ... map.random.int64(
-                in: Self.stockpileDays ... Self.stockpileMax
+            let target: TradeableInput.StockpileTarget = .random(
+                in: Self.stockpileDays,
+                using: &map.random
             )
             let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
 
             if  budget.l.tradeable > 0 {
-                let spent: Int64 = self.state.nl.buy(
-                    days: target,
-                    with: budget.l.tradeable,
+                let (gain, loss): (Int64, loss: Int64) = self.state.nl.trade(
+                    stockpileDays: target,
+                    spendingLimit: budget.l.tradeable,
                     in: country.currency,
                     on: &map.exchange,
                 )
 
-                self.state.cash.b -= spent
+                self.state.cash.b += loss
+                self.state.cash.r += gain
             }
 
             self.state.today.fl = self.state.nl.fulfilled
@@ -430,14 +431,15 @@ extension PopContext {
             )
 
             if  budget.e.tradeable > 0 {
-                let spent: Int64 = self.state.ne.buy(
-                    days: target,
-                    with: budget.e.tradeable,
+                let (gain, loss): (Int64, loss: Int64) = self.state.ne.trade(
+                    stockpileDays: target,
+                    spendingLimit: budget.e.tradeable,
                     in: country.currency,
                     on: &map.exchange,
                 )
 
-                self.state.cash.b -= spent
+                self.state.cash.b += loss
+                self.state.cash.r += gain
             }
 
             self.state.today.fe = self.state.ne.fulfilled
@@ -447,13 +449,14 @@ extension PopContext {
             )
 
             if  budget.x.tradeable > 0 {
-                let spent: Int64 = self.state.nx.buy(
-                    days: target,
-                    with: budget.x.tradeable,
+                let (gain, loss): (Int64, loss: Int64) = self.state.nx.trade(
+                    stockpileDays: target,
+                    spendingLimit: budget.x.tradeable,
                     in: country.currency,
                     on: &map.exchange,
                 )
-                self.state.cash.b -= spent
+                self.state.cash.b += loss
+                self.state.cash.r += gain
             }
 
             self.state.today.fx = self.state.nx.fulfilled

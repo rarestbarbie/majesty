@@ -13,6 +13,7 @@ extension TradeableInput {
         case valueConsumed = "C"
 
         case unitsPurchased = "b"
+        case unitsReturned = "r"
         case price = "p"
     }
 }
@@ -23,6 +24,7 @@ extension TradeableInput: JavaScriptEncodable {
         js[.unitsDemanded] = self.unitsDemanded
         js[.unitsConsumed] = self.unitsConsumed
         js[.unitsPurchased] = self.unitsPurchased
+        js[.unitsReturned] = self.unitsReturned
         js[.valueAcquired] = self.valueAcquired
         js[.valueConsumed] = self.valueConsumed
         js[.price] = self.price
@@ -36,6 +38,7 @@ extension TradeableInput: JavaScriptDecodable {
             unitsConsumed: try js[.unitsConsumed].decode(),
             unitsDemanded: try js[.unitsDemanded].decode(),
             unitsPurchased: try js[.unitsPurchased].decode(),
+            unitsReturned: try js[.unitsReturned].decode(),
             valueAcquired: try js[.valueAcquired].decode(),
             valueConsumed: try js[.valueConsumed].decode(),
             price: try js[.price].decode()
