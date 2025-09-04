@@ -40,8 +40,7 @@ struct FactoryContext {
     }
 }
 extension FactoryContext {
-    private static var stockpileDays: Int64 { 3 }
-    private static var stockpileMax: Int64 { 7 }
+    private static var stockpileDays: ClosedRange<Int64> { 3 ... 7 }
     static var pr: Int { 8 }
 
     mutating func startIndexCount() {
@@ -130,13 +129,13 @@ extension FactoryContext: TransactingContext {
         self.state.ni.sync(
             with: self.type.inputs,
             scalingFactor: (self.productivity * self.workers.count, self.state.today.ei),
-            stockpileDays: Self.stockpileDays,
+            stockpileDays: Self.stockpileDays.lowerBound,
         )
 
         self.state.nv.sync(
             with: self.type.costs,
             scalingFactor: (self.productivity, self.state.today.ei),
-            stockpileDays: Self.stockpileDays,
+            stockpileDays: Self.stockpileDays.lowerBound,
         )
 
         self.budget = self.budget(inputsCostPerHour: inputsCostPerHour)
@@ -174,20 +173,23 @@ extension FactoryContext: TransactingContext {
             self.state.today.eo = 1
         }
 
-        let stockpileTargets: ClosedRange<Int64> = Self.stockpileDays ... map.random.int64(
-            in: Self.stockpileDays ... Self.stockpileMax
+        let target: TradeableInput.StockpileTarget = .random(
+            in: Self.stockpileDays,
+            using: &map.random,
         )
+
         let profit: Int64
 
         do {
-            let inputSpend: Int64 = self.state.ni.buy(
-                days: stockpileTargets,
-                with: budget.inputs,
+            let (gain, loss): (Int64, loss: Int64) = self.state.ni.trade(
+                stockpileDays: target,
+                spendingLimit: budget.inputs,
                 in: country.currency,
                 on: &map.exchange,
             )
 
-            self.state.cash.b -= inputSpend
+            self.state.cash.b += loss
+            self.state.cash.r += gain
 
             #assert(
                 self.state.cash.balance >= 0,
@@ -246,12 +248,15 @@ extension FactoryContext: TransactingContext {
         let investmentBudget: Int64 = investmentRatio <> profit
         expansion:
         if  investmentBudget > 0 {
-            self.state.cash.v -= self.state.nv.buy(
-                days: stockpileTargets,
-                with: investmentBudget,
+            let (gain, loss): (Int64, loss: Int64) = self.state.nv.trade(
+                stockpileDays: target,
+                spendingLimit: investmentBudget,
                 in: country.currency,
                 on: &map.exchange,
             )
+
+            self.state.cash.v += loss
+            self.state.cash.r += gain
 
             let growth: Int64 = self.state.nv.width(limit: 1, tier: self.type.costs)
 

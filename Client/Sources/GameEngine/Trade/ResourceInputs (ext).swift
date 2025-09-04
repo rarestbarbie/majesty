@@ -68,7 +68,8 @@ extension ResourceInputs {
                         ? nil
                         : (Double.init(input.unitsAcquired) / Double.init(input.unitsDemanded))[..3]
                 }
-                $0["Purchased today", +] = +?input.unitsConsumed[/3]
+                $0["Purchased today", +] = +?input.unitsPurchased[/3]
+                $0["Returned today", +] = +?input.unitsReturned[/3]
             }
         } else if let input: InelasticInput = self.inelastic[id] {
             return .instructions {
