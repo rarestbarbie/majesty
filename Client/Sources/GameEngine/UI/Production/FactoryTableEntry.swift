@@ -7,8 +7,7 @@ struct FactoryTableEntry {
     let id: FactoryID
     let location: String
     let type: String
-    let grow: Int64
-    let size: Int64
+    let size: Factory.Size
     let valuation: Int64
     let yesterday: Factory.Dimensions
     let today: Factory.Dimensions
@@ -20,8 +19,8 @@ extension FactoryTableEntry: JavaScriptEncodable {
         case id
         case location
         case type
-        case grow
-        case size
+        case size_l
+        case size_p
         case valuation
 
         case yesterday_wn = "y_wn"
@@ -44,8 +43,8 @@ extension FactoryTableEntry: JavaScriptEncodable {
         js[.id] = self.id
         js[.location] = self.location
         js[.type] = self.type
-        js[.grow] = self.grow
-        js[.size] = self.size
+        js[.size_l] = self.size.level
+        js[.size_p] = self.size.growthProgress
         js[.valuation] = self.valuation
 
         js[.yesterday_wn] = self.yesterday.wn

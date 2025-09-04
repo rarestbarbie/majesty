@@ -75,8 +75,9 @@ extension FactoryContext {
 }
 extension FactoryContext: RuntimeContext {
     mutating func compute(in pass: GameContext.ResidentPass) throws {
-        self.workers.limit = self.type.workers.amount * self.state.size
-        self.clerks?.limit = (self.type.clerks?.amount ?? 0) * self.state.size
+        let area: Int64 = self.state.size.value
+        self.workers.limit = self.type.workers.amount * area
+        self.clerks?.limit = (self.type.clerks?.amount ?? 0) * area
 
         guard
         let country: CountryID = pass.planets[self.state.on.planet]?.occupied,
@@ -134,7 +135,7 @@ extension FactoryContext: TransactingContext {
 
         self.state.nv.sync(
             with: self.type.costs,
-            scalingFactor: (self.productivity, self.state.today.ei),
+            scalingFactor: (self.productivity * self.state.size.level, self.state.today.ei),
             stockpileDays: Self.stockpileDays.lowerBound,
         )
 
@@ -236,7 +237,7 @@ extension FactoryContext: TransactingContext {
                 map.jobs.fire.worker[self.state.id] = block
 
             case .hire(let block, let type):
-                guard profit >= 0 else {
+                guard profit >= 0 || self.workers.count == 0 else {
                     break
                 }
 
@@ -264,16 +265,11 @@ extension FactoryContext: TransactingContext {
                 break expansion
             }
 
-            self.state.grow += growth
+            self.state.size.grow()
             self.state.nv.consume(
                 from: self.type.costs,
-                scalingFactor: (self.productivity, self.state.today.ei)
+                scalingFactor: (self.productivity * self.state.size.level, self.state.today.ei)
             )
-
-            if  self.state.grow >= 100 {
-                self.state.size += 1
-                self.state.grow = 0
-            }
         }
 
         self.state.today.vv = self.state.nv.valuation
@@ -287,7 +283,7 @@ extension FactoryContext: TransactingContext {
 
     mutating func advance() {
         // Add self.state subsidies at the end, after profit calculation.
-        self.state.cash.s += self.state.size
+        self.state.cash.s += self.state.size.value + (self.policy?.minwage ?? 0)
     }
 }
 extension FactoryContext {

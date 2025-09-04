@@ -270,7 +270,7 @@ extension GameSession {
             return factory.state.nv.tooltipDemand(
                 need,
                 tier: factory.type.costs,
-                unit: "worker",
+                unit: "level",
                 factor: 1
             )
         default:
@@ -350,7 +350,12 @@ extension GameSession {
             return nil
         }
         return .instructions {
-            $0["Growth"] = factory.grow[/0] / 100
+            $0["Effective size"] = factory.size.value[/3]
+            $0["Growth progress"] = factory.size.growthProgress[/0] / Factory.Size.growthRequired
+
+            $0[>] = """
+            Doubling the factory level will quadruple its capacity
+            """
         }
     }
 

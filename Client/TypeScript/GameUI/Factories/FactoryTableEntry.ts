@@ -5,8 +5,8 @@ export interface FactoryTableEntry {
     readonly id: GameID;
     readonly location: string;
     readonly type: string;
-    readonly size: bigint;
-    readonly grow: bigint;
+    readonly size_l: bigint;
+    readonly size_p: number;
     readonly valuation: bigint;
 
     readonly y_wn: bigint;
