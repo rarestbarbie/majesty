@@ -82,8 +82,8 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
         UpdateText(this.type, factory.type);
         UpdateText(this.location, factory.location);
 
-        UpdateBigInt(this.size.summary, factory.size);
-        this.size.set(factory.grow);
+        UpdateBigInt(this.size.summary, factory.size_l);
+        this.size.set(factory.size_p);
 
         this.workers.wn.updateBigIntChange(factory.y_wn, factory.t_wn);
         this.workers.update(factory.workers);

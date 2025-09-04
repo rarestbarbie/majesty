@@ -55,18 +55,19 @@ extension ProductionReport: PersistentReport {
                 factory.state.today.vi +
                 factory.state.today.vv
 
-            self.factories.append(.init(
-                id: factory.state.id,
-                location: tile.name ?? planet.state.name,
-                type: factory.type.name,
-                grow: factory.state.grow,
-                size: factory.state.size,
-                valuation: valuation,
-                yesterday: factory.state.yesterday,
-                today: factory.state.today,
-                workers: .init(aggregate: factory.workers),
-                clerks: factory.clerks.map(FactoryWorkers.init(aggregate:))
-            ))
+            self.factories.append(
+                .init(
+                    id: factory.state.id,
+                    location: tile.name ?? planet.state.name,
+                    type: factory.type.name,
+                    size: factory.state.size,
+                    valuation: valuation,
+                    yesterday: factory.state.yesterday,
+                    today: factory.state.today,
+                    workers: .init(aggregate: factory.workers),
+                    clerks: factory.clerks.map(FactoryWorkers.init(aggregate:))
+                )
+            )
         }
 
         self.factory?.update(from: snapshot)

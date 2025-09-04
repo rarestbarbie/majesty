@@ -9,8 +9,7 @@ struct Factory: CashAccountHolder, Identifiable {
     let id: FactoryID
     let on: Address
     var type: FactoryType
-    var grow: Int64
-    var size: Int64
+    var size: Size
     var subs: Bool
     var cash: CashAccount
 
@@ -24,8 +23,7 @@ struct Factory: CashAccountHolder, Identifiable {
         id: FactoryID,
         on: Address,
         type: FactoryType,
-        grow: Int64,
-        size: Int64,
+        size: Size,
         subs: Bool,
         cash: CashAccount,
         nv: ResourceInputs,
@@ -37,7 +35,6 @@ struct Factory: CashAccountHolder, Identifiable {
         self.id = id
         self.on = on
         self.type = type
-        self.grow = grow
         self.size = size
         self.subs = subs
         self.cash = cash
@@ -58,8 +55,8 @@ extension Factory {
         case id
         case on
         case type
-        case grow
-        case size
+        case size_l
+        case size_p
         case subs
         case cash
         case nv
@@ -102,8 +99,8 @@ extension Factory: JavaScriptEncodable {
         js[.id] = self.id
         js[.on] = self.on
         js[.type] = self.type.rawValue
-        js[.grow] = self.grow
-        js[.size] = self.size
+        js[.size_l] = self.size.level
+        js[.size_p] = self.size.growthProgress
         js[.subs] = self.subs
         js[.cash] = self.cash
 
@@ -155,8 +152,10 @@ extension Factory: JavaScriptDecodable {
             id: try js[.id].decode(),
             on: try js[.on].decode(),
             type: try js[.type].decode(),
-            grow: try js[.grow]?.decode() ?? 0,
-            size: try js[.size]?.decode() ?? 1,
+            size: .init(
+                level: try js[.size_l]?.decode() ?? 1,
+                growthProgress: try js[.size_p]?.decode() ?? 0
+            ),
             subs: try js[.subs]?.decode() ?? false,
             cash: try js[.cash].decode(),
             nv: try js[.nv]?.decode() ?? .init(),
