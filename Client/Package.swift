@@ -15,6 +15,7 @@ let package: Package = .init(
         .package(url: "https://github.com/swiftwasm/JavaScriptKit", from: "0.33.1"),
         .package(url: "https://github.com/apple/swift-numerics", from: "1.0.3"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.2.0"),
+        .package(url: "https://github.com/tayloraswift/d", from: "0.1.1"),
     ],
     targets: [
         .executableTarget(
@@ -79,28 +80,15 @@ let package: Package = .init(
         .target(
             name: "ColorText",
             dependencies: [
-                .target(name: "D"),
+                .product(name: "D", package: "d"),
             ],
-        ),
-
-        .target(
-            name: "D",
-            dependencies: [
-                .product(name: "RealModule", package: "swift-numerics"),
-            ],
-        ),
-        .testTarget(
-            name: "DTests",
-            dependencies: [
-                .target(name: "D"),
-            ]
         ),
 
         .target(
             name: "GameConditions",
             dependencies: [
                 .target(name: "ColorText"),
-                .target(name: "D"),
+                .product(name: "D", package: "d"),
             ],
         ),
         .testTarget(

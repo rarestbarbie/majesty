@@ -1,6 +1,15 @@
 {
-  "originHash" : "acac25dcdb10630b71eb99d56820a716574c9a36c6654ecfe3288b325dff8762",
+  "originHash" : "a4cfd3ccd18706684e21ffbd1c9d2884085b38a7c5fb75937bef95ea5735cd9d",
   "pins" : [
+    {
+      "identity" : "d",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/tayloraswift/d",
+      "state" : {
+        "revision" : "4bd829e507693c14e90eaafa695e30f357295893",
+        "version" : "0.1.1"
+      }
+    },
     {
       "identity" : "javascriptkit",
       "kind" : "remoteSourceControl",
