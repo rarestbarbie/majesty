@@ -4,6 +4,7 @@ SPRITE_WIDTH=56
 CONFIG_FILE="crop.cfg"
 
 cd Art/Pops/
+rm -f Icons/*.png
 
 for file in Sources/*.png; do
     filename=$(basename "$file" .png)
@@ -41,3 +42,7 @@ cd ..
 
 mkdir -p Public/Icons
 node Scripts/spritesheet.js
+
+TIMESTAMP=$(date +%s)
+echo "\$spritesheet-url: '/Icons/Pops.png?v=$TIMESTAMP';" > Stylesheets/generated/_sprite-url.scss
+echo "Spritesheet and URL variable baked successfully."
