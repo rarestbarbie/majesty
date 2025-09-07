@@ -61,6 +61,7 @@ extension PopContext {
                 $0[$1 >= 0.1] = +2‱
                 $0[$1 >= 0.2] = +1‱
                 $0[$1 >= 0.3] = +1‱
+                $0[$1 >= 0.4] = +1‱
             } = { "\(+$0[%]): Unemployment is above \(em: $1[%0])" }
 
             $0[self.state.yesterday.fl] {
@@ -74,6 +75,10 @@ extension PopContext {
             $0[self.state.yesterday.fx] {
                 $0[$1 > 0.25] = -90%
             } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Luxury Needs" }
+            $0[self.state.yesterday.fe] {
+                $0[$1 > 0.75] = -50%
+                $0[$1 > 0.5] = -25%
+            } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Everyday Needs" }
 
             $0[self.state.yesterday.mil] {
                 $0[$1 >= 1.0] = -10%
@@ -109,20 +114,23 @@ extension PopContext {
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
-            $0[self.state.yesterday.fe] {
-                $0[$1 >= 0.75] = +2‰
-            } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Everyday Needs" }
-            $0[self.state.yesterday.fx] {
-                $0[$1 >= 0.25] = +3‰
-                $0[$1 >= 0.50] = +3‰
-                $0[$1 >= 0.75] = +3‰
-            } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Luxury Needs" }
-
             $0[self.state.yesterday.mil] {
                 $0[$1 >= 5.0] = -1‰
                 $0[$1 >= 7.0] = -1‰
                 $0[$1 >= 9.0] = -1‰
             } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
+
+            switch self.state.type.stratum {
+            case .Owner:
+                $0[self.state.yesterday.fx] {
+                    $0[$1 >= 0.25] = +3‰
+                    $0[$1 >= 0.50] = +3‰
+                    $0[$1 >= 0.75] = +3‰
+                } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Luxury Needs" }
+
+            case _:
+                break
+            }
 
             $0[self.state.yesterday.con] {
                 $0[$1 >= 1.0] = +1‱
@@ -141,6 +149,18 @@ extension PopContext {
                 $0[$1 < 1.00] = -100%
             } = { "\(+$0[%]): Getting less than \(em: $1[%0]) of Life Needs" }
 
+            $0[self.state.yesterday.fe] {
+                $0[$1 >= 0.1] = -10%
+                $0[$1 >= 0.2] = -10%
+                $0[$1 >= 0.3] = -10%
+                $0[$1 >= 0.4] = -10%
+                $0[$1 >= 0.5] = -10%
+                $0[$1 >= 0.6] = -10%
+                $0[$1 >= 0.7] = -10%
+                $0[$1 >= 0.8] = -10%
+                $0[$1 >= 0.9] = -10%
+            } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Everyday Needs" }
+
             $0[self.state.yesterday.mil] {
                 $0[$1 >= 2.0] = -20%
                 $0[$1 >= 4.0] = -10%
@@ -154,15 +174,16 @@ extension PopContext {
                     $0 = -100%
                 } = { "\(+$0[%]): Pop is \(em: "enslaved")" }
 
-            default:
-                $0[self.state.nat] {
-                    $0[$1 != country.culture] = -75%
-                } = { "\(+$0[%]): Culture is not \(em: $1)" }
-                $0[self.state.nat] {
-                    $0[$1 == country.culture] = +5%
-                } = { "\(+$0[%]): Culture is \(em: $1)" }
+            case _:
+                break
             }
 
+            $0[self.state.nat] {
+                $0[$1 != country.culture] = -75%
+            } = { "\(+$0[%]): Culture is not \(em: $1)" }
+            $0[self.state.nat] {
+                $0[$1 == country.culture] = +5%
+            } = { "\(+$0[%]): Culture is \(em: $1)" }
         }
     }
 }
@@ -501,14 +522,30 @@ extension PopContext {
         if self.state.type.stratum > .Ward {
             self.state.egress(
                 evaluator: self.buildDemotionMatrix(country: country),
-                direction: >=,
                 on: &map,
-            )
+            ) {
+                switch ($0, $1) {
+                case (.Owner, .Owner): true
+                case (.Owner, .Clerk): true
+                case (.Clerk, .Clerk): true
+                case (.Clerk, .Worker): true
+                case (.Worker, .Worker): true
+                default: false
+                }
+            }
             self.state.egress(
                 evaluator: self.buildPromotionMatrix(country: country),
-                direction: <=,
-                on: &map
-            )
+                on: &map,
+            ) {
+                switch ($0, $1) {
+                case (.Owner, .Owner): true
+                case (.Clerk, .Owner): true
+                case (.Clerk, .Clerk): true
+                case (.Worker, .Clerk): true
+                case (.Worker, .Worker): true
+                default: false
+                }
+            }
         }
 
         // We do not need to remove jobs that have no employees left, that will be done

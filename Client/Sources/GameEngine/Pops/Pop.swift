@@ -77,8 +77,8 @@ extension Pop: Turnable {
 extension Pop {
     mutating func egress(
         evaluator: ConditionEvaluator,
+        on map: inout GameMap,
         direction: (PopStratum, PopStratum) -> Bool,
-        on map: inout GameMap
     ) {
         let rate: Double = evaluator.output
         if  rate <= 0 {
@@ -89,7 +89,7 @@ extension Pop {
             using: &map.random.generator
         )
         var targets: [(id: PopType, weight: Int64)] = PopType.allCases.filter {
-            direction(self.type.stratum, $0.stratum) && $0.stratum != .Ward
+            direction(self.type.stratum, $0.stratum)
         }.map {
             (id: $0, weight: 1)
         }

@@ -7,6 +7,7 @@ import VectorCharts
 
 struct PopDetails {
     let id: PopID
+    private var state: Pop?
     private var inventory: ResourceInventory
     private var spending: PieChart<CashFlowItem, PieChartLabel>?
 
@@ -23,6 +24,8 @@ extension PopDetails {
         let currency: Fiat = pop.policy?.currency else {
             return
         }
+
+        self.state = pop.state
 
         self.inventory.reset(
             inputs: pop.state.nl.count + pop.state.ne.count + pop.state.nx.count,
@@ -64,6 +67,11 @@ extension PopDetails {
 extension PopDetails: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
         case id
+
+        case type_singular
+        case type_plural
+        case type
+
         case needs
         case sales
         case spending
@@ -71,6 +79,11 @@ extension PopDetails: JavaScriptEncodable {
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
+
+        js[.type_singular] = self.state?.type.singular
+        js[.type_plural] = self.state?.type.plural
+        js[.type] = self.state?.type
+
         js[.needs] = self.inventory.needs
         js[.sales] = self.inventory.sales
         js[.spending] = self.spending
