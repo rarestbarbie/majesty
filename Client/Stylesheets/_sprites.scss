@@ -1,5 +1,6 @@
 @use 'sass:map';
 @import 'generated/_sprite';
+@import 'generated/_sprite-url';
 
 @mixin sprite($name) {
     $icon: map.get($sprites, $name);
@@ -35,18 +36,24 @@
 [data-pop-type='F'] > span {
     @include sprite(farmer);
 }
+[data-pop-type='I'] > span {
+    @include sprite(influencer);
+}
 [data-pop-type='M'] > span {
     @include sprite(astronaut);
 }
 [data-pop-type='O'] > span {
     @include sprite(businesswoman);
 }
+[data-pop-type='P'] > span {
+    @include sprite(speaker);
+}
 [data-pop-type] > span {
     display: block;
     height: 30px;
     width: 30px;
 
-    background-image: url('/Icons/Pops.png');
+    background-image: url($spritesheet-url);
     --sprite-offset-x: -13px;
 }
 [data-pop-type] {

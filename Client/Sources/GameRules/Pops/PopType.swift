@@ -17,6 +17,7 @@ import JavaScriptKit
     // Clerks
     case Engineer
     case Farmer
+    case Influencer
     // case academic
     // case bureaucrat
     // case manager
@@ -24,21 +25,25 @@ import JavaScriptKit
     // case therapist
 
     // Owners
-    case Capitalist
-    // case influencer
+    case Executive
+    case Politician
 }
 extension PopType: RawRepresentable {
     @Bijection(label: "rawValue")
     @inlinable public var rawValue: Unicode.Scalar {
         switch self {
         case .Livestock:    "A"
+
         case .Driver:       "D"
         case .Editor:       "E"
         case .Miner:        "M"
         case .Server:       "S"
         case .Engineer:     "G"
         case .Farmer:       "F"
-        case .Capitalist:   "O"
+        case .Influencer:   "I"
+
+        case .Executive:    "O"
+        case .Politician:   "P"
         }
     }
 }
@@ -53,39 +58,45 @@ extension PopType {
         case .Server:       .Worker
         case .Engineer:     .Clerk
         case .Farmer:       .Clerk
-        case .Capitalist:   .Owner
+        case .Influencer:   .Clerk
+        case .Executive:    .Owner
+        case .Politician:   .Owner
         }
     }
 }
 extension PopType {
     @inlinable public var singular: String {
         switch self {
-        case .Livestock:    "Livestock"
+        case .Livestock: "Livestock"
 
-        case .Driver:       "Driver"
-        case .Editor:       "Editor"
-        case .Miner:        "Miner"
-        case .Server:       "Server"
+        case .Driver: "Driver"
+        case .Editor: "Editor"
+        case .Miner: "Miner"
+        case .Server: "Server"
 
-        case .Engineer:     "Engineer"
-        case .Farmer:       "Farmer"
+        case .Engineer: "Engineer"
+        case .Farmer: "Farmer"
+        case .Influencer: "Influencer"
 
-        case .Capitalist:   "Capitalist"
+        case .Executive: "Executive"
+        case .Politician: "Politician"
         }
     }
     @inlinable public var plural: String {
         switch self {
-        case .Livestock:    "Livestock"
+        case .Livestock: "Livestock"
 
-        case .Driver:       "Drivers"
-        case .Editor:       "Editors"
-        case .Miner:        "Miners"
-        case .Server:       "Servers"
+        case .Driver: "Drivers"
+        case .Editor: "Editors"
+        case .Miner: "Miners"
+        case .Server: "Servers"
 
-        case .Engineer:     "Engineers"
-        case .Farmer:       "Farmers"
+        case .Engineer: "Engineers"
+        case .Farmer: "Farmers"
+        case .Influencer: "Influencers"
 
-        case .Capitalist:   "Capitalists"
+        case .Executive: "Executives"
+        case .Politician: "Politicians"
         }
     }
 }
