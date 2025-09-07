@@ -90,7 +90,7 @@
             }
         }
         // Panel
-        > *:last-child {
+        > *.panel {
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -100,6 +100,49 @@
             > *:first-child {
                 position: relative;
                 height: 50%;
+
+                // Header
+                > header {
+                    display: flex;
+                    position: relative;
+                    align-items: center;
+                    border-bottom: 2px solid rgba(255, 255, 255, 0.7);
+                    margin: 0.25rem 0 1rem 0;
+
+                    font-size: 24px;
+
+
+                    [data-pop-type] {
+                        background-image: none;
+                        > span {
+                            margin-left: 0.25em;
+                            height: 56px;
+                        }
+
+                        &::before {
+                            position: absolute;
+                            content: '';
+
+                            width: 8rem;
+                            height: 100%;
+                            background-image: linear-gradient(
+                                to right in oklab,
+                                rgba(var(--pop-stratum-color), 0.5),
+                                rgba(var(--pop-stratum-color), 0.4) 6.25%,
+                                rgba(var(--pop-stratum-color), 0.3) 12.5%,
+                                rgba(var(--pop-stratum-color), 0.2) 25%,
+                                rgba(var(--pop-stratum-color), 0.1) 50%,
+                                transparent
+                            );
+
+                            z-index: -1;
+                        }
+                    }
+
+                    > span {
+                        margin-left: 0.75em;
+                    }
+                }
 
                 // Tabs
                 > nav {

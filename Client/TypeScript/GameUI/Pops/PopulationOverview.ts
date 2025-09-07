@@ -1,7 +1,7 @@
-import { StaticList } from '../../DOM/exports.js';
-import { GameID } from "../../GameEngine/GameID.js";
-import { ScreenContent } from "../ScreenContent.js";
-import { Swift } from "../../Swift.js";
+import { StaticList, UpdateText } from '../../DOM/exports.js';
+import { GameID } from '../../GameEngine/GameID.js';
+import { ScreenContent } from '../ScreenContent.js';
+import { Swift } from '../../Swift.js';
 import {
     PieChart,
     PopulationReport,
@@ -14,6 +14,7 @@ import {
     Resource,
     ScreenType,
     TooltipType,
+    PopIcon,
 } from '../exports.js';
 
 export class PopulationOverview extends ScreenContent {
@@ -27,6 +28,9 @@ export class PopulationOverview extends ScreenContent {
     private dom?: {
         readonly index: HTMLUListElement;
         readonly panel: HTMLDivElement;
+        readonly title: HTMLElement;
+        readonly titleIcon: PopIcon;
+        readonly titleName: HTMLSpanElement;
         readonly stats: HTMLDivElement;
         readonly nav: HTMLElement;
     };
@@ -34,11 +38,11 @@ export class PopulationOverview extends ScreenContent {
     constructor() {
         super();
 
-        this.pops = new StaticList<PopTableRow, GameID>(document.createElement("div"));
+        this.pops = new StaticList<PopTableRow, GameID>(document.createElement('div'));
         this.pops.table('Pops', PopTableRow.columns);
 
-        this.needs = new StaticList<ResourceNeedRow, Resource>(document.createElement("div"));
-        this.sales = new StaticList<ResourceSaleBox, Resource>(document.createElement("div"));
+        this.needs = new StaticList<ResourceNeedRow, Resource>(document.createElement('div'));
+        this.sales = new StaticList<ResourceSaleBox, Resource>(document.createElement('div'));
         this.charts = {
             spending: new PieChart<string>(TooltipType.PopStatementItem),
         };
@@ -57,18 +61,26 @@ export class PopulationOverview extends ScreenContent {
 
         if (!this.dom) {
             this.dom = {
-                index: document.createElement("ul"),
-                panel: document.createElement("div"),
-                stats: document.createElement("div"),
-                nav: document.createElement("nav"),
+                index: document.createElement('ul'),
+                panel: document.createElement('div'),
+                title: document.createElement('header'),
+                titleIcon: new PopIcon(),
+                titleName: document.createElement('span'),
+                stats: document.createElement('div'),
+                nav: document.createElement('nav'),
             }
 
+            this.dom.title.appendChild(this.dom.titleIcon.node);
+            this.dom.title.appendChild(this.dom.titleName);
+
             const upper: HTMLDivElement = document.createElement('div');
+            upper.appendChild(this.dom.title);
             upper.appendChild(this.dom.stats);
             upper.appendChild(this.dom.nav);
 
             this.dom.panel.appendChild(upper);
             this.dom.panel.appendChild(this.pops.node);
+            this.dom.panel.classList.add('panel');
 
             const right: HTMLDivElement = document.createElement('div');
             right.appendChild(this.sales.node);
@@ -77,6 +89,7 @@ export class PopulationOverview extends ScreenContent {
             this.dom.stats.setAttribute('data-subscreen', 'Inventory');
             this.dom.stats.appendChild(this.needs.node);
             this.dom.stats.appendChild(right);
+            this.dom.stats.classList.add('stats');
         }
         if (root) {
             root.appendChild(this.dom.index);
@@ -88,7 +101,7 @@ export class PopulationOverview extends ScreenContent {
 
     public override detach(): void {
         if (!this.dom) {
-            throw new Error("PopulationOverview not attached");
+            throw new Error('PopulationOverview not attached');
         }
 
         this.dom.index.remove();
@@ -110,6 +123,10 @@ export class PopulationOverview extends ScreenContent {
 
         if (state.pop) {
             const id: GameID = state.pop.id;
+
+            UpdateText(this.dom.titleName, state.pop.type_singular ?? '');
+            this.dom.titleIcon.set({ id: state.pop.id, type: state.pop.type ?? '' });
+
             this.needs.update(
                 state.pop.needs,
                 (need: ResourceNeed) => new ResourceNeedRow(
@@ -134,6 +151,9 @@ export class PopulationOverview extends ScreenContent {
             );
 
             this.charts.spending.update([id], state.pop.spending ?? []);
+        } else {
+            UpdateText(this.dom.titleName, '');
+            this.dom.titleIcon.set(null);
         }
     }
 }

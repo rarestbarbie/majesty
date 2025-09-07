@@ -76,6 +76,9 @@ export class ProductionOverview extends ScreenContent {
 
             this.dom.panel.appendChild(upper);
             this.dom.panel.appendChild(this.factories.node);
+            this.dom.panel.classList.add('panel');
+
+            this.dom.stats.classList.add('stats');
         } else {
             this.dom.stats.replaceChildren();
             this.dom.nav.replaceChildren();

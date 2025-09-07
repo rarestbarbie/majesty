@@ -26,9 +26,11 @@ export * from './ProductionReport.js';
 export * from './PopulationReport.js';
 
 export * from './Pops/PopDetails.js';
+export * from './Pops/PopIcon.js';
 export * from './Pops/PopJobDescription.js';
 export * from './Pops/PopTableEntry.js';
 export * from './Pops/PopTableRow.js';
+export * from './Pops/PopType.js';
 export * from './Pops/PopType.js';
 export * from './Pops/PopulationOverview.js';
 
