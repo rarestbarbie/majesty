@@ -62,7 +62,10 @@ export class HexGrid {
         this.lines.update(
             cells,
             (cell: PlanetGridCell) => {
-                const instance: HexGridCell = new HexGridCell(cell, [...prefix, cell.id]);
+                const instance: HexGridCell = new HexGridCell(
+                    cell,
+                    [...prefix, cell.id, layer]
+                );
                 const href: string | null = target(cell.id);
                 if (href) {
                     instance.node.setAttribute('href', href);

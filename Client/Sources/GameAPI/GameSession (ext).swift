@@ -77,6 +77,7 @@ extension GameSession {
             self.tooltipPlanetCell(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
+                try arguments[2].decode(),
             )
         case .PopAccount:
             self.tooltipPopAccount(

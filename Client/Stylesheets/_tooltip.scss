@@ -48,40 +48,49 @@
         --blur-filter: blur(20px) saturate(180%);
     }
 
-    ul > li {
-        padding-left: calc(var(--indent, 0) * 1.5em);
-
-        &:not([data-indent]) + li[data-indent] {
-            margin-top: 0.25rem;
+    ul {
+        > li:first-child > p:first-child {
+            margin: 0.25em 0 0;
         }
-        &[data-indent] + li:not([data-indent]) {
-            margin-top: 0.5rem;
-        }
-
-        white-space: pre-wrap;
-
-        em {
-            font-style: normal;
-            font-weight: bold;
-            color: var(--color-em-text);
-        }
-
-        p {
+        > li > p {
             margin: 0.5em 0 0;
-            max-width: 20rem;
+        }
 
-            ins, del {
-                text-decoration: unset;
+        > li {
+            padding-left: calc(var(--indent, 0) * 1.5em);
+
+            &:not([data-indent]) + li[data-indent] {
+                margin-top: 0.25rem;
+            }
+            &[data-indent] + li:not([data-indent]) {
+                margin-top: 0.5rem;
+            }
+
+            white-space: pre-wrap;
+
+            em {
+                font-style: normal;
                 font-weight: bold;
+                color: var(--color-em-text);
             }
-            ins {
-                color: var(--color-pos-text);
-            }
-            del {
-                color: var(--color-neg-text);
+
+            p {
+                max-width: 20rem;
+
+                ins, del {
+                    text-decoration: unset;
+                    font-weight: bold;
+                }
+                ins {
+                    color: var(--color-pos-text);
+                }
+                del {
+                    color: var(--color-neg-text);
+                }
             }
         }
     }
+
 }
 
 [data-tooltip='hidden'] > aside {

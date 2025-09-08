@@ -459,7 +459,11 @@ extension GameSession {
     }
 }
 extension GameSession {
-    public func tooltipPlanetCell(_ id: PlanetID, _ cell: HexCoordinate) -> Tooltip? {
+    public func tooltipPlanetCell(
+        _ id: PlanetID,
+        _ cell: HexCoordinate,
+        _ layer: MinimapLayer,
+    ) -> Tooltip? {
         guard
         let planet: PlanetContext = self.context.planets[id],
         let cell: PlanetContext.Cell = planet.cells[cell] else {
@@ -467,7 +471,27 @@ extension GameSession {
         }
 
         return .instructions(style: .borderless) {
-            $0[>] = "\(cell.type.name)"
+            switch layer {
+            case .Terrain:
+                $0[>] = "\(cell.type.name)"
+            case .Population:
+                $0["Population"] = cell.population[/3]
+
+            case .AverageMilitancy:
+                let value: Double = cell.population > 0
+                    ? (cell.weighted.mil / Double.init(cell.population))
+                    : 0
+                $0["Average militancy"] = value[..2]
+            case .AverageConsciousness:
+                let value: Double = cell.population > 0
+                    ? (cell.weighted.con / Double.init(cell.population))
+                    : 0
+                $0["Average consciousness"] = value[..2]
+            }
+
+            if let name: String = cell.tile.name {
+                $0[>] = "\(name)"
+            }
         }
     }
 }
