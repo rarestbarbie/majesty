@@ -1,0 +1,90 @@
+@use 'fonts';
+
+html {
+    background-color: rgb(12, 12, 12);
+
+    --typeface-body: 'Serif UI', 'Times New Roman';
+    --bg-codewell-highlight: rgb(44, 44, 44);
+    --bg-codewell: rgb(30, 30, 30);
+    --fg: rgb(241, 241, 241);
+
+    -webkit-font-smoothing: antialiased;
+}
+
+body {
+    font-family: var(--typeface-body);
+    display: flex;
+    justify-content: center;
+
+    color: var(--fg);
+}
+
+button {
+    outline: 0;
+    border: none;
+    background: var(--bg-codewell);
+
+    color: var(--fg);
+    font-weight: 700;
+    font-size: inherit;
+
+    cursor: pointer;
+
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+}
+button:hover {
+    background: var(--bg-codewell-highlight);
+}
+
+form {
+    input[type='text'] {
+        outline: 0;
+        background: var(--bg-codewell);
+        padding: 0.5rem 1rem;
+        border-radius: 0.25rem;
+        border: none;
+        color: var(--fg);
+        font-family: var(--typeface-body);
+        font-style: italic;
+        font-size: inherit;
+    }
+}
+
+div.content {
+    div.load-map {
+        h1 {
+            font-size: 1.5rem;
+            font-weight: 400;
+        }
+        ul {
+            list-style: none;
+            padding: 0;
+
+            li {
+                a {
+                    display: block;
+                    padding: 0.5rem 1rem;
+                    color: white;
+                    text-decoration: none;
+
+                    border-radius: 0.5rem;
+
+                    background-color: rgba(255, 255, 255, 0.1);
+                }
+                a:hover {
+                    background-color: rgba(255, 255, 255, 0.2);
+                }
+            }
+        }
+    }
+
+    div.new-map {
+        margin: 1rem 0;
+
+        form {
+            display: flex;
+            gap: 0.5rem;
+        }
+    }
+}

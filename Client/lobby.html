@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Majesty - Select World</title>
+    <link rel="stylesheet" href="/Stylesheets/lobby.scss">
+</head>
+
+<body>
+    <div class="content">
+        <div class="load-map">
+            <h1>Select a Map</h1>
+            <ul id="maps"></ul>
+        </div>
+        <div class="new-map">
+            <form id="new-map-form" action="/majesty/play" method="GET">
+                <input type="text" name="new" placeholder="New map name" required>
+                <button type="submit">New Map</button>
+            </form>
+        </div>
+        <button id="logout-button">Logout</button>
+    </div>
+    <script type="module" src="/TypeScript/lobby.ts"></script>
+</body>
+
+</html>

@@ -32,14 +32,28 @@ async function json(path: string): Promise<any> {
 
 async function main(user: Firebase.User): Promise<void> {
     const persistence: Persistence = new Persistence(user);
+    const parameters: URLSearchParams = new URLSearchParams(window.location.search);
+
+    const newMap: string | null = parameters.get('new');
+    const oldMap: string | null = parameters.get('map');
 
     const sprites: Promise<Texture> = texture('/majesty/CelestialBodies.png');
     const start: Promise<any> = json('/majesty/start.json');
     const rules: Promise<any> = json('/majesty/rules.json');
-    let terrain: any[] | null = await persistence.loadTerrain();
-    if (terrain === null) {
-        // User does not have terrain saved, load default terrain
+
+    let terrain: any[] | null = null;
+
+    if (oldMap !== null) {
+        persistence.currentMap = oldMap;
+        terrain = await persistence.loadMap();
+    } else {
+        persistence.currentMap = newMap ?? 'untitled';
         terrain = await json('/majesty/terrain.json') as any[];
+    }
+
+    if (terrain === null) {
+        console.error("Failed to load terrain");
+        return;
     }
 
     window.swift = new Swift();

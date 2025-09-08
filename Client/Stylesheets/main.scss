@@ -4,6 +4,7 @@
 @use 'conditions';
 @use 'devtools';
 @use 'factors';
+@use 'fonts';
 @use 'hud';
 @use 'minimap';
 @use 'pops';
@@ -260,6 +261,8 @@ body {
     overflow: hidden;
 
     -webkit-font-smoothing: antialiased;
+
+    font-family: 'Serif UI', 'Times New Roman';
 }
 
 body > canvas {
