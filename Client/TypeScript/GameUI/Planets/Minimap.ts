@@ -6,6 +6,7 @@ export class Minimap {
     private readonly name: HTMLElement;
     private readonly grid: HexGrid;
     private readonly layers: HTMLElement;
+    private layerShown?: MinimapLayer;
     private id?: GameID;
 
     constructor() {
@@ -26,6 +27,10 @@ export class Minimap {
         }
 
         const minimap: MinimapState = navigator.minimap;
+        if (this.layerShown !== minimap.layer) {
+            this.layerShown = minimap.layer;
+            this.grid.switch();
+        }
 
         this.name.innerText = minimap.name;
 
