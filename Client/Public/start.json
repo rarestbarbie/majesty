@@ -1778,7 +1778,7 @@
 
         {
             "id": 200,
-            "on": "401N0,0",
+            "on": "401X",
             "type": 1,
             "size_l": 5,
             "cash": {
@@ -1787,7 +1787,7 @@
         },
         {
             "id": 250,
-            "on": "402N0,0",
+            "on": "402X",
             "type": 1,
             "size_l": 5,
             "cash": {
@@ -2056,38 +2056,38 @@
         },
 
         {
-            "on": "401N0,0",
+            "on": "401X",
             "t_size": 62,
             "type": "D",
             "nat": "Martian"
         },
         {
-            "on": "401N0,0",
+            "on": "401X",
             "t_size": 3,
             "type": "D",
             "nat": "Earther"
         },
         {
-            "on": "401N0,0",
+            "on": "401X",
             "t_size": 40,
             "type": "D",
             "nat": "Lunan"
         },
 
         {
-            "on": "402N0,0",
+            "on": "402X",
             "t_size": 16,
             "type": "D",
             "nat": "Martian"
         },
         {
-            "on": "402N0,0",
+            "on": "402X",
             "t_size": 2,
             "type": "D",
             "nat": "Earther"
         },
         {
-            "on": "402N0,0",
+            "on": "402X",
             "t_size": 26,
             "type": "D",
             "nat": "Lunan"

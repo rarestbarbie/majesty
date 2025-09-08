@@ -81,52 +81,52 @@
         "grid": [
             {
                 "id": "N-2,0",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S-2,0",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "N-2,1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S-2,1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "N-2,2",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S-2,2",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "N-1,-1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S-1,-1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "N-1,0",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S-1,0",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
@@ -136,42 +136,42 @@
             },
             {
                 "id": "S-1,1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "N-1,2",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S-1,2",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "N0,-2",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S0,-2",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "N0,-1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S0,-1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "N0,0",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
@@ -181,7 +181,7 @@
             },
             {
                 "id": "N0,1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
@@ -191,12 +191,12 @@
             },
             {
                 "id": "N0,2",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S0,2",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
@@ -206,22 +206,22 @@
             },
             {
                 "id": "S1,-2",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "N1,-1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S1,-1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "N1,0",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
@@ -231,42 +231,42 @@
             },
             {
                 "id": "N1,1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S1,1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "N2,-2",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S2,-2",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "N2,-1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S2,-1",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "N2,0",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             },
             {
                 "id": "S2,0",
-                "type": "Desert Vacuum",
+                "type": "Highland Vacuum",
                 "tile": {}
             }
         ]
@@ -2646,12 +2646,7 @@
         "size": 0,
         "grid": [
             {
-                "id": "N0,0",
-                "type": "Space Vacuum",
-                "tile": {}
-            },
-            {
-                "id": "S0,0",
+                "id": "X",
                 "type": "Space Vacuum",
                 "tile": {}
             }
@@ -2662,12 +2657,7 @@
         "size": 0,
         "grid": [
             {
-                "id": "N0,0",
-                "type": "Space Vacuum",
-                "tile": {}
-            },
-            {
-                "id": "S0,0",
+                "id": "X",
                 "type": "Space Vacuum",
                 "tile": {}
             }

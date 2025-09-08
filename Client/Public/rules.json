@@ -718,9 +718,6 @@
         "Frozen Barren": {
             "color": "#948b7e"
         },
-        "Desert Barren": {
-            "color": "#ff00ea"
-        },
         "Lowland Barren": {
             "color": "#613630"
         },
@@ -742,9 +739,6 @@
         },
         "Highland Vacuum": {
             "color": "#838383"
-        },
-        "Desert Vacuum": {
-            "color": "#ff00ea"
         },
         "Mountain Vacuum": {
             "color": "#a7a7a7"

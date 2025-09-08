@@ -1,11 +1,17 @@
 @frozen public enum HexCoordinate: Equatable, Hashable, Sendable {
+    /// Solitary tile.
+    case x
+    /// Northern hemisphere tile.
     case n(_ q: Int8, _ r: Int8)
+    /// Equatorial tile, appears to the player as two fragments.
     case e(_ φ: Int8)
+    /// Southern hemisphere tile.
     case s(_ q: Int8, _ r: Int8)
 }
 extension HexCoordinate: CustomStringConvertible {
     @inlinable public var description: String {
         switch self {
+        case .x: "X"
         case .n(let q, let r): "N\(q),\(r)"
         case .e(let φ): "E\(φ)"
         case .s(let q, let r): "S\(q),\(r)"
@@ -37,6 +43,10 @@ extension HexCoordinate: LosslessStringConvertible {
                 self = .s(coordinate.q, coordinate.r)
                 return
             }
+        case "X":
+            self = .x
+            return
+
         default:
             break
         }
