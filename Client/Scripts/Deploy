@@ -3,12 +3,15 @@
 BUCKET_PATH="tayloraswift-apps/majesty"
 BUILD_FOLDER=".build.vite"
 
-# Step 1: Sync all non-compressible assets (HTML, images, etc.)
-# We explicitly exclude the compressed assets because they need special handling.
-echo "Uploading non-compressible assets..."
 aws s3 sync "$BUILD_FOLDER" "s3://$BUCKET_PATH" --delete --exclude "*.gz" --exclude "*.html"
-aws s3 cp "$BUILD_FOLDER/index.html" "s3://$BUCKET_PATH/play" \
-    --content-type "text/html"
+
+for path in $BUILD_FOLDER/*.html; do
+    name=$(basename "$path" .html)
+    echo "Uploading HTML: $name"
+    aws s3 cp "$path" "s3://$BUCKET_PATH/$name" \
+        --content-type "text/html" &
+done
+wait
 
 # Step 2: Upload compressed files with the correct headers
 echo "Uploading compressed assets..."

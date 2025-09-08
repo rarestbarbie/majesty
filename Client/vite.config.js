@@ -26,7 +26,7 @@ export default defineConfig({
         viteCompression({
             // Use a regex to target .js, .css, and .wasm files
             // The `$` ensures it only matches the end of the filename
-            filter: /\.(js|css|wasm|html|json)$/i,
+            filter: /\.(js|css|wasm|json)$/i,
             algorithm: 'gzip',
             deleteOriginFile: true,
         })
