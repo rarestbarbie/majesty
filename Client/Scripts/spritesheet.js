@@ -9,7 +9,7 @@ const __dirname = path.dirname(__filename);
 // 1. Define paths
 const sourceDirectory = path.resolve(__dirname, '..', 'Art/Pops/Icons');
 const outputImage = path.resolve(__dirname, '..', 'Public/Icons/Pops.png');
-const outputCss = path.resolve(__dirname, '..', 'Stylesheets/generated/_sprite.scss');
+const outputCss = path.resolve(__dirname, '..', 'Stylesheets/generated/_sprite-list.scss');
 
 // 2. Get all icon files
 const icons = fs.readdirSync(sourceDirectory).map(file => path.join(sourceDirectory, file));

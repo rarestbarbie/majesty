@@ -1,9 +1,9 @@
 @use 'sass:map';
-@import 'generated/_sprite';
-@import 'generated/_sprite-url';
+@use 'generated/_sprite-list';
+@use 'generated/_sprite-url';
 
 @mixin sprite($name) {
-    $icon: map.get($sprites, $name);
+    $icon: map.get(sprite-list.$sprites, $name);
 
     @if $icon {
         background-repeat: no-repeat;
@@ -76,7 +76,7 @@
     height: 30px;
     width: 30px;
 
-    background-image: url($spritesheet-url);
+    background-image: url(sprite-url.$spritesheet-url);
     --sprite-offset-x: -13px;
 }
 [data-pop-type] {
