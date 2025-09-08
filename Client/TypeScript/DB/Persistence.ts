@@ -1,4 +1,4 @@
-import { doc, getFirestore, getDoc, setDoc, Firestore } from 'firebase/firestore';
+import * as Firestore from 'firebase/firestore';
 import { initializeApp, FirebaseApp, FirebaseOptions } from 'firebase/app';
 import { getAuth, Auth, User } from 'firebase/auth';
 
@@ -16,32 +16,57 @@ export class Persistence {
     public static app: FirebaseApp = initializeApp(this.configuration);
     public static auth: Auth = getAuth(this.app);
 
-    private readonly firestore: Firestore;
+    private readonly firestore: Firestore.Firestore;
     private readonly user: User;
 
+    public currentMap: string;
+
     public constructor(user: User) {
-        this.firestore = getFirestore(Persistence.app);
+        this.firestore = Firestore.getFirestore(Persistence.app);
         this.user = user;
+
+        this.currentMap = 'untitled';
     }
 
-    public async saveTerrain(terrainData: any[]): Promise<void> {
-        // Create a reference to a document named after the user's UID
-        const userTerrainRef = doc(this.firestore, "user-terrains", this.user.uid);
-
-        // Set the document's data. This will create or overwrite it.
-        await setDoc(userTerrainRef, { terrain: terrainData });
-        console.log("Terrain saved to cloud!");
+    public async listMaps(): Promise<string[]> {
+        const collection: Firestore.CollectionReference<
+            Firestore.DocumentData,
+            Firestore.DocumentData
+        > = Firestore.collection(
+            this.firestore,
+            `users/${this.user.uid}/maps`
+        );
+        const snapshot: Firestore.QuerySnapshot<
+            Firestore.DocumentData,
+            Firestore.DocumentData
+        > = await Firestore.getDocs(collection);
+        return snapshot.docs.map(document => document.id);
     }
 
-    public async loadTerrain(): Promise<any[] | null> {
-        const userTerrainRef = doc(this.firestore, "user-terrains", this.user.uid);
-        const docSnap = await getDoc(userTerrainRef);
+    public async saveMap(terrainData: any[]): Promise<void> {
+        const reference: Firestore.DocumentReference<
+            Firestore.DocumentData,
+            Firestore.DocumentData
+        > = Firestore.doc(this.firestore, `users/${this.user.uid}/maps/${this.currentMap}`);
 
-        if (docSnap.exists()) {
-            console.log("Terrain loaded from cloud!");
-            return docSnap.data().terrain;
+        await Firestore.setDoc(reference, { terrain: terrainData });
+    }
+
+    public async loadMap(): Promise<any[] | null> {
+        const reference: Firestore.DocumentReference<
+            Firestore.DocumentData,
+            Firestore.DocumentData
+        > = Firestore.doc(this.firestore, `users/${this.user.uid}/maps/${this.currentMap}`);
+
+        const document: Firestore.DocumentSnapshot<
+            Firestore.DocumentData,
+            Firestore.DocumentData
+        > = await Firestore.getDoc(reference);
+
+        if (document.exists()) {
+            return document.data().terrain;
         } else {
-            console.log("No terrain data found in the cloud for this user.");
+            console.error('No map data found!');
             return null;
         }
     }

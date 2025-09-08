@@ -11,8 +11,9 @@ export default defineConfig({
         assetsDir: 'assets',
         rollupOptions: {
             input: {
-                play: resolve(__dirname, 'index.html'),
-                login: resolve(__dirname, 'login.html'),
+                login: resolve(__dirname, 'Static', 'login.html'),
+                lobby: resolve(__dirname, 'Static', 'lobby.html'),
+                play: resolve(__dirname, 'Static', 'play.html'),
             },
         },
     },

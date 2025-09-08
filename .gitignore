@@ -5,6 +5,8 @@ package-lock.json
 /Client/.build
 /Client/.build.*
 /Client/Art/Pops/Icons/*.png
+/Client/Public/Fonts/*.otf
+/Client/Public/Fonts/*.woff2
 /ClientIntegrationTests/.build/
 /ClientIntegrationTests/.build.*
 

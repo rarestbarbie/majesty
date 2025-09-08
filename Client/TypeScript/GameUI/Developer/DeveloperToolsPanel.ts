@@ -103,11 +103,11 @@ export class DeveloperToolsPanel {
         }
 
         try {
-            await this.context.persistence.saveTerrain(serializedTerrain);
-            alert("Terrain saved successfully!");
+            await this.context.persistence.saveMap(serializedTerrain);
+            alert("Map saved successfully!");
         } catch (error) {
-            console.error("Failed to save terrain to cloud:", error);
-            alert(`Error saving terrain: ${error}`);
+            console.error("Failed to save map to cloud:", error);
+            alert(`Error saving map: ${error}`);
         }
     }
 }
