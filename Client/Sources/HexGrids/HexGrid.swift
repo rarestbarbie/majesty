@@ -9,6 +9,10 @@ extension HexGrid {
     @inlinable public func reduce<T>(
         into result: consuming T,
         with yield: (inout T, HexCoordinate) throws -> ()) rethrows -> T {
+        if  self.radius == 0 {
+            try yield(&result, .x)
+            return result
+        }
         for q: Int8 in -self.radius ... self.radius {
             let r: (Int8, Int8) = (
                 max(-self.radius, -q - self.radius),

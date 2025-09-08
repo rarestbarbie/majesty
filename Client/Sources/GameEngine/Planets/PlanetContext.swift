@@ -122,6 +122,7 @@ extension PlanetContext {
                 switch rotate {
                 case .ccw:
                     switch source.id {
+                    case .x:                id = .x
                     case .n(let q, let r):  id = .n(r + q, -q)
                     case .e(let φ):         id = .e(φ == 5 ? 0 : φ + 1)
                     case .s(let q, let r):  id = .s(r + q, -q)
@@ -129,6 +130,7 @@ extension PlanetContext {
 
                 case .cw:
                     switch source.id {
+                    case .x:                id = .x
                     case .n(let q, let r):  id = .n(-r, r + q)
                     case .e(let φ):         id = .e(φ == 0 ? 5 : φ - 1)
                     case .s(let q, let r):  id = .s(-r, r + q)
@@ -191,6 +193,10 @@ extension PlanetContext {
             let shape: (HexagonPath, HexagonPath?)
 
             switch id {
+            case .x:
+                shape.0 = .init(c: .zero, q: 0, r: 0, tilt: tilt)
+                shape.1 = nil
+
             case .n(let q, let r):
                 shape.0 = .init(c: center.north, q: q, r: r, tilt: tilt)
                 shape.1 = nil
