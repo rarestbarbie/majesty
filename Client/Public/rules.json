@@ -39,13 +39,17 @@
             "color": "#beaa66"
         },
 
+        "Aluminum": {
+            "emoji": "🪨",
+            "color": "#b0b0b0"
+        },
         "Ammonia": {
             "emoji": "💨",
             "color": "#1b7760"
         },
-        "Bauxite": {
-            "emoji": "🪨",
-            "color": "#b0b0b0"
+        "Diamonds": {
+            "emoji": "💎",
+            "color": "#161616"
         },
         "Graphite": {
             "emoji": "✏️",
@@ -67,9 +71,13 @@
             "emoji": "⛓️",
             "color": "#3f3f3f"
         },
+        "Ivory": {
+            "emoji": "🐘",
+            "color": "#dfd3cc"
+        },
         "Limestone": {
             "emoji": "🏛️",
-            "color": "#e7ded5"
+            "color": "#d5e1e7"
         },
         "Lithium": {
             "emoji": "🔋",
@@ -289,7 +297,7 @@
     "factories": {
         "Alloy Foundry": {
             "inputs": {
-                "Bauxite": 8,
+                "Aluminum": 8,
                 "Iron": 8,
                 "Graphite": 2,
                 "Sulfur": 2,
@@ -668,39 +676,120 @@
             "summary": "The definition of stupidity is doing the same thing over and over again and expecting different results."
         }
     },
+    "terrain_resources": {
+        "aquatic": {
+            "base_resources": {
+                "Fertilizer": 5,
+                "Hydrocarbons": 1
+            },
+            "bonus_resources": {
+                "Fertilizer": {
+                    "_": {
+                        "chance": 10
+                    },
+                    "Phosphate": {
+                        "chance": 0,
+                        "amount": "0.5"
+                    },
+                    "Pearls": {
+                        "chance": 1,
+                        "amount": "0.1"
+                    }
+                }
+            }
+        },
+        "arctic": {
+            "base_resources": {
+                "Fertilizer": 5,
+                "Hydrocarbons": 2
+            },
+            "bonus_resources": {
+                "Fertilizer": {
+                    "_": {
+                        "chance": 10
+                    },
+                    "Pearls": {
+                        "chance": 2,
+                        "amount": "0.25"
+                    }
+                }
+            }
+        },
+        "land": {
+            "base_resources": {
+                "Aluminum": 80,
+                "Diamonds": 10,
+                "Graphite": 10,
+                "Gold": 10,
+                "Iron": 80,
+                "Hydrocarbons": 60,
+                "Limestone": 80,
+                "Lithium": 20,
+                "Phosphate": 80,
+                "Potash": 80,
+                "Uranium": 1
+            },
+            "bonus_resources": {
+                "Hydrocarbons": {
+                    "_": {
+                        "chance": 20
+                    },
+                    "Sulfur": {
+                        "chance": 10,
+                        "amount": "0.1"
+                    },
+                    "Helium": {
+                        "chance": 1,
+                        "amount": "0.02"
+                    }
+                }
+            }
+        }
+    },
     "terrains": {
         "Ocean": {
-            "color": "#1e3e83"
+            "color": "#1e3e83",
+            "group": "aquatic"
         },
         "Archipelago": {
-            "color": "#3485bb"
+            "color": "#3485bb",
+            "group": "aquatic"
         },
         "Rainforest": {
-            "color": "#284226"
+            "color": "#284226",
+            "group": "land"
         },
         "Forest": {
-            "color": "#4f6d36"
+            "color": "#4f6d36",
+            "group": "land"
         },
         "Steppe": {
-            "color": "#9abd6e"
+            "color": "#9abd6e",
+            "group": "land"
         },
         "Arctic": {
-            "color": "#8fe5ff"
+            "color": "#8fe5ff",
+            "group": "arctic"
         },
         "Antarctic": {
-            "color": "#e6e6e6"
+            "color": "#e6e6e6",
+            "group": "land"
         },
         "Tundra": {
-            "color": "#80968c"
+            "color": "#80968c",
+            "group": "land"
         },
         "Taiga": {
-            "color": "#3a4942"
+            "color": "#3a4942",
+            "group": "land"
         },
         "Desert": {
-            "color": "#ccb295"
+            "color": "#ccb295",
+            "group": "land"
         },
         "Mountain": {
-            "color": "#6d615a"
+            "color": "#6d615a",
+            "group": "land"
         },
         "Mountain Jungle": {
             "color": "#2c382c"

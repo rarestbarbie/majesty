@@ -1,24 +1,25 @@
 import Color
 import GameState
+import GameRules
 import JavaScriptInterop
 import JavaScriptKit
 
 /// In Majesty, everything is a planet, even stars and moons.
-struct Planet: IdentityReplaceable {
-    var id: PlanetID
-    let name: String
-    let type: PlanetType
-    let color: Color
-    let orbit: CelestialOrbit?
-    let opposes: PlanetID?
-    let mass: Double
-    let tilt: Double?
-    let radius: Double
-    let sprite: (x: Int, y: Int, size: Int, disk: Double)
+@frozen public struct Planet: IdentityReplaceable {
+    public var id: PlanetID
+    public let name: String
+    public let type: PlanetType
+    public let color: Color
+    public let orbit: Orbit?
+    public let opposes: PlanetID?
+    public let mass: Double
+    public let tilt: Double?
+    public let radius: Double
+    public let sprite: (x: Int, y: Int, size: Int, disk: Double)
 }
 
 extension Planet {
-    enum ObjectKey: JSString, Sendable {
+    @frozen public enum ObjectKey: JSString, Sendable {
         case id
         case name
         case type
@@ -35,7 +36,7 @@ extension Planet {
     }
 }
 extension Planet: JavaScriptEncodable {
-    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+    public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.name] = self.name
         js[.type] = self.type
@@ -52,7 +53,7 @@ extension Planet: JavaScriptEncodable {
     }
 }
 extension Planet: JavaScriptDecodable {
-    init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+    public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             id: try js[.id].decode(),
             name: try js[.name].decode(),

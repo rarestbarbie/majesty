@@ -2,20 +2,22 @@ import GameState
 import JavaScriptInterop
 import JavaScriptKit
 
-@frozen public struct CelestialOrbit {
-    public let orbits: PlanetID
-    /// Semi-major axis
-    public let a: Double
-    /// Eccentricity
-    public let e: Double
-    /// Inclination, in radians
-    public let i: Double
-    /// Argument of periapsis, in radians
-    public let ω: Double
-    /// Longitude of ascending node, in radians
-    public let Ω: Double
+extension Planet {
+    @frozen public struct Orbit {
+        public let orbits: PlanetID
+        /// Semi-major axis
+        public let a: Double
+        /// Eccentricity
+        public let e: Double
+        /// Inclination, in radians
+        public let i: Double
+        /// Argument of periapsis, in radians
+        public let ω: Double
+        /// Longitude of ascending node, in radians
+        public let Ω: Double
+    }
 }
-extension CelestialOrbit {
+extension Planet.Orbit {
     @frozen public enum ObjectKey: JSString, Sendable {
         case orbits
         case a
@@ -25,7 +27,7 @@ extension CelestialOrbit {
         case Ω
     }
 }
-extension CelestialOrbit: JavaScriptEncodable {
+extension Planet.Orbit: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.orbits] = self.orbits
         js[.a] = self.a
@@ -35,7 +37,7 @@ extension CelestialOrbit: JavaScriptEncodable {
         js[.Ω] = self.Ω
     }
 }
-extension CelestialOrbit: JavaScriptDecodable {
+extension Planet.Orbit: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             orbits: try js[.orbits].decode(),

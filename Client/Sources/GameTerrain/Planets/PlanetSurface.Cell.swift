@@ -3,28 +3,38 @@ import JavaScriptInterop
 import JavaScriptKit
 
 extension PlanetSurface {
-    @frozen @usableFromInline struct Cell {
-        let id: HexCoordinate
-        let type: String
-        let tile: PlanetTile
+    @frozen public struct Cell {
+        public let id: HexCoordinate
+        public let type: String
+        public let tile: PlanetTile
+
+        @inlinable public init(
+            id: HexCoordinate,
+            type: String,
+            tile: PlanetTile,
+        ) {
+            self.id = id
+            self.type = type
+            self.tile = tile
+        }
     }
 }
 extension PlanetSurface.Cell {
-    @frozen @usableFromInline enum ObjectKey: JSString {
+    @frozen public enum ObjectKey: JSString {
         case id
         case type
         case tile
     }
 }
 extension PlanetSurface.Cell: JavaScriptEncodable {
-    @usableFromInline func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+    public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.type] = self.type
         js[.tile] = self.tile
     }
 }
 extension PlanetSurface.Cell: JavaScriptDecodable {
-    @usableFromInline init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+    public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             id: try js[.id].decode(),
             type: try js[.type].decode(),

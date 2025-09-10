@@ -1,6 +1,7 @@
 import GameEconomy
 import GameRules
 import GameState
+import GameTerrain
 import HexGrids
 
 extension PlanetContext {

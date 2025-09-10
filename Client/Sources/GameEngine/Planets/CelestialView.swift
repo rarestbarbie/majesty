@@ -1,4 +1,5 @@
 import GameState
+import GameTerrain
 import JavaScriptKit
 import JavaScriptInterop
 
@@ -45,7 +46,7 @@ extension CelestialView {
         }
 
         for world: PlanetContext in context.planets {
-            guard let orbit: CelestialOrbit = world.state.orbit,
+            guard let orbit: Planet.Orbit = world.state.orbit,
             case self.subject = orbit.orbits else {
                 continue
             }

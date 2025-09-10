@@ -3,9 +3,19 @@ import JavaScriptInterop
 import JavaScriptKit
 
 @frozen public struct PlanetSurface {
-    let id: PlanetID
-    let size: Int8
-    let grid: [Cell]
+    public let id: PlanetID
+    public let size: Int8
+    public let grid: [Cell]
+
+    @inlinable public init(
+        id: PlanetID,
+        size: Int8,
+        grid: [Cell]
+    ) {
+        self.id = id
+        self.size = size
+        self.grid = grid
+    }
 }
 extension PlanetSurface {
     @frozen public enum ObjectKey: JSString {

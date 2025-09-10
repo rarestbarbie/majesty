@@ -1,5 +1,6 @@
 import GameEconomy
 import GameState
+import GameTerrain
 import JavaScriptKit
 import JavaScriptInterop
 
