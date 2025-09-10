@@ -1,6 +1,7 @@
 import Color
 import GameRules
 import GameState
+import GameTerrain
 import HexGrids
 import OrderedCollections
 import Vector
@@ -29,7 +30,7 @@ struct PlanetContext {
 }
 extension PlanetContext: RuntimeContext {
     mutating func compute(in context: GameContext.TerritoryPass) throws {
-        if  let orbit: CelestialOrbit = self.state.orbit,
+        if  let orbit: Planet.Orbit = self.state.orbit,
             let orbits: Planet = context.planets[orbit.orbits] {
             let motion: CelestialMotion = .init(
                 orbit: orbit,
@@ -43,7 +44,7 @@ extension PlanetContext: RuntimeContext {
 
         if  let opposes: PlanetID = self.state.opposes,
             let opposes: Planet = context.planets[opposes],
-            let orbit: CelestialOrbit = opposes.orbit {
+            let orbit: Planet.Orbit = opposes.orbit {
             let orbit: CelestialMotion = .init(
                 orbit: orbit,
                 of: opposes.id,

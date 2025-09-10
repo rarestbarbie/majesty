@@ -2,6 +2,7 @@ import Assert
 import GameEconomy
 import GameRules
 import GameState
+import GameTerrain
 import JavaScriptKit
 
 struct GameContext {
@@ -20,13 +21,12 @@ struct GameContext {
     /// Initialize a fresh game context from the given game state.
     init(save: borrowing GameSave, rules: GameRules) throws {
         /// We do not use metadata for these types of objects:
-        let planet: PlanetContext.Metadata = .init()
         let country: CountryContext.Metadata = .init()
         let culture: CultureContext.Metadata = .init()
 
         self.date = save.date
         self.player = save.player
-        self.planets = try .init(states: save.planets) { _ in planet }
+        self.planets = [:]
         self.cultures = try .init(states: save.cultures) { _ in culture }
         self.countries = try .init(states: save.countries) { _ in country }
         self.factories = try .init(states: save.factories) { rules.factories[$0.type] }
@@ -54,13 +54,16 @@ extension GameContext {
         )
     }
 
-    mutating func loadTerrain(_ surfaces: [PlanetSurface]) throws {
+    mutating func loadTerrain(_ map: TerrainMap) throws {
+        // Load planets
+        let planetMetadata: PlanetContext.Metadata = .init()
+        self.planets = try .init(states: map.planets) { _ in planetMetadata }
         // Initialize hex grids
         guard
         let terrainDefault: TerrainMetadata = self.rules.terrains.values.first else {
             fatalError("No terrain metadata found in rules!!!")
         }
-        let defined: [PlanetID: PlanetSurface] = surfaces.reduce(into: [:]) {
+        let defined: [PlanetID: PlanetSurface] = map.planetSurfaces.reduce(into: [:]) {
             $0[$1.id] = $1
         }
         for i: Int in self.planets.indices {
@@ -75,16 +78,19 @@ extension GameContext {
         }
     }
 
-    func saveTerrain() -> [PlanetSurface] {
-        self.planets.map {
-            PlanetSurface.init(
-                id: $0.state.id,
-                size: $0.size,
-                grid: $0.cells.values.map {
-                    .init(id: $0.id, type: $0.type.name, tile: $0.tile)
-                }
-            )
-        }
+    func saveTerrain() -> TerrainMap {
+        .init(
+            planets: self.planets.map(\.state),
+            planetSurfaces: self.planets.map {
+                PlanetSurface.init(
+                    id: $0.state.id,
+                    size: $0.size,
+                    grid: $0.cells.values.map {
+                        .init(id: $0.id, type: $0.type.name, tile: $0.tile)
+                    }
+                )
+            }
+        )
     }
 }
 extension GameContext {

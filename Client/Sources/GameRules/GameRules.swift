@@ -30,7 +30,7 @@ import OrderedCollections
 }
 extension GameRules {
     public init(
-        resolving rules: GameRulesDescription,
+        resolving rules: borrowing GameRulesDescription,
         with symbols: inout GameRules.Symbols
     ) throws {
         try self.init(
@@ -50,7 +50,7 @@ extension GameRules {
     /// It is critical here that `symbols` is the last parameter, because Swift evaluates
     /// function arguments from left to right.
     private init(
-        resolving rules: GameRulesDescription,
+        resolving rules: borrowing GameRulesDescription,
         resources: OrderedDictionary<Resource, (Symbol, ResourceDescription)>,
         factories: OrderedDictionary<FactoryType, (Symbol, FactoryDescription)>,
         technologies: OrderedDictionary<Technology, (Symbol, TechnologyDescription)>,

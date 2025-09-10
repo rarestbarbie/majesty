@@ -4,6 +4,7 @@ import GameConditions
 import GameEconomy
 import GameRules
 import GameState
+import GameTerrain
 import HexGrids
 import JavaScriptKit
 
@@ -14,10 +15,9 @@ public struct GameSession: ~Copyable {
 
     public init(
         save: consuming GameSave,
-        rules: GameRulesDescription,
-        terrain: [PlanetSurface],
+        rules: borrowing GameRulesDescription,
+        terrain: borrowing TerrainMap,
     ) throws {
-        Self.address(&save.planets)
         Self.address(&save.countries)
         Self.address(&save.pops)
 
@@ -56,7 +56,7 @@ extension GameSession {
         )
     }
 
-    public func saveTerrain() -> [PlanetSurface] { self.context.saveTerrain() }
+    public func saveTerrain() -> TerrainMap { self.context.saveTerrain() }
 }
 extension GameSession {
     private static func address<ID>(

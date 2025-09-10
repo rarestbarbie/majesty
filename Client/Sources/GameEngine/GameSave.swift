@@ -11,8 +11,6 @@ public struct GameSave {
     let date: GameDate
     let player: CountryID
 
-    let terrain: [PlanetSurface]?
-    var planets: [Planet]
     let cultures: [Culture]
     var countries: [Country]
     let factories: [Factory]
@@ -27,8 +25,8 @@ extension GameSave {
         case date
         case player
 
-        case terrain
-        case planets
+        // case terrain
+        // case planets
         case cultures
         case countries
         case factories
@@ -43,8 +41,6 @@ extension GameSave: JavaScriptEncodable {
         js[.date] = self.date
         js[.player] = self.player
 
-        // js[.terrain] = self.terrain
-        js[.planets] = self.planets
         js[.cultures] = self.cultures
         js[.countries] = self.countries
         js[.factories] = self.factories
@@ -59,8 +55,6 @@ extension GameSave: JavaScriptDecodable {
             symbols: try js[.symbols].decode(),
             date: try js[.date].decode(),
             player: try js[.player].decode(),
-            terrain: try js[.terrain]?.decode(),
-            planets: try js[.planets].decode(),
             cultures: try js[.cultures].decode(),
             countries: try js[.countries].decode(),
             factories: try js[.factories].decode(),
