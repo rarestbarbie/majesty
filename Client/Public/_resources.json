@@ -48,7 +48,7 @@
         "Lunar Mare": {
             "color": "#3a3a3a"
         },
-        "Procellarum KREEP Terrane": {
+        "Lunar Procellarum": {
             "color": "#5b4a69"
         },
         "Martian Polar Cap": {
@@ -79,73 +79,17 @@
             "color": "#19172c"
         }
     },
-    "terrain_groups": {
-        "Earth_Continental_Crust": [
-            "Mountain",
-            "Forest",
-            "Rainforest",
-            "Steppe",
-            "Desert",
-            "Taiga",
-            "Tundra"
-        ],
-        "Earth_Polar": [
-            "Arctic",
-            "Antarctic"
-        ],
-        "Earth_Sedimentary_Basin": [
-            "Desert",
-            "Steppe",
-            "Continental Shelf"
-        ],
-        "Earth_Large_Igneous_Province": [
-            "Mountain"
-        ],
-        "Earth_Oceanic_Abyssal": [
-            "Ocean",
-            "Abyssal Plain"
-        ],
-        "Earth_Oceanic_Vents": [
-            "Hydrothermal Vent Field"
-        ],
-        "Earth_Oceanic_Shelf": [
-            "Continental Shelf",
-            "Archipelago"
-        ],
-        "Moon_Highlands": [
-            "Lunar Highlands"
-        ],
-        "Moon_Mare": [
-            "Lunar Mare"
-        ],
-        "Moon_KREEP": [
-            "Procellarum KREEP Terrane"
-        ],
-        "Mars_Polar": [
-            "Martian Polar Cap"
-        ],
-        "Mars_Generic_Crust": [
-            "Martian Lowland Barren",
-            "Martian Highland Barren"
-        ],
-        "Mars_Canyon": [
-            "Valles Marineris"
-        ],
-        "Mars_Volcanic": [
-            "Tharsis Volcanic Province"
-        ],
-        "Asteroid_C_Type": [
-            "C-Type Asteroid"
-        ],
-        "Asteroid_S_Type": [
-            "S-Type Asteroid"
-        ],
-        "Asteroid_M_Type": [
-            "M-Type Asteroid"
-        ]
-    },
     "resources": {
         "Earth_Continental_Crust": {
+            "terrains": [
+                "Mountain",
+                "Forest",
+                "Rainforest",
+                "Steppe",
+                "Desert",
+                "Taiga",
+                "Tundra"
+            ],
             "base_resources": {
                 "Iron": 80,
                 "Aluminum": 80,
@@ -236,6 +180,11 @@
             }
         },
         "Earth_Sedimentary_Basin": {
+            "terrains": [
+                "Desert",
+                "Steppe",
+                "Continental Shelf"
+            ],
             "base_resources": {
                 "Hydrocarbons": 100,
                 "Limestone": 120,
@@ -254,6 +203,9 @@
             }
         },
         "Earth_Large_Igneous_Province": {
+            "terrains": [
+                "Mountain"
+            ],
             "base_resources": {
                 "Iron": 100,
                 "Nickel": 50,
@@ -287,6 +239,10 @@
             }
         },
         "Earth_Oceanic_Abyssal": {
+            "terrains": [
+                "Ocean",
+                "Abyssal Plain"
+            ],
             "base_resources": {
                 "Manganese Nodules": 100
             },
@@ -311,6 +267,9 @@
             }
         },
         "Earth_Oceanic_Vents": {
+            "terrains": [
+                "Hydrothermal Vent Field"
+            ],
             "base_resources": {
                 "Polymetallic Sulfides": 100
             },
@@ -338,13 +297,31 @@
                 }
             }
         },
+        "Earth_Oceanic_Shelf": {
+            "terrains": [
+                "Continental Shelf",
+                "Archipelago"
+            ],
+            "base_resources": {
+                "Limestone": 50,
+                "Phosphate": 20
+            },
+            "bonus_resources": {}
+        },
         "Earth_Polar": {
+            "terrains": [
+                "Arctic",
+                "Antarctic"
+            ],
             "base_resources": {
                 "Water Ice": 200
             },
             "bonus_resources": {}
         },
         "Moon_Highlands": {
+            "terrains": [
+                "Lunar Highlands"
+            ],
             "base_resources": {
                 "Aluminum": 150,
                 "Silicon": 80,
@@ -354,6 +331,9 @@
             "bonus_resources": {}
         },
         "Moon_Mare": {
+            "terrains": [
+                "Lunar Mare"
+            ],
             "base_resources": {
                 "Titanium": 150,
                 "Iron": 100,
@@ -386,6 +366,9 @@
             }
         },
         "Moon_KREEP": {
+            "terrains": [
+                "Lunar Procellarum"
+            ],
             "base_resources": {
                 "KREEP Thorium": 30,
                 "Generic Rare Earth Ore": 50,
@@ -413,6 +396,10 @@
             }
         },
         "Mars_Generic_Crust": {
+            "terrains": [
+                "Martian Lowland Barren",
+                "Martian Highland Barren"
+            ],
             "base_resources": {
                 "Iron": 250,
                 "Silicon": 100,
@@ -438,6 +425,9 @@
             }
         },
         "Mars_Canyon": {
+            "terrains": [
+                "Valles Marineris"
+            ],
             "base_resources": {
                 "Gypsum": 100,
                 "Iron": 150,
@@ -447,6 +437,9 @@
             "bonus_resources": {}
         },
         "Mars_Volcanic": {
+            "terrains": [
+                "Tharsis Volcanic Province"
+            ],
             "base_resources": {
                 "Iron": 200,
                 "Titanium": 50,
@@ -456,6 +449,9 @@
             "bonus_resources": {}
         },
         "Mars_Polar": {
+            "terrains": [
+                "Martian Polar Cap"
+            ],
             "base_resources": {
                 "Water Ice": 250,
                 "Carbon Dioxide Ice": 100
@@ -463,6 +459,9 @@
             "bonus_resources": {}
         },
         "Asteroid_C_Type": {
+            "terrains": [
+                "C-Type Asteroid"
+            ],
             "base_resources": {
                 "Water Ice": 150,
                 "Carbonaceous Materials": 120,
@@ -473,6 +472,9 @@
             "bonus_resources": {}
         },
         "Asteroid_S_Type": {
+            "terrains": [
+                "S-Type Asteroid"
+            ],
             "base_resources": {
                 "Iron": 60,
                 "Nickel": 30,
@@ -493,6 +495,9 @@
             }
         },
         "Asteroid_M_Type": {
+            "terrains": [
+                "M-Type Asteroid"
+            ],
             "base_resources": {
                 "Iron": 120,
                 "Nickel": 150,
@@ -530,6 +535,7 @@
             }
         },
         "carbonatite_intrusion": {
+            "terrains": [],
             "base_resources": {
                 "Niobium": 20,
                 "Generic Rare Earth Ore": 80,
