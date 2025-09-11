@@ -1,0 +1,308 @@
+{
+    "terrains": {
+        "Ocean": {
+            "color": "#1e3e83"
+        },
+        "Archipelago": {
+            "color": "#3485bb"
+        },
+        "Rainforest": {
+            "color": "#284226"
+        },
+        "Forest": {
+            "color": "#4f6d36"
+        },
+        "Steppe": {
+            "color": "#9abd6e"
+        },
+        "Arctic": {
+            "color": "#8fe5ff"
+        },
+        "Antarctic": {
+            "color": "#e6e6e6"
+        },
+        "Tundra": {
+            "color": "#80968c"
+        },
+        "Taiga": {
+            "color": "#3a4942"
+        },
+        "Desert": {
+            "color": "#ccb295"
+        },
+        "Mountain": {
+            "color": "#6d615a"
+        },
+        "Lowland Vacuum": {
+            "color": "#3a3a3a"
+        },
+        "Highland Vacuum": {
+            "color": "#838383"
+        },
+        "Lowland Barren": {
+            "color": "#613630"
+        },
+        "Highland Barren": {
+            "color": "#4d4241"
+        },
+        "Space Vacuum": {
+            "color": "#19172c"
+        }
+    },
+    "resources": {
+        "terrestrial_crust": {
+            "base_resources": {
+                "Iron": 80,
+                "Aluminum": 80,
+                "Copper": 40,
+                "Limestone": 100,
+                "Phosphate": 80,
+                "Potash": 80,
+                "Graphite": 50,
+                "Lithium": 20,
+                "Nickel": 15,
+                "Tungsten": 5,
+                "Zinc": 40,
+                "Uranium": 2
+            },
+            "bonus_resources": {
+                "Aluminum": {
+                    "_": {
+                        "chance": 90
+                    },
+                    "Gallium": {
+                        "chance": 10,
+                        "amount": "0.00005"
+                    }
+                },
+                "Copper": {
+                    "_": {
+                        "chance": 70
+                    },
+                    "Cobalt": {
+                        "chance": 10,
+                        "amount": "0.005"
+                    },
+                    "Silver": {
+                        "chance": 15,
+                        "amount": "0.001"
+                    },
+                    "Rhenium": {
+                        "chance": 5,
+                        "amount": "0.00001"
+                    }
+                },
+                "Graphite": {
+                    "_": {
+                        "chance": 95
+                    },
+                    "Germanium": {
+                        "chance": 5,
+                        "amount": "0.0001"
+                    }
+                },
+                "Iron": {
+                    "_": {
+                        "chance": 99
+                    },
+                    "Scandium": {
+                        "chance": 1,
+                        "amount": "0.0001"
+                    }
+                },
+                "Nickel": {
+                    "_": {
+                        "chance": 80
+                    },
+                    "Cobalt": {
+                        "chance": 20,
+                        "amount": "0.05"
+                    }
+                },
+                "Zinc": {
+                    "_": {
+                        "chance": 60
+                    },
+                    "Germanium": {
+                        "chance": 25,
+                        "amount": "0.0002"
+                    },
+                    "Gallium": {
+                        "chance": 10,
+                        "amount": "0.00002"
+                    },
+                    "Silver": {
+                        "chance": 5,
+                        "amount": "0.0005"
+                    }
+                }
+            }
+        },
+        "lunar_highlands": {
+            "base_resources": {
+                "Aluminum": 200,
+                "Iron": 10,
+                "Silicon": 50
+            },
+            "bonus_resources": {}
+        },
+        "lunar_mare": {
+            "base_resources": {
+                "Titanium": 150,
+                "Iron": 75,
+                "Helium-3": 5,
+                "Neodymium": 10,
+                "Silicon": 20
+            },
+            "bonus_resources": {
+                "Neodymium": {
+                    "_": {
+                        "chance": 95
+                    },
+                    "Dysprosium": {
+                        "chance": 5,
+                        "amount": "0.08"
+                    }
+                },
+                "Titanium": {
+                    "_": {
+                        "chance": 90
+                    },
+                    "Zirconium": {
+                        "chance": 8,
+                        "amount": "0.01"
+                    },
+                    "Scandium": {
+                        "chance": 2,
+                        "amount": "0.0002"
+                    }
+                }
+            }
+        },
+        "martian_crust": {
+            "base_resources": {
+                "Iron": 250,
+                "Aluminum": 60,
+                "Silicon": 80,
+                "Titanium": 20,
+                "Copper": 5,
+                "Nickel": 10,
+                "Zinc": 10
+            },
+            "bonus_resources": {
+                "Zinc": {
+                    "_": {
+                        "chance": 40
+                    },
+                    "Germanium": {
+                        "chance": 50,
+                        "amount": "0.0005"
+                    },
+                    "Gallium": {
+                        "chance": 10,
+                        "amount": "0.00003"
+                    }
+                }
+            }
+        },
+        "c_type_asteroid": {
+            "base_resources": {
+                "Water": 150,
+                "Graphite": 100,
+                "Iron": 20,
+                "Silicon": 30
+            },
+            "bonus_resources": {}
+        },
+        "s_type_asteroid": {
+            "base_resources": {
+                "Iron": 60,
+                "Nickel": 30,
+                "Silicon": 100,
+                "Copper": 10
+            },
+            "bonus_resources": {
+                "Nickel": {
+                    "_": {
+                        "chance": 95
+                    },
+                    "Cobalt": {
+                        "chance": 5,
+                        "amount": "0.02"
+                    }
+                }
+            }
+        },
+        "m_type_asteroid": {
+            "base_resources": {
+                "Iron": 100,
+                "Nickel": 150,
+                "Platinum": 5,
+                "Tungsten": 8
+            },
+            "bonus_resources": {
+                "Nickel": {
+                    "_": {
+                        "chance": 30
+                    },
+                    "Cobalt": {
+                        "chance": 60,
+                        "amount": "0.08"
+                    },
+                    "Platinum": {
+                        "chance": 5,
+                        "amount": "0.0001"
+                    },
+                    "Rhodium": {
+                        "chance": 5,
+                        "amount": "0.00001"
+                    }
+                },
+                "Platinum": {
+                    "_": {
+                        "chance": 50
+                    },
+                    "Rhodium": {
+                        "chance": 40,
+                        "amount": "0.1"
+                    },
+                    "Iridium": {
+                        "chance": 10,
+                        "amount": "0.1"
+                    }
+                }
+            }
+        },
+        "carbonatite_intrusion": {
+            "base_resources": {
+                "Niobium": 20,
+                "Neodymium": 15,
+                "Phosphate": 50
+            },
+            "bonus_resources": {
+                "Niobium": {
+                    "_": {
+                        "chance": 70
+                    },
+                    "Tantalum": {
+                        "chance": 25,
+                        "amount": "0.1"
+                    },
+                    "Neodymium": {
+                        "chance": 5,
+                        "amount": "0.05"
+                    }
+                },
+                "Neodymium": {
+                    "_": {
+                        "chance": 90
+                    },
+                    "Dysprosium": {
+                        "chance": 10,
+                        "amount": "0.1"
+                    }
+                }
+            }
+        }
+    }
+}
