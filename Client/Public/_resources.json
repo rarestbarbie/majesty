@@ -182,8 +182,7 @@
         "Earth_Sedimentary_Basin": {
             "terrains": [
                 "Desert",
-                "Steppe",
-                "Continental Shelf"
+                "Steppe"
             ],
             "base_resources": {
                 "Hydrocarbons": 100,
@@ -194,6 +193,10 @@
                 "Hydrocarbons": {
                     "_": {
                         "chance": 98
+                    },
+                    "Helium": {
+                        "chance": 20,
+                        "amount": "0.005"
                     },
                     "Sulfur": {
                         "chance": 2,
@@ -303,10 +306,45 @@
                 "Archipelago"
             ],
             "base_resources": {
+                "Fertilizer": 80,
+                "Hydrocarbons": 40,
                 "Limestone": 50,
-                "Phosphate": 20
+                "Phosphate": 20,
+                "Uranium": 1
             },
-            "bonus_resources": {}
+            "bonus_resources": {
+                "Limestone": {
+                    "_": {
+                        "chance": 98
+                    },
+                    "Pearls": {
+                        "chance": 2,
+                        "amount": "1"
+                    }
+                },
+                "Fertilizer": {
+                    "_": {
+                        "chance": 99
+                    },
+                    "Pearls": {
+                        "chance": 1,
+                        "amount": "1"
+                    }
+                },
+                "Hydrocarbons": {
+                    "_": {
+                        "chance": 98
+                    },
+                    "Helium": {
+                        "chance": 20,
+                        "amount": "0.005"
+                    },
+                    "Sulfur": {
+                        "chance": 2,
+                        "amount": "0.02"
+                    }
+                }
+            }
         },
         "Earth_Polar": {
             "terrains": [
