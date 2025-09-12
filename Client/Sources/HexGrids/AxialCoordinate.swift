@@ -11,12 +11,12 @@ extension AxialCoordinate {
     /// Returns the equatorial coordinate of this axial coordinate, if it is a corner cell.
     @inlinable func φ(_ z: Int8) -> Int8? {
         switch (self.q, self.r) {
-        case ( z, -z): 0
-        case ( 0, -z): 1
-        case (-z,  0): 2
-        case (-z,  z): 3
-        case ( 0,  z): 4
-        case ( z,  0): 5
+        case ( z,  0): 0
+        case ( z, -z): 1
+        case ( 0, -z): 2
+        case (-z,  0): 3
+        case (-z,  z): 4
+        case ( 0,  z): 5
         case ( _,  _): nil
         }
     }
@@ -26,12 +26,12 @@ extension AxialCoordinate {
         let r: Int8
 
         switch φ {
-        case 0: (q, r) = ( z, -z)
-        case 1: (q, r) = ( 0, -z)
-        case 2: (q, r) = (-z,  0)
-        case 3: (q, r) = (-z,  z)
-        case 4: (q, r) = ( 0,  z)
-        case _: (q, r) = ( z,  0)
+        case 0: (q, r) = ( z,  0)
+        case 1: (q, r) = ( z, -z)
+        case 2: (q, r) = ( 0, -z)
+        case 3: (q, r) = (-z,  0)
+        case 4: (q, r) = (-z,  z)
+        case _: (q, r) = ( 0,  z)
         }
 
         self.init(q: q, r: r)

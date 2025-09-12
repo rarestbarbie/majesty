@@ -9,7 +9,7 @@ extension HexagonPath {
         let c: Vector2 = c + size * Self[coordinate.q, coordinate.r, tilt: tilt]
         var d: String = "M"
 
-        for i: Int8 in φ - 4 ..< φ {
+        for i: Int8 in φ - 5 ..< φ - 1 {
             let i: Int8 = i < 0 ? i + 6 : i
             let v: Vector2 = c + size * Self[i, tilt: tilt]
             d += " \(v)"

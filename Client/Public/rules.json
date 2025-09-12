@@ -47,9 +47,29 @@
             "emoji": "💨",
             "color": "#1b7760"
         },
+        "Cobalt": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
+        "Copper": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
         "Diamonds": {
             "emoji": "💎",
             "color": "#161616"
+        },
+        "Dysprosium": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
+        "Gallium": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
+        "Germanium": {
+            "emoji": "?",
+            "color": "#30ff52"
         },
         "Graphite": {
             "emoji": "✏️",
@@ -59,6 +79,10 @@
             "emoji": "💰",
             "color": "#ffe2a4"
         },
+        "Helium-3": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
         "Helium": {
             "emoji": "🎈",
             "color": "#ff4e37"
@@ -66,6 +90,10 @@
         "Hydrocarbons": {
             "emoji": "🛢️",
             "color": "#292929"
+        },
+        "Iridium": {
+            "emoji": "?",
+            "color": "#30ff52"
         },
         "Iron": {
             "emoji": "⛓️",
@@ -87,6 +115,18 @@
             "emoji": "💗",
             "color": "#ff4dc4"
         },
+        "Neodymium": {
+            "emoji": "🧲",
+            "color": "#ff81d5"
+        },
+        "Nickel": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
+        "Niobium": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
         "Pearls": {
             "emoji": "⚪",
             "color": "#ffd5c8"
@@ -95,13 +135,45 @@
             "emoji": "🧂",
             "color": "#cecece"
         },
+        "Platinum": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
         "Potash": {
             "emoji": "🪨",
             "color": "#d4a0a0"
         },
+        "Rhenium": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
+        "Rhodium": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
+        "Scandium": {
+            "emoji": "🟣",
+            "color": "#e6e6e6"
+        },
+        "Silver": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
         "Sulfur": {
             "emoji": "🟡",
             "color": "#f4d03f"
+        },
+        "Tantalum": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
+        "Titanium": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
+        "Tungsten": {
+            "emoji": "?",
+            "color": "#30ff52"
         },
         "Uranium": {
             "emoji": "☢️",
@@ -110,6 +182,18 @@
         "Water": {
             "emoji": "💧",
             "color": "#5ea9ff"
+        },
+        "Yttrium": {
+            "emoji": "🟢",
+            "color": "#30ff52"
+        },
+        "Zinc": {
+            "emoji": "?",
+            "color": "#30ff52"
+        },
+        "Zirconium": {
+            "emoji": "?",
+            "color": "#30ff52"
         },
 
         "Alloys": {
@@ -676,80 +760,19 @@
             "summary": "The definition of stupidity is doing the same thing over and over again and expecting different results."
         }
     },
-    "terrain_resources": {
-        "aquatic": {
-            "base_resources": {
-                "Fertilizer": 5,
-                "Hydrocarbons": 1
-            },
-            "bonus_resources": {
-                "Fertilizer": {
-                    "_": {
-                        "chance": 10
-                    },
-                    "Phosphate": {
-                        "chance": 0,
-                        "amount": "0.5"
-                    },
-                    "Pearls": {
-                        "chance": 1,
-                        "amount": "0.1"
-                    }
-                }
-            }
-        },
-        "arctic": {
-            "base_resources": {
-                "Fertilizer": 5,
-                "Hydrocarbons": 2
-            },
-            "bonus_resources": {
-                "Fertilizer": {
-                    "_": {
-                        "chance": 10
-                    },
-                    "Pearls": {
-                        "chance": 2,
-                        "amount": "0.25"
-                    }
-                }
-            }
-        },
-        "land": {
-            "base_resources": {
-                "Aluminum": 80,
-                "Diamonds": 10,
-                "Graphite": 10,
-                "Gold": 10,
-                "Iron": 80,
-                "Hydrocarbons": 60,
-                "Limestone": 80,
-                "Lithium": 20,
-                "Phosphate": 80,
-                "Potash": 80,
-                "Uranium": 1
-            },
-            "bonus_resources": {
-                "Hydrocarbons": {
-                    "_": {
-                        "chance": 20
-                    },
-                    "Sulfur": {
-                        "chance": 10,
-                        "amount": "0.1"
-                    },
-                    "Helium": {
-                        "chance": 1,
-                        "amount": "0.02"
-                    }
-                }
-            }
-        }
-    },
     "terrains": {
         "Ocean": {
             "color": "#1e3e83",
             "group": "aquatic"
+        },
+        "Continental Shelf": {
+            "color": "#1e3e83"
+        },
+        "Abyssal Plain": {
+            "color": "#152d5e"
+        },
+        "Hydrothermal Vent Field": {
+            "color": "#0e1e3f"
         },
         "Archipelago": {
             "color": "#3485bb",
