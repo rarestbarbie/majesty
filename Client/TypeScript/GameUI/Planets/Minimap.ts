@@ -47,13 +47,14 @@ export class Minimap {
                 link.classList.toggle('selected', link.dataset.layer === minimap.layer);
             }
         }
-
+        // Tile ID is the cell ID with numeric prefix removed.
+        // E.g. "399N1,1" -> "N1,1"
         this.grid.update(
             minimap.grid,
             minimap.layer,
             [id],
             (cell: string) => `#planet=${id}&cell=${cell}`,
-            navigator.tile?.id,
+            navigator.tile?.id.replace(/^\d+/, ''),
         );
     }
 
