@@ -6,4 +6,6 @@ export interface NavigatorTileState {
     readonly terrain: string;
     readonly culture?: PieChartSector<string>[];
     readonly popType?: PieChartSector<string>[];
+
+    readonly _neighbors: string[];
 }

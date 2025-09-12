@@ -7,6 +7,8 @@ import VectorCharts
 struct NavigatorTile {
     let id: Address
 
+    private var _neighbors: [HexCoordinate]
+
     private var name: String
     private var terrain: String
     private var culture: PieChart<String, PieChartLabel>?
@@ -18,6 +20,8 @@ struct NavigatorTile {
         self.terrain = ""
         self.culture = nil
         self.popType = nil
+
+        self._neighbors = []
     }
 }
 extension NavigatorTile {
@@ -52,6 +56,8 @@ extension NavigatorTile {
             }
         }
 
+        self._neighbors = self.id.tile._neighbors(size: planet.size)
+
         self.culture = .init(values: culture.sorted { $0.key < $1.key })
         self.popType = .init(values: popType.sorted { $0.key > $1.key })
     }
@@ -63,6 +69,8 @@ extension NavigatorTile: JavaScriptEncodable {
         case terrain
         case culture
         case popType
+
+        case _neighbors
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
@@ -71,5 +79,7 @@ extension NavigatorTile: JavaScriptEncodable {
         js[.terrain] = self.terrain
         js[.culture] = self.culture
         js[.popType] = self.popType
+
+        js[._neighbors] = self._neighbors
     }
 }

@@ -8,6 +8,266 @@
     /// Southern hemisphere tile.
     case s(_ q: Int8, _ r: Int8)
 }
+
+extension HexCoordinate {
+    static func e(_ q: Int8, _ r: Int8) -> Self {
+        let a: AxialCoordinate = .init(q: q, r: r)
+        guard let φ: Int8 = a.φ(1) else {
+            fatalError("Axial coordinate \(a) is not an equatorial cell")
+        }
+        return .e(φ)
+    }
+}
+
+extension HexCoordinate {
+    public func _neighbors(size z: Int8) -> [HexCoordinate] {
+        //  Cube coordinate basis vectors
+        //
+        //        1
+        //    2       0
+        //       >|<
+        //    3       5
+        //        4
+        //
+        //  v[0] = ( 1,  0, -1)
+        //  v[1] = ( 1, -1,  0)
+        //  v[2] = ( 0, -1,  1)
+        //  v[3] = (-1,  0,  1)
+        //  v[4] = (-1,  1,  0)
+        //  v[5] = ( 0,  1, -1)
+        switch self {
+        case .x:
+            return []
+
+        case .n(let q, let r):
+            let s: Int8 = -q - r
+            switch (q, r, s) {
+            /// If one of the coordinates is ±z, the tile is an edge tile, which will never
+            /// be axis-aligned (as those are equatorial)
+            ///
+            /// Most edge tiles have seven neighbors – the four normal axial neighbors
+            /// on the same hemisphere, its twin in the other hemisphere, and the two
+            /// axial neighbors of the twin tile that also happen to be edge tiles.
+            ///
+            /// If the tile has an equatorial neighbor (i.e., there is a basis vector that
+            /// would yield an axis-aligned coordinate when added to its own coordinate),
+            /// then it has six neighbors – the equatorial tile, its twin in the other
+            /// hemisphere, the twin’s equatorial neighbor (which is the same tile as the
+            /// first equatorial neighbor), the tile on the opposite side of the twin
+            /// across from the equatorial neighbor, and the three remaining normal axial
+            /// neighbors of that tile.
+
+            ///          (  , -z,  1)     ( z,   , -1)
+            ///          ( 1, -z,   )     ( z, -1,   )
+            ///                        1
+            ///     (-1,   ,  z)   2       0
+            ///     (  , -1,  z)      >|<      (  ,  1, -z)
+            ///                    3       5   ( 1,   , -z)
+            ///                        4
+            ///          (-z,  1,   )     (-1,  z,   )
+            ///          (-z,   ,  1)     (  ,  z, -1)
+            ///
+            /// In the comments below, `t` is the vector (q, r, s) of the tile whose
+            /// neighbors we are computing, and R(t, +θ) is a counterclockwise rotation
+            /// of t by θ degrees around the origin.
+            ///
+            /// A(t) and B(t) are the two cases defined below.
+            case (z, -1, _):
+                // CASE A: `t` has an equatorial neighbor along v[0] axis
+                //
+                // Note that `e(_:_:)` interprets its arguments as multiples of `z`,
+                // so `e(+1, -1)` means `e(+z, -z, scale: z)`.
+                //
+                // In all computations below, we omit the third cube coordinate.
+                return [
+                    .n(q    , r - 1),   // t + v[2]
+                    .n(q - 1, r    ),   // t + v[3]
+                    .n(q - 1, r + 1),   // t + v[4]
+                    .e(+1,  0),         // t + v[5] (aka: +z, 0, -z)
+                    .s(q    , r    ),   // t        (twin tile)
+                    .s(q    , r - 1),   // t + v[2] (across from v[5])
+                ]
+            case (z, _, -1):
+                // CASE B: `t` has an equatorial neighbor along v[1] axis
+                return [
+                    .s(q    , r + 1),   // t + v[5] (across from v[2])
+                    .s(q    , r    ),   // t        (twin tile)
+                    .e(+1, -1),         // t + v[2] (aka: +z, -z, 0)
+                    .n(q - 1, r    ),   // t + v[3]
+                    .n(q - 1, r + 1),   // t + v[4]
+                    .n(q    , r + 1),   // t + v[5]
+                ]
+
+            case (z, _, _):
+                // CASE C: no equatorial neighbor
+                return [
+                    .n(q    , r - 1),   // t + v[2]
+                    .n(q - 1, r    ),   // t + v[3]
+                    .n(q - 1, r + 1),   // t + v[4]
+                    .n(q    , r + 1),   // t + v[5]
+                    .s(q    , r + 1),   // t + v[5] (across from v[2])
+                    .s(q    , r    ),   // t        (twin tile)
+                    .s(q    , r - 1),   // t + v[2] (across from v[5])
+                ]
+
+
+            case (_, -z, +1):
+                // Rotate `t` 60° clockwise, apply CASE A, then result back.
+                //
+                // R(A(R(t, -60°)), +60°)
+                return [] // unimplemented
+
+            case (+1, -z, _):
+                // Rotate `t` 60° clockwise, apply CASE B, then rotate back.
+                //
+                // R(B(R(t, -60°)), +60°)
+                return [] // unimplemented
+
+            case (_, -z, _):
+                // R(C(R(t, -60°)), +60°)
+                return [] // unimplemented
+
+
+            case (-1, _, z):
+                // R(A(R(t, -120°)), +120°)
+                return [] // unimplemented
+            case (_, -1, z):
+                // R(B(R(t, -120°)), +120°)
+                return [] // unimplemented
+            case (_, _, z):
+                // R(C(R(t, -120°)), +120°)
+                return [] // unimplemented
+
+
+            case (-z, +1, _):
+                // R(A(R(t, ±180°)), ±180°) = -A(-t)
+                //
+                // Probably could be simplified more.
+                return [
+                    .n(q    , r + 1),   // t - v[2] (alternatively: t + v[5])
+                    .n(q + 1, r    ),   // t - v[3] (alternatively: t + v[0])
+                    .n(q + 1, r - 1),   // t - v[4] (alternatively: t + v[1])
+                    .e(-1,  0),         // t - v[5] (aka: -z, 0, +z)
+                    .s(-z, +1),         // t        (twin tile)
+                    .s(-z, +2),         // t - v[2] (across from v[5])
+                ]
+            case (-z, _, +1):
+                // R(B(R(t, ±180°)), ±180°) = -B(-t)
+                //
+                // Probably could be simplified more.
+                return [
+                    .s(-z, z - 2),      // t - v[5] (across from v[2])
+                    .s(-z, z - 1),      // t        (twin tile)
+                    .e(-1, +1),         // t - v[2] (aka: -z, +z, 0)
+                    .n(q + 1, r    ),   // t - v[3] (alternatively: t + v[0])
+                    .n(q + 1, r - 1),   // t - v[4] (alternatively: t + v[1])
+                    .n(q    , r - 1),   // t - v[5] (alternatively: t + v[2])
+                ]
+            case (-z, _, _):
+                // R(C(R(t, ±180°)), ±180°) = -C(-t)
+                return [] // unimplemented
+
+
+            case (_, z, -1):
+                // R(A(R(t, -240°)), +240°) = ???
+                return [] // unimplemented
+            case (-1, z, _):
+                // R(B(R(t, -240°)), +240°) = ???
+                return [] // unimplemented
+            case (_, z, _):
+                // R(C(R(t, -240°)), +240°) = ???
+                return [] // unimplemented
+
+            case (+1, _, -z):
+                // R(A(R(t, -300°)), +300°) = ???
+                return [] // unimplemented
+            case (_, +1, -z):
+                // R(B(R(t, -300°)), +300°) = ???
+                return [] // unimplemented
+            case (_, _, -z):
+                // R(C(R(t, -300°)), +300°) = ???
+                return [] // unimplemented
+
+
+            /// If one of the coordinates is 0, and the other two are ±(z - 1), the tile is
+            /// axis-aligned, inset 1 tile from the edge, and has one equatorial neighbor.
+            case (z - 1, 0, _):
+                return [
+                    .n(q + 1, r - 1),   // t + v[1]
+                    .n(q    , r - 1),   // t + v[2]
+                    .n(q - 1, r    ),   // t + v[3]
+                    .n(q - 1, r + 1),   // t + v[4]
+                    .n(q    , r + 1),   // t + v[5]
+                    .e(+1, 0),          // t + v[0] (aka: +z, 0, -z)
+                ]
+
+            case (z - 1, _, 0):
+                return [
+                    .n(q    , r - 1),   // t + v[2]
+                    .n(q - 1, r    ),   // t + v[3]
+                    .n(q - 1, r + 1),   // t + v[4]
+                    .n(q    , r + 1),   // t + v[5]
+                    .n(q + 1, r    ),   // t + v[0]
+                    .e(+1, -1),         // t + v[1] (aka: +z, -z, 0)
+                ]
+
+            case (0, _, z - 1):
+                return [
+                    .n(q - 1, r    ),   // t + v[3]
+                    .n(q - 1, r + 1),   // t + v[4]
+                    .n(q    , r + 1),   // t + v[5]
+                    .n(q + 1, r    ),   // t + v[0]
+                    .n(q + 1, r - 1),   // t + v[1]
+                    .e(0, -1),          // t + v[2] (aka: 0, -z, +z)
+                ]
+
+            case (_, 0, z - 1):
+                return [
+                    .n(q - 1, r + 1),   // t + v[4]
+                    .n(q    , r + 1),   // t + v[5]
+                    .n(q + 1, r    ),   // t + v[0]
+                    .n(q + 1, r - 1),   // t + v[1]
+                    .n(q    , r - 1),   // t + v[2]
+                    .e(-1, 0),          // t + v[3] (aka: -z, 0, +z)
+                ]
+
+            case (_, z - 1, 0):
+                return [
+                    .n(q    , r + 1),   // t + v[5]
+                    .n(q + 1, r    ),   // t + v[0]
+                    .n(q + 1, r - 1),   // t + v[1]
+                    .n(q    , r - 1),   // t + v[2]
+                    .n(q - 1, r    ),   // t + v[3]
+                    .e(-1, +1),         // t + v[4] (aka: -z, +z, 0)
+                ]
+
+            case (0, z - 1, _):
+                return [
+                    .n(q + 1, r    ),   // t + v[0]
+                    .n(q + 1, r - 1),   // t + v[1]
+                    .n(q    , r - 1),   // t + v[2]
+                    .n(q - 1, r    ),   // t + v[3]
+                    .n(q - 1, r + 1),   // t + v[4]
+                    .e(0, +1),          // t + v[5] (aka: 0, +z, -z)
+                ]
+
+            default:
+                // Normal axial neighbors
+                return [
+                    .n(q + 1, r    ),   // t + v[0]
+                    .n(q + 1, r - 1),   // t + v[1]
+                    .n(q    , r - 1),   // t + v[2]
+                    .n(q - 1, r    ),   // t + v[3]
+                    .n(q - 1, r + 1),   // t + v[4]
+                    .n(q    , r + 1),   // t + v[5]
+                ]
+            }
+
+        default:
+            return []
+        }
+    }
+}
 extension HexCoordinate: CustomStringConvertible {
     @inlinable public var description: String {
         switch self {

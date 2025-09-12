@@ -134,6 +134,10 @@ $gradients: (
                 stroke: rgb(255, 87, 185);
                 stroke-width: 0.1px;
             }
+            a.neighbor path {
+                stroke: rgba(255, 128, 213, 0.5);
+                stroke-width: 0.1px;
+            }
         }
     }
 
