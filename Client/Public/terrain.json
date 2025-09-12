@@ -3116,7 +3116,7 @@
             "size": 3,
             "grid": [
                 {
-                    "id": "E2",
+                    "id": "E3",
                     "type": "Highland Barren",
                     "tile": {}
                 },
@@ -3141,7 +3141,7 @@
                     "tile": {}
                 },
                 {
-                    "id": "E3",
+                    "id": "E4",
                     "type": "Highland Barren",
                     "tile": {}
                 },
@@ -3256,7 +3256,7 @@
                     "tile": {}
                 },
                 {
-                    "id": "E1",
+                    "id": "E2",
                     "type": "Highland Barren",
                     "tile": {}
                 },
@@ -3311,7 +3311,7 @@
                     "tile": {}
                 },
                 {
-                    "id": "E4",
+                    "id": "E5",
                     "type": "Highland Barren",
                     "tile": {}
                 },
@@ -3426,7 +3426,7 @@
                     "tile": {}
                 },
                 {
-                    "id": "E0",
+                    "id": "E1",
                     "type": "Highland Barren",
                     "tile": {}
                 },
@@ -3451,7 +3451,7 @@
                     "tile": {}
                 },
                 {
-                    "id": "E5",
+                    "id": "E0",
                     "type": "Lowland Barren",
                     "tile": {}
                 }
