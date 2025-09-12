@@ -1660,7 +1660,7 @@
             "size": 4,
             "grid": [
                 {
-                    "id": "E2",
+                    "id": "E3",
                     "type": "Rainforest",
                     "tile": {}
                 },
@@ -1695,7 +1695,7 @@
                     "tile": {}
                 },
                 {
-                    "id": "E3",
+                    "id": "E4",
                     "type": "Mountain Jungle",
                     "tile": {}
                 },
@@ -1924,7 +1924,7 @@
                     }
                 },
                 {
-                    "id": "E1",
+                    "id": "E2",
                     "type": "Rainforest",
                     "tile": {}
                 },
@@ -2019,7 +2019,7 @@
                     "tile": {}
                 },
                 {
-                    "id": "E4",
+                    "id": "E5",
                     "type": "Rainforest",
                     "tile": {}
                 },
@@ -2248,7 +2248,7 @@
                     }
                 },
                 {
-                    "id": "E0",
+                    "id": "E1",
                     "type": "Volcanic",
                     "tile": {
                         "name": "Maat Mons"
@@ -2287,7 +2287,7 @@
                     }
                 },
                 {
-                    "id": "E5",
+                    "id": "E0",
                     "type": "Mountain Jungle",
                     "tile": {
                         "name": "Thetis Regio"
@@ -2300,7 +2300,7 @@
             "size": 4,
             "grid": [
                 {
-                    "id": "E2",
+                    "id": "E3",
                     "type": "Ocean",
                     "tile": {
                         "name": "Fiji"
@@ -2349,7 +2349,7 @@
                     }
                 },
                 {
-                    "id": "E3",
+                    "id": "E4",
                     "type": "Ocean",
                     "tile": {
                         "name": "Pacific Ocean"
@@ -2648,7 +2648,7 @@
                     }
                 },
                 {
-                    "id": "E1",
+                    "id": "E2",
                     "type": "Archipelago",
                     "tile": {
                         "name": "Western Indonesia"
@@ -2753,7 +2753,7 @@
                     }
                 },
                 {
-                    "id": "E4",
+                    "id": "E5",
                     "type": "Rainforest",
                     "tile": {
                         "name": "Panama"
@@ -3054,7 +3054,7 @@
                     }
                 },
                 {
-                    "id": "E0",
+                    "id": "E1",
                     "type": "Ocean",
                     "tile": {
                         "name": "Indian Ocean"
@@ -3103,7 +3103,7 @@
                     }
                 },
                 {
-                    "id": "E5",
+                    "id": "E0",
                     "type": "Ocean",
                     "tile": {
                         "name": "Atlantic Ocean"

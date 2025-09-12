@@ -203,7 +203,7 @@ extension PlanetContext {
                 shape.1 = nil
 
             case .e(let φ):
-                let θ: Int8 = φ > 2 ? 8 - φ : 2 - φ
+                let θ: Int8 = φ > 4 ? 10 - φ : 4 - φ
                 shape.0 = .init(c: center.north, φ: φ, z: self.size, tilt: tilt)
                 shape.1 = .init(c: center.south, φ: θ, z: self.size, tilt: tilt?.inverted)
 
