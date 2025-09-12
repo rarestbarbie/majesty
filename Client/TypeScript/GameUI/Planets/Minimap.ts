@@ -55,6 +55,7 @@ export class Minimap {
             [id],
             (cell: string) => `#planet=${id}&cell=${cell}`,
             navigator.tile?.id.replace(/^\d+/, ''),
+            navigator.tile !== undefined ? new Set(navigator.tile._neighbors) : undefined
         );
     }
 
