@@ -1,0 +1,39 @@
+I am creating a Space Video Game that simulates the mining of rare earth materials, among other things.
+
+The basic mechanics of the game’s map: Tiles contain randomly-selected Base Resources, which have varying probabilities. For each tile, its Base Resource may spawn a Bonus Resource, which produces some fractional amount of the Bonus Resource for every unit of Base Resource mined.
+
+I have attached a JSON data file, `_resources.json`, which describes the Game’s resource spawning rates (in the "resources" object), as well as a list of some physical tile types (the "terrains" object). Some of these tile types were intended for the “Earth” map, while others are intended for other planet, asteroid, and moon maps.
+
+The resource spawning table is keyed by “geological terrain groups”, such as 'Earth_Sedimentary_Basin', 'Earth_Large_Igneous_Province', etc. It is these geological terrain groups which actually determine which tiles spawn what resources, and so forth.
+
+Right now, we have a crude map of the Earth, in `_earth.json`, which has a number of tiles that we have labeled with physical tile types (“Ocean”, “Desert”, etc.). These tiles have been given names corresponding to a physical location near each tile’s center. Your primary task is to take the tile definitions in `_earth.json`, and augment the terrain data with the appropriate geological terrain group for each tile, based on its real-world geographic location. Store this information in a field called "geological_province" alongside the existing "type" field. Pay special attention to distances and proportions. The game’s map tiles are equally-sized and regularly-spaced, and the labels you choose must reflect this. You should choose labels that are representative of the entire geometrical expanse of each hex tile, not merely the point location suggested by the tile’s name.
+
+Your secondary task is to improve the labeling of marine tile types - for example, we have lots of Pacific Ocean tiles with type “Ocean”, and it would be great if these tiles were assigned one of the newer aquatic terrain types, such as "Continental Shelf" or "Abyssal Plain", as the existing “Ocean” tile type is too generic and we want to deprecate it. Try to avoid renaming or relabeling the land tiles however.
+
+Do not re-number the tiles, and do not modify the terrain group definitions or introduce new terrain groups!
+
+Some of these tiles have been given names in accordance with the game’s lore, which may be confusing. For example, the tile named “Central America” is actually what we would call “The Midwestern United States” in 21st century real life, because in the game lore, the USA annexed all of North America, which means real-world regions like Canada and Guatemala are named “Northern America” and “Southern America” in-game, respectively. Notably, the Western Mediterranean was drained and named “Atlantropa” in game lore, which turned that tile into a ‘Forest’-type tile. Moreover, some of the biomes may not be what you expect - in the game lore, Climate Change made parts of Antarctica habitable, which is why some of those tiles are not ice-covered as they are today.
+
+The following is an exhaustive list of tiles with names that may not correspond to their 21st-century real-world locations:
+
+- "Northern America" (Eastern Canada)
+- "Western America" (Oregon and Western Canada)
+- "Central America" (Midwestern US)
+- "West Atlantis" (Eastern US)
+- "Gulf of America" (Gulf of Mexico)
+- "Southern America" (Central America, e.g. Honduras, Costa Rica, etc.)
+- "East Atlantis" (Northwestern Europe)
+- "Atlantropa" (Western Mediterranean)
+- "Northern Europe" (Scandinavia, and Northwestern Russia)
+- "Eastern Midlands" (Eastern China and Russian Far East)
+- "Western Midlands" (Western and Southern China)
+- "Antarctic Territories" (Eastern half of Australian claims in East Antarctica)
+- "New Territories" (Western half of Australian claims in East Antarctica)
+
+You can safely assume all other named tiles in the original `_earth.json` have the same names as their corresponding 21st-century real life locations, and you can use them as anchor points to help you orient yourself on the map.
+
+Your output should be a modified version of the `_earth.json` file, with an additional field "geological_province" populated for each of the tiles in the "grid" array. This field is an enum field, and its value must be one of the keys of the "resources" object of `_resources.json`.
+
+Do not make any other changes to the JSON, with the exception of replacing `"type": "Ocean"` with a more-specific aquatic tile type.
+
+We are aiming for the game to have a “hard sci-fi” feel. So try to inform your decisions using real industrial and scientific knowledge.
