@@ -1,0 +1,3 @@
+#!/bin/bash
+
+node Scripts/collate_json.js Public/Rules/ Public/rules.json
