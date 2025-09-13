@@ -22,8 +22,24 @@ export class Tooltip<Type> {
     }
 
     public move(event: MouseEvent, frame: DOMRect) {
-        this.node.style.left = `${event.clientX - frame.left}px`;
-        this.node.style.top = `${event.clientY - frame.top}px`;
+        const bounds: DOMRect = this.tooltip.getBoundingClientRect();
+        const footprintX: number = frame.right - frame.left;
+        const footprintY: number = frame.bottom - frame.top;
+        const margin: number = 20;
+
+        let left: number = event.clientX - frame.left;
+        let top: number = event.clientY - frame.top;
+
+        if (event.clientX + margin + bounds.width > footprintX) {
+            left = event.clientX - frame.left - bounds.width;
+        }
+
+        if (event.clientY + margin + bounds.height > footprintY) {
+            top = event.clientY - frame.top - bounds.height;
+        }
+
+        this.node.style.left = `${left}px`;
+        this.node.style.top = `${top}px`;
     }
 
     public hide(): void {
