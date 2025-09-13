@@ -1,0 +1,8 @@
+{
+    "*": {
+        "Appliances":  100000,
+        "Storage":     100000,
+        "Instruments":  40000,
+        "Vehicles":     40000
+    }
+}
