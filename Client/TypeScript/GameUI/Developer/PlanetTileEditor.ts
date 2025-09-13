@@ -1,16 +1,43 @@
 import { Swift } from '../../Swift.js';
 import { PlanetTileEditorState } from '../exports.js';
 
+// Represents the options for a <select> dropdown
+type SelectOption = {
+    label: string;
+    value: string | number;
+};
+
+// The configuration for a single form field
+type FieldConfig = {
+    // The kind of input to render
+    type: 'text' | 'number' | 'select' | 'checkbox' | 'command_button';
+    // The property name in your state object
+    key: string;
+    // The UI label for the field
+    label: string;
+    // The current value of the field
+    value: any;
+    // Optional: is the field disabled?
+    disabled?: boolean;
+    // Optional: only for 'select' type
+    options?: SelectOption[];
+    // Callback to update persistent state
+    onUpdate?: (key: string, value: any) => void;
+    // Callback for one-shot commands
+    onCommand?: (key: string, value: any) => void;
+};
+
+
 export class PlanetTileEditor {
     public readonly node: HTMLDivElement;
-    private readonly nameInput: HTMLInputElement;
-    private readonly sizeInput: HTMLInputElement;
-    private readonly rotateFieldset: HTMLFieldSetElement;
-    private readonly terrainSelect: HTMLSelectElement;
+
+    private readonly fieldsContainer: HTMLDivElement;
     private readonly applyButton: HTMLButtonElement;
 
     // A copy of the last received editor state to send back on apply
     private lastReceivedState: PlanetTileEditorState | null = null;
+    // A temporary store for one-shot commands like 'rotate' or 'size'
+    private pendingCommands: { [key: string]: any } = {};
 
     constructor() {
         this.node = document.createElement('div');
@@ -21,81 +48,20 @@ export class PlanetTileEditor {
         title.textContent = 'Tile Editor';
         this.node.appendChild(title);
 
-        // Group for "Selected Tile Properties"
-        const tilePropertiesGroup = document.createElement('div');
-        const tilePropertiesHeader = document.createElement('h5');
-        tilePropertiesHeader.textContent = 'Selected Tile Properties';
-        tilePropertiesGroup.appendChild(tilePropertiesHeader);
-
-        const nameLabel = document.createElement('label');
-        nameLabel.textContent = 'Name';
-        this.nameInput = document.createElement('input');
-        this.nameInput.type = 'text';
-        nameLabel.appendChild(this.nameInput);
-        tilePropertiesGroup.appendChild(nameLabel);
-
-        const terrainLabel = document.createElement('label');
-        terrainLabel.textContent = 'Terrain';
-        this.terrainSelect = document.createElement('select');
-        terrainLabel.appendChild(this.terrainSelect);
-        tilePropertiesGroup.appendChild(terrainLabel);
-        this.node.appendChild(tilePropertiesGroup);
-
-        // Group for "Global Grid Actions"
-        const gridActionsGroup = document.createElement('div');
-        const gridActionsHeader = document.createElement('h5');
-        gridActionsHeader.textContent = 'Global Grid Actions';
-        gridActionsGroup.appendChild(gridActionsHeader);
-
-        const sizeLabel = document.createElement('label');
-        sizeLabel.textContent = 'Size';
-        this.sizeInput = document.createElement('input');
-        this.sizeInput.type = 'number';
-        this.sizeInput.min = "0";
-        sizeLabel.appendChild(this.sizeInput);
-        gridActionsGroup.appendChild(sizeLabel);
-
-        // Rotation Radio Buttons
-        this.rotateFieldset = document.createElement('fieldset');
-        const rotateLegend = document.createElement('legend');
-        rotateLegend.textContent = 'Rotate Tiles';
-        this.rotateFieldset.appendChild(rotateLegend);
-
-        const rotations = [
-            { label: 'None', value: 'none', checked: true },
-            { label: 'Clockwise ↻', value: 'cw', checked: false },
-            { label: 'Counter-Clockwise ↺', value: 'ccw', checked: false }
-        ];
-
-        rotations.forEach(rot => {
-            const wrapper = document.createElement('div');
-            const input = document.createElement('input');
-            input.type = 'radio';
-            input.name = 'rotation';
-            input.id = `rotate-${rot.value}`;
-            input.value = rot.value;
-            input.checked = rot.checked;
-
-            const label = document.createElement('label');
-            label.htmlFor = `rotate-${rot.value}`;
-            label.textContent = rot.label;
-
-            wrapper.appendChild(input);
-            wrapper.appendChild(label);
-            this.rotateFieldset.appendChild(wrapper);
-        });
-        gridActionsGroup.appendChild(this.rotateFieldset);
-        this.node.appendChild(gridActionsGroup);
-
+        // A single container where the data-driven form will be rendered
+        this.fieldsContainer = document.createElement('div');
+        this.fieldsContainer.className = 'fields-container';
+        this.node.appendChild(this.fieldsContainer);
 
         this.applyButton = document.createElement('button');
         this.applyButton.textContent = 'Apply Settings';
-        this.applyButton.addEventListener('click', this.applySettings.bind(this));
+        this.applyButton.addEventListener('click', () => this.applySettings(false));
         this.node.appendChild(this.applyButton);
     }
 
     public show(): void {
         this.node.style.display = 'flex';
+        this.node.style.flexDirection = 'column';
     }
 
     public hide(): void {
@@ -113,69 +79,212 @@ export class PlanetTileEditor {
         }
 
         this.lastReceivedState = state;
-
         const polar: boolean = state.id === 'N0,0' || state.id === 'S0,0';
 
-        this.sizeInput.disabled = !polar;
-        this.rotateFieldset.disabled = !polar;
+        // Define the entire form structure as a configuration object.
+        // Adding, removing, or changing fields is now as simple as editing this array.
+        const fields: FieldConfig[] = [
+            // --- Selected Tile Properties ---
+            {
+                type: 'text',
+                key: 'name',
+                label: 'Name',
+                value: state.tile.name ?? '',
+                onUpdate: (key, value) => {
+                    if (this.lastReceivedState) this.lastReceivedState.tile.name = value;
+                },
+            },
+            {
+                type: 'select',
+                key: 'type',
+                label: 'Terrain',
+                value: state.type,
+                options: state.terrainChoices.map((val, i) => ({
+                    value: val,
+                    label: state.terrainLabels[i],
+                })),
+                onUpdate: (key, value) => {
+                    if (this.lastReceivedState) this.lastReceivedState.type = parseInt(value, 10);
+                },
+            },
+            // --- Global Grid Actions ---
+            {
+                type: 'number',
+                key: 'size',
+                label: 'Grid Size',
+                value: state.size,
+                disabled: !polar,
+                onUpdate: (key, value) => this.pendingCommands[key] = value,
+            },
+            {
+                type: 'command_button',
+                key: 'rotate',
+                label: 'Rotate Clockwise ↻',
+                value: true, // Corresponds to 'cw' which Swift expects as 'true'
+                disabled: !polar,
+                onCommand: (key, value) => this.pendingCommands[key] = value,
+            },
+            {
+                type: 'command_button',
+                key: 'rotate',
+                label: 'Rotate Counter-Clockwise ↺',
+                value: false, // Corresponds to 'ccw' which Swift expects as 'false'
+                disabled: !polar,
+                onCommand: (key, value) => this.pendingCommands[key] = value,
+            },
+        ];
 
-        const disabledTooltip: string = 'Select a polar tile to modify the grid.';
-        this.sizeInput.title = polar ? '' : disabledTooltip;
-        this.rotateFieldset.title = polar ? '' : disabledTooltip;
-
-        this.nameInput.value = state.tile.name ?? '';
-        this.sizeInput.value = state.size.toString();
-
-        // Reset rotation to 'None'
-        (this.rotateFieldset.querySelector('input[value="none"]') as HTMLInputElement).checked = true;
-
-        // Populate and set the terrain dropdown
-        this.terrainSelect.innerHTML = '';
-        for (let i = 0; i < state.terrainChoices.length; i++) {
-            const option = document.createElement('option');
-            // Use the terrain ID (number) as the value
-            option.value = state.terrainChoices[i].toString();
-            // Use the label from the parallel array as the text content
-            option.textContent = state.terrainLabels[i];
-            this.terrainSelect.appendChild(option);
-        }
-        this.terrainSelect.value = state.type.toString();
-        this.show();
+        this.renderForm(fields);
     }
 
-    private applySettings(): void {
-        if (!this.lastReceivedState) return;
+    private renderForm(fields: FieldConfig[]): void {
+        // Clear out the old fields to prevent duplicates
+        this.fieldsContainer.innerHTML = '';
+        const disabledTooltip: string = 'Select a polar tile to modify the grid.';
 
-        const selectedRotation = (this.rotateFieldset.querySelector('input[name="rotation"]:checked') as HTMLInputElement).value;
-        let rotateValue: boolean | undefined;
-        if (selectedRotation === 'cw') {
-            rotateValue = false;
-        } else if (selectedRotation === 'ccw') {
-            rotateValue = true;
-        } else {
-            rotateValue = undefined;
+        for (const field of fields) {
+            const fieldRow = document.createElement('div');
+            fieldRow.className = 'editor-field-row';
+            if (field.disabled) {
+                fieldRow.title = disabledTooltip;
+            }
+
+            // Command buttons don't need a visible label, it's on the button itself
+            if (field.type !== 'command_button') {
+                const label = document.createElement('label');
+                label.textContent = field.label;
+                fieldRow.appendChild(label);
+            }
+
+            let inputElement: HTMLElement;
+
+            switch (field.type) {
+                case 'text':
+                    inputElement = this.createTextInput(field);
+                    break;
+                case 'number':
+                    inputElement = this.createNumberInput(field);
+                    break;
+                case 'select':
+                    inputElement = this.createSelectInput(field);
+                    break;
+                case 'command_button':
+                    inputElement = this.createCommandButton(field);
+                    break;
+                case 'checkbox':
+                    inputElement = this.createCheckboxInput(field);
+                    break;
+            }
+
+            fieldRow.appendChild(inputElement);
+            this.fieldsContainer.appendChild(fieldRow);
+        }
+    }
+
+    // --- Field Generator Functions ---
+
+    private createTextInput(field: FieldConfig): HTMLInputElement {
+        const input = document.createElement('input');
+        input.type = 'text';
+        input.value = field.value;
+        input.disabled = field.disabled ?? false;
+        if (field.onUpdate) {
+            input.onchange = () => field.onUpdate!(field.key, input.value);
+        }
+        return input;
+    }
+
+    private createNumberInput(field: FieldConfig): HTMLInputElement {
+        const input = document.createElement('input');
+        input.type = 'number';
+        input.value = field.value;
+        input.min = "0";
+        input.disabled = field.disabled ?? false;
+        if (field.onUpdate) {
+            input.onchange = () => field.onUpdate!(field.key, parseInt(input.value, 10));
+        }
+        return input;
+    }
+
+    private createSelectInput(field: FieldConfig): HTMLSelectElement {
+        const select = document.createElement('select');
+        select.disabled = field.disabled ?? false;
+
+        for (const option of field.options ?? []) {
+            const optElement = document.createElement('option');
+            optElement.value = option.value.toString();
+            optElement.textContent = option.label;
+            if (option.value === field.value) {
+                optElement.selected = true;
+            }
+            select.appendChild(optElement);
         }
 
-        // Construct the object to send back, preserving the original structure
-        const updatedEditorData: PlanetTileEditorState = {
-            ...this.lastReceivedState, // Start with the last known state
-            rotate: rotateValue,
-            size: parseInt(this.sizeInput.value, 10),
-            type: parseInt(this.terrainSelect.value, 10),
-            tile: {
-                ...this.lastReceivedState.tile, // Preserve other potential tile properties
-                name: this.nameInput.value || undefined, // Set to undefined if empty
+        if (field.onUpdate) {
+            select.onchange = () => field.onUpdate!(field.key, select.value);
+        }
+        return select;
+    }
+
+    private createCheckboxInput(field: FieldConfig): HTMLInputElement {
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.checked = field.value;
+        input.disabled = field.disabled ?? false;
+        if (field.onUpdate) {
+            input.onchange = () => field.onUpdate!(field.key, input.checked);
+        }
+        return input;
+    }
+
+    private createCommandButton(field: FieldConfig): HTMLButtonElement {
+        const button = document.createElement('button');
+        button.textContent = field.label;
+        button.disabled = field.disabled ?? false;
+
+        button.onclick = () => {
+            if (field.onCommand) {
+                field.onCommand(field.key, field.value);
+                // Immediately apply settings when a command button is clicked
+                this.applySettings(true);
             }
         };
+        return button;
+    }
 
-        Swift.loadTerrain(updatedEditorData);
+    private applySettings(isCommand: boolean): void {
+        if (!this.lastReceivedState) return;
 
-        // Visual feedback
+        // Start with the last known state, which includes any changes to persistent fields.
+        const dataToSend = { ...this.lastReceivedState };
+
+        // Merge any pending one-shot commands.
+        // This will overwrite fields like `rotate` (which was null) with the command value.
+        Object.assign(dataToSend, this.pendingCommands);
+
+        // The name/type might have been updated via their own onUpdate handlers,
+        // so we ensure they are correctly set from the last received state.
+        dataToSend.tile.name = this.lastReceivedState.tile.name || undefined;
+        dataToSend.type = this.lastReceivedState.type;
+
+
+        Swift.loadTerrain(dataToSend);
+
+        // IMPORTANT: Clear the pending commands immediately after sending.
+        this.pendingCommands = {};
+
+        // Give visual feedback to the user
         this.applyButton.textContent = 'Applied!';
         this.applyButton.style.backgroundColor = '#20d08d';
         setTimeout(() => {
             this.applyButton.textContent = 'Apply Settings';
             this.applyButton.style.backgroundColor = '';
         }, 1000);
+
+        // If a command was issued (like rotate), we don't want to keep the editor open
+        // as the state is now fundamentally changed.
+        if (isCommand) {
+             this.hide();
+        }
     }
 }
