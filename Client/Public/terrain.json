@@ -4,8 +4,7 @@
             "id": 10,
             "name": "Sun",
             "type": "S",
-            "color": "#ff7b00",
-            "orbit": null,
+            "color": 16743168,
             "mass": 1.9891e+30,
             "radius": 696340,
             "sprite_x": 4,
@@ -17,7 +16,7 @@
             "id": 199,
             "name": "Mercury",
             "type": "P",
-            "color": "#8c8c8c",
+            "color": 9211020,
             "orbit": {
                 "orbits": 10,
                 "a": 0.39,
@@ -27,8 +26,8 @@
                 "Ω": 0.8213
             },
             "mass": 3.285e+23,
-            "radius": 2440,
             "tilt": 0.0006,
+            "radius": 2440,
             "sprite_x": 0,
             "sprite_y": 3,
             "sprite_size": 1,
@@ -38,7 +37,7 @@
             "id": 299,
             "name": "Venus",
             "type": "P",
-            "color": "#bd8400",
+            "color": 12420096,
             "orbit": {
                 "orbits": 10,
                 "a": 0.72,
@@ -48,8 +47,8 @@
                 "Ω": 1.3372
             },
             "mass": 4.867e+24,
-            "radius": 6052,
             "tilt": 3.0968,
+            "radius": 6052,
             "sprite_x": 1,
             "sprite_y": 3,
             "sprite_size": 1,
@@ -59,7 +58,7 @@
             "id": 399,
             "name": "Earth",
             "type": "P",
-            "color": "#003b8a",
+            "color": 15242,
             "orbit": {
                 "orbits": 10,
                 "a": 1,
@@ -70,19 +69,18 @@
             },
             "opposes": 301,
             "mass": 5.972e+24,
-            "radius": 6371,
             "tilt": 0.4084,
+            "radius": 6371,
             "sprite_x": 2,
             "sprite_y": 3,
             "sprite_size": 1,
-            "sprite_disk": 24,
-            "resources": [1]
+            "sprite_disk": 24
         },
         {
             "id": 499,
             "name": "Mars",
             "type": "P",
-            "color": "#852c00",
+            "color": 8727552,
             "orbit": {
                 "orbits": 10,
                 "a": 1.52,
@@ -92,8 +90,8 @@
                 "Ω": 0.8651
             },
             "mass": 6.4171e+23,
-            "radius": 3389,
             "tilt": 0.4398,
+            "radius": 3389,
             "sprite_x": 3,
             "sprite_y": 3,
             "sprite_size": 1,
@@ -103,7 +101,7 @@
             "id": 599,
             "name": "Jupiter",
             "type": "P",
-            "color": "#965e2d",
+            "color": 9854509,
             "orbit": {
                 "orbits": 10,
                 "a": 5.2,
@@ -113,8 +111,8 @@
                 "Ω": 1.7536
             },
             "mass": 1.898e+27,
-            "radius": 69911,
             "tilt": 0.0541,
+            "radius": 69911,
             "sprite_x": 4,
             "sprite_y": 3,
             "sprite_size": 1,
@@ -124,7 +122,7 @@
             "id": 699,
             "name": "Saturn",
             "type": "P",
-            "color": "#947a43",
+            "color": 9730627,
             "orbit": {
                 "orbits": 10,
                 "a": 9.58,
@@ -134,8 +132,8 @@
                 "Ω": 1.9855
             },
             "mass": 5.683e+26,
-            "radius": 58232,
             "tilt": 0.466,
+            "radius": 58232,
             "sprite_x": 0,
             "sprite_y": 0,
             "sprite_size": 2,
@@ -145,7 +143,7 @@
             "id": 799,
             "name": "Uranus",
             "type": "P",
-            "color": "#096685",
+            "color": 616069,
             "orbit": {
                 "orbits": 10,
                 "a": 19.22,
@@ -155,8 +153,8 @@
                 "Ω": 1.292
             },
             "mass": 8.681e+25,
-            "radius": 25362,
             "tilt": 1.7072,
+            "radius": 25362,
             "sprite_x": 2,
             "sprite_y": 0,
             "sprite_size": 2,
@@ -166,7 +164,7 @@
             "id": 899,
             "name": "Neptune",
             "type": "P",
-            "color": "#084d85",
+            "color": 544133,
             "orbit": {
                 "orbits": 10,
                 "a": 30.05,
@@ -176,8 +174,8 @@
                 "Ω": 2.2985
             },
             "mass": 1.024e+26,
-            "radius": 24622,
             "tilt": 0.4939,
+            "radius": 24622,
             "sprite_x": 5,
             "sprite_y": 3,
             "sprite_size": 1,
@@ -187,10 +185,9 @@
             "id": 301,
             "name": "The Moon",
             "type": "M",
-            "color": "#4d4d4d",
+            "color": 5066061,
             "orbit": {
                 "orbits": 399,
-                "frame": "C",
                 "a": 0.0025695552897999907,
                 "e": 0.0554,
                 "i": 0.09005898940290741,
@@ -208,10 +205,9 @@
             "id": 401,
             "name": "Phobos",
             "type": "M",
-            "color": "#8B7765",
+            "color": 9140069,
             "orbit": {
                 "orbits": 499,
-                "frame": "L",
                 "a": 0.00006266800427126668,
                 "e": 0.015,
                 "i": 0.019198621771937627,
@@ -229,10 +225,9 @@
             "id": 402,
             "name": "Deimos",
             "type": "M",
-            "color": "#9F9F9F",
+            "color": 10461087,
             "orbit": {
                 "orbits": 499,
-                "frame": "L",
                 "a": 0.00015680036012705095,
                 "e": 0,
                 "i": 0.031415926535897934,
@@ -250,10 +245,9 @@
             "id": 501,
             "name": "Io",
             "type": "M",
-            "color": "#D9CB4B",
+            "color": 14273355,
             "orbit": {
                 "orbits": 599,
-                "frame": "L",
                 "a": 0.0028195588481728304,
                 "e": 0.004,
                 "i": 0,
@@ -271,10 +265,9 @@
             "id": 502,
             "name": "Europa",
             "type": "M",
-            "color": "#DBDBDB",
+            "color": 14408667,
             "orbit": {
                 "orbits": 599,
-                "frame": "L",
                 "a": 0.004486026417754354,
                 "e": 0.009,
                 "i": 0.008726646259971648,
@@ -292,10 +285,9 @@
             "id": 503,
             "name": "Ganymede",
             "type": "M",
-            "color": "#B0B5C5",
+            "color": 11580869,
             "orbit": {
                 "orbits": 599,
-                "frame": "L",
                 "a": 0.007155182055676145,
                 "e": 0.001,
                 "i": 0.003490658503988659,
@@ -313,10 +305,9 @@
             "id": 504,
             "name": "Callisto",
             "type": "M",
-            "color": "#5C5C5C",
+            "color": 6052956,
             "orbit": {
                 "orbits": 599,
-                "frame": "L",
                 "a": 0.012585072175094802,
                 "e": 0.007,
                 "i": 0.005235987755982988,
@@ -334,10 +325,9 @@
             "id": 505,
             "name": "Amalthea",
             "type": "M",
-            "color": "#A83632",
+            "color": 11023922,
             "orbit": {
                 "orbits": 599,
-                "frame": "L",
                 "a": 0.001212584103979496,
                 "e": 0.003,
                 "i": 0.006981317007977318,
@@ -355,10 +345,9 @@
             "id": 506,
             "name": "Himalia",
             "type": "M",
-            "color": "#8B7355",
+            "color": 9139029,
             "orbit": {
                 "orbits": 599,
-                "frame": "C",
                 "a": 0.07646499209162876,
                 "e": 0.16,
                 "i": 0.49567350756638956,
@@ -376,10 +365,9 @@
             "id": 507,
             "name": "Elara",
             "type": "M",
-            "color": "#8B7355",
+            "color": 9139029,
             "orbit": {
                 "orbits": 599,
-                "frame": "C",
                 "a": 0.0782811944127491,
                 "e": 0.212,
                 "i": 0.4852015320544236,
@@ -397,10 +385,9 @@
             "id": 508,
             "name": "Pasiphae",
             "type": "M",
-            "color": "#4d4d4d",
+            "color": 5066061,
             "orbit": {
                 "orbits": 599,
-                "frame": "C",
                 "a": 0.156841804567209,
                 "e": 0.412,
                 "i": 2.588323280707591,
@@ -418,10 +405,9 @@
             "id": 509,
             "name": "Sinope",
             "type": "M",
-            "color": "#4d4d4d",
+            "color": 5066061,
             "orbit": {
                 "orbits": 599,
-                "frame": "C",
                 "a": 0.1582863438443312,
                 "e": 0.262,
                 "i": 2.7454029133870805,
@@ -439,10 +425,9 @@
             "id": 510,
             "name": "Lysithea",
             "type": "M",
-            "color": "#4d4d4d",
+            "color": 5066061,
             "orbit": {
                 "orbits": 599,
-                "frame": "C",
                 "a": 0.07820365320213078,
                 "e": 0.117,
                 "i": 0.4834562028024293,
@@ -460,10 +445,9 @@
             "id": 511,
             "name": "Carme",
             "type": "M",
-            "color": "#4d4d4d",
+            "color": 5066061,
             "orbit": {
                 "orbits": 599,
-                "frame": "C",
                 "a": 0.15467599833959403,
                 "e": 0.261,
                 "i": 2.872811948782666,
@@ -481,10 +465,9 @@
             "id": 512,
             "name": "Ananke",
             "type": "M",
-            "color": "#4d4d4d",
+            "color": 5066061,
             "orbit": {
                 "orbits": 599,
-                "frame": "C",
                 "a": 0.14057352488774427,
                 "e": 0.238,
                 "i": 2.5761059759436304,
@@ -502,10 +485,9 @@
             "id": 513,
             "name": "Leda",
             "type": "M",
-            "color": "#4d4d4d",
+            "color": 5066061,
             "orbit": {
                 "orbits": 599,
-                "frame": "C",
                 "a": 0.07450106039510629,
                 "e": 0.162,
                 "i": 0.4921828490624009,
@@ -523,10 +505,9 @@
             "id": 514,
             "name": "Thebe",
             "type": "M",
-            "color": "#8B7355",
+            "color": 9139029,
             "orbit": {
                 "orbits": 599,
-                "frame": "L",
                 "a": 0.0014833098824313681,
                 "e": 0.018,
                 "i": 0.019198621771937627,
@@ -544,10 +525,9 @@
             "id": 515,
             "name": "Adrastea",
             "type": "M",
-            "color": "#4d4d4d",
+            "color": 5066061,
             "orbit": {
                 "orbits": 599,
-                "frame": "L",
                 "a": 0.0008623117387726295,
                 "e": 0,
                 "i": 0,
@@ -565,10 +545,9 @@
             "id": 516,
             "name": "Metis",
             "type": "M",
-            "color": "#4d4d4d",
+            "color": 5066061,
             "orbit": {
                 "orbits": 599,
-                "frame": "L",
                 "a": 0.0008556271516503611,
                 "e": 0,
                 "i": 0,
@@ -586,10 +565,9 @@
             "id": 601,
             "name": "Mimas",
             "type": "M",
-            "color": "#C0C0C0",
+            "color": 12632256,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.001243333204741931,
                 "e": 0.02,
                 "i": 0.027925268031909273,
@@ -607,10 +585,9 @@
             "id": 602,
             "name": "Enceladus",
             "type": "M",
-            "color": "#FFFFFF",
+            "color": 16777215,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.0015936055699487975,
                 "e": 0.005,
                 "i": 0,
@@ -628,10 +605,9 @@
             "id": 603,
             "name": "Tethys",
             "type": "M",
-            "color": "#E0E0E0",
+            "color": 14737632,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.0019719532010691915,
                 "e": 0.001,
                 "i": 0.019198621771937627,
@@ -649,10 +625,9 @@
             "id": 604,
             "name": "Dione",
             "type": "M",
-            "color": "#D3D3D3",
+            "color": 13882323,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.0025247685560807922,
                 "e": 0.002,
                 "i": 0,
@@ -670,10 +645,9 @@
             "id": 605,
             "name": "Rhea",
             "type": "M",
-            "color": "#CCCCCC",
+            "color": 13421772,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.0035241143308599246,
                 "e": 0.001,
                 "i": 0.005235987755982988,
@@ -691,10 +665,9 @@
             "id": 606,
             "name": "Titan",
             "type": "M",
-            "color": "#E8AD00",
+            "color": 15248640,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.008167897004699814,
                 "e": 0.029,
                 "i": 0.005235987755982988,
@@ -712,10 +685,9 @@
             "id": 607,
             "name": "Hyperion",
             "type": "M",
-            "color": "#BC8F8F",
+            "color": 12357519,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.009903215821640703,
                 "e": 0.105,
                 "i": 0.010471975511965976,
@@ -733,10 +705,9 @@
             "id": 608,
             "name": "Iapetus",
             "type": "M",
-            "color": "#A0522D",
+            "color": 10506797,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.023808493953383525,
                 "e": 0.028,
                 "i": 0.13264502315156904,
@@ -754,10 +725,9 @@
             "id": 609,
             "name": "Phoebe",
             "type": "M",
-            "color": "#696969",
+            "color": 6908265,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.08642770073865765,
                 "e": 0.164,
                 "i": 3.057816849494065,
@@ -775,10 +745,9 @@
             "id": 610,
             "name": "Janus",
             "type": "M",
-            "color": "#A9A9A9",
+            "color": 11119017,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.0010127149490236696,
                 "e": 0.007,
                 "i": 0.003490658503988659,
@@ -796,10 +765,9 @@
             "id": 611,
             "name": "Epimetheus",
             "type": "M",
-            "color": "#A9A9A9",
+            "color": 11119017,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.0010120464903114427,
                 "e": 0.02,
                 "i": 0.005235987755982988,
@@ -817,10 +785,9 @@
             "id": 612,
             "name": "Helene",
             "type": "M",
-            "color": "#B8B8B8",
+            "color": 12105912,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.002524100097368565,
                 "e": 0.007,
                 "i": 0.003490658503988659,
@@ -838,10 +805,9 @@
             "id": 613,
             "name": "Telesto",
             "type": "M",
-            "color": "#B8B8B8",
+            "color": 12105912,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.0019719532010691915,
                 "e": 0.001,
                 "i": 0.020943951023931952,
@@ -859,10 +825,9 @@
             "id": 614,
             "name": "Calypso",
             "type": "M",
-            "color": "#B8B8B8",
+            "color": 12105912,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.0019719532010691915,
                 "e": 0.001,
                 "i": 0.026179938779914945,
@@ -880,10 +845,9 @@
             "id": 615,
             "name": "Atlas",
             "type": "M",
-            "color": "#B0B0B0",
+            "color": 11579568,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.000920467646736365,
                 "e": 0.001,
                 "i": 0,
@@ -901,10 +865,9 @@
             "id": 616,
             "name": "Prometheus",
             "type": "M",
-            "color": "#B0B0B0",
+            "color": 11579568,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.0009318314448442214,
                 "e": 0.002,
                 "i": 0,
@@ -922,10 +885,9 @@
             "id": 617,
             "name": "Pandora",
             "type": "M",
-            "color": "#B0B0B0",
+            "color": 11579568,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.0009472059952254389,
                 "e": 0.004,
                 "i": 0,
@@ -943,10 +905,9 @@
             "id": 618,
             "name": "Pan",
             "type": "M",
-            "color": "#B0B0B0",
+            "color": 11579568,
             "orbit": {
                 "orbits": 699,
-                "frame": "L",
                 "a": 0.0008930608395350644,
                 "e": 0,
                 "i": 0,
@@ -964,10 +925,9 @@
             "id": 619,
             "name": "Ymir",
             "type": "M",
-            "color": "#4D4D4D",
+            "color": 5066061,
             "orbit": {
                 "orbits": 699,
-                "frame": "C",
                 "a": 0.15344135509811105,
                 "e": 0.338,
                 "i": 3.00720230118623,
@@ -985,10 +945,9 @@
             "id": 705,
             "name": "Miranda",
             "type": "M",
-            "color": "#C0C0C0",
+            "color": 12632256,
             "orbit": {
                 "orbits": 799,
-                "frame": "Q",
                 "a": 0.0008679668994780686,
                 "e": 0.001,
                 "i": 0.07679448708775051,
@@ -1006,10 +965,9 @@
             "id": 701,
             "name": "Ariel",
             "type": "M",
-            "color": "#E0E0E0",
+            "color": 14737632,
             "orbit": {
                 "orbits": 799,
-                "frame": "Q",
                 "a": 0.001276281534667592,
                 "e": 0.001,
                 "i": 0,
@@ -1027,10 +985,9 @@
             "id": 702,
             "name": "Umbriel",
             "type": "M",
-            "color": "#808080",
+            "color": 8421504,
             "orbit": {
                 "orbits": 799,
-                "frame": "Q",
                 "a": 0.001778006590303695,
                 "e": 0.004,
                 "i": 0.0017453292519943296,
@@ -1048,10 +1005,9 @@
             "id": 703,
             "name": "Titania",
             "type": "M",
-            "color": "#BEBEBE",
+            "color": 12500670,
             "orbit": {
                 "orbits": 799,
-                "frame": "Q",
                 "a": 0.0029164719922714784,
                 "e": 0.002,
                 "i": 0.0017453292519943296,
@@ -1069,10 +1025,9 @@
             "id": 704,
             "name": "Oberon",
             "type": "M",
-            "color": "#A9A9A9",
+            "color": 11119017,
             "orbit": {
                 "orbits": 799,
-                "frame": "Q",
                 "a": 0.0039005301163019834,
                 "e": 0.002,
                 "i": 0.0017453292519943296,
@@ -1090,10 +1045,9 @@
             "id": 803,
             "name": "Naiad",
             "type": "M",
-            "color": "#A9A9A9",
+            "color": 11119017,
             "orbit": {
                 "orbits": 899,
-                "frame": "L",
                 "a": 0.0003221970992933391,
                 "e": 0,
                 "i": 0.08203047484373349,
@@ -1111,10 +1065,9 @@
             "id": 804,
             "name": "Thalassa",
             "type": "M",
-            "color": "#A9A9A9",
+            "color": 11119017,
             "orbit": {
                 "orbits": 899,
-                "frame": "L",
                 "a": 0.00033489781482564914,
                 "e": 0,
                 "i": 0.003490658503988659,
@@ -1132,10 +1085,9 @@
             "id": 805,
             "name": "Despina",
             "type": "M",
-            "color": "#A9A9A9",
+            "color": 11119017,
             "orbit": {
                 "orbits": 899,
-                "frame": "L",
                 "a": 0.00035094082391909343,
                 "e": 0,
                 "i": 0,
@@ -1153,10 +1105,9 @@
             "id": 806,
             "name": "Galatea",
             "type": "M",
-            "color": "#A9A9A9",
+            "color": 11119017,
             "orbit": {
                 "orbits": 899,
-                "frame": "L",
                 "a": 0.00041444440158064366,
                 "e": 0,
                 "i": 0,
@@ -1174,10 +1125,9 @@
             "id": 807,
             "name": "Larissa",
             "type": "M",
-            "color": "#A9A9A9",
+            "color": 11119017,
             "orbit": {
                 "orbits": 899,
-                "frame": "L",
                 "a": 0.0004913171534867308,
                 "e": 0.001,
                 "i": 0.003490658503988659,
@@ -1195,10 +1145,9 @@
             "id": 808,
             "name": "Proteus",
             "type": "M",
-            "color": "#808080",
+            "color": 8421504,
             "orbit": {
                 "orbits": 899,
-                "frame": "L",
                 "a": 0.0007861074455787693,
                 "e": 0,
                 "i": 0,
@@ -1216,10 +1165,9 @@
             "id": 801,
             "name": "Triton",
             "type": "M",
-            "color": "#E6E6E6",
+            "color": 15132390,
             "orbit": {
                 "orbits": 899,
-                "frame": "L",
                 "a": 0.002371691510980845,
                 "e": 0,
                 "i": 2.7454029133870805,
@@ -1237,10 +1185,9 @@
             "id": 802,
             "name": "Nereid",
             "type": "M",
-            "color": "#C0C0C0",
+            "color": 12632256,
             "orbit": {
                 "orbits": 899,
-                "frame": "C",
                 "a": 0.036858144933475986,
                 "e": 0.751,
                 "i": 0.0890117918517108,
@@ -1258,7 +1205,7 @@
             "id": 999,
             "name": "Pluto",
             "type": "P",
-            "color": "#E5D3BD",
+            "color": 15061949,
             "orbit": {
                 "orbits": 10,
                 "a": 39.48,
@@ -1267,10 +1214,10 @@
                 "ω": 1.9255,
                 "Ω": 1.9251
             },
-            "mass": 1.303e+22,
             "opposes": 901,
-            "radius": 1188.3,
+            "mass": 1.303e+22,
             "tilt": 2.1397,
+            "radius": 1188.3,
             "sprite_x": 0,
             "sprite_y": 3,
             "sprite_size": 1,
@@ -1280,10 +1227,9 @@
             "id": 901,
             "name": "Charon",
             "type": "M",
-            "color": "#C8C8C8",
+            "color": 13158600,
             "orbit": {
                 "orbits": 999,
-                "frame": "Q",
                 "a": 0.00013101790759646154,
                 "e": 0,
                 "i": 0,
@@ -1301,10 +1247,9 @@
             "id": 902,
             "name": "Nix",
             "type": "M",
-            "color": "#E5E5E5",
+            "color": 15066597,
             "orbit": {
                 "orbits": 999,
-                "frame": "Q",
                 "a": 0.0003295501451278344,
                 "e": 0.015,
                 "i": 0,
@@ -1322,10 +1267,9 @@
             "id": 903,
             "name": "Hydra",
             "type": "M",
-            "color": "#E5E5E5",
+            "color": 15066597,
             "orbit": {
                 "orbits": 999,
-                "frame": "Q",
                 "a": 0.0004358350803719027,
                 "e": 0.009,
                 "i": 0.005235987755982988,
@@ -1343,10 +1287,9 @@
             "id": 904,
             "name": "Kerberos",
             "type": "M",
-            "color": "#C8C8C8",
+            "color": 13158600,
             "orbit": {
                 "orbits": 999,
-                "frame": "Q",
                 "a": 0.0003897114292282504,
                 "e": 0.01,
                 "i": 0.006981317007977318,
@@ -1364,10 +1307,9 @@
             "id": 905,
             "name": "Styx",
             "type": "M",
-            "color": "#C8C8C8",
+            "color": 13158600,
             "orbit": {
                 "orbits": 999,
-                "frame": "Q",
                 "a": 0.0002887741636819969,
                 "e": 0.025,
                 "i": 0,
@@ -2331,7 +2273,7 @@
                     "id": "S-4,2",
                     "type": "Ocean",
                     "tile": {
-                        "name": "French Polynesia"
+                        "name": "Pitcairn Islands"
                     }
                 },
                 {
@@ -2352,7 +2294,7 @@
                     "id": "E4",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Cocos Plate"
+                        "name": "East Pacific Rise"
                     }
                 },
                 {
@@ -2422,14 +2364,14 @@
                     "id": "S-3,3",
                     "type": "Ocean",
                     "tile": {
-                        "name": "East Pacific Rise"
+                        "name": "Easter Fracture Zone"
                     }
                 },
                 {
                     "id": "N-3,4",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Gulf of California"
+                        "name": "Cocos Plate"
                     }
                 },
                 {
@@ -2520,7 +2462,7 @@
                     "id": "S-2,3",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Drake Passage"
+                        "name": "Chile Rise"
                     }
                 },
                 {
@@ -2534,7 +2476,7 @@
                     "id": "S-2,4",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Peruvian Sea"
+                        "name": "Galapagos Rise"
                     }
                 },
                 {
@@ -2618,7 +2560,7 @@
                     "id": "S-1,2",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Scotia Sea"
+                        "name": "Chile Rise"
                     }
                 },
                 {
@@ -2632,7 +2574,7 @@
                     "id": "S-1,3",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Chilean Sea"
+                        "name": "Nazca Ridge"
                     }
                 },
                 {
@@ -3052,7 +2994,7 @@
                     "id": "S3,1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Gulf of Guinea"
+                        "name": "Tropical South Atlantic"
                     }
                 },
                 {
@@ -3101,7 +3043,7 @@
                     "id": "S4,-1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Angola Basin"
+                        "name": "St. Helena"
                     }
                 },
                 {
@@ -3464,13 +3406,8 @@
             "size": 0,
             "grid": [
                 {
-                    "id": "N0,0",
-                    "type": "Antarctic",
-                    "tile": {}
-                },
-                {
-                    "id": "S0,0",
-                    "type": "Antarctic",
+                    "id": "X",
+                    "type": "Abyssal Plain",
                     "tile": {}
                 }
             ]
@@ -3480,13 +3417,8 @@
             "size": 0,
             "grid": [
                 {
-                    "id": "N0,0",
-                    "type": "Antarctic",
-                    "tile": {}
-                },
-                {
-                    "id": "S0,0",
-                    "type": "Antarctic",
+                    "id": "X",
+                    "type": "Abyssal Plain",
                     "tile": {}
                 }
             ]
@@ -3648,7 +3580,7 @@
             "size": 3,
             "grid": [
                 {
-                    "id": "E2",
+                    "id": "E3",
                     "type": "Highland Vacuum",
                     "tile": {}
                 },
@@ -3673,7 +3605,7 @@
                     "tile": {}
                 },
                 {
-                    "id": "E3",
+                    "id": "E4",
                     "type": "Highland Vacuum",
                     "tile": {}
                 },
@@ -3792,11 +3724,9 @@
                     "tile": {}
                 },
                 {
-                    "id": "E1",
-                    "type": "Lowland Vacuum",
-                    "tile": {
-                        "name": "Mare Smythii"
-                    }
+                    "id": "E2",
+                    "type": "Highland Vacuum",
+                    "tile": {}
                 },
                 {
                     "id": "N0,-2",
@@ -3855,7 +3785,7 @@
                     "tile": {}
                 },
                 {
-                    "id": "E4",
+                    "id": "E5",
                     "type": "Highland Vacuum",
                     "tile": {}
                 },
@@ -3990,10 +3920,10 @@
                     }
                 },
                 {
-                    "id": "E0",
+                    "id": "E1",
                     "type": "Lowland Vacuum",
                     "tile": {
-                        "name": "Mare Fecuditatis"
+                        "name": "Mare Smythii"
                     }
                 },
                 {
@@ -4021,9 +3951,11 @@
                     "tile": {}
                 },
                 {
-                    "id": "E5",
-                    "type": "Highland Vacuum",
-                    "tile": {}
+                    "id": "E0",
+                    "type": "Lowland Vacuum",
+                    "tile": {
+                        "name": "Mare Fecuditatis"
+                    }
                 }
             ]
         },
@@ -6238,13 +6170,8 @@
             "size": 0,
             "grid": [
                 {
-                    "id": "N0,0",
-                    "type": "Antarctic",
-                    "tile": {}
-                },
-                {
-                    "id": "S0,0",
-                    "type": "Antarctic",
+                    "id": "X",
+                    "type": "Abyssal Plain",
                     "tile": {}
                 }
             ]
