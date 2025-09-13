@@ -8,16 +8,6 @@
     /// Southern hemisphere tile.
     case s(_ q: Int8, _ r: Int8)
 }
-
-extension HexCoordinate {
-    static func e(_ q: Int8, _ r: Int8) -> Self {
-        let a: AxialCoordinate = .init(q: q, r: r)
-        guard let φ: Int8 = a.φ(1) else {
-            fatalError("Axial coordinate \(a) is not an equatorial cell")
-        }
-        return .e(φ)
-    }
-}
 extension HexCoordinate: CustomStringConvertible {
     @inlinable public var description: String {
         switch self {
@@ -204,22 +194,17 @@ extension HexCoordinate {
         case (z, -1, _):
             // CASE A: `t` has an equatorial neighbor along v[0] axis
             //
-            // Note that `e(_:_:)` interprets its arguments as multiples of `z`,
-            // so `e(+1, -1)` means `e(+z, -z, scale: z)`.
-            //
-            // In all computations below, we omit the third cube coordinate.
-            //
             // x[0] = cis(t + v[2]) = cis(q    , r - 1, s + 1)
             // x[1] = cis(t + v[3]) = cis(q - 1, r    , s + 1)
             // x[2] = cis(t + v[4]) = cis(q - 1, r + 1, s    )
             // x[3] = eqt(t + v[5]) = eqt(+z, 0, -z)
-            // x[4] = trn(t + v[2]) = trn(q    , r - 1, s + 1) (across from v[5])
-            // x[5] = trn(t) = trn(q, r, s) (twin tile)
+            // x[4] = trn(t) = trn(q, r, s) (twin tile)
+            // x[5] = trn(t + v[2]) = trn(q    , r - 1, s + 1) (across from v[5])
             return [
                 cis(q    , r - 1),  // t + v[2]
                 cis(q - 1, r    ),  // t + v[3]
                 cis(q - 1, r + 1),  // t + v[4]
-                .e(+1,  0),         // t + v[5] (aka: +z, 0, -z)
+                .e(0),              // t + v[5] (aka: +z, 0, -z)
                 trn(q    , r    ),  // t        (twin tile)
                 trn(q    , r - 1),  // t + v[2] (across from v[5])
             ]
@@ -235,7 +220,7 @@ extension HexCoordinate {
             return [
                 trn(q    , r + 1),  // t + v[5] (across from v[2])
                 trn(q    , r    ),  // t        (twin tile)
-                .e(+1, -1),         // t + v[2] (aka: +z, -z, 0)
+                .e(1),              // t + v[2] (aka: +z, -z, 0)
                 cis(q - 1, r    ),  // t + v[3]
                 cis(q - 1, r + 1),  // t + v[4]
                 cis(q    , r + 1),  // t + v[5]
@@ -306,7 +291,7 @@ extension HexCoordinate {
                 cis(q + 1, r    ),
             ]
         case (_, -z, _):
-            // R(C(R(t, +60°)), -60°)
+            // R(C(R(t, -60°)), +60°)
             //
             // x[0] = cis(R((-r, -s, -q) + v[2]), +60°))
             //      = cis(R((-r, -s - 1, -q + 1), +60°))
@@ -349,7 +334,7 @@ extension HexCoordinate {
                 cis(q - 1, r + 1),
                 cis(q    , r + 1),
                 cis(q + 1, r    ),
-                .e(0, -1),
+                .e(2),
                 trn(q    , r    ),
                 trn(q - 1, r + 1),
             ]
@@ -368,7 +353,7 @@ extension HexCoordinate {
             return [
                 trn(q + 1, r - 1),
                 trn(q    , r    ),
-                .e(-1, 0),
+                .e(3),
                 cis(q    , r + 1),
                 cis(q + 1, r    ),
                 cis(q + 1, r - 1),
@@ -449,7 +434,7 @@ extension HexCoordinate {
                 cis(q + 1, r    ),
                 cis(q + 1, r - 1),
                 cis(q    , r - 1),
-                .e(-1, +1),
+                .e(4),
                 trn(q    , r    ),
                 trn(q + 1, r    ),
             ]
@@ -468,7 +453,7 @@ extension HexCoordinate {
             return [
                 trn(q - 1, r    ),
                 trn(q    , r    ),
-                .e(0, +1),
+                .e(5),
                 cis(q + 1, r - 1),
                 cis(q    , r - 1),
                 cis(q - 1, r    ),
@@ -517,7 +502,7 @@ extension HexCoordinate {
                 cis(q + 1, r - 1),
                 cis(q    , r - 1),
                 cis(q - 1, r    ),
-                .e(0, +1),
+                .e(5),
                 trn(q    , r    ),
                 trn(q + 1, r - 1),
             ]
@@ -536,7 +521,7 @@ extension HexCoordinate {
             return [
                 trn(q - 1, r + 1),
                 trn(q    , r    ),
-                .e(+1, 0),
+                .e(0),
                 cis(q    , r - 1),
                 cis(q - 1, r    ),
                 cis(q - 1, r + 1),
@@ -575,7 +560,7 @@ extension HexCoordinate {
                 cis(q - 1, r    ),  // t + v[3]
                 cis(q - 1, r + 1),  // t + v[4]
                 cis(q    , r + 1),  // t + v[5]
-                .e(+1, 0),          // t + v[0] (aka: +z, 0, -z)
+                .e(0),              // t + v[0] (aka: +z, 0, -z)
             ]
 
         case (z - 1, _, 0):
@@ -585,7 +570,7 @@ extension HexCoordinate {
                 cis(q - 1, r + 1),  // t + v[4]
                 cis(q    , r + 1),  // t + v[5]
                 cis(q + 1, r    ),  // t + v[0]
-                .e(+1, -1),         // t + v[1] (aka: +z, -z, 0)
+                .e(1),              // t + v[1] (aka: +z, -z, 0)
             ]
 
         case (0, _, z - 1):
@@ -595,7 +580,7 @@ extension HexCoordinate {
                 cis(q    , r + 1),  // t + v[5]
                 cis(q + 1, r    ),  // t + v[0]
                 cis(q + 1, r - 1),  // t + v[1]
-                .e(0, -1),          // t + v[2] (aka: 0, -z, +z)
+                .e(2),              // t + v[2] (aka: 0, -z, +z)
             ]
 
         case (_, 0, z - 1):
@@ -605,7 +590,7 @@ extension HexCoordinate {
                 cis(q + 1, r    ),  // t + v[0]
                 cis(q + 1, r - 1),  // t + v[1]
                 cis(q    , r - 1),  // t + v[2]
-                .e(-1, 0),          // t + v[3] (aka: -z, 0, +z)
+                .e(3),              // t + v[3] (aka: -z, 0, +z)
             ]
 
         case (_, z - 1, 0):
@@ -615,7 +600,7 @@ extension HexCoordinate {
                 cis(q + 1, r - 1),  // t + v[1]
                 cis(q    , r - 1),  // t + v[2]
                 cis(q - 1, r    ),  // t + v[3]
-                .e(-1, +1),         // t + v[4] (aka: -z, +z, 0)
+                .e(4),              // t + v[4] (aka: -z, +z, 0)
             ]
 
         case (0, z - 1, _):
@@ -625,7 +610,7 @@ extension HexCoordinate {
                 cis(q    , r - 1),  // t + v[2]
                 cis(q - 1, r    ),  // t + v[3]
                 cis(q - 1, r + 1),  // t + v[4]
-                .e(0, +1),          // t + v[5] (aka: 0, +z, -z)
+                .e(5),              // t + v[5] (aka: 0, +z, -z)
             ]
 
         default:
