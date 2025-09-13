@@ -56,7 +56,7 @@ extension NavigatorTile {
             }
         }
 
-        self._neighbors = self.id.tile._neighbors(size: planet.size)
+        self._neighbors = self.id.tile.neighbors(size: planet.size)
 
         self.culture = .init(values: culture.sorted { $0.key < $1.key })
         self.popType = .init(values: popType.sorted { $0.key > $1.key })
