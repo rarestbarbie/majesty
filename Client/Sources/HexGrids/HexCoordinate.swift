@@ -55,6 +55,27 @@ extension HexCoordinate: LosslessStringConvertible {
     }
 }
 extension HexCoordinate {
+    /// Computes the neighbors of a tile in a two-sided hex grid that represents the surface
+    /// of a sphere.
+    ///
+    /// The grid can be thought of as coin-shaped, which is topologically similar to an actual
+    /// sphere. The Northern (N) Hemisphere of the sphere’s surface is mapped to the top side of
+    /// the coin, and the Southern (S) Hemisphere of the sphere is mapped to the bottom side of
+    /// the coin. The central hex (`N0,0`) of the N side is the “North Pole”, and the central
+    /// hex (`S0,0`) of the S side is the “South Pole”.
+    ///
+    /// There are also six Equatorial (E) Tiles that can be thought of as the “edges” of the
+    /// coin, which link the top and bottom sides. Note that the E tiles don’t form an unbroken
+    /// ring around the edges of the coin, rather, they are equally spaced around the coin’s
+    /// circumference, with seams in between them where N tiles and S tiles touch directly.
+    ///
+    /// The hex grid is said to have size *z*, where *z* is the tile radius around the poles
+    /// of each hemisphere. A grid with *z* = 0 has exactly two tiles — a north pole and a south
+    /// pole — but neighbor computation is only well-defined for *z* > 2.
+    ///
+    /// Neighbors are returned in counter-clockwise order when viewed from outside the sphere.
+    /// However, the starting point of the list varies by tile, and the list of tiles returned
+    /// may begin on either the cis or trans hemisphere of the queried tile.
     public func neighbors(size z: Int8) -> [HexCoordinate] {
         switch self {
         case .x:
