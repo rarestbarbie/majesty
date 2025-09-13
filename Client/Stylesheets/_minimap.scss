@@ -134,9 +134,33 @@ $gradients: (
                 stroke: rgb(255, 87, 185);
                 stroke-width: 0.1px;
             }
-            a.neighbor path {
-                stroke: rgba(255, 128, 213, 0.5);
+
+            a[data-neighbor-index] path {
+                stroke: var(--stroke, rgb(255, 255, 255));
                 stroke-width: 0.1px;
+                opacity: 0.7;
+            }
+
+            a[data-neighbor-index='0'] {
+                --stroke: rgb(255, 0, 0);
+            }
+            a[data-neighbor-index='1'] {
+                --stroke: rgb(255, 127, 0);
+            }
+            a[data-neighbor-index='2'] {
+                --stroke: rgb(255, 255, 0);
+            }
+            a[data-neighbor-index='3'] {
+                --stroke: rgb(0, 255, 0);
+            }
+            a[data-neighbor-index='4'] {
+                --stroke: rgb(0, 204, 255);
+            }
+            a[data-neighbor-index='5'] {
+                --stroke: rgb(0, 18, 182);
+            }
+            a[data-neighbor-index='6'] {
+                --stroke: rgb(148, 0, 211);
             }
         }
     }

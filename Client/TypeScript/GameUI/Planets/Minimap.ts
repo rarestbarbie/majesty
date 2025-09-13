@@ -49,13 +49,19 @@ export class Minimap {
         }
         // Tile ID is the cell ID with numeric prefix removed.
         // E.g. "399N1,1" -> "N1,1"
+
+        // Map of neighbor ID to index in neighbors array.
+        const neighbors: Map<string, number> | undefined = navigator.tile !== undefined
+            ? new Map(navigator.tile._neighbors.map((id, index) => [id, index]))
+            : undefined;
+
         this.grid.update(
             minimap.grid,
             minimap.layer,
             [id],
             (cell: string) => `#planet=${id}&cell=${cell}`,
             navigator.tile?.id.replace(/^\d+/, ''),
-            navigator.tile !== undefined ? new Set(navigator.tile._neighbors) : undefined
+            neighbors
         );
     }
 
