@@ -176,8 +176,8 @@ extension HexCoordinate {
                 cis(q - 1, r    ),  // t + v[3]
                 cis(q - 1, r + 1),  // t + v[4]
                 .e(+1,  0),         // t + v[5] (aka: +z, 0, -z)
-                trn(q    , r - 1),  // t + v[2] (across from v[5])
                 trn(q    , r    ),  // t        (twin tile)
+                trn(q    , r - 1),  // t + v[2] (across from v[5])
             ]
         case (z, _, -1):
             // CASE B: `t` has an equatorial neighbor along v[1] axis
@@ -238,8 +238,8 @@ extension HexCoordinate {
                 cis(q - 1, r + 1),
                 cis(q    , r + 1),
                 .e(1),
-                trn(q - 1, r    ),
                 trn(q    , r    ),
+                trn(q - 1, r    ),
             ]
         case (+1, -z, _):
             // Rotate `t` -60°, apply CASE B, then rotate result +60°.
@@ -290,6 +290,19 @@ extension HexCoordinate {
 
         case (-1, _, z):
             // R(A(R(t, -120°)), +120°)
+            //
+            // R(t, -120°) = (s, q, r)
+            // R(t, +120°) = (r, s, q)
+            //
+            // x[0] = cis(R((s, q, r) + v[2]), +120°))
+            //      = cis(R((s, q - 1, r + 1), +120°))
+            //      = cis(q - 1, r + 1, s)
+            // x[1] = cis(R((s, q, r) + v[3]), +120°))
+            //      = cis(R((s - 1, q, r + 1), +120°))
+            //      = cis(q, r + 1, s - 1)
+            // x[2] = cis(R((s, q, r) + v[4]), +120°))
+            //      = cis(R((s - 1, q + 1, r), +120°))
+            //      = cis(q + 1, r, s - 1)
             return [
             ]
         case (_, -1, z):
@@ -309,8 +322,8 @@ extension HexCoordinate {
                 cis(q + 1, r    ),
                 cis(q + 1, r - 1),
                 .e(3),
-                trn(q    , r + 1),
                 trn(q    , r    ),
+                trn(q    , r + 1),
             ]
         case (-z, _, +1):
             // R(B(R(t, ±180°)), ±180°) = -B(-t)
