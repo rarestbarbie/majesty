@@ -2245,929 +2245,929 @@
                     "id": "E3",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Fiji"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Fiji",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N-4,1",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Midway"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Midway",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "S-4,1",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Cook Islands"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Cook Islands",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N-4,2",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Hawaii"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Hawaii",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "S-4,2",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Pitcairn Islands"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Pitcairn Islands",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N-4,3",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Clarion Fracture Zone"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Clarion Fracture Zone",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "S-4,3",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Easter Island"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Easter Island",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "E4",
                     "type": "Hydrothermal Vent Field",
                     "tile": {
-                        "name": "East Pacific Rise"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "East Pacific Rise",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N-3,-1",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Japan Trench"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Japan Trench",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "S-3,-1",
                     "type": "Archipelago",
                     "tile": {
-                        "name": "Oceania"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Oceania",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N-3,0",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Emperor Seamounts"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Emperor Seamounts",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "S-3,0",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Coral Sea"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Coral Sea",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N-3,1",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "North Pacific Ocean"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "North Pacific Ocean",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "S-3,1",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Kermadec Trench"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Kermadec Trench",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N-3,2",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "North Pacific Gyre"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "North Pacific Gyre",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "S-3,2",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "South Pacific Gyre"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "South Pacific Gyre",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N-3,3",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Baja California Seamounts"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Baja California Seamounts",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "S-3,3",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Easter Fracture Zone"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Easter Fracture Zone",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N-3,4",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Cocos Plate"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Cocos Plate",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "S-3,4",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Peru-Chile Trench"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Peru-Chile Trench",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N-2,-2",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "East China Sea"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "East China Sea",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "S-2,-2",
                     "type": "Archipelago",
                     "tile": {
-                        "name": "New Guinea"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "New Guinea",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N-2,-1",
                     "type": "Archipelago",
                     "tile": {
-                        "name": "Japan"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Japan",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "S-2,-1",
                     "type": "Desert",
                     "tile": {
-                        "name": "Eastern Australia"
-                    },
-                    "geological_province": "Earth_Sedimentary_Basin"
+                        "name": "Eastern Australia",
+                        "geology": "Earth_Sedimentary_Basin"
+                    }
                 },
                 {
                     "id": "N-2,0",
                     "type": "Archipelago",
                     "tile": {
-                        "name": "Aleutian Islands"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Aleutian Islands",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "S-2,0",
                     "type": "Archipelago",
                     "tile": {
-                        "name": "New Zealand"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "New Zealand",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N-2,1",
                     "type": "Taiga",
                     "tile": {
-                        "name": "Alaska"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Alaska",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S-2,1",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Amundsen Sea"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Amundsen Sea",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N-2,2",
                     "type": "Forest",
                     "tile": {
-                        "name": "Western America"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Western America",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S-2,2",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Bellingshausen Sea"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Bellingshausen Sea",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N-2,3",
                     "type": "Mountain",
                     "tile": {
-                        "name": "California"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "California",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S-2,3",
                     "type": "Hydrothermal Vent Field",
                     "tile": {
-                        "name": "Chile Rise"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Chile Rise",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N-2,4",
                     "type": "Desert",
                     "tile": {
-                        "name": "Mexico"
-                    },
-                    "geological_province": "Earth_Sedimentary_Basin"
+                        "name": "Mexico",
+                        "geology": "Earth_Sedimentary_Basin"
+                    }
                 },
                 {
                     "id": "S-2,4",
                     "type": "Hydrothermal Vent Field",
                     "tile": {
-                        "name": "Galapagos Rise"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Galapagos Rise",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N-1,-3",
                     "type": "Archipelago",
                     "tile": {
-                        "name": "Philippines"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Philippines",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "S-1,-3",
                     "type": "Archipelago",
                     "tile": {
-                        "name": "Eastern Indonesia"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Eastern Indonesia",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N-1,-2",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Taiwan"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Taiwan",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "S-1,-2",
                     "type": "Desert",
                     "tile": {
-                        "name": "Western Australia"
-                    },
-                    "geological_province": "Earth_Sedimentary_Basin"
+                        "name": "Western Australia",
+                        "geology": "Earth_Sedimentary_Basin"
+                    }
                 },
                 {
                     "id": "N-1,-1",
                     "type": "Forest",
                     "tile": {
-                        "name": "Eastern Midlands"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Eastern Midlands",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S-1,-1",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Tasman Sea"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Tasman Sea",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N-1,0",
                     "type": "Arctic",
                     "tile": {
-                        "name": "Bering Sea"
-                    },
-                    "geological_province": "Earth_Polar"
+                        "name": "Bering Sea",
+                        "geology": "Earth_Polar"
+                    }
                 },
                 {
                     "id": "S-1,0",
                     "type": "Antarctic",
                     "tile": {
-                        "name": "Antarctic Territories"
-                    },
-                    "geological_province": "Earth_Polar"
+                        "name": "Antarctic Territories",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N-1,1",
                     "type": "Arctic",
                     "tile": {
-                        "name": "Hudson Bay"
-                    },
-                    "geological_province": "Earth_Polar"
+                        "name": "Hudson Bay",
+                        "geology": "Earth_Polar"
+                    }
                 },
                 {
                     "id": "S-1,1",
                     "type": "Arctic",
                     "tile": {
-                        "name": "Ross Sea"
-                    },
-                    "geological_province": "Earth_Polar"
+                        "name": "Ross Sea",
+                        "geology": "Earth_Polar"
+                    }
                 },
                 {
                     "id": "N-1,2",
                     "type": "Steppe",
                     "tile": {
-                        "name": "Central America"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Central America",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S-1,2",
                     "type": "Hydrothermal Vent Field",
                     "tile": {
-                        "name": "Chile Rise"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Chile Rise",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N-1,3",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Gulf of America"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Gulf of America",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "S-1,3",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Nazca Ridge"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Nazca Ridge",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N-1,4",
                     "type": "Rainforest",
                     "tile": {
-                        "name": "Southern America"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Southern America",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S-1,4",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Galapagos"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Galapagos",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "E2",
                     "type": "Archipelago",
                     "tile": {
-                        "name": "Western Indonesia"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Western Indonesia",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N0,-3",
                     "type": "Rainforest",
                     "tile": {
-                        "name": "Thailand"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Thailand",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S0,-3",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Great Australian Bight"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Great Australian Bight",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N0,-2",
                     "type": "Steppe",
                     "tile": {
-                        "name": "Western Midlands"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Western Midlands",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S0,-2",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Cooperation Sea"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Cooperation Sea",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N0,-1",
                     "type": "Taiga",
                     "tile": {
-                        "name": "Russia"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Russia",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S0,-1",
                     "type": "Antarctic",
                     "tile": {
-                        "name": "New Territories"
-                    },
-                    "geological_province": "Earth_Polar"
+                        "name": "New Territories",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N0,0",
                     "type": "Arctic",
                     "tile": {
-                        "name": "Arctic Ocean"
-                    },
-                    "geological_province": "Earth_Polar"
+                        "name": "Arctic Ocean",
+                        "geology": "Earth_Polar"
+                    }
                 },
                 {
                     "id": "S0,0",
                     "type": "Antarctic",
                     "tile": {
-                        "name": "Central Antarctica"
-                    },
-                    "geological_province": "Earth_Polar"
+                        "name": "Central Antarctica",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N0,1",
                     "type": "Forest",
                     "tile": {
-                        "name": "Northern America"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Northern America",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S0,1",
                     "type": "Taiga",
                     "tile": {
-                        "name": "West Antarctica"
-                    },
-                    "geological_province": "Earth_Polar"
+                        "name": "West Antarctica",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N0,2",
                     "type": "Forest",
                     "tile": {
-                        "name": "West Atlantis"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "West Atlantis",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S0,2",
                     "type": "Steppe",
                     "tile": {
-                        "name": "Patagonia"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Patagonia",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N0,3",
                     "type": "Archipelago",
                     "tile": {
-                        "name": "Caribbean Sea"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Caribbean Sea",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "S0,3",
                     "type": "Mountain",
                     "tile": {
-                        "name": "Peru"
-                    },
-                    "geological_province": "Earth_Large_Igneous_Province"
+                        "name": "Peru",
+                        "geology": "Earth_Large_Igneous_Province"
+                    }
                 },
                 {
                     "id": "E5",
                     "type": "Rainforest",
                     "tile": {
-                        "name": "Panama"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Panama",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N1,-4",
                     "type": "Archipelago",
                     "tile": {
-                        "name": "Malaysia"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Malaysia",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "S1,-4",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Cocos Islands"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Cocos Islands",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N1,-3",
                     "type": "Mountain",
                     "tile": {
-                        "name": "Himalayan Mountains"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Himalayan Mountains",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S1,-3",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Wharton Basin"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Wharton Basin",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N1,-2",
                     "type": "Steppe",
                     "tile": {
-                        "name": "Central Asia"
-                    },
-                    "geological_province": "Earth_Sedimentary_Basin"
+                        "name": "Central Asia",
+                        "geology": "Earth_Sedimentary_Basin"
+                    }
                 },
                 {
                     "id": "S1,-2",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Kerguelen Plateau"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Kerguelen Plateau",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N1,-1",
                     "type": "Forest",
                     "tile": {
-                        "name": "Northern Europe"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Northern Europe",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S1,-1",
                     "type": "Antarctic",
                     "tile": {
-                        "name": "Queen Maud Land"
-                    },
-                    "geological_province": "Earth_Polar"
+                        "name": "Queen Maud Land",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N1,0",
                     "type": "Arctic",
                     "tile": {
-                        "name": "North Sea"
-                    },
-                    "geological_province": "Earth_Polar"
+                        "name": "North Sea",
+                        "geology": "Earth_Polar"
+                    }
                 },
                 {
                     "id": "S1,0",
                     "type": "Antarctic",
                     "tile": {
-                        "name": "East Antarctica"
-                    },
-                    "geological_province": "Earth_Polar"
+                        "name": "East Antarctica",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N1,1",
                     "type": "Archipelago",
                     "tile": {
-                        "name": "Greenland"
-                    },
-                    "geological_province": "Earth_Polar"
+                        "name": "Greenland",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S1,1",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Argentine Sea"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Argentine Sea",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N1,2",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "North Atlantic Gyre"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "North Atlantic Gyre",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "S1,2",
                     "type": "Steppe",
                     "tile": {
-                        "name": "Argentina"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Argentina",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N1,3",
                     "type": "Rainforest",
                     "tile": {
-                        "name": "Colombia"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Colombia",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S1,3",
                     "type": "Rainforest",
                     "tile": {
-                        "name": "Amazon"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Amazon",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N2,-4",
                     "type": "Rainforest",
                     "tile": {
-                        "name": "India"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "India",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S2,-4",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Bay of Bengal"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Bay of Bengal",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N2,-3",
                     "type": "Mountain",
                     "tile": {
-                        "name": "Persia"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Persia",
+                        "geology": "Earth_Sedimentary_Basin"
+                    }
                 },
                 {
                     "id": "S2,-3",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Agulhas Plateau"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Agulhas Plateau",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N2,-2",
                     "type": "Steppe",
                     "tile": {
-                        "name": "Eastern Europe"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Eastern Europe",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S2,-2",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Weddell Sea"
-                    },
-                    "geological_province": "Earth_Polar"
+                        "name": "Weddell Sea",
+                        "geology": "Earth_Polar"
+                    }
                 },
                 {
                     "id": "N2,-1",
                     "type": "Forest",
                     "tile": {
-                        "name": "Central Europe"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Central Europe",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S2,-1",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Cosmonauts Sea"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Cosmonauts Sea",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N2,0",
                     "type": "Forest",
                     "tile": {
-                        "name": "East Atlantis"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "East Atlantis",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S2,0",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "South Sandwich Trench"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "South Sandwich Trench",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N2,1",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Azores"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Azores",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "S2,1",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Brazil Basin"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Brazil Basin",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N2,2",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Tropical North Atlantic"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Tropical North Atlantic",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "S2,2",
                     "type": "Forest",
                     "tile": {
-                        "name": "Brazil"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Brazil",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N3,-4",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Arabian Sea"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Arabian Sea",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "S3,-4",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Mascarene Basin"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Mascarene Basin",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N3,-3",
                     "type": "Desert",
                     "tile": {
-                        "name": "Holy Land"
-                    },
-                    "geological_province": "Earth_Sedimentary_Basin"
+                        "name": "Holy Land",
+                        "geology": "Earth_Sedimentary_Basin"
+                    }
                 },
                 {
                     "id": "S3,-3",
                     "type": "Archipelago",
                     "tile": {
-                        "name": "Madagascar"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Madagascar",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N3,-2",
                     "type": "Archipelago",
                     "tile": {
-                        "name": "Eastern Mediterranean"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Eastern Mediterranean",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "S3,-2",
                     "type": "Forest",
                     "tile": {
-                        "name": "South Africa"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "South Africa",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N3,-1",
                     "type": "Forest",
                     "tile": {
-                        "name": "Atlantropa"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Atlantropa",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S3,-1",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Agulhas Basin"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Agulhas Basin",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N3,0",
                     "type": "Forest",
                     "tile": {
-                        "name": "Iberia"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Iberia",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S3,0",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Walvis Ridge"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Walvis Ridge",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "N3,1",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Canary Islands"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Canary Islands",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "S3,1",
                     "type": "Abyssal Plain",
                     "tile": {
-                        "name": "Tropical South Atlantic"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Tropical South Atlantic",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 },
                 {
                     "id": "E1",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Seychelles"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "Seychelles",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "N4,-3",
                     "type": "Mountain",
                     "tile": {
-                        "name": "Ethiopia"
-                    },
-                    "geological_province": "Earth_Large_Igneous_Province"
+                        "name": "Ethiopia",
+                        "geology": "Earth_Large_Igneous_Province"
+                    }
                 },
                 {
                     "id": "S4,-3",
                     "type": "Forest",
                     "tile": {
-                        "name": "East Africa"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "East Africa",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N4,-2",
                     "type": "Desert",
                     "tile": {
-                        "name": "North Africa"
-                    },
-                    "geological_province": "Earth_Sedimentary_Basin"
+                        "name": "North Africa",
+                        "geology": "Earth_Sedimentary_Basin"
+                    }
                 },
                 {
                     "id": "S4,-2",
                     "type": "Rainforest",
                     "tile": {
-                        "name": "Congo"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "Congo",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "N4,-1",
                     "type": "Desert",
                     "tile": {
-                        "name": "West Africa"
-                    },
-                    "geological_province": "Earth_Continental_Crust"
+                        "name": "West Africa",
+                        "geology": "Earth_Continental_Crust"
+                    }
                 },
                 {
                     "id": "S4,-1",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "St. Helena"
-                    },
-                    "geological_province": "Earth_Oceanic_Shelf"
+                        "name": "St. Helena",
+                        "geology": "Earth_Oceanic_Shelf"
+                    }
                 },
                 {
                     "id": "E0",
                     "type": "Hydrothermal Vent Field",
                     "tile": {
-                        "name": "Mid-Atlantic Ridge"
-                    },
-                    "geological_province": "Earth_Oceanic_Abyssal"
+                        "name": "Mid-Atlantic Ridge",
+                        "geology": "Earth_Oceanic_Abyssal"
+                    }
                 }
             ]
         },

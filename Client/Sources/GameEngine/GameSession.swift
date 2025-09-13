@@ -473,7 +473,12 @@ extension GameSession {
         return .instructions(style: .borderless) {
             switch layer {
             case .Terrain:
-                $0[>] = "\(cell.type.name)"
+                if let geology: String = cell.tile.geology {
+                    $0[>] = "\(cell.type.name) (\(geology))"
+                } else {
+                    $0[>] = "\(cell.type.name)"
+                }
+
             case .Population:
                 $0["Population"] = cell.population[/3]
 
