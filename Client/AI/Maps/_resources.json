@@ -81,15 +81,6 @@
     },
     "resources": {
         "Earth_Continental_Crust": {
-            "terrains": [
-                "Mountain",
-                "Forest",
-                "Rainforest",
-                "Steppe",
-                "Desert",
-                "Taiga",
-                "Tundra"
-            ],
             "base_resources": {
                 "Iron": 80,
                 "Aluminum": 80,
@@ -180,10 +171,6 @@
             }
         },
         "Earth_Sedimentary_Basin": {
-            "terrains": [
-                "Desert",
-                "Steppe"
-            ],
             "base_resources": {
                 "Hydrocarbons": 100,
                 "Limestone": 120,
@@ -206,9 +193,6 @@
             }
         },
         "Earth_Large_Igneous_Province": {
-            "terrains": [
-                "Mountain"
-            ],
             "base_resources": {
                 "Iron": 100,
                 "Nickel": 50,
@@ -242,10 +226,6 @@
             }
         },
         "Earth_Oceanic_Abyssal": {
-            "terrains": [
-                "Ocean",
-                "Abyssal Plain"
-            ],
             "base_resources": {
                 "Manganese Nodules": 100
             },
@@ -270,9 +250,6 @@
             }
         },
         "Earth_Oceanic_Vents": {
-            "terrains": [
-                "Hydrothermal Vent Field"
-            ],
             "base_resources": {
                 "Polymetallic Sulfides": 100
             },
@@ -301,10 +278,6 @@
             }
         },
         "Earth_Oceanic_Shelf": {
-            "terrains": [
-                "Continental Shelf",
-                "Archipelago"
-            ],
             "base_resources": {
                 "Fertilizer": 80,
                 "Hydrocarbons": 40,
@@ -347,19 +320,12 @@
             }
         },
         "Earth_Polar": {
-            "terrains": [
-                "Arctic",
-                "Antarctic"
-            ],
             "base_resources": {
                 "Water Ice": 200
             },
             "bonus_resources": {}
         },
         "Moon_Highlands": {
-            "terrains": [
-                "Lunar Highlands"
-            ],
             "base_resources": {
                 "Aluminum": 150,
                 "Silicon": 80,
@@ -369,9 +335,6 @@
             "bonus_resources": {}
         },
         "Moon_Mare": {
-            "terrains": [
-                "Lunar Mare"
-            ],
             "base_resources": {
                 "Titanium": 150,
                 "Iron": 100,
@@ -404,9 +367,6 @@
             }
         },
         "Moon_KREEP": {
-            "terrains": [
-                "Lunar Procellarum"
-            ],
             "base_resources": {
                 "KREEP Thorium": 30,
                 "Generic Rare Earth Ore": 50,
@@ -434,10 +394,6 @@
             }
         },
         "Mars_Generic_Crust": {
-            "terrains": [
-                "Martian Lowland Barren",
-                "Martian Highland Barren"
-            ],
             "base_resources": {
                 "Iron": 250,
                 "Silicon": 100,
@@ -463,9 +419,6 @@
             }
         },
         "Mars_Canyon": {
-            "terrains": [
-                "Valles Marineris"
-            ],
             "base_resources": {
                 "Gypsum": 100,
                 "Iron": 150,
@@ -475,9 +428,6 @@
             "bonus_resources": {}
         },
         "Mars_Volcanic": {
-            "terrains": [
-                "Tharsis Volcanic Province"
-            ],
             "base_resources": {
                 "Iron": 200,
                 "Titanium": 50,
@@ -487,9 +437,6 @@
             "bonus_resources": {}
         },
         "Mars_Polar": {
-            "terrains": [
-                "Martian Polar Cap"
-            ],
             "base_resources": {
                 "Water Ice": 250,
                 "Carbon Dioxide Ice": 100
@@ -497,9 +444,6 @@
             "bonus_resources": {}
         },
         "Asteroid_C_Type": {
-            "terrains": [
-                "C-Type Asteroid"
-            ],
             "base_resources": {
                 "Water Ice": 150,
                 "Carbonaceous Materials": 120,
@@ -510,9 +454,6 @@
             "bonus_resources": {}
         },
         "Asteroid_S_Type": {
-            "terrains": [
-                "S-Type Asteroid"
-            ],
             "base_resources": {
                 "Iron": 60,
                 "Nickel": 30,
@@ -533,9 +474,6 @@
             }
         },
         "Asteroid_M_Type": {
-            "terrains": [
-                "M-Type Asteroid"
-            ],
             "base_resources": {
                 "Iron": 120,
                 "Nickel": 150,
