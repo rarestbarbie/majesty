@@ -48,7 +48,7 @@ export class HexGrid {
         prefix: any[],
         target: (id: string) => string | null = (_: string) => null,
         selected?: string,
-        neighbors?: Set<string>,
+        neighbors?: Map<string, number>,
     ): void {
         this.svg.setAttribute('data-layer', layer);
         this.cells.update(
@@ -78,10 +78,11 @@ export class HexGrid {
                 element.path.setAttribute('d', cell.d0);
                 element.twin?.setAttribute('d', cell.d1 ?? '');
 
-                if (neighbors !== undefined && neighbors.has(cell.id)) {
-                    element.node.classList.add('neighbor');
+                const neighbor: number | undefined = neighbors?.get(cell.id);
+                if (neighbor !== undefined) {
+                    element.node.setAttribute('data-neighbor-index', `${neighbor}`);
                 } else {
-                    element.node.classList.remove('neighbor');
+                    element.node.removeAttribute('data-neighbor-index');
                 }
             },
             selected,
