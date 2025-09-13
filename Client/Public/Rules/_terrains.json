@@ -2,6 +2,15 @@
     "Ocean": {
         "color": "#1e3e83"
     },
+    "Continental Shelf": {
+        "color": "#1e3e83"
+    },
+    "Abyssal Plain": {
+        "color": "#152d5e"
+    },
+    "Hydrothermal Vent Field": {
+        "color": "#0e1e3f"
+    },
     "Archipelago": {
         "color": "#3485bb"
     },
@@ -31,15 +40,6 @@
     },
     "Mountain": {
         "color": "#6d615a"
-    },
-    "Continental Shelf": {
-        "color": "#2a6a96"
-    },
-    "Abyssal Plain": {
-        "color": "#152d5e"
-    },
-    "Hydrothermal Vent Field": {
-        "color": "#0e1e3f"
     },
     "Lunar Highlands": {
         "color": "#838383"
