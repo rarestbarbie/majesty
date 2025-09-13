@@ -164,6 +164,13 @@ extension HexCoordinate {
             // so `e(+1, -1)` means `e(+z, -z, scale: z)`.
             //
             // In all computations below, we omit the third cube coordinate.
+            //
+            // x[0] = cis(t + v[2]) = cis(q    , r - 1, s + 1)
+            // x[1] = cis(t + v[3]) = cis(q - 1, r    , s + 1)
+            // x[2] = cis(t + v[4]) = cis(q - 1, r + 1, s    )
+            // x[3] = eqt(t + v[5]) = eqt(+z, 0, -z)
+            // x[4] = trn(t + v[2]) = trn(q    , r - 1, s + 1) (across from v[5])
+            // x[5] = trn(t) = trn(q, r, s) (twin tile)
             return [
                 cis(q    , r - 1),  // t + v[2]
                 cis(q - 1, r    ),  // t + v[3]
@@ -174,6 +181,13 @@ extension HexCoordinate {
             ]
         case (z, _, -1):
             // CASE B: `t` has an equatorial neighbor along v[1] axis
+            //
+            // x[0] = trn(t + v[5]) = trn(q    , r + 1, s - 1) (across from v[2])
+            // x[1] = trn(t) = trn(q, r, s) (twin tile)
+            // x[2] = eqt(t + v[2]) = eqt(+z, -z, 0)
+            // x[3] = cis(t + v[3]) = cis(q - 1, r    , s + 1)
+            // x[4] = cis(t + v[4]) = cis(q - 1, r + 1, s    )
+            // x[5] = cis(t + v[5]) = cis(q    , r + 1, s - 1)
             return [
                 trn(q    , r + 1),  // t + v[5] (across from v[2])
                 trn(q    , r    ),  // t        (twin tile)
@@ -182,9 +196,16 @@ extension HexCoordinate {
                 cis(q - 1, r + 1),  // t + v[4]
                 cis(q    , r + 1),  // t + v[5]
             ]
-
         case (z, _, _):
             // CASE C: no equatorial neighbor
+            //
+            // x[0] = cis(t + v[2]) = cis(q    , r - 1, s + 1)
+            // x[1] = cis(t + v[3]) = cis(q - 1, r    , s + 1)
+            // x[2] = cis(t + v[4]) = cis(q - 1, r + 1, s    )
+            // x[3] = cis(t + v[5]) = cis(q    , r + 1, s - 1)
+            // x[4] = trn(t + v[5]) = trn(q    , r + 1, s - 1) (across from v[2])
+            // x[5] = trn(t) = trn(q, r, s) (twin tile)
+            // x[6] = trn(t + v[2]) = trn(q    , r - 1, s + 1) (across from v[5])
             return [
                 cis(q    , r - 1),  // t + v[2]
                 cis(q - 1, r    ),  // t + v[3]
@@ -197,81 +218,148 @@ extension HexCoordinate {
 
 
         case (_, -z, +1):
-            // Rotate `t` 60° clockwise, apply CASE A, then result back.
-            //
+            // Rotate `t` -60°, apply CASE A, then rotate result +60°.
             // R(A(R(t, -60°)), +60°)
-            return [] // unimplemented
-
-        case (+1, -z, _):
-            // Rotate `t` 60° clockwise, apply CASE B, then rotate back.
             //
+            // R(t, -60°) = (-r, -s, -q)
+            // R(t, +60°) = (-s, -q, -r)
+            //
+            // x[0] = cis(R((-r, -s, -q) + v[2]), +60°))
+            //      = cis(R((-r, -s - 1, -q + 1), +60°))
+            //      = cis(q - 1, r, s + 1)
+            // x[1] = cis(R((-r, -s, -q) + v[3]), +60°))
+            //      = cis(R((-r - 1, -s, -q + 1), +60°))
+            //      = cis(q - 1, r + 1, s)
+            // x[2] = cis(R((-r, -s, -q) + v[4]), +60°))
+            //      = cis(R((-r - 1, -s + 1, -q), +60°))
+            //      = cis(q, r + 1, s - 1)
+            return [
+                cis(q - 1, r    ),
+                cis(q - 1, r + 1),
+                cis(q    , r + 1),
+                .e(1),
+                trn(q - 1, r    ),
+                trn(q    , r    ),
+            ]
+        case (+1, -z, _):
+            // Rotate `t` -60°, apply CASE B, then rotate result +60°.
             // R(B(R(t, -60°)), +60°)
-            return [] // unimplemented
-
+            //
+            // x[3] = cis(R((-r, -s, -q) + v[3]), +60°))
+            //      = cis(R((-r - 1, -s, -q + 1), +60°))
+            //      = cis(q - 1, r + 1, s)
+            // x[4] = cis(R((-r, -s, -q) + v[4]), +60°))
+            //      = cis(R((-r - 1, -s + 1, -q), +60°))
+            //      = cis(q, r + 1, s - 1)
+            // x[5] = cis(R((-r, -s, -q) + v[5]), +60°))
+            //      = cis(R((-r, -s + 1, -q - 1), +60°))
+            //      = cis(q + 1, r, s - 1)
+            return [
+                trn(q + 1, r    ),
+                trn(q    , r    ),
+                .e(2),
+                cis(q - 1, r + 1),
+                cis(q    , r + 1),
+                cis(q + 1, r    ),
+            ]
         case (_, -z, _):
-            // R(C(R(t, -60°)), +60°)
-            return [] // unimplemented
+            // R(C(R(t, +60°)), -60°)
+            //
+            // x[0] = cis(R((-r, -s, -q) + v[2]), +60°))
+            //      = cis(R((-r, -s - 1, -q + 1), +60°))
+            //      = cis(q - 1, r, s + 1)
+            // x[1] = cis(R((-r, -s, -q) + v[3]), +60°))
+            //      = cis(R((-r - 1, -s, -q + 1), +60°))
+            //      = cis(q - 1, r + 1, s)
+            // x[2] = cis(R((-r, -s, -q) + v[4]), +60°))
+            //      = cis(R((-r - 1, -s + 1, -q), +60°))
+            //      = cis(q, r + 1, s - 1)
+            // x[3] = cis(R((-r, -s, -q) + v[5]), +60°))
+            //      = cis(R((-r, -s + 1, -q - 1), +60°))
+            //      = cis(q + 1, r, s - 1)
+            return [
+                cis(q - 1, r    ),
+                cis(q - 1, r + 1),
+                cis(q    , r + 1),
+                cis(q + 1, r    ),
+                trn(q + 1, r    ),
+                trn(q    , r    ),
+                trn(q - 1, r    ),
+            ]
 
 
         case (-1, _, z):
             // R(A(R(t, -120°)), +120°)
-            return [] // unimplemented
+            return [
+            ]
         case (_, -1, z):
             // R(B(R(t, -120°)), +120°)
-            return [] // unimplemented
+            return [
+            ]
         case (_, _, z):
             // R(C(R(t, -120°)), +120°)
-            return [] // unimplemented
+            return [
+            ]
 
 
         case (-z, +1, _):
             // R(A(R(t, ±180°)), ±180°) = -A(-t)
-            //
-            // Probably could be simplified more.
             return [
-                cis(q    , r + 1),  // t - v[2] (alternatively: t + v[5])
-                cis(q + 1, r    ),  // t - v[3] (alternatively: t + v[0])
-                cis(q + 1, r - 1),  // t - v[4] (alternatively: t + v[1])
-                .e(-1,  0),         // t - v[5] (aka: -z, 0, +z)
-                trn(-z, +1),         // t        (twin tile)
-                trn(-z, +2),         // t - v[2] (across from v[5])
+                cis(q    , r + 1),
+                cis(q + 1, r    ),
+                cis(q + 1, r - 1),
+                .e(3),
+                trn(q    , r + 1),
+                trn(q    , r    ),
             ]
         case (-z, _, +1):
             // R(B(R(t, ±180°)), ±180°) = -B(-t)
-            //
-            // Probably could be simplified more.
             return [
-                trn(-z, z - 2),     // t - v[5] (across from v[2])
-                trn(-z, z - 1),     // t        (twin tile)
-                .e(-1, +1),         // t - v[2] (aka: -z, +z, 0)
-                cis(q + 1, r    ),  // t - v[3] (alternatively: t + v[0])
-                cis(q + 1, r - 1),  // t - v[4] (alternatively: t + v[1])
-                cis(q    , r - 1),  // t - v[5] (alternatively: t + v[2])
+                trn(q    , r - 1),
+                trn(q    , r    ),
+                .e(4),
+                cis(q + 1, r    ),
+                cis(q + 1, r - 1),
+                cis(q    , r - 1),
             ]
         case (-z, _, _):
             // R(C(R(t, ±180°)), ±180°) = -C(-t)
-            return [] // unimplemented
+            return [
+                cis(q    , r + 1),
+                cis(q + 1, r    ),
+                cis(q + 1, r - 1),
+                cis(q    , r - 1),
+                trn(q    , r - 1),
+                trn(q    , r    ),
+                trn(q    , r + 1),
+            ]
 
 
         case (_, z, -1):
-            // R(A(R(t, -240°)), +240°) = ???
-            return [] // unimplemented
+            // R(A(R(t, +120°)), -120°)
+            return [
+            ]
         case (-1, z, _):
-            // R(B(R(t, -240°)), +240°) = ???
-            return [] // unimplemented
+            // R(B(R(t, +120°)), -120°)
+            return [
+            ]
         case (_, z, _):
-            // R(C(R(t, -240°)), +240°) = ???
-            return [] // unimplemented
+            // R(C(R(t, +120°)), -120°)
+            return [
+            ]
 
         case (+1, _, -z):
-            // R(A(R(t, -300°)), +300°) = ???
-            return [] // unimplemented
+            // R(A(R(t, +60°)), -60°)
+            return [
+            ]
         case (_, +1, -z):
-            // R(B(R(t, -300°)), +300°) = ???
-            return [] // unimplemented
+            // R(B(R(t, +60°)), -60°)
+            return [
+            ]
         case (_, _, -z):
-            // R(C(R(t, -300°)), +300°) = ???
-            return [] // unimplemented
+            // R(C(R(t, +60°)), -60°)
+            return [
+            ]
 
 
         /// If one of the coordinates is 0, and the other two are ±(z - 1), the tile is
