@@ -1,0 +1,287 @@
+{
+    "Alloy Foundry": {
+        "inputs": {
+            "Aluminum": 8,
+            "Iron": 8,
+            "Graphite": 2,
+            "Sulfur": 2,
+            "Electricity": 16
+        },
+        "output": {
+            "Alloys": 16
+        },
+        "workers": {
+            "Driver": 50000,
+            "Engineer": 50000
+        }
+    },
+    "Ammonia Plant": {
+        "inputs": {
+            "Hydrocarbons": 12
+        },
+        "output": {
+            "Ammonia": 12
+        },
+        "workers": {
+            "Driver": 50000,
+            "Engineer": 50000
+        }
+    },
+    "Battery Plant": {
+        "inputs": {
+            "Lithium": 4,
+            "Polymers": 1,
+            "Graphite": 3
+        },
+        "output": {
+            "Batteries": 8
+        },
+        "workers": {
+            "Driver": 50000,
+            "Engineer": 50000
+        }
+    },
+    "Cereal Farm": {
+        "inputs": {
+            "Water": 4,
+            "Fertilizer": 1
+        },
+        "output": {
+            "Wheat": 12
+        },
+        "workers": {
+            "Driver": 100000,
+            "Farmer": 30000
+        },
+        "terrain": ["Desert", "Forest", "Rainforest", "Steppe"]
+    },
+    "Chemical Synthesis Plant": {
+        "inputs": {
+            "Hydrocarbons": 2,
+            "Graphite": 1,
+            "Ammonia": 1,
+            "Water": 2
+        },
+        "output": {
+            "Hormones": 8
+        },
+        "workers": {
+            "Driver": 50000,
+            "Engineer": 50000
+        }
+    },
+    "Compute Cluster": {
+        "inputs": {
+            "Electricity": 24,
+            "Electronics": 4,
+            "Storage": 24
+        },
+        "output": {
+            "Autocomplete": 16
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+    "Data Center": {
+        "inputs": {
+            "Electricity": 12,
+            "Electronics": 4
+        },
+        "output": {
+            "Storage": 128
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+    "Fermentation Plant": {
+        "inputs": {
+            "Hydrocarbons": 2,
+            "Hormones": 1,
+            "Fertilizer": 3,
+            "Water": 2
+        },
+        "output": {
+            "Antibiotics": 8
+        },
+        "workers": {
+            "Driver": 50000,
+            "Engineer": 50000
+        }
+    },
+    "Fertilizer Plant (2)": {
+        "inputs": {
+            "Ammonia": 2,
+            "Potash": 2,
+            "Phosphate": 2,
+            "Sulfur": 2
+        },
+        "output": {
+            "Fertilizer": 8
+        },
+        "workers": {
+            "Driver": 100000,
+            "Engineer": 30000
+        }
+    },
+    "Fertilizer Plant": {
+        "inputs": {
+            "Electricity": 2
+        },
+        "output": {
+            "Fertilizer": 8
+        },
+        "workers": {
+            "Driver": 100000,
+            "Engineer": 30000
+        }
+    },
+    "Hydroelectric Dam": {
+        "inputs": {
+            "Influence": 1
+        },
+        "output": {
+            "Electricity": 12,
+            "Water": 48
+        },
+        "workers": {
+            "Driver": 1000,
+            "Engineer": 1000
+        },
+        "terrain": [
+            "Desert",
+            "Forest",
+            "Rainforest",
+            "Mountain",
+            "Mountain Jungle",
+            "Steppe",
+            "Taiga"
+        ]
+    },
+    "Hydroponic Farm": {
+        "inputs": {
+            "Water": 1,
+            "Fertilizer": 2
+        },
+        "output": {
+            "Produce": 6,
+            "Wheat": 6
+        },
+        "workers": {
+            "Driver": 100000,
+            "Engineer": 30000
+        }
+    },
+    "Machine Parts Factory": {
+        "inputs": {
+            "Hydrocarbons": 1,
+            "Alloys": 5,
+            "Sulfur": 1,
+            "Water": 1
+        },
+        "output": {
+            "Machine Parts": 12
+        },
+        "workers": {
+            "Driver": 50000,
+            "Engineer": 50000
+        }
+    },
+    "Nuclear Power Plant": {
+        "inputs": {
+            "Uranium": 1,
+            "Influence": 1
+        },
+        "output": {
+            "Electricity": 24
+        },
+        "workers": {
+            "Driver": 50000,
+            "Engineer": 50000
+        }
+    },
+    "Plantation": {
+        "inputs": {
+            "Water": 4,
+            "Fertilizer": 1
+        },
+        "output": {
+            "Produce": 12
+        },
+        "workers": {
+            "Driver": 100000,
+            "Farmer": 30000
+        },
+        "terrain": ["Desert", "Steppe", "Forest", "Rainforest"]
+    },
+    "Polypropylene Plant": {
+        "inputs": {
+            "Hydrocarbons": 8,
+            "Water": 8
+        },
+        "output": {
+            "Polymers": 8
+        },
+        "workers": {
+            "Driver": 50000,
+            "Engineer": 50000
+        }
+    },
+    "Semiconductor Foundry": {
+        "inputs": {
+            "Batteries": 1,
+            "Graphite": 1,
+            "Gold": 2,
+            "Neon": 1,
+            "Helium": 1
+        },
+        "output": {
+            "Semiconductor Devices": 8
+        },
+        "workers": {
+            "Driver": 50000,
+            "Engineer": 50000
+        }
+    },
+    "Slaughterhouse": {
+        "inputs": {
+            "Livestock": 16,
+            "Water": 2
+        },
+        "output": {
+            "Poultry": 12,
+            "Beef": 8
+        },
+        "workers": {
+            "Driver": 100000,
+            "Engineer": 30000
+        }
+    },
+    "Water Treatment Plant": {
+        "inputs": {
+            "Electricity": 8
+        },
+        "output": {
+            "Water": 16
+        },
+        "workers": {
+            "Driver": 30000,
+            "Engineer": 20000
+        }
+    },
+    "Uranium Enrichment Facility": {
+        "inputs": {
+            "Electricity": 4
+        },
+        "output": {
+            "Uranium": 2
+        },
+        "workers": {
+            "Driver": 50000,
+            "Engineer": 20000
+        }
+    }
+}

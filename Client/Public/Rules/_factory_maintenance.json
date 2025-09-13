@@ -1,0 +1,11 @@
+{
+    "*": {
+        "Electricity": 100000,
+        "Storage":     100000,
+        "Ice":           1000,
+        "Machine Parts": 1000,
+        "Autocomplete":  1000,
+        "Instruments":     50,
+        "Vehicles":        50
+    }
+}

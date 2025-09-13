@@ -1,0 +1,332 @@
+{
+    "Housing": {
+        "emoji": "🏠",
+        "color": "#575a7e",
+        "local": true
+    },
+    "Services": {
+        "emoji": "💼",
+        "color": "#242753",
+        "local": true
+    },
+    "Influence": {
+        "emoji": "⚖️",
+        "color": "#873a8a",
+        "local": true
+    },
+
+    "Beef": {
+        "emoji": "🍖",
+        "color": "#a1442d"
+    },
+    "Poultry": {
+        "emoji": "🍗",
+        "color": "#da9669"
+    },
+    "Produce": {
+        "emoji": "🥬",
+        "color": "#7ed157"
+    },
+    "Wheat": {
+        "emoji": "🌾",
+        "color": "#beaa66"
+    },
+
+    "Aluminum": {
+        "emoji": "🪨",
+        "color": "#b0b0b0"
+    },
+    "Ammonia": {
+        "emoji": "💨",
+        "color": "#1b7760"
+    },
+    "Cobalt": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Copper": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Diamonds": {
+        "emoji": "💎",
+        "color": "#161616"
+    },
+    "Dysprosium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Gallium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Germanium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Graphite": {
+        "emoji": "✏️",
+        "color": "#161616"
+    },
+    "Gold": {
+        "emoji": "💰",
+        "color": "#ffe2a4"
+    },
+    "Helium-3": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Helium": {
+        "emoji": "🎈",
+        "color": "#ff4e37"
+    },
+    "Hydrocarbons": {
+        "emoji": "🛢️",
+        "color": "#292929"
+    },
+    "Iridium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Iron": {
+        "emoji": "⛓️",
+        "color": "#3f3f3f"
+    },
+    "Ivory": {
+        "emoji": "🐘",
+        "color": "#dfd3cc"
+    },
+    "Limestone": {
+        "emoji": "🏛️",
+        "color": "#d5e1e7"
+    },
+    "Lithium": {
+        "emoji": "🔋",
+        "color": "#dcf5bb"
+    },
+    "Neon": {
+        "emoji": "💗",
+        "color": "#ff4dc4"
+    },
+    "Neodymium": {
+        "emoji": "🧲",
+        "color": "#ff81d5"
+    },
+    "Nickel": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Niobium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Pearls": {
+        "emoji": "⚪",
+        "color": "#ffd5c8"
+    },
+    "Phosphate": {
+        "emoji": "🧂",
+        "color": "#cecece"
+    },
+    "Platinum": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Potash": {
+        "emoji": "🪨",
+        "color": "#d4a0a0"
+    },
+    "Rhenium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Rhodium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Scandium": {
+        "emoji": "🟣",
+        "color": "#e6e6e6"
+    },
+    "Silver": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Sulfur": {
+        "emoji": "🟡",
+        "color": "#f4d03f"
+    },
+    "Tantalum": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Titanium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Tungsten": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Uranium": {
+        "emoji": "☢️",
+        "color": "#30ff8d"
+    },
+    "Water": {
+        "emoji": "💧",
+        "color": "#5ea9ff"
+    },
+    "Yttrium": {
+        "emoji": "🟢",
+        "color": "#30ff52"
+    },
+    "Zinc": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Zirconium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+
+    "Alloys": {
+        "emoji": "⬜",
+        "color": "#d0d0d0"
+    },
+    "Advertising": {
+        "emoji": "🎙️",
+        "color": "#793fff"
+    },
+    "Antibiotics": {
+        "emoji": "⚕️",
+        "color": "#86b893"
+    },
+    "Appliances": {
+        "emoji": "🖥️",
+        "color": "#505253"
+    },
+    "Autocomplete": {
+        "emoji": "🤖",
+        "color": "#9ab3c4"
+    },
+    "Batteries": {
+        "emoji": "🔋",
+        "color": "#baff82"
+    },
+    "Clothing": {
+        "emoji": "👗",
+        "color": "#4cffd2"
+    },
+    "Deuterium": {
+        "emoji": "🟦",
+        "color": "#4cf9ff"
+    },
+    "Drones": {
+        "emoji": "🛫",
+        "color": "#6b73a1"
+    },
+    "Electronics": {
+        "emoji": "🎮",
+        "color": "#62a060"
+    },
+    "Electricity": {
+        "emoji": "⚡",
+        "color": "#fff27a"
+    },
+    "Explosives": {
+        "emoji": "🧨",
+        "color": "#ff6913"
+    },
+    "Fertilizer": {
+        "emoji": "🌱",
+        "color": "#8bc34a"
+    },
+    "Firearms": {
+        "emoji": "🔫",
+        "color": "#242424"
+    },
+    "Hormones": {
+        "emoji": "🧬",
+        "color": "#ffcee1"
+    },
+    "Instruments": {
+        "emoji": "🎸",
+        "color": "#a02535"
+    },
+    "Jewelry": {
+        "emoji": "💍",
+        "color": "#cfffff"
+    },
+    "Lingerie": {
+        "emoji": "💝",
+        "color": "#ff4171"
+    },
+    "Machine Parts": {
+        "emoji": "🔩",
+        "color": "#a0a0a0"
+    },
+    "Makeup": {
+        "emoji": "💄",
+        "color": "#ff2643"
+    },
+    "Medical Equipment": {
+        "emoji": "💉",
+        "color": "#9de9f7"
+    },
+    "Missiles": {
+        "emoji": "🚀",
+        "color": "#9c0000"
+    },
+    "Organs": {
+        "emoji": "🫁",
+        "color": "#ff95be"
+    },
+    "Polymers": {
+        "emoji": "🧴",
+        "color": "#009c9c"
+    },
+    "Semiconductor Devices": {
+        "emoji": "📀",
+        "color": "#e4b55f"
+    },
+    "Spacecraft": {
+        "emoji": "🛸",
+        "color": "#e9a72d"
+    },
+    "Shells": {
+        "emoji": "💣",
+        "color": "#4b3d3d"
+    },
+    "Storage": {
+        "emoji": "💾",
+        "color": "#d4b0f7"
+    },
+    "Vehicles": {
+        "emoji": "🛻",
+        "color": "#91091b"
+    },
+
+
+    "Livestock": {
+        "emoji": "🐄",
+        "color": "#7c566c"
+    },
+
+
+    "Adderall": {
+        "emoji": "💊",
+        "color": "#9dffe6"
+    },
+    "Liquor": {
+        "emoji": "🍺",
+        "color": "#b38a3e"
+    },
+    "Cocaine": {
+        "emoji": "❄️",
+        "color": "#FFFFFF"
+    },
+    "Vapes": {
+        "emoji": "🖊️",
+        "color": "#754285"
+    }
+}

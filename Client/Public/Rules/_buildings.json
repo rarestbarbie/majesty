@@ -1,0 +1,22 @@
+{
+    "High Density Housing": {
+        "costs": {
+            "Influence": 2,
+            "Limestone": 6,
+            "Appliances": 12,
+            "Alloys": 6
+        },
+        "output": {
+            "Housing": 24
+        }
+    },
+    "Single Family Housing": {
+        "costs": {
+            "Limestone": 6,
+            "Appliances": 6
+        },
+        "output": {
+            "Housing": 4
+        }
+    }
+}
