@@ -175,9 +175,17 @@ let package: Package = .init(
             ]
         ),
 
-        .target(name: "HexGrids",
+        .target(
+            name: "HexGrids",
             dependencies: [
                 .target(name: "Vector"),
+            ],
+        ),
+
+        .testTarget(
+            name: "HexGridTests",
+            dependencies: [
+                .target(name: "HexGrids"),
             ],
         ),
 

@@ -1,0 +1,42 @@
+I am creating a Space Video Game which represents the surfaces of various planets as a hex grid with a coin-like topology, which is meant to represent the surface of a sphere.
+
+The precise topology and coordinate system of the grid is described by the Swift code in `HexCoordinate.swift`. Pay special attention to `HexCoordinate.neighbors(size:)`, which is a function that returns the list of neighbors for any given tile.
+
+For your convenience, a precomputed table of neighbor mappings for a grid of size `z=4` has been provided for you in `N4.txt`.
+
+Right now, we have a crude map of the Earth, in `_earth.json`. The tiles have identifiers where tiles with IDs with `N` prefixes are in the northern hemisphere, `S` prefixes in the southern hemisphere, and `E` prefixes for tiles that straddle the equator, as previously discussed.
+
+Many of the tiles also have names, in the `"name"` field, which are supposed to indicate the tile’s true, physical geographic location.
+
+Some of the tiles in our existing data are not well-annotated - for example, we have lots of “Pacific Ocean” tiles and it would be great if these tiles had more-specific names. Try to avoid renaming or relabeling the land tiles however. Make sure you have a solid grasp of the game map’s coordinate system first, before you attempt this.
+
+Some of these tiles have been given names in accordance with the game’s lore, which may be confusing. For example, the tile named “Central America” is actually what we would call “The Midwestern United States” in 21st century real life, because in the game lore, the USA annexed all of North America, which means real-world regions like Canada and Guatemala are named “Northern America” and “Southern America” in-game, respectively. Notably, the Western Mediterranean was drained and named “Atlantropa” in game lore, which turned that tile into a ‘Forest’-type tile. Moreover, some of the biomes may not be what you expect - in the game lore, Climate Change made parts of Antarctica habitable, which is why some of those tiles are not ice-covered as they are today.
+
+The following is an exhaustive list of tiles with names that may not correspond to their 21st-century real-world locations:
+
+- "Northern America" (Eastern Canada)
+- "Western America" (Oregon and Western Canada)
+- "Central America" (Midwestern US)
+- "West Atlantis" (Eastern US)
+- "Gulf of America" (Gulf of Mexico)
+- "Southern America" (Central America, e.g. Honduras, Costa Rica, etc.)
+- "East Atlantis" (Northwestern Europe)
+- "Atlantropa" (Western Mediterranean)
+- "Northern Europe" (Scandinavia, and Northwestern Russia)
+- "Eastern Midlands" (Eastern China and Russian Far East)
+- "Western Midlands" (Western and Southern China)
+- "Antarctic Territories" (Eastern half of Australian claims in East Antarctica)
+- "New Territories" (Western half of Australian claims in East Antarctica)
+
+You can safely assume all other named tiles in the original `_earth.json` have the same names as their corresponding 21st-century real life locations, and you can use them as anchor points to help you orient yourself on the map.
+
+Your task is to take the aquatic tiles in `_earth.json` that have non-unique names, and give them more useful, unique names corresponding to their real life 21st-century locations. Your output should be a modified version of the `_earth.json` file, with the `grid.tile.name` field populated with unique names for the problematic marine tiles. Do not make any other changes to the JSON.
+
+In the past, you (Google Gemini) have struggled with geographical and spatial reasoning tasks. The strategy I recommend that you use is to use the adjacency table (`N4.txt`) to orient yourself on the map. For example, when assigning a label to a tile, check the neighbors of that tile, and verify that the adjacency relationships make sense.
+
+Pay special attention to distances and proportions. The game’s map tiles are equally-sized and regularly-spaced, and the labels you choose must reflect this.
+Avoid creating representations for features that would be spatially occluded by other features - for example, at the granuality of the map’s tile grid, Cuba and the Caribbean Sea would occupy the same hexagonal tile region, so it’s better to simply omit "Cuba" rather than artificially dialate the size of that region to fit all “famous” geographical features on the map. Many “famous” landmarks are likely not large enough to appear as tile-scale features, and would be absorbed into other labels in a map with correct proportions.
+
+Use Deep Research to pick useful, recognizable names for the marine tiles. For example, “Guam” is a better name than “West-Central Pacific Ocean”.
+
+If you notice any contradictions between the preexisting labels and the provided adjacency table, or otherwise get lost, please call it out instead of trying to reconcile the contradictions yourself. You are also encouraged to use the “terrain” type annotations as an additional sanity check.

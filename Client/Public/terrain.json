@@ -2331,35 +2331,35 @@
                     "id": "S-4,2",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "French Polynesia"
                     }
                 },
                 {
                     "id": "N-4,3",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "Clarion Fracture Zone"
                     }
                 },
                 {
                     "id": "S-4,3",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "Easter Island"
                     }
                 },
                 {
                     "id": "E4",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "Cocos Plate"
                     }
                 },
                 {
                     "id": "N-3,-1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "Japan Trench"
                     }
                 },
                 {
@@ -2373,76 +2373,78 @@
                     "id": "N-3,0",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "Emperor Seamounts"
                     }
                 },
                 {
                     "id": "S-3,0",
                     "type": "Ocean",
                     "tile": {
-                        "name": "New Caledonia"
+                        "name": "Coral Sea"
                     }
                 },
                 {
                     "id": "N-3,1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "North Pacific Ocean"
                     }
                 },
                 {
                     "id": "S-3,1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "Kermadec Trench"
                     }
                 },
                 {
                     "id": "N-3,2",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "North Pacific Gyre"
                     }
                 },
                 {
                     "id": "S-3,2",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "South Pacific Gyre"
                     }
                 },
                 {
                     "id": "N-3,3",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "Baja California Seamounts"
                     }
                 },
                 {
                     "id": "S-3,3",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "East Pacific Rise"
                     }
                 },
                 {
                     "id": "N-3,4",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "Gulf of California"
                     }
                 },
                 {
                     "id": "S-3,4",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "Peru-Chile Trench"
                     }
                 },
                 {
                     "id": "N-2,-2",
                     "type": "Ocean",
-                    "tile": {}
+                    "tile": {
+                        "name": "East China Sea"
+                    }
                 },
                 {
                     "id": "S-2,-2",
@@ -2490,7 +2492,7 @@
                     "id": "S-2,1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Southern Ocean"
+                        "name": "Amundsen Sea"
                     }
                 },
                 {
@@ -2504,7 +2506,7 @@
                     "id": "S-2,2",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Southern Ocean"
+                        "name": "Bellingshausen Sea"
                     }
                 },
                 {
@@ -2518,7 +2520,7 @@
                     "id": "S-2,3",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "Drake Passage"
                     }
                 },
                 {
@@ -2532,7 +2534,7 @@
                     "id": "S-2,4",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "Peruvian Sea"
                     }
                 },
                 {
@@ -2574,14 +2576,14 @@
                     "id": "S-1,-1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Southern Ocean"
+                        "name": "Tasman Sea"
                     }
                 },
                 {
                     "id": "N-1,0",
                     "type": "Arctic",
                     "tile": {
-                        "name": "Arctic Ocean"
+                        "name": "Bering Sea"
                     }
                 },
                 {
@@ -2616,7 +2618,7 @@
                     "id": "S-1,2",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Southern Ocean"
+                        "name": "Scotia Sea"
                     }
                 },
                 {
@@ -2630,7 +2632,7 @@
                     "id": "S-1,3",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Pacific Ocean"
+                        "name": "Chilean Sea"
                     }
                 },
                 {
@@ -2665,7 +2667,7 @@
                     "id": "S0,-3",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Australian Ocean"
+                        "name": "Great Australian Bight"
                     }
                 },
                 {
@@ -2679,7 +2681,7 @@
                     "id": "S0,-2",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Southern Ocean"
+                        "name": "Cooperation Sea"
                     }
                 },
                 {
@@ -2784,7 +2786,7 @@
                     "id": "S1,-3",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Australian Ocean"
+                        "name": "Wharton Basin"
                     }
                 },
                 {
@@ -2798,7 +2800,7 @@
                     "id": "S1,-2",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Southern Ocean"
+                        "name": "Kerguelen Plateau"
                     }
                 },
                 {
@@ -2840,14 +2842,14 @@
                     "id": "S1,1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Falkland Islands"
+                        "name": "Argentine Sea"
                     }
                 },
                 {
                     "id": "N1,2",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Atlantic Ocean"
+                        "name": "North Atlantic Gyre"
                     }
                 },
                 {
@@ -2882,7 +2884,7 @@
                     "id": "S2,-4",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Indian Ocean"
+                        "name": "Bay of Bengal"
                     }
                 },
                 {
@@ -2896,7 +2898,7 @@
                     "id": "S2,-3",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Indian Ocean"
+                        "name": "Agulhas Plateau"
                     }
                 },
                 {
@@ -2910,7 +2912,7 @@
                     "id": "S2,-2",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Southern Ocean"
+                        "name": "Weddell Sea"
                     }
                 },
                 {
@@ -2924,7 +2926,7 @@
                     "id": "S2,-1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Southern Ocean"
+                        "name": "Cosmonauts Sea"
                     }
                 },
                 {
@@ -2938,28 +2940,28 @@
                     "id": "S2,0",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Atlantic Ocean"
+                        "name": "South Sandwich Trench"
                     }
                 },
                 {
                     "id": "N2,1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Atlantic Ocean"
+                        "name": "Azores"
                     }
                 },
                 {
                     "id": "S2,1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Atlantic Ocean"
+                        "name": "Brazil Basin"
                     }
                 },
                 {
                     "id": "N2,2",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Atlantic Ocean"
+                        "name": "Tropical North Atlantic"
                     }
                 },
                 {
@@ -2973,14 +2975,14 @@
                     "id": "N3,-4",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Indian Ocean"
+                        "name": "Arabian Sea"
                     }
                 },
                 {
                     "id": "S3,-4",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Indian Ocean"
+                        "name": "Mascarene Basin"
                     }
                 },
                 {
@@ -3022,7 +3024,7 @@
                     "id": "S3,-1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Atlantic Ocean"
+                        "name": "Agulhas Basin"
                     }
                 },
                 {
@@ -3036,7 +3038,7 @@
                     "id": "S3,0",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Atlantic Ocean"
+                        "name": "Walvis Ridge"
                     }
                 },
                 {
@@ -3050,14 +3052,14 @@
                     "id": "S3,1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Atlantic Ocean"
+                        "name": "Gulf of Guinea"
                     }
                 },
                 {
                     "id": "E1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Indian Ocean"
+                        "name": "Seychelles"
                     }
                 },
                 {
@@ -3099,14 +3101,14 @@
                     "id": "S4,-1",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Atlantic Ocean"
+                        "name": "Angola Basin"
                     }
                 },
                 {
                     "id": "E0",
                     "type": "Ocean",
                     "tile": {
-                        "name": "Atlantic Ocean"
+                        "name": "Mid-Atlantic Ridge"
                     }
                 }
             ]
