@@ -7,6 +7,7 @@ package-lock.json
 /Client/Art/Pops/Icons/*.png
 /Client/Public/Fonts/*.otf
 /Client/Public/Fonts/*.woff2
+/Client/Public/rules.json
 /ClientIntegrationTests/.build/
 /ClientIntegrationTests/.build.*
 
