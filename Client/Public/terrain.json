@@ -2589,7 +2589,7 @@
                     "id": "S1,1",
                     "type": "Continental Shelf",
                     "tile": {
-                        "name": "Argentine Sea",
+                        "name": "Scotia Sea",
                         "geology": "Earth_Oceanic_Shelf"
                     }
                 },
