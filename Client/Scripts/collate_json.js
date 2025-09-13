@@ -17,7 +17,7 @@ const finalOutput = {};
 
 try {
     // Find all files matching the pattern '_*.json' in the specified directory
-    const files = glob.sync(path.join(inputDir, '_*.json'));
+    const files = glob.sync(path.join(inputDir, '_*.jsonc'));
 
     if (files.length === 0) {
         console.warn(`⚠️ No files matching '_*.json' found in '${inputDir}'.`);
@@ -26,7 +26,7 @@ try {
     // --- Process each file ---
     files.forEach(filePath => {
         // 1. Derive the key from the filename: '_foo_bar.json' -> 'foo_bar'
-        const baseName = path.basename(filePath, '.json'); // Gets '_foo_bar'
+        const baseName = path.basename(filePath, '.jsonc'); // Gets '_foo_bar'
         const key = baseName.slice(1); // Removes the leading '_' to get 'foo_bar'
 
         // 2. Read the JSON5 file content

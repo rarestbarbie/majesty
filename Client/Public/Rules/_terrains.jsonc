@@ -1,7 +1,13 @@
 {
+    "Space Vacuum": {
+        "color": "#19172c"
+    },
+
+    // Deprecated
     "Ocean": {
         "color": "#1e3e83"
     },
+
     "Continental Shelf": {
         "color": "#1e3e83"
     },
@@ -85,6 +91,7 @@
         "color": "#1b1b1b"
     },
 
+    // Deprecated
     "Arctic Barren": {
         "color": "#b5ceda"
     },
@@ -116,7 +123,4 @@
     "Mountain Vacuum": {
         "color": "#a7a7a7"
     },
-    "Space Vacuum": {
-        "color": "#19172c"
-    }
 }
