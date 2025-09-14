@@ -2414,7 +2414,7 @@
                     "type": "Taiga",
                     "tile": {
                         "name": "Russia",
-                        "geology": "Earth_Continental_Crust"
+                        "geology": "Earth_Large_Igneous_Province"
                     }
                 },
                 {
@@ -2539,10 +2539,10 @@
                 },
                 {
                     "id": "S1,-2",
-                    "type": "Abyssal Plain",
+                    "type": "Continental Shelf",
                     "tile": {
                         "name": "Kerguelen Plateau",
-                        "geology": "Earth_Oceanic_Abyssal"
+                        "geology": "Earth_Oceanic_Shelf"
                     }
                 },
                 {
@@ -2582,7 +2582,7 @@
                     "type": "Archipelago",
                     "tile": {
                         "name": "Greenland",
-                        "geology": "Earth_Continental_Crust"
+                        "geology": "Earth_Large_Igneous_Province"
                     }
                 },
                 {
@@ -2630,7 +2630,7 @@
                     "type": "Rainforest",
                     "tile": {
                         "name": "India",
-                        "geology": "Earth_Continental_Crust"
+                        "geology": "Earth_Large_Igneous_Province"
                     }
                 },
                 {

@@ -6,14 +6,14 @@ public final class GeologicalMetadata: Identifiable {
     public let id: GeologicalType
     public let name: String
     public let base: OrderedDictionary<Resource, Int64>
-    public let bonus: [Resource: GeologicalBonuses]
+    public let bonus: [Resource: Bonuses]
     public let color: Color
 
     init(
         id: GeologicalType,
         name: String,
         base: OrderedDictionary<Resource, Int64>,
-        bonus: [Resource: GeologicalBonuses],
+        bonus: [Resource: Bonuses],
         color: Color
     ) {
         self.id = id

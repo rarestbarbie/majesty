@@ -40,6 +40,14 @@
         "emoji": "💨",
         "color": "#1b7760"
     },
+    "Anorthosite": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Chromium": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
     "Cobalt": {
         "emoji": "?",
         "color": "#30ff52"
@@ -72,6 +80,10 @@
         "emoji": "💰",
         "color": "#ffe2a4"
     },
+    "Gypsum": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
     "Helium-3": {
         "emoji": "?",
         "color": "#30ff52"
@@ -96,6 +108,14 @@
         "emoji": "🐘",
         "color": "#dfd3cc"
     },
+    "Jarosite": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Lanthanum": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
     "Limestone": {
         "emoji": "🏛️",
         "color": "#d5e1e7"
@@ -103,6 +123,10 @@
     "Lithium": {
         "emoji": "🔋",
         "color": "#dcf5bb"
+    },
+    "Manganese Nodules": {
+        "emoji": "?",
+        "color": "#6aff3d"
     },
     "Neon": {
         "emoji": "💗",
@@ -120,9 +144,17 @@
         "emoji": "?",
         "color": "#30ff52"
     },
+    "Olivine": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
     "Pearls": {
         "emoji": "⚪",
         "color": "#ffd5c8"
+    },
+    "Perchlorates": {
+        "emoji": "?",
+        "color": "#6aff3d"
     },
     "Phosphate": {
         "emoji": "🧂",
@@ -132,9 +164,21 @@
         "emoji": "?",
         "color": "#30ff52"
     },
+    "Polymetallic Sulfides": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
     "Potash": {
         "emoji": "🪨",
         "color": "#d4a0a0"
+    },
+    "Pyroxene": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Quartz": {
+        "emoji": "?",
+        "color": "#6aff3d"
     },
     "Rhenium": {
         "emoji": "?",
@@ -328,5 +372,32 @@
     "Vapes": {
         "emoji": "🖊️",
         "color": "#754285"
+    },
+
+    // Placeholders
+    "Hydrogen": {
+        "emoji": "🧊",
+        "color": "#a7e9ff"
+    },
+    "Generic Rare Earth Ore": {
+        "emoji": "🧊",
+        "color": "#a7e9ff"
+    },
+    "Carbon Dioxide Ice": {
+        "emoji": "🧊",
+        "color": "#a7e9ff"
+    },
+    "KREEP Thorium": {
+        "emoji": "🧊",
+        "color": "#a7e9ff"
+    },
+    "Water Ice": {
+        "emoji": "🧊",
+        "color": "#a7e9ff"
+    },
+    "Carbonaceous Materials": {
+        "emoji": "🧊",
+        "color": "#a7e9ff",
+        "text": "Carbonaceous materials are bulk resources representing the mix of organic compounds, tars, and simple carbon molecules found in C-type (carbonaceous) asteroids. They can be refined to extract essential volatiles like water, nitrogen compounds, and hydrocarbons, but cannot be used in their raw form, even as fuel."
     }
 }
