@@ -7,6 +7,8 @@ extension GameRules {
         case resources
         case pops
         case technologies
+
+        case geology
         case terrains
 
         case exchange

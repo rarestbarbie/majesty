@@ -1,5 +1,6 @@
 {
     "vscode-color-picker.languages": [
         "json",
+        "jsonc",
     ],
 }

@@ -7,6 +7,7 @@ public struct GameRulesDescription {
     let resources: SymbolTable<ResourceDescription>
     let pops: SymbolTable<PopDescription>
     let technologies: SymbolTable<TechnologyDescription>
+    let geology: SymbolTable<GeologicalDescription>
     let terrains: SymbolTable<TerrainDescription>
     let exchange: Exchange.Settings
 }
@@ -18,6 +19,7 @@ extension GameRulesDescription: JavaScriptDecodable {
             resources: try js[.resources].decode(),
             pops: try js[.pops].decode(),
             technologies: try js[.technologies].decode(),
+            geology: try js[.geology].decode(),
             terrains: try js[.terrains].decode(),
             exchange: try js[.exchange].decode(),
         )
