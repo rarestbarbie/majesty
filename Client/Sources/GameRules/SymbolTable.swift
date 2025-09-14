@@ -37,15 +37,15 @@ extension SymbolTable where Value: Hashable {
     }
 
     func resolve<Metadata>(
-        _ table: OrderedTable<Metadata>
+        _ table: OrderedDictionary<Symbol, Metadata>
     ) throws -> OrderedDictionary<Value, Metadata> {
         try self.resolve(table, \.self)
     }
     func resolve<T, Metadata>(
-        _ table: OrderedTable<T>,
+        _ table: OrderedDictionary<Symbol, T>,
         _ yield: (T) throws -> Metadata
     ) throws -> OrderedDictionary<Value, Metadata> {
-        try table.index.reduce(into: [:]) { $0[try self[$1.key]] = try yield($1.value) }
+        try table.reduce(into: [:]) { $0[try self[$1.key]] = try yield($1.value) }
     }
 
     func resolve<Metadata>(

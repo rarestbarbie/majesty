@@ -6,6 +6,7 @@ import OrderedCollections
     public let resources: OrderedDictionary<Resource, ResourceMetadata>
     public let factories: OrderedDictionary<FactoryType, FactoryMetadata>
     public let technologies: OrderedDictionary<Technology, TechnologyMetadata>
+    public let geology: OrderedDictionary<GeologicalType, GeologicalMetadata>
     public let terrains: OrderedDictionary<TerrainType, TerrainMetadata>
 
     public let pops: [PopType: PopMetadata]
@@ -16,6 +17,7 @@ import OrderedCollections
         resources: OrderedDictionary<Resource, ResourceMetadata>,
         factories: OrderedDictionary<FactoryType, FactoryMetadata>,
         technologies: OrderedDictionary<Technology, TechnologyMetadata>,
+        geology: OrderedDictionary<GeologicalType, GeologicalMetadata>,
         terrains: OrderedDictionary<TerrainType, TerrainMetadata>,
         pops: [PopType: PopMetadata],
         settings: Settings
@@ -23,6 +25,7 @@ import OrderedCollections
         self.resources = resources
         self.factories = factories
         self.technologies = technologies
+        self.geology = geology
         self.terrains = terrains
         self.pops = pops
         self.settings = settings
@@ -71,19 +74,6 @@ extension GameRules {
             .init(name: $0.name, color: $1.color, emoji: $1.emoji, local: $1.local)
         }
 
-        let geology: OrderedDictionary<GeologicalType, GeologicalMetadata> = try table.geology.reduce(
-            into: [:]
-        ) {
-            let (type, (symbol, province)): (GeologicalType, (Symbol, GeologicalDescription)) = $1
-            let base: OrderedDictionary<Resource, Int64> = try symbols.resources.resolve(province.base)
-            let bonus: [
-                Resource: OrderedDictionary<Resource, GeologicalSpawnWeight>
-            ] = try symbols.resources.resolve(province.bonus) {
-                // Cannot resolve special key "_" !!!
-                try symbols.resources.resolve($0)
-            }
-        }
-
         let factoryCosts: EffectsTable<FactoryType, SymbolTable<Int64>> = try symbols.factories.resolve(
             rules.factory_costs
         )
@@ -118,6 +108,26 @@ extension GameRules {
                     starter: $1.starter,
                     effects: try $1.effects.resolved(with: symbols),
                     summary: $1.summary
+                )
+            },
+            geology: try table.geology.reduce(
+                into: [:]
+            ) {
+                let (type, (symbol, province)): (
+                    GeologicalType, (Symbol, GeologicalDescription)
+                ) = $1
+
+                $0[type] = .init(
+                    id: type,
+                    name: symbol.name,
+                    base: try symbols.resources.resolve(province.base),
+                    bonus: try symbols.resources.resolve(province.bonus) {
+                        .init(
+                            weightNone: $0.weightNone,
+                            weights: try symbols.resources.resolve($0.weights)
+                        )
+                    },
+                    color: province.color
                 )
             },
             terrains: table.terrains.reduce(into: [:]) {
@@ -162,6 +172,10 @@ extension GameRules {
             value.hash.hash(into: &hasher)
         }
         for (key, value): (Technology, TechnologyMetadata) in self.technologies {
+            key.hash(into: &hasher)
+            value.hash.hash(into: &hasher)
+        }
+        for (key, value): (GeologicalType, GeologicalMetadata) in self.geology {
             key.hash(into: &hasher)
             value.hash.hash(into: &hasher)
         }

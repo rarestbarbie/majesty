@@ -53,7 +53,7 @@ extension JavaScriptDecoder {
 
     @inlinable public func values<T, Value>(
         storage: (_ count: Int) throws -> T,
-        _ yield: (inout T, ObjectKey, Value) throws -> (),
+        combine: (inout T, ObjectKey, Value) throws -> (),
     ) throws -> T where Value: LoadableFromJSValue {
         guard
         case .object(let object)? = JavaScriptClass.Object.constructor.keys?(self.object) else {
@@ -69,7 +69,7 @@ extension JavaScriptDecoder {
                 throw KeyspaceError.init(invalid: key.description)
             }
 
-            try yield(&$0, key, try self[key].decode())
+            try combine(&$0, key, try self[key].decode())
         }
     }
 }

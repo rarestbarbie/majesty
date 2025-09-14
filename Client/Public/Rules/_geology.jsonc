@@ -16,8 +16,7 @@
             "Tungsten": 5,
             "Zinc": 40,
             "Uranium": 2,
-            "Silicon": 120,
-            "Quartz": 150
+            "Quartz": 270
         },
         "bonus_resources": {
             "Aluminum": {
@@ -214,8 +213,7 @@
             "Fertilizer": 80,
             "Hydrocarbons": 40,
             "Limestone": 50,
-            "Phosphate": 20,
-            "Uranium": 1
+            "Phosphate": 20
         },
         "bonus_resources": {
             "Limestone": {
@@ -263,10 +261,10 @@
         "color": "#9f97a5",
         "name": "Anorthositic Highlands",
         "base_resources": {
-            "Aluminum": 150,
-            "Silicon": 80,
-            "Anorthosite": 200,
-            "Iron": 20
+            "Anorthosite": 280,
+            "Iron": 20,
+            "Nickel": 10,
+            "Platinum": 1
         },
         "bonus_resources": {}
     },
@@ -276,8 +274,9 @@
         "base_resources": {
             "Titanium": 150,
             "Iron": 100,
-            "Silicon": 50,
-            "Helium-3": 1
+            "Helium-3": 1,
+            "Olivine": 25,
+            "Pyroxene": 25
         },
         "bonus_resources": {
             "Helium-3": {
@@ -286,7 +285,7 @@
                 },
                 "Hydrogen": {
                     "chance": 80,
-                    "amount": "0.00005"
+                    "amount": "1"
                 }
             },
             "Titanium": {
@@ -338,11 +337,12 @@
         "name": "Martian Crust",
         "base_resources": {
             "Iron": 250,
-            "Silicon": 100,
             "Aluminum": 60,
             "Titanium": 20,
             "Sulfur": 80,
-            "Perchlorates": 25
+            "Perchlorates": 25,
+            "Olivine": 50,
+            "Pyroxene": 50
         },
         "bonus_resources": {
             "Iron": {
@@ -366,8 +366,9 @@
         "base_resources": {
             "Gypsum": 100,
             "Iron": 150,
-            "Silicon": 80,
-            "Jarosite": 50
+            "Jarosite": 50,
+            "Olivine": 40,
+            "Pyroxene": 40
         },
         "bonus_resources": {}
     },
@@ -399,7 +400,8 @@
             "Carbonaceous Materials": 120,
             "Graphite": 100,
             "Iron": 20,
-            "Silicon": 30
+            "Olivine": 15,
+            "Pyroxene": 15
         },
         "bonus_resources": {}
     },
@@ -409,9 +411,8 @@
         "base_resources": {
             "Iron": 60,
             "Nickel": 30,
-            "Silicon": 100,
-            "Olivine": 80,
-            "Pyroxene": 80
+            "Olivine": 130,
+            "Pyroxene": 130
         },
         "bonus_resources": {
             "Nickel": {

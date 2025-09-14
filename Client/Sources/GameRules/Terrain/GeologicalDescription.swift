@@ -1,11 +1,12 @@
 import Color
 import JavaScriptInterop
 import JavaScriptKit
+import OrderedCollections
 
 struct GeologicalDescription {
     let name: String
-    let base: OrderedTable<Int64>
-    let bonus: SymbolTable<OrderedTable<GeologicalSpawnWeight>>
+    let base: OrderedDictionary<Symbol, Int64>
+    let bonus: SymbolTable<Bonuses>
     let color: Color
 }
 extension GeologicalDescription: JavaScriptDecodable {
@@ -17,9 +18,10 @@ extension GeologicalDescription: JavaScriptDecodable {
     }
 
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+        let base: OrderedTable<Int64> = try js[.base].decode()
         self.init(
             name: try js[.name].decode(),
-            base: try js[.base].decode(),
+            base: base.index,
             bonus: try js[.bonus].decode(),
             color: try js[.color].decode()
         )
