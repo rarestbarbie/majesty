@@ -27,14 +27,25 @@ extension SymbolTable {
 }
 extension SymbolTable where Value: Hashable {
     func resolve<Metadata>(_ table: SymbolTable<Metadata>) throws -> [Value: Metadata] {
-        try table.index.reduce(into: [:]) {
-            // If we got this far, we should be able to safely assume identifiers are unique.
-            if let id: Value = self.index[$1.key] {
-                $0[id] = $1.value
-            } else {
-                throw SymbolResolutionError<Value>.undefined($1.key.name)
-            }
-        }
+        try self.resolve(table, \.self)
+    }
+    func resolve<T, Metadata>(
+        _ table: SymbolTable<T>,
+        _ yield: (T) throws -> Metadata
+    ) throws -> [Value: Metadata] {
+        try table.index.reduce(into: [:]) { $0[try self[$1.key]] = try yield($1.value) }
+    }
+
+    func resolve<Metadata>(
+        _ table: OrderedTable<Metadata>
+    ) throws -> OrderedDictionary<Value, Metadata> {
+        try self.resolve(table, \.self)
+    }
+    func resolve<T, Metadata>(
+        _ table: OrderedTable<T>,
+        _ yield: (T) throws -> Metadata
+    ) throws -> OrderedDictionary<Value, Metadata> {
+        try table.index.reduce(into: [:]) { $0[try self[$1.key]] = try yield($1.value) }
     }
 
     func resolve<Metadata>(

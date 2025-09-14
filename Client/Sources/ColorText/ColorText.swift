@@ -42,7 +42,7 @@ extension ColorText: StringInterpolationProtocol {
     }
     @available(*, deprecated,
         message: """
-        ColorText interpolation of 'Decimal' produces a debug string, not a formatted one – \
+        ColorText interpolation of 'Decimal' produces an ASCII string, not a UI string – \
         did you mean to use '[..]' instead?
         """
     )

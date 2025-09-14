@@ -54,15 +54,15 @@
         "color": "#3a3a3a"
     },
     "Lunar Procellarum": {
-        "color": "#5b4a69"
+        "color": "#363636"
     },
     "Martian Polar Cap": {
         "color": "#d5e6f0"
     },
-    "Martian Lowland Barren": {
+    "Martian Lowland": {
         "color": "#613630"
     },
-    "Martian Highland Barren": {
+    "Martian Highland": {
         "color": "#4d4241"
     },
     "Valles Marineris": {
@@ -122,5 +122,5 @@
     },
     "Mountain Vacuum": {
         "color": "#a7a7a7"
-    },
+    }
 }

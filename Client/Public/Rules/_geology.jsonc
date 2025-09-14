@@ -1,5 +1,8 @@
 {
     "Earth_Continental_Crust": {
+        "color": "#777365",
+        "name": "Continental Crust",
+        "text": "The crust of a geologically active, Earth-like planet with a history of liquid water and tectonic activity is a balanced, resource-diverse environment. It is rich in bulk materials formed by sedimentary and weathering processes, such as Iron (from Banded Iron Formations), Aluminum (from bauxite), Limestone, Phosphate, and Potash, but it lacks the extreme concentrations of specialized materials found elsewhere.",
         "base_resources": {
             "Iron": 80,
             "Aluminum": 80,
@@ -90,6 +93,8 @@
         }
     },
     "Earth_Sedimentary_Basin": {
+        "color": "#836e60",
+        "name": "Sedimentary Basin",
         "base_resources": {
             "Hydrocarbons": 100,
             "Limestone": 120,
@@ -112,6 +117,8 @@
         }
     },
     "Earth_Large_Igneous_Province": {
+        "color": "#534c46",
+        "name": "Large Igneous Province",
         "base_resources": {
             "Iron": 100,
             "Nickel": 50,
@@ -145,6 +152,8 @@
         }
     },
     "Earth_Oceanic_Abyssal": {
+        "color": "#102652",
+        "name": "Oceanic Abyss",
         "base_resources": {
             "Manganese Nodules": 100
         },
@@ -169,6 +178,8 @@
         }
     },
     "Earth_Oceanic_Vents": {
+        "color": "#0b1c33",
+        "name": "Oceanic Vents",
         "base_resources": {
             "Polymetallic Sulfides": 100
         },
@@ -197,6 +208,8 @@
         }
     },
     "Earth_Oceanic_Shelf": {
+        "color": "#1e3e83",
+        "name": "Continental Shelf",
         "base_resources": {
             "Fertilizer": 80,
             "Hydrocarbons": 40,
@@ -239,12 +252,16 @@
         }
     },
     "Earth_Polar": {
+        "color": "#cfe8f2",
+        "name": "Polar Ice Cap",
         "base_resources": {
             "Water Ice": 200
         },
         "bonus_resources": {}
     },
     "Moon_Highlands": {
+        "color": "#9f97a5",
+        "name": "Anorthositic Highlands",
         "base_resources": {
             "Aluminum": 150,
             "Silicon": 80,
@@ -254,6 +271,8 @@
         "bonus_resources": {}
     },
     "Moon_Mare": {
+        "color": "#333333",
+        "name": "Basaltic Mare",
         "base_resources": {
             "Titanium": 150,
             "Iron": 100,
@@ -286,6 +305,8 @@
         }
     },
     "Moon_KREEP": {
+        "color": "#5b4a69",
+        "name": "KREEP Terrane",
         "base_resources": {
             "KREEP Thorium": 30,
             "Generic Rare Earth Ore": 50,
@@ -313,6 +334,8 @@
         }
     },
     "Mars_Generic_Crust": {
+        "color": "#5f4945",
+        "name": "Martian Crust",
         "base_resources": {
             "Iron": 250,
             "Silicon": 100,
@@ -338,6 +361,8 @@
         }
     },
     "Mars_Canyon": {
+        "color": "#5a3a34",
+        "name": "Martian Canyon",
         "base_resources": {
             "Gypsum": 100,
             "Iron": 150,
@@ -347,6 +372,8 @@
         "bonus_resources": {}
     },
     "Mars_Volcanic": {
+        "color": "#5c2c25",
+        "name": "Martian Volcanic",
         "base_resources": {
             "Iron": 200,
             "Titanium": 50,
@@ -356,6 +383,8 @@
         "bonus_resources": {}
     },
     "Mars_Polar": {
+        "color": "#f0ded5",
+        "name": "Polar Ice Cap",
         "base_resources": {
             "Water Ice": 250,
             "Carbon Dioxide Ice": 100
@@ -363,6 +392,8 @@
         "bonus_resources": {}
     },
     "Asteroid_C_Type": {
+        "color": "#282828",
+        "name": "Carbonaceous Body",
         "base_resources": {
             "Water Ice": 150,
             "Carbonaceous Materials": 120,
@@ -373,6 +404,8 @@
         "bonus_resources": {}
     },
     "Asteroid_S_Type": {
+        "color": "#7a7571",
+        "name": "Silicaceous Body",
         "base_resources": {
             "Iron": 60,
             "Nickel": 30,
@@ -393,6 +426,8 @@
         }
     },
     "Asteroid_M_Type": {
+        "color": "#2b2b30",
+        "name": "Metallic Body",
         "base_resources": {
             "Iron": 120,
             "Nickel": 150,
@@ -430,6 +465,8 @@
         }
     },
     "carbonatite_intrusion": {
+        "color": "#882251",
+        "name": "Carbonatite Intrusion",
         "terrains": [],
         "base_resources": {
             "Niobium": 20,
