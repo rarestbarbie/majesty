@@ -37,20 +37,26 @@ struct GameContext {
     }
 }
 extension GameContext {
-    mutating func loadTerrain(from editor: PlanetTileEditor) {
-        guard let terrain: TerrainMetadata = self.rules.terrains[editor.type] else {
+    mutating func loadTerrain(from editor: PlanetTileEditor) throws {
+        let terrain: TerrainType = try self.symbols[terrain: editor.terrain]
+        let geology: GeologicalType = try self.symbols[geology: editor.geology]
+        guard
+        let terrain: TerrainMetadata = self.rules.terrains[terrain],
+        let geology: GeologicalMetadata = self.rules.geology[geology] else {
             return
         }
 
-        self.planets[editor.on]?.cells[editor.id]?.self = .init(
+        self.planets[editor.on]?.grid.tiles[editor.id]?.self = .init(
             id: editor.id,
-            type: terrain,
-            tile: editor.tile
+            name: editor.name,
+            terrain: terrain,
+            geology: geology
         )
-        self.planets[editor.on]?.resurface(
+        self.planets[editor.on]?.grid.resurface(
             rotate: editor.rotate,
             size: editor.size,
-            terrainDefault: terrain
+            terrainDefault: terrain,
+            geologyDefault: geology
         )
     }
 
@@ -63,16 +69,21 @@ extension GameContext {
         let terrainDefault: TerrainMetadata = self.rules.terrains.values.first else {
             fatalError("No terrain metadata found in rules!!!")
         }
+        guard
+        let geologyDefault: GeologicalMetadata = self.rules.geology.values.first else {
+            fatalError("No geological metadata found in rules!!!")
+        }
         let defined: [PlanetID: PlanetSurface] = map.planetSurfaces.reduce(into: [:]) {
             $0[$1.id] = $1
         }
         for i: Int in self.planets.indices {
             try {
-                try $0.replace(
+                try $0.grid.replace(
                     surface: defined[$0.state.id],
                     symbols: self.symbols,
                     rules: self.rules,
                     terrainDefault: terrainDefault,
+                    geologyDefault: geologyDefault
                 )
             } (&self.planets[i])
         }
@@ -84,10 +95,8 @@ extension GameContext {
             planetSurfaces: self.planets.map {
                 PlanetSurface.init(
                     id: $0.state.id,
-                    size: $0.size,
-                    grid: $0.cells.values.map {
-                        .init(id: $0.id, type: $0.type.name, tile: $0.tile)
-                    }
+                    size: $0.grid.size,
+                    grid: $0.grid.tiles.values.map(PlanetSurface.Tile.init(from:))
                 )
             }
         )
@@ -234,8 +243,8 @@ extension GameContext {
 
         for i: Int in self.planets.indices {
             {
-                for j: Int in $0.cells.values.indices {
-                    $0.cells.values[j].startIndexCount()
+                for j: Int in $0.grid.tiles.values.indices {
+                    $0.grid.tiles.values[j].startIndexCount()
                 }
             } (&self.planets[i])
         }
@@ -247,7 +256,7 @@ extension GameContext {
         }
         for pop: PopContext in self.pops.table {
             let home: Address = pop.state.home
-            let counted: ()? = self.planets[home.planet]?.cells[home.tile]?.addResidentCount(
+            let counted: ()? = self.planets[home.planet]?.grid.tiles[home.tile]?.addResidentCount(
                 pop: pop.state
             )
 

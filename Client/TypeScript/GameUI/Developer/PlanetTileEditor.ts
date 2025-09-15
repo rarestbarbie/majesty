@@ -89,22 +89,35 @@ export class PlanetTileEditor {
                 type: 'text',
                 key: 'name',
                 label: 'Name',
-                value: state.tile.name ?? '',
+                value: state.name ?? '',
                 onUpdate: (key, value) => {
-                    if (this.lastReceivedState) this.lastReceivedState.tile.name = value;
+                    if (this.lastReceivedState) this.lastReceivedState.name = value;
                 },
             },
             {
                 type: 'select',
                 key: 'type',
                 label: 'Terrain',
-                value: state.type,
-                options: state.terrainChoices.map((val, i) => ({
-                    value: val,
-                    label: state.terrainLabels[i],
+                value: state.terrain,
+                options: state.terrainChoices.map((value, i) => ({
+                    value: value,
+                    label: value,
                 })),
                 onUpdate: (key, value) => {
-                    if (this.lastReceivedState) this.lastReceivedState.type = parseInt(value, 10);
+                    if (this.lastReceivedState) this.lastReceivedState.terrain = value;
+                },
+            },
+            {
+                type: 'select',
+                key: 'geology',
+                label: 'Geology',
+                value: state.geology,
+                options: state.geologyChoices.map((value, i) => ({
+                    value: value,
+                    label: value,
+                })),
+                onUpdate: (key, value) => {
+                    if (this.lastReceivedState) this.lastReceivedState.geology = value;
                 },
             },
             // --- Global Grid Actions ---
@@ -264,8 +277,9 @@ export class PlanetTileEditor {
 
         // The name/type might have been updated via their own onUpdate handlers,
         // so we ensure they are correctly set from the last received state.
-        dataToSend.tile.name = this.lastReceivedState.tile.name || undefined;
-        dataToSend.type = this.lastReceivedState.type;
+        dataToSend.name = this.lastReceivedState.name;
+        dataToSend.terrain = this.lastReceivedState.terrain;
+        dataToSend.geology = this.lastReceivedState.geology;
 
 
         Swift.loadTerrain(dataToSend);

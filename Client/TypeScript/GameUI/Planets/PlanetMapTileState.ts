@@ -1,6 +1,6 @@
 import { Color } from '../../GameEngine/exports.js';
 
-export interface PlanetGridCell {
+export interface PlanetMapTileState {
     readonly id: string;
     readonly d0: string;
     readonly d1?: string;

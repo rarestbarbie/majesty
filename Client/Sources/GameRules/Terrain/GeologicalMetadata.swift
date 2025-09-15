@@ -4,6 +4,7 @@ import OrderedCollections
 
 public final class GeologicalMetadata: Identifiable {
     public let id: GeologicalType
+    public let symbol: Symbol
     public let name: String
     public let base: OrderedDictionary<Resource, Int64>
     public let bonus: [Resource: Bonuses]
@@ -11,12 +12,14 @@ public final class GeologicalMetadata: Identifiable {
 
     init(
         id: GeologicalType,
+        symbol: Symbol,
         name: String,
         base: OrderedDictionary<Resource, Int64>,
         bonus: [Resource: Bonuses],
         color: Color
     ) {
         self.id = id
+        self.symbol = symbol
         self.name = name
         self.base = base
         self.bonus = bonus
@@ -27,6 +30,7 @@ extension GeologicalMetadata {
     var hash: Int {
         var hasher: Hasher = .init()
         // ID already hashed by dictionary key
+        self.symbol.hash(into: &hasher)
         self.name.hash(into: &hasher)
         self.base.hash(into: &hasher)
         self.bonus.hash(into: &hasher)

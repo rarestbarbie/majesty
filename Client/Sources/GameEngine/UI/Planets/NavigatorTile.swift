@@ -28,17 +28,17 @@ extension NavigatorTile {
     mutating func update(in context: GameContext) {
         guard
         let planet: PlanetContext = context.planets[self.id.planet],
-        let cell: PlanetContext.Cell = planet.cells[self.id.tile] else {
+        let tile: PlanetGrid.Tile = planet.grid.tiles[self.id.tile] else {
             return
         }
 
-        self.name = "\(cell.tile.name ?? cell.type.name) (\(planet.state.name))"
-        self.terrain = cell.type.name
+        self.name = "\(tile.name ?? tile.terrain.name) (\(planet.state.name))"
+        self.terrain = tile.terrain.name
 
         let (culture, popType): (
             [String: (share: Int64, PieChartLabel)],
             [PopType: (share: Int64, PieChartLabel)]
-        ) = cell.pops.reduce(
+        ) = tile.pops.reduce(
             into: (culture: [:], popType: [:])
         ) {
             guard
@@ -56,7 +56,7 @@ extension NavigatorTile {
             }
         }
 
-        self._neighbors = self.id.tile.neighbors(size: planet.size)
+        self._neighbors = self.id.tile.neighbors(size: planet.grid.size)
 
         self.culture = .init(values: culture.sorted { $0.key < $1.key })
         self.popType = .init(values: popType.sorted { $0.key > $1.key })

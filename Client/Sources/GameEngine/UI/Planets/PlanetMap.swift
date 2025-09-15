@@ -4,27 +4,27 @@ import JavaScriptInterop
 import Vector
 import VectorCharts
 
-struct PlanetGrid {
-    var cells: [PlanetGridCell]
+struct PlanetMap {
+    var tiles: [PlanetMapTile]
 
     init() {
-        self.cells = []
+        self.tiles = []
     }
 }
-extension PlanetGrid {
+extension PlanetMap {
     mutating func update(from planet: PlanetContext, in _: GameContext) {
-        self.cells = planet.grid { $0.type.color }
+        self.tiles = planet.grid.color(\.terrain.color)
     }
 }
-extension PlanetGrid {
+extension PlanetMap {
     enum ObjectKey: JSString, Sendable {
         case type
-        case cells
+        case tiles
     }
 }
-extension PlanetGrid: JavaScriptEncodable {
+extension PlanetMap: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.type] = PlanetDetailsTab.Grid
-        js[.cells] = self.cells
+        js[.tiles] = self.tiles
     }
 }

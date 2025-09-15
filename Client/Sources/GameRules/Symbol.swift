@@ -1,7 +1,7 @@
 import JavaScriptInterop
 import JavaScriptKit
 
-@frozen @usableFromInline struct Symbol: Hashable {
+@frozen public struct Symbol: Hashable {
     @usableFromInline let name: String
 
     @inlinable init(name: String) {
@@ -9,14 +9,14 @@ import JavaScriptKit
     }
 }
 extension Symbol: Comparable {
-    @inlinable static func < (a: Symbol, b: Symbol) -> Bool { a.name < b.name }
+    @inlinable public static func < (a: Symbol, b: Symbol) -> Bool { a.name < b.name }
 }
 extension Symbol: ExpressibleByStringLiteral {
-    @inlinable init(stringLiteral: String) {
+    @inlinable public init(stringLiteral: String) {
         self.init(name: stringLiteral)
     }
 }
-extension Symbol: RawRepresentable {
-    @inlinable init(rawValue: JSString) { self.init(name: rawValue.description) }
-    @inlinable var rawValue: JSString { .init(self.name) }
+extension Symbol: RawRepresentable, LoadableFromJSValue, ConvertibleToJSValue {
+    @inlinable public init(rawValue: JSString) { self.init(name: rawValue.description) }
+    @inlinable public var rawValue: JSString { .init(self.name) }
 }

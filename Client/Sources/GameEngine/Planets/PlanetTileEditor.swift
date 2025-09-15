@@ -11,11 +11,13 @@ public struct PlanetTileEditor {
 
     let rotate: HexRotation?
     let size: Int8
-    let tile: PlanetTile
-    let type: TerrainType
+    let name: String?
 
-    let terrainLabels: [String]
-    let terrainChoices: [TerrainType]
+    let terrain: Symbol
+    let terrainChoices: [Symbol]
+
+    let geology: Symbol
+    let geologyChoices: [Symbol]
 }
 extension PlanetTileEditor {
     @frozen public enum ObjectKey: JSString, Sendable {
@@ -23,10 +25,11 @@ extension PlanetTileEditor {
         case on
         case rotate
         case size
-        case tile
-        case type
-        case terrainLabels
+        case name
+        case terrain
         case terrainChoices
+        case geology
+        case geologyChoices
     }
 }
 extension PlanetTileEditor: JavaScriptEncodable {
@@ -35,10 +38,11 @@ extension PlanetTileEditor: JavaScriptEncodable {
         js[.on] = self.on
         js[.rotate] = self.rotate
         js[.size] = self.size
-        js[.tile] = self.tile
-        js[.type] = self.type
-        js[.terrainLabels] = self.terrainLabels
+        js[.name] = self.name
+        js[.terrain] = self.terrain
         js[.terrainChoices] = self.terrainChoices
+        js[.geology] = self.geology
+        js[.geologyChoices] = self.geologyChoices
     }
 }
 extension PlanetTileEditor: JavaScriptDecodable {
@@ -48,10 +52,11 @@ extension PlanetTileEditor: JavaScriptDecodable {
             on: try js[.on].decode(),
             rotate: try js[.rotate]?.decode(),
             size: try js[.size].decode(),
-            tile: try js[.tile].decode(),
-            type: try js[.type].decode(),
-            terrainLabels: try js[.terrainLabels].decode(),
-            terrainChoices: try js[.terrainChoices].decode()
+            name: try js[.name]?.decode(),
+            terrain: try js[.terrain].decode(),
+            terrainChoices: try js[.terrainChoices].decode(),
+            geology: try js[.geology].decode(),
+            geologyChoices: try js[.geologyChoices].decode()
         )
     }
 }

@@ -3,7 +3,7 @@ import {
     HexGridCell,
     HexGridCellBackground,
     MinimapLayer,
-    PlanetGridCell,
+    PlanetMapTileState,
 } from '../exports.js';
 
 export class HexGrid {
@@ -43,7 +43,7 @@ export class HexGrid {
     }
 
     public update(
-        cells: PlanetGridCell[],
+        tiles: PlanetMapTileState[],
         layer: MinimapLayer,
         prefix: any[],
         target: (id: string) => string | null = (_: string) => null,
@@ -52,33 +52,33 @@ export class HexGrid {
     ): void {
         this.svg.setAttribute('data-layer', layer);
         this.cells.update(
-            cells,
-            (cell: PlanetGridCell) => new HexGridCellBackground(cell),
-            (cell: PlanetGridCell, element: HexGridCellBackground) => {
-                element.path.setAttribute('d', cell.d0);
-                element.twin?.setAttribute('d', cell.d1 ?? '');
-                element.update(cell);
+            tiles,
+            (tile: PlanetMapTileState) => new HexGridCellBackground(tile),
+            (tile: PlanetMapTileState, element: HexGridCellBackground) => {
+                element.path.setAttribute('d', tile.d0);
+                element.twin?.setAttribute('d', tile.d1 ?? '');
+                element.update(tile);
             }
         );
 
         this.lines.update(
-            cells,
-            (cell: PlanetGridCell) => {
+            tiles,
+            (tile: PlanetMapTileState) => {
                 const instance: HexGridCell = new HexGridCell(
-                    cell,
-                    [...prefix, cell.id, layer]
+                    tile,
+                    [...prefix, tile.id, layer]
                 );
-                const href: string | null = target(cell.id);
+                const href: string | null = target(tile.id);
                 if (href) {
                     instance.node.setAttribute('href', href);
                 }
                 return instance;
             },
-            (cell: PlanetGridCell, element: HexGridCell) => {
-                element.path.setAttribute('d', cell.d0);
-                element.twin?.setAttribute('d', cell.d1 ?? '');
+            (tile: PlanetMapTileState, element: HexGridCell) => {
+                element.path.setAttribute('d', tile.d0);
+                element.twin?.setAttribute('d', tile.d1 ?? '');
 
-                const neighbor: number | undefined = neighbors?.get(cell.id);
+                const neighbor: number | undefined = neighbors?.get(tile.id);
                 if (neighbor !== undefined) {
                     element.node.setAttribute('data-neighbor-index', `${neighbor}`);
                 } else {

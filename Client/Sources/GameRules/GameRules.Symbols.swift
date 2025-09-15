@@ -15,16 +15,14 @@ extension GameRules {
     }
 }
 extension GameRules.Symbols {
-    @inlinable public subscript(geology symbol: String) -> GeologicalType {
+    @inlinable public subscript(geology symbol: Symbol) -> GeologicalType {
         get throws {
-            let symbol: Symbol = .init(name: symbol)
             return try self.geology[symbol]
         }
     }
 
-    @inlinable public subscript(terrain symbol: String) -> TerrainType {
+    @inlinable public subscript(terrain symbol: Symbol) -> TerrainType {
         get throws {
-            let symbol: Symbol = .init(name: symbol)
             return try self.terrains[symbol]
         }
     }

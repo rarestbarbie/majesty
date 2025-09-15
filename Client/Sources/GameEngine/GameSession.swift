@@ -33,26 +33,27 @@ public struct GameSession: ~Copyable {
 }
 extension GameSession {
     public mutating func loadTerrain(from editor: PlanetTileEditor) throws {
-        self.context.loadTerrain(from: editor)
+        try self.context.loadTerrain(from: editor)
     }
 
     public func editTerrain() -> PlanetTileEditor? {
         guard
         case (_, let current?) = self.ui.navigator.current,
         let planet: PlanetContext = self.context.planets[current.planet],
-        let cell: PlanetContext.Cell = planet.cells[current.tile] else {
+        let tile: PlanetGrid.Tile = planet.grid.tiles[current.tile] else {
             return nil
         }
 
         return .init(
-            id: cell.id,
+            id: tile.id,
             on: planet.state.id,
             rotate: nil,
-            size: planet.size,
-            tile: cell.tile,
-            type: cell.type.id,
-            terrainLabels: self.context.rules.terrains.values.map(\.name),
-            terrainChoices: self.context.rules.terrains.keys.map(\.self),
+            size: planet.grid.size,
+            name: tile.name,
+            terrain: tile.terrain.symbol,
+            terrainChoices: self.context.rules.terrains.values.map(\.symbol),
+            geology: tile.geology.symbol,
+            geologyChoices: self.context.rules.geology.values.map(\.symbol)
         )
     }
 
@@ -466,35 +467,31 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let planet: PlanetContext = self.context.planets[id],
-        let cell: PlanetContext.Cell = planet.cells[cell] else {
+        let tile: PlanetGrid.Tile = planet.grid.tiles[cell] else {
             return nil
         }
 
         return .instructions(style: .borderless) {
             switch layer {
             case .Terrain:
-                if let geology: String = cell.tile.geology {
-                    $0[>] = "\(cell.type.name) (\(geology))"
-                } else {
-                    $0[>] = "\(cell.type.name)"
-                }
+                $0[>] = "\(tile.terrain.name) (\(tile.geology.name))"
 
             case .Population:
-                $0["Population"] = cell.population[/3]
+                $0["Population"] = tile.population[/3]
 
             case .AverageMilitancy:
-                let value: Double = cell.population > 0
-                    ? (cell.weighted.mil / Double.init(cell.population))
+                let value: Double = tile.population > 0
+                    ? (tile.weighted.mil / Double.init(tile.population))
                     : 0
                 $0["Average militancy"] = value[..2]
             case .AverageConsciousness:
-                let value: Double = cell.population > 0
-                    ? (cell.weighted.con / Double.init(cell.population))
+                let value: Double = tile.population > 0
+                    ? (tile.weighted.con / Double.init(tile.population))
                     : 0
                 $0["Average consciousness"] = value[..2]
             }
 
-            if let name: String = cell.tile.name {
+            if let name: String = tile.name {
                 $0[>] = "\(name)"
             }
         }
@@ -771,11 +768,11 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let planet: PlanetContext = context.planets[id.planet],
-        let cell: PlanetContext.Cell = planet.cells[id.tile] else {
+        let tile: PlanetGrid.Tile = planet.grid.tiles[id.tile] else {
             return nil
         }
 
-        let (share, total): (share: Int64, total: Int64) = cell.pops.reduce(
+        let (share, total): (share: Int64, total: Int64) = tile.pops.reduce(
             into: (0, 0)
         ) {
             guard let pop: Pop = context.pops.table.state[$1] else {
@@ -798,11 +795,11 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let planet: PlanetContext = context.planets[id.planet],
-        let cell: PlanetContext.Cell = planet.cells[id.tile] else {
+        let tile: PlanetGrid.Tile = planet.grid.tiles[id.tile] else {
             return nil
         }
 
-        let (share, total): (share: Int64, total: Int64) = cell.pops.reduce(
+        let (share, total): (share: Int64, total: Int64) = tile.pops.reduce(
             into: (0, 0)
         ) {
             guard let pop: Pop = context.pops.table.state[$1] else {
