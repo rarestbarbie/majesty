@@ -1,9 +1,9 @@
 import { GameID } from '../../GameEngine/exports.js';
-import { MinimapLayer, PlanetGridCell } from '../exports.js';
+import { MinimapLayer, PlanetMapTileState } from '../exports.js';
 
 export interface MinimapState {
     id: GameID;
     name: string;
-    grid: PlanetGridCell[];
+    grid: PlanetMapTileState[];
     layer: MinimapLayer;
 }

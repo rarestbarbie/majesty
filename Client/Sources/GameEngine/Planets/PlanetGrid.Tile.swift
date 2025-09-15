@@ -4,11 +4,12 @@ import GameState
 import GameTerrain
 import HexGrids
 
-extension PlanetContext {
-    struct Cell: Identifiable {
+extension PlanetGrid {
+    struct Tile: Identifiable {
         let id: HexCoordinate
-        var type: TerrainMetadata
-        var tile: PlanetTile
+        var name: String?
+        var terrain: TerrainMetadata
+        var geology: GeologicalMetadata
 
         // Computed statistics
 
@@ -19,10 +20,16 @@ extension PlanetContext {
             con: Double
         )
 
-        init(id: HexCoordinate, type: TerrainMetadata, tile: PlanetTile) {
+        init(
+            id: HexCoordinate,
+            name: String?,
+            terrain: TerrainMetadata,
+            geology: GeologicalMetadata,
+        ) {
             self.id = id
-            self.type = type
-            self.tile = tile
+            self.name = name
+            self.terrain = terrain
+            self.geology = geology
 
             self.pops = []
             self.population = 0
@@ -31,13 +38,14 @@ extension PlanetContext {
         }
     }
 }
-extension PlanetContext.Cell {
+extension PlanetGrid.Tile {
     mutating func copy(from source: Self) {
-        self.type = source.type
-        self.tile = source.tile
+        self.name = source.name
+        self.terrain = source.terrain
+        self.geology = source.geology
     }
 }
-extension PlanetContext.Cell {
+extension PlanetGrid.Tile {
     mutating func startIndexCount() {
         self.pops = []
         self.population = 0

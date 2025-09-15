@@ -2,7 +2,7 @@ import {
     ScreenContent,
     HexGrid,
     PlanetDetailsTab,
-    PlanetGrid,
+    PlanetMapState,
     PlanetReport,
     MinimapLayer,
 } from '../exports.js';
@@ -64,7 +64,7 @@ export class PlanetOverview extends ScreenContent {
         }
 
         // The 'open' property contains the grid data, as per your extensible design.
-        const grid: PlanetGrid = state.planet.open;
-        this.grid.update(grid.cells, MinimapLayer.Terrain, [state.planet.id]);
+        const grid: PlanetMapState = state.planet.open;
+        this.grid.update(grid.tiles, MinimapLayer.Terrain, [state.planet.id]);
     }
 }

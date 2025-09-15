@@ -4,7 +4,7 @@ import JavaScriptKit
 import JavaScriptInterop
 import VectorCharts
 
-@frozen @usableFromInline struct PlanetGridCell {
+@frozen @usableFromInline struct PlanetMapTile {
     let id: HexCoordinate
     let shape: (HexagonPath, HexagonPath?)
     let color: Color?
@@ -12,7 +12,7 @@ import VectorCharts
     let y: Double?
     let z: Double?
 }
-extension PlanetGridCell {
+extension PlanetMapTile {
     @frozen @usableFromInline enum ObjectKey: JSString, Sendable {
         case id
         case d0
@@ -23,7 +23,7 @@ extension PlanetGridCell {
         case z
     }
 }
-extension PlanetGridCell: JavaScriptEncodable {
+extension PlanetMapTile: JavaScriptEncodable {
     @usableFromInline func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.d0] = self.shape.0.d

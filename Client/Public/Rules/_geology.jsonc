@@ -1,4 +1,12 @@
 {
+    "_None": {
+        "color": "#2b2b30",
+        "name": "None",
+        "base_resources": {
+        },
+        "bonus_resources": {
+        }
+    },
     "Earth_Continental_Crust": {
         "color": "#777365",
         "name": "Continental Crust",

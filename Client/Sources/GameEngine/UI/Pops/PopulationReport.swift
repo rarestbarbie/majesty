@@ -33,7 +33,7 @@ extension PopulationReport: PersistentReport {
         ) {
             guard
             let planet: PlanetContext = snapshot.planets[pop.state.home.planet],
-            let tile: PlanetTile = planet.cells[pop.state.home.tile]?.tile,
+            let tile: PlanetGrid.Tile = planet.grid.tiles[pop.state.home.tile],
             let culture: Culture = snapshot.cultures.state[pop.state.nat] else {
                 continue
             }

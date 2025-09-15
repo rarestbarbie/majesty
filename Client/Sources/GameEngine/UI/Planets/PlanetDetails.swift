@@ -5,7 +5,7 @@ import JavaScriptInterop
 struct PlanetDetails {
     let id: PlanetID
     var open: PlanetDetailsTab
-    var grid: PlanetGrid
+    var grid: PlanetMap
 
     init(id: PlanetID, open: PlanetDetailsTab) {
         self.id = id

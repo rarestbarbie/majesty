@@ -119,7 +119,8 @@ extension GameRules {
 
                 $0[type] = .init(
                     id: type,
-                    name: symbol.name,
+                    symbol: symbol,
+                    name: province.name,
                     base: try symbols.resources.resolve(province.base),
                     bonus: try symbols.resources.resolve(province.bonus) {
                         .init(
@@ -131,7 +132,7 @@ extension GameRules {
                 )
             },
             terrains: table.terrains.reduce(into: [:]) {
-                $0[$1.key] = .init(id: $1.key, name: $1.value.0.name, color: $1.value.1.color)
+                $0[$1.key] = .init(id: $1.key, symbol: $1.value.0, color: $1.value.1.color)
             },
             pops: try PopType.allCases.reduce(into: [:]) {
                 let pop: PopDescription? = pops[$1]

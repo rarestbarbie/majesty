@@ -41,7 +41,7 @@ extension ProductionReport: PersistentReport {
         ) {
             guard
             let planet: PlanetContext = snapshot.planets[factory.state.on.planet],
-            let tile: PlanetTile = planet.cells[factory.state.on.tile]?.tile else {
+            let tile: PlanetGrid.Tile = planet.grid.tiles[factory.state.on.tile] else {
                 continue
             }
 

@@ -8,7 +8,7 @@ struct Minimap {
     let layer: MinimapLayer
 
     var name: String
-    var grid: [PlanetGridCell]
+    var grid: [PlanetMapTile]
 
     init(id: PlanetID, layer: MinimapLayer) {
         self.id = id
@@ -29,17 +29,21 @@ extension Minimap {
 
         switch self.layer {
         case .Terrain:
-            self.grid = planet.grid { $0.type.color }
+            self.grid = planet.grid.color { $0.terrain.color }
 
         case .Population:
-            let scale: Double = .init(planet.cells.values.reduce(0) { max($0, $1.population) })
-            self.grid = planet.grid {
+            let scale: Double = .init(
+                planet.grid.tiles.values.reduce(0) { max($0, $1.population) }
+            )
+            self.grid = planet.grid.color {
                 scale > 0 ? Double.init($0.population) / scale : 0
             }
 
         case .AverageMilitancy:
-            let scale: Double = .init(planet.cells.values.reduce(0) { max($0, $1.population) })
-            self.grid = planet.grid {
+            let scale: Double = .init(
+                planet.grid.tiles.values.reduce(0) { max($0, $1.population) }
+            )
+            self.grid = planet.grid.color {
                 guard $0.population > 0 else {
                     return (0, 0)
                 }
@@ -50,8 +54,10 @@ extension Minimap {
             }
 
         case .AverageConsciousness:
-            let scale: Double = .init(planet.cells.values.reduce(0) { max($0, $1.population) })
-            self.grid = planet.grid {
+            let scale: Double = .init(
+                planet.grid.tiles.values.reduce(0) { max($0, $1.population) }
+            )
+            self.grid = planet.grid.color {
                 guard $0.population > 0 else {
                     return (0, 0)
                 }

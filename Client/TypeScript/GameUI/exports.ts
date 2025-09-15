@@ -62,8 +62,8 @@ export * from './Planets/HexGridCell.js';
 export * from './Planets/HexGridCellBackground.js';
 export * from './Planets/PlanetDetails.js';
 export * from './Planets/PlanetDetailsTab.js';
-export * from './Planets/PlanetGrid.js';
-export * from './Planets/PlanetGridCell.js';
+export * from './Planets/PlanetMapState.js';
+export * from './Planets/PlanetMapTileState.js';
 export * from './Planets/PlanetReport.js';
 export * from './Planets/PlanetOverview.js';
 
