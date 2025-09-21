@@ -22,7 +22,7 @@ extension JavaScriptTypecastError {
         case .object(_): .object
         case .null: .null
         case .undefined: .undefined
-        case .function(_): .function
+        // case .function(_): .function
         case .symbol(_): .symbol
         case .bigInt(_): .bigint
         }
