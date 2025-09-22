@@ -5,7 +5,7 @@ import { init } from '../.build.wasm/plugins/PackageToJS/outputs/Package/index.j
 import { PlayerEventID, PlayerMessage } from './Multiplayer/exports.js';
 import { Swift } from './Swift.js';
 import { Persistence } from './DB/exports.js';
-import { Application } from './GameUI/exports.js';
+import { Application, GameUI } from './GameUI/exports.js';
 import { GameID } from './GameEngine/exports.js';
 
 import * as Firebase from 'firebase/auth';
@@ -15,7 +15,6 @@ import '../Stylesheets/main.scss';
 declare global {
     interface Window {
         swift: Swift;
-        ui: Application;
     }
 }
 
@@ -57,7 +56,7 @@ async function main(user: Firebase.User): Promise<void> {
     }
 
     window.swift = new Swift();
-    window.ui = new Application(persistence, await sprites);
+    const application: Application = new Application(persistence, await sprites);
 
     // Parse path components to determine the current page
     const path: string[] = window.location.pathname.split('/').filter(Boolean);
@@ -69,14 +68,16 @@ async function main(user: Firebase.User): Promise<void> {
 
         await init();
 
-        if (!Swift.load(await start, await rules, terrain)) {
+        let ui: GameUI | null = Swift.load(await start, await rules, terrain);
+        if (ui !== null) {
+            application.update(ui);
+            application.view(0, 10 as GameID);
+            application.navigate();
+            application.resize();
+        } else {
             console.error("Failed to load game");
             return;
         }
-
-        window.ui.view(0, 10 as GameID);
-        window.ui.navigate();
-        window.ui.resize();
 
         mp.on('designate', () => {
             console.log(`You are the HOST of this game!`);
@@ -98,6 +99,8 @@ async function main(user: Firebase.User): Promise<void> {
                 dialog.close();
                 dialog.remove();
                 setInterval(() => { Application.move({ id: PlayerEventID.Tick }); }, 100);
+
+                Swift.start(application);
             });
         });
         mp.on('admit', (admitted: boolean) => {
@@ -120,21 +123,26 @@ async function main(user: Firebase.User): Promise<void> {
 
     } else {
         console.log(`Running in Single Player Mode`);
-        // Launch the game engine, which is written in Swift WebAssembly. When `init` returns, it will
-        // have created the `UI.tick` function, which allows us to interact with the engine.
+
         await init();
 
+        console.log(`Launching Game Engine (WebAssembly must be initialized before this!)`);
+
         // Load the game state from the server.
-        if (!Swift.load(await start, await rules, terrain)) {
+        let ui: GameUI | null = Swift.load(await start, await rules, terrain);
+        if (ui !== null) {
+            application.update(ui);
+            application.view(0, 10 as GameID);
+            application.navigate();
+            application.resize();
+
+            setInterval(() => { Application.move({ id: PlayerEventID.Tick }); }, 100);
+
+            Swift.start(application);
+        } else {
             console.error("Failed to load game");
             return;
         }
-
-        window.ui.view(0, 10 as GameID);
-        window.ui.navigate();
-        window.ui.resize();
-
-        setInterval(() => { Application.move({ id: PlayerEventID.Tick }); }, 100);
     }
 }
 

@@ -1,5 +1,6 @@
 extension GameAPI {
     enum Symbol: String {
+        case start
         /// Load the game state from a file.
         case load
         case loadTerrain
