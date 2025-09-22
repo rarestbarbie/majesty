@@ -4,7 +4,9 @@ import {
 } from './DOM/exports.js';
 import { GameID, GameDate, GameDateComponents } from './GameEngine/exports.js';
 import {
+    Application,
     CelestialViewState,
+    FactoryDetailsTab,
     MinimapLayer,
     NavigatorState,
     PlanetDetailsTab,
@@ -13,14 +15,19 @@ import {
     ProductionReport,
     PopulationReport,
     TradeReport,
-    FactoryDetailsTab,
     TooltipType,
+    GameUI
 } from './GameUI/exports.js';
 import { PlayerEvent } from './Multiplayer/exports.js';
 
 export class Swift {
     // Will be added by Swift WebAssembly
-    declare public static load: (state: Object, rules: Object, terrain: Object[]) => boolean;
+    declare public static start: (ui: Application) => void;
+    declare public static load: (
+        state: Object,
+        rules: Object,
+        terrain: Object[]
+    ) => GameUI | null;
     declare public static push: (event: PlayerEvent, i: bigint) => void;
 
     declare public static orbit: (id: GameID) => Float32Array | null;
@@ -41,7 +48,7 @@ export class Swift {
     ) => TradeReport;
     declare public static closeScreen: () => void;
 
-    declare public static switch: (planet: GameID) => void;
+    declare public static switch: (planet: GameID) => GameUI;
 
     declare public static minimap: (
         planet: GameID,

@@ -14,7 +14,8 @@ import {
     Application,
     CelestialBody,
     CelestialBodyState,
-    CelestialViewState
+    CelestialViewState,
+    GameUI
 } from '../exports.js';
 import { Swift } from '../../Swift.js';
 
@@ -166,7 +167,7 @@ export class CelestialView {
             event.preventDefault();
             // If ctrlKey is pressed, switch context
             if (event.ctrlKey) {
-                Swift.switch(id);
+                this.context.update(Swift.switch(id));
             } else {
                 // Only open new tab from left pane
                 if (this.id === 0) {

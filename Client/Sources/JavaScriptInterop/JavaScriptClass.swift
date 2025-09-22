@@ -5,7 +5,7 @@ import JavaScriptKit
     case Array
 }
 extension JavaScriptClass {
-    @inlinable var constructor: JSFunction {
+    @inlinable var constructor: JSObject {
         JSObject.global[self.rawValue].function!
     }
 }
