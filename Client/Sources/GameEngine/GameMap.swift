@@ -16,6 +16,7 @@ struct GameMap: ~Copyable {
         fire: (worker: Jobs.Fire, clerk: Jobs.Fire)
     )
     var localMarkets: LocalMarkets<PopID>
+    var stockMarkets: StockMarkets<LegalEntity>
 
     init(
         settings: GameRules.Settings,
@@ -28,6 +29,7 @@ struct GameMap: ~Copyable {
         self.conversions = []
         self.jobs = ((.init(), .init()), (.init(), .init()))
         self.localMarkets = .init()
+        self.stockMarkets = .init()
     }
 }
 extension GameMap {
@@ -78,16 +80,25 @@ extension GameMap {
 
     mutating func pay(
         dividend: Int64,
-        to shareholders: [(id: PopID, count: Int64)]
+        to shareholders: [Property<LegalEntity>]
     ) -> Int64 {
-        guard let payments: [Int64] = shareholders.distribute(dividend, share: \.count) else {
+        guard
+        let payments: [Int64] = shareholders.distribute(
+            dividend,
+            share: \.shares
+        ) else {
             return 0
         }
 
         var dividendsPaid: Int64 = 0
 
-        for ((pop, _), payment) in zip(shareholders, payments) {
-            self.transfers[pop, default: .init()].i += payment
+        for (shareholder, payment) in zip(shareholders, payments) {
+            switch shareholder.id {
+            case .pop(let id):
+                self.transfers[id, default: .init()].i += payment
+            case .factory:
+                fatalError("unimplemented")
+            }
             dividendsPaid += payment
         }
 

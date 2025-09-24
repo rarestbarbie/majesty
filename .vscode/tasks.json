@@ -10,7 +10,7 @@
             "command": [
                 "swift package",
                 "--scratch-path .build.wasm",
-                "--swift-sdk wasm32-unknown-wasip1-threads",
+                "--swift-sdk 6.1-RELEASE-wasm32-unknown-wasip1-threads",
                 "js",
                 "--product engine",
                 "-c release",
@@ -32,7 +32,7 @@
             "command": [
                 "swift package",
                 "--scratch-path .build.wasm",
-                "--swift-sdk wasm32-unknown-wasip1-threads",
+                "--swift-sdk 6.1-RELEASE-wasm32-unknown-wasip1-threads",
                 "js",
                 "--product engine",
                 "-c release",
@@ -55,7 +55,7 @@
             "command": [
                 "swift package",
                 "--scratch-path .build.wasm",
-                "--swift-sdk wasm32-unknown-wasip1-threads",
+                "--swift-sdk 6.1-RELEASE-wasm32-unknown-wasip1-threads",
                 "js",
                 "--product engine",
                 "-c debug",
@@ -98,7 +98,7 @@
             "command": [
                 "swift package",
                 "--scratch-path ../ClientIntegrationTests/.build.wasm",
-                "--swift-sdk wasm32-unknown-wasip1-threads",
+                "--swift-sdk 6.1-RELEASE-wasm32-unknown-wasip1-threads",
                 "js",
                 "--product integration-tests",
                 "-c debug",
@@ -121,7 +121,7 @@
             "command": [
                 "swift package",
                 "--scratch-path ../ClientIntegrationTests/.build.wasm",
-                "--swift-sdk wasm32-unknown-wasip1-threads",
+                "--swift-sdk 6.1-RELEASE-wasm32-unknown-wasip1-threads",
                 "js",
                 "--product integration-tests",
                 "-c release",

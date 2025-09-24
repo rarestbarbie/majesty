@@ -17,7 +17,7 @@ struct FactoryContext {
 
     private(set) var workers: Workforce
     private(set) var clerks: Workforce?
-    private(set) var equity: Equity
+    private(set) var equity: Equity<LegalEntity>.Statistics
 
     private(set) var cashFlow: CashFlowStatement
 
@@ -46,7 +46,6 @@ extension FactoryContext {
     mutating func startIndexCount() {
         self.workers = .init()
         self.clerks = self.type.clerks == nil ? nil : .init()
-        self.equity = .init()
     }
 
     mutating func addWorkforceCount(pop: Pop, job: FactoryJob) {
@@ -64,13 +63,12 @@ extension FactoryContext {
             )
         }
     }
-    mutating func addShareholderCount(pop: Pop, shares: Int64) {
-        #assert(
-            shares > 0,
-            "Pop (id = \(pop.id)) owns \(shares) shares of factory '\(self.type.name)'!"
-        )
+    mutating func addPosition(asset: LegalEntity, value: Int64) {
+        guard value > 0 else {
+            return
+        }
 
-        self.equity.count(pop: pop.id, shares: shares)
+        // TODO
     }
 }
 extension FactoryContext: RuntimeContext {
@@ -92,6 +90,8 @@ extension FactoryContext: RuntimeContext {
         self.cashFlow.update(with: self.state.ni.tradeable.values.elements)
         self.cashFlow[.workers] = -self.state.cash.w
         self.cashFlow[.clerks] = -self.state.cash.c
+
+        self.equity = .compute(from: self.state.equity)
     }
 }
 extension FactoryContext: TransactingContext {
@@ -140,6 +140,16 @@ extension FactoryContext: TransactingContext {
         )
 
         self.budget = self.budget(inputsCostPerHour: inputsCostPerHour)
+
+        let shares: Int64 = self.equity.shares.outstanding
+        let price: Fraction = shares > 0
+            ? self.state.cash.balance %/ shares
+            : 1 %/ 1
+        map.stockMarkets.issueShares(
+            asset: .factory(self.state.id),
+            price: price,
+            currency: country.currency
+        )
     }
 
     mutating func transact(on map: inout GameMap) {
@@ -174,83 +184,41 @@ extension FactoryContext: TransactingContext {
             self.state.today.eo = 1
         }
 
-        let target: TradeableInput.StockpileTarget = .random(
+        let stockpileTarget: TradeableInput.StockpileTarget = .random(
             in: Self.stockpileDays,
             using: &map.random,
         )
 
-        let profit: Int64
+        let wages: Paychecks = self.operate(
+            policy: country,
+            budget: budget,
+            stockpileTarget: stockpileTarget,
+            map: &map
+        )
 
-        do {
-            let (gain, loss): (Int64, loss: Int64) = self.state.ni.trade(
-                stockpileDays: target,
-                spendingLimit: budget.inputs,
-                in: country.currency,
-                on: &map.exchange,
-            )
+        let operatingProfit: Int64 = self.state.operatingProfit
 
-            self.state.cash.b += loss
-            self.state.cash.r += gain
+        switch wages.headcount {
+        case nil:
+            break
 
-            #assert(
-                self.state.cash.balance >= 0,
-                "Factory has negative cash! (\(self.state.cash))"
-            )
+        case .fire(let block):
+            map.jobs.fire.worker[self.state.id] = block
 
-            let (wages, hours): (Paychecks, Int64) = self.workerEffects(
-                budget: budget.workers,
-                map: &map
-            )
-
-            self.state.today.wn = max(country.minwage, self.state.today.wn + wages.change)
-            self.state.today.wa = wages.rate
-            self.state.cash.w -= wages.paid
-
-            /// On some days, the factory purchases more inputs than others. To get a more accurate
-            /// estimate of the factory’s profitability, we need to credit the day’s balance with
-            /// the amount of currency that was sunk into purchasing inputs, and subtract the
-            /// approximate value of the inputs consumed today.
-            self.state.ni.consume(
-                from: self.type.inputs,
-                scalingFactor: (self.productivity * hours, self.state.today.ei)
-            )
-            self.state.out.deposit(
-                from: self.type.output,
-                scalingFactor: (self.productivity * hours, self.state.today.eo)
-            )
-
-            // Sell outputs.
-            self.state.cash.r += self.state.out.sell(in: country.currency, on: &map.exchange)
-
-            #assert(self.state.cash.balance >= 0, "Factory has negative cash! (\(self.state.cash))")
-
-            self.state.today.fi = self.state.ni.fulfilled
-            self.state.today.vi = self.state.ni.valuation
-
-            profit = self.state.cash.change + self.state.Δ.vi
-
-            switch wages.headcount {
-            case nil:
+        case .hire(let block, let type):
+            guard operatingProfit >= 0 || self.workers.count == 0 else {
                 break
-
-            case .fire(let block):
-                map.jobs.fire.worker[self.state.id] = block
-
-            case .hire(let block, let type):
-                guard profit >= 0 || self.workers.count == 0 else {
-                    break
-                }
-
-                map.jobs.hire.worker[self.state.on, type].append(block)
             }
+
+            map.jobs.hire.worker[self.state.on, type].append(block)
         }
 
         let investmentRatio: Fraction = (self.workers.count %/ (10 * self.workers.limit))
-        let investmentBudget: Int64 = investmentRatio <> profit
+        let investmentBudget: Int64 = investmentRatio <> operatingProfit
         expansion:
         if  investmentBudget > 0 {
             let (gain, loss): (Int64, loss: Int64) = self.state.nv.trade(
-                stockpileDays: target,
+                stockpileDays: stockpileTarget,
                 spendingLimit: investmentBudget,
                 in: country.currency,
                 on: &map.exchange,
@@ -272,18 +240,78 @@ extension FactoryContext: TransactingContext {
             )
         }
 
-        self.state.today.vv = self.state.nv.valuation
+        self.state.today.vv = self.state.nv.valueAcquired
 
         // Pay dividends to shareholders, if any.
         self.state.cash.i -= map.pay(
             dividend: self.state.cash.balance <> (2 %/ 10_000),
-            to: self.equity.owners.shuffled(using: &map.random.generator)
+            to: self.state.equity.shares.values.shuffled(using: &map.random.generator)
         )
+
+        // Perform stock buybacks or issuance, depending on factory level and cash on hand.
+        if  self.state.size.level > 1 {
+            // let size: Int64 = self.equity.shares.outstanding <> (1 %/ 10_000)
+        }
     }
 
     mutating func advance() {
         // Add self.state subsidies at the end, after profit calculation.
         self.state.cash.s += self.state.size.value + (self.policy?.minwage ?? 0)
+    }
+}
+extension FactoryContext {
+    private mutating func operate(
+        policy: CountryPolicies,
+        budget: FactoryBudget,
+        stockpileTarget: TradeableInput.StockpileTarget,
+        map: inout GameMap
+    ) -> Paychecks {
+        let (gain, loss): (Int64, loss: Int64) = self.state.ni.trade(
+            stockpileDays: stockpileTarget,
+            spendingLimit: budget.inputs,
+            in: policy.currency,
+            on: &map.exchange,
+        )
+
+        self.state.cash.b += loss
+        self.state.cash.r += gain
+
+        #assert(
+            self.state.cash.balance >= 0,
+            "Factory has negative cash! (\(self.state.cash))"
+        )
+
+        let (wages, hours): (Paychecks, Int64) = self.workerEffects(
+            budget: budget.workers,
+            map: &map
+        )
+
+        self.state.today.wn = max(policy.minwage, self.state.today.wn + wages.change)
+        self.state.today.wa = wages.rate
+        self.state.cash.w -= wages.paid
+
+        /// On some days, the factory purchases more inputs than others. To get a more accurate
+        /// estimate of the factory’s profitability, we need to credit the day’s balance with
+        /// the amount of currency that was sunk into purchasing inputs, and subtract the
+        /// approximate value of the inputs consumed today.
+        self.state.ni.consume(
+            from: self.type.inputs,
+            scalingFactor: (self.productivity * hours, self.state.today.ei)
+        )
+        self.state.out.deposit(
+            from: self.type.output,
+            scalingFactor: (self.productivity * hours, self.state.today.eo)
+        )
+
+        // Sell outputs.
+        self.state.cash.r += self.state.out.sell(in: policy.currency, on: &map.exchange)
+
+        #assert(self.state.cash.balance >= 0, "Factory has negative cash! (\(self.state.cash))")
+
+        self.state.today.fi = self.state.ni.fulfilled
+        self.state.today.vi = self.state.ni.valueAcquired
+
+        return wages
     }
 }
 extension FactoryContext {

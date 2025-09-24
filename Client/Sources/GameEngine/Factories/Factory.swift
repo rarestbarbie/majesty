@@ -19,35 +19,35 @@ struct Factory: CashAccountHolder, Identifiable {
     var yesterday: Dimensions
     var today: Dimensions
 
-    init(
-        id: FactoryID,
-        on: Address,
-        type: FactoryType,
-        size: Size,
-        subs: Bool,
-        cash: CashAccount,
-        nv: ResourceInputs,
-        ni: ResourceInputs,
-        out: ResourceOutputs,
-        yesterday: Dimensions,
-        today: Dimensions,
-    ) {
-        self.id = id
-        self.on = on
-        self.type = type
-        self.size = size
-        self.subs = subs
-        self.cash = cash
-        self.nv = nv
-        self.ni = ni
-        self.out = out
-        self.yesterday = yesterday
-        self.today = today
-    }
+    var equity: Equity<LegalEntity>
 }
 extension Factory: Turnable {
     mutating func turn() {
         self.cash.settle()
+    }
+}
+extension Factory {
+    mutating func issue(shares fill: StockMarket<LegalEntity>.Fill) {
+        self.equity.issue(shares: fill.quantity, to: fill.buyer)
+        self.cash.e += fill.cost
+    }
+}
+extension Factory {
+    var grossProfit: Int64 {
+        self.Δ.vi + // Change in stockpiled inputs
+        self.cash.b + // Spending on inputs
+        self.cash.w + // Spending on wages
+        self.cash.r // Revenue
+    }
+    var grossMargin: Fraction? {
+        self.cash.r > 0 ? self.grossProfit %/ self.cash.r : nil
+    }
+
+    var operatingProfit: Int64 {
+        self.grossProfit + self.cash.c
+    }
+    var operatingMargin: Fraction? {
+        self.cash.r > 0 ? self.operatingProfit %/ self.cash.r : nil
     }
 }
 extension Factory {
@@ -92,6 +92,8 @@ extension Factory {
         case today_ei = "t_ei"
         case today_eo = "t_eo"
         case today_fi = "t_fi"
+
+        case equity
     }
 }
 extension Factory: JavaScriptEncodable {
@@ -131,6 +133,8 @@ extension Factory: JavaScriptEncodable {
         js[.today_ei] = self.today.ei
         js[.today_eo] = self.today.eo
         js[.today_fi] = self.today.fi
+
+        js[.equity] = self.equity
     }
 }
 extension Factory: JavaScriptDecodable {
@@ -175,6 +179,7 @@ extension Factory: JavaScriptDecodable {
                 fi: try js[.yesterday_fi]?.decode() ?? today.fi,
             ),
             today: today,
+            equity: try js[.equity]?.decode() ?? [:]
         )
     }
 }

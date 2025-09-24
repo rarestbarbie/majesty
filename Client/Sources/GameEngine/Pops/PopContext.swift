@@ -15,7 +15,7 @@ struct PopContext {
     private(set) var policy: CountryPolicies?
 
     private(set) var unemployment: Double
-    private(set) var equity: Equity
+    private(set) var equity: Equity<LegalEntity>.Statistics
 
     private(set) var cashFlow: CashFlowStatement
 
@@ -38,16 +38,14 @@ extension PopContext {
     private static var stockpileDays: ClosedRange<Int64> { 3 ... 7 }
 
     mutating func startIndexCount() {
-        self.equity = .init()
     }
 
-    mutating func addShareholderCount(pop: Pop, shares: Int64) {
-        #assert(
-            shares > 0,
-            "Pop (id = \(pop.id)) owns \(shares) shares of pop '\(self.type.plural)'!"
-        )
+    mutating func addPosition(asset: LegalEntity, value: Int64) {
+        guard value > 0 else {
+            return
+        }
 
-        self.equity.count(pop: pop.id, shares: shares)
+        // TODO
     }
 }
 
@@ -207,6 +205,8 @@ extension PopContext: RuntimeContext {
         self.cashFlow.update(with: self.state.nx.inelastic.values.elements)
 
         self.policy = country.policies
+
+        self.equity = .compute(from: self.state.equity)
     }
 }
 extension PopContext: TransactingContext {
@@ -215,11 +215,19 @@ extension PopContext: TransactingContext {
             using: &map.random.generator
         )
 
-        if  case .Ward = self.state.type.stratum {
-            return
-        }
-
         let currency: Fiat = self.policy!.currency
+
+        if  case .Ward = self.state.type.stratum {
+            let shares: Int64 = self.equity.shares.outstanding
+            let price: Fraction = shares > 0
+                ? self.state.cash.balance %/ shares
+                : 1 %/ 1
+            map.stockMarkets.issueShares(
+                asset: .pop(self.state.id),
+                price: price,
+                currency: currency
+            )
+        }
 
         /// Compute vertical weights.
         let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
@@ -326,6 +334,19 @@ extension PopContext: TransactingContext {
             tradeable: tradeableCostPerDay.x * Self.stockpileDays.upperBound,
         )
 
+        equity:
+        if case .Owner = self.state.type.stratum {
+            let valueToInvest: Int64 = (self.state.cash.balance - min.l - min.e) / d.x
+            if  valueToInvest <= 0 {
+                break equity
+            }
+            map.stockMarkets.queueRandomPurchase(
+                buyer: .pop(self.state.id),
+                value: valueToInvest,
+                currency: currency
+            )
+        }
+
         for (budget, weights, tier):
             (Int64, [InelasticBudgetTier.Weight], ResourceTierIdentifier) in [
             (budget.l.inelastic, weights.l.inelastic.x, .l),
@@ -426,69 +447,8 @@ extension PopContext {
             on: &map.exchange
         )
 
-        if  let budget: PopBudget = self.budget {
-            let target: TradeableInput.StockpileTarget = .random(
-                in: Self.stockpileDays,
-                using: &map.random
-            )
-            let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
-
-            if  budget.l.tradeable > 0 {
-                let (gain, loss): (Int64, loss: Int64) = self.state.nl.trade(
-                    stockpileDays: target,
-                    spendingLimit: budget.l.tradeable,
-                    in: country.currency,
-                    on: &map.exchange,
-                )
-
-                self.state.cash.b += loss
-                self.state.cash.r += gain
-            }
-
-            self.state.today.fl = self.state.nl.fulfilled
-            self.state.nl.consume(
-                from: self.type.l,
-                scalingFactor: (self.state.today.size, z.l)
-            )
-
-            if  budget.e.tradeable > 0 {
-                let (gain, loss): (Int64, loss: Int64) = self.state.ne.trade(
-                    stockpileDays: target,
-                    spendingLimit: budget.e.tradeable,
-                    in: country.currency,
-                    on: &map.exchange,
-                )
-
-                self.state.cash.b += loss
-                self.state.cash.r += gain
-            }
-
-            self.state.today.fe = self.state.ne.fulfilled
-            self.state.ne.consume(
-                from: self.type.e,
-                scalingFactor: (self.state.today.size, z.e)
-            )
-
-            if  budget.x.tradeable > 0 {
-                let (gain, loss): (Int64, loss: Int64) = self.state.nx.trade(
-                    stockpileDays: target,
-                    spendingLimit: budget.x.tradeable,
-                    in: country.currency,
-                    on: &map.exchange,
-                )
-                self.state.cash.b += loss
-                self.state.cash.r += gain
-            }
-
-            self.state.today.fx = self.state.nx.fulfilled
-            self.state.nx.consume(
-                from: self.type.x,
-                scalingFactor: (self.state.today.size, z.x)
-            )
-
-            // Welfare
-            self.state.cash.s += self.state.today.size * country.minwage / 10
-        } else {
+        guard
+        let budget: PopBudget = self.budget else {
             // Pop is enslaved
             self.state.today.fl = 1
             self.state.today.fe = 1
@@ -496,10 +456,74 @@ extension PopContext {
 
             // Pay dividends to shareholders, if any.
             self.state.cash.i -= map.pay(
-                dividend: self.state.cash.balance,
-                to: self.equity.owners.shuffled(using: &map.random.generator)
+                dividend: self.state.cash.balance <> (1 %/ 1_000),
+                to: self.state.equity.shares.values.shuffled(using: &map.random.generator)
             )
+
+            return
         }
+
+        let target: TradeableInput.StockpileTarget = .random(
+            in: Self.stockpileDays,
+            using: &map.random
+        )
+        let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
+
+        if  budget.l.tradeable > 0 {
+            let (gain, loss): (Int64, loss: Int64) = self.state.nl.trade(
+                stockpileDays: target,
+                spendingLimit: budget.l.tradeable,
+                in: country.currency,
+                on: &map.exchange,
+            )
+
+            self.state.cash.b += loss
+            self.state.cash.r += gain
+        }
+
+        self.state.today.fl = self.state.nl.fulfilled
+        self.state.nl.consume(
+            from: self.type.l,
+            scalingFactor: (self.state.today.size, z.l)
+        )
+
+        if  budget.e.tradeable > 0 {
+            let (gain, loss): (Int64, loss: Int64) = self.state.ne.trade(
+                stockpileDays: target,
+                spendingLimit: budget.e.tradeable,
+                in: country.currency,
+                on: &map.exchange,
+            )
+
+            self.state.cash.b += loss
+            self.state.cash.r += gain
+        }
+
+        self.state.today.fe = self.state.ne.fulfilled
+        self.state.ne.consume(
+            from: self.type.e,
+            scalingFactor: (self.state.today.size, z.e)
+        )
+
+        if  budget.x.tradeable > 0 {
+            let (gain, loss): (Int64, loss: Int64) = self.state.nx.trade(
+                stockpileDays: target,
+                spendingLimit: budget.x.tradeable,
+                in: country.currency,
+                on: &map.exchange,
+            )
+            self.state.cash.b += loss
+            self.state.cash.r += gain
+        }
+
+        self.state.today.fx = self.state.nx.fulfilled
+        self.state.nx.consume(
+            from: self.type.x,
+            scalingFactor: (self.state.today.size, z.x)
+        )
+
+        // Welfare
+        self.state.cash.s += self.state.today.size * country.minwage / 10
     }
 
     mutating func advance(factories: RuntimeStateTable<FactoryContext>, on map: inout GameMap) {

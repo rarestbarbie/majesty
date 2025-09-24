@@ -7,7 +7,7 @@ struct FactoryDetails {
     let id: FactoryID
     var open: FactoryDetailsTab
     var inventory: FactoryInventory
-    var ownership: FactoryOwnership
+    var ownership: EquityBreakdown
 
     init(id: FactoryID, open: FactoryDetailsTab) {
         self.id = id
@@ -27,7 +27,7 @@ extension FactoryDetails {
 
         switch self.open {
         case .Inventory: self.inventory.update(from: factory, in: snapshot)
-        case .Ownership: self.ownership.update(from: factory, in: snapshot.context)
+        case .Ownership: self.ownership.update(from: factory.equity, in: snapshot.context)
         }
     }
 }

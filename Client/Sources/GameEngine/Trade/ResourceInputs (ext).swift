@@ -12,7 +12,7 @@ extension ResourceInputs {
         )
     }
 
-    var valuation: Int64 {
+    var valueAcquired: Int64 {
         self.tradeable.values.reduce(0) { $0 + $1.valueAcquired }
     }
 

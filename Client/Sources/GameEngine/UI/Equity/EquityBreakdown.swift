@@ -4,7 +4,7 @@ import JavaScriptInterop
 import VectorCharts
 import VectorCharts_JavaScript
 
-struct FactoryOwnership {
+struct EquityBreakdown {
     var country: PieChart<CountryID, PieChartLabel>?
     var culture: PieChart<String, PieChartLabel>?
 
@@ -13,25 +13,27 @@ struct FactoryOwnership {
         self.culture = nil
     }
 }
-extension FactoryOwnership {
-    mutating func update(from factory: FactoryContext, in context: GameContext) {
+extension EquityBreakdown {
+    mutating func update(from equity: Equity<LegalEntity>.Statistics, in context: GameContext) {
         let (country, culture): (
             country: [CountryID: (share: Int64, PieChartLabel)],
             culture: [String: (share: Int64, PieChartLabel)]
-        ) = factory.equity.owners.reduce(
+        ) = equity.owners.reduce(
             into: ([:], [:])
         ) {
-            guard let pop: Pop = context.pops.table.state[$1.id] else {
+            // Don’t have a way of representing non-pop owners yet.
+            guard case .pop(let id) = $1.id,
+            let pop: Pop = context.pops.table.state[id] else {
                 return
             }
             if  let country: CountryID = context.planets[pop.home.planet]?.occupied,
                 let country: Country = context.countries.state[country] {
                 let label: PieChartLabel = .init(color: country.color, name: country.name)
-                $0.country[country.id, default: (0, label)].share += $1.count
+                $0.country[country.id, default: (0, label)].share += $1.shares
             }
             if  let culture: Culture = context.cultures.state[pop.nat] {
                 let label: PieChartLabel = .init(color: culture.color, name: culture.id)
-                $0.culture[culture.id, default: (0, label)].share += $1.count
+                $0.culture[culture.id, default: (0, label)].share += $1.shares
             }
         }
 
@@ -43,7 +45,7 @@ extension FactoryOwnership {
         )
     }
 }
-extension FactoryOwnership: JavaScriptEncodable {
+extension EquityBreakdown: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
         case type
         case country

@@ -28,8 +28,7 @@ struct Pop: CashAccountHolder, IdentityReplaceable {
     var yesterday: Dimensions
     var today: Dimensions
 
-    var stocks: OrderedDictionary<FactoryID, Property<Factory>>
-    var slaves: OrderedDictionary<PopID, Property<Pop>>
+    var equity: Equity<LegalEntity>
     var jobs: OrderedDictionary<FactoryID, FactoryJob>
 }
 extension Pop: Sectionable {
@@ -46,8 +45,7 @@ extension Pop: Sectionable {
             out: .init(),
             yesterday: .init(),
             today: .init(),
-            stocks: [:],
-            slaves: [:],
+            equity: [:],
             jobs: [:]
         )
     }
@@ -75,6 +73,11 @@ extension Pop: Turnable {
     }
 }
 extension Pop {
+    mutating func issue(shares fill: StockMarket<LegalEntity>.Fill) {
+        self.equity.issue(shares: fill.quantity, to: fill.buyer)
+        self.cash.e += fill.cost
+    }
+
     mutating func egress(
         evaluator: ConditionEvaluator,
         on map: inout GameMap,
@@ -171,8 +174,7 @@ extension Pop {
         case today_fe = "t_fe"
         case today_fx = "t_fx"
 
-        case stocks
-        case slaves
+        case equity
         case jobs
     }
 }
@@ -202,8 +204,7 @@ extension Pop: JavaScriptEncodable {
         js[.today_fe] = self.today.fe
         js[.today_fx] = self.today.fx
 
-        js[.stocks] = self.stocks.isEmpty ? nil : self.stocks
-        js[.slaves] = self.slaves.isEmpty ? nil : self.slaves
+        js[.equity] = self.equity
         js[.jobs] = self.jobs.isEmpty ? nil : self.jobs
     }
 }
@@ -236,8 +237,7 @@ extension Pop: JavaScriptDecodable {
                 fx: try js[.yesterday_fx]?.decode() ?? today.fx,
             ),
             today: today,
-            stocks: try js[.stocks]?.decode() ?? [:],
-            slaves: try js[.slaves]?.decode() ?? [:],
+            equity: try js[.equity]?.decode() ?? [:],
             jobs: try js[.jobs]?.decode() ?? [:],
         )
     }
