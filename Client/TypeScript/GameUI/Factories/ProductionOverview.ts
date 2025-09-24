@@ -25,8 +25,8 @@ export class ProductionOverview extends ScreenContent {
     private readonly sales: StaticList<ResourceSaleBox, Resource>;
     private readonly charts: {
         readonly spending: PieChart<string>;
-        readonly country: PieChart<GameID>;
-        readonly culture: PieChart<string>;
+        readonly ownerCountry: PieChart<GameID>;
+        readonly ownerCulture: PieChart<string>;
     };
 
     private dom?: {
@@ -46,8 +46,8 @@ export class ProductionOverview extends ScreenContent {
 
         this.charts = {
             spending: new PieChart<string>(TooltipType.FactoryStatementItem),
-            country: new PieChart<GameID>(TooltipType.FactoryOwnershipCountry),
-            culture: new PieChart<string>(TooltipType.FactoryOwnershipCulture),
+            ownerCountry: new PieChart<GameID>(TooltipType.FactoryOwnershipCountry),
+            ownerCulture: new PieChart<string>(TooltipType.FactoryOwnershipCulture),
         }
     }
 
@@ -87,7 +87,11 @@ export class ProductionOverview extends ScreenContent {
         for (const tab of [FactoryDetailsTab.Inventory, FactoryDetailsTab.Ownership]) {
             const link: HTMLAnchorElement = document.createElement('a');
             link.href = `#screen=${ScreenType.Production}&details=${tab}`;
-            link.textContent = tab;
+
+            switch (tab) {
+            case FactoryDetailsTab.Inventory: link.textContent = 'Consumption'; break;
+            case FactoryDetailsTab.Ownership: link.textContent = 'Capital Structure'; break;
+            }
 
             if (tab == state.factory?.open.type) {
                 link.classList.add('selected');
@@ -109,8 +113,8 @@ export class ProductionOverview extends ScreenContent {
 
         case FactoryDetailsTab.Ownership:
             this.dom.stats.setAttribute('data-subscreen', 'Ownership');
-            this.dom.stats.appendChild(this.charts.country.node);
-            this.dom.stats.appendChild(this.charts.culture.node);
+            this.dom.stats.appendChild(this.charts.ownerCountry.node);
+            this.dom.stats.appendChild(this.charts.ownerCulture.node);
             break;
         }
 
@@ -174,8 +178,8 @@ export class ProductionOverview extends ScreenContent {
             break;
 
         case FactoryDetailsTab.Ownership:
-            this.charts.country.update([state.factory.id], state.factory.open.country ?? []);
-            this.charts.culture.update([state.factory.id], state.factory.open.culture ?? []);
+            this.charts.ownerCountry.update([state.factory.id], state.factory.open.country ?? []);
+            this.charts.ownerCulture.update([state.factory.id], state.factory.open.culture ?? []);
             break;
         }
     }

@@ -5,3 +5,5 @@ import JavaScriptKit
     case Inventory
     case Ownership
 }
+extension FactoryDetailsTab: InventoryTab {}
+extension FactoryDetailsTab: OwnershipTab {}

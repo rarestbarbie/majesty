@@ -1,5 +1,5 @@
 import { GameID } from '../../GameEngine/GameID.js';
-import { ResourceNeed, ResourceSale, PieChartSector } from '../exports.js';
+import { InventoryBreakdown, OwnershipBreakdown, PopDetailsTab } from '../exports.js';
 
 export interface PopDetails {
     readonly id: GameID;
@@ -8,7 +8,7 @@ export interface PopDetails {
     readonly type_plural?: string;
     readonly type?: string;
 
-    readonly needs: ResourceNeed[];
-    readonly sales: ResourceSale[];
-    readonly spending?: PieChartSector<string>[];
+    readonly open:
+        InventoryBreakdown<PopDetailsTab.Inventory> |
+        OwnershipBreakdown<PopDetailsTab.Ownership>;
 }

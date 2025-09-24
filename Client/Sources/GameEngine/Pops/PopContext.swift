@@ -206,7 +206,7 @@ extension PopContext: RuntimeContext {
 
         self.policy = country.policies
 
-        self.equity = .compute(from: self.state.equity)
+        self.equity = .compute(from: self.state.equity, in: context)
     }
 }
 extension PopContext: TransactingContext {
@@ -433,7 +433,8 @@ extension PopContext {
 extension PopContext {
     mutating func transact(on map: inout GameMap) {
         guard
-        let country: CountryPolicies = self.policy else {
+        let country: CountryPolicies = self.policy,
+        let budget: PopBudget = self.budget else {
             return
         }
 
@@ -446,22 +447,6 @@ extension PopContext {
             in: country.currency,
             on: &map.exchange
         )
-
-        guard
-        let budget: PopBudget = self.budget else {
-            // Pop is enslaved
-            self.state.today.fl = 1
-            self.state.today.fe = 1
-            self.state.today.fx = 0
-
-            // Pay dividends to shareholders, if any.
-            self.state.cash.i -= map.pay(
-                dividend: self.state.cash.balance <> (1 %/ 1_000),
-                to: self.state.equity.shares.values.shuffled(using: &map.random.generator)
-            )
-
-            return
-        }
 
         let target: TradeableInput.StockpileTarget = .random(
             in: Self.stockpileDays,
@@ -521,6 +506,18 @@ extension PopContext {
             from: self.type.x,
             scalingFactor: (self.state.today.size, z.x)
         )
+
+        if case .Ward = self.state.type.stratum {
+            // Pop is enslaved
+            self.state.today.fe = 1
+            self.state.today.fx = 0
+
+            // Pay dividends to shareholders, if any.
+            self.state.cash.i -= map.pay(
+                dividend: self.state.cash.balance <> (1 %/ 1_000),
+                to: self.state.equity.shares.values.shuffled(using: &map.random.generator)
+            )
+        }
 
         // Welfare
         self.state.cash.s += self.state.today.size * country.minwage / 10

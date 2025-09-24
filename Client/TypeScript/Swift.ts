@@ -14,6 +14,7 @@ import {
     PlanetTileEditorState,
     ProductionReport,
     PopulationReport,
+    PopDetailsTab,
     TradeReport,
     TooltipType,
     GameUI
@@ -41,7 +42,10 @@ export class Swift {
         factory: GameID | null,
         details: FactoryDetailsTab | null,
     ) => ProductionReport;
-    declare public static openPopulation: (id: GameID | null) => PopulationReport;
+    declare public static openPopulation: (
+        id: GameID | null,
+        details: PopDetailsTab | null
+    ) => PopulationReport;
     declare public static openTrade: (
         market: string | null,
         filter: string | null

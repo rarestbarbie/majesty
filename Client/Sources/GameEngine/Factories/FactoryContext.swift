@@ -91,7 +91,7 @@ extension FactoryContext: RuntimeContext {
         self.cashFlow[.workers] = -self.state.cash.w
         self.cashFlow[.clerks] = -self.state.cash.c
 
-        self.equity = .compute(from: self.state.equity)
+        self.equity = .compute(from: self.state.equity, in: pass)
     }
 }
 extension FactoryContext: TransactingContext {

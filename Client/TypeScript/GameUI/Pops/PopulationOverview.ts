@@ -5,6 +5,7 @@ import { Swift } from '../../Swift.js';
 import {
     PieChart,
     PopulationReport,
+    PopDetailsTab,
     PopTableEntry,
     PopTableRow,
     ResourceNeed,
@@ -22,6 +23,9 @@ export class PopulationOverview extends ScreenContent {
     private sales: StaticList<ResourceSaleBox, Resource>;
     private readonly charts: {
         readonly spending: PieChart<string>;
+
+        readonly ownerCountry: PieChart<GameID>;
+        readonly ownerCulture: PieChart<string>;
     };
 
     private pops: StaticList<PopTableRow, GameID>;
@@ -45,6 +49,8 @@ export class PopulationOverview extends ScreenContent {
         this.sales = new StaticList<ResourceSaleBox, Resource>(document.createElement('div'));
         this.charts = {
             spending: new PieChart<string>(TooltipType.PopStatementItem),
+            ownerCountry: new PieChart<GameID>(TooltipType.PopOwnershipCountry),
+            ownerCulture: new PieChart<string>(TooltipType.PopOwnershipCulture),
         };
     }
 
@@ -52,6 +58,7 @@ export class PopulationOverview extends ScreenContent {
         let subject: string | null = parameters.get('id');
         let state: PopulationReport = Swift.openPopulation(
             subject ? parseInt(subject) as GameID : null,
+            parameters.get('details') as PopDetailsTab
         );
 
         // We need to empty the upper content, as we will need to replace the IDs.
@@ -82,6 +89,30 @@ export class PopulationOverview extends ScreenContent {
             this.dom.panel.appendChild(this.pops.node);
             this.dom.panel.classList.add('panel');
 
+            this.dom.stats.classList.add('stats');
+        } else {
+            this.dom.stats.replaceChildren();
+            this.dom.nav.replaceChildren();
+        }
+
+        for (const tab of [PopDetailsTab.Inventory, PopDetailsTab.Ownership]) {
+            const link: HTMLAnchorElement = document.createElement('a');
+            link.href = `#screen=${ScreenType.Population}&details=${tab}`;
+
+            switch (tab) {
+            case PopDetailsTab.Inventory: link.textContent = 'Consumption'; break;
+            case PopDetailsTab.Ownership: link.textContent = 'Capital Structure'; break;
+            }
+
+            if (tab == state.pop?.open.type) {
+                link.classList.add('selected');
+            }
+
+            this.dom.nav.appendChild(link);
+        }
+
+        switch (state.pop?.open.type) {
+        case PopDetailsTab.Inventory:
             const right: HTMLDivElement = document.createElement('div');
             right.appendChild(this.sales.node);
             right.appendChild(this.charts.spending.node);
@@ -89,8 +120,15 @@ export class PopulationOverview extends ScreenContent {
             this.dom.stats.setAttribute('data-subscreen', 'Inventory');
             this.dom.stats.appendChild(this.needs.node);
             this.dom.stats.appendChild(right);
-            this.dom.stats.classList.add('stats');
+            break;
+
+        case PopDetailsTab.Ownership:
+            this.dom.stats.setAttribute('data-subscreen', 'Ownership');
+            this.dom.stats.appendChild(this.charts.ownerCountry.node);
+            this.dom.stats.appendChild(this.charts.ownerCulture.node);
+            break;
         }
+
         if (root) {
             root.appendChild(this.dom.index);
             root.appendChild(this.dom.panel);
@@ -121,14 +159,20 @@ export class PopulationOverview extends ScreenContent {
             state.pop?.id
         );
 
-        if (state.pop) {
+        if (state.pop === undefined) {
+            return;
+        }
+
+        UpdateText(this.dom.titleName, state.pop.type_singular ?? '');
+        this.dom.titleIcon.set({ id: state.pop.id, type: state.pop.type ?? '' });
+
+        switch (state.pop.open.type) {
+        case PopDetailsTab.Inventory:
             const id: GameID = state.pop.id;
 
-            UpdateText(this.dom.titleName, state.pop.type_singular ?? '');
-            this.dom.titleIcon.set({ id: state.pop.id, type: state.pop.type ?? '' });
 
             this.needs.update(
-                state.pop.needs,
+                state.pop.open.needs,
                 (need: ResourceNeed) => new ResourceNeedRow(
                     need,
                     id,
@@ -140,7 +184,7 @@ export class PopulationOverview extends ScreenContent {
             );
 
             this.sales.update(
-                state.pop.sales,
+                state.pop.open.sales,
                 (sale: ResourceSale) => new ResourceSaleBox(
                     sale,
                     id,
@@ -150,8 +194,15 @@ export class PopulationOverview extends ScreenContent {
                 (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
             );
 
-            this.charts.spending.update([id], state.pop.spending ?? []);
-        } else {
+            this.charts.spending.update([id], state.pop.open.spending ?? []);
+            break;
+
+        case PopDetailsTab.Ownership:
+            this.charts.ownerCountry.update([state.pop.id], state.pop.open.country ?? []);
+            this.charts.ownerCulture.update([state.pop.id], state.pop.open.culture ?? []);
+            break;
+
+        case undefined:
             UpdateText(this.dom.titleName, '');
             this.dom.titleIcon.set(null);
         }
