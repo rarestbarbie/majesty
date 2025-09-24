@@ -216,19 +216,20 @@ extension GameSession {
         let assets: (y: Int64, t: Int64) = (y.vi + y.vv, t.vi + t.vv)
         let value: (y: Int64, t: Int64) = (liquid.y + assets.y, liquid.t + assets.t)
 
-        /// Does not include subsidies, or changes in stockpiled equipment!
-        let consumed: Int64 = t.vi - y.vi
-        let profit: Int64 = consumed
-            + factory.cash.v
-            + factory.cash.b
-            + factory.cash.r
-            + factory.cash.c
-            + factory.cash.w
+        let operatingProfit: Int64 = factory.operatingProfit
+        let operatingMargin: Fraction? = factory.operatingMargin
+        let grossMargin: Fraction? = factory.grossMargin
 
         return .instructions {
             $0["Total valuation", +] = value.t[/3] <- value.y
             $0[>] {
-                $0["Today’s profit", +] = +profit[/3]
+                $0["Today’s profit", +] = +operatingProfit[/3]
+                $0["Gross margin", +] = grossMargin.map {
+                    (Double.init($0))[%2]
+                }
+                $0["Operating margin", +] = operatingMargin.map {
+                    (Double.init($0))[%2]
+                }
             }
 
             $0["Illiquid assets", +] = assets.t[/3] <- assets.y
@@ -241,11 +242,13 @@ extension GameSession {
             $0[>] {
                 $0["Capital expenditures", +] = +?factory.cash.v[/3]
                 $0["Market spending", +] = +?factory.cash.b[/3]
+                $0["Market spending (amortized)", +] = +?(factory.cash.b + factory.Δ.vi)[/3]
                 $0["Market earnings", +] = +?factory.cash.r[/3]
                 $0["Subsidies", +] = +?factory.cash.s[/3]
                 $0["Salaries", +] = +?factory.cash.c[/3]
                 $0["Wages", +] = +?factory.cash.w[/3]
                 $0["Interest and dividends", +] = +?factory.cash.i[/3]
+                $0["Equity raises", +] = +?factory.cash.e[/3]
             }
         }
     }
@@ -411,13 +414,12 @@ extension GameSession {
         let (share, total): (share: Int64, total: Int64) = factory.equity.owners.reduce(
             into: (0, 0)
         ) {
-            guard let pop: Pop = self.context.pops.table.state[$1.id] else {
-                return
+            if case .pop(let id) = $1.id,
+                let pop: Pop = self.context.pops.table.state[id], pop.nat == culture.id {
+                $0.share += $1.shares
             }
-            if  pop.nat == culture.id {
-                $0.share += $1.count
-            }
-            $0.total += $1.count
+
+            $0.total += $1.shares
         }
 
         return .instructions(style: .borderless) {
@@ -438,13 +440,13 @@ extension GameSession {
         let (share, total): (share: Int64, total: Int64) = factory.equity.owners.reduce(
             into: (0, 0)
         ) {
-            guard let pop: Pop = self.context.pops.table.state[$1.id] else {
-                return
+            if  case .pop(let id) = $1.id,
+                let pop: Pop = self.context.pops.table.state[id],
+                case country.id? = self.context.planets[pop.home.planet]?.occupied {
+                $0.share += $1.shares
             }
-            if case country.id? = self.context.planets[pop.home.planet]?.occupied {
-                $0.share += $1.count
-            }
-            $0.total += $1.count
+
+            $0.total += $1.shares
         }
 
         return .instructions(style: .borderless) {
@@ -513,7 +515,8 @@ extension GameSession {
                 $0["Interest and dividends", +] = +?pop.cash.i[/3]
 
                 $0["Market spending", +] = +?pop.cash.b[/3]
-                $0["Investments", +] = +?pop.cash.v[/3]
+                $0["Surrogacy", +] = +?pop.cash.v[/3]
+                $0["Investments", +] = +?pop.cash.e[/3]
             }
         }
     }

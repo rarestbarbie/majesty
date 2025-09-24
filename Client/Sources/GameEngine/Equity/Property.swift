@@ -3,25 +3,25 @@ import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public struct Property<Instrument>: Identifiable, Equatable, Hashable
-    where Instrument: Identifiable, Instrument.ID: ConvertibleToJSValue & LoadableFromJSValue {
-    public let id: Instrument.ID
+    where Instrument: Hashable & ConvertibleToJSValue & LoadableFromJSValue {
+    public let id: Instrument
     private(set) var shares: Int64
     private(set) var bought: Int64
     private(set) var sold: Int64
 }
 extension Property {
-    init(id: Instrument.ID) {
+    init(id: Instrument) {
         self.init(id: id, shares: 0, bought: 0, sold: 0)
     }
 
     mutating func buy(_ shares: Int64) {
         self.bought += shares
-        self.shares += shares
+        self.shares -= shares
     }
 
     mutating func sell(_ shares: Int64) {
         self.sold += shares
-        self.shares -= shares
+        self.shares += shares
     }
 }
 extension Property {

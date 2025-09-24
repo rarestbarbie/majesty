@@ -21,6 +21,10 @@ export default defineConfig({
         watch: {
             ignored: ['/.build/'], // Example for a large directory
         },
+        headers: {
+            "Cross-Origin-Opener-Policy": "same-origin",
+            "Cross-Origin-Embedder-Policy": "require-corp",
+        },
     },
     plugins: [
         viteCompression({

@@ -180,6 +180,22 @@ extension GameContext {
                 )
             }
         }
+        map.stockMarkets.turn {
+            for fill: StockMarket<LegalEntity>.Fill in $1.match(using: &map.random) {
+                switch fill.buyer {
+                case .pop(let id):
+                    self.pops.table[id]?.state.cash.e -= fill.cost
+                case .factory(let id):
+                    self.factories[id]?.state.cash.e -= fill.cost
+                }
+                switch fill.asset {
+                case .pop(let id):
+                    self.pops.table[id]?.state.issue(shares: fill)
+                case .factory(let id):
+                    self.factories[id]?.state.issue(shares: fill)
+                }
+            }
+        }
 
         var order: [Resident] = []
 
@@ -262,21 +278,49 @@ extension GameContext {
 
             #assert(counted != nil, "Pop \(pop.state.id) has no home tile!!!")
 
+            let indenture: LegalEntity = .pop(pop.state.id)
+
             for job: FactoryJob in pop.state.jobs.values {
                 self.factories[job.at]?.addWorkforceCount(pop: pop.state, job: job)
             }
-            // TODO: handle missing factories/slaves
-            for stocks: Property<Factory> in pop.state.stocks.values {
-                self.factories[stocks.id]?.addShareholderCount(
-                    pop: pop.state,
-                    shares: stocks.shares,
-                )
+            for owner: Property<LegalEntity> in pop.state.equity.shares.values {
+                let counted: ()?
+                switch owner.id {
+                case .pop(let id):
+                    counted = self.pops.table[id]?.addPosition(
+                        asset: indenture,
+                        value: owner.shares
+                    )
+
+                case .factory(let id):
+                    counted = self.factories[id]?.addPosition(
+                        asset: indenture,
+                        value: owner.shares
+                    )
+                }
+
+                #assert(counted != nil, "Slave \(owner.id) has no owner!!!")
             }
-            for slaves: Property<Pop> in pop.state.slaves.values {
-                self.pops.table[slaves.id]?.addShareholderCount(
-                    pop: pop.state,
-                    shares: slaves.shares
-                )
+        }
+        for factory: FactoryContext in self.factories {
+            let title: LegalEntity = .factory(factory.state.id)
+            for owner: Property<LegalEntity> in factory.state.equity.shares.values {
+                let counted: ()?
+                switch owner.id {
+                case .pop(let id):
+                    counted = self.pops.table[id]?.addPosition(
+                        asset: title,
+                        value: owner.shares
+                    )
+
+                case .factory(let id):
+                    counted = self.factories[id]?.addPosition(
+                        asset: title,
+                        value: owner.shares
+                    )
+                }
+
+                #assert(counted != nil, "Factory \(owner.id) has no owner!!!")
             }
         }
     }

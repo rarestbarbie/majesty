@@ -20,17 +20,16 @@ struct CashAccount {
 
     /// Interest and dividends, negative if owed.
     var i: Int64
+    /// Equity value, negative for purchasers of equity, positive for issuers.
+    var e: Int64
 }
 extension CashAccount {
     init() {
-        self.init(liq: 0, b: 0, v: 0, r: 0, s: 0, c: 0, w: 0, i: 0)
+        self.init(liq: 0, b: 0, v: 0, r: 0, s: 0, c: 0, w: 0, i: 0, e: 0)
     }
 }
 extension CashAccount {
     static func += (self: inout Self, other: CashTransfers) {
-        self.b += other.b
-        self.v += other.v
-        self.r += other.r
         self.s += other.s
         self.c += other.c
         self.w += other.w
@@ -39,19 +38,15 @@ extension CashAccount {
 }
 extension CashAccount {
     var balance: Int64 {
-        self.liq + self.change
-    }
-
-    var change: Int64 {
-        self.b + self.v + self.r + self.s + self.c + self.w + self.i
-    }
-
-    mutating func borrow<T>(_ yield: (_ credit: inout Int64) -> T) -> T {
-        let credit: Int64 = self.liq + self.change
-        self.b += credit
-        let output: T = yield(&self.b)
-        self.b -= credit
-        return output
+        self.liq +
+        self.b +
+        self.v +
+        self.r +
+        self.s +
+        self.c +
+        self.w +
+        self.i +
+        self.e
     }
 
     mutating func settle() {
@@ -62,6 +57,7 @@ extension CashAccount {
         self.liq += self.c; self.c = 0
         self.liq += self.w; self.w = 0
         self.liq += self.i; self.i = 0
+        self.liq += self.e; self.e = 0
     }
 }
 extension CashAccount {
@@ -74,6 +70,7 @@ extension CashAccount {
         case c
         case w
         case i
+        case e
     }
 }
 extension CashAccount: JavaScriptEncodable {
@@ -86,6 +83,7 @@ extension CashAccount: JavaScriptEncodable {
         js[.c] = self.c
         js[.w] = self.w
         js[.i] = self.i
+        js[.e] = self.e
     }
 }
 extension CashAccount: JavaScriptDecodable {
@@ -98,7 +96,8 @@ extension CashAccount: JavaScriptDecodable {
             s: try js[.s]?.decode() ?? 0,
             c: try js[.c]?.decode() ?? 0,
             w: try js[.w]?.decode() ?? 0,
-            i: try js[.i]?.decode() ?? 0
+            i: try js[.i]?.decode() ?? 0,
+            e: try js[.e]?.decode() ?? 0
         )
     }
 }
