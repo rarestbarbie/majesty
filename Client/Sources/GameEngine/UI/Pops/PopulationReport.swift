@@ -13,9 +13,16 @@ public struct PopulationReport {
     }
 }
 extension PopulationReport: PersistentReport {
-    mutating func select(subject: PopID?, details: Never?, filter: Never?) {
+    mutating func select(
+        subject: PopID?,
+        details: PopDetailsTab?,
+        filter: Never?
+    ) {
         if  let subject: PopID {
-            self.pop = .init(id: subject)
+            self.pop = .init(id: subject, open: self.pop?.open ?? .Inventory)
+        }
+        if  let details: PopDetailsTab {
+            self.pop?.open = details
         }
     }
 

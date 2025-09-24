@@ -57,7 +57,7 @@ extension GameAPI {
 
         self[.openPlanet] = { try Self.game?.openPlanet(subject: $0, details: $1) }
         self[.openProduction] = { try Self.game?.openProduction(subject: $0, details: $1) }
-        self[.openPopulation] = { try Self.game?.openPopulation(subject: $0) }
+        self[.openPopulation] = { try Self.game?.openPopulation(subject: $0, details: $1) }
         self[.openTrade] = { try Self.game?.openTrade(subject: $0, filter: $1) }
         self[.closeScreen] = { Self.game?.open(nil) }
         self[.minimap] = { Self.game?.minimap(planet: $0, layer: $1, cell: $2) }

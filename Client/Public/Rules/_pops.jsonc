@@ -15,17 +15,17 @@
         }
     },
     "Livestock": {
-        "color": "#b48f9e",
+        "color": "#ff6a14",
         "l": {
+            "Wheat": 6
         },
         "e": {
         },
         "x": {
-            "Cocaine": 1
         },
         "output": {
-            "Livestock": 12,
-            "Poultry": 4
+            "Livestock": 3,
+            "Poultry": 1
         }
     },
     "Miner": {

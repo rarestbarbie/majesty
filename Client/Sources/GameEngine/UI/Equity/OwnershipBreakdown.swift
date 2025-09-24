@@ -4,7 +4,7 @@ import JavaScriptInterop
 import VectorCharts
 import VectorCharts_JavaScript
 
-struct EquityBreakdown {
+struct OwnershipBreakdown<Tab> where Tab: OwnershipTab {
     var country: PieChart<CountryID, PieChartLabel>?
     var culture: PieChart<String, PieChartLabel>?
 
@@ -13,7 +13,7 @@ struct EquityBreakdown {
         self.culture = nil
     }
 }
-extension EquityBreakdown {
+extension OwnershipBreakdown {
     mutating func update(from equity: Equity<LegalEntity>.Statistics, in context: GameContext) {
         let (country, culture): (
             country: [CountryID: (share: Int64, PieChartLabel)],
@@ -21,17 +21,12 @@ extension EquityBreakdown {
         ) = equity.owners.reduce(
             into: ([:], [:])
         ) {
-            // Don’t have a way of representing non-pop owners yet.
-            guard case .pop(let id) = $1.id,
-            let pop: Pop = context.pops.table.state[id] else {
-                return
-            }
-            if  let country: CountryID = context.planets[pop.home.planet]?.occupied,
-                let country: Country = context.countries.state[country] {
+            if  let country: Country = context.countries.state[$1.country] {
                 let label: PieChartLabel = .init(color: country.color, name: country.name)
                 $0.country[country.id, default: (0, label)].share += $1.shares
             }
-            if  let culture: Culture = context.cultures.state[pop.nat] {
+            if  let culture: String = $1.culture,
+                let culture: Culture = context.cultures.state[culture] {
                 let label: PieChartLabel = .init(color: culture.color, name: culture.id)
                 $0.culture[culture.id, default: (0, label)].share += $1.shares
             }
@@ -45,7 +40,7 @@ extension EquityBreakdown {
         )
     }
 }
-extension EquityBreakdown: JavaScriptEncodable {
+extension OwnershipBreakdown: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
         case type
         case country
@@ -53,7 +48,7 @@ extension EquityBreakdown: JavaScriptEncodable {
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.type] = FactoryDetailsTab.Ownership
+        js[.type] = Tab.Ownership
         js[.country] = self.country
         js[.culture] = self.culture
     }

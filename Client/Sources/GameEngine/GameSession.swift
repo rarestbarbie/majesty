@@ -156,11 +156,14 @@ extension GameSession {
         )
     }
 
-    public mutating func openPopulation(subject: PopID?) throws -> PopulationReport {
+    public mutating func openPopulation(
+        subject: PopID?,
+        details: PopDetailsTab?
+    ) throws -> PopulationReport {
         self.ui.screen = .Population
         return try self.ui.report.population.open(
             subject: subject,
-            details: nil,
+            details: details,
             filter: nil,
             snapshot: self.snapshot
         )
@@ -405,53 +408,20 @@ extension GameSession {
         _ id: FactoryID,
         culture: String,
     ) -> Tooltip? {
-        guard
-        let factory: FactoryContext = self.context.factories[id],
-        let culture: Culture = self.context.cultures.state[culture] else {
-            return nil
-        }
-
-        let (share, total): (share: Int64, total: Int64) = factory.equity.owners.reduce(
-            into: (0, 0)
-        ) {
-            if case .pop(let id) = $1.id,
-                let pop: Pop = self.context.pops.table.state[id], pop.nat == culture.id {
-                $0.share += $1.shares
-            }
-
-            $0.total += $1.shares
-        }
-
-        return .instructions(style: .borderless) {
-            $0[culture.id] = (Double.init(share) / Double.init(total))[%3]
-        }
+        self.context.factories[id]?.equity.tooltipOwnership(
+            culture: culture,
+            context: self.context
+        )
     }
 
     public func tooltipFactoryOwnership(
         _ id: FactoryID,
         country: CountryID,
     ) -> Tooltip? {
-        guard
-        let factory: FactoryContext = self.context.factories[id],
-        let country: Country = self.context.countries.state[country] else {
-            return nil
-        }
-
-        let (share, total): (share: Int64, total: Int64) = factory.equity.owners.reduce(
-            into: (0, 0)
-        ) {
-            if  case .pop(let id) = $1.id,
-                let pop: Pop = self.context.pops.table.state[id],
-                case country.id? = self.context.planets[pop.home.planet]?.occupied {
-                $0.share += $1.shares
-            }
-
-            $0.total += $1.shares
-        }
-
-        return .instructions(style: .borderless) {
-            $0[country.name] = (Double.init(share) / Double.init(total))[%3]
-        }
+        self.context.factories[id]?.equity.tooltipOwnership(
+            country: country,
+            context: self.context
+        )
     }
 
     public func tooltipFactoryStatementItem(
@@ -714,6 +684,26 @@ extension GameSession {
                 "We expect \(em: demotions) demotion(s) in the next month",
                 breakdown: demotion
             ),
+        )
+    }
+
+    public func tooltipPopOwnership(
+        _ id: PopID,
+        culture: String,
+    ) -> Tooltip? {
+        self.context.pops.table[id]?.equity.tooltipOwnership(
+            culture: culture,
+            context: self.context
+        )
+    }
+
+    public func tooltipPopOwnership(
+        _ id: PopID,
+        country: CountryID,
+    ) -> Tooltip? {
+        self.context.pops.table[id]?.equity.tooltipOwnership(
+            country: country,
+            context: self.context
         )
     }
 

@@ -10,6 +10,9 @@ struct Equity<Owner>
         self.shares = shares
     }
 }
+extension Equity: ExpressibleByDictionaryLiteral {
+    init(dictionaryLiteral: (Never, Never)...) { self.init(shares: [:]) }
+}
 extension Equity {
     mutating func issue(shares: Int64, to owner: Owner) {
         self.shares[owner, default: .init(id: owner)].sell(shares)
@@ -17,9 +20,6 @@ extension Equity {
     mutating func buyback(shares: Int64, from owner: Owner) {
         self.shares[owner, default: .init(id: owner)].buy(shares)
     }
-}
-extension Equity: ExpressibleByDictionaryLiteral {
-    init(dictionaryLiteral: (Never, Never)...) { self.init(shares: [:]) }
 }
 extension Equity: ConvertibleToJSArray {
     func encode(to js: inout JavaScriptEncoder<JavaScriptArrayKey>) {

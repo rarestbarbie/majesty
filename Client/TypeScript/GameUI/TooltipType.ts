@@ -11,6 +11,8 @@ export enum TooltipType {
     PopNeeds = 'PopNeeds',
     PopType = 'PopType',
     PopStatementItem = 'PopStatementItem',
+    PopOwnershipCountry = 'PopOwnershipCountry',
+    PopOwnershipCulture = 'PopOwnershipCulture',
 
     // Factory Tooltips
     FactoryAccount = 'FactoryAccount',

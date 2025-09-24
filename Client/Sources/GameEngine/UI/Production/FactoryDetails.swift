@@ -6,8 +6,8 @@ import JavaScriptInterop
 struct FactoryDetails {
     let id: FactoryID
     var open: FactoryDetailsTab
-    var inventory: FactoryInventory
-    var ownership: EquityBreakdown
+    private var inventory: InventoryBreakdown<FactoryDetailsTab>
+    private var ownership: OwnershipBreakdown<FactoryDetailsTab>
 
     init(id: FactoryID, open: FactoryDetailsTab) {
         self.id = id
@@ -20,8 +20,7 @@ struct FactoryDetails {
 extension FactoryDetails {
     mutating func update(from snapshot: borrowing GameSnapshot) {
         guard
-        let factory: FactoryContext = snapshot.factories[self.id]
-        else {
+        let factory: FactoryContext = snapshot.factories[self.id] else {
             return
         }
 

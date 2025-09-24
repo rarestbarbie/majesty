@@ -7,66 +7,41 @@ import VectorCharts
 
 struct PopDetails {
     let id: PopID
-    private var state: Pop?
-    private var inventory: ResourceInventory
-    private var spending: PieChart<CashFlowItem, PieChartLabel>?
+    var open: PopDetailsTab
 
-    init(id: PopID) {
+    private var inventory: InventoryBreakdown<PopDetailsTab>
+    private var ownership: OwnershipBreakdown<PopDetailsTab>
+
+    private var state: Pop?
+
+    init(id: PopID, open: PopDetailsTab) {
         self.id = id
+        self.open = open
+
         self.inventory = .init()
-        self.spending = nil
+        self.ownership = .init()
+        self.state = nil
     }
 }
 extension PopDetails {
     mutating func update(from snapshot: borrowing GameSnapshot) {
         guard
-        let pop: PopContext = snapshot.pops.table[self.id],
-        let currency: Fiat = pop.policy?.currency else {
+        let pop: PopContext = snapshot.pops.table[self.id] else {
             return
         }
 
         self.state = pop.state
 
-        self.inventory.reset(
-            inputs: pop.state.nl.count + pop.state.ne.count + pop.state.nx.count,
-        )
-
-        self.inventory.update(
-            from: pop.state.nl,
-            tier: .l,
-            currency: currency,
-            location: pop.state.home,
-            snapshot: snapshot
-        )
-        self.inventory.update(
-            from: pop.state.ne,
-            tier: .e,
-            currency: currency,
-            location: pop.state.home,
-            snapshot: snapshot
-        )
-        self.inventory.update(
-            from: pop.state.nx,
-            tier: .x,
-            currency: currency,
-            location: pop.state.home,
-            snapshot: snapshot
-        )
-
-        self.inventory.reset(outputs: pop.state.out.count)
-        self.inventory.update(
-            from: pop.state.out,
-            currency: currency,
-            location: pop.state.home,
-            snapshot: snapshot
-        )
-
-        self.spending = pop.cashFlow.chart(rules: snapshot.rules)
+        switch self.open {
+        case .Inventory: self.inventory.update(from: pop, in: snapshot)
+        case .Ownership: self.ownership.update(from: pop.equity, in: snapshot.context)
+        }
     }
 }
 extension PopDetails: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
         case id
+        case open
 
         case type_singular
         case type_plural
@@ -84,8 +59,9 @@ extension PopDetails: JavaScriptEncodable {
         js[.type_plural] = self.state?.type.plural
         js[.type] = self.state?.type
 
-        js[.needs] = self.inventory.needs
-        js[.sales] = self.inventory.sales
-        js[.spending] = self.spending
+        switch self.open {
+        case .Inventory:    js[.open] = self.inventory
+        case .Ownership:    js[.open] = self.ownership
+        }
     }
 }

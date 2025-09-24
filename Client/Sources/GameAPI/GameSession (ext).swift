@@ -119,6 +119,16 @@ extension GameSession {
             self.tooltipPopType(
                 try arguments[0].decode(),
             )
+        case .PopOwnershipCountry:
+            self.tooltipPopOwnership(
+                try arguments[0].decode(),
+                country: try arguments[1].decode(),
+            )
+        case .PopOwnershipCulture:
+            self.tooltipPopOwnership(
+                try arguments[0].decode(),
+                culture: try arguments[1].decode(),
+            )
         case .PopStatementItem:
             self.tooltipPopStatementItem(
                 try arguments[0].decode(),
