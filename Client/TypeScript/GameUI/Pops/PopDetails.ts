@@ -1,5 +1,9 @@
 import { GameID } from '../../GameEngine/GameID.js';
-import { InventoryBreakdown, OwnershipBreakdown, PopDetailsTab } from '../exports.js';
+import {
+    InventoryBreakdownState,
+    OwnershipBreakdownState,
+    PopDetailsTab
+} from '../exports.js';
 
 export interface PopDetails {
     readonly id: GameID;
@@ -9,6 +13,6 @@ export interface PopDetails {
     readonly type?: string;
 
     readonly open:
-        InventoryBreakdown<PopDetailsTab.Inventory> |
-        OwnershipBreakdown<PopDetailsTab.Ownership>;
+        InventoryBreakdownState<PopDetailsTab.Inventory> |
+        OwnershipBreakdownState<PopDetailsTab.Ownership>;
 }

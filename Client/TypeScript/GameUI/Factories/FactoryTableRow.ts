@@ -3,10 +3,11 @@ import {
     UpdateBigInt,
     UpdateText,
     UpdatePrice,
+    Ticker,
+    Fortune,
 } from '../../DOM/exports.js';
 import { GameID } from '../../GameEngine/exports.js';
 import {
-    CashAccount,
     FactoryTableEntry,
     FactoryWorkersCell,
     ProgressCell,
@@ -23,7 +24,7 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
     private readonly size: ProgressCell;
     private readonly workers: FactoryWorkersCell;
     private readonly clerks: FactoryWorkersCell;
-    private readonly cash: HTMLElement;
+    private readonly px: Ticker;
     private readonly fi: HTMLElement;
 
     public static get columns(): string[] {
@@ -33,7 +34,7 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
             "Level",
             "Workers",
             "Clerks",
-            "Valuation",
+            "Share price",
             "Needs",
         ];
     }
@@ -62,9 +63,9 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
             JSON.stringify([factory.id, 'Clerk'])
         );
 
-        this.cash = document.createElement('div');
-        this.cash.setAttribute('data-tooltip-type', TooltipType.FactoryAccount);
-        this.cash.setAttribute('data-tooltip-arguments', JSON.stringify([factory.id]));
+        this.px = new Ticker(Fortune.Bonus);
+        this.px.outer.setAttribute('data-tooltip-type', TooltipType.FactoryAccount);
+        this.px.outer.setAttribute('data-tooltip-arguments', JSON.stringify([factory.id]));
 
         this.fi = document.createElement('div');
 
@@ -74,7 +75,7 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
         this.node.appendChild(this.size.node);
         this.node.appendChild(this.workers.node);
         this.node.appendChild(this.clerks.node);
-        this.node.appendChild(this.cash);
+        this.node.appendChild(this.px.outer);
         this.node.appendChild(this.fi);
     }
 
@@ -91,7 +92,7 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
         this.clerks.wn.updateBigIntChange(factory.y_cn, factory.t_cn);
         this.clerks.update(factory.clerks);
 
-        UpdateBigInt(this.cash, factory.valuation);
+        this.px.updatePriceChange(factory.y_px, factory.t_px);
         UpdatePrice(this.fi, factory.t_fi * 100, 1);
     }
 }

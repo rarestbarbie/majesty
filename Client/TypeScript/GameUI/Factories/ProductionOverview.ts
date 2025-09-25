@@ -8,6 +8,7 @@ import {
     FactoryTableEntry,
     FactoryTableRow,
     FactoryDetailsTab,
+    OwnershipBreakdown,
     PieChart,
     ProductionReport,
     ResourceNeed,
@@ -25,9 +26,9 @@ export class ProductionOverview extends ScreenContent {
     private readonly sales: StaticList<ResourceSaleBox, Resource>;
     private readonly charts: {
         readonly spending: PieChart<string>;
-        readonly ownerCountry: PieChart<GameID>;
-        readonly ownerCulture: PieChart<string>;
     };
+
+    private readonly ownership: OwnershipBreakdown;
 
     private dom?: {
         readonly index: HTMLUListElement;
@@ -46,9 +47,13 @@ export class ProductionOverview extends ScreenContent {
 
         this.charts = {
             spending: new PieChart<string>(TooltipType.FactoryStatementItem),
-            ownerCountry: new PieChart<GameID>(TooltipType.FactoryOwnershipCountry),
-            ownerCulture: new PieChart<string>(TooltipType.FactoryOwnershipCulture),
         }
+
+        this.ownership = new OwnershipBreakdown(
+            TooltipType.FactoryOwnershipCountry,
+            TooltipType.FactoryOwnershipCulture,
+            TooltipType.FactoryOwnershipSecurities,
+        );
     }
 
     public override attach(root: HTMLElement | null, parameters: URLSearchParams): void {
@@ -113,8 +118,7 @@ export class ProductionOverview extends ScreenContent {
 
         case FactoryDetailsTab.Ownership:
             this.dom.stats.setAttribute('data-subscreen', 'Ownership');
-            this.dom.stats.appendChild(this.charts.ownerCountry.node);
-            this.dom.stats.appendChild(this.charts.ownerCulture.node);
+            this.dom.stats.appendChild(this.ownership.node);
             break;
         }
 
@@ -178,8 +182,7 @@ export class ProductionOverview extends ScreenContent {
             break;
 
         case FactoryDetailsTab.Ownership:
-            this.charts.ownerCountry.update([state.factory.id], state.factory.open.country ?? []);
-            this.charts.ownerCulture.update([state.factory.id], state.factory.open.culture ?? []);
+            this.ownership.update(state.factory.id, state.factory.open);
             break;
         }
     }

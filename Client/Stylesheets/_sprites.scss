@@ -42,7 +42,7 @@
 }
 
 [data-pop-type='A'] > span {
-    @include sprite(inmate);
+    @include sprite(handmaid);
 }
 [data-pop-type='S'] > span {
     @include sprite(maid);

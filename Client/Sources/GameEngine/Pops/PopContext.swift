@@ -216,18 +216,7 @@ extension PopContext: TransactingContext {
         )
 
         let currency: Fiat = self.policy!.currency
-
-        if  case .Ward = self.state.type.stratum {
-            let shares: Int64 = self.equity.shares.outstanding
-            let price: Fraction = shares > 0
-                ? self.state.cash.balance %/ shares
-                : 1 %/ 1
-            map.stockMarkets.issueShares(
-                asset: .pop(self.state.id),
-                price: price,
-                currency: currency
-            )
-        }
+        let balance: Int64 = self.state.cash.balance
 
         /// Compute vertical weights.
         let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
@@ -317,26 +306,44 @@ extension PopContext: TransactingContext {
         )
 
         budget.l.distribute(
-            funds: self.state.cash.balance / d.l,
+            funds: balance / d.l,
             inelastic: inelasticCostPerDay.l * Self.stockpileDays.upperBound,
             tradeable: tradeableCostPerDay.l * Self.stockpileDays.upperBound,
         )
 
         budget.e.distribute(
-            funds: (self.state.cash.balance - min.l) / d.e,
+            funds: (balance - min.l) / d.e,
             inelastic: inelasticCostPerDay.e * Self.stockpileDays.upperBound,
             tradeable: tradeableCostPerDay.e * Self.stockpileDays.upperBound,
         )
 
         budget.x.distribute(
-            funds: (self.state.cash.balance - min.l - min.e) / d.x,
+            funds: (balance - min.l - min.e) / d.x,
             inelastic: inelasticCostPerDay.x * Self.stockpileDays.upperBound,
             tradeable: tradeableCostPerDay.x * Self.stockpileDays.upperBound,
         )
 
         equity:
-        if case .Owner = self.state.type.stratum {
-            let valueToInvest: Int64 = (self.state.cash.balance - min.l - min.e) / d.x
+        switch self.state.type.stratum {
+        case .Ward:
+            budget.dividend = max(0, (balance - min.l) / 3650)
+            budget.buybacks = max(0, (balance - min.l - budget.dividend) / 365)
+            // Align share price
+            budget.px = self.equity.price(valuation: balance)
+            self.state.today.px = Double.init(budget.px)
+
+            guard
+            let security: StockMarket<LegalEntity>.Security = .init(
+                asset: .pop(self.state.id),
+                price: budget.px
+            ) else {
+                break equity
+            }
+
+            map.stockMarkets.issueShares(security: security, currency: currency)
+
+        case .Owner:
+            let valueToInvest: Int64 = (balance - min.l - min.e) / d.x
             if  valueToInvest <= 0 {
                 break equity
             }
@@ -345,6 +352,9 @@ extension PopContext: TransactingContext {
                 value: valueToInvest,
                 currency: currency
             )
+
+        default:
+            break
         }
 
         for (budget, weights, tier):
@@ -507,6 +517,7 @@ extension PopContext {
             scalingFactor: (self.state.today.size, z.x)
         )
 
+        liquidation:
         if case .Ward = self.state.type.stratum {
             // Pop is enslaved
             self.state.today.fe = 1
@@ -514,8 +525,22 @@ extension PopContext {
 
             // Pay dividends to shareholders, if any.
             self.state.cash.i -= map.pay(
-                dividend: self.state.cash.balance <> (1 %/ 1_000),
+                dividend: budget.dividend,
                 to: self.state.equity.shares.values.shuffled(using: &map.random.generator)
+            )
+            guard
+            let security: StockMarket<LegalEntity>.Security = .init(
+                asset: .pop(self.state.id),
+                price: budget.px
+            ) else {
+                break liquidation
+            }
+
+            self.state.cash.e -= map.buyback(
+                value: budget.buybacks,
+                from: &self.state.equity,
+                of: security,
+                in: country.currency
             )
         }
 

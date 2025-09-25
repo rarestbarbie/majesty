@@ -16,6 +16,7 @@ import {
     ScreenType,
     TooltipType,
     PopIcon,
+    OwnershipBreakdown,
 } from '../exports.js';
 
 export class PopulationOverview extends ScreenContent {
@@ -23,10 +24,9 @@ export class PopulationOverview extends ScreenContent {
     private sales: StaticList<ResourceSaleBox, Resource>;
     private readonly charts: {
         readonly spending: PieChart<string>;
-
-        readonly ownerCountry: PieChart<GameID>;
-        readonly ownerCulture: PieChart<string>;
     };
+
+    private readonly ownership: OwnershipBreakdown;
 
     private pops: StaticList<PopTableRow, GameID>;
     private dom?: {
@@ -49,9 +49,13 @@ export class PopulationOverview extends ScreenContent {
         this.sales = new StaticList<ResourceSaleBox, Resource>(document.createElement('div'));
         this.charts = {
             spending: new PieChart<string>(TooltipType.PopStatementItem),
-            ownerCountry: new PieChart<GameID>(TooltipType.PopOwnershipCountry),
-            ownerCulture: new PieChart<string>(TooltipType.PopOwnershipCulture),
         };
+
+        this.ownership = new OwnershipBreakdown(
+            TooltipType.PopOwnershipCountry,
+            TooltipType.PopOwnershipCulture,
+            TooltipType.PopOwnershipSecurities
+        );
     }
 
     public override attach(root: HTMLElement | null, parameters: URLSearchParams): void {
@@ -124,8 +128,7 @@ export class PopulationOverview extends ScreenContent {
 
         case PopDetailsTab.Ownership:
             this.dom.stats.setAttribute('data-subscreen', 'Ownership');
-            this.dom.stats.appendChild(this.charts.ownerCountry.node);
-            this.dom.stats.appendChild(this.charts.ownerCulture.node);
+            this.dom.stats.appendChild(this.ownership.node);
             break;
         }
 
@@ -198,8 +201,7 @@ export class PopulationOverview extends ScreenContent {
             break;
 
         case PopDetailsTab.Ownership:
-            this.charts.ownerCountry.update([state.pop.id], state.pop.open.country ?? []);
-            this.charts.ownerCulture.update([state.pop.id], state.pop.open.culture ?? []);
+            this.ownership.update(state.pop.id, state.pop.open);
             break;
 
         case undefined:

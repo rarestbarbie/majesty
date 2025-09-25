@@ -68,6 +68,10 @@ extension GameSession {
                 try arguments[0].decode(),
                 culture: try arguments[1].decode(),
             )
+        case .FactoryOwnershipSecurities:
+            self.tooltipFactoryOwnership(
+                try arguments[0].decode(),
+            )
         case .FactoryStatementItem:
             self.tooltipFactoryStatementItem(
                 try arguments[0].decode(),
@@ -128,6 +132,10 @@ extension GameSession {
             self.tooltipPopOwnership(
                 try arguments[0].decode(),
                 culture: try arguments[1].decode(),
+            )
+        case .PopOwnershipSecurities:
+            self.tooltipPopOwnership(
+                try arguments[0].decode(),
             )
         case .PopStatementItem:
             self.tooltipPopStatementItem(

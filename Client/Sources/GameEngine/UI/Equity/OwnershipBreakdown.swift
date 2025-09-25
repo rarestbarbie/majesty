@@ -5,12 +5,14 @@ import VectorCharts
 import VectorCharts_JavaScript
 
 struct OwnershipBreakdown<Tab> where Tab: OwnershipTab {
-    var country: PieChart<CountryID, PieChartLabel>?
-    var culture: PieChart<String, PieChartLabel>?
+    private var country: PieChart<CountryID, PieChartLabel>?
+    private var culture: PieChart<String, PieChartLabel>?
+    private var state: Equity<LegalEntity>.Statistics?
 
     init() {
         self.country = nil
         self.culture = nil
+        self.state = nil
     }
 }
 extension OwnershipBreakdown {
@@ -38,6 +40,8 @@ extension OwnershipBreakdown {
         self.culture = .init(
             values: culture.sorted { $0.key < $1.key }
         )
+
+        self.state = equity
     }
 }
 extension OwnershipBreakdown: JavaScriptEncodable {
@@ -45,11 +49,15 @@ extension OwnershipBreakdown: JavaScriptEncodable {
         case type
         case country
         case culture
+
+        case shares
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.type] = Tab.Ownership
         js[.country] = self.country
         js[.culture] = self.culture
+
+        js[.shares] = self.state?.shares.outstanding
     }
 }

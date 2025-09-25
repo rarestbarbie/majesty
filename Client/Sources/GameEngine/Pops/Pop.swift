@@ -70,6 +70,7 @@ extension Pop: Turnable {
         }
 
         self.cash.settle()
+        self.equity.turn()
     }
 }
 extension Pop {
@@ -166,6 +167,7 @@ extension Pop {
         case yesterday_fl = "y_fl"
         case yesterday_fe = "y_fe"
         case yesterday_fx = "y_fx"
+        case yesterday_px = "y_px"
 
         case today_size = "t_size"
         case today_mil = "t_mil"
@@ -173,6 +175,7 @@ extension Pop {
         case today_fl = "t_fl"
         case today_fe = "t_fe"
         case today_fx = "t_fx"
+        case today_px = "t_px"
 
         case equity
         case jobs
@@ -196,6 +199,7 @@ extension Pop: JavaScriptEncodable {
         js[.yesterday_fl] = self.yesterday.fl
         js[.yesterday_fe] = self.yesterday.fe
         js[.yesterday_fx] = self.yesterday.fx
+        js[.yesterday_px] = self.yesterday.px
 
         js[.today_size] = self.today.size
         js[.today_mil] = self.today.mil
@@ -203,6 +207,7 @@ extension Pop: JavaScriptEncodable {
         js[.today_fl] = self.today.fl
         js[.today_fe] = self.today.fe
         js[.today_fx] = self.today.fx
+        js[.today_px] = self.today.px
 
         js[.equity] = self.equity
         js[.jobs] = self.jobs.isEmpty ? nil : self.jobs
@@ -217,6 +222,7 @@ extension Pop: JavaScriptDecodable {
             fl: try js[.today_fl]?.decode() ?? 0,
             fe: try js[.today_fe]?.decode() ?? 0,
             fx: try js[.today_fx]?.decode() ?? 0,
+            px: try js[.today_px]?.decode() ?? 1,
         )
         self.init(
             id: try js[.id]?.decode() ?? 0,
@@ -235,6 +241,7 @@ extension Pop: JavaScriptDecodable {
                 fl: try js[.yesterday_fl]?.decode() ?? today.fl,
                 fe: try js[.yesterday_fe]?.decode() ?? today.fe,
                 fx: try js[.yesterday_fx]?.decode() ?? today.fx,
+                px: try js[.yesterday_px]?.decode() ?? today.px,
             ),
             today: today,
             equity: try js[.equity]?.decode() ?? [:],

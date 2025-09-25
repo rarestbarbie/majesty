@@ -24,6 +24,7 @@ struct Factory: CashAccountHolder, Identifiable {
 extension Factory: Turnable {
     mutating func turn() {
         self.cash.settle()
+        self.equity.turn()
     }
 }
 extension Factory {
@@ -78,6 +79,8 @@ extension Factory {
         case yesterday_eo = "y_eo"
         case yesterday_fi = "y_fi"
 
+        case yesterday_px = "y_px"
+
         case today_vi = "t_vi"
         case today_vv = "t_vv"
 
@@ -92,6 +95,8 @@ extension Factory {
         case today_ei = "t_ei"
         case today_eo = "t_eo"
         case today_fi = "t_fi"
+
+        case today_px = "t_px"
 
         case equity
     }
@@ -121,6 +126,7 @@ extension Factory: JavaScriptEncodable {
         js[.yesterday_ei] = self.yesterday.ei
         js[.yesterday_eo] = self.yesterday.eo
         js[.yesterday_fi] = self.yesterday.fi
+        js[.yesterday_px] = self.yesterday.px
 
         js[.today_vi] = self.today.vi
         js[.today_vv] = self.today.vv
@@ -133,6 +139,7 @@ extension Factory: JavaScriptEncodable {
         js[.today_ei] = self.today.ei
         js[.today_eo] = self.today.eo
         js[.today_fi] = self.today.fi
+        js[.today_px] = self.today.px
 
         js[.equity] = self.equity
     }
@@ -151,6 +158,7 @@ extension Factory: JavaScriptDecodable {
             ei: try js[.today_ei]?.decode() ?? 1,
             eo: try js[.today_eo]?.decode() ?? 1,
             fi: try js[.today_fi]?.decode() ?? 0,
+            px: try js[.today_px]?.decode() ?? 1,
         )
         self.init(
             id: try js[.id].decode(),
@@ -177,6 +185,7 @@ extension Factory: JavaScriptDecodable {
                 ei: try js[.yesterday_ei]?.decode() ?? today.ei,
                 eo: try js[.yesterday_eo]?.decode() ?? today.eo,
                 fi: try js[.yesterday_fi]?.decode() ?? today.fi,
+                px: try js[.yesterday_px]?.decode() ?? today.px,
             ),
             today: today,
             equity: try js[.equity]?.decode() ?? [:]

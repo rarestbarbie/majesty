@@ -1,3 +1,5 @@
+import GameEconomy
+
 extension Factory {
     struct Dimensions {
         var vi: Int64
@@ -25,6 +27,9 @@ extension Factory {
         var eo: Double
 
         var fi: Double
+
+        /// Share price.
+        var px: Double
     }
 }
 

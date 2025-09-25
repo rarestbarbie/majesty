@@ -1,3 +1,5 @@
+import GameEconomy
+
 extension Pop {
     struct Dimensions {
         var size: Int64
@@ -6,11 +8,12 @@ extension Pop {
         var fl: Double
         var fe: Double
         var fx: Double
+        var px: Double
     }
 }
 extension Pop.Dimensions {
     init() {
-        self.init(size: 0, mil: 0, con: 0, fl: 0, fe: 0, fx: 0)
+        self.init(size: 0, mil: 0, con: 0, fl: 0, fe: 0, fx: 0, px: 1)
     }
 }
 

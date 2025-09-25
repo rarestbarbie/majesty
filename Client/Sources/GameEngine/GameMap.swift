@@ -9,7 +9,7 @@ struct GameMap: ~Copyable {
     var random: PseudoRandom
 
     var exchange: Exchange
-    var transfers: [PopID: CashTransfers]
+    var transfers: [LegalEntity: CashTransfers]
     var conversions: [(count: Int64, to: Pop.Section)]
     var jobs: (
         hire: (worker: Jobs.Hire<Address>, clerk: Jobs.Hire<PlanetID>),
@@ -33,6 +33,43 @@ struct GameMap: ~Copyable {
     }
 }
 extension GameMap {
+    /// Returns the total compensation paid out to shareholders.
+    mutating func buyback(
+        value: Int64,
+        from equity: inout Equity<LegalEntity>,
+        of security: StockMarket<LegalEntity>.Security,
+        in currency: Fiat,
+    ) -> Int64 {
+        let quote: (quantity: Int64, cost: Int64) = security.quote(value: value)
+
+        guard quote.quantity > 0, quote.cost > 0 else {
+            return 0
+        }
+
+        let recipients: [EquityStake<LegalEntity>] = equity.shares.values.shuffled(
+            using: &self.random.generator
+        )
+
+        guard
+        let shares: [Int64] = recipients.distribute(quote.quantity, share: \.shares),
+        let compensation: [Int64] = shares.distribute(quote.cost) else {
+            // If nobody owns shares, nothing to do.
+            return 0
+        }
+
+        for ((shares, compensation), recipient):
+            ((Int64, Int64), EquityStake<LegalEntity>) in zip(
+            zip(shares, compensation),
+            recipients
+        ) {
+            equity.buyback(shares: shares, from: recipient.id)
+            self.transfers[recipient.id, default: .init()].j += compensation
+        }
+
+        return quote.cost
+    }
+}
+extension GameMap {
     mutating func payscale(
         shuffling pops: [(id: PopID, count: Int64)],
         rate: Int64
@@ -51,7 +88,7 @@ extension GameMap {
         var salariesPaid: Int64 = 0
 
         for ((pop, _), payment) in zip(recipients.joined(), payments) {
-            self.transfers[pop, default: .init()].c += payment
+            self.transfers[.pop(pop), default: .init()].c += payment
             salariesPaid += payment
         }
 
@@ -66,7 +103,7 @@ extension GameMap {
         var wagesPaid: Int64 = 0
 
         for ((pop, _), payment) in zip(recipients, payments) {
-            self.transfers[pop, default: .init()].w += payment
+            self.transfers[.pop(pop), default: .init()].w += payment
             wagesPaid += payment
         }
 
@@ -80,7 +117,7 @@ extension GameMap {
 
     mutating func pay(
         dividend: Int64,
-        to shareholders: [Property<LegalEntity>]
+        to shareholders: [EquityStake<LegalEntity>]
     ) -> Int64 {
         guard
         let payments: [Int64] = shareholders.distribute(
@@ -93,12 +130,7 @@ extension GameMap {
         var dividendsPaid: Int64 = 0
 
         for (shareholder, payment) in zip(shareholders, payments) {
-            switch shareholder.id {
-            case .pop(let id):
-                self.transfers[id, default: .init()].i += payment
-            case .factory:
-                fatalError("unimplemented")
-            }
+            self.transfers[shareholder.id, default: .init()].i += payment
             dividendsPaid += payment
         }
 

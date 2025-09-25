@@ -1,4 +1,5 @@
 import D
+import GameEconomy
 import GameState
 
 extension Equity {
@@ -6,14 +7,19 @@ extension Equity {
         var owners: [Shareholder]
         var shares: (
             outstanding: Int64,
-            bought: Int64,
-            issued: Int64
+            issued: Int64,
+            traded: Int64
         )
     }
 }
 extension Equity.Statistics {
     init() {
-        self.init(owners: [], shares: (outstanding: 0, bought: 0, issued: 0))
+        self.init(owners: [], shares: (outstanding: 0, issued: 0, traded: 0))
+    }
+}
+extension Equity.Statistics {
+    func price(valuation: Int64) -> Fraction {
+        self.shares.outstanding > 0 ? valuation %/ self.shares.outstanding : 1
     }
 }
 extension Equity<LegalEntity>.Statistics {
@@ -21,13 +27,12 @@ extension Equity<LegalEntity>.Statistics {
         from equity: Equity<LegalEntity>,
         in context: GameContext.ResidentPass
     ) -> Self {
-        let shares: (outstanding: Int64, bought: Int64, issued: Int64) = equity.shares.reduce(
+        let shares: (outstanding: Int64, bought: Int64, sold: Int64) = equity.shares.reduce(
             into: (0, 0, 0)
         ) {
             $0.outstanding += $1.value.shares
-            $0.issued += $1.value.bought
-            // Buybacks are currently the only way pops can dispose of shares
-            $0.bought += $1.value.sold
+            $0.bought += $1.value.bought
+            $0.sold += $1.value.sold
         }
 
         return .init(
@@ -73,8 +78,8 @@ extension Equity<LegalEntity>.Statistics {
             },
             shares: (
                 outstanding: shares.outstanding,
-                bought: shares.bought,
-                issued: shares.issued
+                issued: shares.sold - shares.bought,
+                traded: shares.sold + shares.bought
             )
         )
     }
@@ -120,6 +125,15 @@ extension Equity<LegalEntity>.Statistics {
 
         return .instructions(style: .borderless) {
             $0[country.name] = (Double.init(share) / Double.init(total))[%3]
+        }
+    }
+
+    func tooltipOwnership() -> Tooltip {
+        .instructions {
+            $0["Shares outstanding", (-)] = self.shares.outstanding[/3] <- self.shares.outstanding - self.shares.issued
+            $0[>] {
+                $0["Today’s trading volume"] = self.shares.traded[/3]
+            }
         }
     }
 }

@@ -34,11 +34,17 @@ export class PieChart<Sector> {
 
         this.node = document.createElement('div');
         this.node.classList.add('pie-chart');
-        this.node.style.position = 'relative';
+        this.node.classList.add('empty');
         this.node.appendChild(svg);
     }
 
     public update(prefix: any[], sectors: PieChartSector<Sector>[]): void {
+        if (sectors.length === 0) {
+            this.node.classList.add('empty');
+        } else {
+            this.node.classList.remove('empty');
+        }
+
         this.sectors.update(
             sectors,
             (sector: PieChartSector<Sector>) => {

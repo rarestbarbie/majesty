@@ -243,15 +243,19 @@ extension GameSession {
 
             $0["Liquid assets", +] = liquid.t[/3] <- liquid.y
             $0[>] {
-                $0["Capital expenditures", +] = +?factory.cash.v[/3]
-                $0["Market spending", +] = +?factory.cash.b[/3]
+                $0["Market spending", +] = +factory.cash.b[/3]
                 $0["Market spending (amortized)", +] = +?(factory.cash.b + factory.Δ.vi)[/3]
                 $0["Market earnings", +] = +?factory.cash.r[/3]
                 $0["Subsidies", +] = +?factory.cash.s[/3]
                 $0["Salaries", +] = +?factory.cash.c[/3]
                 $0["Wages", +] = +?factory.cash.w[/3]
                 $0["Interest and dividends", +] = +?factory.cash.i[/3]
-                $0["Equity raises", +] = +?factory.cash.e[/3]
+                if factory.cash.e < 0 {
+                    $0["Stock buybacks", +] = factory.cash.e[/3]
+                } else {
+                    $0["Market capitalization", +] = +?factory.cash.e[/3]
+                }
+                $0["Capital expenditures", +] = +?factory.cash.v[/3]
             }
         }
     }
@@ -424,6 +428,12 @@ extension GameSession {
         )
     }
 
+    public func tooltipFactoryOwnership(
+        _ id: FactoryID,
+    ) -> Tooltip? {
+        self.context.factories[id]?.equity.tooltipOwnership()
+    }
+
     public func tooltipFactoryStatementItem(
         _ id: FactoryID,
         _ item: CashFlowItem,
@@ -485,8 +495,12 @@ extension GameSession {
                 $0["Interest and dividends", +] = +?pop.cash.i[/3]
 
                 $0["Market spending", +] = +?pop.cash.b[/3]
-                $0["Surrogacy", +] = +?pop.cash.v[/3]
-                $0["Investments", +] = +?pop.cash.e[/3]
+                $0["Stock sales", +] = +?pop.cash.v[/3]
+                if case .Ward = pop.type.stratum {
+                    $0["Loans taken", +] = +?pop.cash.e[/3]
+                } else {
+                    $0["Investments", +] = +?pop.cash.e[/3]
+                }
             }
         }
     }
@@ -705,6 +719,12 @@ extension GameSession {
             country: country,
             context: self.context
         )
+    }
+
+    public func tooltipPopOwnership(
+        _ id: PopID,
+    ) -> Tooltip? {
+        self.context.pops.table[id]?.equity.tooltipOwnership()
     }
 
     public func tooltipPopStatementItem(

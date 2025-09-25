@@ -13,6 +13,7 @@ export enum TooltipType {
     PopStatementItem = 'PopStatementItem',
     PopOwnershipCountry = 'PopOwnershipCountry',
     PopOwnershipCulture = 'PopOwnershipCulture',
+    PopOwnershipSecurities = 'PopOwnershipSecurities',
 
     // Factory Tooltips
     FactoryAccount = 'FactoryAccount',
@@ -24,6 +25,7 @@ export enum TooltipType {
     FactoryWorkers = 'FactoryWorkers',
     FactoryOwnershipCountry = 'FactoryOwnershipCountry',
     FactoryOwnershipCulture = 'FactoryOwnershipCulture',
+    FactoryOwnershipSecurities = 'FactoryOwnershipSecurities',
     FactoryStatementItem = 'FactoryStatementItem',
 
     MarketLiquidity = 'MarketLiquidity',

@@ -47,6 +47,9 @@ div.pie-chart:hover::before {
         inset 0 -0.4em 0.5px 0.1em rgba(0, 0, 0, 0.18),
         inset 0 -1.3em 5em 0.1em rgba(0, 0, 0, 0.05)
 }
+div.pie-chart.empty::before {
+    background-color: rgb(26, 26, 26);
+}
 
 
 [data-count] > span:nth-child(2)::before {
@@ -178,7 +181,7 @@ div.tabs > * > input[type=radio]:checked + label {
     height: 50%;
 }
 [data-table='Pops'] {
-    grid-template-columns: 2fr 0.4fr 1fr 1.5fr 1fr 1fr 1fr 1.5fr 0.5fr 0.5fr 0.5fr 0.5fr;
+    grid-template-columns: 2fr 0.4fr 1fr 1.5fr 1fr 1fr 1fr 1fr 0.5fr 0.5fr 0.5fr 0.1fr;
     height: 50%;
 }
 
