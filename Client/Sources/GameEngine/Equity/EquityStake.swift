@@ -2,14 +2,14 @@ import GameState
 import JavaScriptKit
 import JavaScriptInterop
 
-@frozen public struct Property<Instrument>: Identifiable, Equatable, Hashable
+@frozen public struct EquityStake<Instrument>: Identifiable, Equatable, Hashable
     where Instrument: Hashable & ConvertibleToJSValue & LoadableFromJSValue {
     public let id: Instrument
     private(set) var shares: Int64
     private(set) var bought: Int64
     private(set) var sold: Int64
 }
-extension Property {
+extension EquityStake {
     init(id: Instrument) {
         self.init(id: id, shares: 0, bought: 0, sold: 0)
     }
@@ -23,8 +23,13 @@ extension Property {
         self.sold += shares
         self.shares += shares
     }
+
+    mutating func turn() {
+        self.bought = 0
+        self.sold = 0
+    }
 }
-extension Property {
+extension EquityStake {
     @frozen public enum ObjectKey: JSString, Sendable {
         case id
         case shares = "n"
@@ -32,7 +37,7 @@ extension Property {
         case sold = "s"
     }
 }
-extension Property: JavaScriptEncodable {
+extension EquityStake: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.shares] = self.shares
@@ -40,7 +45,7 @@ extension Property: JavaScriptEncodable {
         js[.sold] = self.sold == 0 ? nil : self.sold
     }
 }
-extension Property: JavaScriptDecodable {
+extension EquityStake: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             id: try js[.id].decode(),

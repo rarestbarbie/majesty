@@ -4,7 +4,7 @@ import {
     ResourceSale
 } from '../exports.js';
 
-export interface InventoryBreakdown<Type extends string> {
+export interface InventoryBreakdownState<Type extends string> {
     readonly type: Type;
     readonly needs: ResourceNeed[];
     readonly sales: ResourceSale[];

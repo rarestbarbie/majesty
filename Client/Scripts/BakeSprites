@@ -13,7 +13,10 @@ for file in Sources/*.png; do
     config_line=$(grep "^${filename}," "$CONFIG_FILE" || echo "")
 
     # Default crop is 0 pixels from each side
-    crop_t=0; crop_r=0; crop_b=0; crop_l=0
+    crop_t=0
+    crop_r=0
+    crop_b=0
+    crop_l=0
 
     if [[ -n "$config_line" ]]; then
         # If a config is found, parse it
@@ -23,15 +26,49 @@ for file in Sources/*.png; do
         crop_l=$(echo "$config_line" | cut -d',' -f5)
     fi
 
-    echo "Processing $filename with crop (T,R,B,L): ${crop_t},${crop_r},${crop_b},${crop_l}"
+    echo "Processing $filename with adjustments (T,R,B,L): ${crop_t},${crop_r},${crop_b},${crop_l}"
+
+    # --- Build crop/pad arguments for ImageMagick ---
+    op_args=()
+
+    # Top: positive=chop, negative=splice
+    if [[ ${crop_t} -gt 0 ]]; then
+        op_args+=(-gravity North -chop "0x${crop_t}")
+    elif [[ ${crop_t} -lt 0 ]]; then
+        padding_t=$(( -crop_t ))
+        op_args+=(-gravity North -splice "0x${padding_t}")
+    fi
+
+    # Right: positive=chop, negative=splice
+    if [[ ${crop_r} -gt 0 ]]; then
+        op_args+=(-gravity East -chop "${crop_r}x0")
+    elif [[ ${crop_r} -lt 0 ]]; then
+        padding_r=$(( -crop_r ))
+        op_args+=(-gravity East -splice "${padding_r}x0")
+    fi
+
+    # Bottom: positive=chop, negative=splice
+    if [[ ${crop_b} -gt 0 ]]; then
+        op_args+=(-gravity South -chop "0x${crop_b}")
+    elif [[ ${crop_b} -lt 0 ]]; then
+        padding_b=$(( -crop_b ))
+        op_args+=(-gravity South -splice "0x${padding_b}")
+    fi
+
+    # Left: positive=chop, negative=splice
+    if [[ ${crop_l} -gt 0 ]]; then
+        op_args+=(-gravity West -chop "${crop_l}x0")
+    elif [[ ${crop_l} -lt 0 ]]; then
+        padding_l=$(( -crop_l ))
+        op_args+=(-gravity West -splice "${padding_l}x0")
+    fi
 
     convert "$file" \
         -fuzz 5% \
         -fill none -draw "color 0,0 floodfill" \
-        -gravity North -chop "0x${crop_t}" \
-        -gravity East -chop "${crop_r}x0" \
-        -gravity South -chop "0x${crop_b}" \
-        -gravity West -chop "${crop_l}x0" +repage \
+        -background none \
+        "${op_args[@]}" \
+        +repage \
         -morphology Erode Diamond:1 \
         -filter box -resize ${SPRITE_WIDTH} \
         "Icons/${filename}.png"

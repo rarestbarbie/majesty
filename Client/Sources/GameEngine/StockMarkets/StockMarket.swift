@@ -22,9 +22,13 @@ extension StockMarket {
         return self.queue.map {
             /// Will always be non-nil because of the `isEmpty` check above.
             let security: Security = securities.randomElement(using: &random.generator)!
-            let quantity: Int64 = $0.value <> (security.price.d %/ security.price.n)
-            let cost: Int64 = quantity >< security.price
-            return .init(asset: security.asset, buyer: $0.buyer, quantity: quantity, cost: cost)
+            let quote: (quantity: Int64, cost: Int64) = security.quote(value: $0.value)
+            return .init(
+                asset: security.asset,
+                buyer: $0.buyer,
+                quantity: quote.quantity,
+                cost: quote.cost
+            )
         }
     }
 }

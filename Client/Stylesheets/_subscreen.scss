@@ -73,3 +73,43 @@
         }
     }
 }
+[data-subscreen='Ownership'] {
+    > div {
+        display: flex;
+
+        > div.pie-charts {
+            display: flex;
+            gap: 0.5rem;
+
+            > figure {
+                margin: 0.5rem;
+
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+
+                > figcaption {
+                    font-weight: bold;
+                }
+            }
+        }
+
+        > dl {
+            margin: 0;
+            padding-left: 1rem;
+
+            display: grid;
+            grid-template-columns: auto 1fr;
+
+            > * {
+                margin: 0.5rem;
+            }
+
+            > dd {
+                font-weight: bold;
+            }
+        }
+    }
+
+}

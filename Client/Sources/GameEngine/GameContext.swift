@@ -283,44 +283,44 @@ extension GameContext {
             for job: FactoryJob in pop.state.jobs.values {
                 self.factories[job.at]?.addWorkforceCount(pop: pop.state, job: job)
             }
-            for owner: Property<LegalEntity> in pop.state.equity.shares.values {
+            for stake: EquityStake<LegalEntity> in pop.state.equity.shares.values {
                 let counted: ()?
-                switch owner.id {
+                switch stake.id {
                 case .pop(let id):
                     counted = self.pops.table[id]?.addPosition(
                         asset: indenture,
-                        value: owner.shares
+                        value: stake.shares
                     )
 
                 case .factory(let id):
                     counted = self.factories[id]?.addPosition(
                         asset: indenture,
-                        value: owner.shares
+                        value: stake.shares
                     )
                 }
 
-                #assert(counted != nil, "Slave \(owner.id) has no owner!!!")
+                #assert(counted != nil, "Slaveowner \(stake.id) does not exist!!!")
             }
         }
         for factory: FactoryContext in self.factories {
             let title: LegalEntity = .factory(factory.state.id)
-            for owner: Property<LegalEntity> in factory.state.equity.shares.values {
+            for stake: EquityStake<LegalEntity> in factory.state.equity.shares.values {
                 let counted: ()?
-                switch owner.id {
+                switch stake.id {
                 case .pop(let id):
                     counted = self.pops.table[id]?.addPosition(
                         asset: title,
-                        value: owner.shares
+                        value: stake.shares
                     )
 
                 case .factory(let id):
                     counted = self.factories[id]?.addPosition(
                         asset: title,
-                        value: owner.shares
+                        value: stake.shares
                     )
                 }
 
-                #assert(counted != nil, "Factory \(owner.id) has no owner!!!")
+                #assert(counted != nil, "Shareholder \(stake.id) does not exist!!!")
             }
         }
     }
@@ -330,8 +330,13 @@ extension GameContext {
         defer {
             map.transfers.removeAll(keepingCapacity: true)
         }
-        for (pop, ct): (PopID, CashTransfers) in map.transfers {
-            self.pops.table[pop]?.state.cash += ct
+        for (recipient, transfers): (LegalEntity, CashTransfers) in map.transfers {
+            switch recipient {
+            case .pop(let id):
+                self.pops.table[id]?.state.cash += transfers
+            case .factory(let id):
+                self.factories[id]?.state.cash += transfers
+            }
         }
     }
 

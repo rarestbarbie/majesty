@@ -139,17 +139,19 @@ extension FactoryContext: TransactingContext {
             stockpileDays: Self.stockpileDays.lowerBound,
         )
 
-        self.budget = self.budget(inputsCostPerHour: inputsCostPerHour)
+        let budget: FactoryBudget = self.budget(inputsCostPerHour: inputsCostPerHour)
+        self.budget = budget
+        self.state.today.px = Double.init(budget.px)
 
-        let shares: Int64 = self.equity.shares.outstanding
-        let price: Fraction = shares > 0
-            ? self.state.cash.balance %/ shares
-            : 1 %/ 1
-        map.stockMarkets.issueShares(
+        guard
+        let security: StockMarket<LegalEntity>.Security = .init(
             asset: .factory(self.state.id),
-            price: price,
-            currency: country.currency
-        )
+            price: budget.px
+        ) else {
+            return
+        }
+
+        map.stockMarkets.issueShares(security: security, currency: country.currency)
     }
 
     mutating func transact(on map: inout GameMap) {
@@ -244,13 +246,26 @@ extension FactoryContext: TransactingContext {
 
         // Pay dividends to shareholders, if any.
         self.state.cash.i -= map.pay(
-            dividend: self.state.cash.balance <> (2 %/ 10_000),
+            dividend: budget.dividend,
             to: self.state.equity.shares.values.shuffled(using: &map.random.generator)
         )
 
-        // Perform stock buybacks or issuance, depending on factory level and cash on hand.
+        guard
+        let security: StockMarket<LegalEntity>.Security = .init(
+            asset: .factory(self.state.id),
+            price: budget.px
+        ) else {
+            // Factory is bankrupt?
+            return
+        }
+
         if  self.state.size.level > 1 {
-            // let size: Int64 = self.equity.shares.outstanding <> (1 %/ 10_000)
+            self.state.cash.e -= map.buyback(
+                value: budget.buybacks,
+                from: &self.state.equity,
+                of: security,
+                in: country.currency
+            )
         }
     }
 
@@ -325,13 +340,34 @@ extension FactoryContext {
         let c: Double = self.clerks.map { Double.init(self.state.today.cn * $0.limit) } ?? 0
         let w: Double = Double.init(self.state.today.wn * self.workers.limit)
 
+        let d: Fraction = 2 %/ 10_000
+
+        let px: Fraction = self.equity.price(valuation: self.state.cash.balance)
 
         if  let budget: [Int64] = [i, c, w].distribute(self.state.cash.balance / 7) {
-            return FactoryBudget.init(inputs: budget[0], clerks: budget[1], workers: budget[2])
+            let l: Int64 = .init((i + w).rounded(.up))
+
+            let dividend: Int64 = self.state.cash.balance <> d
+            let buybacks: Int64 = (self.state.cash.balance - l) / 365
+            return FactoryBudget.init(
+                inputs: budget[0],
+                clerks: budget[1],
+                workers: budget[2],
+                dividend: dividend,
+                buybacks: buybacks,
+                px: px
+            )
         }
         else {
             // All costs zero.
-            return FactoryBudget.init(inputs: 0, clerks: 0, workers: 0)
+            return FactoryBudget.init(
+                inputs: 0,
+                clerks: 0,
+                workers: 0,
+                dividend: 0,
+                buybacks: 0,
+                px: px
+            )
         }
     }
 

@@ -63,7 +63,6 @@ extension PopulationReport: PersistentReport {
                         quit: $0.quit,
                     )
                 },
-                cash: pop.state.cash,
             ))
         }
 

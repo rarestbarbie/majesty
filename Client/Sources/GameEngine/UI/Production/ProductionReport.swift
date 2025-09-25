@@ -45,24 +45,12 @@ extension ProductionReport: PersistentReport {
                 continue
             }
 
-            let valuation: Int64 = factory.state.cash.liq +
-                factory.state.cash.v +
-                factory.state.cash.b +
-                factory.state.cash.r +
-                factory.state.cash.s +
-                factory.state.cash.c +
-                factory.state.cash.w +
-                factory.state.cash.i +
-                factory.state.today.vi +
-                factory.state.today.vv
-
             self.factories.append(
                 .init(
                     id: factory.state.id,
                     location: tile.name ?? planet.state.name,
                     type: factory.type.name,
                     size: factory.state.size,
-                    valuation: valuation,
                     yesterday: factory.state.yesterday,
                     today: factory.state.today,
                     workers: .init(aggregate: factory.workers),

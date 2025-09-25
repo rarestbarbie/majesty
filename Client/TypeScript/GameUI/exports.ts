@@ -8,7 +8,6 @@ export * from './Developer/PlanetTileEditorState.js';
 
 export * from './Markets/Candle.js';
 export * from './Markets/CandleGeometry.js';
-export * from './CashAccount.js';
 export * from './Charts/PieChart.js';
 export * from './Charts/PieChartComponent.js';
 export * from './Charts/PieChartSector.js';
@@ -19,8 +18,9 @@ export * from './Factories/FactoryTableRow.js';
 export * from './Factories/FactoryWorkers.js';
 export * from './Factories/FactoryWorkersCell.js';
 export * from './Factories/ProductionOverview.js';
-export * from './Factories/InventoryBreakdown.js';
+export * from './Factories/InventoryBreakdownState.js';
 export * from './Factories/OwnershipBreakdown.js';
+export * from './Factories/OwnershipBreakdownState.js';
 export * from './PersistentReport.js';
 export * from './ProductionReport.js';
 export * from './PopulationReport.js';

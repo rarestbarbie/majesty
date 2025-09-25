@@ -21,6 +21,11 @@ extension Fraction: LosslessStringConvertible {
         self.init(n, d)
     }
 }
+extension Fraction: ExpressibleByIntegerLiteral {
+    @inlinable public init(integerLiteral value: Int64) {
+        self.init(value, 1)
+    }
+}
 extension Fraction {
     /// Multiply the operand by this fraction, rounding away from zero.
     @inlinable public static func >< (self: Self, a: Int64) -> Int64 {

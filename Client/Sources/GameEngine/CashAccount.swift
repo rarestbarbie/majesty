@@ -34,6 +34,7 @@ extension CashAccount {
         self.c += other.c
         self.w += other.w
         self.i += other.i
+        self.v += other.j
     }
 }
 extension CashAccount {

@@ -26,7 +26,7 @@ export class PopTableRow implements DiffableListElement<GameID> {
     private readonly mil: Ticker;
     private readonly con: Ticker;
     private readonly jobs: HTMLElement;
-    private readonly cash: HTMLElement;
+    private readonly px: Ticker;
     private readonly fl: ProgressCell;
     private readonly fe: ProgressCell;
     private readonly fx: ProgressCell;
@@ -40,7 +40,7 @@ export class PopTableRow implements DiffableListElement<GameID> {
             "Militancy",
             "Consciousness",
             "Unemployment",
-            "Cash",
+            "Net worth",
             "Needs",
             "",
             "",
@@ -63,9 +63,9 @@ export class PopTableRow implements DiffableListElement<GameID> {
         this.jobs.setAttribute('data-tooltip-type', TooltipType.PopJobs);
         this.jobs.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
 
-        this.cash = document.createElement('div');
-        this.cash.setAttribute('data-tooltip-type', TooltipType.PopAccount);
-        this.cash.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
+        this.px = new Ticker(Fortune.Bonus);
+        this.px.outer.setAttribute('data-tooltip-type', TooltipType.PopAccount);
+        this.px.outer.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
 
         this.fl = new ProgressCell();
         this.fl.node.classList.add('needs-cup');
@@ -99,7 +99,7 @@ export class PopTableRow implements DiffableListElement<GameID> {
         this.node.appendChild(this.mil.outer);
         this.node.appendChild(this.con.outer);
         this.node.appendChild(this.jobs);
-        this.node.appendChild(this.cash);
+        this.node.appendChild(this.px.outer);
         this.node.appendChild(this.fl.node);
         this.node.appendChild(this.fe.node);
         this.node.appendChild(this.fx.node);
@@ -119,16 +119,7 @@ export class PopTableRow implements DiffableListElement<GameID> {
 
         UpdateDecimal(this.jobs, pop.une * 100, 2);
 
-        const balance: bigint = pop.cash.liq +
-            pop.cash.v +
-            pop.cash.b +
-            pop.cash.r +
-            pop.cash.s +
-            pop.cash.c +
-            pop.cash.w +
-            pop.cash.i;
-
-        UpdateBigInt(this.cash, balance);
+        this.px.updatePriceChange(pop.y_px, pop.t_px);
 
         UpdateDecimal(this.fl.summary, pop.t_fl * 100, 1);
         UpdateDecimal(this.fe.summary, pop.t_fe * 100, 1);
