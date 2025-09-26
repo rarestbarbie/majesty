@@ -113,9 +113,10 @@ extension PopContext {
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
             $0[self.state.yesterday.mil] {
-                $0[$1 >= 5.0] = -1‰
-                $0[$1 >= 7.0] = -1‰
-                $0[$1 >= 9.0] = -1‰
+                $0[$1 >= 3.0] = -2‱
+                $0[$1 >= 5.0] = -2‱
+                $0[$1 >= 7.0] = -3‱
+                $0[$1 >= 9.0] = -3‱
             } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
 
             switch self.state.type.stratum {
