@@ -6,7 +6,7 @@ import HexGrids
 import Vector
 import VectorCharts
 
-struct PlanetContext {
+struct PlanetContext: RuntimeContext {
     var state: Planet
 
     var motion: (global: CelestialMotion?, local: CelestialMotion?)
@@ -25,8 +25,11 @@ struct PlanetContext {
         self.grid = .init()
     }
 }
-extension PlanetContext: RuntimeContext {
-    mutating func compute(in context: GameContext.TerritoryPass) throws {
+extension PlanetContext {
+    mutating func compute(
+        map: borrowing GameMap,
+        context: GameContext.TerritoryPass
+    ) throws {
         if  let orbit: Planet.Orbit = self.state.orbit,
             let orbits: Planet = context.planets[orbit.orbits] {
             let motion: CelestialMotion = .init(
@@ -35,7 +38,7 @@ extension PlanetContext: RuntimeContext {
                 around: orbits.mass
             )
 
-            self.position.global = motion.position(context.date)
+            self.position.global = motion.position(map.date)
             self.motion.global = motion
         }
 
@@ -52,12 +55,12 @@ extension PlanetContext: RuntimeContext {
                 massOfPrimary: self.state.mass
             )
 
-            self.position.local = motion.position(context.date)
+            self.position.local = motion.position(map.date)
             self.motion.local = motion
         } else {
             self.motion.local = nil
         }
     }
-    mutating func advance(in context: GameContext, on map: inout GameMap) throws {
-    }
+
+    mutating func advance(map: inout GameMap, context: GameContext) throws {}
 }

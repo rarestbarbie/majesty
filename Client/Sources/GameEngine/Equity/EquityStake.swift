@@ -5,7 +5,7 @@ import JavaScriptInterop
 @frozen public struct EquityStake<Instrument>: Identifiable, Equatable, Hashable
     where Instrument: Hashable & ConvertibleToJSValue & LoadableFromJSValue {
     public let id: Instrument
-    private(set) var shares: Int64
+    public var shares: Int64
     private(set) var bought: Int64
     private(set) var sold: Int64
 }

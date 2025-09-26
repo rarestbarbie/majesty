@@ -1,4 +1,5 @@
 import GameEconomy
+import GameState
 import JavaScriptKit
 import JavaScriptInterop
 
@@ -12,8 +13,8 @@ struct MarketDetails {
     }
 }
 extension MarketDetails {
-    mutating func update(in context: GameContext, from market: Market) {
-        self.chart.update(with: market, date: context.date)
+    mutating func update(from market: Market, date: GameDate) {
+        self.chart.update(with: market, date: date)
     }
 }
 extension MarketDetails: JavaScriptEncodable {

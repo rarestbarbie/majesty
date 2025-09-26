@@ -27,7 +27,7 @@ public struct GameSession: ~Copyable {
         try context.loadTerrain(terrain)
 
         self.context = context
-        self.map = .init(settings: rules.settings, markets: save.markets)
+        self.map = .init(date: save.date, settings: rules.settings, markets: save.markets)
         self.ui = .init()
     }
 }
@@ -92,7 +92,8 @@ extension GameSession {
     private var snapshot: GameSnapshot {
         .init(
             context: self.context,
-            markets: (self.map.exchange.markets, self.map.localMarkets)
+            markets: (self.map.exchange.markets, self.map.localMarkets),
+            date: self.map.date
         )
     }
 
@@ -111,7 +112,7 @@ extension GameSession {
     }
 
     public mutating func start() throws -> GameUI {
-        try self.context.compute()
+        try self.context.compute(self.map)
         try self.ui.sync(with: self.snapshot)
         return self.ui
     }
@@ -119,7 +120,7 @@ extension GameSession {
     public mutating func tick() throws -> GameUI {
         if  self.ui.clock.tick() {
             try self.context.advance(&self.map)
-            try self.context.compute()
+            try self.context.compute(self.map)
         }
 
         try self.ui.sync(with: self.snapshot)
@@ -412,7 +413,7 @@ extension GameSession {
         _ id: FactoryID,
         culture: String,
     ) -> Tooltip? {
-        self.context.factories[id]?.equity.tooltipOwnership(
+        self.context.factories[id]?.tooltipOwnership(
             culture: culture,
             context: self.context
         )
@@ -422,7 +423,7 @@ extension GameSession {
         _ id: FactoryID,
         country: CountryID,
     ) -> Tooltip? {
-        self.context.factories[id]?.equity.tooltipOwnership(
+        self.context.factories[id]?.tooltipOwnership(
             country: country,
             context: self.context
         )
@@ -431,7 +432,7 @@ extension GameSession {
     public func tooltipFactoryOwnership(
         _ id: FactoryID,
     ) -> Tooltip? {
-        self.context.factories[id]?.equity.tooltipOwnership()
+        self.context.factories[id]?.tooltipOwnership()
     }
 
     public func tooltipFactoryStatementItem(
@@ -674,13 +675,13 @@ extension GameSession {
         guard
         let pop: PopContext = self.context.pops.table[id],
         let country: CountryID = context.planets[pop.state.home.planet]?.occupied,
-        let country: Country = self.context.countries.state[country]
+        let country: CountryProperties = self.context.countries[country]?.properties
         else {
             return nil
         }
 
-        let promotion: ConditionBreakdown = pop.buildPromotionMatrix(country: country.policies)
-        let demotion: ConditionBreakdown = pop.buildDemotionMatrix(country: country.policies)
+        let promotion: ConditionBreakdown = pop.buildPromotionMatrix(country: country)
+        let demotion: ConditionBreakdown = pop.buildDemotionMatrix(country: country)
 
         let promotions: Int64 = promotion.output > 0
             ? .init(Double.init(pop.state.today.size) * promotion.output * 30)
@@ -705,7 +706,7 @@ extension GameSession {
         _ id: PopID,
         culture: String,
     ) -> Tooltip? {
-        self.context.pops.table[id]?.equity.tooltipOwnership(
+        self.context.pops.table[id]?.tooltipOwnership(
             culture: culture,
             context: self.context
         )
@@ -715,7 +716,7 @@ extension GameSession {
         _ id: PopID,
         country: CountryID,
     ) -> Tooltip? {
-        self.context.pops.table[id]?.equity.tooltipOwnership(
+        self.context.pops.table[id]?.tooltipOwnership(
             country: country,
             context: self.context
         )
@@ -724,7 +725,7 @@ extension GameSession {
     public func tooltipPopOwnership(
         _ id: PopID,
     ) -> Tooltip? {
-        self.context.pops.table[id]?.equity.tooltipOwnership()
+        self.context.pops.table[id]?.tooltipOwnership()
     }
 
     public func tooltipPopStatementItem(
@@ -834,12 +835,12 @@ extension GameSession {
 #if TESTABLE
 extension GameSession {
     public mutating func run(until date: GameDate) throws {
-        try self.context.compute()
-        while self.context.date < date {
+        try self.context.compute(self.map)
+        while self.map.date < date {
             try self.context.advance(&self.map)
-            try self.context.compute()
+            try self.context.compute(self.map)
 
-            if case (year: let year, month: 1, day: 1) = self.context.date.gregorian {
+            if case (year: let year, month: 1, day: 1) = self.map.date.gregorian {
                 print("Year \(year) has started.")
             }
         }

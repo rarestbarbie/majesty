@@ -9,6 +9,22 @@ extension BigIntRepresentation {
         )
     }
 
+    static func ^^ (self: Self, change: Value) -> TooltipInstruction.Ticker {
+        let delta: Self
+        let sign: TooltipInstruction.Sign?
+        if change == 0 {
+            delta = self.with(value: 0)
+            sign = nil
+        } else if change < 0 {
+            delta = self.with(value: 0 - change)
+            sign = .neg
+        } else {
+            delta = self.with(value: change)
+            sign = .pos
+        }
+        return .init(value: "\(self)", delta: "\(delta)", sign: sign)
+    }
+
     static func <- (self: Self, before: Value) -> TooltipInstruction.Ticker {
         let delta: Self
         let sign: TooltipInstruction.Sign?

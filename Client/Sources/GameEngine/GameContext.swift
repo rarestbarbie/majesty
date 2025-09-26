@@ -6,7 +6,6 @@ import GameTerrain
 import JavaScriptKit
 
 struct GameContext {
-    var date: GameDate
     var player: CountryID
 
     private(set) var planets: RuntimeContextTable<PlanetContext>
@@ -24,7 +23,6 @@ struct GameContext {
         let country: CountryContext.Metadata = .init()
         let culture: CultureContext.Metadata = .init()
 
-        self.date = save.date
         self.player = save.player
         self.planets = [:]
         self.cultures = try .init(states: save.cultures) { _ in culture }
@@ -105,7 +103,6 @@ extension GameContext {
 extension GameContext {
     var territoryPass: TerritoryPass {
         .init(
-            date: self.date,
             player: self.player,
             planets: self.planets.state,
             cultures: self.cultures.state,
@@ -118,7 +115,6 @@ extension GameContext {
 
     private var residentPass: ResidentPass {
         .init(
-            date: self.date,
             player: self.player,
             planets: self.planets,
             cultures: self.cultures,
@@ -131,16 +127,16 @@ extension GameContext {
 }
 extension GameContext {
     mutating func advance(_ map: inout GameMap) throws {
-        self.date.increment()
+        map.notifications.turn()
 
         for i: Int in self.planets.indices {
-            try self.planets[i].advance(in: self, on: &map)
+            try self.planets[i].advance(map: &map, context: self)
         }
         for i: Int in self.cultures.indices {
-            try self.cultures[i].advance(in: self, on: &map)
+            try self.cultures[i].advance(map: &map, context: self)
         }
         for i: Int in self.countries.indices {
-            try self.countries[i].advance(in: self, on: &map)
+            try self.countries[i].advance(map: &map, context: self)
         }
 
         map.localMarkets.turn {
@@ -207,19 +203,19 @@ extension GameContext {
         for i: Resident in order {
             switch i {
             case .factory(let i):
-                self.factories[i].transact(on: &map)
+                self.factories[i].transact(map: &map)
             case .pop(let i):
-                self.pops.table[i].transact(on: &map)
+                self.pops.table[i].transact(map: &map)
             }
         }
 
         map.exchange.turn()
 
         self.factories.turn {
-            $0.advance()
+            $0.advance(map: &map)
         }
         self.pops.table.turn {
-            $0.advance(factories: self.factories.state, on: &map)
+            $0.advance(map: &map, factories: self.factories.state)
         }
 
         self.postCashTransfers(&map)
@@ -228,24 +224,24 @@ extension GameContext {
         try self.postPopConversions(&map)
     }
 
-    mutating func compute() throws {
+    mutating func compute(_ map: borrowing GameMap) throws {
         for i: Int in self.planets.indices {
-            try self.planets[i].compute(in: self.territoryPass)
+            try self.planets[i].compute(map: map, context: self.territoryPass)
         }
         for i: Int in self.cultures.indices {
-            try self.cultures[i].compute(in: self.territoryPass)
+            try self.cultures[i].compute(map: map, context: self.territoryPass)
         }
         for i: Int in self.countries.indices {
-            try self.countries[i].compute(in: self.territoryPass)
+            try self.countries[i].compute(map: map, context: self.territoryPass)
         }
 
         self.index()
 
         for i: Int in self.factories.indices {
-            try self.factories[i].compute(in: self.residentPass)
+            try self.factories[i].compute(map: map, context: self.residentPass)
         }
         for i: Int in self.pops.table.indices {
-            try self.pops.table[i].compute(in: self.residentPass)
+            try self.pops.table[i].compute(map: map, context: self.residentPass)
         }
     }
 }

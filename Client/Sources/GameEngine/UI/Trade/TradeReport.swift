@@ -110,7 +110,7 @@ extension TradeReport: PersistentReport {
                 fallthrough
 
             case market.id?:
-                self.market?.update(in: snapshot.context, from: market)
+                self.market?.update(from: market, date: snapshot.date)
 
             case _?:
                 continue

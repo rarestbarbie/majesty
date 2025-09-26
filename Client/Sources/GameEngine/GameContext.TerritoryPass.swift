@@ -3,7 +3,6 @@ import GameState
 
 extension GameContext {
     struct TerritoryPass {
-        let date: GameDate
         let player: CountryID
         let planets: RuntimeStateTable<PlanetContext>
         let cultures: RuntimeStateTable<CultureContext>

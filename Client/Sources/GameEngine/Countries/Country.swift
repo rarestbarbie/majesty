@@ -29,11 +29,6 @@ struct Country: IdentityReplaceable {
     var minwage: Int64
 }
 extension Country {
-    var policies: CountryPolicies {
-        .init(currency: self.currency.id, minwage: self.minwage, culture: self.white)
-    }
-}
-extension Country {
     enum ObjectKey: JSString, Sendable {
         case id
         case currency

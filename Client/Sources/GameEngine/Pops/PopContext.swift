@@ -8,11 +8,11 @@ import JavaScriptKit
 import JavaScriptInterop
 import Random
 
-struct PopContext {
+struct PopContext: RuntimeContext {
     let type: PopMetadata
     var state: Pop
 
-    private(set) var policy: CountryPolicies?
+    private(set) var country: CountryProperties?
 
     private(set) var unemployment: Double
     private(set) var equity: Equity<LegalEntity>.Statistics
@@ -25,7 +25,7 @@ struct PopContext {
         self.type = type
         self.state = state
 
-        self.policy = nil
+        self.country = nil
 
         self.unemployment = 0
         self.equity = .init()
@@ -51,7 +51,7 @@ extension PopContext {
 
 extension PopContext {
     func buildDemotionMatrix<Matrix>(
-        country: CountryPolicies,
+        country: CountryProperties,
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
@@ -108,7 +108,7 @@ extension PopContext {
     }
 
     func buildPromotionMatrix<Matrix>(
-        country: CountryPolicies,
+        country: CountryProperties,
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
@@ -185,11 +185,14 @@ extension PopContext {
         }
     }
 }
-extension PopContext: RuntimeContext {
-    mutating func compute(in context: GameContext.ResidentPass) throws {
+extension PopContext {
+    mutating func compute(
+        map _: borrowing GameMap,
+        context: GameContext.ResidentPass
+    ) throws {
         guard
         let country: CountryID = context.planets[self.state.home.planet]?.occupied,
-        let country: Country = context.countries.state[country] else {
+        let country: CountryProperties = context.countries[country]?.properties else {
             return
         }
 
@@ -204,18 +207,18 @@ extension PopContext: RuntimeContext {
         self.cashFlow.update(with: self.state.nx.tradeable.values.elements)
         self.cashFlow.update(with: self.state.nx.inelastic.values.elements)
 
-        self.policy = country.policies
+        self.country = country
 
         self.equity = .compute(from: self.state.equity, in: context)
     }
 }
 extension PopContext: TransactingContext {
-    mutating func allocate(on map: inout GameMap) {
+    mutating func allocate(map: inout GameMap) {
         self.state.today.size += Binomial[self.state.today.size, 0.000_02].sample(
             using: &map.random.generator
         )
 
-        let currency: Fiat = self.policy!.currency
+        let currency: Fiat = self.country!.currency
         let balance: Int64 = self.state.cash.balance
 
         /// Compute vertical weights.
@@ -441,9 +444,9 @@ extension PopContext {
     }
 }
 extension PopContext {
-    mutating func transact(on map: inout GameMap) {
+    mutating func transact(map: inout GameMap) {
         guard
-        let country: CountryPolicies = self.policy,
+        let country: CountryProperties = self.country,
         let budget: PopBudget = self.budget else {
             return
         }
@@ -548,9 +551,9 @@ extension PopContext {
         self.state.cash.s += self.state.today.size * country.minwage / 10
     }
 
-    mutating func advance(factories: RuntimeStateTable<FactoryContext>, on map: inout GameMap) {
+    mutating func advance(map: inout GameMap, factories: RuntimeStateTable<FactoryContext>) {
         guard
-        let country: CountryPolicies = self.policy else {
+        let country: CountryProperties = self.country else {
             return
         }
 
@@ -565,7 +568,7 @@ extension PopContext {
         self.state.today.mil = max(0, min(10, self.state.today.mil))
         self.state.today.con = max(0, min(10, self.state.today.con))
 
-        if self.state.type.stratum > .Ward {
+        if  self.state.type.stratum > .Ward {
             self.state.egress(
                 evaluator: self.buildDemotionMatrix(country: country),
                 on: &map,
@@ -592,6 +595,12 @@ extension PopContext {
                 default: false
                 }
             }
+        } else {
+            self.state.equity.split(
+                price: self.state.today.px,
+                map: &map,
+                notifying: [country.id]
+            )
         }
 
         // We do not need to remove jobs that have no employees left, that will be done
@@ -645,4 +654,7 @@ extension PopContext {
             }
         }
     }
+}
+extension PopContext: LegalEntityContext {
+    var equitySplits: [EquitySplit] { self.state.equity.splits }
 }
