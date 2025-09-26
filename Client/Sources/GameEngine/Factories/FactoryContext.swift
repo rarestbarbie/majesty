@@ -7,11 +7,11 @@ import JavaScriptInterop
 import OrderedCollections
 import Random
 
-struct FactoryContext {
+struct FactoryContext: RuntimeContext {
     let type: FactoryMetadata
     var state: Factory
 
-    private(set) var policy: CountryPolicies?
+    private(set) var country: CountryProperties?
 
     private var productivity: Int64
 
@@ -28,7 +28,7 @@ struct FactoryContext {
         self.state = state
 
         self.productivity = 0
-        self.policy = nil
+        self.country = nil
 
         self.workers = .init()
         self.clerks = nil
@@ -71,33 +71,37 @@ extension FactoryContext {
         // TODO
     }
 }
-extension FactoryContext: RuntimeContext {
-    mutating func compute(in pass: GameContext.ResidentPass) throws {
+extension FactoryContext {
+    mutating func compute(
+        map _: borrowing GameMap,
+        context: GameContext.ResidentPass
+    ) throws {
         let area: Int64 = self.state.size.value
         self.workers.limit = self.type.workers.amount * area
         self.clerks?.limit = (self.type.clerks?.amount ?? 0) * area
 
         guard
-        let country: CountryID = pass.planets[self.state.on.planet]?.occupied,
-        let country: CountryContext = pass.countries[country] else {
+        let country: CountryID = context.planets[self.state.on.planet]?.occupied,
+        let country: CountryContext = context.countries[country] else {
             return
         }
 
-        self.productivity = country.factories.productivity[self.state.type]
-        self.policy = country.state.policies
+
+        self.productivity = country.properties.factories.productivity[self.state.type]
+        self.country = country.properties
 
         self.cashFlow.reset()
         self.cashFlow.update(with: self.state.ni.tradeable.values.elements)
         self.cashFlow[.workers] = -self.state.cash.w
         self.cashFlow[.clerks] = -self.state.cash.c
 
-        self.equity = .compute(from: self.state.equity, in: pass)
+        self.equity = .compute(from: self.state.equity, in: context)
     }
 }
 extension FactoryContext: TransactingContext {
-    mutating func allocate(on map: inout GameMap) {
+    mutating func allocate(map: inout GameMap) {
         guard
-        let country: CountryPolicies = self.policy else {
+        let country: CountryProperties = self.country else {
             return
         }
 
@@ -154,9 +158,9 @@ extension FactoryContext: TransactingContext {
         map.stockMarkets.issueShares(security: security, currency: country.currency)
     }
 
-    mutating func transact(on map: inout GameMap) {
+    mutating func transact(map: inout GameMap) {
         guard
-        let country: CountryPolicies = self.policy,
+        let country: CountryProperties = self.country,
         let budget: FactoryBudget = self.budget else {
             return
         }
@@ -269,14 +273,20 @@ extension FactoryContext: TransactingContext {
         }
     }
 
-    mutating func advance() {
+    mutating func advance(map: inout GameMap) {
+        guard
+        let country: CountryProperties = self.country  else {
+            return
+        }
+
         // Add self.state subsidies at the end, after profit calculation.
-        self.state.cash.s += self.state.size.value + (self.policy?.minwage ?? 0)
+        self.state.cash.s += self.state.size.value + country.minwage
+        self.state.equity.split(price: self.state.today.px, map: &map, notifying: [country.id])
     }
 }
 extension FactoryContext {
     private mutating func operate(
-        policy: CountryPolicies,
+        policy: CountryProperties,
         budget: FactoryBudget,
         stockpileTarget: TradeableInput.StockpileTarget,
         map: inout GameMap
@@ -541,4 +551,7 @@ extension FactoryContext {
 
         return (wages, hours)
     }
+}
+extension FactoryContext: LegalEntityContext {
+    var equitySplits: [EquitySplit] { self.state.equity.splits }
 }

@@ -3,7 +3,6 @@ import GameRules
 
 extension GameContext {
     struct ResidentPass {
-        let date: GameDate
         let player: CountryID
         let planets: RuntimeContextTable<PlanetContext>
         let cultures: RuntimeContextTable<CultureContext>

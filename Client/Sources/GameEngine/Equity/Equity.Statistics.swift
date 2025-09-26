@@ -1,4 +1,3 @@
-import D
 import GameEconomy
 import GameState
 
@@ -82,58 +81,5 @@ extension Equity<LegalEntity>.Statistics {
                 traded: shares.sold + shares.bought
             )
         )
-    }
-
-    func tooltipOwnership(
-        culture: String,
-        context: GameContext,
-    ) -> Tooltip {
-        let (share, total): (share: Int64, total: Int64) = self.owners.reduce(
-            into: (0, 0)
-        ) {
-            if case .pop(let id) = $1.id,
-                let pop: Pop = context.pops.table.state[id], pop.nat == culture {
-                $0.share += $1.shares
-            }
-
-            $0.total += $1.shares
-        }
-
-        return .instructions(style: .borderless) {
-            $0[culture] = (Double.init(share) / Double.init(total))[%3]
-        }
-    }
-
-    func tooltipOwnership(
-        country: CountryID,
-        context: GameContext,
-    ) -> Tooltip? {
-        guard
-        let country: Country = context.countries.state[country] else {
-            return nil
-        }
-
-        let (share, total): (share: Int64, total: Int64) = self.owners.reduce(
-            into: (0, 0)
-        ) {
-            if  $1.country == country.id {
-                $0.share += $1.shares
-            }
-
-            $0.total += $1.shares
-        }
-
-        return .instructions(style: .borderless) {
-            $0[country.name] = (Double.init(share) / Double.init(total))[%3]
-        }
-    }
-
-    func tooltipOwnership() -> Tooltip {
-        .instructions {
-            $0["Shares outstanding", (-)] = self.shares.outstanding[/3] <- self.shares.outstanding - self.shares.issued
-            $0[>] {
-                $0["Today’s trading volume"] = self.shares.traded[/3]
-            }
-        }
     }
 }

@@ -2,13 +2,14 @@ import Assert
 import GameEconomy
 import GameRules
 import GameState
-import Random
 import OrderedCollections
+import Random
 
 struct GameMap: ~Copyable {
     var random: PseudoRandom
-
     var exchange: Exchange
+    var notifications: Notifications
+
     var transfers: [LegalEntity: CashTransfers]
     var conversions: [(count: Int64, to: Pop.Section)]
     var jobs: (
@@ -19,18 +20,23 @@ struct GameMap: ~Copyable {
     var stockMarkets: StockMarkets<LegalEntity>
 
     init(
+        date: GameDate,
         settings: GameRules.Settings,
         markets: OrderedDictionary<Market.AssetPair, Market> = [:]
     ) {
         self.random = .init(seed: 12345)
-
         self.exchange = .init(settings: settings.exchange, table: markets)
+        self.notifications = .init(date: date)
+
         self.transfers = [:]
         self.conversions = []
         self.jobs = ((.init(), .init()), (.init(), .init()))
         self.localMarkets = .init()
         self.stockMarkets = .init()
     }
+}
+extension GameMap {
+    var date: GameDate { self.notifications.date }
 }
 extension GameMap {
     /// Returns the total compensation paid out to shareholders.

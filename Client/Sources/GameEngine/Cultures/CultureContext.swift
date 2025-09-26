@@ -1,16 +1,18 @@
 import GameState
 
-struct CultureContext {
+struct CultureContext: RuntimeContext {
     var state: Culture
 
     init(type _: Metadata, state: Culture) {
         self.state = state
     }
 }
-extension CultureContext: RuntimeContext {
-    mutating func compute(in context: GameContext.TerritoryPass) throws {
+extension CultureContext {
+    mutating func compute(
+        map _: borrowing GameMap,
+        context: GameContext.TerritoryPass
+    ) throws {
     }
 
-    mutating func advance(in context: GameContext, on map: inout GameMap) throws {
-    }
+    mutating func advance(map: inout GameMap, context: GameContext) throws {}
 }

@@ -58,3 +58,16 @@ extension GameDate {
         return .init(rawValue: J - 1721425)
     }
 }
+extension GameDate {
+    @inlinable public subscript(format: GameDateFormat) -> String {
+        switch format {
+        case .phrasal_US:
+            let (y, m, d): (Int32, Int32, Int32) = self.gregorian
+            return "\(Month[m]) \(d), \(y)"
+
+        case .phrasal_EU:
+            let (y, m, d): (Int32, Int32, Int32) = self.gregorian
+            return "\(d) \(Month[m]) \(y)"
+        }
+    }
+}

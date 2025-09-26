@@ -8,6 +8,7 @@ import OrderedCollections
         tradeable: OrderedDictionary<Market.AssetPair, Market>,
         inelastic: LocalMarkets<PopID>
     )
+    let date: GameDate
 }
 extension GameSnapshot {
     subscript<T>(dynamicMember keyPath: KeyPath<GameContext, T>) -> T {
