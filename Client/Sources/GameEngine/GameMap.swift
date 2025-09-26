@@ -56,23 +56,37 @@ extension GameMap {
             using: &self.random.generator
         )
 
-        guard
-        let shares: [Int64] = recipients.distribute(quote.quantity, share: \.shares),
-        let compensation: [Int64] = shares.distribute(quote.cost) else {
-            // If nobody owns shares, nothing to do.
-            return 0
+        // Occasionally the factory will receive a large windfall, and `quote(value:)` will
+        // return a quantity that exceeds the number of shares in circulation!
+        let shares: [Int64]? = recipients.distribute(share: \.shares) {
+            // Cap the number of shares bought back at 1 percent of the total circulation.
+            min($0 / 100, quote.quantity)
         }
 
-        for ((shares, compensation), recipient):
-            ((Int64, Int64), EquityStake<LegalEntity>) in zip(
-            zip(shares, compensation),
-            recipients
-        ) {
-            equity.buyback(shares: shares, from: recipient.id)
-            self.transfers[recipient.id, default: .init()].j += compensation
+        var compensationPaid: Int64 = 0
+
+        if  let shares: [Int64],
+            let compensation: [Int64] = shares.distribute(quote.cost) {
+            for ((shares, compensation), recipient):
+                ((Int64, Int64), EquityStake<LegalEntity>) in zip(
+                zip(shares, compensation),
+                recipients
+            ) where shares > 0 {
+                // Note that because of the way `distribute(share:funds:)` works, it’s possible
+                // for `compensation` to be non-zero even while `shares` is zero. We ban this
+                // situation manually here.
+                equity.buyback(shares: shares, from: recipient.id)
+                self.transfers[recipient.id, default: .init()].j += compensation
+                compensationPaid += compensation
+            }
         }
 
-        return quote.cost
+        #assert(
+            compensationPaid <= quote.cost,
+            "Compensation paid (\(compensationPaid)) exceeds cost quoted (\(quote.cost))!"
+        )
+
+        return compensationPaid
     }
 }
 extension GameMap {
