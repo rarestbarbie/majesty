@@ -1,6 +1,6 @@
 {
     "date": 885349,
-    "player": 2,
+    "player": 1,
     "symbols": {
         "resources": {
             "Ice": 1,
@@ -423,6 +423,39 @@
         },
         {
             "on": "399N0,2",
+            "type": "O",
+            "nat": "Earther",
+            "t_size": 5400,
+            "t_mil": 0.1,
+            "t_con": 4.0,
+            "cash": {
+                "liq": 200000000
+            }
+        },
+        {
+            "on": "399N0,2",
+            "type": "O",
+            "nat": "Lunan",
+            "t_size": 765,
+            "t_mil": 0.1,
+            "t_con": 4.0,
+            "cash": {
+                "liq": 20000000
+            }
+        },
+        {
+            "on": "399N0,2",
+            "type": "O",
+            "nat": "Gallilean",
+            "t_size": 325,
+            "t_mil": 0.1,
+            "t_con": 4.0,
+            "cash": {
+                "liq": 10000000
+            }
+        },
+        {
+            "on": "399N0,2",
             "t_size": 34020508,
             "type": "D",
             "nat": "Earther",
@@ -510,50 +543,6 @@
             "t_con": 4.1
         },
 
-        {
-            "on": "499E2",
-            "type": "O",
-            "nat": "Martian",
-            "t_size": 1736,
-            "t_mil": 0.1,
-            "t_con": 4.0,
-            "cash": {
-                "liq": 200000000
-            }
-        },
-        {
-            "on": "499E2",
-            "type": "O",
-            "nat": "Earther",
-            "t_size": 479,
-            "t_mil": 0.1,
-            "t_con": 4.0,
-            "cash": {
-                "liq": 1000000000
-            }
-        },
-        {
-            "on": "499E2",
-            "type": "O",
-            "nat": "Lunan",
-            "t_size": 12,
-            "t_mil": 0.1,
-            "t_con": 4.0,
-            "cash": {
-                "liq": 10000000
-            }
-        },
-        {
-            "on": "499E2",
-            "type": "O",
-            "nat": "Gallilean",
-            "t_size": 5,
-            "t_mil": 0.1,
-            "t_con": 4.0,
-            "cash": {
-                "liq": 1000000
-            }
-        },
         {
             "on": "499E2",
             "type": "D",

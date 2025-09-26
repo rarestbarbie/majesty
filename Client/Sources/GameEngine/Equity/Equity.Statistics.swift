@@ -1,3 +1,4 @@
+import Assert
 import GameEconomy
 import GameState
 
@@ -18,7 +19,9 @@ extension Equity.Statistics {
 }
 extension Equity.Statistics {
     func price(valuation: Int64) -> Fraction {
-        self.shares.outstanding > 0 ? valuation %/ self.shares.outstanding : 1
+        // This formulation means that if there are no outstanding shares, the price is equal
+        // to the valuation. In other words, you can buy the entire company for its valuation.
+        valuation %/ (self.shares.outstanding + 1)
     }
 }
 extension Equity<LegalEntity>.Statistics {
@@ -33,6 +36,11 @@ extension Equity<LegalEntity>.Statistics {
             $0.bought += $1.value.bought
             $0.sold += $1.value.sold
         }
+
+        #assert(
+            shares.outstanding >= 0,
+            "Outstanding shares (\(shares.outstanding)) cannot be negative!!!"
+        )
 
         return .init(
             owners: equity.shares.values.reduce(into: []) {

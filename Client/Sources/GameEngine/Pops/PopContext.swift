@@ -213,6 +213,56 @@ extension PopContext {
         self.equity = .compute(from: self.state.equity, in: context)
     }
 }
+extension PopContext {
+    mutating func credit(
+        inelastic resource: Resource,
+        units: Int64,
+        price: Int64
+    ) {
+        let value: Int64 = units * price
+        self.state.out.inelastic[resource]?.report(
+            unitsSold: units,
+            valueSold: value,
+        )
+        self.state.cash.r += value
+    }
+
+    mutating func debit(
+        inelastic resource: Resource,
+        units: Int64,
+        price: Int64,
+        in tier: ResourceTierIdentifier?
+    ) {
+        guard let tier: ResourceTierIdentifier else {
+            return
+        }
+
+        let value: Int64 = units * price
+
+        switch tier {
+        case .l:
+            self.state.nl.inelastic[resource]?.report(
+                unitsConsumed: units,
+                valueConsumed: value,
+            )
+        case .e:
+            self.state.ne.inelastic[resource]?.report(
+                unitsConsumed: units,
+                valueConsumed: value,
+            )
+        case .x:
+            self.state.nx.inelastic[resource]?.report(
+                unitsConsumed: units,
+                valueConsumed: value,
+            )
+
+        case _:
+            return
+        }
+
+        self.state.cash.b -= value
+    }
+}
 extension PopContext: TransactingContext {
     mutating func allocate(map: inout GameMap) {
         self.state.today.size += Binomial[self.state.today.size, 0.000_02].sample(
@@ -393,58 +443,7 @@ extension PopContext: TransactingContext {
 
         self.budget = budget
     }
-}
-extension PopContext {
-    mutating func credit(
-        inelastic resource: Resource,
-        units: Int64,
-        price: Int64
-    ) {
-        let value: Int64 = units * price
-        self.state.out.inelastic[resource]?.report(
-            unitsSold: units,
-            valueSold: value,
-        )
-        self.state.cash.r += value
-    }
 
-    mutating func debit(
-        inelastic resource: Resource,
-        units: Int64,
-        price: Int64,
-        in tier: ResourceTierIdentifier?
-    ) {
-        guard let tier: ResourceTierIdentifier else {
-            return
-        }
-
-        let value: Int64 = units * price
-
-        switch tier {
-        case .l:
-            self.state.nl.inelastic[resource]?.report(
-                unitsConsumed: units,
-                valueConsumed: value,
-            )
-        case .e:
-            self.state.ne.inelastic[resource]?.report(
-                unitsConsumed: units,
-                valueConsumed: value,
-            )
-        case .x:
-            self.state.nx.inelastic[resource]?.report(
-                unitsConsumed: units,
-                valueConsumed: value,
-            )
-
-        case _:
-            return
-        }
-
-        self.state.cash.b -= value
-    }
-}
-extension PopContext {
     mutating func transact(map: inout GameMap) {
         guard
         let country: CountryProperties = self.country,
@@ -551,7 +550,8 @@ extension PopContext {
         // Welfare
         self.state.cash.s += self.state.today.size * country.minwage / 10
     }
-
+}
+extension PopContext {
     mutating func advance(map: inout GameMap, factories: RuntimeStateTable<FactoryContext>) {
         guard
         let country: CountryProperties = self.country else {
