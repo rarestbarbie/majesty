@@ -1,37 +1,64 @@
 @use 'mixins/blur';
 
-@keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-}
+// Special hacks needed to make the backdrop-filter work on the menu.
+#context-menu[data-display='hidden'],
+#context-menu ul[data-display='hidden'] {
+    pointer-events: none;
 
-@keyframes fade-out {
-    from { opacity: 1; }
-    to { opacity: 0; }
+    &::before,
+    > * {
+        opacity: 0;
+        transition: opacity var(--transition-length) ease-out;
+    }
+}
+#context-menu[data-display='floating'],
+#context-menu ul[data-display='floating'] {
+    &::before,
+    > * {
+        opacity: 1;
+        transition: opacity var(--transition-length) ease-in;
+    }
 }
 
 #context-menu {
     position: fixed;
     z-index: 10000;
 
+
     ul {
         position: absolute;
 
         list-style: none;
-        padding: 5px 0;
+        padding: 0.5rem 0;
         margin: 0;
         border-radius: 0.25rem;
         min-width: 180px;
 
-        --bg: rgba(0, 0, 0, 0.05);
-        --blur-filter: blur(20px) saturate(200%) brightness(0.5);
+        --transition-length: 0.25s;
 
-        @include blur.background;
+        &::before {
+            z-index: 1000;
 
-        background-color: var(--bg);
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: -1; // Places the background behind the <li> content.
 
-        box-shadow: 0 0.5rem 3rem rgba(0, 0, 0, 0.8);
-        border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 0.25rem;
+
+            --bg: rgba(0, 0, 0, 0.15);
+            --blur-filter: blur(20px) saturate(200%) brightness(0.5);
+
+            @include blur.background;
+            background-color: var(--bg);
+
+            box-shadow: 0 0.5rem 3rem rgba(0, 0, 0, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
 
         li {
             padding: 8px 15px;
@@ -52,26 +79,17 @@
                 }
             }
 
-            &.has-submenu::after {
-                content: '▶';
-                position: absolute;
-                right: 10px;
-                top: 50%;
-                transform: translateY(-50%);
-            }
         }
 
-        // Submenu styles
-        ul {
-            top: -6px; // Adjust for border
-            left: 100%;
-
+        li[data-submenu='right']::after {
+            content: '▶';
+            position: absolute;
+            right: 10px;
+        }
+        li[data-submenu='left']::after {
+            content: '◀';
+            left: 10px;
+            right: auto;
         }
     }
-}
-#context-menu[data-display='hidden'] {
-    opacity: 0;
-}
-#context-menu[data-display='floating'] {
-    animation: fade-in 0.15s;
 }
