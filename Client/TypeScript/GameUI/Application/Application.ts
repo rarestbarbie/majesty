@@ -9,6 +9,7 @@ import { PlayerEvent, PlayerEventID } from '../../Multiplayer/exports.js';
 import {
     CelestialView,
     CelestialViewState,
+    ContextMenuType,
     Clock,
     DeveloperToolsPanel,
     GameUI,
@@ -22,7 +23,11 @@ import {
 } from '../exports.js';
 import { Swift } from '../../Swift.js';
 import { Socket } from "socket.io-client";
-import { Tooltip } from '../../DOM/exports.js';
+import {
+    ContextMenu,
+    ContextMenuItem,
+    Tooltip
+} from '../../DOM/exports.js';
 
 export class Application {
     public static mp?: Socket<any, any>;
@@ -42,7 +47,7 @@ export class Application {
 
     private views: [CelestialView?, CelestialView?];
 
-    // New tooltip properties
+    private readonly contextMenu: ContextMenu;
     private readonly tooltip: Tooltip<TooltipType>;
     private readonly devtools: DeveloperToolsPanel;
 
@@ -119,51 +124,25 @@ export class Application {
         hud.node.appendChild(hud.interface);
         hud.node.appendChild(hud.developer.node);
 
+        this.contextMenu = new ContextMenu(Swift.call);
+        this.contextMenu.node.id = 'context-menu';
+
         this.tooltip = new Tooltip<TooltipType>();
+        this.tooltip.node.id = 'tooltip';
+
         this.devtools = hud.developer;
 
         document.body.appendChild(this.renderer.domElement);
         document.body.appendChild(this.main);
         document.body.appendChild(hud.node);
+        document.body.appendChild(this.contextMenu.node);
         document.body.appendChild(this.tooltip.node);
 
         this.screen.attach(document.body);
 
         this.views = [undefined, undefined];
 
-        window.addEventListener('hashchange', this.navigate.bind(this));
-        window.addEventListener('resize', this.resize.bind(this));
-
-        document.addEventListener('mouseover', (event) => {
-            const owner: HTMLElement | null = (event.target as HTMLElement).closest(
-                '[data-tooltip-arguments]'
-            );
-
-            if (!owner) {
-                return;
-            }
-
-            const unparsed: string | null = owner.getAttribute('data-tooltip-arguments');
-            const type: TooltipType = owner.getAttribute('data-tooltip-type') as TooltipType;
-            const list: any[] = unparsed ? JSON.parse(unparsed) : [];
-
-            this.tooltip.show(Swift.tooltip(type, list));
-            this.tooltip.source = { arguments: list, type: type };
-        });
-
-        document.addEventListener('mousemove', (event) => {
-            this.tooltip.move(event, document.body.getBoundingClientRect());
-        });
-
-        document.addEventListener('mouseout', (event) => {
-            const owner: HTMLElement | null = (event.target as HTMLElement).closest(
-                '[data-tooltip-arguments]'
-            );
-            if (owner) {
-                this.tooltip.hide();
-                this.tooltip.source = undefined;
-            }
-        });
+        this.bindEventHandlers();
 
         const animate = () => {
             requestAnimationFrame(animate);
@@ -285,5 +264,66 @@ export class Application {
         } else {
             Swift.push(event, 0n);
         }
+    }
+
+    private bindEventHandlers(): void {
+        window.addEventListener('hashchange', this.navigate.bind(this));
+        window.addEventListener('resize', this.resize.bind(this));
+
+        document.addEventListener('mouseover', (event) => {
+            const owner: HTMLElement | null = (event.target as HTMLElement).closest(
+                '[data-tooltip-arguments]'
+            );
+
+            if (!owner) {
+                return;
+            }
+
+            const unparsed: string | null = owner.getAttribute('data-tooltip-arguments');
+            const type: TooltipType = owner.getAttribute('data-tooltip-type') as TooltipType;
+            const list: any[] = unparsed ? JSON.parse(unparsed) : [];
+
+            this.tooltip.show(Swift.tooltip(type, list));
+            this.tooltip.source = { arguments: list, type: type };
+        });
+
+        document.addEventListener('mousemove', (event) => {
+            this.tooltip.move(event, document.body.getBoundingClientRect());
+        });
+
+        document.addEventListener('mouseout', (event) => {
+            const owner: HTMLElement | null = (event.target as HTMLElement).closest(
+                '[data-tooltip-arguments]'
+            );
+            if (owner) {
+                this.tooltip.hide();
+                this.tooltip.source = undefined;
+            }
+        });
+
+        document.addEventListener('contextmenu', (event) => {
+            const target: HTMLElement | null = (event.target as HTMLElement).closest(
+                '[data-menu-type]'
+            );
+
+            if (target !== null) {
+                event.preventDefault();
+                const type: ContextMenuType = target.getAttribute(
+                    'data-menu-type'
+                ) as ContextMenuType;
+                const argumentsText: string | null = target.getAttribute('data-menu-arguments');
+                const argumentsList: any[] = argumentsText ? JSON.parse(argumentsText) : [];
+                const items: ContextMenuItem[] = Swift.contextMenu(type, argumentsList);
+                this.contextMenu.show(items, event.clientX, event.clientY);
+            } else {
+                this.contextMenu.hide();
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            if (this.contextMenu.isOpen && !this.contextMenu.node.contains(event.target as Node)) {
+                this.contextMenu.hide();
+            }
+        });
     }
 }

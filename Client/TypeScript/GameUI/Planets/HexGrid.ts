@@ -1,9 +1,11 @@
 import { StaticList } from '../../DOM/exports.js';
 import {
+    ContextMenuType,
     HexGridCell,
     HexGridCellBackground,
     MinimapLayer,
     PlanetMapTileState,
+    TooltipType,
 } from '../exports.js';
 
 export class HexGrid {
@@ -64,15 +66,19 @@ export class HexGrid {
         this.lines.update(
             tiles,
             (tile: PlanetMapTileState) => {
-                const instance: HexGridCell = new HexGridCell(
-                    tile,
-                    [...prefix, tile.id, layer]
-                );
+                const cell: HexGridCell = new HexGridCell(tile);
                 const href: string | null = target(tile.id);
-                if (href) {
-                    instance.node.setAttribute('href', href);
+                if (href !== null) {
+                    cell.node.setAttribute('href', href);
                 }
-                return instance;
+
+                const path: string = JSON.stringify([...prefix, tile.id, layer]);
+
+                cell.node.setAttribute('data-tooltip-type', TooltipType.PlanetCell);
+                cell.node.setAttribute('data-tooltip-arguments', path);
+                cell.node.setAttribute('data-menu-type', ContextMenuType.MinimapTile);
+                cell.node.setAttribute('data-menu-arguments', path);
+                return cell;
             },
             (tile: PlanetMapTileState, element: HexGridCell) => {
                 element.path.setAttribute('d', tile.d0);

@@ -71,56 +71,6 @@ export class ContextMenu {
         }
     }
 
-    private position(menu: HTMLElement, x: number, y: number): void {
-        let left: number = x;
-        let top: number = y;
-
-        const buffer: number = 10;
-        const h: number = window.innerHeight - y - buffer;
-        const w: number = window.innerWidth - x - buffer;
-
-        if (menu.offsetWidth > w) {
-            left = x - menu.offsetWidth;
-            this.node.style.transformOrigin = 'top right';
-        } else {
-            this.node.style.transformOrigin = 'top left';
-        }
-
-        if (menu.offsetHeight > h) {
-            top = y - menu.offsetHeight;
-            this.node.style.transformOrigin = 'bottom left';
-        } else {
-             // We already set top-left or top-right, no need to override
-        }
-
-        if ((menu.offsetWidth > w) && (menu.offsetHeight > h)) {
-            this.node.style.transformOrigin = 'bottom right';
-        }
-
-        this.node.style.left = `${left}px`;
-        this.node.style.top = `${top}px`;
-    }
-
-    private positionNested(submenu: HTMLElement, parent: HTMLUListElement): void {
-        const parentRectangle: DOMRect = parent.getBoundingClientRect();
-
-        // Horizontal Positioning
-        if (parentRectangle.right + submenu.offsetWidth > window.innerWidth) {
-            parent.setAttribute('data-submenu', 'left');
-            submenu.style.left = `-${submenu.offsetWidth}px`;
-        } else {
-            parent.setAttribute('data-submenu', 'right');
-            submenu.style.left = `${parentRectangle.width}px`;
-        }
-
-        // Vertical Positioning
-        if (parentRectangle.top + submenu.offsetHeight > window.innerHeight) {
-            submenu.style.top = `-${parentRectangle.height - submenu.offsetHeight}px`;
-        } else {
-            submenu.style.top = `0px`;
-        }
-    }
-
     public show(items: ContextMenuItem[], x: number, y: number): void {
         this.root.replaceChildren();
 
@@ -149,7 +99,10 @@ export class ContextMenu {
     private render(items: ContextMenuItem[], menu: HTMLUListElement): void {
         for (const item of items) {
             const li: HTMLLIElement = document.createElement('li');
-            li.textContent = item.label;
+
+            const content: HTMLDivElement = document.createElement('div');
+            content.textContent = item.label;
+            li.appendChild(content);
 
             if (item.disabled) {
                 li.classList.add('disabled');
@@ -160,7 +113,7 @@ export class ContextMenu {
                 // Recursively render the submenu and append it
                 const submenu: HTMLUListElement = this.renderNested(item.submenu);
                 submenu.setAttribute('data-display', 'hidden');
-                li.appendChild(submenu);
+                content.appendChild(submenu);
 
             } else if (item.action !== undefined) {
                 li.setAttribute('data-action', item.action);
@@ -178,8 +131,45 @@ export class ContextMenu {
         return menu;
     }
 
-    private positionSubmenusRecursively(parentMenu: HTMLUListElement): void {
-        for (const item of parentMenu.children) {
+
+    private position(menu: HTMLElement, x: number, y: number): void {
+        let left: number;
+        let top: number;
+
+        const buffer: number = 10;
+        const h: number = window.innerHeight - y - buffer;
+        const w: number = window.innerWidth - x - buffer;
+
+        // The small offsets help to position the menu underneath the cursor, which hides any
+        // tooltips that might otherwise appear beneath the menu.
+
+        if (menu.offsetWidth > w) {
+            left = x + 5 - menu.offsetWidth;
+            this.node.style.transformOrigin = 'top right';
+        } else {
+            left = x - 5;
+            this.node.style.transformOrigin = 'top left';
+        }
+
+        if (menu.offsetHeight > h) {
+            top = y + 10 - menu.offsetHeight;
+            this.node.style.transformOrigin = 'bottom left';
+        } else {
+            top = y - 10;
+             // We already set top-left or top-right, no need to override
+        }
+
+        if ((menu.offsetWidth > w) && (menu.offsetHeight > h)) {
+            this.node.style.transformOrigin = 'bottom right';
+        }
+
+        this.node.style.left = `${left}px`;
+        this.node.style.top = `${top}px`;
+    }
+    private positionSubmenusRecursively(parent: HTMLUListElement): void {
+        parent.classList.remove('has-submenu-left', 'has-submenu-right');
+
+        for (const item of parent.children) {
             const li = item as HTMLLIElement;
             const submenu = this.directSubmenu(li);
 
@@ -188,9 +178,11 @@ export class ContextMenu {
 
                 if (parentRect.right + submenu.offsetWidth > window.innerWidth) {
                     li.setAttribute('data-submenu', 'left');
+                    parent.classList.add('has-submenu-left');
                     submenu.style.left = `-${submenu.offsetWidth}px`;
                 } else {
                     li.setAttribute('data-submenu', 'right');
+                    parent.classList.add('has-submenu-right');
                     submenu.style.left = `${li.offsetWidth}px`;
                 }
 
@@ -207,8 +199,12 @@ export class ContextMenu {
 
     private directSubmenu(item: HTMLLIElement): HTMLUListElement | null {
         for (const child of item.children) {
-            if (child instanceof HTMLUListElement) {
-                return child;
+            if (child instanceof HTMLDivElement) {
+                for (const grandchild of child.children) {
+                    if (grandchild instanceof HTMLUListElement) {
+                        return grandchild;
+                    }
+                }
             }
         }
         return null;

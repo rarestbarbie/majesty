@@ -9,7 +9,7 @@ export class Tooltip<Type> {
         this.tooltip = document.createElement('aside');
         this.node = document.createElement('div');
         this.node.appendChild(this.tooltip);
-        this.node.setAttribute('data-tooltip', 'hidden');
+        this.node.setAttribute('data-display', 'hidden');
     }
 
     public show(tooltip: TooltipInstructions | TooltipBreakdown | null): void {
@@ -18,7 +18,7 @@ export class Tooltip<Type> {
             : TooltipRenderer.render(tooltip);
         this.tooltip.replaceChildren(...list);
         this.tooltip.className = tooltip?.display ?? '';
-        this.node.setAttribute('data-tooltip', 'floating');
+        this.node.setAttribute('data-display', 'floating');
     }
 
     public move(event: MouseEvent, frame: DOMRect) {
@@ -43,7 +43,7 @@ export class Tooltip<Type> {
     }
 
     public hide(): void {
-        this.node.setAttribute('data-tooltip', 'hidden');
+        this.node.setAttribute('data-display', 'hidden');
         this.tooltip.replaceChildren();
     }
 }

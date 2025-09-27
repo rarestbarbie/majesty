@@ -1,4 +1,5 @@
 import {
+    ContextMenuItem,
     TooltipBreakdown,
     TooltipInstructions,
 } from './DOM/exports.js';
@@ -6,6 +7,7 @@ import { GameID, GameDate, GameDateComponents } from './GameEngine/exports.js';
 import {
     Application,
     CelestialViewState,
+    ContextMenuType,
     FactoryDetailsTab,
     MinimapLayer,
     NavigatorState,
@@ -65,6 +67,45 @@ export class Swift {
         type: TooltipType,
         arguments: any[]
     ) => TooltipInstructions | TooltipBreakdown | null;
+
+    public static contextMenu(type: ContextMenuType, argumentList: any[]): ContextMenuItem[] {
+        // In a real implementation, you would call the declared swift_context_menu function.
+        // For now, we return a stubbed, hierarchical menu.
+        console.log(`Requesting context menu of type '${type}' with arguments:`, argumentList);
+
+        // Stubbed data
+        return [
+            {
+                label: "Switch To Player",
+                action: "switchToPlayer",
+                arguments: ["player-uuid-12345"]
+            },
+            {
+                label: "Diplomacy",
+                submenu: [
+                    { label: "Declare War", action: "declareWar", arguments: ["player-uuid-12345"] },
+                    { label: "Offer Alliance", action: "offerAlliance", arguments: ["player-uuid-12345"], disabled: true },
+                    {
+                        label: "Trade Actions",
+                        submenu: [
+                            { label: "Open Trade Route", action: "openTradeRoute", arguments: ["player-uuid-12345"] },
+                            { label: "View Trade History", action: "viewTradeHistory", arguments: ["player-uuid-12345"] },
+                        ]
+                    }
+                ]
+            },
+            {
+                label: "Inspect Tile",
+                action: "InspectTile",
+                arguments: argumentList
+            }
+        ];
+    }
+
+    public static call(action: string, argumentList: any[]): void {
+        // This would eventually call a generic swift function to perform an action.
+        console.log(`Swift.call -> Action: ${action}`, 'Args:', argumentList);
+    }
 
     declare public static editTerrain: () => PlanetTileEditorState | null;
     declare public static loadTerrain: (from: PlanetTileEditorState) => void;
