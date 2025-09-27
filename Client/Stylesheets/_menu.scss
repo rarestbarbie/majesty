@@ -1,0 +1,77 @@
+@use 'mixins/blur';
+
+@keyframes fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes fade-out {
+    from { opacity: 1; }
+    to { opacity: 0; }
+}
+
+#context-menu {
+    position: fixed;
+    z-index: 10000;
+
+    ul {
+        position: absolute;
+
+        list-style: none;
+        padding: 5px 0;
+        margin: 0;
+        border-radius: 0.25rem;
+        min-width: 180px;
+
+        --bg: rgba(0, 0, 0, 0.05);
+        --blur-filter: blur(20px) saturate(200%) brightness(0.5);
+
+        @include blur.background;
+
+        background-color: var(--bg);
+
+        box-shadow: 0 0.5rem 3rem rgba(0, 0, 0, 0.8);
+        border: 1px solid rgba(255, 255, 255, 0.1);
+
+        li {
+            padding: 8px 15px;
+            cursor: pointer;
+            position: relative;
+
+            &:hover {
+                background-color: #3498db;
+                color: white;
+            }
+
+            &.disabled {
+                color: #7f8c8d;
+                cursor: not-allowed;
+
+                &:hover {
+                    background-color: transparent;
+                }
+            }
+
+            &.has-submenu::after {
+                content: '▶';
+                position: absolute;
+                right: 10px;
+                top: 50%;
+                transform: translateY(-50%);
+            }
+        }
+
+        // Submenu styles
+        ul {
+            top: -6px; // Adjust for border
+            left: 100%;
+
+        }
+    }
+}
+#context-menu[data-display='hidden'] {
+    opacity: 0;
+}
+#context-menu[data-display='floating'] {
+    animation: fade-in 0.15s;
+}
