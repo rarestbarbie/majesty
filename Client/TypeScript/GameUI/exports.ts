@@ -1,5 +1,5 @@
 export * from './ProgressCell.js';
-export * from './TooltipType.js';
+export * from './Application/TooltipType.js';
 
 export * from './Developer/DeveloperToolsPanel.js';
 export * from './Developer/PlanetTile.js';
@@ -73,9 +73,9 @@ export * from './Planets/CelestialBodyState.js';
 
 export * from './Clock.js';
 export * from './Country.js';
-export * from './Screen.js';
-export * from './ScreenLayout.js';
-export * from './ScreenType.js';
-export * from './ScreenContent.js';
+export * from './Application/Screen.js';
+export * from './Application/ScreenLayout.js';
+export * from './Application/ScreenType.js';
+export * from './Application/ScreenContent.js';
 export * from './GameUI.js';
-export * from './Application.js';
+export * from './Application/Application.js';

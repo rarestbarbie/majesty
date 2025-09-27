@@ -1,5 +1,5 @@
 import { StaticList } from '../../DOM/exports.js';
-import { ScreenContent } from "../ScreenContent.js";
+import { ScreenContent } from "../Application/ScreenContent.js";
 import { Swift } from "../../Swift.js";
 import {
     GameDate
