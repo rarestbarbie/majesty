@@ -24,7 +24,16 @@
     position: fixed;
     z-index: 10000;
 
-
+    ul.has-submenu-left {
+        > li {
+            padding-left: 2rem;
+        }
+    }
+    ul.has-submenu-right {
+        > li {
+            padding-right: 2rem;
+        }
+    }
     ul {
         position: absolute;
 
@@ -37,8 +46,6 @@
         --transition-length: 0.25s;
 
         &::before {
-            z-index: 1000;
-
             content: '';
             position: absolute;
             top: 0;
@@ -50,46 +57,55 @@
             border-radius: 0.25rem;
 
             --bg: rgba(0, 0, 0, 0.15);
-            --blur-filter: blur(20px) saturate(200%) brightness(0.5);
-
-            @include blur.background;
             background-color: var(--bg);
 
+            --blur-filter: blur(20px) saturate(200%) brightness(0.5);
+            @include blur.background;
+
             box-shadow: 0 0.5rem 3rem rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.15);
         }
 
 
-        li {
-            padding: 8px 15px;
-            cursor: pointer;
+        > li {
             position: relative;
+            cursor: pointer;
+
+            padding: 0.35rem 1rem;
+            display: flex;
+            align-content: center;
 
             &:hover {
-                background-color: #3498db;
-                color: white;
+                background-color: rgba(255, 35, 156, 0.212);
             }
 
             &.disabled {
-                color: #7f8c8d;
+                color: #ffffff80;
                 cursor: not-allowed;
 
                 &:hover {
                     background-color: transparent;
                 }
             }
-
         }
 
-        li[data-submenu='right']::after {
-            content: '▶';
+        > li[data-submenu] {
+            z-index: 1;
+        }
+
+        > li[data-submenu]::after {
             position: absolute;
-            right: 10px;
+            color: #ffffff80;
         }
-        li[data-submenu='left']::after {
+        > li[data-submenu='right']::after {
+            content: '▶';
+            right: 0;
+            margin-right: 0.5rem;
+        }
+        > li[data-submenu='left']::after {
             content: '◀';
-            left: 10px;
-            right: auto;
+            left: 0;
+            margin-left: 0.5rem;
         }
     }
 }

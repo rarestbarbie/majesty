@@ -10,7 +10,7 @@
     to { opacity: 0; }
 }
 
-[data-tooltip] {
+#tooltip {
     position: absolute;
     pointer-events: none;
 
@@ -90,12 +90,11 @@
             }
         }
     }
-
 }
 
-[data-tooltip='hidden'] > aside {
+#tooltip[data-display='hidden'] > aside {
     opacity: 0;
 }
-[data-tooltip='floating'] > aside {
+#tooltip[data-display='floating'] > aside {
     animation: fade-in 0.25s;
 }
