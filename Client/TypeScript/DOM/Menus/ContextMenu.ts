@@ -1,23 +1,29 @@
 import { ContextMenuItem } from '../exports.js';
 
 export class ContextMenu {
-    public readonly node: HTMLElement;
     public isOpen: boolean = false;
 
+    public readonly node: HTMLElement;
+    private readonly root: HTMLUListElement;
     private readonly action: (action: string, _: any[]) => void;
-    private activeSubmenus: HTMLElement[] = [];
 
     public constructor(action: (action: string, _: any[]) => void) {
         this.action = action;
 
-        this.node = document.createElement('div');
-        this.node.setAttribute('data-display', 'hidden');
+        this.root = document.createElement('ul');
+        this.root.setAttribute('data-display', 'hidden');
 
-        this.node.addEventListener('click', this.onMenuClick.bind(this));
-        this.node.addEventListener('mouseover', this.onMenuMouseover.bind(this));
+        this.node = document.createElement('div');
+        this.node.id = 'context-menu';
+        this.node.appendChild(this.root);
+
+        this.node.addEventListener('click', this.onclick.bind(this));
+        this.node.addEventListener('mouseover', this.onmouseover.bind(this));
+        // Prevent the context menu from showing a context menu on itself
+        this.node.addEventListener('contextmenu', (event) => event.preventDefault());
     }
 
-    private onMenuClick(event: MouseEvent): void {
+    private onclick(event: MouseEvent): void {
         const target = event.target as HTMLElement;
         const item: HTMLLIElement | null = target.closest('li');
 
@@ -36,7 +42,7 @@ export class ContextMenu {
         }
     }
 
-    private onMenuMouseover(event: MouseEvent): void {
+    private onmouseover(event: MouseEvent): void {
         const target: HTMLElement = event.target as HTMLElement;
         const item: HTMLLIElement | null = target.closest('li');
 
@@ -45,76 +51,102 @@ export class ContextMenu {
         }
 
         const parentMenu: HTMLElement | null = item.parentElement;
-        const currentSubmenu: HTMLElement | null = item.querySelector('.context-menu');
 
-        // Close sibling submenus
+        // Hide sibling submenus
         if (parentMenu !== null) {
-            this.closeSubmenus(parentMenu, currentSubmenu);
+            for (const child of parentMenu.children) {
+                if (child !== item) {
+                    const submenu: HTMLElement | null = child.querySelector('ul');
+                    if (submenu !== null) {
+                        this.hideNested(submenu);
+                    }
+                }
+            }
         }
 
-        // Open new submenu if it exists
-        if (item.classList.contains('has-submenu') && !currentSubmenu) {
-             const menuDataStr = item.getAttribute('data-submenu');
-             if(menuDataStr) {
-                const submenuData = JSON.parse(menuDataStr) as ContextMenuItem[];
-                this.createAndShowSubmenu(submenuData, item);
-             }
+        // Show the direct submenu of the hovered item
+        const directSubmenu: HTMLElement | null = item.querySelector('ul');
+        if (directSubmenu !== null) {
+            directSubmenu.setAttribute('data-display', 'floating');
         }
     }
 
-    private createAndShowSubmenu(menu: ContextMenuItem[], parent: HTMLElement) {
-        const submenu: HTMLUListElement = this.render(menu);
-        parent.appendChild(submenu);
-        this.positionSubmenu(submenu, parent);
-        this.activeSubmenus.push(submenu);
-    }
+    private position(menu: HTMLElement, x: number, y: number): void {
+        let left: number = x;
+        let top: number = y;
 
-    private positionSubmenu(submenu: HTMLElement, parentItem: HTMLElement): void {
-        const parentRect = parentItem.getBoundingClientRect();
-        submenu.style.left = `${parentRect.width}px`;
-        submenu.style.top = `0px`;
-    }
+        const buffer: number = 10;
+        const h: number = window.innerHeight - y - buffer;
+        const w: number = window.innerWidth - x - buffer;
 
-    public show(menu: ContextMenuItem[], x: number, y: number): void {
-        if (menu.length === 0) {
-            return;
+        if (menu.offsetWidth > w) {
+            left = x - menu.offsetWidth;
+            this.node.style.transformOrigin = 'top right';
+        } else {
+            this.node.style.transformOrigin = 'top left';
         }
 
-        console.log('Showing context menu at:', x, y);
+        if (menu.offsetHeight > h) {
+            top = y - menu.offsetHeight;
+            this.node.style.transformOrigin = 'bottom left';
+        } else {
+             // We already set top-left or top-right, no need to override
+        }
 
-        this.node.replaceChildren(); // Clear previous menu
-        this.node.appendChild(this.render(menu));
+        if ((menu.offsetWidth > w) && (menu.offsetHeight > h)) {
+            this.node.style.transformOrigin = 'bottom right';
+        }
 
-        this.node.style.left = `${x}px`;
-        this.node.style.top = `${y}px`;
-        this.node.setAttribute('data-display', 'floating');
+        this.node.style.left = `${left}px`;
+        this.node.style.top = `${top}px`;
+    }
+
+    private positionNested(submenu: HTMLElement, parent: HTMLUListElement): void {
+        const parentRectangle: DOMRect = parent.getBoundingClientRect();
+
+        // Horizontal Positioning
+        if (parentRectangle.right + submenu.offsetWidth > window.innerWidth) {
+            parent.setAttribute('data-submenu', 'left');
+            submenu.style.left = `-${submenu.offsetWidth}px`;
+        } else {
+            parent.setAttribute('data-submenu', 'right');
+            submenu.style.left = `${parentRectangle.width}px`;
+        }
+
+        // Vertical Positioning
+        if (parentRectangle.top + submenu.offsetHeight > window.innerHeight) {
+            submenu.style.top = `-${parentRectangle.height - submenu.offsetHeight}px`;
+        } else {
+            submenu.style.top = `0px`;
+        }
+    }
+
+    public show(items: ContextMenuItem[], x: number, y: number): void {
+        this.root.replaceChildren();
+
+        this.render(items, this.root);
+        this.position(this.root, x, y);
+        this.positionSubmenusRecursively(this.root);
+
+        this.root.setAttribute('data-display', 'floating');
+
         this.isOpen = true;
     }
 
     public hide(): void {
-        this.node.setAttribute('data-display', 'hidden');
-        this.node.replaceChildren();
+        this.root.setAttribute('data-display', 'hidden');
         this.isOpen = false;
-        this.activeSubmenus = [];
     }
 
-    private closeSubmenus(parentMenu: HTMLElement, exclude: Element | null): void {
-        const submenus = parentMenu.querySelectorAll('.context-menu');
-        submenus.forEach(submenu => {
-            if (submenu !== exclude) {
-                submenu.remove();
-                const index = this.activeSubmenus.indexOf(submenu as HTMLElement);
-                if (index > -1) {
-                    this.activeSubmenus.splice(index, 1);
-                }
-            }
-        });
+    private hideNested(menu: HTMLElement) {
+        menu.setAttribute('data-display', 'hidden');
+        const submenus = menu.querySelectorAll('ul') as NodeListOf<HTMLElement>;
+        for (const submenu of submenus) {
+            submenu.setAttribute('data-display', 'hidden');
+        }
     }
 
-    private render(items: ContextMenuItem[]): HTMLUListElement {
-        const menu: HTMLUListElement = document.createElement('ul');
-        menu.className = 'context-menu';
-
+    private render(items: ContextMenuItem[], menu: HTMLUListElement): void {
         for (const item of items) {
             const li: HTMLLIElement = document.createElement('li');
             li.textContent = item.label;
@@ -123,18 +155,62 @@ export class ContextMenu {
                 li.classList.add('disabled');
             }
 
-            if (item.submenu) {
+            if (item.submenu !== undefined) {
                 li.classList.add('has-submenu');
-                li.setAttribute('data-submenu', JSON.stringify(item.submenu));
-            } else if (item.action) {
+                // Recursively render the submenu and append it
+                const submenu: HTMLUListElement = this.renderNested(item.submenu);
+                submenu.setAttribute('data-display', 'hidden');
+                li.appendChild(submenu);
+
+            } else if (item.action !== undefined) {
                 li.setAttribute('data-action', item.action);
-                if (item.arguments) {
+                if (item.arguments !== undefined) {
                     li.setAttribute('data-action-arguments', JSON.stringify(item.arguments));
                 }
             }
             menu.appendChild(li);
         }
+    }
 
+    private renderNested(items: ContextMenuItem[]): HTMLUListElement {
+        const menu: HTMLUListElement = document.createElement('ul');
+        this.render(items, menu);
         return menu;
+    }
+
+    private positionSubmenusRecursively(parentMenu: HTMLUListElement): void {
+        for (const item of parentMenu.children) {
+            const li = item as HTMLLIElement;
+            const submenu = this.directSubmenu(li);
+
+            if (submenu) {
+                const parentRect = li.getBoundingClientRect();
+
+                if (parentRect.right + submenu.offsetWidth > window.innerWidth) {
+                    li.setAttribute('data-submenu', 'left');
+                    submenu.style.left = `-${submenu.offsetWidth}px`;
+                } else {
+                    li.setAttribute('data-submenu', 'right');
+                    submenu.style.left = `${li.offsetWidth}px`;
+                }
+
+                if (parentRect.top + submenu.offsetHeight > window.innerHeight) {
+                    submenu.style.top = `${li.offsetHeight - submenu.offsetHeight}px`;
+                } else {
+                    submenu.style.top = '0px';
+                }
+
+                this.positionSubmenusRecursively(submenu);
+            }
+        }
+    }
+
+    private directSubmenu(item: HTMLLIElement): HTMLUListElement | null {
+        for (const child of item.children) {
+            if (child instanceof HTMLUListElement) {
+                return child;
+            }
+        }
+        return null;
     }
 }
