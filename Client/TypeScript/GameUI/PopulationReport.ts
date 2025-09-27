@@ -1,6 +1,8 @@
-import { PopDetails } from './Pops/PopDetails.js';
-import { PopTableEntry } from './Pops/PopTableEntry.js';
-import { ScreenType } from './ScreenType.js';
+import {
+    PopDetails,
+    PopTableEntry,
+    ScreenType
+} from './exports.js';
 
 export interface PopulationReport {
     readonly type: ScreenType.Population;

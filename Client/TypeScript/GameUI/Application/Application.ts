@@ -3,9 +3,9 @@ import {
     SRGBColorSpace,
     WebGLRenderer
 } from 'three';
-import { Persistence } from '../DB/exports.js';
-import { GameID } from '../GameEngine/exports.js';
-import { PlayerEvent, PlayerEventID } from '../Multiplayer/exports.js';
+import { Persistence } from '../../DB/exports.js';
+import { GameID } from '../../GameEngine/exports.js';
+import { PlayerEvent, PlayerEventID } from '../../Multiplayer/exports.js';
 import {
     CelestialView,
     CelestialViewState,
@@ -19,10 +19,10 @@ import {
     NavigatorTile,
     NavigatorState,
     MinimapLayer,
-} from './exports.js';
-import { Swift } from '../Swift.js';
+} from '../exports.js';
+import { Swift } from '../../Swift.js';
 import { Socket } from "socket.io-client";
-import { Tooltip } from '../DOM/exports.js';
+import { Tooltip } from '../../DOM/exports.js';
 
 export class Application {
     public static mp?: Socket<any, any>;

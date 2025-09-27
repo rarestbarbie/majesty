@@ -1,6 +1,6 @@
 import { StaticList, UpdateText } from '../../DOM/exports.js';
 import { GameID } from '../../GameEngine/GameID.js';
-import { ScreenContent } from '../ScreenContent.js';
+import { ScreenContent } from '../Application/ScreenContent.js';
 import { Swift } from '../../Swift.js';
 import {
     PieChart,

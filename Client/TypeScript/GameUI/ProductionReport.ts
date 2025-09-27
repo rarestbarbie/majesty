@@ -1,6 +1,8 @@
-import { ScreenType } from './ScreenType.js';
-import { FactoryDetails } from './Factories/FactoryDetails.js';
-import { FactoryTableEntry } from './Factories/FactoryTableEntry.js';
+import {
+    FactoryDetails,
+    FactoryTableEntry,
+    ScreenType
+} from './exports.js';
 
 export interface ProductionReport {
     readonly type: ScreenType.Production;

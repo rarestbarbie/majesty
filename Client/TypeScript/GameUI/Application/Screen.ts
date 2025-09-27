@@ -7,7 +7,7 @@ import {
     ScreenLayout,
     ScreenType,
     TradeOverview,
-} from './exports.js';
+} from '../exports.js';
 
 export class Screen {
     private dom?: {

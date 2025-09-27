@@ -1,4 +1,4 @@
-import { Swift } from "../Swift.js";
+import { Swift } from "../../Swift.js";
 
 export class ScreenContent {
     constructor() {
