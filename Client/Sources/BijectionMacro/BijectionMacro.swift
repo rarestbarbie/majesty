@@ -88,12 +88,16 @@ public struct BijectionMacro: PeerMacro {
 
         // Parse the `label` argument from the macro attribute.
         var label: String = "_"
-        if  let arguments: LabeledExprListSyntax = attribute.arguments?.as(LabeledExprListSyntax.self) {
+        if  let arguments: LabeledExprListSyntax = attribute.arguments?.as(
+                LabeledExprListSyntax.self
+            ) {
             for argument: LabeledExprSyntax in arguments {
                 switch argument.label?.text {
                 case "label"?:
                     guard
-                    let value: StringLiteralExprSyntax = argument.expression.as(StringLiteralExprSyntax.self),
+                    let value: StringLiteralExprSyntax = argument.expression.as(
+                        StringLiteralExprSyntax.self
+                    ),
                     case .stringSegment(let segment)? = value.segments.first,
                     case 1 = value.segments.count else {
                         context[.error, argument] = """

@@ -32,11 +32,11 @@ public struct IdentifierMacro: MemberMacro {
 
         let property: DeclSyntax = "public var rawValue: \(type)"
         let initializer: DeclSyntax =
-            """
-            @inlinable public init(rawValue: \(type)) {
-                self.rawValue = rawValue
-            }
-            """
+        """
+        @inlinable public init(rawValue: \(type)) {
+            self.rawValue = rawValue
+        }
+        """
 
         return [property, initializer]
     }
