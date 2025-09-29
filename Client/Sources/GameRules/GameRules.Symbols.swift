@@ -39,9 +39,11 @@ extension GameRules.Symbols: JavaScriptEncodable {
 extension GameRules.Symbols: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<GameRules.Namespace>) throws {
         self.init(
-            pops: .init(index: PopType.allCases.reduce(into: [:]) {
+            pops: .init(
+                index: PopType.allCases.reduce(into: [:]) {
                     $0[.init(name: $1.singular)] = $1
-                }),
+                }
+            ),
             factories: try js[.factories]?.decode() ?? [:],
             resources: try js[.resources]?.decode() ?? [:],
             technologies: try js[.technologies]?.decode() ?? [:],

@@ -8,7 +8,8 @@
 extension HexGrid {
     @inlinable public func reduce<T>(
         into result: consuming T,
-        with yield: (inout T, HexCoordinate) throws -> ()) rethrows -> T {
+        with yield: (inout T, HexCoordinate) throws -> ()
+    ) rethrows -> T {
         if  self.radius == 0 {
             try yield(&result, .x)
             return result
