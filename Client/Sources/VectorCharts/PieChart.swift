@@ -52,7 +52,7 @@ extension PieChart {
         var w: Int64 = 0
 
         var slices: [Slice] = []
-            slices.reserveCapacity(sectors.count)
+        ;   slices.reserveCapacity(sectors.count)
 
         for (id, (share, value)): (Key, (Int64, Value)) in sectors[..<last] {
             w += share
