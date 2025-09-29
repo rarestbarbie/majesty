@@ -16,9 +16,9 @@ extension OrderedDictionary where Key == Resource, Value: ResourceStockpile {
             }
 
             for (i, (_, amount)): (Int, (Resource, Int64)) in zip(
-                self.values.indices,
-                coefficients
-            ) {
+                    self.values.indices,
+                    coefficients
+                ) {
                 sync(&self.values[i], amount)
             }
 

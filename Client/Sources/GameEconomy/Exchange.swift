@@ -79,11 +79,11 @@ extension Exchange {
     ) -> [ResourceArbitrage] {
         partners.reduce(into: []) {
             if let arbitrage: ResourceArbitrage = self.arbitrate(
-                resource: .fiat($1),
-                currency: currency,
-                partners: partners,
-                capital: &capital
-            ) {
+                    resource: .fiat($1),
+                    currency: currency,
+                    partners: partners,
+                    capital: &capital
+                ) {
                 $0.append(arbitrage)
             }
         }

@@ -69,9 +69,9 @@ extension GameMap {
             let compensation: [Int64] = shares.distribute(quote.cost) {
             for ((shares, compensation), recipient):
                 ((Int64, Int64), EquityStake<LegalEntity>) in zip(
-                zip(shares, compensation),
-                recipients
-            ) where shares > 0 {
+                    zip(shares, compensation),
+                    recipients
+                ) where shares > 0 {
                 // Note that because of the way `distribute(share:funds:)` works, it’s possible
                 // for `compensation` to be non-zero even while `shares` is zero. We ban this
                 // situation manually here.
