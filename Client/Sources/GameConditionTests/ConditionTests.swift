@@ -58,7 +58,8 @@ import Testing
         }
 
         #expect(tooltip.output == 0.025)
-        #expect(tooltip.addends == [
+        #expect(
+            tooltip.addends == [
                 .init(
                     listItem: .init(
                         fulfilled: true,
@@ -104,7 +105,8 @@ import Testing
         }
 
         #expect(tooltip.output == 0.014)
-        #expect(tooltip.addends == [
+        #expect(
+            tooltip.addends == [
                 .init(
                     listItem: .init(
                         fulfilled: true,
@@ -196,7 +198,8 @@ import Testing
 
         #expect(tooltip.output == 0.0)
         #expect(tooltip.addends == [])
-        #expect(tooltip.factors == [
+        #expect(
+            tooltip.factors == [
                 .init(
                     listItem: .init(
                         fulfilled: true,
@@ -270,7 +273,8 @@ import Testing
 
         #expect(abs(tooltip.output - 0.04) <= 1e-17)
         #expect(tooltip.addends == [])
-        #expect(tooltip.factors == [
+        #expect(
+            tooltip.factors == [
                 .init(
                     listItem: .init(
                         fulfilled: true,
@@ -420,7 +424,8 @@ import Testing
 
         #expect(abs(tooltip.output - 0.0125) <= 1e-17)
         #expect(tooltip.addends == [])
-        #expect(tooltip.factors == [
+        #expect(
+            tooltip.factors == [
                 .init(
                     listItem: .init(
                         fulfilled: false,

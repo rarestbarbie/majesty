@@ -50,23 +50,27 @@ import Testing
         var capital: Int64 = 10
 
         /// Arbitrage should fail, because the forex market is not liquid enough.
-        #expect(nil == exchange.arbitrate(
+        #expect(
+            nil == exchange.arbitrate(
                 resource: XAU,
                 currency: MAR,
                 partners: [UNB],
                 capital: &capital
-            ))
+            )
+        )
         #expect(capital == 10)
 
         /// Inject 100 units of liquidity into the forex market on both sides.
         exchange[MAR / UNB] = .init(liquidity: (base: 100, quote: 100))
 
-        let arbitrage: ResourceArbitrage = try #require(exchange.arbitrate(
+        let arbitrage: ResourceArbitrage = try #require(
+            exchange.arbitrate(
                 resource: XAU,
                 currency: MAR,
                 partners: [UNB],
                 capital: &capital
-            ))
+            )
+        )
 
         #expect(arbitrage.exported == 98)
         #expect(arbitrage.proceeds == 99)
@@ -121,12 +125,14 @@ import Testing
         /// Since the Lunar Bancor can also be turned back into United Nations Bancor at a 1:1
         /// exchange rate, the arbitrageur end up with much more UNB than they started with.
         var capital: Int64 = 5
-        let arbitrage: ResourceArbitrage = try #require(exchange.arbitrate(
+        let arbitrage: ResourceArbitrage = try #require(
+            exchange.arbitrate(
                 resource: .fiat(MAR),
                 currency: UNB,
                 partners: [LUB, CRN],
                 capital: &capital
-            ))
+            )
+        )
 
         /// In an infinitely liquid market, the arbitrageur would profited tenfold, but since
         /// the three markets have finite liquidity, the actual profit is lower.

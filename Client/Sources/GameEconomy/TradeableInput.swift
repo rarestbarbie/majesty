@@ -104,7 +104,8 @@ extension TradeableInput {
         stockpileDays: ClosedRange<Int64>,
         budget: Int64,
         in currency: Fiat,
-        on exchange: inout Exchange) -> Int64 {
+        on exchange: inout Exchange
+    ) -> Int64 {
         {
             let target: Int64 = self.unitsDemanded * stockpileDays.lowerBound
             let limit: Int64 = self.unitsDemanded * stockpileDays.upperBound
