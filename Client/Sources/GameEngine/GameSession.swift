@@ -6,6 +6,7 @@ import GameRules
 import GameState
 import GameTerrain
 import HexGrids
+import JavaScriptInterop
 import JavaScriptKit
 
 public struct GameSession: ~Copyable {
@@ -74,19 +75,19 @@ extension GameSession {
     }
 }
 extension GameSession {
-    public mutating func `switch`(to planet: PlanetID) throws -> GameUI {
-        if  let country: CountryID = self.context.planets[planet]?.occupied {
-            self.context.player = country
-            try self.ui.sync(with: self.snapshot)
-        }
-        return self.ui
-    }
+    // public mutating func `switch`(to planet: PlanetID) throws -> GameUI {
+    //     if  let country: CountryID = self.context.planets[planet]?.occupied {
+    //         self.context.player = country
+    //         try self.ui.sync(with: self.snapshot)
+    //     }
+    //     return self.ui
+    // }
 
-    private mutating func `switch`(to player: CountryID) throws -> GameUI {
-        self.context.player = player
-        try self.ui.sync(with: self.snapshot)
-        return self.ui
-    }
+    // private mutating func `switch`(to player: CountryID) throws -> GameUI {
+    //     self.context.player = player
+    //     try self.ui.sync(with: self.snapshot)
+    //     return self.ui
+    // }
 }
 extension GameSession {
     private var snapshot: GameSnapshot {
@@ -205,6 +206,46 @@ extension GameSession {
 
     public func orbit(_ id: PlanetID) -> JSTypedArray<Float>? {
         self.context.planets[id]?.motion.global?.rendered()
+    }
+}
+extension GameSession {
+    public mutating func call(
+        _ action: ContextMenuAction,
+        with arguments: borrowing JavaScriptDecoder<JavaScriptArrayKey>
+    ) throws {
+        switch action {
+        case .SwitchToPlayer:
+            self.callSwitchToPlayer(
+                try arguments[0].decode(),
+            )
+        }
+    }
+
+    private mutating func callSwitchToPlayer(
+        _ id: CountryID
+    ) {
+        self.context.player = id
+    }
+}
+extension GameSession {
+    public func contextMenuMinimapTile(
+        _ id: PlanetID,
+        _ cell: HexCoordinate,
+        _ layer: MinimapLayer,
+    ) -> ContextMenu? {
+        guard
+        let planet: PlanetContext = self.context.planets[id],
+        let tile: PlanetGrid.Tile = planet.grid.tiles[cell] else {
+            return nil
+        }
+
+        return .items {
+            $0["Switch to Player"] {
+                if  let country: CountryID = planet.occupied {
+                    $0[.SwitchToPlayer] = country
+                }
+            }
+        }
     }
 }
 extension GameSession {

@@ -39,6 +39,7 @@ extension GameAPI {
             try await Task.sleep(nanoseconds: 1_000_000_000)
             try await Self.handle(events: events, ui: $0)
         }
+        self[.call] = { try Self.game?.call($0, with: .init(array: $1)) }
         self[.load] = {
             do {
                 Self.game = try .init(save: $0, rules: $1, terrain: $2)
@@ -62,10 +63,13 @@ extension GameAPI {
         self[.closeScreen] = { Self.game?.open(nil) }
         self[.minimap] = { Self.game?.minimap(planet: $0, layer: $1, cell: $2) }
         self[.view] = { try Self.game?.view($0, to: $1) }
-        self[.switch] = { try Self.game?.switch(to: $0) }
+        // self[.switch] = { try Self.game?.switch(to: $0) }
         self[.orbit] = { Self.game?.orbit($0) }
 
         self[.gregorian] = GameDateComponents.init(_:)
+        self[.contextMenu] = {
+            try Self.game?.contextMenu(type: $0, with: .init(array: $1))
+        }
         self[.tooltip] = {
             try Self.game?.tooltip(type: $0, with: .init(array: $1))
         }

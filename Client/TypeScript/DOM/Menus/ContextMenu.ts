@@ -104,10 +104,6 @@ export class ContextMenu {
             content.textContent = item.label;
             li.appendChild(content);
 
-            if (item.disabled) {
-                li.classList.add('disabled');
-            }
-
             if (item.submenu !== undefined) {
                 li.classList.add('has-submenu');
                 // Recursively render the submenu and append it
@@ -120,6 +116,8 @@ export class ContextMenu {
                 if (item.arguments !== undefined) {
                     li.setAttribute('data-action-arguments', JSON.stringify(item.arguments));
                 }
+            } else {
+                li.classList.add('disabled');
             }
             menu.appendChild(li);
         }
