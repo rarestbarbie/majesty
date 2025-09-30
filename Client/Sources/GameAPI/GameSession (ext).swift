@@ -17,6 +17,20 @@ extension GameSession {
         return nil
     }
 
+    func contextMenu(
+        type: ContextMenuType,
+        with arguments: borrowing JavaScriptDecoder<JavaScriptArrayKey>
+    ) throws -> ContextMenu? {
+        switch type {
+        case .MinimapTile:
+            self.contextMenuMinimapTile(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+                try arguments[2].decode(),
+            )
+        }
+    }
+
     func tooltip(
         type: TooltipType,
         with arguments: borrowing JavaScriptDecoder<JavaScriptArrayKey>

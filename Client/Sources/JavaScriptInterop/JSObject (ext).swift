@@ -1,6 +1,5 @@
 import JavaScriptKit
 
-
 extension JSObject {
     @inlinable static func allocate(_ type: JavaScriptClass) -> JSObject {
         JSObject.global[type.rawValue].function!.new()
@@ -32,6 +31,17 @@ extension JSObject {
         let encoded: JSObject = .allocate(.Array)
         var encoder: JavaScriptEncoder<JavaScriptArrayKey> = .init(wrapping: encoded)
         encodable.encode(to: &encoder)
+        return encoded
+    }
+
+    @inlinable public static func new<each Element>(
+        array element: repeat each Element
+    ) -> JSObject where repeat each Element: ConvertibleToJSValue {
+        let encoded: JSObject = .allocate(.Array)
+        var encoder: JavaScriptEncoder<JavaScriptArrayKey> = .init(wrapping: encoded)
+        for element: _ in repeat each element {
+            encoder.push(element)
+        }
         return encoded
     }
 }

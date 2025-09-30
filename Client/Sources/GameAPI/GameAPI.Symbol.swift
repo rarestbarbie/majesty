@@ -7,6 +7,7 @@ extension GameAPI {
         case editTerrain
         case saveTerrain
 
+        case call
         /// Sequence a player event.
         case push
 
@@ -33,6 +34,7 @@ extension GameAPI {
 
         case `switch`
 
+        case contextMenu
         case tooltip
     }
 }

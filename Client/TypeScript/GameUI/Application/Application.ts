@@ -25,7 +25,7 @@ import { Swift } from '../../Swift.js';
 import { Socket } from "socket.io-client";
 import {
     ContextMenu,
-    ContextMenuItem,
+    ContextMenuState,
     Tooltip
 } from '../../DOM/exports.js';
 
@@ -124,7 +124,9 @@ export class Application {
         hud.node.appendChild(hud.interface);
         hud.node.appendChild(hud.developer.node);
 
-        this.contextMenu = new ContextMenu(Swift.call);
+        this.contextMenu = new ContextMenu(
+            (action, argumentList) => Swift.call(action, argumentList)
+    );
         this.contextMenu.node.id = 'context-menu';
 
         this.tooltip = new Tooltip<TooltipType>();
@@ -313,8 +315,8 @@ export class Application {
                 ) as ContextMenuType;
                 const argumentsText: string | null = target.getAttribute('data-menu-arguments');
                 const argumentsList: any[] = argumentsText ? JSON.parse(argumentsText) : [];
-                const items: ContextMenuItem[] = Swift.contextMenu(type, argumentsList);
-                this.contextMenu.show(items, event.clientX, event.clientY);
+                const contextMenu: ContextMenuState = Swift.contextMenu(type, argumentsList);
+                this.contextMenu.show(contextMenu.items, event.clientX, event.clientY);
             } else {
                 this.contextMenu.hide();
             }
