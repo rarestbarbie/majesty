@@ -1,9 +1,11 @@
 import D
 import GameState
 
-protocol LegalEntityContext {
+protocol LegalEntityContext<State> {
+    associatedtype State: Turnable where State.Dimensions: LegalEntityMetrics
     var equity: Equity<LegalEntity>.Statistics { get }
     var equitySplits: [EquitySplit] { get }
+    var state: State { get }
 }
 extension LegalEntityContext {
     func tooltipOwnership(

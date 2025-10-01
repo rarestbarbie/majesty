@@ -80,6 +80,7 @@ extension Factory {
         case yesterday_fi = "y_fi"
 
         case yesterday_px = "y_px"
+        case yesterday_pa = "y_pa"
 
         case today_vi = "t_vi"
         case today_vv = "t_vv"
@@ -97,6 +98,7 @@ extension Factory {
         case today_fi = "t_fi"
 
         case today_px = "t_px"
+        case today_pa = "t_pa"
 
         case equity
     }
@@ -127,6 +129,7 @@ extension Factory: JavaScriptEncodable {
         js[.yesterday_eo] = self.yesterday.eo
         js[.yesterday_fi] = self.yesterday.fi
         js[.yesterday_px] = self.yesterday.px
+        js[.yesterday_pa] = self.yesterday.pa
 
         js[.today_vi] = self.today.vi
         js[.today_vv] = self.today.vv
@@ -140,6 +143,7 @@ extension Factory: JavaScriptEncodable {
         js[.today_eo] = self.today.eo
         js[.today_fi] = self.today.fi
         js[.today_px] = self.today.px
+        js[.today_pa] = self.today.pa
 
         js[.equity] = self.equity
     }
@@ -159,6 +163,7 @@ extension Factory: JavaScriptDecodable {
             eo: try js[.today_eo]?.decode() ?? 1,
             fi: try js[.today_fi]?.decode() ?? 0,
             px: try js[.today_px]?.decode() ?? 1,
+            pa: try js[.today_pa]?.decode() ?? 1,
         )
         self.init(
             id: try js[.id].decode(),
@@ -186,6 +191,7 @@ extension Factory: JavaScriptDecodable {
                 eo: try js[.yesterday_eo]?.decode() ?? today.eo,
                 fi: try js[.yesterday_fi]?.decode() ?? today.fi,
                 px: try js[.yesterday_px]?.decode() ?? today.px,
+                pa: try js[.yesterday_pa]?.decode() ?? today.pa
             ),
             today: today,
             equity: try js[.equity]?.decode() ?? [:]

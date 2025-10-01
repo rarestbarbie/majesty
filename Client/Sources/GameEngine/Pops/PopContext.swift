@@ -392,6 +392,7 @@ extension PopContext: TransactingContext {
 
             guard
             let security: StockMarket<LegalEntity>.Security = .init(
+                attraction: self.state.today.pa,
                 asset: .pop(self.state.id),
                 price: budget.px
             ) else {
@@ -537,6 +538,7 @@ extension PopContext: TransactingContext {
             )
             guard
             let security: StockMarket<LegalEntity>.Security = .init(
+                attraction: self.state.today.pa,
                 asset: .pop(self.state.id),
                 price: budget.px
             ) else {

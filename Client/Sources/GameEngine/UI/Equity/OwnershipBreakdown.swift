@@ -7,16 +7,22 @@ import VectorCharts_JavaScript
 struct OwnershipBreakdown<Tab> where Tab: OwnershipTab {
     private var country: PieChart<CountryID, PieChartLabel>?
     private var culture: PieChart<String, PieChartLabel>?
-    private var state: Equity<LegalEntity>.Statistics?
+    private var equity: Equity<LegalEntity>.Statistics?
+    private var state: Tab.State?
 
     init() {
         self.country = nil
         self.culture = nil
+        self.equity = nil
         self.state = nil
     }
 }
 extension OwnershipBreakdown {
-    mutating func update(from equity: Equity<LegalEntity>.Statistics, in context: GameContext) {
+    mutating func update(
+        from asset: some LegalEntityContext<Tab.State>,
+        in context: GameContext
+    ) {
+        let equity: Equity<LegalEntity>.Statistics = asset.equity
         let (country, culture): (
             country: [CountryID: (share: Int64, PieChartLabel)],
             culture: [String: (share: Int64, PieChartLabel)]
@@ -41,7 +47,8 @@ extension OwnershipBreakdown {
             values: culture.sorted { $0.key < $1.key }
         )
 
-        self.state = equity
+        self.equity = equity
+        self.state = asset.state
     }
 }
 extension OwnershipBreakdown: JavaScriptEncodable {
@@ -51,6 +58,11 @@ extension OwnershipBreakdown: JavaScriptEncodable {
         case culture
 
         case shares
+        case yesterday_px = "y_px"
+        case yesterday_pa = "y_pa"
+        case today_px = "t_px"
+        case today_pa = "t_pa"
+
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
@@ -58,6 +70,10 @@ extension OwnershipBreakdown: JavaScriptEncodable {
         js[.country] = self.country
         js[.culture] = self.culture
 
-        js[.shares] = self.state?.shares.outstanding
+        js[.shares] = self.equity?.shares.outstanding
+        js[.yesterday_px] = self.state?.yesterday.px
+        js[.yesterday_pa] = self.state?.yesterday.pa
+        js[.today_px] = self.state?.today.px
+        js[.today_pa] = self.state?.today.pa
     }
 }
