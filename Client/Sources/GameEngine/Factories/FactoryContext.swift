@@ -11,7 +11,8 @@ struct FactoryContext: RuntimeContext {
     let type: FactoryMetadata
     var state: Factory
 
-    private(set) var country: CountryProperties?
+    private(set) var governedBy: CountryProperties?
+    private(set) var occupiedBy: CountryProperties?
 
     private var productivity: Int64
 
@@ -28,7 +29,8 @@ struct FactoryContext: RuntimeContext {
         self.state = state
 
         self.productivity = 0
-        self.country = nil
+        self.governedBy = nil
+        self.occupiedBy = nil
 
         self.workers = .init()
         self.clerks = nil
@@ -81,14 +83,16 @@ extension FactoryContext {
         self.clerks?.limit = (self.type.clerks?.amount ?? 0) * area
 
         guard
-        let country: CountryID = context.planets[self.state.on.planet]?.occupied,
-        let country: CountryContext = context.countries[country] else {
+        let tile: PlanetGrid.Tile = context.planets[self.state.on],
+        let governedBy: CountryProperties = tile.governedBy,
+        let occupiedBy: CountryProperties = tile.occupiedBy else {
             return
         }
 
 
-        self.productivity = country.properties.factories.productivity[self.state.type]
-        self.country = country.properties
+        self.governedBy = governedBy
+        self.occupiedBy = occupiedBy
+        self.productivity = occupiedBy.factories.productivity[self.state.type]
 
         self.cashFlow.reset()
         self.cashFlow.update(with: self.state.ni.tradeable.values.elements)
@@ -101,7 +105,7 @@ extension FactoryContext {
 extension FactoryContext: TransactingContext {
     mutating func allocate(map: inout GameMap) {
         guard
-        let country: CountryProperties = self.country else {
+        let country: CountryProperties = self.occupiedBy else {
             return
         }
 
@@ -124,7 +128,10 @@ extension FactoryContext: TransactingContext {
         let inputsCostPerHour: Double = self.state.today.ei * self.type.inputs.tradeable.reduce(
             into: 0
         ) {
-            $0 += Double.init($1.value) * map.exchange.price(of: $1.key, in: country.currency)
+            $0 += Double.init($1.value) * map.exchange.price(
+                of: $1.key,
+                in: country.currency.id
+            )
         }
 
         // Compute input capacity. The stockpile target is computed relative to the number
@@ -155,12 +162,12 @@ extension FactoryContext: TransactingContext {
             return
         }
 
-        map.stockMarkets.issueShares(security: security, currency: country.currency)
+        map.stockMarkets.issueShares(security: security, currency: country.currency.id)
     }
 
     mutating func transact(map: inout GameMap) {
         guard
-        let country: CountryProperties = self.country,
+        let country: CountryProperties = self.occupiedBy,
         let budget: FactoryBudget = self.budget else {
             return
         }
@@ -226,7 +233,7 @@ extension FactoryContext: TransactingContext {
             let (gain, loss): (Int64, loss: Int64) = self.state.nv.trade(
                 stockpileDays: stockpileTarget,
                 spendingLimit: investmentBudget,
-                in: country.currency,
+                in: country.currency.id,
                 on: &map.exchange,
             )
 
@@ -268,14 +275,14 @@ extension FactoryContext: TransactingContext {
                 value: budget.buybacks,
                 from: &self.state.equity,
                 of: security,
-                in: country.currency
+                in: country.currency.id
             )
         }
     }
 
     mutating func advance(map: inout GameMap) {
         guard
-        let country: CountryProperties = self.country  else {
+        let country: CountryProperties = self.occupiedBy else {
             return
         }
 
@@ -294,7 +301,7 @@ extension FactoryContext {
         let (gain, loss): (Int64, loss: Int64) = self.state.ni.trade(
             stockpileDays: stockpileTarget,
             spendingLimit: budget.inputs,
-            in: policy.currency,
+            in: policy.currency.id,
             on: &map.exchange,
         )
 
@@ -329,7 +336,7 @@ extension FactoryContext {
         )
 
         // Sell outputs.
-        self.state.cash.r += self.state.out.sell(in: policy.currency, on: &map.exchange)
+        self.state.cash.r += self.state.out.sell(in: policy.currency.id, on: &map.exchange)
 
         #assert(self.state.cash.balance >= 0, "Factory has negative cash! (\(self.state.cash))")
 

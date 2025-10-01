@@ -18,6 +18,29 @@ struct PlanetGrid {
     }
 }
 extension PlanetGrid {
+    mutating func assign(
+        governedBy: CountryProperties?,
+        occupiedBy: CountryProperties?,
+    ) {
+        for tile: Int in self.tiles.values.indices {
+            {
+                $0.governedBy = governedBy
+                $0.occupiedBy = occupiedBy
+            } (&self.tiles.values[tile])
+        }
+    }
+    mutating func assign(
+        governedBy: CountryProperties?,
+        occupiedBy: CountryProperties?,
+        to tile: HexCoordinate
+    ) {
+        {
+            $0?.governedBy = governedBy
+            $0?.occupiedBy = occupiedBy
+        } (&self.tiles[tile])
+    }
+}
+extension PlanetGrid {
     mutating func replace(
         surface: PlanetSurface?,
         symbols: GameRules.Symbols,

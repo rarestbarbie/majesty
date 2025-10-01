@@ -35,10 +35,10 @@ extension ProductionReport: PersistentReport {
             return
         }
 
-        let include: Set<PlanetID> = .init(country.state.territory)
-        for factory: FactoryContext in snapshot.factories where include.contains(
-            factory.state.on.planet
-        ) {
+        for factory: FactoryContext in snapshot.factories {
+            guard case country.state.id? = factory.governedBy?.id else {
+                continue
+            }
             guard
             let planet: PlanetContext = snapshot.planets[factory.state.on.planet],
             let tile: PlanetGrid.Tile = planet.grid.tiles[factory.state.on.tile] else {

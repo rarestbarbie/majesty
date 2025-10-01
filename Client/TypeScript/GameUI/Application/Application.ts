@@ -67,8 +67,8 @@ export class Application {
 
     public constructor(persistence: Persistence, sprites: Texture) {
         this.persistence = persistence;
-        this.renderer = new WebGLRenderer( { antialias: true } );
-        this.renderer.setPixelRatio( window.devicePixelRatio );
+        this.renderer = new WebGLRenderer({ antialias: true });
+        this.renderer.setPixelRatio(window.devicePixelRatio);
         this.sprites = sprites;
         this.sprites.colorSpace = SRGBColorSpace;
         //this.sprites.magFilter = LinearMipmapNearestFilter;
@@ -126,7 +126,7 @@ export class Application {
 
         this.contextMenu = new ContextMenu(
             (action, argumentList) => Swift.call(action, argumentList)
-    );
+        );
         this.contextMenu.node.id = 'context-menu';
 
         this.tooltip = new Tooltip<TooltipType>();

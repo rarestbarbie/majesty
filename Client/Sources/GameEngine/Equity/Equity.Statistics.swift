@@ -68,7 +68,7 @@ extension Equity<LegalEntity>.Statistics {
                 }
 
                 guard
-                let country: CountryID = context.planets[location.planet]?.occupied else {
+                let country: CountryID = context.planets[location]?.governedBy?.id else {
                     return
                 }
 

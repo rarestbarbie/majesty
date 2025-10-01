@@ -34,10 +34,11 @@ extension PopulationReport: PersistentReport {
             return
         }
 
-        let include: Set<PlanetID> = .init(country.state.territory)
-        for pop: PopContext in snapshot.pops.table where include.contains(
-            pop.state.home.planet
-        ) {
+        for pop: PopContext in snapshot.pops.table {
+            guard case country.state.id? = pop.governedBy?.id else {
+                continue
+            }
+
             guard
             let planet: PlanetContext = snapshot.planets[pop.state.home.planet],
             let tile: PlanetGrid.Tile = planet.grid.tiles[pop.state.home.tile],

@@ -16,7 +16,7 @@ struct InventoryBreakdown<Tab> where Tab: InventoryTab {
 extension InventoryBreakdown {
     mutating func update(from pop: PopContext, in snapshot: borrowing GameSnapshot) {
         guard
-        let currency: Fiat = pop.country?.currency else {
+        let currency: Fiat = pop.governedBy?.currency.id else {
             return
         }
 
@@ -59,7 +59,7 @@ extension InventoryBreakdown {
 
     mutating func update(from factory: FactoryContext, in snapshot: borrowing GameSnapshot) {
         guard
-        let currency: Fiat = factory.country?.currency else {
+        let currency: Fiat = factory.occupiedBy?.currency.id else {
             return
         }
 

@@ -12,7 +12,8 @@ struct PopContext: RuntimeContext {
     let type: PopMetadata
     var state: Pop
 
-    private(set) var country: CountryProperties?
+    private(set) var governedBy: CountryProperties?
+    private(set) var occupiedBy: CountryProperties?
 
     private(set) var unemployment: Double
     private(set) var equity: Equity<LegalEntity>.Statistics
@@ -25,7 +26,8 @@ struct PopContext: RuntimeContext {
         self.type = type
         self.state = state
 
-        self.country = nil
+        self.governedBy = nil
+        self.occupiedBy = nil
 
         self.unemployment = 0
         self.equity = .init()
@@ -98,10 +100,10 @@ extension PopContext {
 
             default:
                 $0[self.state.nat] {
-                    $0[$1 != country.culture] = +100%
+                    $0[$1 != country.culturePreferred] = +100%
                 } = { "\(+$0[%]): Culture is not \(em: $1)" }
                 $0[self.state.nat] {
-                    $0[$1 == country.culture] = -5%
+                    $0[$1 == country.culturePreferred] = -5%
                 } = { "\(+$0[%]): Culture is \(em: $1)" }
             }
         }
@@ -178,10 +180,10 @@ extension PopContext {
             }
 
             $0[self.state.nat] {
-                $0[$1 != country.culture] = -75%
+                $0[$1 != country.culturePreferred] = -75%
             } = { "\(+$0[%]): Culture is not \(em: $1)" }
             $0[self.state.nat] {
-                $0[$1 == country.culture] = +5%
+                $0[$1 == country.culturePreferred] = +5%
             } = { "\(+$0[%]): Culture is \(em: $1)" }
         }
     }
@@ -192,8 +194,9 @@ extension PopContext {
         context: GameContext.ResidentPass
     ) throws {
         guard
-        let country: CountryID = context.planets[self.state.home.planet]?.occupied,
-        let country: CountryProperties = context.countries[country]?.properties else {
+        let tile: PlanetGrid.Tile = context.planets[self.state.home],
+        let governedBy: CountryProperties = tile.governedBy,
+        let occupiedBy: CountryProperties = tile.occupiedBy else {
             return
         }
 
@@ -208,7 +211,8 @@ extension PopContext {
         self.cashFlow.update(with: self.state.nx.tradeable.values.elements)
         self.cashFlow.update(with: self.state.nx.inelastic.values.elements)
 
-        self.country = country
+        self.governedBy = governedBy
+        self.occupiedBy = occupiedBy
 
         self.equity = .compute(from: self.state.equity, in: context)
     }
@@ -269,7 +273,7 @@ extension PopContext: TransactingContext {
             using: &map.random.generator
         )
 
-        let currency: Fiat = self.country!.currency
+        let currency: Fiat = self.occupiedBy!.currency.id
         let balance: Int64 = self.state.cash.balance
 
         /// Compute vertical weights.
@@ -446,7 +450,7 @@ extension PopContext: TransactingContext {
 
     mutating func transact(map: inout GameMap) {
         guard
-        let country: CountryProperties = self.country,
+        let country: CountryProperties = self.occupiedBy,
         let budget: PopBudget = self.budget else {
             return
         }
@@ -457,7 +461,7 @@ extension PopContext: TransactingContext {
         )
 
         self.state.cash.r += self.state.out.sell(
-            in: country.currency,
+            in: country.currency.id,
             on: &map.exchange
         )
 
@@ -471,7 +475,7 @@ extension PopContext: TransactingContext {
             let (gain, loss): (Int64, loss: Int64) = self.state.nl.trade(
                 stockpileDays: target,
                 spendingLimit: budget.l.tradeable,
-                in: country.currency,
+                in: country.currency.id,
                 on: &map.exchange,
             )
 
@@ -489,7 +493,7 @@ extension PopContext: TransactingContext {
             let (gain, loss): (Int64, loss: Int64) = self.state.ne.trade(
                 stockpileDays: target,
                 spendingLimit: budget.e.tradeable,
-                in: country.currency,
+                in: country.currency.id,
                 on: &map.exchange,
             )
 
@@ -507,7 +511,7 @@ extension PopContext: TransactingContext {
             let (gain, loss): (Int64, loss: Int64) = self.state.nx.trade(
                 stockpileDays: target,
                 spendingLimit: budget.x.tradeable,
-                in: country.currency,
+                in: country.currency.id,
                 on: &map.exchange,
             )
             self.state.cash.b += loss
@@ -543,7 +547,7 @@ extension PopContext: TransactingContext {
                 value: budget.buybacks,
                 from: &self.state.equity,
                 of: security,
-                in: country.currency
+                in: country.currency.id
             )
         }
 
@@ -554,7 +558,7 @@ extension PopContext: TransactingContext {
 extension PopContext {
     mutating func advance(map: inout GameMap, factories: RuntimeStateTable<FactoryContext>) {
         guard
-        let country: CountryProperties = self.country else {
+        let country: CountryProperties = self.occupiedBy else {
             return
         }
 
