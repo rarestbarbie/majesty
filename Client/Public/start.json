@@ -198,218 +198,146 @@
         {
             "id": 1,
             "on": "399N-1,2",
-            "type": 20,
-            "cash": {
-                "liq": 10000
-            }
+            "type": 20
         },
         {
             "id": 2,
             "on": "301N-1,0",
-            "type": 21,
-            "cash": {
-                "liq": 10000
-            }
+            "type": 21
         },
         {
             "id": 3,
             "on": "301N-1,0",
             "type": 1,
-            "size_l": 30,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 30
         },
         {
             "id": 4,
             "on": "399N-1,2",
             "type": 4,
-            "size_l": 59,
-            "cash": {
-                "liq": 100000
-            }
+            "size_l": 59
         },
         {
             "id": 5,
             "on": "399N0,-2",
             "type": 21,
-            "size_l": 19,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 19
         },
         {
             "id": 6,
             "on": "399N-1,-1",
             "type": 21,
-            "size_l": 25,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 25
         },
         {
             "id": 7,
             "on": "399N0,2",
             "type": 21,
-            "size_l": 24,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 24
         },
         {
             "id": 8,
             "on": "399N-1,2",
             "type": 6,
-            "size_l": 21,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 21
         },
         {
             "id": 9,
             "on": "399S-1,-2",
             "type": 1,
-            "size_l": 16,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 16
         },
         {
             "id": 10,
             "on": "399S-2,-1",
             "type": 1,
-            "size_l": 18,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 18
         },
         {
             "id": 11,
             "on": "399N0,-2",
             "type": 4,
-            "size_l": 31,
-            "cash": {
-                "liq": 100000
-            }
+            "size_l": 31
         },
         {
             "id": 12,
             "on": "399N-1,2",
             "type": 2,
-            "size_l": 30,
-            "cash": {
-                "liq": 100000
-            }
+            "size_l": 30
         },
         {
             "id": 13,
             "on": "301N-1,0",
             "type": 5,
-            "size_l": 16,
-            "cash": {
-                "liq": 100000
-            }
+            "size_l": 16
         },
 
         {
             "id": 100,
             "on": "499E2",
             "type": 20,
-            "size_l": 8,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 8
         },
         {
             "id": 101,
             "on": "499E2",
             "type": 5,
-            "size_l": 13,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 13
         },
         {
             "id": 102,
             "on": "499E2",
             "type": 2,
-            "size_l": 9,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 9
         },
         {
             "id": 103,
             "on": "499E2",
             "type": 1,
-            "size_l": 18,
-            "cash": {
-                "liq": 100000
-            }
+            "size_l": 18
         },
         {
             "id": 104,
             "on": "499E2",
             "type": 3,
-            "size_l": 2,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 2
         },
         {
             "id": 105,
             "on": "499E2",
             "type": 4,
-            "size_l": 4,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 4
         },
         {
             "id": 106,
             "on": "499E2",
             "type": 6,
-            "size_l": 6,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 6
         },
         {
             "id": 107,
             "on": "499E2",
             "type": 5,
-            "size_l": 20,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 20
         },
         {
             "id": 108,
             "on": "499E2",
             "type": 21,
-            "size_l": 17,
-            "cash": {
-                "liq": 10000
-            }
+            "size_l": 17
         },
 
         {
             "id": 200,
             "on": "401X",
             "type": 1,
-            "size_l": 5,
-            "cash": {
-                "liq": 100000
-            }
+            "size_l": 5
         },
         {
             "id": 250,
             "on": "402X",
             "type": 1,
-            "size_l": 5,
-            "cash": {
-                "liq": 100000
-            }
+            "size_l": 5
         }
     ],
     "pops": [

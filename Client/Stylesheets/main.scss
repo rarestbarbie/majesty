@@ -178,7 +178,7 @@ div.tabs > * > input[type=radio]:checked + label {
 }
 
 [data-table='Factories'] {
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 0.5fr 0.5fr 1fr 1fr 1fr;
     height: 50%;
 }
 [data-table='Pops'] {

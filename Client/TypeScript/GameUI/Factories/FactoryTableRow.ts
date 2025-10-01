@@ -19,9 +19,8 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
     public readonly id: GameID;
     public readonly node: HTMLAnchorElement;
 
-    private readonly type: HTMLElement;
+    private readonly type: ProgressCell;
     private readonly location: HTMLElement;
-    private readonly size: ProgressCell;
     private readonly workers: FactoryWorkersCell;
     private readonly clerks: FactoryWorkersCell;
     private readonly px: Ticker;
@@ -31,7 +30,6 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
         return [
             "Type",
             "Location",
-            "Level",
             "Workers",
             "Clerks",
             "Share price",
@@ -43,12 +41,10 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
         this.id = factory.id;
         this.node = document.createElement('a');
 
-        this.type = document.createElement('div');
+        this.type = new ProgressCell();
+        this.type.node.setAttribute('data-tooltip-type', TooltipType.FactorySize);
+        this.type.node.setAttribute('data-tooltip-arguments', JSON.stringify([factory.id]));
         this.location = document.createElement('div');
-
-        this.size = new ProgressCell();
-        this.size.node.setAttribute('data-tooltip-type', TooltipType.FactorySize);
-        this.size.node.setAttribute('data-tooltip-arguments', JSON.stringify([factory.id]));
 
         this.workers = new FactoryWorkersCell();
         this.workers.node.setAttribute('data-tooltip-type', TooltipType.FactoryWorkers);
@@ -70,9 +66,8 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
         this.fi = document.createElement('div');
 
         this.node.href = `#screen=${ScreenType.Production}&id=${factory.id}`;
-        this.node.appendChild(this.type);
+        this.node.appendChild(this.type.node);
         this.node.appendChild(this.location);
-        this.node.appendChild(this.size.node);
         this.node.appendChild(this.workers.node);
         this.node.appendChild(this.clerks.node);
         this.node.appendChild(this.px.outer);
@@ -80,11 +75,10 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
     }
 
     public update(factory: FactoryTableEntry): void {
-        UpdateText(this.type, factory.type);
-        UpdateText(this.location, factory.location);
+        UpdateText(this.type.summary, `${factory.type} (${factory.size_l})`);
+        this.type.set(factory.size_p);
 
-        UpdateBigInt(this.size.summary, factory.size_l);
-        this.size.set(factory.size_p);
+        UpdateText(this.location, factory.location);
 
         this.workers.wn.updateBigIntChange(factory.y_wn, factory.t_wn);
         this.workers.update(factory.workers);

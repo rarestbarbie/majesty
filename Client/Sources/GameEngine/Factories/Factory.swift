@@ -169,7 +169,7 @@ extension Factory: JavaScriptDecodable {
                 growthProgress: try js[.size_p]?.decode() ?? 0
             ),
             subs: try js[.subs]?.decode() ?? false,
-            cash: try js[.cash].decode(),
+            cash: try js[.cash]?.decode() ?? .init(liq: 1),
             nv: try js[.nv]?.decode() ?? .init(),
             ni: try js[.ni]?.decode() ?? .init(),
             out: try js[.out]?.decode() ?? .init(),

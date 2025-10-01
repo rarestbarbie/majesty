@@ -287,7 +287,7 @@ extension FactoryContext: TransactingContext {
         }
 
         // Add self.state subsidies at the end, after profit calculation.
-        self.state.cash.s += self.state.size.value + country.minwage
+        // self.state.cash.s += self.state.size.value + country.minwage
         self.state.equity.split(price: self.state.today.px, map: &map, notifying: [country.id])
     }
 }
