@@ -34,7 +34,7 @@ extension PopDetails {
 
         switch self.open {
         case .Inventory: self.inventory.update(from: pop, in: snapshot)
-        case .Ownership: self.ownership.update(from: pop.equity, in: snapshot.context)
+        case .Ownership: self.ownership.update(from: pop, in: snapshot.context)
         }
     }
 }

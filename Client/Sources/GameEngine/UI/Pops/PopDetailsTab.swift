@@ -6,4 +6,6 @@ import JavaScriptKit
     case Ownership
 }
 extension PopDetailsTab: InventoryTab {}
-extension PopDetailsTab: OwnershipTab {}
+extension PopDetailsTab: OwnershipTab {
+    typealias State = Pop
+}

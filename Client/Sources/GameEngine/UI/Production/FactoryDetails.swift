@@ -26,7 +26,7 @@ extension FactoryDetails {
 
         switch self.open {
         case .Inventory: self.inventory.update(from: factory, in: snapshot)
-        case .Ownership: self.ownership.update(from: factory.equity, in: snapshot.context)
+        case .Ownership: self.ownership.update(from: factory, in: snapshot.context)
         }
     }
 }

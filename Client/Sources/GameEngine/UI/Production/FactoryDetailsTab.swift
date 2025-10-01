@@ -6,4 +6,6 @@ import JavaScriptKit
     case Ownership
 }
 extension FactoryDetailsTab: InventoryTab {}
-extension FactoryDetailsTab: OwnershipTab {}
+extension FactoryDetailsTab: OwnershipTab {
+    typealias State = Factory
+}

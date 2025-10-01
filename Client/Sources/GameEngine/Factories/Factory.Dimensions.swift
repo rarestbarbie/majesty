@@ -1,7 +1,7 @@
 import GameEconomy
 
 extension Factory {
-    struct Dimensions {
+    struct Dimensions: LegalEntityMetrics {
         var vi: Int64
         var vv: Int64
 
@@ -30,6 +30,8 @@ extension Factory {
 
         /// Share price.
         var px: Double
+        /// Investor confidence, a number between 0 and 1.
+        var pa: Double
     }
 }
 

@@ -156,6 +156,7 @@ extension FactoryContext: TransactingContext {
 
         guard
         let security: StockMarket<LegalEntity>.Security = .init(
+            attraction: self.state.today.pa,
             asset: .factory(self.state.id),
             price: budget.px
         ) else {
@@ -210,6 +211,11 @@ extension FactoryContext: TransactingContext {
         )
 
         let operatingProfit: Int64 = self.state.operatingProfit
+        if  operatingProfit > 0 {
+            self.state.today.pa = min(1, self.state.today.pa + 0.01)
+        } else {
+            self.state.today.pa = max(0, self.state.today.pa - 0.01)
+        }
 
         switch wages.headcount {
         case nil:
@@ -263,6 +269,7 @@ extension FactoryContext: TransactingContext {
 
         guard
         let security: StockMarket<LegalEntity>.Security = .init(
+            attraction: self.state.today.pa,
             asset: .factory(self.state.id),
             price: budget.px
         ) else {
@@ -561,4 +568,6 @@ extension FactoryContext {
 }
 extension FactoryContext: LegalEntityContext {
     var equitySplits: [EquitySplit] { self.state.equity.splits }
+    var yesterday: Factory.Dimensions { self.state.yesterday }
+    var today: Factory.Dimensions { self.state.today }
 }

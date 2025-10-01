@@ -16,12 +16,18 @@ extension StockMarket {
             self.queue.removeAll(keepingCapacity: true)
             self.securities.removeAll(keepingCapacity: true)
         }
-        if  self.securities.isEmpty {
+
+        guard
+        let sampler: RandomWeightedSampler<Security, Double> = .init(
+            choices: self.securities,
+            sampleWeight: \.attraction
+        ) else {
             return []
         }
+
         return self.queue.map {
             /// Will always be non-nil because of the `isEmpty` check above.
-            let security: Security = securities.randomElement(using: &random.generator)!
+            let security: Security = sampler.next(using: &random.generator)
             let quote: (quantity: Int64, cost: Int64) = security.quote(value: $0.value)
             return .init(
                 asset: security.asset,

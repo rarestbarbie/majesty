@@ -12,6 +12,8 @@ export class OwnershipBreakdown {
     private readonly byCountry: PieChart<GameID>;
     private readonly byCulture: PieChart<string>;
     private readonly shares: Ticker;
+    private readonly px: Ticker;
+    private readonly pa: Ticker;
 
     constructor(
         tooltipCountry: TooltipType,
@@ -41,9 +43,14 @@ export class OwnershipBreakdown {
         this.shares = new Ticker(Fortune.Bonus);
         this.shares.outer.setAttribute('data-tooltip-type', tooltipSecurities);
 
+        this.px = new Ticker(Fortune.Bonus);
+        this.pa = new Ticker(Fortune.Bonus);
+
         const right: HTMLDListElement = document.createElement('dl');
         const rows: [HTMLElement, string][] = [
             [this.shares.outer, '🍰'],
+            [this.px.outer, '🌐'],
+            [this.pa.outer, '🧲'],
         ];
         for (const [value, label] of rows) {
             const dt: HTMLElement = document.createElement('dt');
@@ -68,5 +75,12 @@ export class OwnershipBreakdown {
         this.byCulture.update([id], state.culture ?? []);
 
         this.shares.updateBigInts(state.shares ?? 0n, 0n);
+
+        if (state.y_px !== undefined && state.t_px !== undefined) {
+            this.px.updatePriceChange(state.y_px, state.t_px);
+        }
+        if (state.y_pa !== undefined && state.t_pa !== undefined) {
+            this.pa.updatePriceChange(state.y_pa * 100, state.t_pa * 100, 1);
+        }
     }
 }
