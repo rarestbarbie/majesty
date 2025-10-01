@@ -16,15 +16,20 @@ struct Country: IdentityReplaceable {
     var long: String
     /// The map color of the country. Does not need to be unique.
     var color: Color
+
     /// The ambient (or “default”) culture of the country, e.g. “Martian”.
-    var white: String
+    var culturePreferred: String
     /// The accepted foreign cultures of the country, if any.
     ///
     /// For example, the United Nations is an “Earther” country that starts the game with
     /// “Lunan” as an accepted culture.
-    var accepted: [String]
-    /// The celestial bodies that this country controls.
-    var territory: [PlanetID]
+    var culturesAccepted: [String]
+
+    /// The tiles this country controls.
+    var controlledWorlds: [PlanetID]
+    /// The tiles this country controls.
+    var controlledTiles: [Address]
+
     var researched: [Technology]
     var minwage: Int64
 }
@@ -36,9 +41,10 @@ extension Country {
         case name
         case long
         case color
-        case white
-        case accepted
-        case territory
+        case culture_preferred
+        case cultures_accepted
+        case controlled_worlds
+        case controlled_tiles
         case researched
         case minwage
     }
@@ -51,9 +57,10 @@ extension Country: JavaScriptEncodable {
         js[.name] = self.name
         js[.long] = self.long
         js[.color] = self.color
-        js[.white] = self.white
-        js[.accepted] = self.accepted
-        js[.territory] = self.territory
+        js[.culture_preferred] = self.culturePreferred
+        js[.cultures_accepted] = self.culturesAccepted
+        js[.controlled_worlds] = self.controlledWorlds
+        js[.controlled_tiles] = self.controlledTiles
         js[.researched] = self.researched
         js[.minwage] = self.minwage
     }
@@ -67,9 +74,10 @@ extension Country: JavaScriptDecodable {
             name: try js[.name].decode(),
             long: try js[.long].decode(),
             color: try js[.color].decode(),
-            white: try js[.white].decode(),
-            accepted: try js[.accepted]?.decode() ?? [],
-            territory: try js[.territory].decode(),
+            culturePreferred: try js[.culture_preferred].decode(),
+            culturesAccepted: try js[.cultures_accepted]?.decode() ?? [],
+            controlledWorlds: try js[.controlled_worlds]?.decode() ?? [],
+            controlledTiles: try js[.controlled_tiles]?.decode() ?? [],
             researched: try js[.researched]?.decode() ?? [],
             minwage: try js[.minwage].decode(),
         )

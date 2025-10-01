@@ -11,6 +11,9 @@ extension PlanetGrid {
         var terrain: TerrainMetadata
         var geology: GeologicalMetadata
 
+        var governedBy: CountryProperties?
+        var occupiedBy: CountryProperties?
+
         // Computed statistics
 
         private(set) var pops: [PopID]
@@ -30,6 +33,9 @@ extension PlanetGrid {
             self.name = name
             self.terrain = terrain
             self.geology = geology
+
+            self.governedBy = nil
+            self.occupiedBy = nil
 
             self.pops = []
             self.population = 0

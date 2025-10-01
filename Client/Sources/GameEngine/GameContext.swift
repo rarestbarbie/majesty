@@ -142,8 +142,7 @@ extension GameContext {
         map.localMarkets.turn {
             /// Apply local minimum wages
             guard
-            let country: CountryID = self.planets[$0.location.planet]?.occupied,
-            let country: Country = self.countries.state[country] else {
+            let country: CountryProperties = self.planets[$0.location]?.governedBy else {
                 return
             }
 
@@ -248,8 +247,18 @@ extension GameContext {
 extension GameContext {
     private mutating func index() {
         for country: CountryContext in self.countries {
-            for planet: PlanetID in country.state.territory {
-                self.planets[planet]?.occupied = country.state.id
+            for planet: PlanetID in country.state.controlledWorlds {
+                self.planets[planet]?.grid.assign(
+                    governedBy: country.properties,
+                    occupiedBy: country.properties
+                )
+            }
+            for address: Address in country.state.controlledTiles {
+                self.planets[address.planet]?.grid.assign(
+                    governedBy: country.properties,
+                    occupiedBy: country.properties,
+                    to: address.tile
+                )
             }
         }
 

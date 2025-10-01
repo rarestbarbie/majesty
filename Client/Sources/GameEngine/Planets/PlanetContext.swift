@@ -11,7 +11,6 @@ struct PlanetContext: RuntimeContext {
 
     var motion: (global: CelestialMotion?, local: CelestialMotion?)
     var position: (global: Vector3, local: Vector3)
-    var occupied: CountryID?
 
     var grid: PlanetGrid
 
@@ -20,7 +19,6 @@ struct PlanetContext: RuntimeContext {
 
         self.motion = (nil, nil)
         self.position = (.zero, .zero)
-        self.occupied = nil
 
         self.grid = .init()
     }

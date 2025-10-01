@@ -55,7 +55,7 @@ extension ResourceOutputs {
             inelastic: (yesterday: LocalMarketState, today: LocalMarketState)?,
             tradeable: Candle<Double>?
         ),
-        _ country: Country
+        _ country: CountryProperties
     ) -> Tooltip? {
         if  let output: TradeableOutput = self.tradeable[id],
             let price: Candle<Double> = market.tradeable {

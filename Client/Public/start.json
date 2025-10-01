@@ -156,14 +156,14 @@
             "name": "United Nations",
             "long": "United Nations",
             "color": "#66a3ff",
-            "white": "Earther",
-            "accepted": ["Lunan"],
+            "culture_preferred": "Earther",
+            "cultures_accepted": ["Lunan"],
             "currency": {
                 "id": 1,
                 "name": "UNB",
                 "long": "United Nations Bancor"
             },
-            "territory": [
+            "controlled_worlds": [
                 399,
                 301
             ],
@@ -177,13 +177,13 @@
             "name": "Mars",
             "long": "Commonwealth of Mars",
             "color": "#FF7043",
-            "white": "Martian",
+            "culture_preferred": "Martian",
             "currency": {
                 "id": 2,
                 "name": "MAR",
                 "long": "Martian Rand"
             },
-            "territory": [
+            "controlled_worlds": [
                 499,
                 401,
                 402

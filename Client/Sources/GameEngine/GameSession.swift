@@ -75,21 +75,6 @@ extension GameSession {
     }
 }
 extension GameSession {
-    // public mutating func `switch`(to planet: PlanetID) throws -> GameUI {
-    //     if  let country: CountryID = self.context.planets[planet]?.occupied {
-    //         self.context.player = country
-    //         try self.ui.sync(with: self.snapshot)
-    //     }
-    //     return self.ui
-    // }
-
-    // private mutating func `switch`(to player: CountryID) throws -> GameUI {
-    //     self.context.player = player
-    //     try self.ui.sync(with: self.snapshot)
-    //     return self.ui
-    // }
-}
-extension GameSession {
     private var snapshot: GameSnapshot {
         .init(
             context: self.context,
@@ -241,8 +226,8 @@ extension GameSession {
 
         return .items {
             $0["Switch to Player"] {
-                if  let country: CountryID = planet.occupied {
-                    $0[.SwitchToPlayer] = country
+                if  let country: CountryProperties = tile.governedBy {
+                    $0[.SwitchToPlayer] = country.id
                 }
             }
         }
@@ -373,8 +358,7 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let factory: FactoryContext = self.context.factories[id],
-        let country: CountryID = context.planets[factory.state.on.planet]?.occupied,
-        let country: Country = self.context.countries.state[country] else {
+        let country: CountryProperties = context.planets[factory.state.on]?.occupiedBy else {
             return nil
         }
 
@@ -683,8 +667,7 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let pop: PopContext = self.context.pops.table[pop],
-        let country: CountryID = context.planets[pop.state.home.planet]?.occupied,
-        let country: Country = self.context.countries.state[country] else {
+        let country: CountryProperties = context.planets[pop.state.home]?.occupiedBy else {
             return nil
         }
 
@@ -715,8 +698,7 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let pop: PopContext = self.context.pops.table[id],
-        let country: CountryID = context.planets[pop.state.home.planet]?.occupied,
-        let country: CountryProperties = self.context.countries[country]?.properties
+        let country: CountryProperties = self.context.planets[pop.state.home]?.occupiedBy
         else {
             return nil
         }
