@@ -37,6 +37,10 @@ extension Equity {
         map: inout GameMap,
         notifying subscribers: [CountryID]
     ) {
+        if self.shares.isEmpty {
+            return
+        }
+
         // If today’s stock price is below 0.5, the stock will undergo a reverse split.
         // If above 4,000, it has a chance of undergoing a forward split. The higher the price,
         // the greater the chance.

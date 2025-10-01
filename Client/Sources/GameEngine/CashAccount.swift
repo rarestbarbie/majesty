@@ -24,6 +24,9 @@ struct CashAccount {
     var e: Int64
 }
 extension CashAccount {
+    init(liq: Int64) {
+        self.init(liq: liq, b: 0, v: 0, r: 0, s: 0, c: 0, w: 0, i: 0, e: 0)
+    }
     init() {
         self.init(liq: 0, b: 0, v: 0, r: 0, s: 0, c: 0, w: 0, i: 0, e: 0)
     }
