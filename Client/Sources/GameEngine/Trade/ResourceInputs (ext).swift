@@ -61,12 +61,15 @@ extension ResourceInputs {
             return .instructions {
                 let change: Int64 = input.unitsPurchased - input.unitsConsumed
 
-                $0["Total stockpile", +] = input.unitsAcquired[/3] <- input.unitsAcquired - change
+                $0["Total stockpile", +] = input.unitsAcquired[/3]
+                    <- input.unitsAcquired - change
                 $0[>] {
                     $0["Average cost"] = ??input.averageCost[..2]
                     $0["Supply (days)"] = input.unitsAcquired == 0
                         ? nil
-                        : (Double.init(input.unitsAcquired) / Double.init(input.unitsDemanded))[..3]
+                        : (Double.init(input.unitsAcquired) / Double.init(input.unitsDemanded))[
+                        ..3
+                    ]
                 }
                 $0["Purchased today", +] = +?input.unitsPurchased[/3]
                 $0["Returned today", +] = +?input.unitsReturned[/3]

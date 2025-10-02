@@ -388,7 +388,8 @@ extension GameSession {
         }
         return .instructions {
             $0["Effective size"] = factory.size.value[/3]
-            $0["Growth progress"] = factory.size.growthProgress[/0] / Factory.Size.growthRequired
+            $0["Growth progress"] = factory.size.growthProgress[/0]
+                / Factory.Size.growthRequired
 
             $0[>] = """
             Doubling the factory level will quadruple its capacity

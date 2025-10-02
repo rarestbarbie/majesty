@@ -11,11 +11,12 @@ let package: Package = .init(
         .executable(name: "integration-tests", targets: ["GameIntegrationTests"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-syntax", from: "600.0.1"),
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: "601.0.0"),
         // .package(url: "https://github.com/swiftwasm/JavaScriptKit", from: "0.36.0"),
         .package(url: "https://github.com/swiftwasm/JavaScriptKit", branch: "main"),
         .package(url: "https://github.com/apple/swift-numerics", from: "1.0.3"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.2.1"),
+        .package(url: "https://github.com/tayloraswift/dollup", branch: "master"),
         .package(url: "https://github.com/tayloraswift/d", from: "0.2.0"),
     ],
     targets: [
@@ -43,6 +44,26 @@ let package: Package = .init(
             dependencies: [
                 .target(name: "Vector"),
             ],
+        ),
+
+
+        .executableTarget(
+            name: "DollupSettings",
+            dependencies: [
+                .product(name: "DollupConfig", package: "dollup"),
+            ],
+            path: "Plugins/DollupSettings",
+        ),
+
+        .plugin(
+            name: "DollupPlugin",
+            capability: .command(
+                intent: .custom(verb: "format", description: "format source files"),
+                permissions: [.writeToPackageDirectory(reason: "code formatter")],
+            ),
+            dependencies: [
+                .target(name: "DollupSettings"),
+            ]
         ),
 
 
@@ -247,6 +268,10 @@ let package: Package = .init(
 )
 
 for target: Target in package.targets {
+    if case .plugin = target.type {
+        continue
+    }
+
     let swift: [SwiftSetting]
     let c: [CSetting]
 

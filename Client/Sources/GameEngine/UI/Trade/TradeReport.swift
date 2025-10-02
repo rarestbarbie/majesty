@@ -42,9 +42,7 @@ extension TradeReport: PersistentReport {
         }
 
         guard
-        let id: Market.AssetPair = self.market?.id,
-            id.x != filter,
-            id.y != filter else {
+        let id: Market.AssetPair = self.market?.id, id.x != filter, id.y != filter else {
             // The currently selected market is still valid.
             return
         }
@@ -87,12 +85,14 @@ extension TradeReport: PersistentReport {
             case _?:            continue
             }
 
-            self.markets.append(.init(
-                id: market.id,
-                name: "\(resource.nameWithIcon) / \(currency.name)",
-                price: today.prices,
-                volume: today.volume.base.total
-            ))
+            self.markets.append(
+                .init(
+                    id: market.id,
+                    name: "\(resource.nameWithIcon) / \(currency.name)",
+                    price: today.prices,
+                    volume: today.volume.base.total
+                )
+            )
 
             switch self.market?.id {
             case nil:
