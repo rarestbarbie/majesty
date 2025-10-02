@@ -277,7 +277,9 @@ extension GameContext {
         }
         for pop: PopContext in self.pops.table {
             let home: Address = pop.state.home
-            let counted: ()? = self.planets[home.planet]?.grid.tiles[home.tile]?.addResidentCount(
+            let counted: ()? = self.planets[home.planet]?.grid.tiles[
+                home.tile
+            ]?.addResidentCount(
                 pop: pop.state
             )
 

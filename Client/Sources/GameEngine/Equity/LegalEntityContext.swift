@@ -56,7 +56,8 @@ extension LegalEntityContext {
 
     func tooltipOwnership() -> Tooltip {
         .instructions {
-            $0["Shares outstanding", (-)] = self.equity.shares.outstanding[/3] ^^ self.equity.shares.issued
+            $0["Shares outstanding", (-)] = self.equity.shares.outstanding[/3]
+                ^^ self.equity.shares.issued
             $0[>] {
                 $0["Today’s trading volume"] = self.equity.shares.traded[/3]
             }
