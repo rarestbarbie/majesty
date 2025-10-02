@@ -70,11 +70,17 @@ extension GameRules {
         settings: Settings
     ) throws {
         let pops: EffectsTable<PopType, PopDescription> = try symbols.pops.resolve(rules.pops)
-        let resources: OrderedDictionary<Resource, ResourceMetadata> = table.resources.mapValues {
+        let resources: OrderedDictionary<
+            Resource,
+            ResourceMetadata
+        > = table.resources.mapValues {
             .init(name: $0.name, color: $1.color, emoji: $1.emoji, local: $1.local)
         }
 
-        let factoryCosts: EffectsTable<FactoryType, SymbolTable<Int64>> = try symbols.factories.resolve(
+        let factoryCosts: EffectsTable<
+            FactoryType,
+            SymbolTable<Int64>
+        > = try symbols.factories.resolve(
             rules.factory_costs
         )
         self.init(

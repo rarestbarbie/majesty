@@ -12,7 +12,8 @@ extension InelasticBudgetTier {
     ) -> Self {
         return .init(
             x: demands.map {
-                .init(id: $0,
+                .init(
+                    id: $0,
                     units: $1.unitsDemanded,
                     value: $1.unitsDemanded * markets[location, $0].yesterday.price
                 )

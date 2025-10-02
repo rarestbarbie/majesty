@@ -16,7 +16,8 @@ public protocol ConditionMatrixEncoder<Effect>  {
 extension ConditionMatrixEncoder<Void> {
     @inlinable public subscript<Expr>(
         value: Expr.Value,
-        yield: (Never?, ConditionParameter) -> Expr) -> (((), Expr.Value) -> ColorText)?
+        yield: (Never?, ConditionParameter) -> Expr
+    ) -> (((), Expr.Value) -> ColorText)?
         where Expr: Condition {
         get { nil }
         set(format) {

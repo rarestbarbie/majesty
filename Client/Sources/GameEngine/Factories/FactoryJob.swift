@@ -17,7 +17,16 @@ import Random
 }
 extension FactoryJob {
     init(at: FactoryID) {
-        self.init(at: at, xp: 0, count: 0, hired: 0, fired: 0, quit: 0, strike: false, unionization: 0)
+        self.init(
+            at: at,
+            xp: 0,
+            count: 0,
+            hired: 0,
+            fired: 0,
+            quit: 0,
+            strike: false,
+            unionization: 0
+        )
     }
 
     mutating func fireAll() {
@@ -54,7 +63,10 @@ extension FactoryJob {
         self.quit += count
         self.count -= count
 
-        #assert(self.count >= 0, "Negative employee count (count = \(self.count)) in job \(self.at)!!!")
+        #assert(
+            self.count >= 0,
+            "Negative employee count (count = \(self.count)) in job \(self.at)!!!"
+        )
     }
 
     mutating func quit(

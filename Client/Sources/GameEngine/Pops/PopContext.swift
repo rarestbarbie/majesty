@@ -418,18 +418,18 @@ extension PopContext: TransactingContext {
 
         for (budget, weights, tier):
             (Int64, [InelasticBudgetTier.Weight], ResourceTierIdentifier) in [
-            (budget.l.inelastic, weights.l.inelastic.x, .l),
-            (budget.e.inelastic, weights.e.inelastic.x, .e),
-            (budget.x.inelastic, weights.x.inelastic.x, .x),
-        ] {
+                (budget.l.inelastic, weights.l.inelastic.x, .l),
+                (budget.e.inelastic, weights.e.inelastic.x, .e),
+                (budget.x.inelastic, weights.x.inelastic.x, .x),
+            ] {
             guard budget > 0,
             let allocations: [Int64] = weights.distribute(budget, share: \.value) else {
                 continue
             }
             for (allocation, x): (Int64, InelasticBudgetTier.Weight) in zip(
-                allocations,
-                weights
-            ) where allocation > 0 {
+                    allocations,
+                    weights
+                ) where allocation > 0 {
                 map.localMarkets[self.state.home, x.id].bid(
                     budget: allocation,
                     by: self.state.id,
