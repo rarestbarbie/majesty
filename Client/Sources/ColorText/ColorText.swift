@@ -56,15 +56,21 @@ extension ColorText: StringInterpolationProtocol {
         self.buffer.append(value.description)
     }
 
-    @inlinable public mutating func appendInterpolation(em value: some CustomStringConvertible) {
+    @inlinable public mutating func appendInterpolation(
+        em value: some CustomStringConvertible
+    ) {
         self.buffer.append("<em>\(value)</em>")
     }
 
-    @inlinable public mutating func appendInterpolation(pos value: some CustomStringConvertible) {
+    @inlinable public mutating func appendInterpolation(
+        pos value: some CustomStringConvertible
+    ) {
         self.buffer.append("<ins>\(value)</ins>")
     }
 
-    @inlinable public mutating func appendInterpolation(neg value: some CustomStringConvertible) {
+    @inlinable public mutating func appendInterpolation(
+        neg value: some CustomStringConvertible
+    ) {
         self.buffer.append("<del>\(value)</del>")
     }
 }

@@ -399,7 +399,9 @@ extension GameContext {
             }
         }
 
-        let workersUnavailable: [(PopType, [FactoryJobOfferBlock])] = map.jobs.hire.worker.turn {
+        let workersUnavailable: [
+            (PopType, [FactoryJobOfferBlock])
+        ] = map.jobs.hire.worker.turn {
             if var pops: [(index: Int, unemployed: Int64)] = workers[$0] {
                 self.postPopHirings(matching: &pops, with: &$1)
             }

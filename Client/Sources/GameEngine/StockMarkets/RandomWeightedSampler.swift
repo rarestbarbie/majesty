@@ -5,7 +5,7 @@ import Random
 /// This sampler has an O(n) initialization cost and an O(log n) cost for each
 /// subsequent sample.
 struct RandomWeightedSampler<Element, Weight>
-where Weight: BinaryFloatingPoint, Weight.RawSignificand: FixedWidthInteger {
+    where Weight: BinaryFloatingPoint, Weight.RawSignificand: FixedWidthInteger {
     private let cumulativeWeights: [(element: Element, cumulativeWeight: Weight)]
     private let totalWeight: Weight
 
