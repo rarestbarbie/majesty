@@ -1,3 +1,4 @@
+import Assert
 import GameEconomy
 import JavaScriptInterop
 import JavaScriptKit
@@ -22,13 +23,16 @@ struct CashAccount {
     var i: Int64
     /// Equity value, negative for purchasers of equity, positive for issuers.
     var e: Int64
+
+    /// Inheritance, from members leaving or joining a pop.
+    var d: Int64
 }
 extension CashAccount {
     init(liq: Int64) {
-        self.init(liq: liq, b: 0, v: 0, r: 0, s: 0, c: 0, w: 0, i: 0, e: 0)
+        self.init(liq: liq, b: 0, v: 0, r: 0, s: 0, c: 0, w: 0, i: 0, e: 0, d: 0)
     }
     init() {
-        self.init(liq: 0, b: 0, v: 0, r: 0, s: 0, c: 0, w: 0, i: 0, e: 0)
+        self.init(liq: 0, b: 0, v: 0, r: 0, s: 0, c: 0, w: 0, i: 0, e: 0, d: 0)
     }
 }
 extension CashAccount {
@@ -38,6 +42,20 @@ extension CashAccount {
         self.w += other.w
         self.i += other.i
         self.v += other.j
+    }
+    static func += (self: inout Self, other: Self) {
+        self = .init(
+            liq: self.liq + other.liq,
+            b: self.b + other.b,
+            v: self.v + other.v,
+            r: self.r + other.r,
+            s: self.s + other.s,
+            c: self.c + other.c,
+            w: self.w + other.w,
+            i: self.i + other.i,
+            e: self.e + other.e,
+            d: self.d + other.d
+        )
     }
 }
 extension CashAccount {
@@ -50,7 +68,8 @@ extension CashAccount {
         self.c +
         self.w +
         self.i +
-        self.e
+        self.e +
+        self.d
     }
 
     mutating func settle() {
@@ -62,6 +81,13 @@ extension CashAccount {
         self.liq += self.w; self.w = 0
         self.liq += self.i; self.i = 0
         self.liq += self.e; self.e = 0
+        self.liq += self.d; self.d = 0
+    }
+
+    mutating func inherit(fraction: Fraction) -> Int64 {
+        let inherited: Int64 = self.balance <> fraction
+        self.d -= inherited
+        return inherited
     }
 }
 extension CashAccount {
@@ -75,6 +101,7 @@ extension CashAccount {
         case w
         case i
         case e
+        case d
     }
 }
 extension CashAccount: JavaScriptEncodable {
@@ -88,6 +115,7 @@ extension CashAccount: JavaScriptEncodable {
         js[.w] = self.w
         js[.i] = self.i
         js[.e] = self.e
+        js[.d] = self.d
     }
 }
 extension CashAccount: JavaScriptDecodable {
@@ -101,7 +129,8 @@ extension CashAccount: JavaScriptDecodable {
             c: try js[.c]?.decode() ?? 0,
             w: try js[.w]?.decode() ?? 0,
             i: try js[.i]?.decode() ?? 0,
-            e: try js[.e]?.decode() ?? 0
+            e: try js[.e]?.decode() ?? 0,
+            d: try js[.d]?.decode() ?? 0
         )
     }
 }

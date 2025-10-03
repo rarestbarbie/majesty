@@ -36,6 +36,13 @@ extension RuntimeContextTable {
             turn(&self.index.values[i])
         }
     }
+
+    /// Returns the **current** location of the element with the given ID, if it exists.
+    /// This may change after items are deleted from the table, although indices are stable
+    /// across insertions.
+    @inlinable public mutating func find(id: ElementContext.State.ID) -> Int? {
+        self.index.index(forKey: id)
+    }
 }
 extension RuntimeContextTable: ExpressibleByDictionaryLiteral {
     @inlinable public init(dictionaryLiteral: (Never, Never)...) {
