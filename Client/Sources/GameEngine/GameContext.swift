@@ -509,7 +509,11 @@ extension GameContext {
             }
 
             let inherited: (cash: Int64, mil: Double, con: Double) = {
-                ($0.state.cash.inherit(fraction: conversion.inherits), $0.state.today.mil, $0.state.today.con)
+                (
+                    $0.state.cash.inherit(fraction: conversion.inherits),
+                    $0.state.today.mil,
+                    $0.state.today.con
+                )
             } (&self.pops.table[i])
 
             // TODO: pops should also inherit stock portfolios and slaves
@@ -517,7 +521,9 @@ extension GameContext {
             try self.pops.with(section: conversion.to) {
                 self.rules.pops[$0.type]
             } update: {
-                let weight: Fraction.Interpolator<Double> = .init(conversion.size %/ (conversion.size + $0.today.size))
+                let weight: Fraction.Interpolator<Double> = .init(
+                    conversion.size %/ (conversion.size + $0.today.size)
+                )
 
                 $0.today.size += conversion.size
                 $0.cash.d += inherited.cash
