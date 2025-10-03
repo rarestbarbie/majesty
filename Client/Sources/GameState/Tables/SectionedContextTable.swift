@@ -32,6 +32,12 @@ extension SectionedContextTable {
     }
 }
 extension SectionedContextTable {
+    @inlinable public mutating func lint(
+        where remove: (ElementContext.State) -> Bool
+    ) {
+        fatalError("unimplemented, requires index rebuilding")
+    }
+
     @inlinable public mutating func with<T>(
         section: ElementContext.State.Section,
         create: (ElementContext.State) -> ElementContext.Metadata?,

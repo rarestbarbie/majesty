@@ -105,8 +105,8 @@ extension Pop {
             return
         }
 
-        for ((target, _), count): ((id: PopType, Int64), Int64) in zip(targets, breakdown)
-            where count > 0 {
+        for ((target, _), size): ((id: PopType, Int64), Int64) in zip(targets, breakdown)
+            where size > 0 {
 
             if self.type == target {
                 // No need to convert to the same type
@@ -119,8 +119,11 @@ extension Pop {
                 home: self.home
             )
 
-            map.conversions.append((count: count, to: section))
-            self.today.size -= count
+            map.conversions.append(
+                .init(from: self.id, size: size, of: self.today.size, to: section)
+            )
+            // we must deduct this now, because we might have multiple calls to `egress`
+            self.today.size -= size
         }
 
         #assert(

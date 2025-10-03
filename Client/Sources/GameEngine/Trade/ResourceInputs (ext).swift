@@ -67,9 +67,9 @@ extension ResourceInputs {
                     $0["Average cost"] = ??input.averageCost[..2]
                     $0["Supply (days)"] = input.unitsAcquired == 0
                         ? nil
-                        : (Double.init(input.unitsAcquired) / Double.init(input.unitsDemanded))[
-                        ..3
-                    ]
+                        : (
+                        Double.init(input.unitsAcquired) / Double.init(input.unitsDemanded)
+                    )[..3]
                 }
                 $0["Purchased today", +] = +?input.unitsPurchased[/3]
                 $0["Returned today", +] = +?input.unitsReturned[/3]

@@ -482,11 +482,47 @@ extension GameContext {
         defer {
             map.conversions.removeAll(keepingCapacity: true)
         }
-        for (count, target): (Int64, Pop.Section) in map.conversions {
-            try self.pops.with(section: target) {
+
+        let investments: (
+            stocks: [PopID: [FactoryID]],
+            slaves: [PopID: [PopID]]
+        ) = (
+            self.factories.state.reduce(into: [:]) {
+                for stake: EquityStake<LegalEntity> in $1.equity.shares.values {
+                    if case .pop(let id) = stake.id {
+                        $0[id, default: []].append($1.id)
+                    }
+                }
+            },
+            self.pops.table.state.reduce(into: [:]) {
+                for stake: EquityStake<LegalEntity> in $1.equity.shares.values {
+                    if case .pop(let id) = stake.id {
+                        $0[id, default: []].append($1.id)
+                    }
+                }
+            }
+        )
+
+        for conversion: Pop.Conversion in map.conversions {
+            guard let i: Int = self.pops.table.find(id: conversion.from) else {
+                fatalError("Pop \(conversion.from) does not exist!!!")
+            }
+
+            let inherited: (cash: Int64, mil: Double, con: Double) = {
+                ($0.state.cash.inherit(fraction: conversion.inherits), $0.state.today.mil, $0.state.today.con)
+            } (&self.pops.table[i])
+
+            // TODO: pops should also inherit stock portfolios and slaves
+
+            try self.pops.with(section: conversion.to) {
                 self.rules.pops[$0.type]
             } update: {
-                $0.today.size += count
+                let weight: Fraction.Interpolator<Double> = .init(conversion.size %/ (conversion.size + $0.today.size))
+
+                $0.today.size += conversion.size
+                $0.cash.d += inherited.cash
+                $0.today.mil = weight.mix(inherited.mil, $0.today.mil)
+                $0.today.con = weight.mix(inherited.con, $0.today.con)
             }
         }
     }

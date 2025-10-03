@@ -528,6 +528,8 @@ extension GameSession {
                 } else {
                     $0["Investments", +] = +?pop.cash.e[/3]
                 }
+
+                $0["Inheritances", +] = +?pop.cash.d[/3]
             }
         }
     }

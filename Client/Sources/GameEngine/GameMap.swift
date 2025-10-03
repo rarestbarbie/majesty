@@ -11,7 +11,7 @@ struct GameMap: ~Copyable {
     var notifications: Notifications
 
     var transfers: [LegalEntity: CashTransfers]
-    var conversions: [(count: Int64, to: Pop.Section)]
+    var conversions: [Pop.Conversion]
     var jobs: (
         hire: (worker: Jobs.Hire<Address>, clerk: Jobs.Hire<PlanetID>),
         fire: (worker: Jobs.Fire, clerk: Jobs.Fire)
