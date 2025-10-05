@@ -7,7 +7,7 @@ import OrderedCollections
 
 struct Factory: CashAccountHolder, Identifiable {
     let id: FactoryID
-    let on: Address
+    let tile: Address
     var type: FactoryType
     var size: Size
     var subs: Bool
@@ -20,6 +20,32 @@ struct Factory: CashAccountHolder, Identifiable {
     var today: Dimensions
 
     var equity: Equity<LegalEntity>
+}
+extension Factory {
+    @available(*, deprecated, renamed: "tile")
+    var on: Address { self.tile }
+}
+extension Factory: Sectionable {
+    init(id: FactoryID, section: Section) {
+        self.init(
+            id: id,
+            tile: section.tile,
+            type: section.type,
+            size: .init(level: 0),
+            subs: false,
+            cash: .init(),
+            nv: .init(),
+            ni: .init(),
+            out: .init(),
+            yesterday: .init(),
+            today: .init(),
+            equity: [:],
+        )
+    }
+
+    var section: Section {
+        .init(type: self.type, tile: self.tile)
+    }
 }
 extension Factory: Turnable {
     mutating func turn() {
@@ -54,7 +80,7 @@ extension Factory {
 extension Factory {
     enum ObjectKey: JSString, Sendable {
         case id
-        case on
+        case tile = "on"
         case type
         case size_l
         case size_p
@@ -106,7 +132,7 @@ extension Factory {
 extension Factory: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
-        js[.on] = self.on
+        js[.tile] = self.tile
         js[.type] = self.type.rawValue
         js[.size_l] = self.size.level
         js[.size_p] = self.size.growthProgress
@@ -167,7 +193,7 @@ extension Factory: JavaScriptDecodable {
         )
         self.init(
             id: try js[.id].decode(),
-            on: try js[.on].decode(),
+            tile: try js[.tile].decode(),
             type: try js[.type].decode(),
             size: .init(
                 level: try js[.size_l]?.decode() ?? 1,

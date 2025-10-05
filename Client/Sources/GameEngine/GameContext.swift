@@ -11,7 +11,7 @@ struct GameContext {
     private(set) var planets: RuntimeContextTable<PlanetContext>
     private(set) var cultures: RuntimeContextTable<CultureContext>
     private(set) var countries: RuntimeContextTable<CountryContext>
-    private(set) var factories: RuntimeContextTable<FactoryContext>
+    private(set) var factories: SectionedContextTable<FactoryContext>
     private(set) var pops: SectionedContextTable<PopContext>
 
     let symbols: GameRules.Symbols
@@ -107,7 +107,7 @@ extension GameContext {
             planets: self.planets.state,
             cultures: self.cultures.state,
             countries: self.countries.state,
-            factories: self.factories.state,
+            factories: self.factories.table.state,
             pops: self.pops.table.state,
             rules: self.rules
         )
@@ -119,7 +119,7 @@ extension GameContext {
             planets: self.planets,
             cultures: self.cultures,
             countries: self.countries,
-            factories: self.factories.state,
+            factories: self.factories.table.state,
             pops: self.pops.table.state,
             rules: self.rules
         )
@@ -149,7 +149,7 @@ extension GameContext {
             $1.turn(minwage: country.minwage)
         }
 
-        self.factories.turn  { $0.turn(on: &map) }
+        self.factories.table.turn  { $0.turn(on: &map) }
         self.pops.table.turn { $0.turn(on: &map) }
 
         map.localMarkets.turn {
@@ -181,28 +181,28 @@ extension GameContext {
                 case .pop(let id):
                     self.pops.table[id]?.state.cash.e -= fill.cost
                 case .factory(let id):
-                    self.factories[id]?.state.cash.e -= fill.cost
+                    self.factories.table[id]?.state.cash.e -= fill.cost
                 }
                 switch fill.asset {
                 case .pop(let id):
                     self.pops.table[id]?.state.issue(shares: fill)
                 case .factory(let id):
-                    self.factories[id]?.state.issue(shares: fill)
+                    self.factories.table[id]?.state.issue(shares: fill)
                 }
             }
         }
 
         var order: [Resident] = []
 
-        order.reserveCapacity(self.factories.count + self.pops.table.count)
-        order += self.factories.indices.lazy.map(Resident.factory(_:))
+        order.reserveCapacity(self.factories.table.count + self.pops.table.count)
+        order += self.factories.table.indices.lazy.map(Resident.factory(_:))
         order += self.pops.table.indices.lazy.map(Resident.pop(_:))
         order.shuffle(using: &map.random.generator)
 
         for i: Resident in order {
             switch i {
             case .factory(let i):
-                self.factories[i].transact(map: &map)
+                self.factories.table[i].transact(map: &map)
             case .pop(let i):
                 self.pops.table[i].transact(map: &map)
             }
@@ -210,11 +210,11 @@ extension GameContext {
 
         map.exchange.turn()
 
-        self.factories.turn {
+        self.factories.table.turn {
             $0.advance(map: &map)
         }
         self.pops.table.turn {
-            $0.advance(map: &map, factories: self.factories.state)
+            $0.advance(map: &map, factories: self.factories.table.state)
         }
 
         self.postCashTransfers(&map)
@@ -236,8 +236,8 @@ extension GameContext {
 
         self.index()
 
-        for i: Int in self.factories.indices {
-            try self.factories[i].compute(map: map, context: self.residentPass)
+        for i: Int in self.factories.table.indices {
+            try self.factories.table[i].compute(map: map, context: self.residentPass)
         }
         for i: Int in self.pops.table.indices {
             try self.pops.table[i].compute(map: map, context: self.residentPass)
@@ -269,26 +269,21 @@ extension GameContext {
                 }
             } (&self.planets[i])
         }
-        for i: Int in self.factories.indices {
-            self.factories[i].startIndexCount()
+        for i: Int in self.factories.table.indices {
+            self.factories.table[i].startIndexCount()
         }
         for i: Int in self.pops.table.indices {
             self.pops.table[i].startIndexCount()
         }
         for pop: PopContext in self.pops.table {
-            let home: Address = pop.state.home
-            let counted: ()? = self.planets[home.planet]?.grid.tiles[
-                home.tile
-            ]?.addResidentCount(
-                pop: pop.state
-            )
+            let counted: ()? = self.planets[pop.state.home]?.addResidentCount(pop.state)
 
             #assert(counted != nil, "Pop \(pop.state.id) has no home tile!!!")
 
             let indenture: LegalEntity = .pop(pop.state.id)
 
             for job: FactoryJob in pop.state.jobs.values {
-                self.factories[job.at]?.addWorkforceCount(pop: pop.state, job: job)
+                self.factories.table[job.at]?.addWorkforceCount(pop: pop.state, job: job)
             }
             for stake: EquityStake<LegalEntity> in pop.state.equity.shares.values {
                 let counted: ()?
@@ -300,7 +295,7 @@ extension GameContext {
                     )
 
                 case .factory(let id):
-                    counted = self.factories[id]?.addPosition(
+                    counted = self.factories.table[id]?.addPosition(
                         asset: indenture,
                         value: stake.shares
                     )
@@ -309,7 +304,11 @@ extension GameContext {
                 #assert(counted != nil, "Slaveowner \(stake.id) does not exist!!!")
             }
         }
-        for factory: FactoryContext in self.factories {
+        for factory: FactoryContext in self.factories.table {
+            let counted: ()? = self.planets[factory.state.tile]?.addResidentCount(factory.state)
+
+            #assert(counted != nil, "Factory \(factory.state.id) has no home tile!!!")
+
             let title: LegalEntity = .factory(factory.state.id)
             for stake: EquityStake<LegalEntity> in factory.state.equity.shares.values {
                 let counted: ()?
@@ -321,7 +320,7 @@ extension GameContext {
                     )
 
                 case .factory(let id):
-                    counted = self.factories[id]?.addPosition(
+                    counted = self.factories.table[id]?.addPosition(
                         asset: title,
                         value: stake.shares
                     )
