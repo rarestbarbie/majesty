@@ -88,8 +88,7 @@ extension PieChart {
 
             slices.append(slice)
             self = .slices(slices)
-        }
-        else {
+        } else {
             self = .circle(.init(id: id, value: value))
         }
     }

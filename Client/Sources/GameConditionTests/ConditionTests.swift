@@ -538,8 +538,7 @@ import Testing
             (mil: 8.0, con: 8.0, expected: 0.02),
             (mil: 6.0, con: 6.0, expected: 0.01),
         ]
-    )
-    static func NestedLogic(_ mil: Double, _ con: Double, _ expected: Double) {
+    ) static func NestedLogic(_ mil: Double, _ con: Double, _ expected: Double) {
         let tooltip: ConditionBreakdown = .init(base: 1%) {
             $0[any: true] {
                 $0 = +1%

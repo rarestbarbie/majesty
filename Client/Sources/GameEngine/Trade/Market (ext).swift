@@ -36,7 +36,7 @@ extension Market: JavaScriptDecodable {
             pool: .init(
                 assets: .init(base: try js[.bl].decode(), quote: try js[.ql].decode()),
                 volume: .init(
-                    base:  .init(i: try js[.bi].decode(), o: try js[.bo].decode()),
+                    base: .init(i: try js[.bi].decode(), o: try js[.bo].decode()),
                     quote: .init(i: try js[.qi].decode(), o: try js[.qo].decode()),
                 ),
                 fee: try js[.fee].decode() ?? 0 %/ 1

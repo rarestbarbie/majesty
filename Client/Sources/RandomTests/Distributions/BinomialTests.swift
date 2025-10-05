@@ -1,8 +1,7 @@
 import Random
 import Testing
 
-@Suite
-struct BinomialTests {
+@Suite struct BinomialTests {
     private var random: PseudoRandom
 
     init() {
@@ -23,8 +22,7 @@ extension BinomialTests {
             (n: 5_000, p: 0.01),
             (n: 50_000, p: 0.001),
         ]
-    )
-    mutating func Statistics(_ n: Int64, _ p: Double) {
+    ) mutating func Statistics(_ n: Int64, _ p: Double) {
         Binomial[n, p].performStandardStatisticalTests(
             sampleCount: 2_000_000,
             using: &self.random,
@@ -39,8 +37,7 @@ extension BinomialTests {
             (n: 100_000, p: 0.9999),      // Large n, p close to 1
             (n: 5_000_000, p: 0.5),       // Very large n, balanced p
         ]
-    )
-    mutating func ExtremeValues(_ n: Int64, _ p: Double) {
+    ) mutating func ExtremeValues(_ n: Int64, _ p: Double) {
         Binomial[n, p].performStandardStatisticalTests(
             sampleCount: 1_000_000,
             using: &self.random,

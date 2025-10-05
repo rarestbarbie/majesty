@@ -7,8 +7,7 @@ import JavaScriptInterop
 import JavaScriptKit
 import RealModule
 
-@MainActor
-struct GameAPI {
+@MainActor struct GameAPI {
     private let swift: JSObject
 
     init(swift: JSValue) {
@@ -16,8 +15,7 @@ struct GameAPI {
     }
 }
 
-@main
-extension GameAPI {
+@main extension GameAPI {
     static var game: GameSession? = nil
 
     static func main() throws {

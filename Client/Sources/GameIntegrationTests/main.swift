@@ -3,8 +3,7 @@ import GameRules
 import GameState
 import JavaScriptKit
 
-@main
-struct Main {
+@main struct Main {
     static func main() throws {
         #if TESTABLE
         let target: GameDate = .gregorian(year: 2475, month: 1, day: 1)
