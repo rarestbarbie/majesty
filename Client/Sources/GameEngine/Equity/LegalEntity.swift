@@ -11,8 +11,7 @@ extension LegalEntity: LosslessStringConvertible {
         guard
         let first: String.Index = id.unicodeScalars.indices.first,
         let discriminant: Class = .init(rawValue: id.unicodeScalars[first]),
-        let index: Int32 = .init(id[id.index(after: first)...])
-        else {
+        let index: Int32 = .init(id[id.index(after: first)...]) else {
             return nil
         }
 

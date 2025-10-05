@@ -39,8 +39,7 @@ extension PieChart {
     ) {
         let sectors: [(Key, (share: Int64, Value))] = values.filter { $1.share > 0 }
 
-        guard sectors.startIndex < sectors.endIndex
-        else {
+        guard sectors.startIndex < sectors.endIndex else {
             self = .slices([])
             return
         }

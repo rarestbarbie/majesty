@@ -16,8 +16,7 @@ struct PlanetDetails {
 extension PlanetDetails {
     mutating func update(in context: GameContext) {
         guard
-        let planet: PlanetContext = context.planets[self.id]
-        else {
+        let planet: PlanetContext = context.planets[self.id] else {
             return
         }
 

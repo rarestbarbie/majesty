@@ -26,8 +26,7 @@ public struct IdentifierMacro: MemberMacro {
         let argument: LabeledExprSyntax = arguments.first,
         case nil = argument.label,
         let type: MemberAccessExprSyntax = argument.expression.as(MemberAccessExprSyntax.self),
-        let type: ExprSyntax = type.base
-        else {
+        let type: ExprSyntax = type.base else {
             fatalError("expected a single, unlabeled argument specifying the raw value type")
         }
 

@@ -705,8 +705,7 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let pop: PopContext = self.context.pops.table[id],
-        let country: CountryProperties = self.context.planets[pop.state.home]?.occupiedBy
-        else {
+        let country: CountryProperties = self.context.planets[pop.state.home]?.occupiedBy else {
             return nil
         }
 
@@ -771,8 +770,7 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let market: Market = self.map.exchange.markets[id],
-        let last: Int = market.history.indices.last
-        else {
+        let last: Int = market.history.indices.last else {
             return nil
         }
 
