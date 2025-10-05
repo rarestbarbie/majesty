@@ -192,7 +192,7 @@ extension FactoryContext: TransactingContext {
             case .fire(let block):
                 map.jobs.fire.clerk[self.state.id] = block
             case .hire(let block, let type):
-                map.jobs.hire.clerk[self.state.on.planet, type].append(block)
+                map.jobs.hire.clerk[self.state.tile.planet, type].append(block)
             }
         } else {
             self.state.today.eo = 1
@@ -229,7 +229,7 @@ extension FactoryContext: TransactingContext {
                 break
             }
 
-            map.jobs.hire.worker[self.state.on, type].append(block)
+            map.jobs.hire.worker[self.state.tile, type].append(block)
         }
 
         let investmentRatio: Fraction = (self.workers.count %/ (10 * self.workers.limit))

@@ -34,6 +34,25 @@ extension Factory {
         var pa: Double
     }
 }
+extension Factory.Dimensions {
+    init() {
+        self.init(
+            vi: 0,
+            vv: 0,
+            wa: 0,
+            wf: nil,
+            wn: 1,
+            ca: 0,
+            cf: nil,
+            cn: 1,
+            ei: 1,
+            eo: 1,
+            fi: 0,
+            px: 1,
+            pa: 1
+        )
+    }
+}
 
 #if TESTABLE
 extension Factory.Dimensions: Equatable, Hashable {}

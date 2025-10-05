@@ -32,6 +32,10 @@ extension SectionedContextTable {
     }
 }
 extension SectionedContextTable {
+    @inlinable public func find(section: ElementContext.State.Section) -> Int? {
+        self.indices[section]
+    }
+
     @inlinable public mutating func lint(
         where remove: (ElementContext.State) -> Bool
     ) {

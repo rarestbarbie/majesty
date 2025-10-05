@@ -24,6 +24,12 @@ struct PlanetContext: RuntimeContext {
     }
 }
 extension PlanetContext {
+    subscript(tile: Int) -> PlanetGrid.Tile {
+        _read   { yield  self.grid.tiles.values[tile] }
+        _modify { yield &self.grid.tiles.values[tile] }
+    }
+}
+extension PlanetContext {
     mutating func compute(
         map: borrowing GameMap,
         context: GameContext.TerritoryPass
