@@ -135,13 +135,15 @@ extension PlanetGrid {
 
         for tile: PlanetSurface.Tile in surface.grid {
             guard
-            let terrain: TerrainMetadata = rules.terrains[try symbols[terrain: tile.terrain]]
-            else {
+            let terrain: TerrainMetadata = rules.terrains[
+                try symbols[terrain: tile.terrain]
+            ] else {
                 fatalError("Missing terrain metadata for \(tile.terrain)!!!")
             }
             guard
-            let geology: GeologicalMetadata = rules.geology[try symbols[geology: tile.geology]]
-            else {
+            let geology: GeologicalMetadata = rules.geology[
+                try symbols[geology: tile.geology]
+            ] else {
                 fatalError("Missing geological metadata for \(tile.geology)!!!")
             }
 

@@ -11,8 +11,7 @@ public struct BijectionMacro: PeerMacro {
         let decl: VariableDeclSyntax = decl.as(VariableDeclSyntax.self),
         let binding: PatternBindingSyntax = decl.bindings.first,
         let type: TypeSyntax = binding.typeAnnotation?.type.trimmed,
-        let accessors: AccessorBlockSyntax.Accessors = binding.accessorBlock?.accessors
-        else {
+        let accessors: AccessorBlockSyntax.Accessors = binding.accessorBlock?.accessors else {
             context[.error, attribute] = """
             '@Bijection' must be applied to a computed property
             """

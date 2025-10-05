@@ -12,8 +12,7 @@ extension DecimalFormat1F: DecimalFormat {
     /// Formats the share as a percentage with one decimal place, without the percent sign.
     /// Returns nil if the share is less than 0.1 percent.
     public var formatted: String {
-        guard self.share >= 0.1
-        else {
+        guard self.share >= 0.1 else {
             return "<0.1"
         }
 

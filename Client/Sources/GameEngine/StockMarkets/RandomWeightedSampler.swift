@@ -30,8 +30,7 @@ struct RandomWeightedSampler<Element, Weight>
         }
 
         guard
-        let totalWeight: Weight = cumulativeData.last?.cumulativeWeight, totalWeight > .zero
-        else {
+        let totalWeight: Weight = cumulativeData.last?.cumulativeWeight, totalWeight > .zero else {
             return nil
         }
 
