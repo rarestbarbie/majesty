@@ -1,5 +1,5 @@
 {
-  "originHash" : "44d116e07b3e31f07b7b39e40e0603e02eacc7a5e4ddb58a1278622098663fe2",
+  "originHash" : "71d1310398e1db85ee53c4da71a1e92e4508ce4101e1954cb279720df547c3ad",
   "pins" : [
     {
       "identity" : "d",
@@ -16,7 +16,7 @@
       "location" : "https://github.com/tayloraswift/dollup",
       "state" : {
         "branch" : "master",
-        "revision" : "9cacd7a84f355c86c15693863c509d4fb70739fc"
+        "revision" : "9d0d65d09524fc44fd97988147e1cbbc66d5daa4"
       }
     },
     {
@@ -52,7 +52,7 @@
       "location" : "https://github.com/tayloraswift/swift-io",
       "state" : {
         "branch" : "master",
-        "revision" : "1cbe8b229f4dd2dd758183b1dc377b39f474c070"
+        "revision" : "9c68f73034a61b742a9dbc98661946b990e4b319"
       }
     },
     {
