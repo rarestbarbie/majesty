@@ -63,7 +63,7 @@ extension Equity<LegalEntity>.Statistics {
                         return
                     }
 
-                    location = factory.on
+                    location = factory.tile
                     culture = nil
                 }
 

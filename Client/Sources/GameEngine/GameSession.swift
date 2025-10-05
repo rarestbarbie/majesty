@@ -879,13 +879,13 @@ extension GameSession {
     public var _hash: Int {
         var hasher: Hasher = .init()
         self.context.pops.table.state.hash(into: &hasher)
-        self.context.factories.state.hash(into: &hasher)
+        self.context.factories.table.state.hash(into: &hasher)
         return hasher.finalize()
     }
 
     public static func != (a: borrowing Self, b: borrowing Self) -> Bool {
         a.context.pops.table.state != b.context.pops.table.state ||
-        a.context.factories.state != b.context.factories.state
+        a.context.factories.table.state != b.context.factories.table.state
     }
 }
 #endif

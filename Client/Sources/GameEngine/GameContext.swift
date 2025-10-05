@@ -341,7 +341,7 @@ extension GameContext {
             case .pop(let id):
                 self.pops.table[id]?.state.cash += transfers
             case .factory(let id):
-                self.factories[id]?.state.cash += transfers
+                self.factories.table[id]?.state.cash += transfers
             }
         }
     }
@@ -433,9 +433,9 @@ extension GameContext {
                 }
 
                 if type.stratum <= .Worker {
-                    self.factories[block.at]?.state.today.wf = probability
+                    self.factories.table[block.at]?.state.today.wf = probability
                 } else {
-                    self.factories[block.at]?.state.today.cf = probability
+                    self.factories.table[block.at]?.state.today.cf = probability
                 }
             }
         }
@@ -482,25 +482,25 @@ extension GameContext {
             map.conversions.removeAll(keepingCapacity: true)
         }
 
-        let investments: (
-            stocks: [PopID: [FactoryID]],
-            slaves: [PopID: [PopID]]
-        ) = (
-            self.factories.state.reduce(into: [:]) {
-                for stake: EquityStake<LegalEntity> in $1.equity.shares.values {
-                    if case .pop(let id) = stake.id {
-                        $0[id, default: []].append($1.id)
-                    }
-                }
-            },
-            self.pops.table.state.reduce(into: [:]) {
-                for stake: EquityStake<LegalEntity> in $1.equity.shares.values {
-                    if case .pop(let id) = stake.id {
-                        $0[id, default: []].append($1.id)
-                    }
-                }
-            }
-        )
+        // let investments: (
+        //     stocks: [PopID: [FactoryID]],
+        //     slaves: [PopID: [PopID]]
+        // ) = (
+        //     self.factories.state.reduce(into: [:]) {
+        //         for stake: EquityStake<LegalEntity> in $1.equity.shares.values {
+        //             if case .pop(let id) = stake.id {
+        //                 $0[id, default: []].append($1.id)
+        //             }
+        //         }
+        //     },
+        //     self.pops.table.state.reduce(into: [:]) {
+        //         for stake: EquityStake<LegalEntity> in $1.equity.shares.values {
+        //             if case .pop(let id) = stake.id {
+        //                 $0[id, default: []].append($1.id)
+        //             }
+        //         }
+        //     }
+        // )
 
         for conversion: Pop.Conversion in map.conversions {
             guard let i: Int = self.pops.table.find(id: conversion.from) else {
@@ -530,5 +530,29 @@ extension GameContext {
                 $0.today.con = weight.mix(inherited.con, $0.today.con)
             }
         }
+    }
+}
+extension GameContext {
+    private mutating func launchStartups(_ map: inout GameMap) {
+        for i: Int in self.planets.indices {
+            for j: Int in self.planets[i].grid.tiles.values.indices {
+                {
+                    let id: PlanetID = $0.state.id
+
+                    $0[j].pickFactory(
+                        among: self.rules.factories,
+                        using: &map.random.generator
+                    ) {
+                        let section: Factory.Section = .init(type: $0, tile: .init(planet: id, tile: $1))
+                        if case nil = self.factories.find(section: section) {
+                            return section
+                        } else {
+                            return nil
+                        }
+                    }
+                } (&self.planets[i])
+            }
+        }
+        self.rules.factories.values.randomElement(using: &map.random.generator)
     }
 }

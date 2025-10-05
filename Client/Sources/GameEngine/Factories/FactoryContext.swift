@@ -83,7 +83,7 @@ extension FactoryContext {
         self.clerks?.limit = (self.type.clerks?.amount ?? 0) * area
 
         guard
-        let tile: PlanetGrid.Tile = context.planets[self.state.on],
+        let tile: PlanetGrid.Tile = context.planets[self.state.tile],
         let governedBy: CountryProperties = tile.governedBy,
         let occupiedBy: CountryProperties = tile.occupiedBy else {
             return
