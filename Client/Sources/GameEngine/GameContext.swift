@@ -543,7 +543,10 @@ extension GameContext {
                         among: self.rules.factories,
                         using: &map.random.generator
                     ) {
-                        let section: Factory.Section = .init(type: $0, tile: .init(planet: id, tile: $1))
+                        let section: Factory.Section = .init(
+                            type: $0,
+                            tile: .init(planet: id, tile: $1)
+                        )
                         if case nil = self.factories.find(section: section) {
                             return section
                         } else {
