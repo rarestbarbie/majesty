@@ -35,13 +35,13 @@ extension ProductionReport: PersistentReport {
             return
         }
 
-        for factory: FactoryContext in snapshot.factories {
+        for factory: FactoryContext in snapshot.factories.table {
             guard case country.state.id? = factory.governedBy?.id else {
                 continue
             }
             guard
-            let planet: PlanetContext = snapshot.planets[factory.state.on.planet],
-            let tile: PlanetGrid.Tile = planet.grid.tiles[factory.state.on.tile] else {
+            let planet: PlanetContext = snapshot.planets[factory.state.tile.planet],
+            let tile: PlanetGrid.Tile = planet.grid.tiles[factory.state.tile.tile] else {
                 continue
             }
 

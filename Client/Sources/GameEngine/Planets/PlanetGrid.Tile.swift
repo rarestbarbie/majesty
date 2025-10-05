@@ -3,6 +3,7 @@ import GameRules
 import GameState
 import GameTerrain
 import HexGrids
+import OrderedCollections
 
 extension PlanetGrid {
     struct Tile: Identifiable {
@@ -16,7 +17,9 @@ extension PlanetGrid {
 
         // Computed statistics
 
+        private(set) var factories: [FactoryID]
         private(set) var pops: [PopID]
+
         private(set) var population: Int64
         private(set) var weighted: (
             mil: Double,
@@ -37,6 +40,7 @@ extension PlanetGrid {
             self.governedBy = nil
             self.occupiedBy = nil
 
+            self.factories = []
             self.pops = []
             self.population = 0
             self.weighted.mil = 0
@@ -53,17 +57,35 @@ extension PlanetGrid.Tile {
 }
 extension PlanetGrid.Tile {
     mutating func startIndexCount() {
+        self.factories = []
         self.pops = []
         self.population = 0
         self.weighted.mil = 0
         self.weighted.con = 0
     }
 
-    mutating func addResidentCount(pop: Pop) {
+    mutating func addResidentCount(_ pop: Pop) {
         let weight: Double = .init(pop.today.size)
         self.pops.append(pop.id)
         self.population += pop.today.size
         self.weighted.mil += pop.today.mil * weight
         self.weighted.con += pop.today.con * weight
+    }
+    mutating func addResidentCount(_ factory: Factory) {
+        self.factories.append(factory.id)
+    }
+}
+extension PlanetGrid.Tile {
+    func pickFactory(
+        among factories: OrderedDictionary<FactoryType, FactoryMetadata>,
+        using generator: inout some RandomNumberGenerator,
+        where filter: (FactoryType, HexCoordinate) throws -> Factory.Section?,
+    ) rethrows -> Factory.Section? {
+        let choices: [Factory.Section] = try factories.keys.reduce(into: []) {
+            if  let section: Factory.Section = try filter($1, self.id) {
+                $0.append(section)
+            }
+        }
+        return choices.randomElement(using: &generator)
     }
 }

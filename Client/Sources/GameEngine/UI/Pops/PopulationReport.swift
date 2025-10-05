@@ -58,7 +58,7 @@ extension PopulationReport: PersistentReport {
                     today: pop.state.today,
                     jobs: pop.state.jobs.values.map {
                         .init(
-                            name: snapshot.factories[$0.at]?.type.name ?? "Unknown",
+                            name: snapshot.factories.table[$0.at]?.type.name ?? "Unknown",
                             size: $0.count,
                             hire: $0.hired,
                             fire: $0.fired,

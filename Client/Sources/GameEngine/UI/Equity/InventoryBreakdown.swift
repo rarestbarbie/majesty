@@ -68,14 +68,14 @@ extension InventoryBreakdown {
             from: factory.state.ni,
             tier: .i,
             currency: currency,
-            location: factory.state.on,
+            location: factory.state.tile,
             snapshot: snapshot
         )
         self.inventory.update(
             from: factory.state.nv,
             tier: .v,
             currency: currency,
-            location: factory.state.on,
+            location: factory.state.tile,
             snapshot: snapshot
         )
 
@@ -83,7 +83,7 @@ extension InventoryBreakdown {
         self.inventory.update(
             from: factory.state.out,
             currency: currency,
-            location: factory.state.on,
+            location: factory.state.tile,
             snapshot: snapshot
         )
 
