@@ -1,8 +1,7 @@
 import Testing
 import HexGrids
 
-@Suite
-public struct NeighborTests {
+@Suite public struct NeighborTests {
     /// The neighbor relationship must be symmetrical. If B is a neighbor of A, then A must
     /// be a neighbor of B. This is the most important test in this suite.
     @Test public func Symmetry() {

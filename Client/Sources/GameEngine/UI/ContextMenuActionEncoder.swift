@@ -17,7 +17,7 @@ extension ContextMenuActionEncoder {
 
     subscript<each Argument>(
         _ action: ContextMenuAction
-    ) -> (repeat each Argument)? where repeat each Argument : ConvertibleToJSValue {
+    ) -> (repeat each Argument)? where repeat each Argument: ConvertibleToJSValue {
         get { nil }
         set(argument) {
             guard let argument: (repeat each Argument) else {

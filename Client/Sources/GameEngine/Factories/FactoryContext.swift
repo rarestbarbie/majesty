@@ -381,8 +381,7 @@ extension FactoryContext {
                 buybacks: buybacks,
                 px: px
             )
-        }
-        else {
+        } else {
             // All costs zero.
             return FactoryBudget.init(
                 inputs: 0,

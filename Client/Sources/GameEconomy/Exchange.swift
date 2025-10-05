@@ -114,8 +114,7 @@ extension Exchange {
         )
     }
 
-    @_spi(testable)
-    public mutating func arbitrate(
+    @_spi(testable) public mutating func arbitrate(
         resource: Market.Asset,
         currency: Fiat,
         partners: [Fiat],

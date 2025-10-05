@@ -13,7 +13,7 @@ extension JavaScriptDecoder {
 }
 extension JavaScriptDecoder.Position {
     @inlinable public func decode<T>(
-        to _:T.Type = T.self
+        to _: T.Type = T.self
     ) throws -> T where T: LoadableFromJSValue {
         do {
             return try T.load(from: self.value)

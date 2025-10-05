@@ -1,8 +1,7 @@
 import Random
 import Testing
 
-@Suite
-struct NormalTests {
+@Suite struct NormalTests {
     private var random: PseudoRandom
 
     init() {
@@ -20,8 +19,7 @@ extension NormalTests {
             (μ: 100, σ: 10),
             (μ: 0, σ: 0.1),
         ]
-    )
-    mutating func Statistics2(_ μ: Double, _ σ: Double) {
+    ) mutating func Statistics2(_ μ: Double, _ σ: Double) {
         Normal[μ, σ].performStandardStatisticalTests(using: &self.random, visualize: true)
     }
 
@@ -32,8 +30,7 @@ extension NormalTests {
             (μ: -1e6, σ: 1e3),    // Very negative mean
             (μ: 0, σ: 0),     // Zero variance
         ]
-    )
-    mutating func ExtremeValues(_ μ: Double, _ σ: Double) {
+    ) mutating func ExtremeValues(_ μ: Double, _ σ: Double) {
         Normal[μ, σ].performStandardStatisticalTests(using: &self.random, visualize: false)
     }
 }

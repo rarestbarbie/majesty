@@ -12,8 +12,7 @@
 ///     `TESTABLE` builds.
 ///   - message: A string to print if `condition` is `false`. This expression
 ///     is only evaluated if `condition` is `false` in a `TESTABLE` build.
-@freestanding(expression)
-public macro assert(
+@freestanding(expression) public macro assert(
     _ condition: Bool,
     _ message: String
 ) = #externalMacro(
