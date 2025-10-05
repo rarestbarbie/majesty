@@ -56,7 +56,7 @@ let package: Package = .init(
         ),
 
         .plugin(
-            name: "DollupPlugin",
+            name: "DollupFormat",
             capability: .command(
                 intent: .custom(verb: "format", description: "format source files"),
                 permissions: [.writeToPackageDirectory(reason: "code formatter")],
