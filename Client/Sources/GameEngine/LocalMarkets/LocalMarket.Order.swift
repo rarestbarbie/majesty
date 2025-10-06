@@ -1,11 +1,11 @@
 extension LocalMarket {
     struct Order {
-        let by: LegalEntity
+        let by: LEI
         let tier: ResourceTierIdentifier?
         var amount: Int64
         var filled: Int64
 
-        init(by: LegalEntity, tier: ResourceTierIdentifier?, amount: Int64, filled: Int64 = 0) {
+        init(by: LEI, tier: ResourceTierIdentifier?, amount: Int64, filled: Int64 = 0) {
             self.by = by
             self.tier = tier
             self.amount = amount

@@ -1,7 +1,7 @@
 import GameEconomy
 import Random
 
-struct LocalMarket<LegalEntity> {
+struct LocalMarket<LEI> {
     var yesterday: LocalMarketState
     var today: LocalMarketState
 
@@ -42,14 +42,14 @@ extension LocalMarket {
     }
 }
 extension LocalMarket {
-    mutating func ask(amount: Int64, by entity: LegalEntity) {
+    mutating func ask(amount: Int64, by entity: LEI) {
         self.asks.append(.init(by: entity, tier: nil, amount: amount))
         self.today.supply += amount
     }
 
     mutating func bid(
         budget: Int64,
-        by entity: LegalEntity,
+        by entity: LEI,
         in tier: ResourceTierIdentifier,
         limit: Int64,
     ) {

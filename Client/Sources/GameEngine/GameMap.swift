@@ -10,14 +10,14 @@ struct GameMap: ~Copyable {
     var exchange: Exchange
     var notifications: Notifications
 
-    var transfers: [LegalEntity: CashTransfers]
+    var transfers: [LEI: CashTransfers]
     var conversions: [Pop.Conversion]
     var jobs: (
         hire: (worker: Jobs.Hire<Address>, clerk: Jobs.Hire<PlanetID>),
         fire: (worker: Jobs.Fire, clerk: Jobs.Fire)
     )
     var localMarkets: LocalMarkets<PopID>
-    var stockMarkets: StockMarkets<LegalEntity>
+    var stockMarkets: StockMarkets<LEI>
 
     init(
         date: GameDate,
@@ -42,17 +42,18 @@ extension GameMap {
     /// Returns the total compensation paid out to shareholders.
     mutating func buyback(
         value: Int64,
-        from equity: inout Equity<LegalEntity>,
-        of security: StockMarket<LegalEntity>.Security,
+        from equity: inout Equity<LEI>,
+        of security: StockMarket<LEI>.Security,
         in currency: Fiat,
     ) -> Int64 {
-        let quote: (quantity: Int64, cost: Int64) = security.quote(value: value)
-
-        guard quote.quantity > 0, quote.cost > 0 else {
+        guard
+        let quote: (quantity: Int64, cost: Int64) = security.quote(value: value),
+        quote.quantity > 0,
+        quote.cost > 0 else {
             return 0
         }
 
-        let recipients: [EquityStake<LegalEntity>] = equity.shares.values.shuffled(
+        let recipients: [EquityStake<LEI>] = equity.shares.values.shuffled(
             using: &self.random.generator
         )
 
@@ -68,7 +69,7 @@ extension GameMap {
         if  let shares: [Int64],
             let compensation: [Int64] = shares.distribute(quote.cost) {
             for ((shares, compensation), recipient):
-                ((Int64, Int64), EquityStake<LegalEntity>) in zip(
+                ((Int64, Int64), EquityStake<LEI>) in zip(
                     zip(shares, compensation),
                     recipients
                 ) where shares > 0 {
@@ -137,7 +138,7 @@ extension GameMap {
 
     mutating func pay(
         dividend: Int64,
-        to shareholders: [EquityStake<LegalEntity>]
+        to shareholders: [EquityStake<LEI>]
     ) -> Int64 {
         guard
         let payments: [Int64] = shareholders.distribute(

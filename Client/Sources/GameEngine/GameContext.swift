@@ -176,7 +176,7 @@ extension GameContext {
             }
         }
         map.stockMarkets.turn {
-            for fill: StockMarket<LegalEntity>.Fill in $1.match(using: &map.random) {
+            for fill: StockMarket<LEI>.Fill in $1.match(using: &map.random) {
                 switch fill.buyer {
                 case .pop(let id):
                     self.pops.table[id]?.state.cash.e -= fill.cost
@@ -281,12 +281,12 @@ extension GameContext {
 
             #assert(counted != nil, "Pop \(pop.state.id) has no home tile!!!")
 
-            let indenture: LegalEntity = .pop(pop.state.id)
+            let indenture: LEI = .pop(pop.state.id)
 
             for job: FactoryJob in pop.state.jobs.values {
                 self.factories.table[job.at]?.addWorkforceCount(pop: pop.state, job: job)
             }
-            for stake: EquityStake<LegalEntity> in pop.state.equity.shares.values {
+            for stake: EquityStake<LEI> in pop.state.equity.shares.values {
                 let counted: ()?
                 switch stake.id {
                 case .pop(let id):
@@ -310,8 +310,8 @@ extension GameContext {
 
             #assert(counted != nil, "Factory \(factory.state.id) has no home tile!!!")
 
-            let title: LegalEntity = .factory(factory.state.id)
-            for stake: EquityStake<LegalEntity> in factory.state.equity.shares.values {
+            let title: LEI = .factory(factory.state.id)
+            for stake: EquityStake<LEI> in factory.state.equity.shares.values {
                 let counted: ()?
                 switch stake.id {
                 case .pop(let id):
@@ -337,7 +337,7 @@ extension GameContext {
         defer {
             map.transfers.removeAll(keepingCapacity: true)
         }
-        for (recipient, transfers): (LegalEntity, CashTransfers) in map.transfers {
+        for (recipient, transfers): (LEI, CashTransfers) in map.transfers {
             switch recipient {
             case .pop(let id):
                 self.pops.table[id]?.state.cash += transfers
@@ -488,14 +488,14 @@ extension GameContext {
         //     slaves: [PopID: [PopID]]
         // ) = (
         //     self.factories.state.reduce(into: [:]) {
-        //         for stake: EquityStake<LegalEntity> in $1.equity.shares.values {
+        //         for stake: EquityStake<LEI> in $1.equity.shares.values {
         //             if case .pop(let id) = stake.id {
         //                 $0[id, default: []].append($1.id)
         //             }
         //         }
         //     },
         //     self.pops.table.state.reduce(into: [:]) {
-        //         for stake: EquityStake<LegalEntity> in $1.equity.shares.values {
+        //         for stake: EquityStake<LEI> in $1.equity.shares.values {
         //             if case .pop(let id) = stake.id {
         //                 $0[id, default: []].append($1.id)
         //             }
@@ -539,20 +539,17 @@ extension GameContext {
             for j: Int in self.planets[i].grid.tiles.values.indices {
                 let factory: Factory.Section? = {
                     let id: PlanetID = $0.state.id
-                    return $0[j].pickFactory(
-                        among: self.rules.factories,
-                        using: &map.random
-                    ) {
-                        let section: Factory.Section = .init(
-                            type: $0,
-                            tile: .init(planet: id, tile: $1)
-                        )
-                        if case nil = self.factories.find(section: section) {
-                            return section
-                        } else {
+                    return {
+                        guard
+                        let selected: FactoryType = $0.pickFactory(
+                            among: self.rules.factories,
+                            using: &map.random
+                        )  else {
                             return nil
                         }
-                    }
+                        return .init(type: selected, tile: .init(planet: id, tile: $0.id))
+
+                    } (&$0[j])
                 } (&self.planets[i])
 
                 guard
@@ -563,7 +560,7 @@ extension GameContext {
                 try self.factories.with(section: factory) {
                     self.rules.factories[$0.type]
                 } update: {
-                    $0.cash.s += 1
+                    $0.size = .init(level: 0)
                 }
             }
         }

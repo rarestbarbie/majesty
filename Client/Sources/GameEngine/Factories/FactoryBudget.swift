@@ -1,26 +1,62 @@
 import GameEconomy
 
-struct FactoryBudget {
-    var inputs: Int64
-    var clerks: Int64
-    var workers: Int64
-    var dividend: Int64
-    var buybacks: Int64
-    var px: Fraction
+enum FactoryBudget {
+    case constructing(Constructing)
+    case liquidating(Liquidating)
+    case active(Active)
+}
+extension FactoryBudget {
+    static func constructing(
+        state: Factory,
+    ) -> Self{
+        let balance: Int64 = state.cash.balance
+        return .constructing(.init(spending: balance / 90))
+    }
+    static func liquidating(
+        state: Factory,
+    ) -> Self {
+        let balance: Int64 = state.cash.balance
+        return .liquidating(.init(buybacks: min(balance, balance / 100 + 1)))
+    }
+    static func active(
+        workers: FactoryContext.Workforce?,
+        clerks: FactoryContext.Workforce?,
+        state: Factory,
+        productivity: Int64,
+        inputsCostPerHour: Double
+    ) -> Self {
+        let c: Double = clerks.map { Double.init(state.today.cn * $0.limit) } ?? 0
+        let i: Double
+        let w: Double
+        if  let workers: FactoryContext.Workforce {
+            i = Double.init(
+                productivity * workers.limit
+            ) * state.today.ei * inputsCostPerHour
+            w = Double.init(
+                state.today.wn * workers.limit
+            )
+        } else {
+            i = 0
+            w = 0
+        }
 
-    init(
-        inputs: Int64 = 0,
-        clerks: Int64 = 0,
-        workers: Int64 = 0,
-        dividend: Int64 = 0,
-        buybacks: Int64 = 0,
-        px: Fraction = 1
-    ) {
-        self.inputs = inputs
-        self.clerks = clerks
-        self.workers = workers
-        self.dividend = dividend
-        self.buybacks = buybacks
-        self.px = px
+        let balance: Int64 = state.cash.balance
+
+        let l: Int64
+        var budget: FactoryBudget.Active
+
+        if  let share: [Int64] = [i, c, w].distribute(balance / 7) {
+            budget = .init(inputs: share[0], clerks: share[1], workers: share[2])
+            l = Int64.init((i + w).rounded(.up))
+        }
+        else {
+            budget = .init()
+            l = 0
+        }
+
+        budget.buybacks = (balance - l) / 365
+        budget.dividend = balance <> (2 %/ 10_000)
+
+        return .active(budget)
     }
 }

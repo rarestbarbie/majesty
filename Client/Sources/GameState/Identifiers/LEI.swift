@@ -1,12 +1,8 @@
-import GameState
-import JavaScriptInterop
-import JavaScriptKit
-
-enum LegalEntity: Equatable, Hashable {
+@frozen public enum LEI: Equatable, Hashable {
     case factory(FactoryID)
     case pop(PopID)
 }
-extension LegalEntity: LosslessStringConvertible {
+extension LEI: LosslessStringConvertible {
     @inlinable public init?(_ id: some StringProtocol) {
         guard
         let first: String.Index = id.unicodeScalars.indices.first,
@@ -21,12 +17,11 @@ extension LegalEntity: LosslessStringConvertible {
         }
     }
 }
-extension LegalEntity: CustomStringConvertible {
+extension LEI: CustomStringConvertible {
     @inlinable public var description: String {
         switch self {
-        case .factory(let id):   "F\(id.rawValue)"
-        case .pop(let id):       "P\(id.rawValue)"
+        case .factory(let id):   "\(Class.F)\(id.rawValue)"
+        case .pop(let id):       "\(Class.P)\(id.rawValue)"
         }
     }
 }
-extension LegalEntity: ConvertibleToJSString, LoadableFromJSString {}

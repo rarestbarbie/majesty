@@ -1,7 +1,7 @@
 extension StockMarket {
     struct Fill {
-        let asset: LegalEntity
-        let buyer: LegalEntity
+        let asset: LEI
+        let buyer: LEI
         let quantity: Int64
         let cost: Int64
     }

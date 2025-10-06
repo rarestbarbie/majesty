@@ -28,7 +28,7 @@ struct Pop: CashAccountHolder, IdentityReplaceable {
     var yesterday: Dimensions
     var today: Dimensions
 
-    var equity: Equity<LegalEntity>
+    var equity: Equity<LEI>
     var jobs: OrderedDictionary<FactoryID, FactoryJob>
 }
 extension Pop: Sectionable {
@@ -74,7 +74,7 @@ extension Pop: Turnable {
     }
 }
 extension Pop {
-    mutating func issue(shares fill: StockMarket<LegalEntity>.Fill) {
+    mutating func issue(shares fill: StockMarket<LEI>.Fill) {
         self.equity.issue(shares: fill.quantity, to: fill.buyer)
         self.cash.e += fill.cost
     }

@@ -1,6 +1,6 @@
 extension StockMarket {
     struct RandomPurchase {
-        let buyer: LegalEntity
+        let buyer: LEI
         let value: Int64
     }
 }
