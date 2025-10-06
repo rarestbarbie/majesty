@@ -10,24 +10,19 @@ extension Equity {
             issued: Int64,
             traded: Int64
         )
+        var sharePrice: Fraction
     }
 }
 extension Equity.Statistics {
     init() {
-        self.init(owners: [], shares: (outstanding: 0, issued: 0, traded: 0))
+        self.init(owners: [], shares: (outstanding: 0, issued: 0, traded: 0), sharePrice: 0)
     }
 }
-extension Equity.Statistics {
-    func price(valuation: Int64) -> Fraction {
-        // This formulation means that if there are no outstanding shares, the price is equal
-        // to the valuation. In other words, you can buy the entire company for its valuation.
-        valuation %/ (self.shares.outstanding + 1)
-    }
-}
-extension Equity<LegalEntity>.Statistics {
+extension Equity<LEI>.Statistics {
     static func compute(
-        from equity: Equity<LegalEntity>,
-        in context: GameContext.ResidentPass
+        equity: Equity<LEI>,
+        assets: CashAccount,
+        in context: GameContext.ResidentPass,
     ) -> Self {
         let shares: (outstanding: Int64, bought: Int64, sold: Int64) = equity.shares.reduce(
             into: (0, 0, 0)
@@ -41,6 +36,10 @@ extension Equity<LegalEntity>.Statistics {
             shares.outstanding >= 0,
             "Outstanding shares (\(shares.outstanding)) cannot be negative!!!"
         )
+
+        // This formulation means that if there are no outstanding shares, the price is equal
+        // to the valuation. In other words, you can buy the entire company for its valuation.
+        let sharePrice: Fraction = assets.balance %/ max(shares.outstanding, 1)
 
         return .init(
             owners: equity.shares.values.reduce(into: []) {
@@ -87,7 +86,8 @@ extension Equity<LegalEntity>.Statistics {
                 outstanding: shares.outstanding,
                 issued: shares.sold - shares.bought,
                 traded: shares.sold + shares.bought
-            )
+            ),
+            sharePrice: sharePrice
         )
     }
 }

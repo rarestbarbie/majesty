@@ -16,7 +16,7 @@
       "location" : "https://github.com/tayloraswift/dollup",
       "state" : {
         "branch" : "master",
-        "revision" : "9d0d65d09524fc44fd97988147e1cbbc66d5daa4"
+        "revision" : "da8c8d669e535568f1394b1bfa18728612a74d35"
       }
     },
     {
@@ -51,8 +51,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tayloraswift/swift-io",
       "state" : {
-        "branch" : "master",
-        "revision" : "9c68f73034a61b742a9dbc98661946b990e4b319"
+        "revision" : "1cbe8b229f4dd2dd758183b1dc377b39f474c070",
+        "version" : "0.1.0"
       }
     },
     {

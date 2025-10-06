@@ -7,7 +7,7 @@ import {
 } from '../DOM/exports.js';
 import { GameID } from '../GameEngine/exports.js';
 import {
-    Resource,
+    CellStyle,
     ResourceNeed,
     ProgressCell,
     TooltipType,
@@ -92,9 +92,9 @@ export class ResourceNeedRow implements DiffableListElement<string> {
         }
 
         if (need.unitsConsumed < need.unitsDemanded) {
-            this.stockpile.dataset['cell'] = 'shortage';
+            this.stockpile.setAttribute('data-cell', CellStyle.Bloody);
         } else {
-            delete this.stockpile.dataset['cell'];
+            this.stockpile.removeAttribute('data-cell');
         }
 
         if (need.priceAtMarket !== undefined) {

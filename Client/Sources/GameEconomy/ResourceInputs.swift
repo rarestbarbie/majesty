@@ -80,9 +80,7 @@ extension ResourceInputs {
         on exchange: inout Exchange,
         weights: ArraySlice<Double>,
     ) -> (gain: Int64, loss: Int64) {
-        guard let budget: [Int64] = weights.distribute(spendingLimit) else {
-            return (0, 0)
-        }
+        let budget: [Int64]? = weights.distribute(spendingLimit)
 
         var gain: Int64 = 0
         var loss: Int64 = 0
@@ -90,7 +88,7 @@ extension ResourceInputs {
         for i: Int in self.tradeable.values.indices {
             let value: Int64 = self.tradeable.values[i].trade(
                 stockpileDays: stockpileDays,
-                budget: budget[i],
+                budget: budget?[i] ?? 0,
                 in: currency,
                 on: &exchange
             )
@@ -106,7 +104,7 @@ extension ResourceInputs {
             """
             Spending is out of bounds: \(-loss) not in [0, \(spendingLimit)] ?!?!
             Inputs: \(self)
-            Budget: \(budget)
+            Budget: \(budget ?? [])
             """
         )
 

@@ -10,8 +10,8 @@ struct Factory: CashAccountHolder, Identifiable {
     let tile: Address
     var type: FactoryType
     var size: Size
-    var subs: Bool
     var cash: CashAccount
+    var liquidating: Bool
 
     var nv: ResourceInputs
     var ni: ResourceInputs
@@ -19,7 +19,7 @@ struct Factory: CashAccountHolder, Identifiable {
     var yesterday: Dimensions
     var today: Dimensions
 
-    var equity: Equity<LegalEntity>
+    var equity: Equity<LEI>
 }
 extension Factory {
     @available(*, deprecated, renamed: "tile")
@@ -32,8 +32,8 @@ extension Factory: Sectionable {
             tile: section.tile,
             type: section.type,
             size: .init(level: 0),
-            subs: false,
             cash: .init(),
+            liquidating: false,
             nv: .init(),
             ni: .init(),
             out: .init(),
@@ -54,7 +54,7 @@ extension Factory: Turnable {
     }
 }
 extension Factory {
-    mutating func issue(shares fill: StockMarket<LegalEntity>.Fill) {
+    mutating func issue(shares fill: StockMarket<LEI>.Fill) {
         self.equity.issue(shares: fill.quantity, to: fill.buyer)
         self.cash.e += fill.cost
     }
@@ -84,8 +84,8 @@ extension Factory {
         case type
         case size_l
         case size_p
-        case subs
         case cash
+        case liquidating
         case nv
         case ni
         case out
@@ -136,8 +136,8 @@ extension Factory: JavaScriptEncodable {
         js[.type] = self.type.rawValue
         js[.size_l] = self.size.level
         js[.size_p] = self.size.growthProgress
-        js[.subs] = self.subs
         js[.cash] = self.cash
+        js[.liquidating] = self.liquidating ? true : nil
 
         js[.nv] = self.nv
         js[.ni] = self.ni
@@ -199,8 +199,8 @@ extension Factory: JavaScriptDecodable {
                 level: try js[.size_l]?.decode() ?? 1,
                 growthProgress: try js[.size_p]?.decode() ?? 0
             ),
-            subs: try js[.subs]?.decode() ?? false,
-            cash: try js[.cash]?.decode() ?? .init(liq: 1),
+            cash: try js[.cash]?.decode() ?? .init(liq: 0),
+            liquidating: try js[.liquidating]?.decode() ?? false,
             nv: try js[.nv]?.decode() ?? .init(),
             ni: try js[.ni]?.decode() ?? .init(),
             out: try js[.out]?.decode() ?? .init(),

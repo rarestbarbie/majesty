@@ -7,6 +7,7 @@ export interface FactoryTableEntry {
     readonly type: string;
     readonly size_l: bigint;
     readonly size_p: number;
+    readonly liquidating: boolean;
 
     readonly y_wn: bigint;
     readonly y_cn: bigint;

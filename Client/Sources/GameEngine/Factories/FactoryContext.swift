@@ -18,7 +18,7 @@ struct FactoryContext: RuntimeContext {
 
     private(set) var workers: Workforce?
     private(set) var clerks: Workforce?
-    private(set) var equity: Equity<LegalEntity>.Statistics
+    private(set) var equity: Equity<LEI>.Statistics
 
     private(set) var cashFlow: CashFlowStatement
 
@@ -70,7 +70,7 @@ extension FactoryContext {
             )
         }
     }
-    mutating func addPosition(asset: LegalEntity, value: Int64) {
+    mutating func addPosition(asset: LEI, value: Int64) {
         guard value > 0 else {
             return
         }
@@ -105,7 +105,7 @@ extension FactoryContext {
         self.cashFlow[.workers] = -self.state.cash.w
         self.cashFlow[.clerks] = -self.state.cash.c
 
-        self.equity = .compute(from: self.state.equity, in: context)
+        self.equity = .compute(equity: self.state.equity, assets: self.state.cash, in: context)
     }
 }
 extension FactoryContext: TransactingContext {
@@ -162,20 +162,29 @@ extension FactoryContext: TransactingContext {
             stockpileDays: Self.stockpileDays.lowerBound,
         )
 
-        let budget: FactoryBudget = self.budget(inputsCostPerHour: inputsCostPerHour)
-        self.budget = budget
-        self.state.today.px = Double.init(budget.px)
-
-        guard
-        let security: StockMarket<LegalEntity>.Security = .init(
-            attraction: self.state.today.pa,
-            asset: .factory(self.state.id),
-            price: budget.px
-        ) else {
-            return
+        if  self.equity.sharePrice.n > 0 {
+            self.state.today.px = Double.init(self.equity.sharePrice)
+        } else {
+            self.state.today.px = 0
+            self.state.equity = [:]
+            self.equity = .init()
         }
 
-        map.stockMarkets.issueShares(security: security, currency: country.currency.id)
+        if  self.state.size.level == 0 {
+            self.budget = .constructing(state: self.state)
+            map.stockMarkets.issueShares(security: self.security, currency: country.currency.id)
+        } else if self.state.liquidating {
+            self.budget = .liquidating(state: self.state)
+        } else {
+            self.budget = .active(
+                workers: self.workers,
+                clerks: self.clerks,
+                state: self.state,
+                productivity: self.productivity,
+                inputsCostPerHour: inputsCostPerHour
+            )
+            map.stockMarkets.issueShares(security: self.security, currency: country.currency.id)
+        }
     }
 
     mutating func transact(map: inout GameMap) {
@@ -185,88 +194,110 @@ extension FactoryContext: TransactingContext {
             return
         }
 
-        #assert(budget.workers >= 0, "Workers budget (\(budget.workers)) is negative?!?!")
-        #assert(budget.clerks >= 0, "Clerks budget (\(budget.clerks)) is negative?!?!")
-        #assert(budget.inputs >= 0, "Inputs budget (\(budget.inputs)) is negative?!?!")
-
-        if  let (salaries, bonus): (Paychecks, Double) = self.clerkEffects(
-                budget: budget.clerks,
-                map: &map
-            ) {
-            self.state.today.eo = 1 + bonus
-            self.state.today.cn = max(country.minwage, self.state.today.cn + salaries.change)
-            self.state.today.ca = salaries.rate
-            self.state.cash.c -= salaries.paid
-
-            switch salaries.headcount {
-            case nil:
-                break
-            case .fire(let block):
-                map.jobs.fire.clerk[self.state.id] = block
-            case .hire(let block, let type):
-                map.jobs.hire.clerk[self.state.tile.planet, type].append(block)
-            }
-        } else {
-            self.state.today.eo = 1
-        }
-
         let stockpileTarget: TradeableInput.StockpileTarget = .random(
             in: Self.stockpileDays,
             using: &map.random,
         )
 
-        let wages: Paychecks? = self.operate(
-            policy: country,
-            budget: budget,
-            stockpileTarget: stockpileTarget,
-            map: &map
-        )
-
-        let operatingProfit: Int64 = self.state.operatingProfit
-
-        if  self.state.size.level == 0 {
+        switch budget {
+        case .constructing(let budget):
             self.state.today.pa = 1
-        } else if operatingProfit > 0 {
-            self.state.today.pa = min(1, self.state.today.pa + 0.01)
-        } else {
-            self.state.today.pa = max(0, self.state.today.pa - 0.01)
-        }
+            self.construct(
+                policy: country,
+                budget: budget,
+                stockpileTarget: stockpileTarget,
+                map: &map
+            )
 
-        switch wages?.headcount {
-        case nil:
-            break
+        case .liquidating(let budget):
+            self.liquidate(policy: country, budget: budget, map: &map)
 
-        case .fire(let block):
-            map.jobs.fire.worker[self.state.id] = block
-
-        case .hire(let block, let type):
-            guard operatingProfit >= 0 || self.workers?.count ?? 0 == 0 else {
-                break
-            }
-
-            map.jobs.hire.worker[self.state.tile, type].append(block)
-        }
-
-        guard
-        let security: StockMarket<LegalEntity>.Security = .init(
-            attraction: self.state.today.pa,
-            asset: .factory(self.state.id),
-            price: budget.px
-        ) else {
-            // Factory is bankrupt?
-            return
-        }
-
-        let investmentBudget: Int64
-
-        if  let workers = self.workers {
-            #assert(self.state.size.level > 0, "Factory with workers has size level 0?!?!")
-
-            investmentBudget = operatingProfit <> (workers.count %/ (50 * workers.limit))
+            self.state.today.pa = 0
             self.state.cash.e -= map.buyback(
                 value: budget.buybacks,
                 from: &self.state.equity,
-                of: security,
+                of: self.security,
+                in: country.currency.id
+            )
+
+        case .active(let budget):
+            #assert(budget.workers >= 0, "Workers budget (\(budget.workers)) is negative?!?!")
+            #assert(budget.clerks >= 0, "Clerks budget (\(budget.clerks)) is negative?!?!")
+            #assert(budget.inputs >= 0, "Inputs budget (\(budget.inputs)) is negative?!?!")
+
+            #assert(self.state.size.level > 0, "Active factory has size level 0?!?!")
+
+            if  let (salaries, bonus): (Paychecks, Double) = self.clerkEffects(
+                    budget: budget.clerks,
+                    map: &map
+                ) {
+                self.state.today.eo = 1 + bonus
+                self.state.today.cn = max(country.minwage, self.state.today.cn + salaries.change)
+                self.state.today.ca = salaries.rate
+                self.state.cash.c -= salaries.paid
+
+                switch salaries.headcount {
+                case nil:
+                    break
+                case .fire(let block):
+                    map.jobs.fire.clerk[self.state.id] = block
+                case .hire(let block, let type):
+                    map.jobs.hire.clerk[self.state.tile.planet, type].append(block)
+                }
+            } else {
+                self.state.today.eo = 1
+            }
+
+            let operatingProfit: Int64
+            let reinvestRatio: Fraction
+
+            if  let workers: Workforce = self.workers {
+                let wages: Paychecks = self.operate(
+                    workers: workers,
+                    policy: country,
+                    budget: budget,
+                    stockpileTarget: stockpileTarget,
+                    map: &map
+                )
+
+                operatingProfit = self.state.operatingProfit
+
+                switch wages.headcount {
+                case nil:
+                    break
+
+                case .fire(let block):
+                    map.jobs.fire.worker[self.state.id] = block
+
+                case .hire(let block, let type):
+                    guard operatingProfit >= 0 || workers.count == 0 else {
+                        break
+                    }
+
+                    map.jobs.hire.worker[self.state.tile, type].append(block)
+                }
+
+                reinvestRatio = workers.count %/ (50 * workers.limit)
+            } else {
+                operatingProfit = self.state.operatingProfit
+                reinvestRatio = 1 %/ 50
+            }
+
+            let construction: FactoryBudget.Constructing = .init(
+                spending: operatingProfit <> reinvestRatio
+            )
+
+            self.construct(
+                policy: country,
+                budget: construction,
+                stockpileTarget: stockpileTarget,
+                map: &map
+            )
+
+            self.state.cash.e -= map.buyback(
+                value: budget.buybacks,
+                from: &self.state.equity,
+                of: self.security,
                 in: country.currency.id
             )
             // Pay dividends to shareholders, if any.
@@ -274,59 +305,101 @@ extension FactoryContext: TransactingContext {
                 dividend: budget.dividend,
                 to: self.state.equity.shares.values.shuffled(using: &map.random.generator)
             )
-        } else {
-            investmentBudget = budget.buybacks + budget.dividend
+
+            if  self.state.size.level == 0 {
+                self.state.today.pa = 1
+            } else if operatingProfit > 0 {
+                self.state.today.pa = min(1, self.state.today.pa + 0.01)
+            } else {
+                self.state.today.pa = max(0, self.state.today.pa - 0.01)
+            }
+        }
+    }
+
+    mutating func advance(map: inout GameMap) {
+        guard !self.state.liquidating,
+        let country: CountryProperties = self.occupiedBy else {
+            return
         }
 
-        expansion:
-        if  investmentBudget > 0 {
-            let (gain, loss): (Int64, loss: Int64) = self.state.nv.trade(
-                stockpileDays: stockpileTarget,
-                spendingLimit: investmentBudget,
-                in: country.currency.id,
-                on: &map.exchange,
-            )
+        if  self.workers?.count ?? 0 == 0,
+            self.clerks?.count ?? 0 == 0,
+            self.state.today.pa <= 0 {
+            self.state.liquidating = true
+        } else {
+            self.state.equity.split(price: self.state.today.px, map: &map, notifying: [country.id])
+        }
+    }
+}
+extension FactoryContext {
+    private mutating func construct(
+        policy: CountryProperties,
+        budget: FactoryBudget.Constructing,
+        stockpileTarget: TradeableInput.StockpileTarget,
+        map: inout GameMap
+    ) {
+        guard budget.spending > 0 else {
+            return
+        }
 
-            self.state.cash.v += loss
-            self.state.cash.r += gain
+        let (gain, loss): (Int64, loss: Int64) = self.state.nv.trade(
+            stockpileDays: stockpileTarget,
+            spendingLimit: budget.spending,
+            in: policy.currency.id,
+            on: &map.exchange,
+        )
 
-            let growth: Int64 = self.state.nv.width(limit: 1, tier: self.type.costs)
+        self.state.cash.v += loss
+        self.state.cash.r += gain
 
-            guard growth > 0 else {
-                break expansion
-            }
-
+        let growthFactor: Int64 = self.productivity * (self.state.size.level + 1)
+        if  growthFactor == self.state.nv.width(limit: growthFactor, tier: self.type.costs) {
             self.state.size.grow()
             self.state.nv.consume(
                 from: self.type.costs,
-                scalingFactor: (
-                    self.productivity * (self.state.size.level + 1),
-                    self.state.today.ei
-                )
+                scalingFactor: (growthFactor, self.state.today.ei)
             )
         }
 
         self.state.today.vv = self.state.nv.valueAcquired
     }
 
-    mutating func advance(map: inout GameMap) {
-        guard
-        let country: CountryProperties = self.occupiedBy else {
-            return
-        }
-
-        // Add self.state subsidies at the end, after profit calculation.
-        // self.state.cash.s += self.state.size.value + country.minwage
-        self.state.equity.split(price: self.state.today.px, map: &map, notifying: [country.id])
-    }
-}
-extension FactoryContext {
-    private mutating func operate(
+    private mutating func liquidate(
         policy: CountryProperties,
-        budget: FactoryBudget,
+        budget: FactoryBudget.Liquidating,
+        map: inout GameMap
+    ) {
+        let stockpileNone: TradeableInput.StockpileTarget = .init(lower: 0, today: 0, upper: 0)
+        let ni: (gain: Int64, loss: Int64) = self.state.ni.trade(
+            stockpileDays: stockpileNone,
+            spendingLimit: 0,
+            in: policy.currency.id,
+            on: &map.exchange,
+        )
+        let nv: (gain: Int64, loss: Int64) = self.state.nv.trade(
+            stockpileDays: stockpileNone,
+            spendingLimit: 0,
+            in: policy.currency.id,
+            on: &map.exchange,
+        )
+
+        #assert(ni.loss == 0, "ni loss during liquidation is non-zero! (\(ni.loss))")
+        #assert(nv.loss == 0, "nv loss during liquidation is non-zero! (\(nv.loss))")
+
+        self.state.cash.r += ni.gain
+        self.state.cash.r += nv.gain
+
+        self.state.today.vi = self.state.ni.valueAcquired
+        self.state.today.vv = self.state.nv.valueAcquired
+    }
+
+    private mutating func operate(
+        workers: Workforce,
+        policy: CountryProperties,
+        budget: FactoryBudget.Active,
         stockpileTarget: TradeableInput.StockpileTarget,
         map: inout GameMap
-    ) -> Paychecks? {
+    ) -> Paychecks {
         let (gain, loss): (Int64, loss: Int64) = self.state.ni.trade(
             stockpileDays: stockpileTarget,
             spendingLimit: budget.inputs,
@@ -342,12 +415,11 @@ extension FactoryContext {
             "Factory has negative cash! (\(self.state.cash))"
         )
 
-        guard let (wages, hours): (Paychecks, Int64) = self.workerEffects(
+        let (wages, hours): (Paychecks, Int64) = self.workerEffects(
+            workers: workers,
             budget: budget.workers,
             map: &map
-        ) else {
-            return nil
-        }
+        )
 
         self.state.today.wn = max(policy.minwage, self.state.today.wn + wages.change)
         self.state.today.wa = wages.rate
@@ -378,52 +450,6 @@ extension FactoryContext {
     }
 }
 extension FactoryContext {
-    private func budget(
-        inputsCostPerHour: Double
-    ) -> FactoryBudget {
-
-        let c: Double = self.clerks.map { Double.init(self.state.today.cn * $0.limit) } ?? 0
-        let (i, w): (i: Double, w: Double) = self.workers.map {
-            (
-                i: Double.init(
-                    self.productivity * $0.limit
-                ) * self.state.today.ei * inputsCostPerHour,
-                w: Double.init(
-                    self.state.today.wn * $0.limit
-                )
-            )
-        } ?? (0, 0)
-
-        let d: Fraction = 2 %/ 10_000
-        let dividend: Int64 = self.state.cash.balance <> d
-
-        let px: Fraction = self.equity.price(valuation: self.state.cash.balance)
-
-        if  let budget: [Int64] = [i, c, w].distribute(self.state.cash.balance / 7) {
-            let l: Int64 = .init((i + w).rounded(.up))
-            let buybacks: Int64 = (self.state.cash.balance - l) / 365
-            return FactoryBudget.init(
-                inputs: budget[0],
-                clerks: budget[1],
-                workers: budget[2],
-                dividend: dividend,
-                buybacks: buybacks,
-                px: px
-            )
-        } else {
-            // All costs zero.
-            let buybacks: Int64 = self.state.cash.balance / 365
-            return FactoryBudget.init(
-                inputs: 0,
-                clerks: 0,
-                workers: 0,
-                dividend: dividend,
-                buybacks: buybacks,
-                px: px
-            )
-        }
-    }
-
     private func clerkEffects(
         budget: Int64,
         map: inout GameMap
@@ -511,13 +537,10 @@ extension FactoryContext {
     }
 
     private func workerEffects(
+        workers: Workforce,
         budget: Int64,
         map: inout GameMap
-    ) -> (wages: Paychecks, hours: Int64)? {
-        guard
-        let workers: Workforce = self.workers else {
-            return nil
-        }
+    ) -> (wages: Paychecks, hours: Int64) {
         /// Compute hours workable, assuming each worker works 1 “hour” per day for mathematical
         /// convenience. This can be larger than the actual number of workers available, but it
         /// will never be larger than the number of workers that can fit in the factory.

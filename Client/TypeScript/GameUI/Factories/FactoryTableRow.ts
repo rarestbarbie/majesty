@@ -8,6 +8,7 @@ import {
 } from '../../DOM/exports.js';
 import { GameID } from '../../GameEngine/exports.js';
 import {
+    CellStyle,
     FactoryTableEntry,
     FactoryWorkersCell,
     ProgressCell,
@@ -97,6 +98,12 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
         this.clerks.update(factory.clerks);
 
         this.px.updatePriceChange(factory.y_px, factory.t_px);
+        if (factory.liquidating) {
+            this.px.outer.setAttribute('data-cell', CellStyle.Bloody);
+        } else {
+            this.px.outer.removeAttribute('data-cell');
+        }
+
         UpdatePrice(this.fi, factory.t_fi * 100, 1);
     }
 }

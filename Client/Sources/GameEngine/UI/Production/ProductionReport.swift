@@ -51,6 +51,7 @@ extension ProductionReport: PersistentReport {
                     location: tile.name ?? planet.state.name,
                     type: factory.type.name,
                     size: factory.state.size,
+                    liquidating: factory.state.liquidating,
                     yesterday: factory.state.yesterday,
                     today: factory.state.today,
                     workers: factory.workers.map(FactoryWorkers.init(aggregate:)),

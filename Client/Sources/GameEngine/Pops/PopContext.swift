@@ -16,7 +16,7 @@ struct PopContext: RuntimeContext {
     private(set) var occupiedBy: CountryProperties?
 
     private(set) var unemployment: Double
-    private(set) var equity: Equity<LegalEntity>.Statistics
+    private(set) var equity: Equity<LEI>.Statistics
 
     private(set) var cashFlow: CashFlowStatement
 
@@ -42,7 +42,7 @@ extension PopContext {
     mutating func startIndexCount() {
     }
 
-    mutating func addPosition(asset: LegalEntity, value: Int64) {
+    mutating func addPosition(asset: LEI, value: Int64) {
         guard value > 0 else {
             return
         }
@@ -214,7 +214,7 @@ extension PopContext {
         self.governedBy = governedBy
         self.occupiedBy = occupiedBy
 
-        self.equity = .compute(from: self.state.equity, in: context)
+        self.equity = .compute(equity: self.state.equity, assets: self.state.cash, in: context)
     }
 }
 extension PopContext {
@@ -387,19 +387,8 @@ extension PopContext: TransactingContext {
             budget.dividend = max(0, (balance - min.l) / 3650)
             budget.buybacks = max(0, (balance - min.l - budget.dividend) / 365)
             // Align share price
-            budget.px = self.equity.price(valuation: balance)
-            self.state.today.px = Double.init(budget.px)
-
-            guard
-            let security: StockMarket<LegalEntity>.Security = .init(
-                attraction: self.state.today.pa,
-                asset: .pop(self.state.id),
-                price: budget.px
-            ) else {
-                break equity
-            }
-
-            map.stockMarkets.issueShares(security: security, currency: currency)
+            self.state.today.px = Double.init(self.equity.sharePrice)
+            map.stockMarkets.issueShares(security: self.security, currency: currency)
 
         case .Owner:
             let valueToInvest: Int64 = (balance - min.l - min.e) / d.x
@@ -536,19 +525,10 @@ extension PopContext: TransactingContext {
                 dividend: budget.dividend,
                 to: self.state.equity.shares.values.shuffled(using: &map.random.generator)
             )
-            guard
-            let security: StockMarket<LegalEntity>.Security = .init(
-                attraction: self.state.today.pa,
-                asset: .pop(self.state.id),
-                price: budget.px
-            ) else {
-                break liquidation
-            }
-
             self.state.cash.e -= map.buyback(
                 value: budget.buybacks,
                 from: &self.state.equity,
-                of: security,
+                of: self.security,
                 in: country.currency.id
             )
         }

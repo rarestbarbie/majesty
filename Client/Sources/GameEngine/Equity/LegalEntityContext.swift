@@ -2,10 +2,23 @@ import D
 import GameState
 
 protocol LegalEntityContext<State> {
-    associatedtype State: Turnable where State.Dimensions: LegalEntityMetrics
-    var equity: Equity<LegalEntity>.Statistics { get }
+    associatedtype State: Turnable, Identifiable
+        where State.Dimensions: LegalEntityMetrics, State.ID: LegalEntityIdentifier
+
+    var equity: Equity<LEI>.Statistics { get }
     var equitySplits: [EquitySplit] { get }
     var state: State { get }
+}
+extension LegalEntityContext {
+    var lei: LEI { self.state.id.lei }
+
+    var security: StockMarket<LEI>.Security {
+        .init(
+            attraction: self.state.today.pa,
+            asset: self.lei,
+            price: self.equity.sharePrice
+        )
+    }
 }
 extension LegalEntityContext {
     func tooltipOwnership(

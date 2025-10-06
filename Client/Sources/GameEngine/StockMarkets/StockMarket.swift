@@ -1,7 +1,7 @@
 import GameEconomy
 import Random
 
-struct StockMarket<LegalEntity> where LegalEntity: Hashable {
+struct StockMarket<LEI> where LEI: Hashable {
     var queue: [RandomPurchase]
     var securities: [Security]
 
@@ -28,12 +28,23 @@ extension StockMarket {
         return self.queue.map {
             /// Will always be non-nil because of the `isEmpty` check above.
             let security: Security = sampler.next(using: &random.generator)
-            let quote: (quantity: Int64, cost: Int64) = security.quote(value: $0.value)
+
+            let quantity: Int64
+            let cost: Int64
+
+            if  let quote: (quantity: Int64, cost: Int64) = security.quote(value: $0.value) {
+                quantity = quote.quantity
+                cost = quote.cost
+            } else {
+                // target an initial share price of 10.00
+                cost = $0.value
+                quantity = max(1, cost / 10)
+            }
             return .init(
                 asset: security.asset,
                 buyer: $0.buyer,
-                quantity: quote.quantity,
-                cost: quote.cost
+                quantity: quantity,
+                cost: cost
             )
         }
     }

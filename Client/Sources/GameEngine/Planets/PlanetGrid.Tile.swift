@@ -18,6 +18,7 @@ extension PlanetGrid {
 
         // Computed statistics
         private(set) var factoriesUnderConstruction: Int64
+        private(set) var factoriesAlreadyPresent: Set<FactoryType>
         private(set) var factories: [FactoryID]
         private(set) var pops: [PopID]
 
@@ -42,6 +43,7 @@ extension PlanetGrid {
             self.occupiedBy = nil
 
             self.factoriesUnderConstruction = 0
+            self.factoriesAlreadyPresent = []
             self.factories = []
             self.pops = []
             self.population = 0
@@ -75,6 +77,7 @@ extension PlanetGrid.Tile {
     }
     mutating func addResidentCount(_ factory: Factory) {
         self.factories.append(factory.id)
+        self.factoriesAlreadyPresent.insert(factory.type)
 
         if factory.size.level == 0 {
             self.factoriesUnderConstruction += 1
@@ -85,8 +88,7 @@ extension PlanetGrid.Tile {
     func pickFactory(
         among factories: OrderedDictionary<FactoryType, FactoryMetadata>,
         using random: inout PseudoRandom,
-        where filter: (FactoryType, HexCoordinate) throws -> Factory.Section?,
-    ) rethrows -> Factory.Section? {
+    ) -> FactoryType? {
         guard random.roll(
             self.population / (1 + self.factoriesUnderConstruction),
             1_000_000_000
@@ -94,10 +96,8 @@ extension PlanetGrid.Tile {
             return nil
         }
 
-        let choices: [Factory.Section] = try factories.keys.reduce(into: []) {
-            if  let section: Factory.Section = try filter($1, self.id) {
-                $0.append(section)
-            }
+        let choices: [FactoryType] = factories.keys.filter {
+            !self.factoriesAlreadyPresent.contains($0)
         }
         return choices.randomElement(using: &random.generator)
     }

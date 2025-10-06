@@ -7,7 +7,7 @@ import VectorCharts_JavaScript
 struct OwnershipBreakdown<Tab> where Tab: OwnershipTab {
     private var country: PieChart<CountryID, PieChartLabel>?
     private var culture: PieChart<String, PieChartLabel>?
-    private var equity: Equity<LegalEntity>.Statistics?
+    private var equity: Equity<LEI>.Statistics?
     private var state: Tab.State?
 
     init() {
@@ -22,7 +22,7 @@ extension OwnershipBreakdown {
         from asset: some LegalEntityContext<Tab.State>,
         in context: GameContext
     ) {
-        let equity: Equity<LegalEntity>.Statistics = asset.equity
+        let equity: Equity<LEI>.Statistics = asset.equity
         let (country, culture): (
             country: [CountryID: (share: Int64, PieChartLabel)],
             culture: [String: (share: Int64, PieChartLabel)]
