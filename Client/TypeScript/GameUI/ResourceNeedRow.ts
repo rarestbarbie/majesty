@@ -13,8 +13,8 @@ import {
     TooltipType,
 } from './exports.js';
 
-export class ResourceNeedRow implements DiffableListElement<Resource> {
-    public readonly id: Resource;
+export class ResourceNeedRow implements DiffableListElement<string> {
+    public readonly id: string;
     public readonly node: HTMLAnchorElement;
 
     private readonly demand: ProgressCell;
@@ -37,7 +37,7 @@ export class ResourceNeedRow implements DiffableListElement<Resource> {
         stockpile: TooltipType,
         explainPrice: TooltipType,
     ) {
-        this.id = need.id;
+        this.id = `${need.id}${need.tier}`;
         this.node = document.createElement('a');
 
         const label: HTMLDivElement = document.createElement('div');
