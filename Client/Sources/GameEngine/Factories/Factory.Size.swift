@@ -10,8 +10,8 @@ extension Factory {
     }
 }
 extension Factory.Size {
-    var value: Int64 {
-        self.level * self.level
+    var area: Int64? {
+        self.level == 0 ? nil : self.level * self.level
     }
 
     static var growthRequired: Int { 100 }

@@ -387,7 +387,7 @@ extension GameSession {
             return nil
         }
         return .instructions {
-            $0["Effective size"] = factory.size.value[/3]
+            $0["Effective size"] = factory.size.area?[/3]
             $0["Growth progress"] = factory.size.growthProgress[/0]
                 / Factory.Size.growthRequired
 
@@ -408,8 +408,9 @@ extension GameSession {
         let workforce: FactoryContext.Workforce
         let type: PopType
 
-        if case .Worker = stratum {
-            workforce = factory.workers
+        if case .Worker = stratum,
+            let workers: FactoryContext.Workforce = factory.workers {
+            workforce = workers
             type = factory.type.workers.unit
         } else if
             let clerks: FactoryContext.Workforce = factory.clerks,

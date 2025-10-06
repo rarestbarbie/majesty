@@ -53,7 +53,7 @@ extension ProductionReport: PersistentReport {
                     size: factory.state.size,
                     yesterday: factory.state.yesterday,
                     today: factory.state.today,
-                    workers: .init(aggregate: factory.workers),
+                    workers: factory.workers.map(FactoryWorkers.init(aggregate:)),
                     clerks: factory.clerks.map(FactoryWorkers.init(aggregate:))
                 )
             )

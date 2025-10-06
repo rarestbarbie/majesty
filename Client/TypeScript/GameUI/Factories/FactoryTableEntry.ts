@@ -26,6 +26,6 @@ export interface FactoryTableEntry {
 
     readonly t_px: number;
 
-    readonly workers: FactoryWorkers;
-    readonly clerks: FactoryWorkers;
+    readonly workers?: FactoryWorkers;
+    readonly clerks?: FactoryWorkers;
 }

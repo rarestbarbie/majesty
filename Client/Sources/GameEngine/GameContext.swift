@@ -221,6 +221,7 @@ extension GameContext {
         self.postPopEmployment(&map, p: order.compactMap(\.pop))
 
         try self.postPopConversions(&map)
+        try self.recycleFactories(&map)
     }
 
     mutating func compute(_ map: borrowing GameMap) throws {
@@ -533,15 +534,14 @@ extension GameContext {
     }
 }
 extension GameContext {
-    private mutating func launchStartups(_ map: inout GameMap) {
+    private mutating func recycleFactories(_ map: inout GameMap) throws {
         for i: Int in self.planets.indices {
             for j: Int in self.planets[i].grid.tiles.values.indices {
-                {
+                let factory: Factory.Section? = {
                     let id: PlanetID = $0.state.id
-
-                    $0[j].pickFactory(
+                    return $0[j].pickFactory(
                         among: self.rules.factories,
-                        using: &map.random.generator
+                        using: &map.random
                     ) {
                         let section: Factory.Section = .init(
                             type: $0,
@@ -554,8 +554,18 @@ extension GameContext {
                         }
                     }
                 } (&self.planets[i])
+
+                guard
+                let factory: Factory.Section else {
+                    continue
+                }
+
+                try self.factories.with(section: factory) {
+                    self.rules.factories[$0.type]
+                } update: {
+                    $0.cash.s += 1
+                }
             }
         }
-        self.rules.factories.values.randomElement(using: &map.random.generator)
     }
 }
