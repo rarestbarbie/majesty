@@ -87,7 +87,10 @@ extension PlanetGrid.Tile {
         using random: inout PseudoRandom,
         where filter: (FactoryType, HexCoordinate) throws -> Factory.Section?,
     ) rethrows -> Factory.Section? {
-        guard random.roll(self.population / (1 + self.factoriesUnderConstruction), 1_000_000_000) else {
+        guard random.roll(
+            self.population / (1 + self.factoriesUnderConstruction),
+            1_000_000_000
+        ) else {
             return nil
         }
 

@@ -21,8 +21,7 @@ extension CountryContext {
         map _: borrowing GameMap,
         context: GameContext.TerritoryPass
     ) throws {
-        self.properties.technology {
-            (
+        self.properties.technology { (
                 factories: inout FactoryModifiers
             ) in
 
