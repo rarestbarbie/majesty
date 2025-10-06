@@ -10,7 +10,7 @@ struct FactoryTableEntry {
     let size: Factory.Size
     let yesterday: Factory.Dimensions
     let today: Factory.Dimensions
-    let workers: FactoryWorkers
+    let workers: FactoryWorkers?
     let clerks: FactoryWorkers?
 }
 extension FactoryTableEntry: JavaScriptEncodable {

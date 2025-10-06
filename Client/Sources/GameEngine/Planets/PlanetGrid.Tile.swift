@@ -4,6 +4,7 @@ import GameState
 import GameTerrain
 import HexGrids
 import OrderedCollections
+import Random
 
 extension PlanetGrid {
     struct Tile: Identifiable {
@@ -16,7 +17,7 @@ extension PlanetGrid {
         var occupiedBy: CountryProperties?
 
         // Computed statistics
-
+        private(set) var factoriesUnderConstruction: Int64
         private(set) var factories: [FactoryID]
         private(set) var pops: [PopID]
 
@@ -40,6 +41,7 @@ extension PlanetGrid {
             self.governedBy = nil
             self.occupiedBy = nil
 
+            self.factoriesUnderConstruction = 0
             self.factories = []
             self.pops = []
             self.population = 0
@@ -73,19 +75,27 @@ extension PlanetGrid.Tile {
     }
     mutating func addResidentCount(_ factory: Factory) {
         self.factories.append(factory.id)
+
+        if factory.size.level == 0 {
+            self.factoriesUnderConstruction += 1
+        }
     }
 }
 extension PlanetGrid.Tile {
     func pickFactory(
         among factories: OrderedDictionary<FactoryType, FactoryMetadata>,
-        using generator: inout some RandomNumberGenerator,
+        using random: inout PseudoRandom,
         where filter: (FactoryType, HexCoordinate) throws -> Factory.Section?,
     ) rethrows -> Factory.Section? {
+        guard random.roll(self.population / (1 + self.factoriesUnderConstruction), 1_000_000_000) else {
+            return nil
+        }
+
         let choices: [Factory.Section] = try factories.keys.reduce(into: []) {
             if  let section: Factory.Section = try filter($1, self.id) {
                 $0.append(section)
             }
         }
-        return choices.randomElement(using: &generator)
+        return choices.randomElement(using: &random.generator)
     }
 }

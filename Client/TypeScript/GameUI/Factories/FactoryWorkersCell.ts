@@ -8,15 +8,19 @@ import {
 } from '../exports.js';
 
 export class FactoryWorkersCell extends ProgressCell {
-    public readonly wn: Ticker;
+    public readonly wage: Ticker;
 
     constructor() {
         super();
-        this.wn = new Ticker(Fortune.Bonus);
-        this.summary.appendChild(this.wn.outer);
+        this.wage = new Ticker(Fortune.Bonus);
+        this.summary.appendChild(this.wage.outer);
     }
 
-    public update(workers: FactoryWorkers): void {
-        this.set(100n * workers.count / workers.limit);
+    public update(workers: FactoryWorkers | undefined): void {
+        if (workers === undefined) {
+            this.set(0n);
+        } else {
+            this.set(100n * workers.count / workers.limit);
+        }
     }
 }

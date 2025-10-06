@@ -80,10 +80,20 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
 
         UpdateText(this.location, factory.location);
 
-        this.workers.wn.updateBigIntChange(factory.y_wn, factory.t_wn);
+        if (factory.workers === undefined) {
+            this.workers.wage.updateBigInts(0n, 0n);
+        } else {
+            this.workers.wage.updateBigIntChange(factory.y_wn, factory.t_wn);
+        }
+
         this.workers.update(factory.workers);
 
-        this.clerks.wn.updateBigIntChange(factory.y_cn, factory.t_cn);
+        if (factory.clerks === undefined) {
+            this.clerks.wage.updateBigInts(0n, 0n);
+        } else {
+            this.clerks.wage.updateBigIntChange(factory.y_cn, factory.t_cn);
+        }
+
         this.clerks.update(factory.clerks);
 
         this.px.updatePriceChange(factory.y_px, factory.t_px);
