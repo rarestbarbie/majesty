@@ -48,8 +48,7 @@ extension FactoryBudget {
         if  let share: [Int64] = [i, c, w].distribute(balance / 7) {
             budget = .init(inputs: share[0], clerks: share[1], workers: share[2])
             l = Int64.init((i + w).rounded(.up))
-        }
-        else {
+        } else {
             budget = .init()
             l = 0
         }

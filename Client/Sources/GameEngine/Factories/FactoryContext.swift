@@ -232,7 +232,10 @@ extension FactoryContext: TransactingContext {
                     map: &map
                 ) {
                 self.state.today.eo = 1 + bonus
-                self.state.today.cn = max(country.minwage, self.state.today.cn + salaries.change)
+                self.state.today.cn = max(
+                    country.minwage,
+                    self.state.today.cn + salaries.change
+                )
                 self.state.today.ca = salaries.rate
                 self.state.cash.c -= salaries.paid
 
@@ -327,7 +330,11 @@ extension FactoryContext: TransactingContext {
             self.state.today.pa <= 0 {
             self.state.liquidating = true
         } else {
-            self.state.equity.split(price: self.state.today.px, map: &map, notifying: [country.id])
+            self.state.equity.split(
+                price: self.state.today.px,
+                map: &map,
+                notifying: [country.id]
+            )
         }
     }
 }

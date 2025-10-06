@@ -48,8 +48,8 @@ extension GameMap {
     ) -> Int64 {
         guard
         let quote: (quantity: Int64, cost: Int64) = security.quote(value: value),
-        quote.quantity > 0,
-        quote.cost > 0 else {
+            quote.quantity > 0,
+            quote.cost > 0 else {
             return 0
         }
 
