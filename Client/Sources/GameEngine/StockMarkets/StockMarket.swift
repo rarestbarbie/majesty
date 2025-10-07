@@ -1,51 +1,69 @@
 import GameEconomy
+import GameState
 import Random
 
-struct StockMarket<LEI> where LEI: Hashable {
-    var queue: [RandomPurchase]
-    var securities: [Security]
+struct StockMarket {
+    var buyers: [RandomPurchase]
+    var assets: [TradeableAsset]
 
     init() {
-        self.queue = []
-        self.securities = []
+        self.buyers = []
+        self.assets = []
     }
 }
 extension StockMarket {
-    mutating func match(using random: inout PseudoRandom) -> [Fill] {
+    struct TradeableAsset {
+        let security: Security
+        var issuable: Int64
+    }
+}
+extension StockMarket {
+    mutating func match(random: inout PseudoRandom, execute: (inout PseudoRandom, StockMarket.Fill) -> ()) {
         defer {
-            self.queue.removeAll(keepingCapacity: true)
-            self.securities.removeAll(keepingCapacity: true)
+            self.buyers.removeAll(keepingCapacity: true)
+            self.assets.removeAll(keepingCapacity: true)
         }
 
         guard
-        let sampler: RandomWeightedSampler<Security, Double> = .init(
-            choices: self.securities,
-            sampleWeight: \.attraction
+        let sampler: RandomWeightedSampler<[TradeableAsset], Double> = .init(
+            choices: self.assets,
+            sampleWeight: \.security.attraction
         ) else {
-            return []
+            return
         }
 
-        return self.queue.map {
-            /// Will always be non-nil because of the `isEmpty` check above.
-            let security: Security = sampler.next(using: &random.generator)
+        for bid: RandomPurchase in self.buyers {
+            let fill: Fill = {
+                let issued: StockPrice.Quote
+                let market: StockPrice.Quote
 
-            let quantity: Int64
-            let cost: Int64
+                if  let stockPrice: StockPrice = $0.security.stockPrice {
+                    let quantity: Int64 = stockPrice.quantity(value: bid.value)
+                    if  quantity < $0.issuable {
+                        issued = stockPrice.quote(quantity: quantity)
+                        market = .zero
+                    } else {
+                        issued = stockPrice.quote(quantity: $0.issuable)
+                        market = stockPrice.quote(quantity: quantity - $0.issuable)
+                    }
+                } else {
+                    // target an initial share price of 10.00
+                    let quantity: Int64 = min(bid.value / 10, $0.issuable)
+                    issued = .init(quantity: quantity, value: quantity * 10)
+                    market = .zero
+                }
 
-            if  let quote: (quantity: Int64, cost: Int64) = security.quote(value: $0.value) {
-                quantity = quote.quantity
-                cost = quote.cost
-            } else {
-                // target an initial share price of 10.00
-                cost = $0.value
-                quantity = max(1, cost / 10)
-            }
-            return .init(
-                asset: security.asset,
-                buyer: $0.buyer,
-                quantity: quantity,
-                cost: cost
-            )
+                $0.issuable -= issued.quantity
+
+                return .init(
+                    asset: $0.security.id,
+                    buyer: bid.buyer,
+                    issued: issued,
+                    market: market,
+                )
+            } (&self.assets[sampler.next(using: &random.generator)])
+
+            execute(&random, fill)
         }
     }
 }

@@ -8,7 +8,7 @@ import JavaScriptKit
 import JavaScriptInterop
 import Random
 
-struct PopContext: RuntimeContext {
+struct PopContext: RuntimeContext, LegalEntityContext {
     let type: PopMetadata
     var state: Pop
 
@@ -388,7 +388,11 @@ extension PopContext: TransactingContext {
             budget.buybacks = max(0, (balance - min.l - budget.dividend) / 365)
             // Align share price
             self.state.today.px = Double.init(self.equity.sharePrice)
-            map.stockMarkets.issueShares(security: self.security, currency: currency)
+            map.stockMarkets.issueShares(
+                currency: currency,
+                quantity: max(0, self.state.today.size - self.equity.shareCount),
+                security: self.security,
+            )
 
         case .Owner:
             let valueToInvest: Int64 = (balance - min.l - min.e) / d.x
@@ -521,15 +525,15 @@ extension PopContext: TransactingContext {
             self.state.today.fx = 0
 
             // Pay dividends to shareholders, if any.
-            self.state.cash.i -= map.pay(
+            self.state.cash.i -= map.bank.pay(
                 dividend: budget.dividend,
                 to: self.state.equity.shares.values.shuffled(using: &map.random.generator)
             )
-            self.state.cash.e -= map.buyback(
-                value: budget.buybacks,
-                from: &self.state.equity,
-                of: self.security,
-                in: country.currency.id
+            self.state.cash.e -= map.bank.buyback(
+                random: &map.random,
+                equity: &self.state.equity,
+                budget: budget.buybacks,
+                security: self.security,
             )
         }
 
@@ -641,7 +645,4 @@ extension PopContext {
             }
         }
     }
-}
-extension PopContext: LegalEntityContext {
-    var equitySplits: [EquitySplit] { self.state.equity.splits }
 }

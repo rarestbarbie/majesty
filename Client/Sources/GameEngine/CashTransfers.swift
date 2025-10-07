@@ -7,6 +7,8 @@ struct CashTransfers {
     var w: Int64
     /// Interest and dividends, negative if owed.
     var i: Int64
+    /// Equity value, negative for purchasers of equity, positive for issuers.
+    var e: Int64
     /// Capital gains
     var j: Int64
 
@@ -15,12 +17,14 @@ struct CashTransfers {
         c: Int64 = 0,
         w: Int64 = 0,
         i: Int64 = 0,
+        e: Int64 = 0,
         j: Int64 = 0
     ) {
         self.s = s
         self.c = c
         self.w = w
         self.i = i
+        self.e = e
         self.j = j
     }
 }

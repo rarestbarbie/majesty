@@ -6,22 +6,12 @@ import JavaScriptInterop
     where ID: Hashable & ConvertibleToJSValue & LoadableFromJSValue {
     public let id: ID
     public var shares: Int64
-    private(set) var bought: Int64
-    private(set) var sold: Int64
+    public var bought: Int64
+    public var sold: Int64
 }
 extension EquityStake {
     init(id: ID) {
         self.init(id: id, shares: 0, bought: 0, sold: 0)
-    }
-
-    mutating func buy(_ shares: Int64) {
-        self.bought += shares
-        self.shares -= shares
-    }
-
-    mutating func sell(_ shares: Int64) {
-        self.sold += shares
-        self.shares += shares
     }
 
     mutating func turn() {

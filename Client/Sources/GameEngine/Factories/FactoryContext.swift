@@ -7,7 +7,7 @@ import JavaScriptInterop
 import OrderedCollections
 import Random
 
-struct FactoryContext: RuntimeContext {
+struct FactoryContext: LegalEntityContext, RuntimeContext {
     let type: FactoryMetadata
     var state: Factory
 
@@ -170,20 +170,40 @@ extension FactoryContext: TransactingContext {
             self.equity = .init()
         }
 
+        let initialShares: Int64 = 10_000
+
         if  self.state.size.level == 0 {
             self.budget = .constructing(state: self.state)
-            map.stockMarkets.issueShares(security: self.security, currency: country.currency.id)
+
+            map.stockMarkets.issueShares(
+                currency: country.currency.id,
+                quantity: max(0, self.equity.shareCount - initialShares),
+                security: self.security,
+            )
         } else if self.state.liquidating {
             self.budget = .liquidating(state: self.state)
         } else {
-            self.budget = .active(
+            let budget: FactoryBudget.Active = FactoryBudget.active(
                 workers: self.workers,
                 clerks: self.clerks,
                 state: self.state,
                 productivity: self.productivity,
                 inputsCostPerHour: inputsCostPerHour
             )
-            map.stockMarkets.issueShares(security: self.security, currency: country.currency.id)
+
+            let targetShares: Int64 = initialShares + self.state.size.level * 5_000
+            let issuedShares: Int64 = max(0, targetShares - self.equity.shareCount)
+
+            // only issue shares if the factory is not performing buybacks
+            // but this needs to be called even if quantity is zero, or the security will not
+            // be tradeable today
+            map.stockMarkets.issueShares(
+                currency: country.currency.id,
+                quantity: budget.buybacks == 0 ? issuedShares : 0,
+                security: self.security,
+            )
+
+            self.budget = .active(budget)
         }
     }
 
@@ -213,11 +233,11 @@ extension FactoryContext: TransactingContext {
             self.liquidate(policy: country, budget: budget, map: &map)
 
             self.state.today.pa = 0
-            self.state.cash.e -= map.buyback(
-                value: budget.buybacks,
-                from: &self.state.equity,
-                of: self.security,
-                in: country.currency.id
+            self.state.cash.e -= map.bank.buyback(
+                random: &map.random,
+                equity: &self.state.equity,
+                budget: budget.buybacks,
+                security: self.security,
             )
 
         case .active(let budget):
@@ -297,14 +317,14 @@ extension FactoryContext: TransactingContext {
                 map: &map
             )
 
-            self.state.cash.e -= map.buyback(
-                value: budget.buybacks,
-                from: &self.state.equity,
-                of: self.security,
-                in: country.currency.id
+            self.state.cash.e -= map.bank.buyback(
+                random: &map.random,
+                equity: &self.state.equity,
+                budget: budget.buybacks,
+                security: self.security,
             )
             // Pay dividends to shareholders, if any.
-            self.state.cash.i -= map.pay(
+            self.state.cash.i -= map.bank.pay(
                 dividend: budget.dividend,
                 to: self.state.equity.shares.values.shuffled(using: &map.random.generator)
             )
@@ -471,7 +491,7 @@ extension FactoryContext {
         let clerksOptimal: Int64 = self.workers.map { $0.count >< clerkRatio } ?? 0
 
         let owed: Int64 = clerks.count * self.state.today.cn
-        let paid: Int64 = map.pay(
+        let paid: Int64 = map.bank.pay(
             salariesBudget: budget,
             salaries: [
                 map.payscale(shuffling: clerks.pops, rate: self.state.today.cn),
@@ -562,7 +582,7 @@ extension FactoryContext {
             min(workers.count, hoursWorkable),
             budget / self.state.today.wn
         )
-        let paid: Int64 = hours <= 0 ? 0 : map.pay(
+        let paid: Int64 = hours <= 0 ? 0 : map.bank.pay(
             wagesBudget: hours * self.state.today.wn,
             wages: map.payscale(shuffling: workers.pops, rate: self.state.today.wn)
         )
@@ -628,9 +648,4 @@ extension FactoryContext {
 
         return (wages, hours)
     }
-}
-extension FactoryContext: LegalEntityContext {
-    var equitySplits: [EquitySplit] { self.state.equity.splits }
-    var yesterday: Factory.Dimensions { self.state.yesterday }
-    var today: Factory.Dimensions { self.state.today }
 }
