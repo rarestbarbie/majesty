@@ -16,7 +16,7 @@ let package: Package = .init(
         .package(url: "https://github.com/swiftwasm/JavaScriptKit", branch: "main"),
         .package(url: "https://github.com/apple/swift-numerics", from: "1.0.3"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.2.1"),
-        .package(url: "https://github.com/tayloraswift/dollup", branch: "master"),
+        .package(url: "https://github.com/tayloraswift/dollup", from: "0.3.0"),
         .package(url: "https://github.com/tayloraswift/d", from: "0.2.0"),
     ],
     targets: [

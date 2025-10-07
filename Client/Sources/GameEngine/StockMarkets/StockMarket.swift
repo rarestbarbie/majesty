@@ -18,7 +18,10 @@ extension StockMarket {
     }
 }
 extension StockMarket {
-    mutating func match(random: inout PseudoRandom, execute: (inout PseudoRandom, StockMarket.Fill) -> ()) {
+    mutating func match(
+        random: inout PseudoRandom,
+        execute: (inout PseudoRandom, StockMarket.Fill) -> ()
+    ) {
         defer {
             self.buyers.removeAll(keepingCapacity: true)
             self.assets.removeAll(keepingCapacity: true)
