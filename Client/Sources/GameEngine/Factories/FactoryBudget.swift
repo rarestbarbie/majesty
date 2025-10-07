@@ -53,7 +53,7 @@ extension FactoryBudget {
             l = 0
         }
 
-        budget.buybacks = (balance - l) / 365
+        budget.buybacks = max(0, balance - l) / 365
         budget.dividend = balance <> (2 %/ 10_000)
 
         return budget

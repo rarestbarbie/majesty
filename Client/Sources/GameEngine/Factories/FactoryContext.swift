@@ -177,7 +177,7 @@ extension FactoryContext: TransactingContext {
 
             map.stockMarkets.issueShares(
                 currency: country.currency.id,
-                quantity: max(0, self.equity.shareCount - initialShares),
+                quantity: max(0, initialShares - self.equity.shareCount),
                 security: self.security,
             )
         } else if self.state.liquidating {
