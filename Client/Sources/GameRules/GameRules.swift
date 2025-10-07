@@ -80,9 +80,8 @@ extension GameRules {
         let factoryCosts: EffectsTable<
             FactoryType,
             SymbolTable<Int64>
-        > = try symbols.factories.resolve(
-            rules.factory_costs
-        )
+        > = try symbols.factories.resolve(rules.factoryCosts.construction)
+
         self.init(
             resources: resources,
             factories: try table.factories.reduce(
@@ -105,7 +104,9 @@ extension GameRules {
                         metadata: resources,
                         quantity: try symbols.resources.resolve(factory.output)
                     ),
-                    workers: try symbols.pops.resolve(factory.workers)
+                    workers: try symbols.pops.resolve(factory.workers),
+                    sharesInitial: rules.factoryCosts.sharesInitial,
+                    sharesPerLevel: rules.factoryCosts.sharesPerLevel
                 )
             },
             technologies: try table.technologies.mapValues {
