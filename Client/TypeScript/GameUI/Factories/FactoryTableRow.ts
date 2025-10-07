@@ -77,7 +77,6 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
 
     public update(factory: FactoryTableEntry): void {
         UpdateText(this.type.summary, `${factory.type} (${factory.size_l})`);
-        this.type.set(factory.size_p);
 
         UpdateText(this.location, factory.location);
 
@@ -98,10 +97,12 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
         this.clerks.update(factory.clerks);
 
         this.px.updatePriceChange(factory.y_px, factory.t_px);
-        if (factory.liquidating) {
-            this.px.outer.setAttribute('data-cell', CellStyle.Bloody);
+        if (factory.liqf !== undefined) {
+            this.type.node.classList.add(CellStyle.Bloody);
+            this.type.set(factory.liqf * 100);
         } else {
-            this.px.outer.removeAttribute('data-cell');
+            this.type.node.classList.remove(CellStyle.Bloody);
+            this.type.set(factory.size_p);
         }
 
         UpdatePrice(this.fi, factory.t_fi * 100, 1);

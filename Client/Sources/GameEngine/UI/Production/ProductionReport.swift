@@ -45,13 +45,19 @@ extension ProductionReport: PersistentReport {
                 continue
             }
 
+            let liquidationProgress: Double? = factory.state.liquidation.map {
+                $0.burning == 0 ? 1 : Double(
+                    $0.burning - factory.equity.shareCount
+                ) / Double($0.burning)
+            }
+
             self.factories.append(
                 .init(
                     id: factory.state.id,
                     location: tile.name ?? planet.state.name,
                     type: factory.type.name,
                     size: factory.state.size,
-                    liquidating: factory.state.liquidating,
+                    liquidationProgress: liquidationProgress,
                     yesterday: factory.state.yesterday,
                     today: factory.state.today,
                     workers: factory.workers.map(FactoryWorkers.init(aggregate:)),

@@ -37,6 +37,15 @@ extension Fraction {
         let (d, _): (Int64, Int64) = self.d.dividingFullWidth(self.n.multipliedFullWidth(by: a))
         return d
     }
+
+    @inlinable public var roundedDown: Int64 {
+        let (d, r): (Int64, remainder: Int64) = self.n.quotientAndRemainder(dividingBy: self.d)
+        return r < 0 ? d - 1 : d
+    }
+    @inlinable public var roundedUp: Int64 {
+        let (d, r): (Int64, remainder: Int64) = self.n.quotientAndRemainder(dividingBy: self.d)
+        return r > 0 ? d + 1 : d
+    }
 }
 extension Fraction {
     @inlinable public static func >< (a: Int64, self: Self) -> Int64 { self >< a }

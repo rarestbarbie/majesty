@@ -92,9 +92,9 @@ export class ResourceNeedRow implements DiffableListElement<string> {
         }
 
         if (need.unitsConsumed < need.unitsDemanded) {
-            this.stockpile.setAttribute('data-cell', CellStyle.Bloody);
+            this.stockpile.classList.add(CellStyle.Bloody);
         } else {
-            this.stockpile.removeAttribute('data-cell');
+            this.stockpile.classList.remove(CellStyle.Bloody);
         }
 
         if (need.priceAtMarket !== undefined) {

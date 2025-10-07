@@ -8,7 +8,7 @@ struct FactoryTableEntry {
     let location: String
     let type: String
     let size: Factory.Size
-    let liquidating: Bool
+    let liquidationProgress: Double?
     let yesterday: Factory.Dimensions
     let today: Factory.Dimensions
     let workers: FactoryWorkers?
@@ -21,7 +21,7 @@ extension FactoryTableEntry: JavaScriptEncodable {
         case type
         case size_l
         case size_p
-        case liquidating
+        case liqf
 
         case yesterday_wn = "y_wn"
         case yesterday_cn = "y_cn"
@@ -47,7 +47,7 @@ extension FactoryTableEntry: JavaScriptEncodable {
         js[.type] = self.type
         js[.size_l] = self.size.level
         js[.size_p] = self.size.growthProgress
-        js[.liquidating] = self.liquidating
+        js[.liqf] = self.liquidationProgress
 
         js[.yesterday_wn] = self.yesterday.wn
         js[.yesterday_cn] = self.yesterday.cn
