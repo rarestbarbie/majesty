@@ -147,8 +147,9 @@ extension Equity<LEI> {
         // Occasionally the factory will receive a large windfall, and `quote(value:)` will
         // return a quantity that exceeds the number of shares in circulation!
         let shares: [Int64]? = recipients.distribute(share: \.shares) {
-            // Cap the number of shares bought back at 1 percent of the total circulation.
-            min($0 / 100, quote.quantity)
+            // Cap the number of shares bought back at 1 percent of the total circulation,
+            // but always allow at least one share to be bought back
+            min(max(1, $0 / 100), quote.quantity)
         }
 
         var liquidated: StockPrice.Quote = .init(quantity: 0, value: 0)

@@ -12,7 +12,7 @@ struct Factory: LegalEntityState, Identifiable {
     var type: FactoryType
     var size: Size
     var cash: CashAccount
-    var liquidating: Bool
+    var liquidation: FactoryLiquidation?
 
     var nv: ResourceInputs
     var ni: ResourceInputs
@@ -34,7 +34,7 @@ extension Factory: Sectionable {
             type: section.type,
             size: .init(level: 0),
             cash: .init(),
-            liquidating: false,
+            liquidation: nil,
             nv: .init(),
             ni: .init(),
             out: .init(),
@@ -80,7 +80,7 @@ extension Factory {
         case size_l
         case size_p
         case cash
-        case liquidating
+        case liquidation
         case nv
         case ni
         case out
@@ -132,7 +132,7 @@ extension Factory: JavaScriptEncodable {
         js[.size_l] = self.size.level
         js[.size_p] = self.size.growthProgress
         js[.cash] = self.cash
-        js[.liquidating] = self.liquidating ? true : nil
+        js[.liquidation] = self.liquidation
 
         js[.nv] = self.nv
         js[.ni] = self.ni
@@ -195,7 +195,7 @@ extension Factory: JavaScriptDecodable {
                 growthProgress: try js[.size_p]?.decode() ?? 0
             ),
             cash: try js[.cash]?.decode() ?? .init(liq: 0),
-            liquidating: try js[.liquidating]?.decode() ?? false,
+            liquidation: try js[.liquidation]?.decode(),
             nv: try js[.nv]?.decode() ?? .init(),
             ni: try js[.ni]?.decode() ?? .init(),
             out: try js[.out]?.decode() ?? .init(),

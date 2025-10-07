@@ -178,8 +178,8 @@ extension FactoryContext: TransactingContext {
                 quantity: max(0, self.type.sharesInitial - self.equity.shareCount),
                 security: self.security,
             )
-        } else if self.state.liquidating {
-            self.budget = .liquidating(state: self.state)
+        } else if case _? = self.state.liquidation {
+            self.budget = .liquidating(state: self.state, sharePrice: self.equity.sharePrice)
         } else {
             let budget: FactoryBudget.Active = FactoryBudget.active(
                 workers: self.workers,
@@ -339,15 +339,16 @@ extension FactoryContext: TransactingContext {
     }
 
     mutating func advance(map: inout GameMap) {
-        guard !self.state.liquidating,
+        guard case nil = self.state.liquidation,
         let country: CountryProperties = self.occupiedBy else {
             return
         }
 
         if  self.workers?.count ?? 0 == 0,
             self.clerks?.count ?? 0 == 0,
+            self.state.yesterday.pa <= 0,
             self.state.today.pa <= 0 {
-            self.state.liquidating = true
+            self.state.liquidation = .init(started: map.date, burning: self.equity.shareCount)
         } else {
             self.state.equity.split(
                 price: self.state.today.px,

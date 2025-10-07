@@ -75,7 +75,7 @@ extension LegalEntityContext {
                 case .reverse:
                     $0[>] = """
                     This stock most recently underwent \(factor.articleIndefinite) \
-                    \(neg: factor) reverse split on \(last.date[.phrasal_US])
+                    \(neg: factor) reverse split on \(em: last.date[.phrasal_US])
                     """
 
                     var times: Int = 0
@@ -91,7 +91,7 @@ extension LegalEntityContext {
                 case .forward:
                     $0[>] = """
                     This stock most recently underwent \(factor.articleIndefinite) \
-                    \(pos: factor) stock split on \(last.date[.phrasal_US])
+                    \(pos: factor) stock split on \(em: last.date[.phrasal_US])
                     """
 
                     var times: Int = 0
