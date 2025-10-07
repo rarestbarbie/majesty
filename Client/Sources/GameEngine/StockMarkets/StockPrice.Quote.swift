@@ -1,7 +1,7 @@
 extension StockPrice {
     struct Quote {
-        let quantity: Int64
-        let value: Int64
+        var quantity: Int64
+        var value: Int64
     }
 }
 extension StockPrice.Quote {

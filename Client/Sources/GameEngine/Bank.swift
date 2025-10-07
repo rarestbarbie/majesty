@@ -37,7 +37,8 @@ extension Bank {
         guard let quote: StockPrice.Quote = security.stockPrice?.quote(value: value) else {
             return 0
         }
-        return equity.liquidate(random: &random, bank: &self, quote: quote, burn: true)
+        let liquidated: StockPrice.Quote = equity.liquidate(random: &random, bank: &self, quote: quote, burn: true)
+        return liquidated.value
     }
 }
 extension Bank {

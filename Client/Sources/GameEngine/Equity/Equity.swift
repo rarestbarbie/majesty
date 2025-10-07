@@ -6,12 +6,12 @@ import OrderedCollections
 import Random
 
 struct Equity<Owner> where Owner: Hashable & ConvertibleToJSValue & LoadableFromJSValue {
-    var shares: OrderedDictionary<Owner, EquityStake<Owner>>
-    var splits: [EquitySplit]
+    private(set) var shares: OrderedDictionary<Owner, EquityStake<Owner>>
+    private(set) var splits: [EquitySplit]
     /// Total volume traded on the market today.
-    var traded: Int64
+    private(set) var traded: Int64
     /// Total volume of shares issued today, negative if shares were burned.
-    var issued: Int64
+    private(set) var issued: Int64
 
     init(shares: OrderedDictionary<Owner, EquityStake<Owner>>, splits: [EquitySplit] = [], traded: Int64 = 0, issued: Int64 = 0) {
         self.shares = shares
@@ -118,17 +118,19 @@ extension Equity {
 }
 extension Equity<LEI> {
     mutating func trade(random: inout PseudoRandom, bank: inout Bank, fill: StockMarket.Fill) {
-        let marketCost: Int64 = self.liquidate(random: &random, bank: &bank, quote: fill.market)
-        let quantity: Int64 = fill.issued.quantity + fill.market.quantity
+        let traded: StockPrice.Quote = self.liquidate(random: &random, bank: &bank, quote: fill.market)
 
-        self.traded += fill.market.quantity
+        self.traded += traded.quantity
         self.issued += fill.issued.quantity
+
+        let quantity: Int64 = fill.issued.quantity + traded.quantity
 
         ; {
             $0.shares += quantity
             $0.bought += quantity
         } (&self[fill.buyer])
-        bank[fill.buyer].e -= fill.issued.value + marketCost
+
+        bank[fill.buyer].e -= fill.issued.value + traded.value
         bank[fill.asset].e += fill.issued.value
     }
 
@@ -137,7 +139,7 @@ extension Equity<LEI> {
         bank: inout Bank,
         quote: StockPrice.Quote,
         burn: Bool = false
-    ) -> Int64 {
+    ) -> StockPrice.Quote {
         let recipients: [EquityStake<LEI>] = self.shares.values.shuffled(
             using: &random.generator
         )
@@ -149,7 +151,7 @@ extension Equity<LEI> {
             min($0 / 100, quote.quantity)
         }
 
-        var compensationPaid: Int64 = 0
+        var liquidated: StockPrice.Quote = .init(quantity: 0, value: 0)
 
         if  let shares: [Int64],
             let compensation: [Int64] = shares.distribute(quote.value) {
@@ -165,21 +167,23 @@ extension Equity<LEI> {
                     $0.sold += shares
                 } (&self[recipient.id])
 
-                if  burn {
-                    self.issued -= shares
-                }
 
+                liquidated.quantity += shares
+                liquidated.value += compensation
                 bank[recipient.id].j += compensation
-                compensationPaid += compensation
             }
         }
 
+        if  burn {
+            self.issued -= liquidated.quantity
+        }
+
         #assert(
-            compensationPaid <= quote.value,
-            "Compensation paid (\(compensationPaid)) exceeds cost quoted (\(quote.value))!"
+            liquidated.value <= quote.value,
+            "Compensation paid (\(liquidated.value)) exceeds cost quoted (\(quote.value))!"
         )
 
-        return compensationPaid
+        return liquidated
     }
 }
 extension Equity {
