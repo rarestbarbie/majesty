@@ -183,7 +183,7 @@ extension Factory: JavaScriptDecodable {
             ei: try js[.today_ei]?.decode() ?? 1,
             eo: try js[.today_eo]?.decode() ?? 1,
             fi: try js[.today_fi]?.decode() ?? 0,
-            px: try js[.today_px]?.decode() ?? 1,
+            px: try js[.today_px]?.decode() ?? 0,
             pa: try js[.today_pa]?.decode() ?? 1,
         )
         self.init(
