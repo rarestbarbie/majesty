@@ -8,12 +8,17 @@ public final class FactoryMetadata: Identifiable, Sendable {
     public let workers: Quantity<PopType>
     public let clerks: Quantity<PopType>?
 
+    public let sharesInitial: Int64
+    public let sharesPerLevel: Int64
+
     init(
         name: String,
         costs: ResourceTier,
         inputs: ResourceTier,
         output: ResourceTier,
         workers divisions: [Quantity<PopType>],
+        sharesInitial: Int64,
+        sharesPerLevel: Int64
     ) throws {
         self.name = name
         self.costs = costs
@@ -32,6 +37,9 @@ public final class FactoryMetadata: Identifiable, Sendable {
 
         self.workers = workers[0]
         self.clerks = clerks.first
+
+        self.sharesInitial = sharesInitial
+        self.sharesPerLevel = sharesPerLevel
     }
 }
 extension FactoryMetadata {
@@ -45,6 +53,8 @@ extension FactoryMetadata {
 
         self.workers.hash(into: &hasher)
         self.clerks.hash(into: &hasher)
+        self.sharesInitial.hash(into: &hasher)
+        self.sharesPerLevel.hash(into: &hasher)
 
         return hasher.finalize()
     }

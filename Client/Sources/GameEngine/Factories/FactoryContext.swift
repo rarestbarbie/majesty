@@ -170,14 +170,12 @@ extension FactoryContext: TransactingContext {
             self.equity = .init()
         }
 
-        let initialShares: Int64 = 10_000
-
         if  self.state.size.level == 0 {
             self.budget = .constructing(state: self.state)
 
             map.stockMarkets.issueShares(
                 currency: country.currency.id,
-                quantity: max(0, initialShares - self.equity.shareCount),
+                quantity: max(0, self.type.sharesInitial - self.equity.shareCount),
                 security: self.security,
             )
         } else if self.state.liquidating {
@@ -191,15 +189,16 @@ extension FactoryContext: TransactingContext {
                 inputsCostPerHour: inputsCostPerHour
             )
 
-            let targetShares: Int64 = initialShares + self.state.size.level * 5_000
-            let issuedShares: Int64 = max(0, targetShares - self.equity.shareCount)
+            let sharesTarget: Int64 = self.state.size.level * self.type.sharesPerLevel
+                + self.type.sharesInitial
+            let sharesIssued: Int64 = max(0, sharesTarget - self.equity.shareCount)
 
             // only issue shares if the factory is not performing buybacks
             // but this needs to be called even if quantity is zero, or the security will not
             // be tradeable today
             map.stockMarkets.issueShares(
                 currency: country.currency.id,
-                quantity: budget.buybacks == 0 ? issuedShares : 0,
+                quantity: budget.buybacks == 0 ? sharesIssued : 0,
                 security: self.security,
             )
 
