@@ -17,7 +17,9 @@ extension FactoryBudget {
         sharePrice: Fraction
     ) -> Self {
         let balance: Int64 = state.cash.balance
-        return .liquidating(.init(buybacks: min(balance, max(balance / 100, sharePrice.roundedUp))))
+        return .liquidating(
+            .init(buybacks: min(balance, max(balance / 100, sharePrice.roundedUp)))
+        )
     }
     static func active(
         workers: FactoryContext.Workforce?,

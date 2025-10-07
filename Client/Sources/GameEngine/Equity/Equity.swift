@@ -13,7 +13,12 @@ struct Equity<Owner> where Owner: Hashable & ConvertibleToJSValue & LoadableFrom
     /// Total volume of shares issued today, negative if shares were burned.
     private(set) var issued: Int64
 
-    init(shares: OrderedDictionary<Owner, EquityStake<Owner>>, splits: [EquitySplit] = [], traded: Int64 = 0, issued: Int64 = 0) {
+    init(
+        shares: OrderedDictionary<Owner, EquityStake<Owner>>,
+        splits: [EquitySplit] = [],
+        traded: Int64 = 0,
+        issued: Int64 = 0
+    ) {
         self.shares = shares
         self.splits = splits
         self.traded = traded
@@ -118,7 +123,11 @@ extension Equity {
 }
 extension Equity<LEI> {
     mutating func trade(random: inout PseudoRandom, bank: inout Bank, fill: StockMarket.Fill) {
-        let traded: StockPrice.Quote = self.liquidate(random: &random, bank: &bank, quote: fill.market)
+        let traded: StockPrice.Quote = self.liquidate(
+            random: &random,
+            bank: &bank,
+            quote: fill.market
+        )
 
         self.traded += traded.quantity
         self.issued += fill.issued.quantity
