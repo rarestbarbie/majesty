@@ -70,7 +70,7 @@ extension OwnershipBreakdown: JavaScriptEncodable {
         js[.country] = self.country
         js[.culture] = self.culture
 
-        js[.shares] = self.equity?.shares.outstanding
+        js[.shares] = self.equity?.shareCount
         js[.yesterday_px] = self.state?.yesterday.px
         js[.yesterday_pa] = self.state?.yesterday.pa
         js[.today_px] = self.state?.today.px

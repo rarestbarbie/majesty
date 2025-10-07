@@ -176,18 +176,20 @@ extension GameContext {
             }
         }
         map.stockMarkets.turn {
-            for fill: StockMarket<LEI>.Fill in $1.match(using: &map.random) {
-                switch fill.buyer {
-                case .pop(let id):
-                    self.pops.table[id]?.state.cash.e -= fill.cost
+            $1.match(random: &map.random) {
+                switch $1.asset {
                 case .factory(let id):
-                    self.factories.table[id]?.state.cash.e -= fill.cost
-                }
-                switch fill.asset {
+                    self.factories.table[id]?.state.equity.trade(
+                        random: &$0,
+                        bank: &map.bank,
+                        fill: $1
+                    )
                 case .pop(let id):
-                    self.pops.table[id]?.state.issue(shares: fill)
-                case .factory(let id):
-                    self.factories.table[id]?.state.issue(shares: fill)
+                    self.pops.table[id]?.state.equity.trade(
+                        random: &$0,
+                        bank: &map.bank,
+                        fill: $1
+                    )
                 }
             }
         }
@@ -334,15 +336,12 @@ extension GameContext {
 }
 extension GameContext {
     private mutating func postCashTransfers(_ map: inout GameMap) {
-        defer {
-            map.transfers.removeAll(keepingCapacity: true)
-        }
-        for (recipient, transfers): (LEI, CashTransfers) in map.transfers {
-            switch recipient {
+        map.bank.turn {
+            switch $0 {
             case .pop(let id):
-                self.pops.table[id]?.state.cash += transfers
+                self.pops.table[id]?.state.cash += $1
             case .factory(let id):
-                self.factories.table[id]?.state.cash += transfers
+                self.factories.table[id]?.state.cash += $1
             }
         }
     }

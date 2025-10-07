@@ -24,7 +24,7 @@ extension FactoryBudget {
         state: Factory,
         productivity: Int64,
         inputsCostPerHour: Double
-    ) -> Self {
+    ) -> Active {
         let c: Double = clerks.map { Double.init(state.today.cn * $0.limit) } ?? 0
         let i: Double
         let w: Double
@@ -56,6 +56,6 @@ extension FactoryBudget {
         budget.buybacks = (balance - l) / 365
         budget.dividend = balance <> (2 %/ 10_000)
 
-        return .active(budget)
+        return budget
     }
 }

@@ -41,6 +41,7 @@ extension CashAccount {
         self.c += other.c
         self.w += other.w
         self.i += other.i
+        self.e += other.e
         self.v += other.j
     }
     static func += (self: inout Self, other: Self) {

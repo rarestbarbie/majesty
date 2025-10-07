@@ -1,22 +1,17 @@
 import D
 import GameState
 
-protocol LegalEntityContext<State> {
-    associatedtype State: Turnable, Identifiable
-        where State.Dimensions: LegalEntityMetrics, State.ID: LegalEntityIdentifier
-
+protocol LegalEntityContext<State>: RuntimeContext where State: LegalEntityState {
     var equity: Equity<LEI>.Statistics { get }
-    var equitySplits: [EquitySplit] { get }
-    var state: State { get }
 }
 extension LegalEntityContext {
     var lei: LEI { self.state.id.lei }
 
-    var security: StockMarket<LEI>.Security {
+    var security: StockMarket.Security {
         .init(
+            id: self.lei,
+            stockPrice: .init(exact: self.equity.sharePrice),
             attraction: self.state.today.pa,
-            asset: self.lei,
-            price: self.equity.sharePrice
         )
     }
 }
@@ -68,13 +63,13 @@ extension LegalEntityContext {
     }
 
     func tooltipOwnership() -> Tooltip {
-        .instructions {
-            $0["Shares outstanding", (-)] = self.equity.shares.outstanding[/3]
-                ^^ self.equity.shares.issued
+        let equity: Equity<LEI> = self.state.equity
+        return .instructions {
+            $0["Shares outstanding", (-)] = self.equity.shareCount[/3] ^^ equity.issued
             $0[>] {
-                $0["Today’s trading volume"] = self.equity.shares.traded[/3]
+                $0["Today’s trading volume"] = equity.traded[/3]
             }
-            if  let last: EquitySplit = self.equitySplits.last {
+            if  let last: EquitySplit = equity.splits.last {
                 let factor: EquitySplit.Factor = last.factor
                 switch factor {
                 case .reverse:
@@ -84,7 +79,7 @@ extension LegalEntityContext {
                     """
 
                     var times: Int = 0
-                    for split: EquitySplit in self.equitySplits.reversed() {
+                    for split: EquitySplit in equity.splits.reversed() {
                         guard case .reverse = split.factor else {
                             break
                         }
@@ -100,7 +95,7 @@ extension LegalEntityContext {
                     """
 
                     var times: Int = 0
-                    for split: EquitySplit in self.equitySplits.reversed() {
+                    for split: EquitySplit in equity.splits.reversed() {
                         guard case .forward = split.factor else {
                             break
                         }

@@ -4,9 +4,10 @@ import Random
 ///
 /// This sampler has an O(n) initialization cost and an O(log n) cost for each
 /// subsequent sample.
-struct RandomWeightedSampler<Element, Weight>
-    where Weight: BinaryFloatingPoint, Weight.RawSignificand: FixedWidthInteger {
-    private let cumulativeWeights: [(element: Element, cumulativeWeight: Weight)]
+struct RandomWeightedSampler<Choices, Weight> where Choices: Collection,
+    Weight: BinaryFloatingPoint,
+    Weight.RawSignificand: FixedWidthInteger {
+    private let cumulativeWeights: [(choice: Choices.Index, cumulativeWeight: Weight)]
     private let totalWeight: Weight
 
     /// Creates a sampler for the given collection.
@@ -17,20 +18,21 @@ struct RandomWeightedSampler<Element, Weight>
     /// - Returns: A new sampler, or `nil` if the collection is empty or the
     ///   total weight is zero.
     init?(
-        choices: borrowing some Collection<Element>,
-        sampleWeight: (Element) -> Weight
+        choices: borrowing Choices,
+        sampleWeight: (Choices.Element) -> Weight
     ) {
-        var cumulativeData: [(element: Element, cumulativeWeight: Weight)] = .init()
+        var cumulativeData: [(Choices.Index, cumulativeWeight: Weight)] = .init()
         ;   cumulativeData.reserveCapacity(choices.count)
 
         var accumulatedWeight: Weight = .zero
-        for element: Element in copy choices {
-            accumulatedWeight += sampleWeight(element)
-            cumulativeData.append((element, accumulatedWeight))
+        for i: Choices.Index in choices.indices {
+            accumulatedWeight += sampleWeight(choices[i])
+            cumulativeData.append((i, accumulatedWeight))
         }
 
         guard
-        let totalWeight: Weight = cumulativeData.last?.cumulativeWeight, totalWeight > .zero else {
+        let totalWeight: Weight = cumulativeData.last?.cumulativeWeight,
+            totalWeight > .zero else {
             return nil
         }
 
@@ -39,7 +41,7 @@ struct RandomWeightedSampler<Element, Weight>
     }
 
     /// Returns the next weighted random element.
-    func next(using generator: inout some RandomNumberGenerator) -> Element {
+    func next(using generator: inout some RandomNumberGenerator) -> Choices.Index {
         let randomValue: Weight = .random(in: .zero ..< self.totalWeight, using: &generator)
 
         // `partitioningIndex` performs a binary search to find the index.
@@ -47,6 +49,6 @@ struct RandomWeightedSampler<Element, Weight>
             $0.cumulativeWeight < randomValue
         }
 
-        return self.cumulativeWeights[index].element
+        return self.cumulativeWeights[index].choice
     }
 }

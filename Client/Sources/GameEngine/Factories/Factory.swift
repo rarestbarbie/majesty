@@ -4,8 +4,9 @@ import GameEconomy
 import GameRules
 import GameState
 import OrderedCollections
+import Random
 
-struct Factory: CashAccountHolder, Identifiable {
+struct Factory: LegalEntityState, Identifiable {
     let id: FactoryID
     let tile: Address
     var type: FactoryType
@@ -51,12 +52,6 @@ extension Factory: Turnable {
     mutating func turn() {
         self.cash.settle()
         self.equity.turn()
-    }
-}
-extension Factory {
-    mutating func issue(shares fill: StockMarket<LEI>.Fill) {
-        self.equity.issue(shares: fill.quantity, to: fill.buyer)
-        self.cash.e += fill.cost
     }
 }
 extension Factory {

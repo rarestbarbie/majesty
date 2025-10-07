@@ -8,7 +8,7 @@ import JavaScriptInterop
 import Random
 import OrderedCollections
 
-struct Pop: CashAccountHolder, IdentityReplaceable {
+struct Pop: LegalEntityState, IdentityReplaceable {
     var id: PopID
     let home: Address
     let type: PopType
@@ -74,11 +74,6 @@ extension Pop: Turnable {
     }
 }
 extension Pop {
-    mutating func issue(shares fill: StockMarket<LEI>.Fill) {
-        self.equity.issue(shares: fill.quantity, to: fill.buyer)
-        self.cash.e += fill.cost
-    }
-
     mutating func egress(
         evaluator: ConditionEvaluator,
         on map: inout GameMap,

@@ -5,17 +5,13 @@ import GameState
 extension Equity {
     struct Statistics {
         var owners: [Shareholder]
-        var shares: (
-            outstanding: Int64,
-            issued: Int64,
-            traded: Int64
-        )
+        var shareCount: Int64
         var sharePrice: Fraction
     }
 }
 extension Equity.Statistics {
     init() {
-        self.init(owners: [], shares: (outstanding: 0, issued: 0, traded: 0), sharePrice: 0)
+        self.init(owners: [], shareCount: 0, sharePrice: 0)
     }
 }
 extension Equity<LEI>.Statistics {
@@ -24,22 +20,16 @@ extension Equity<LEI>.Statistics {
         assets: CashAccount,
         in context: GameContext.ResidentPass,
     ) -> Self {
-        let shares: (outstanding: Int64, bought: Int64, sold: Int64) = equity.shares.reduce(
-            into: (0, 0, 0)
-        ) {
-            $0.outstanding += $1.value.shares
-            $0.bought += $1.value.bought
-            $0.sold += $1.value.sold
-        }
+        let shareCount: Int64 = equity.shares.reduce(into: 0) { $0 += $1.value.shares }
 
         #assert(
-            shares.outstanding >= 0,
-            "Outstanding shares (\(shares.outstanding)) cannot be negative!!!"
+            shareCount >= 0,
+            "Outstanding shares (\(shareCount)) cannot be negative!!!"
         )
 
         // This formulation means that if there are no outstanding shares, the price is equal
         // to the valuation. In other words, you can buy the entire company for its valuation.
-        let sharePrice: Fraction = assets.balance %/ max(shares.outstanding, 1)
+        let sharePrice: Fraction = assets.balance %/ max(shareCount, 1)
 
         return .init(
             owners: equity.shares.values.reduce(into: []) {
@@ -82,11 +72,7 @@ extension Equity<LEI>.Statistics {
                     )
                 )
             },
-            shares: (
-                outstanding: shares.outstanding,
-                issued: shares.sold - shares.bought,
-                traded: shares.sold + shares.bought
-            ),
+            shareCount: shareCount,
             sharePrice: sharePrice
         )
     }
