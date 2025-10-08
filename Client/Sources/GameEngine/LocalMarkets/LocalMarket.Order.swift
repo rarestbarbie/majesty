@@ -1,3 +1,5 @@
+import GameState
+
 extension LocalMarket {
     struct Order {
         let by: LEI

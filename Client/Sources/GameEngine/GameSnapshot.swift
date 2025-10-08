@@ -6,7 +6,7 @@ import OrderedCollections
     let context: GameContext
     let markets: (
         tradeable: OrderedDictionary<Market.AssetPair, Market>,
-        inelastic: LocalMarkets<PopID>
+        inelastic: LocalMarkets
     )
     let date: GameDate
 }

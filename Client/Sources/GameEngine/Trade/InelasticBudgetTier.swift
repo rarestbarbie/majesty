@@ -7,7 +7,7 @@ struct InelasticBudgetTier {
 extension InelasticBudgetTier {
     static func compute(
         demands: OrderedDictionary<Resource, InelasticInput>,
-        markets: LocalMarkets<some Any>,
+        markets: LocalMarkets,
         location: Address,
     ) -> Self {
         return .init(

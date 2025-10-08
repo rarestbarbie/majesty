@@ -1,14 +1,15 @@
 import GameEconomy
+import GameState
 
-struct LocalMarkets<LEI> {
-    private var markets: [Key: LocalMarket<LEI>]
+struct LocalMarkets {
+    private var markets: [Key: LocalMarket]
 
-    init(markets: [Key: LocalMarket<LEI>] = [:]) {
+    init(markets: [Key: LocalMarket] = [:]) {
         self.markets = markets
     }
 }
 extension LocalMarkets {
-    subscript(location: Address, resource: Resource) -> LocalMarket<LEI> {
+    subscript(location: Address, resource: Resource) -> LocalMarket {
         _read {
             yield  self.markets[.init(location: location, resource: resource), default: .init()]
         }
@@ -18,8 +19,8 @@ extension LocalMarkets {
     }
 }
 extension LocalMarkets {
-    mutating func turn(by turn: (Key, inout LocalMarket<LEI>) -> ()) {
-        var i: [Key: LocalMarket<LEI>].Index = self.markets.startIndex
+    mutating func turn(by turn: (Key, inout LocalMarket) -> ()) {
+        var i: [Key: LocalMarket].Index = self.markets.startIndex
         while i < self.markets.endIndex {
             let id: Key = self.markets.keys[i]
             turn(id, &self.markets.values[i])

@@ -108,6 +108,57 @@ extension FactoryContext {
         self.equity = .compute(equity: self.state.equity, assets: self.state.cash, in: context)
     }
 }
+extension FactoryContext {
+    mutating func credit(
+        inelastic resource: Resource,
+        units: Int64,
+        price: Int64
+    ) {
+        let value: Int64 = units * price
+        self.state.out.inelastic[resource]?.report(
+            unitsSold: units,
+            valueSold: value,
+        )
+        self.state.cash.r += value
+    }
+
+    mutating func debit(
+        inelastic resource: Resource,
+        units: Int64,
+        price: Int64,
+        in tier: ResourceTierIdentifier?
+    ) {
+        guard let tier: ResourceTierIdentifier else {
+            return
+        }
+
+        let value: Int64 = units * price
+
+        switch tier {
+        case .l:
+            // TODO: need a way to distinguish between constructing and operating phases
+            self.state.nv.inelastic[resource]?.report(
+                unitsConsumed: units,
+                valueConsumed: value,
+            )
+        case .e:
+            self.state.ni.inelastic[resource]?.report(
+                unitsConsumed: units,
+                valueConsumed: value,
+            )
+        case .x:
+            self.state.nv.inelastic[resource]?.report(
+                unitsConsumed: units,
+                valueConsumed: value,
+            )
+
+        case _:
+            return
+        }
+
+        self.state.cash.b -= value
+    }
+}
 extension FactoryContext: TransactingContext {
     mutating func allocate(map: inout GameMap) {
         guard
@@ -125,20 +176,6 @@ extension FactoryContext: TransactingContext {
         // Reset fill positions, since they are copied from yesterday’s positions by default.
         self.state.today.wf = nil
         self.state.today.cf = nil
-
-        /// Update the resource demands of this factory, returning the estimated marginal cost of
-        /// input resources per worker-hour.
-        ///
-        /// This is a linear rate, and will slightly underestimate the true cost, due to the
-        /// curvature of the market.
-        let inputsCostPerHour: Double = self.state.today.ei * self.type.inputs.tradeable.reduce(
-            into: 0
-        ) {
-            $0 += Double.init($1.value) * map.exchange.price(
-                of: $1.key,
-                in: country.currency.id
-            )
-        }
 
         // Compute input capacity. The stockpile target is computed relative to the number
         // of workers available, minus workers on strike. This prevents the factory from
@@ -170,39 +207,95 @@ extension FactoryContext: TransactingContext {
             self.equity = .init()
         }
 
-        if  self.state.size.level == 0 {
-            self.budget = .constructing(state: self.state)
-
-            map.stockMarkets.issueShares(
-                currency: country.currency.id,
-                quantity: max(0, self.type.sharesInitial - self.equity.shareCount),
-                security: self.security,
-            )
-        } else if case _? = self.state.liquidation {
+        if case _? = self.state.liquidation {
             self.budget = .liquidating(state: self.state, sharePrice: self.equity.sharePrice)
+            return
+        }
+
+        let weights: ResourceInputWeights
+        let budget: OperatingBudget
+        let sharesToIssue: Int64
+
+        if  self.state.size.level == 0 {
+            weights = .init(
+                tiers: (self.state.nv, .init(), .init()),
+                location: self.state.tile,
+                currency: country.currency.id,
+                map: map,
+            )
+            budget = .init(
+                workers: nil,
+                clerks: nil,
+                state: self.state,
+                weights: weights,
+                stockpileMaxDays: Self.stockpileDays.upperBound,
+                d: (7, 30, 365),
+            )
+            sharesToIssue = max(0, self.type.sharesInitial - self.equity.shareCount)
+
+            self.budget = .constructing(budget)
         } else {
-            let budget: FactoryBudget.Active = FactoryBudget.active(
+            weights = .init(
+                tiers: (.init(), self.state.ni, self.state.nv),
+                location: self.state.tile,
+                currency: country.currency.id,
+                map: map,
+            )
+            budget = .init(
                 workers: self.workers,
                 clerks: self.clerks,
                 state: self.state,
-                productivity: self.productivity,
-                inputsCostPerHour: inputsCostPerHour
+                weights: weights,
+                stockpileMaxDays: Self.stockpileDays.upperBound,
+                d: (7, 30, Int64.init(365 / (0.1 + self.state.today.pa))),
             )
 
             let sharesTarget: Int64 = self.state.size.level * self.type.sharesPerLevel
                 + self.type.sharesInitial
             let sharesIssued: Int64 = max(0, sharesTarget - self.equity.shareCount)
 
-            // only issue shares if the factory is not performing buybacks
-            // but this needs to be called even if quantity is zero, or the security will not
-            // be tradeable today
-            map.stockMarkets.issueShares(
-                currency: country.currency.id,
-                quantity: budget.buybacks == 0 ? sharesIssued : 0,
-                security: self.security,
-            )
+            sharesToIssue = budget.buybacks == 0 ? sharesIssued : 0
 
             self.budget = .active(budget)
+        }
+
+        // only issue shares if the factory is not performing buybacks
+        // but this needs to be called even if quantity is zero, or the security will not
+        // be tradeable today
+        map.stockMarkets.issueShares(
+            currency: country.currency.id,
+            quantity: sharesToIssue,
+            security: self.security,
+        )
+
+        for (budget, weights, tier):
+            (Int64, [InelasticBudgetTier.Weight], ResourceTierIdentifier) in [
+                (budget.l.inelastic, weights.l.inelastic.x, .l),
+                (budget.e.inelastic, weights.e.inelastic.x, .e),
+                (budget.x.inelastic, weights.x.inelastic.x, .x),
+            ] {
+            guard budget > 0,
+            let allocations: [Int64] = weights.distribute(budget, share: \.value) else {
+                continue
+            }
+            for (allocation, x): (Int64, InelasticBudgetTier.Weight) in zip(
+                    allocations,
+                    weights
+                ) where allocation > 0 {
+                map.localMarkets[self.state.tile, x.id].bid(
+                    budget: allocation,
+                    by: self.lei,
+                    in: tier,
+                    limit: x.units
+                )
+            }
+        }
+
+        for (id, output): (Resource, InelasticOutput) in self.state.out.inelastic {
+            let ask: Int64 = output.unitsProduced
+            if  ask > 0 {
+                map.localMarkets[self.state.tile, id].ask(amount: ask, by: self.lei)
+            }
         }
     }
 
@@ -223,7 +316,7 @@ extension FactoryContext: TransactingContext {
             self.state.today.pa = 1
             self.construct(
                 policy: country,
-                budget: budget,
+                budget: budget.l,
                 stockpileTarget: stockpileTarget,
                 map: &map
             )
@@ -242,7 +335,6 @@ extension FactoryContext: TransactingContext {
         case .active(let budget):
             #assert(budget.workers >= 0, "Workers budget (\(budget.workers)) is negative?!?!")
             #assert(budget.clerks >= 0, "Clerks budget (\(budget.clerks)) is negative?!?!")
-            #assert(budget.inputs >= 0, "Inputs budget (\(budget.inputs)) is negative?!?!")
 
             #assert(self.state.size.level > 0, "Active factory has size level 0?!?!")
 
@@ -270,7 +362,6 @@ extension FactoryContext: TransactingContext {
             }
 
             let operatingProfit: Int64
-            let reinvestRatio: Fraction
 
             if  let workers: Workforce = self.workers {
                 let wages: Paychecks = self.operate(
@@ -297,20 +388,13 @@ extension FactoryContext: TransactingContext {
 
                     map.jobs.hire.worker[self.state.tile, type].append(block)
                 }
-
-                reinvestRatio = workers.count %/ (50 * workers.limit)
             } else {
                 operatingProfit = self.state.operatingProfit
-                reinvestRatio = 1 %/ 50
             }
-
-            let construction: FactoryBudget.Constructing = .init(
-                spending: operatingProfit <> reinvestRatio
-            )
 
             self.construct(
                 policy: country,
-                budget: construction,
+                budget: budget.x,
                 stockpileTarget: stockpileTarget,
                 map: &map
             )
@@ -360,17 +444,17 @@ extension FactoryContext: TransactingContext {
 extension FactoryContext {
     private mutating func construct(
         policy: CountryProperties,
-        budget: FactoryBudget.Constructing,
+        budget: ResourceBudgetTier,
         stockpileTarget: TradeableInput.StockpileTarget,
         map: inout GameMap
     ) {
-        guard budget.spending > 0 else {
+        guard budget.tradeable > 0 else {
             return
         }
 
         let (gain, loss): (Int64, loss: Int64) = self.state.nv.trade(
             stockpileDays: stockpileTarget,
-            spendingLimit: budget.spending,
+            spendingLimit: budget.tradeable,
             in: policy.currency.id,
             on: &map.exchange,
         )
@@ -422,13 +506,13 @@ extension FactoryContext {
     private mutating func operate(
         workers: Workforce,
         policy: CountryProperties,
-        budget: FactoryBudget.Active,
+        budget: OperatingBudget,
         stockpileTarget: TradeableInput.StockpileTarget,
         map: inout GameMap
     ) -> Paychecks {
         let (gain, loss): (Int64, loss: Int64) = self.state.ni.trade(
             stockpileDays: stockpileTarget,
-            spendingLimit: budget.inputs,
+            spendingLimit: budget.e.tradeable,
             in: policy.currency.id,
             on: &map.exchange,
         )

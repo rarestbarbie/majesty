@@ -306,93 +306,26 @@ extension PopContext: TransactingContext {
             scalingFactor: (self.state.today.size, 1)
         )
 
-        /// Compute horizontal weights.
-        let weights: (
-            l: (tradeable: TradeableBudgetTier, inelastic: InelasticBudgetTier),
-            e: (tradeable: TradeableBudgetTier, inelastic: InelasticBudgetTier),
-            x: (tradeable: TradeableBudgetTier, inelastic: InelasticBudgetTier)
-        )
-
-        weights.l.tradeable = .compute(
-            demands: self.state.nl.tradeable,
-            markets: map.exchange,
-            currency: currency,
-        )
-        weights.e.tradeable = .compute(
-            demands: self.state.ne.tradeable,
-            markets: map.exchange,
-            currency: currency,
-        )
-        weights.x.tradeable = .compute(
-            demands: self.state.nx.tradeable,
-            markets: map.exchange,
-            currency: currency,
-        )
-
-        weights.l.inelastic = .compute(
-            demands: self.state.nl.inelastic,
-            markets: map.localMarkets,
+        let weights: ResourceInputWeights = .init(
+            tiers: (self.state.nl, self.state.ne, self.state.nx),
             location: self.state.home,
-        )
-        weights.e.inelastic = .compute(
-            demands: self.state.ne.inelastic,
-            markets: map.localMarkets,
-            location: self.state.home,
-        )
-        weights.x.inelastic = .compute(
-            demands: self.state.nx.inelastic,
-            markets: map.localMarkets,
-            location: self.state.home,
-        )
-
-        var budget: PopBudget = .init()
-
-        let inelasticCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: weights.l.inelastic.total,
-            e: weights.e.inelastic.total,
-            x: weights.x.inelastic.total,
-        )
-        let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: Int64.init(weights.l.tradeable.total.rounded(.up)),
-            e: Int64.init(weights.e.tradeable.total.rounded(.up)),
-            x: Int64.init(weights.x.tradeable.total.rounded(.up)),
-        )
-        let totalCostPerDay: (l: Int64, e: Int64) = (
-            l: tradeableCostPerDay.l + inelasticCostPerDay.l,
-            e: tradeableCostPerDay.e + inelasticCostPerDay.e,
+            currency: currency,
+            map: map,
         )
 
         let d: (l: Int64, e: Int64, x: Int64) = (7, 30, 365)
-        /// These are the minimum theoretical balances the pop would need to purchase 100% of
-        /// its needs in that tier on any particular day.
-        let min: (l: Int64, e: Int64) = (
-            l: totalCostPerDay.l * d.l,
-            e: totalCostPerDay.e * d.e,
-        )
-
-        budget.l.distribute(
-            funds: balance / d.l,
-            inelastic: inelasticCostPerDay.l * Self.stockpileDays.upperBound,
-            tradeable: tradeableCostPerDay.l * Self.stockpileDays.upperBound,
-        )
-
-        budget.e.distribute(
-            funds: (balance - min.l) / d.e,
-            inelastic: inelasticCostPerDay.e * Self.stockpileDays.upperBound,
-            tradeable: tradeableCostPerDay.e * Self.stockpileDays.upperBound,
-        )
-
-        budget.x.distribute(
-            funds: (balance - min.l - min.e) / d.x,
-            inelastic: inelasticCostPerDay.x * Self.stockpileDays.upperBound,
-            tradeable: tradeableCostPerDay.x * Self.stockpileDays.upperBound,
+        var budget: PopBudget = .init(
+            weights: weights,
+            balance: balance,
+            stockpileMaxDays: Self.stockpileDays.upperBound,
+            d: d
         )
 
         equity:
         switch self.state.type.stratum {
         case .Ward:
-            budget.dividend = max(0, (balance - min.l) / 3650)
-            budget.buybacks = max(0, (balance - min.l - budget.dividend) / 365)
+            budget.dividend = max(0, (balance - budget.min.l) / 3650)
+            budget.buybacks = max(0, (balance - budget.min.l - budget.dividend) / 365)
             // Align share price
             self.state.today.px = Double.init(self.equity.sharePrice)
             map.stockMarkets.issueShares(
@@ -402,7 +335,7 @@ extension PopContext: TransactingContext {
             )
 
         case .Owner:
-            let valueToInvest: Int64 = (balance - min.l - min.e) / d.x
+            let valueToInvest: Int64 = (balance - budget.min.l - budget.min.e) / d.x
             if  valueToInvest <= 0 {
                 break equity
             }
@@ -432,7 +365,7 @@ extension PopContext: TransactingContext {
                 ) where allocation > 0 {
                 map.localMarkets[self.state.home, x.id].bid(
                     budget: allocation,
-                    by: self.state.id,
+                    by: self.lei,
                     in: tier,
                     limit: x.units
                 )
@@ -442,7 +375,7 @@ extension PopContext: TransactingContext {
         for (id, output): (Resource, InelasticOutput) in self.state.out.inelastic {
             let ask: Int64 = output.unitsProduced
             if  ask > 0 {
-                map.localMarkets[self.state.home, id].ask(amount: ask, by: self.state.id)
+                map.localMarkets[self.state.home, id].ask(amount: ask, by: self.lei)
             }
         }
 

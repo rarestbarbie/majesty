@@ -162,24 +162,44 @@ extension GameContext {
         map.localMarkets.turn {
             let price: Int64 = $1.today.price
             let (asks, bids): (
-                asks: [LocalMarket<PopID>.Order],
-                bids: [LocalMarket<PopID>.Order]
+                asks: [LocalMarket.Order],
+                bids: [LocalMarket.Order]
             ) = $1.match(using: &map.random)
 
-            for order: LocalMarket<PopID>.Order in asks {
-                self.pops[modifying: order.by].credit(
-                    inelastic: $0.resource,
-                    units: order.filled,
-                    price: price
-                )
+            for order: LocalMarket.Order in asks {
+                switch order.by {
+                case .factory(let id):
+                    self.factories[modifying: id].credit(
+                        inelastic: $0.resource,
+                        units: order.filled,
+                        price: price
+                    )
+
+                case .pop(let id):
+                    self.pops[modifying: id].credit(
+                        inelastic: $0.resource,
+                        units: order.filled,
+                        price: price
+                    )
+                }
             }
-            for order: LocalMarket<PopID>.Order in bids {
-                self.pops[modifying: order.by].debit(
-                    inelastic: $0.resource,
-                    units: order.filled,
-                    price: price,
-                    in: order.tier
-                )
+            for order: LocalMarket.Order in bids {
+                switch order.by {
+                case .factory(let id):
+                    self.factories[modifying: id].debit(
+                        inelastic: $0.resource,
+                        units: order.filled,
+                        price: price,
+                        in: order.tier
+                    )
+                case .pop(let id):
+                    self.pops[modifying: id].debit(
+                        inelastic: $0.resource,
+                        units: order.filled,
+                        price: price,
+                        in: order.tier
+                    )
+                }
             }
         }
         map.stockMarkets.turn {
