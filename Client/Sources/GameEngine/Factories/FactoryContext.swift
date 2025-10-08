@@ -255,7 +255,6 @@ extension FactoryContext: TransactingContext {
                     country.minwage,
                     self.state.today.cn + salaries.change
                 )
-                self.state.today.ca = salaries.rate
                 self.state.cash.c -= salaries.paid
 
                 switch salaries.headcount {
@@ -449,7 +448,6 @@ extension FactoryContext {
         )
 
         self.state.today.wn = max(policy.minwage, self.state.today.wn + wages.change)
-        self.state.today.wa = wages.rate
         self.state.cash.w -= wages.paid
 
         /// On some days, the factory purchases more inputs than others. To get a more accurate
@@ -549,9 +547,6 @@ extension FactoryContext {
         let salaries: Paychecks = .init(
             change: change,
             paid: paid,
-            rate: clerks.count != 0
-                ? Double.init(paid) / Double.init(clerks.count)
-                : 0,
             headcount: headcount
         )
 
@@ -640,9 +635,6 @@ extension FactoryContext {
         let wages: Paychecks = .init(
             change: change,
             paid: paid,
-            rate: workers.count != 0
-                ? Double.init(paid) / Double.init(workers.count)
-                : 0,
             headcount: headcount
         )
 

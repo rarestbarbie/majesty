@@ -48,6 +48,11 @@ extension Factory: Sectionable {
         .init(type: self.type, tile: self.tile)
     }
 }
+extension Factory {
+    mutating func prune(in context: GameContext.PruningPass) {
+        self.equity.prune(in: context)
+    }
+}
 extension Factory: Turnable {
     mutating func turn() {
         self.cash.settle()
@@ -88,11 +93,9 @@ extension Factory {
         case yesterday_vi = "y_vi"
         case yesterday_vv = "y_vv"
 
-        case yesterday_wa = "y_wa"
         case yesterday_wf = "y_wf"
         case yesterday_wn = "y_wn"
 
-        case yesterday_ca = "y_ca"
         case yesterday_cf = "y_cf"
         case yesterday_cn = "y_cn"
 
@@ -140,10 +143,8 @@ extension Factory: JavaScriptEncodable {
 
         js[.yesterday_vi] = self.yesterday.vi
         js[.yesterday_vv] = self.yesterday.vv
-        js[.yesterday_wa] = self.yesterday.wa
         js[.yesterday_wf] = self.yesterday.wf
         js[.yesterday_wn] = self.yesterday.wn
-        js[.yesterday_ca] = self.yesterday.ca
         js[.yesterday_cf] = self.yesterday.cf
         js[.yesterday_cn] = self.yesterday.cn
         js[.yesterday_ei] = self.yesterday.ei
@@ -154,10 +155,8 @@ extension Factory: JavaScriptEncodable {
 
         js[.today_vi] = self.today.vi
         js[.today_vv] = self.today.vv
-        js[.today_wa] = self.today.wa
         js[.today_wf] = self.today.wf
         js[.today_wn] = self.today.wn
-        js[.today_ca] = self.today.ca
         js[.today_cf] = self.today.cf
         js[.today_cn] = self.today.cn
         js[.today_ei] = self.today.ei
@@ -174,10 +173,8 @@ extension Factory: JavaScriptDecodable {
         let today: Dimensions = .init(
             vi: try js[.today_vi]?.decode() ?? 0,
             vv: try js[.today_vv]?.decode() ?? 0,
-            wa: try js[.today_wa]?.decode() ?? 0,
             wf: try js[.today_wf]?.decode(),
             wn: try js[.today_wn]?.decode() ?? 1,
-            ca: try js[.today_ca]?.decode() ?? 0,
             cf: try js[.today_cf]?.decode(),
             cn: try js[.today_cn]?.decode() ?? 1,
             ei: try js[.today_ei]?.decode() ?? 1,
@@ -202,10 +199,8 @@ extension Factory: JavaScriptDecodable {
             yesterday: .init(
                 vi: try js[.yesterday_vi]?.decode() ?? today.vi,
                 vv: try js[.yesterday_vv]?.decode() ?? today.vv,
-                wa: try js[.yesterday_wa]?.decode() ?? today.wa,
                 wf: try js[.yesterday_wf]?.decode(),
                 wn: try js[.yesterday_wn]?.decode() ?? today.wn,
-                ca: try js[.yesterday_ca]?.decode() ?? today.ca,
                 cf: try js[.yesterday_cf]?.decode(),
                 cn: try js[.yesterday_cn]?.decode() ?? today.cn,
                 ei: try js[.yesterday_ei]?.decode() ?? today.ei,

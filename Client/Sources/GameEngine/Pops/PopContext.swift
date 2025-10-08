@@ -16,6 +16,7 @@ struct PopContext: RuntimeContext, LegalEntityContext {
     private(set) var occupiedBy: CountryProperties?
 
     private(set) var unemployment: Double
+    private(set) var income: [FactoryID: Int64]
     private(set) var equity: Equity<LEI>.Statistics
 
     private(set) var cashFlow: CashFlowStatement
@@ -30,6 +31,7 @@ struct PopContext: RuntimeContext, LegalEntityContext {
         self.occupiedBy = nil
 
         self.unemployment = 0
+        self.income = [:]
         self.equity = .init()
         self.cashFlow = .init()
 
@@ -202,6 +204,11 @@ extension PopContext {
 
         let unemployed: Int64 = self.state.unemployed
         self.unemployment = Double.init(unemployed) / Double.init(self.state.today.size)
+
+        self.income.removeAll(keepingCapacity: true)
+        for id: FactoryID in self.state.jobs.keys {
+            self.income[id] = context.factories[id]?.today.wn
+        }
 
         self.cashFlow.reset()
         self.cashFlow.update(with: self.state.nl.tradeable.values.elements)
@@ -542,7 +549,7 @@ extension PopContext: TransactingContext {
     }
 }
 extension PopContext {
-    mutating func advance(map: inout GameMap, factories: RuntimeStateTable<FactoryContext>) {
+    mutating func advance(map: inout GameMap) {
         guard
         let country: CountryProperties = self.occupiedBy else {
             return
@@ -597,27 +604,13 @@ extension PopContext {
         // We do not need to remove jobs that have no employees left, that will be done
         // automatically by ``Pop.turn``.
         let jobs: Range<Int> = self.state.jobs.values.indices
-        let w0: Double = .init(country.minwage)
+        let w0: Double = self.occupiedBy.map { Double.init($0.minwage) } ?? 1
         for i: Int in jobs {
             {
-                guard let factory: Factory = factories[$0.at] else {
-                    // Factory has gone bankrupt or been destroyed.
-                    $0.fireAll()
-                    return
-                }
-
-                let earned: Double
-
-                if self.state.type.stratum <= .Worker {
-                    earned = factory.yesterday.wa
-                } else {
-                    earned = factory.yesterday.ca
-                }
-
                 /// At this rate, if the factory pays minimum wage or less, about half of
                 /// non-union workers, and one third of union workers, will quit every year.
                 $0.quit(
-                    rate: 0.002 * w0 / max(w0, earned),
+                    rate: 0.002 * w0 / max(w0, self.income[$0.at].map(Double.init(_:)) ?? 1),
                     using: &map.random.generator
                 )
             } (&self.state.jobs.values[i])

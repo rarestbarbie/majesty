@@ -28,6 +28,28 @@ struct Equity<Owner> where Owner: Hashable & ConvertibleToJSValue & LoadableFrom
 extension Equity: ExpressibleByDictionaryLiteral {
     init(dictionaryLiteral: (Never, Never)...) { self.init(shares: [:]) }
 }
+extension Equity<LEI> {
+    mutating func prune(in context: GameContext.PruningPass) {
+        self.shares.update {
+            if $0.shares <= 0 {
+                return false
+            }
+            switch $0.id {
+            case .factory(let id):
+                return context.factories.contains(id)
+            case .pop(let id):
+                return context.pops.contains(id)
+            }
+        }
+    }
+    mutating func turn() {
+        for i: Int in self.shares.values.indices {
+            self.shares.values[i].turn()
+        }
+        self.traded = 0
+        self.issued = 0
+    }
+}
 extension Equity {
     private subscript(owner: Owner) -> EquityStake<Owner> {
         _read   { yield  self.shares[owner, default: .init(id: owner)] }
@@ -194,25 +216,6 @@ extension Equity<LEI> {
         )
 
         return liquidated
-    }
-}
-extension Equity {
-    mutating func turn() {
-        var remove: [Int] = []
-        for i: Int in self.shares.values.indices {
-            {
-                $0.turn()
-                if $0.shares <= 0 {
-                    remove.append(i)
-                }
-            } (&self.shares.values[i])
-        }
-        for i: Int in remove.reversed() {
-            self.shares.remove(at: i)
-        }
-
-        self.traded = 0
-        self.issued = 0
     }
 }
 extension Equity {
