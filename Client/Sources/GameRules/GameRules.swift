@@ -106,7 +106,10 @@ extension GameRules {
                     ),
                     workers: try symbols.pops.resolve(factory.workers),
                     sharesInitial: rules.factoryCosts.sharesInitial,
-                    sharesPerLevel: rules.factoryCosts.sharesPerLevel
+                    sharesPerLevel: rules.factoryCosts.sharesPerLevel,
+                    terrainAllowed: .init(
+                        try factory.terrain.lazy.map { try symbols.terrains[$0] }
+                    )
                 )
             },
             technologies: try table.technologies.mapValues {

@@ -5,19 +5,22 @@ struct FactoryDescription {
     let inputs: SymbolTable<Int64>
     let output: SymbolTable<Int64>
     let workers: SymbolTable<Int64>
+    let terrain: [Symbol]
 }
 extension FactoryDescription: JavaScriptDecodable {
     enum ObjectKey: JSString {
         case inputs
         case output
         case workers
+        case terrain
     }
 
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             inputs: try js[.inputs].decode(),
             output: try js[.output].decode(),
-            workers: try js[.workers].decode()
+            workers: try js[.workers].decode(),
+            terrain: try js[.terrain]?.decode() ?? []
         )
     }
 }
