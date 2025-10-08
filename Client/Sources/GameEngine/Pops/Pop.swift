@@ -54,6 +54,17 @@ extension Pop: Sectionable {
         .init(culture: self.nat, type: self.type, home: self.home)
     }
 }
+extension Pop: Deletable {
+    var dead: Bool {
+        if  self.today.size == 0,
+            self.cash.balance == 0,
+            self.equity.shares.values.allSatisfy({ $0.shares <= 0 }) {
+            true
+        } else {
+            false
+        }
+    }
+}
 extension Pop {
     mutating func prune(in context: GameContext.PruningPass) {
         self.equity.prune(in: context)

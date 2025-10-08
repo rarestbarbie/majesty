@@ -22,10 +22,6 @@ struct Factory: LegalEntityState, Identifiable {
 
     var equity: Equity<LEI>
 }
-extension Factory {
-    @available(*, deprecated, renamed: "tile")
-    var on: Address { self.tile }
-}
 extension Factory: Sectionable {
     init(id: FactoryID, section: Section) {
         self.init(
@@ -46,6 +42,17 @@ extension Factory: Sectionable {
 
     var section: Section {
         .init(type: self.type, tile: self.tile)
+    }
+}
+extension Factory: Deletable {
+    var dead: Bool {
+        if  case _? = self.liquidation,
+            self.cash.balance == 0,
+            self.equity.shares.values.allSatisfy({ $0.shares <= 0 }) {
+            true
+        } else {
+            false
+        }
     }
 }
 extension Factory {

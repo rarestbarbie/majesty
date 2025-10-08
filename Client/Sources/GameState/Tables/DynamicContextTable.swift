@@ -1,7 +1,7 @@
 import OrderedCollections
 
 @frozen public struct DynamicContextTable<ElementContext>
-    where ElementContext: RuntimeContext, ElementContext.State: Sectionable {
+    where ElementContext: RuntimeContext, ElementContext.State: Sectionable & Deletable {
 
     @usableFromInline var contexts: RuntimeContextTable<ElementContext>
     @usableFromInline var indices: [ElementContext.State.Section: Int]
@@ -65,10 +65,13 @@ extension DynamicContextTable: Collection {
     }
 }
 extension DynamicContextTable {
-    @inlinable public mutating func lint(
-        where remove: (ElementContext.State) -> Bool
-    ) {
-        fatalError("unimplemented, requires index rebuilding")
+    @inlinable public mutating func lint() {
+        let rebuild: Bool = self.contexts.index.update { !$0.state.dead }
+        if  rebuild {
+            self.indices = self.contexts.indices.reduce(into: [:]) {
+                $0[self.contexts[$1].state.section] = $1
+            }
+        }
     }
 
     @inlinable public subscript(id: ElementContext.State.ID) -> ElementContext? {

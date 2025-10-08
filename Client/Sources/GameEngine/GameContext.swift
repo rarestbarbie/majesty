@@ -224,6 +224,8 @@ extension GameContext {
         self.postPopEmployment(&map, p: order.compactMap(\.pop))
 
         try self.executeMovements(&map)
+
+        self.destroyObjects()
     }
 
     mutating func compute(_ map: borrowing GameMap) throws {
@@ -563,5 +565,11 @@ extension GameContext {
                 }
             }
         }
+    }
+}
+extension GameContext {
+    private mutating func destroyObjects() {
+        self.factories.lint()
+        self.pops.lint()
     }
 }
