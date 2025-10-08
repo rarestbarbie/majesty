@@ -177,14 +177,10 @@ extension FactoryContext: TransactingContext {
         self.state.today.wf = nil
         self.state.today.cf = nil
 
-        // Compute input capacity. The stockpile target is computed relative to the number
-        // of workers available, minus workers on strike. This prevents the factory from
-        // spending all of its cash on inputs when there are not enough workers to process
-        // them.
         self.state.ni.sync(
             with: self.type.inputs,
             scalingFactor: (
-                self.workers.map { self.productivity * $0.count } ?? 0,
+                self.workers.map { self.productivity * $0.limit } ?? 0,
                 self.state.today.ei
             ),
             stockpileDays: Self.stockpileDays.lowerBound,
