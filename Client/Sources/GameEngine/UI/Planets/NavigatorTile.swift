@@ -42,7 +42,7 @@ extension NavigatorTile {
             into: (culture: [:], popType: [:])
         ) {
             guard
-            let pop: PopContext = context.pops.table[$1] else {
+            let pop: PopContext = context.pops[$1] else {
                 return
             }
 

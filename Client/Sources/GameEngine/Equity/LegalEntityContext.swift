@@ -24,7 +24,7 @@ extension LegalEntityContext {
             into: (0, 0)
         ) {
             if case .pop(let id) = $1.id,
-                let pop: Pop = context.pops.table.state[id], pop.nat == culture {
+                let pop: Pop = context.pops.state[id], pop.nat == culture {
                 $0.share += $1.shares
             }
 

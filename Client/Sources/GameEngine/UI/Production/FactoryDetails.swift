@@ -20,7 +20,7 @@ struct FactoryDetails {
 extension FactoryDetails {
     mutating func update(from snapshot: borrowing GameSnapshot) {
         guard
-        let factory: FactoryContext = snapshot.factories.table[self.id] else {
+        let factory: FactoryContext = snapshot.factories[self.id] else {
             return
         }
 

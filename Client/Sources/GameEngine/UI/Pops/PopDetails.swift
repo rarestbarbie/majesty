@@ -26,7 +26,7 @@ struct PopDetails {
 extension PopDetails {
     mutating func update(from snapshot: borrowing GameSnapshot) {
         guard
-        let pop: PopContext = snapshot.pops.table[self.id] else {
+        let pop: PopContext = snapshot.pops[self.id] else {
             return
         }
 
