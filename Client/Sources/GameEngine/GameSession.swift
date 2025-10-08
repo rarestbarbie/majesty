@@ -235,7 +235,7 @@ extension GameSession {
 }
 extension GameSession {
     public func tooltipFactoryAccount(_ id: FactoryID) -> Tooltip? {
-        guard let factory: Factory = self.context.factories.table.state[id] else {
+        guard let factory: Factory = self.context.factories.state[id] else {
             return nil
         }
 
@@ -292,7 +292,7 @@ extension GameSession {
         _ tier: ResourceTierIdentifier,
         _ need: Resource,
     ) -> Tooltip? {
-        guard let factory: FactoryContext = self.context.factories.table[id] else {
+        guard let factory: FactoryContext = self.context.factories[id] else {
             return nil
         }
 
@@ -320,7 +320,7 @@ extension GameSession {
         _ id: FactoryID,
         _ need: Resource,
     ) -> Tooltip? {
-        guard let factory: FactoryContext = self.context.factories.table[id] else {
+        guard let factory: FactoryContext = self.context.factories[id] else {
             return nil
         }
 
@@ -337,7 +337,7 @@ extension GameSession {
         _ tier: ResourceTierIdentifier,
         _ need: Resource,
     ) -> Tooltip? {
-        guard let factory: FactoryContext = self.context.factories.table[id] else {
+        guard let factory: FactoryContext = self.context.factories[id] else {
             return nil
         }
 
@@ -357,7 +357,7 @@ extension GameSession {
         _ need: Resource,
     ) -> Tooltip? {
         guard
-        let factory: FactoryContext = self.context.factories.table[id],
+        let factory: FactoryContext = self.context.factories[id],
         let country: CountryProperties = context.planets[factory.state.tile]?.occupiedBy else {
             return nil
         }
@@ -383,7 +383,7 @@ extension GameSession {
     }
 
     public func tooltipFactorySize(_ id: FactoryID) -> Tooltip? {
-        guard let factory: FactoryContext = self.context.factories.table[id] else {
+        guard let factory: FactoryContext = self.context.factories[id] else {
             return nil
         }
         return .instructions {
@@ -413,7 +413,7 @@ extension GameSession {
         _ id: FactoryID,
         _ stratum: PopStratum,
     ) -> Tooltip? {
-        guard let factory: FactoryContext = self.context.factories.table[id] else {
+        guard let factory: FactoryContext = self.context.factories[id] else {
             return nil
         }
 
@@ -452,7 +452,7 @@ extension GameSession {
         _ id: FactoryID,
         culture: String,
     ) -> Tooltip? {
-        self.context.factories.table[id]?.tooltipOwnership(
+        self.context.factories[id]?.tooltipOwnership(
             culture: culture,
             context: self.context
         )
@@ -462,7 +462,7 @@ extension GameSession {
         _ id: FactoryID,
         country: CountryID,
     ) -> Tooltip? {
-        self.context.factories.table[id]?.tooltipOwnership(
+        self.context.factories[id]?.tooltipOwnership(
             country: country,
             context: self.context
         )
@@ -471,14 +471,14 @@ extension GameSession {
     public func tooltipFactoryOwnership(
         _ id: FactoryID,
     ) -> Tooltip? {
-        self.context.factories.table[id]?.tooltipOwnership()
+        self.context.factories[id]?.tooltipOwnership()
     }
 
     public func tooltipFactoryStatementItem(
         _ id: FactoryID,
         _ item: CashFlowItem,
     ) -> Tooltip? {
-        self.context.factories.table[id]?.cashFlow.tooltip(
+        self.context.factories[id]?.cashFlow.tooltip(
             rules: self.context.rules,
             item: item
         )
@@ -524,7 +524,7 @@ extension GameSession {
 }
 extension GameSession {
     public func tooltipPopAccount(_ id: PopID) -> Tooltip? {
-        guard let pop: Pop = self.context.pops.table.state[id] else {
+        guard let pop: Pop = self.context.pops.state[id] else {
             return nil
         }
 
@@ -551,7 +551,7 @@ extension GameSession {
     }
 
     public func tooltipPopJobs(_ id: PopID) -> Tooltip? {
-        guard let pop: Pop = self.context.pops.table.state[id] else {
+        guard let pop: Pop = self.context.pops.state[id] else {
             return nil
         }
 
@@ -572,8 +572,7 @@ extension GameSession {
             $0[>] {
                 for job: FactoryJob in pop.jobs.values {
                     let change: Int64 = job.hired - job.fired - job.quit
-                    let name: String = self.context.factories.table[job.at]?.type.name
-                        ?? "Unknown"
+                    let name: String = self.context.factories[job.at]?.type.name ?? "Unknown"
                     $0[name, +] = job.count[/3] <- job.count - change
                 }
             }
@@ -590,7 +589,7 @@ extension GameSession {
         _ id: PopID,
         _ tier: ResourceTierIdentifier
     ) -> Tooltip? {
-        guard let pop: Pop = self.context.pops.table.state[id] else {
+        guard let pop: Pop = self.context.pops.state[id] else {
             return nil
         }
         return .instructions {
@@ -612,7 +611,7 @@ extension GameSession {
         _ tier: ResourceTierIdentifier,
         _ need: Resource,
     ) -> Tooltip? {
-        guard let pop: PopContext = self.context.pops.table[id] else {
+        guard let pop: PopContext = self.context.pops[id] else {
             return nil
         }
 
@@ -647,7 +646,7 @@ extension GameSession {
         _ id: PopID,
         _ need: Resource,
     ) -> Tooltip? {
-        guard let pop: PopContext = self.context.pops.table[id] else {
+        guard let pop: PopContext = self.context.pops[id] else {
             return nil
         }
 
@@ -664,7 +663,7 @@ extension GameSession {
         _ tier: ResourceTierIdentifier,
         _ need: Resource,
     ) -> Tooltip? {
-        guard let pop: PopContext = self.context.pops.table[id] else {
+        guard let pop: PopContext = self.context.pops[id] else {
             return nil
         }
 
@@ -686,7 +685,7 @@ extension GameSession {
         _ need: Resource,
     ) -> Tooltip? {
         guard
-        let pop: PopContext = self.context.pops.table[pop],
+        let pop: PopContext = self.context.pops[pop],
         let country: CountryProperties = context.planets[pop.state.home]?.occupiedBy else {
             return nil
         }
@@ -717,7 +716,7 @@ extension GameSession {
         _ id: PopID,
     ) -> Tooltip? {
         guard
-        let pop: PopContext = self.context.pops.table[id],
+        let pop: PopContext = self.context.pops[id],
         let country: CountryProperties = self.context.planets[pop.state.home]?.occupiedBy else {
             return nil
         }
@@ -748,7 +747,7 @@ extension GameSession {
         _ id: PopID,
         culture: String,
     ) -> Tooltip? {
-        self.context.pops.table[id]?.tooltipOwnership(
+        self.context.pops[id]?.tooltipOwnership(
             culture: culture,
             context: self.context
         )
@@ -758,7 +757,7 @@ extension GameSession {
         _ id: PopID,
         country: CountryID,
     ) -> Tooltip? {
-        self.context.pops.table[id]?.tooltipOwnership(
+        self.context.pops[id]?.tooltipOwnership(
             country: country,
             context: self.context
         )
@@ -767,14 +766,14 @@ extension GameSession {
     public func tooltipPopOwnership(
         _ id: PopID,
     ) -> Tooltip? {
-        self.context.pops.table[id]?.tooltipOwnership()
+        self.context.pops[id]?.tooltipOwnership()
     }
 
     public func tooltipPopStatementItem(
         _ id: PopID,
         _ item: CashFlowItem,
     ) -> Tooltip? {
-        self.context.pops.table[id]?.cashFlow.tooltip(rules: self.context.rules, item: item)
+        self.context.pops[id]?.cashFlow.tooltip(rules: self.context.rules, item: item)
     }
 }
 extension GameSession {
@@ -830,7 +829,7 @@ extension GameSession {
         let (share, total): (share: Int64, total: Int64) = tile.pops.reduce(
             into: (0, 0)
         ) {
-            guard let pop: Pop = context.pops.table.state[$1] else {
+            guard let pop: Pop = context.pops.state[$1] else {
                 return
             }
 
@@ -857,7 +856,7 @@ extension GameSession {
         let (share, total): (share: Int64, total: Int64) = tile.pops.reduce(
             into: (0, 0)
         ) {
-            guard let pop: Pop = context.pops.table.state[$1] else {
+            guard let pop: Pop = context.pops.state[$1] else {
                 return
             }
 
@@ -889,14 +888,14 @@ extension GameSession {
 
     public var _hash: Int {
         var hasher: Hasher = .init()
-        self.context.pops.table.state.hash(into: &hasher)
-        self.context.factories.table.state.hash(into: &hasher)
+        self.context.pops.state.hash(into: &hasher)
+        self.context.factories.state.hash(into: &hasher)
         return hasher.finalize()
     }
 
     public static func != (a: borrowing Self, b: borrowing Self) -> Bool {
-        a.context.pops.table.state != b.context.pops.table.state ||
-        a.context.factories.table.state != b.context.factories.table.state
+        a.context.pops.state != b.context.pops.state ||
+        a.context.factories.state != b.context.factories.state
     }
 }
 #endif

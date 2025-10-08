@@ -35,7 +35,7 @@ extension ProductionReport: PersistentReport {
             return
         }
 
-        for factory: FactoryContext in snapshot.factories.table {
+        for factory: FactoryContext in snapshot.factories {
             guard case country.state.id? = factory.governedBy?.id else {
                 continue
             }
