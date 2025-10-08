@@ -101,6 +101,13 @@ extension GameContext {
     }
 }
 extension GameContext {
+    var pruningPass: PruningPass {
+        .init(
+            factories: self.factories.keys,
+            pops: self.pops.keys,
+        )
+    }
+
     var territoryPass: TerritoryPass {
         .init(
             player: self.player,
@@ -149,7 +156,7 @@ extension GameContext {
             $1.turn(minwage: country.minwage)
         }
 
-        self.factories.turn  { $0.turn(on: &map) }
+        self.factories.turn { $0.turn(on: &map) }
         self.pops.turn { $0.turn(on: &map) }
 
         map.localMarkets.turn {
@@ -203,30 +210,31 @@ extension GameContext {
 
         for i: Resident in order {
             switch i {
-            case .factory(let i):
-                self.factories[i].transact(map: &map)
-            case .pop(let i):
-                self.pops[i].transact(map: &map)
+            case .factory(let i): self.factories[i].transact(map: &map)
+            case .pop(let i): self.pops[i].transact(map: &map)
             }
         }
 
         map.exchange.turn()
 
-        self.factories.turn {
-            $0.advance(map: &map)
-        }
-        self.pops.turn {
-            $0.advance(map: &map, factories: self.factories.state)
-        }
+        self.factories.turn { $0.advance(map: &map) }
+        self.pops.turn { $0.advance(map: &map) }
 
         self.postCashTransfers(&map)
         self.postPopEmployment(&map, p: order.compactMap(\.pop))
 
-        try self.postPopConversions(&map)
-        try self.recycleFactories(&map)
+        try self.executeMovements(&map)
     }
 
     mutating func compute(_ map: borrowing GameMap) throws {
+        let retain: PruningPass = self.pruningPass
+        for i: Int in self.factories.indices {
+            self.factories[i].state.prune(in: retain)
+        }
+        for i: Int in self.pops.indices {
+            self.pops[i].state.prune(in: retain)
+        }
+
         for i: Int in self.planets.indices {
             try self.planets[i].compute(map: map, context: self.territoryPass)
         }
@@ -469,8 +477,13 @@ extension GameContext {
             )
         }
     }
-
-    private mutating func postPopConversions(_ map: inout GameMap) throws {
+}
+extension GameContext {
+    private mutating func executeMovements(_ map: inout GameMap) throws {
+        try self.executeConversions(&map)
+        try self.executeConstructions(&map)
+    }
+    private mutating func executeConversions(_ map: inout GameMap) throws {
         defer {
             map.conversions.removeAll(keepingCapacity: true)
         }
@@ -520,9 +533,7 @@ extension GameContext {
             }
         }
     }
-}
-extension GameContext {
-    private mutating func recycleFactories(_ map: inout GameMap) throws {
+    private mutating func executeConstructions(_ map: inout GameMap) throws {
         for i: Int in self.planets.indices {
             for j: Int in self.planets[i].grid.tiles.values.indices {
                 let factory: Factory.Section? = {

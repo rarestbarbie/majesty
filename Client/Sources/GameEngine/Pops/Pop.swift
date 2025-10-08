@@ -54,21 +54,19 @@ extension Pop: Sectionable {
         .init(culture: self.nat, type: self.type, home: self.home)
     }
 }
+extension Pop {
+    mutating func prune(in context: GameContext.PruningPass) {
+        self.equity.prune(in: context)
+        self.jobs.update {
+            $0.count > 0 && context.factories.contains($0.at)
+        }
+    }
+}
 extension Pop: Turnable {
     mutating func turn() {
-        var remove: [Int] = []
         for i: Int in self.jobs.values.indices {
-            {
-                $0.turn()
-                if $0.count <= 0 {
-                    remove.append(i)
-                }
-            } (&self.jobs.values[i])
+            self.jobs.values[i].turn()
         }
-        for i: Int in remove.reversed() {
-            self.jobs.remove(at: i)
-        }
-
         self.cash.settle()
         self.equity.turn()
     }

@@ -37,6 +37,7 @@ extension DynamicContextTable {
 }
 extension DynamicContextTable {
     @inlinable public var state: RuntimeStateTable<ElementContext> { .init(index: self.contexts.index) }
+    @inlinable public var keys: OrderedSet<ElementContext.State.ID> { self.contexts.index.keys }
 
     @inlinable public mutating func turn(by turn: (inout ElementContext) -> Void) {
         for i: Int in self.contexts.index.values.indices {
