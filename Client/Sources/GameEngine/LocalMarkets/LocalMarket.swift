@@ -1,7 +1,8 @@
 import GameEconomy
+import GameState
 import Random
 
-struct LocalMarket<LEI> {
+struct LocalMarket {
     var yesterday: LocalMarketState
     var today: LocalMarketState
 

@@ -14,7 +14,7 @@ struct GameMap: ~Copyable {
         hire: (worker: Jobs.Hire<Address>, clerk: Jobs.Hire<PlanetID>),
         fire: (worker: Jobs.Fire, clerk: Jobs.Fire)
     )
-    var localMarkets: LocalMarkets<PopID>
+    var localMarkets: LocalMarkets
     var stockMarkets: StockMarkets
     var bank: Bank
 
