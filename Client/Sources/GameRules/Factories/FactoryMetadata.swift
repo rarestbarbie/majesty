@@ -11,6 +11,8 @@ public final class FactoryMetadata: Identifiable, Sendable {
     public let sharesInitial: Int64
     public let sharesPerLevel: Int64
 
+    public let terrainAllowed: Set<TerrainType>
+
     init(
         name: String,
         costs: ResourceTier,
@@ -18,7 +20,8 @@ public final class FactoryMetadata: Identifiable, Sendable {
         output: ResourceTier,
         workers divisions: [Quantity<PopType>],
         sharesInitial: Int64,
-        sharesPerLevel: Int64
+        sharesPerLevel: Int64,
+        terrainAllowed: Set<TerrainType>
     ) throws {
         self.name = name
         self.costs = costs
@@ -40,6 +43,8 @@ public final class FactoryMetadata: Identifiable, Sendable {
 
         self.sharesInitial = sharesInitial
         self.sharesPerLevel = sharesPerLevel
+
+        self.terrainAllowed = terrainAllowed
     }
 }
 extension FactoryMetadata {

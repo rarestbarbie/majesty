@@ -96,8 +96,16 @@ extension PlanetGrid.Tile {
             return nil
         }
 
-        let choices: [FactoryType] = factories.keys.filter {
-            !self.factoriesAlreadyPresent.contains($0)
+        let choices: [FactoryType] = factories.reduce(into: []) {
+            if self.factoriesAlreadyPresent.contains($1.key) {
+                return
+            }
+            if  $1.value.terrainAllowed.isEmpty {
+                $0.append($1.key)
+            } else if
+                $1.value.terrainAllowed.contains(self.terrain.id) {
+                $0.append($1.key)
+            }
         }
         return choices.randomElement(using: &random.generator)
     }
