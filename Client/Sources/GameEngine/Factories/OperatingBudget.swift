@@ -41,8 +41,8 @@ extension OperatingBudget {
 
         let balance: Int64 = state.cash.balance
 
-        let w: Int64 = workers.map { state.today.wn * $0.limit } ?? 0
-        let c: Int64 = clerks.map { state.today.cn * $0.limit } ?? 0
+        let w: Int64 = workers.map { state.today.wn * Swift.min($0.limit, $0.count + 1) } ?? 0
+        let c: Int64 = clerks.map { state.today.cn * Swift.min($0.limit, $0.count + 1) } ?? 0
 
         /// These are the minimum theoretical balances the factory would need to purchase 100%
         /// of its needs in that tier on any particular day.
@@ -64,8 +64,8 @@ extension OperatingBudget {
             funds: (balance - self.min.l) / d.e,
             inelastic: inelasticCostPerDay.e * stockpileMaxDays,
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
-            w: w,
-            c: c,
+            w: w * stockpileMaxDays,
+            c: c * stockpileMaxDays,
         ) ?? (0, 0)
 
         self.x.distribute(

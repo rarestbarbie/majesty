@@ -15,7 +15,7 @@
         }
     },
     "Livestock": {
-        "color": "#ff6a14",
+        "color": "#8b1e27",
         "l": {
             "Wheat": 6
         },
@@ -43,11 +43,17 @@
     "Driver": {
         "color": "#71bac7"
     },
+    "Contractor": {
+        "color": "#ff7a3d",
+        "output": {
+            "Construction": 1
+        }
+    },
     "Engineer": {
         "color": "#e4e4e4"
     },
     "Farmer": {
-        "color": "#ff6d59"
+        "color": "#ff5959"
     },
     "Influencer": {
         "color": "#bf97ff",

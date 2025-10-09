@@ -1,4 +1,28 @@
 {
+    "Hydroelectric Dam": {
+        "inputs": {
+            "Influence": 1
+        },
+        "output": {
+            "Electricity": 12,
+            "Water": 48
+        },
+        "workers": {
+            "Driver": 1000,
+            "Engineer": 1000
+        },
+        "terrain": [
+            "Desert",
+            "Forest",
+            "Rainforest",
+            "Mountain",
+            "Mountain Jungle",
+            "Steppe",
+            "Taiga"
+        ]
+    },
+
+
     "Alloy Foundry": {
         "inputs": {
             "Aluminum": 8,
@@ -138,28 +162,6 @@
             "Driver": 100000,
             "Engineer": 30000
         }
-    },
-    "Hydroelectric Dam": {
-        "inputs": {
-            "Influence": 1
-        },
-        "output": {
-            "Electricity": 12,
-            "Water": 48
-        },
-        "workers": {
-            "Driver": 1000,
-            "Engineer": 1000
-        },
-        "terrain": [
-            "Desert",
-            "Forest",
-            "Rainforest",
-            "Mountain",
-            "Mountain Jungle",
-            "Steppe",
-            "Taiga"
-        ]
     },
     "Hydroponic Farm": {
         "inputs": {

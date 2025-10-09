@@ -69,14 +69,16 @@ extension Pop {
     mutating func prune(in context: GameContext.PruningPass) {
         self.equity.prune(in: context)
         self.jobs.update {
-            $0.count > 0 && context.factories.contains($0.at)
+            // don’t prune empty jobs yet, they may have interesting deltas
+            context.factories.contains($0.at)
         }
     }
 }
 extension Pop: Turnable {
     mutating func turn() {
-        for i: Int in self.jobs.values.indices {
-            self.jobs.values[i].turn()
+        self.jobs.update {
+            $0.turn()
+            return $0.count > 0
         }
         self.cash.settle()
         self.equity.turn()

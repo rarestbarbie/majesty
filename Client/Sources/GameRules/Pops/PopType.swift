@@ -13,6 +13,7 @@ import JavaScriptKit
     case Editor
     case Server
     case Driver
+    case Contractor
 
     // Clerks
     case Engineer
@@ -38,6 +39,8 @@ extension PopType: RawRepresentable {
         case .Editor:       "E"
         case .Miner:        "M"
         case .Server:       "S"
+        case .Contractor:   "C"
+
         case .Engineer:     "G"
         case .Farmer:       "F"
         case .Influencer:   "I"
@@ -56,6 +59,7 @@ extension PopType {
         case .Editor:       .Worker
         case .Miner:        .Worker
         case .Server:       .Worker
+        case .Contractor:   .Worker
         case .Engineer:     .Clerk
         case .Farmer:       .Clerk
         case .Influencer:   .Clerk
@@ -73,6 +77,7 @@ extension PopType {
         case .Editor: "Editor"
         case .Miner: "Miner"
         case .Server: "Server"
+        case .Contractor: "Contractor"
 
         case .Engineer: "Engineer"
         case .Farmer: "Farmer"
@@ -90,6 +95,7 @@ extension PopType {
         case .Editor: "Editors"
         case .Miner: "Miners"
         case .Server: "Servers"
+        case .Contractor: "Contractors"
 
         case .Engineer: "Engineers"
         case .Farmer: "Farmers"

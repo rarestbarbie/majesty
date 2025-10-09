@@ -366,7 +366,7 @@ extension GameSession {
             inelastic: (yesterday: LocalMarketState, today: LocalMarketState)?,
             tradeable: Candle<Double>?
         ) = (
-            nil, // self.map.localMarkets[factory.state.home, need].history,
+            self.map.localMarkets[factory.state.tile, need].history,
             self.map.exchange.markets[need / country.currency.id]?.history.last?.prices
         )
 

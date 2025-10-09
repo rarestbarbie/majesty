@@ -1,51 +1,69 @@
 @frozen public struct InelasticInput: Identifiable, ResourceInput {
     public let id: Resource
 
-    public var unitsDemanded: Int64
+    public var unitsAcquired: Int64
     public var unitsConsumed: Int64
+    public var unitsDemanded: Int64
+    public var unitsPurchased: Int64
+
+    public var valueAcquired: Int64
     public var valueConsumed: Int64
-    // public var price: Int64
 
     @inlinable public init(
         id: Resource,
-        unitsDemanded: Int64,
+        unitsAcquired: Int64,
         unitsConsumed: Int64,
+        unitsDemanded: Int64,
+        unitsPurchased: Int64,
+        valueAcquired: Int64,
         valueConsumed: Int64,
-        // price: Int64
     ) {
         self.id = id
-        self.unitsDemanded = unitsDemanded
+        self.unitsAcquired = unitsAcquired
         self.unitsConsumed = unitsConsumed
+        self.unitsDemanded = unitsDemanded
+        self.unitsPurchased = unitsPurchased
+        self.valueAcquired = valueAcquired
         self.valueConsumed = valueConsumed
-        // self.price = price
     }
 }
 extension InelasticInput: ResourceStockpile {
     @inlinable public init(id: Resource) {
         self.init(
             id: id,
-            unitsDemanded: 0,
+            unitsAcquired: 0,
             unitsConsumed: 0,
-            valueConsumed: 0,
-            // price: 0
+            unitsDemanded: 0,
+            unitsPurchased: 0,
+            valueAcquired: 0,
+            valueConsumed: 0
         )
     }
 }
 extension InelasticInput {
     @inlinable public mutating func turn(unitsDemanded: Int64, efficiency: Double) {
-        self.unitsDemanded = .init((Double.init(unitsDemanded) * efficiency).rounded(.up))
         self.unitsConsumed = 0
+        self.unitsDemanded = .init((Double.init(unitsDemanded) * efficiency).rounded(.up))
+        self.unitsPurchased = 0
         self.valueConsumed = 0
     }
 
+    /// Inelastic resources can be accumulated over multiple turns, but cannot be stockpiled,
+    /// and if they are consumed on a turn, they must be consumed in full.
+    mutating func consume() {
+        self.unitsConsumed = self.unitsAcquired
+        self.unitsAcquired = 0
+        self.valueConsumed = self.valueAcquired
+        self.valueAcquired = 0
+    }
+
     @inlinable public mutating func report(
-        unitsConsumed: Int64,
-        valueConsumed: Int64,
-        // price: Int64
+        unitsPurchased: Int64,
+        valuePurchased: Int64,
     ) {
-        self.unitsConsumed = unitsConsumed
-        self.valueConsumed = valueConsumed
-        // self.price = price
+        self.unitsPurchased = unitsPurchased
+        self.unitsAcquired += unitsPurchased
+        self.valueAcquired += valuePurchased
     }
 }
 extension InelasticInput {

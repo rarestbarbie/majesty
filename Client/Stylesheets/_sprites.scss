@@ -25,6 +25,7 @@
 [data-pop-type='E'],
 [data-pop-type='S'],
 [data-pop-type='M'],
+[data-pop-type='C'],
 [data-pop-type='D'] {
     --pop-stratum-color-rgba: rgb(255, 51, 51);
     --pop-stratum-color: 255, 51, 51;
@@ -52,6 +53,9 @@
 }
 [data-pop-type='D'] > span {
     @include sprite(driver);
+}
+[data-pop-type='C'] > span {
+    @include sprite(contractor);
 }
 [data-pop-type='E'] > span {
     @include sprite(editor);
