@@ -61,8 +61,10 @@ extension PlanetGrid.Tile {
 }
 extension PlanetGrid.Tile {
     mutating func startIndexCount() {
-        self.factories = []
-        self.pops = []
+        self.factoriesUnderConstruction = 0
+        self.factoriesAlreadyPresent.removeAll(keepingCapacity: true)
+        self.factories.removeAll(keepingCapacity: true)
+        self.pops.removeAll(keepingCapacity: true)
         self.population = 0
         self.weighted.mil = 0
         self.weighted.con = 0
