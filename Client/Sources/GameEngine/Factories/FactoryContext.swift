@@ -224,6 +224,14 @@ extension FactoryContext: TransactingContext {
 
             self.budget = .constructing(budget)
         } else {
+            let unused: Double
+            if  let workers: Workforce = self.workers,
+                workers.limit > 0 {
+                unused = Double.init(workers.limit - workers.count) / Double.init(workers.limit)
+            } else {
+                unused = 1
+            }
+
             weights = .init(
                 tiers: (.init(), self.state.ni, self.state.nv),
                 location: self.state.tile,
@@ -236,7 +244,7 @@ extension FactoryContext: TransactingContext {
                 state: self.state,
                 weights: weights,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
-                d: (7, 30, Int64.init(365 / (0.1 + self.state.today.pa))),
+                d: (7, 30, Int64.init(3650 * unused + 365 / (0.1 + self.state.today.pa))),
             )
 
             let sharesTarget: Int64 = self.state.size.level * self.type.sharesPerLevel
