@@ -32,7 +32,7 @@ extension TradeableOutput: ResourceStockpile {
 }
 extension TradeableOutput {
     mutating func deposit(unitsProduced: Int64, efficiency: Double) {
-        self.unitsProduced = unitsProduced
+        self.unitsProduced = Int64.init((Double.init(unitsProduced) * efficiency))
         self.unitsSold = 0
         self.valueSold = 0
     }
