@@ -48,7 +48,7 @@ extension ResourceInputs {
             $0.consume($1 * scalingFactor.x, efficiency: scalingFactor.z)
         }
         self.inelastic.sync(with: resourceTier.inelastic) {
-            $0.consume() ; _ = $1
+            $0.consume($1 * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }
 }

@@ -61,7 +61,9 @@ extension LocalMarkets {
                     budget: budget,
                     by: lei,
                     in: tier,
-                    limit: x.unitsToPurchase
+                    // not `x.unitsToPurchase`!
+                    // this effectively makes the stockpile target 1–2d
+                    limit: x.units
                 )
             }
         }

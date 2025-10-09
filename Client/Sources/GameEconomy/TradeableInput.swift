@@ -63,21 +63,6 @@ extension TradeableInput {
         self.unitsPurchased = 0
         self.unitsReturned = 0
     }
-
-    mutating func consume(_ amount: Int64, efficiency: Double) {
-        let unitsConsumed: Int64 = min(
-            Int64.init((Double.init(amount) * efficiency).rounded(.up)),
-            self.unitsAcquired
-        )
-
-        self.valueConsumed = self.unitsAcquired != 0
-            ? (unitsConsumed %/ self.unitsAcquired) <> self.valueAcquired
-            : 0
-
-        self.valueAcquired -= self.valueConsumed
-        self.unitsAcquired -= unitsConsumed
-        self.unitsConsumed += unitsConsumed
-    }
 }
 extension TradeableInput {
     /// Returns the amount of funds actually spent.

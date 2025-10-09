@@ -48,15 +48,6 @@ extension InelasticInput {
         self.valueConsumed = 0
     }
 
-    /// Inelastic resources can be accumulated over multiple turns, but cannot be stockpiled,
-    /// and if they are consumed on a turn, they must be consumed in full.
-    mutating func consume() {
-        self.unitsConsumed = self.unitsAcquired
-        self.unitsAcquired = 0
-        self.valueConsumed = self.valueAcquired
-        self.valueAcquired = 0
-    }
-
     @inlinable public mutating func report(
         unitsPurchased: Int64,
         valuePurchased: Int64,
@@ -68,17 +59,15 @@ extension InelasticInput {
 }
 extension InelasticInput {
     @inlinable public var fulfilled: Double {
-        self.unitsDemanded == 0
-            ? 0
-            : Double.init(self.unitsConsumed) / Double.init(self.unitsDemanded)
+        let denominator: Int64 = self.unitsDemanded
+        return denominator == 0 ? 0 : Double.init(self.unitsConsumed) / Double.init(denominator)
     }
 
     @inlinable public var averageCost: Double {
-        self.unitsConsumed == 0 ? 0 : Double.init(
-            self.valueConsumed
-        ) / Double.init(
-            self.unitsConsumed
-        )
+        let denominator: Int64 = self.unitsConsumed + self.unitsAcquired
+        return denominator == 0 ? 0 : Double.init(
+            self.valueConsumed + self.valueAcquired
+        ) / Double.init(denominator)
     }
 }
 
