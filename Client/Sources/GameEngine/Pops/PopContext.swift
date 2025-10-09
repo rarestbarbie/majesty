@@ -242,29 +242,25 @@ extension PopContext {
         inelastic resource: Resource,
         units: Int64,
         price: Int64,
-        in tier: ResourceTierIdentifier?
+        tier: UInt8?
     ) {
-        guard let tier: ResourceTierIdentifier else {
-            return
-        }
-
         let value: Int64 = units * price
 
         switch tier {
-        case .l:
+        case 0?:
             self.state.nl.inelastic[resource]?.report(
-                unitsConsumed: units,
-                valueConsumed: value,
+                unitsPurchased: units,
+                valuePurchased: value,
             )
-        case .e:
+        case 1?:
             self.state.ne.inelastic[resource]?.report(
-                unitsConsumed: units,
-                valueConsumed: value,
+                unitsPurchased: units,
+                valuePurchased: value,
             )
-        case .x:
+        case 2?:
             self.state.nx.inelastic[resource]?.report(
-                unitsConsumed: units,
-                valueConsumed: value,
+                unitsPurchased: units,
+                valuePurchased: value,
             )
 
         case _:
@@ -349,28 +345,15 @@ extension PopContext: TransactingContext {
             break
         }
 
-        for (budget, weights, tier):
-            (Int64, [InelasticBudgetTier.Weight], ResourceTierIdentifier) in [
-                (budget.l.inelastic, weights.l.inelastic.x, .l),
-                (budget.e.inelastic, weights.e.inelastic.x, .e),
-                (budget.x.inelastic, weights.x.inelastic.x, .x),
-            ] {
-            guard budget > 0,
-            let allocations: [Int64] = weights.distribute(budget, share: \.value) else {
-                continue
-            }
-            for (allocation, x): (Int64, InelasticBudgetTier.Weight) in zip(
-                    allocations,
-                    weights
-                ) where allocation > 0 {
-                map.localMarkets[self.state.home, x.id].bid(
-                    budget: allocation,
-                    by: self.lei,
-                    in: tier,
-                    limit: x.units
-                )
-            }
-        }
+        map.localMarkets.place(
+            bids: (
+                (budget.l.inelastic, weights.l.inelastic.x),
+                (budget.e.inelastic, weights.e.inelastic.x),
+                (budget.x.inelastic, weights.x.inelastic.x),
+            ),
+            as: self.lei,
+            in: self.state.home,
+        )
 
         for (id, output): (Resource, InelasticOutput) in self.state.out.inelastic {
             let ask: Int64 = output.unitsProduced

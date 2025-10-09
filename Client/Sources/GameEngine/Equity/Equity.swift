@@ -31,9 +31,6 @@ extension Equity: ExpressibleByDictionaryLiteral {
 extension Equity<LEI> {
     mutating func prune(in context: GameContext.PruningPass) {
         self.shares.update {
-            if $0.shares <= 0 {
-                return false
-            }
             switch $0.id {
             case .factory(let id):
                 return context.factories.contains(id)
@@ -43,8 +40,9 @@ extension Equity<LEI> {
         }
     }
     mutating func turn() {
-        for i: Int in self.shares.values.indices {
-            self.shares.values[i].turn()
+        self.shares.update {
+            $0.turn()
+            return $0.shares > 0
         }
         self.traded = 0
         self.issued = 0

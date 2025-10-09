@@ -19,7 +19,7 @@ extension ResourceInputs {
     func width(limit: Int64, tier: ResourceTier) -> Int64 {
         let limit: Int64 = zip(self.inelastic.values, tier.inelastic).reduce(limit) {
             let (resource, (_, amount)): (InelasticInput, (Resource, Int64)) = $1
-            return min($0, resource.unitsConsumed / amount)
+            return min($0, resource.unitsAcquired / amount)
         }
         return zip(self.tradeable.values, tier.tradeable).reduce(limit) {
             let (resource, (_, amount)): (TradeableInput, (Resource, Int64)) = $1

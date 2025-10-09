@@ -190,14 +190,14 @@ extension GameContext {
                         inelastic: $0.resource,
                         units: order.filled,
                         price: price,
-                        in: order.tier
+                        tier: order.tier
                     )
                 case .pop(let id):
                     self.pops[modifying: id].debit(
                         inelastic: $0.resource,
                         units: order.filled,
                         price: price,
-                        in: order.tier
+                        tier: order.tier
                     )
                 }
             }

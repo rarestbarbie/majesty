@@ -80,25 +80,6 @@ extension TradeableInput {
     }
 }
 extension TradeableInput {
-    @inlinable public var averageCost: Double {
-        let quantity: Int64 = self.unitsAcquired + self.unitsConsumed
-        if  quantity == 0 {
-            return 0
-        } else {
-            return Double.init(self.valueAcquired + self.valueConsumed) / Double.init(quantity)
-        }
-    }
-
-    @inlinable public var fulfilled: Double {
-        self.unitsDemanded == 0
-            ? 0
-            : Double.init(self.unitsAcquired) / Double.init(self.unitsDemanded)
-    }
-
-    @inlinable func needed(_ target: Int64) -> Int64 {
-        self.unitsAcquired < target ? target - self.unitsAcquired : 0
-    }
-
     /// Returns the amount of funds actually spent.
     mutating func trade(
         stockpileDays: ClosedRange<Int64>,

@@ -126,30 +126,21 @@ extension FactoryContext {
         inelastic resource: Resource,
         units: Int64,
         price: Int64,
-        in tier: ResourceTierIdentifier?
+        tier: UInt8?
     ) {
-        guard let tier: ResourceTierIdentifier else {
-            return
-        }
-
         let value: Int64 = units * price
 
         switch tier {
-        case .l:
+        case 1?:
+            self.state.ni.inelastic[resource]?.report(
+                unitsPurchased: units,
+                valuePurchased: value,
+            )
+        case 0?, 2?:
             // TODO: need a way to distinguish between constructing and operating phases
             self.state.nv.inelastic[resource]?.report(
-                unitsConsumed: units,
-                valueConsumed: value,
-            )
-        case .e:
-            self.state.ni.inelastic[resource]?.report(
-                unitsConsumed: units,
-                valueConsumed: value,
-            )
-        case .x:
-            self.state.nv.inelastic[resource]?.report(
-                unitsConsumed: units,
-                valueConsumed: value,
+                unitsPurchased: units,
+                valuePurchased: value,
             )
 
         case _:
@@ -180,7 +171,9 @@ extension FactoryContext: TransactingContext {
         self.state.ni.sync(
             with: self.type.inputs,
             scalingFactor: (
-                self.workers.map { self.productivity * $0.limit } ?? 0,
+                self.workers.map {
+                    self.productivity * min($0.limit, $0.count + 1)
+                } ?? 0,
                 self.state.today.ei
             ),
             stockpileDays: Self.stockpileDays.lowerBound,
@@ -214,7 +207,7 @@ extension FactoryContext: TransactingContext {
 
         if  self.state.size.level == 0 {
             weights = .init(
-                tiers: (self.state.nv, .init(), .init()),
+                tiers: (.init(), .init(), self.state.nv),
                 location: self.state.tile,
                 currency: country.currency.id,
                 map: map,
@@ -225,7 +218,7 @@ extension FactoryContext: TransactingContext {
                 state: self.state,
                 weights: weights,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
-                d: (7, 30, 365),
+                d: (7, 30, 90),
             )
             sharesToIssue = max(0, self.type.sharesInitial - self.equity.shareCount)
 
@@ -264,28 +257,15 @@ extension FactoryContext: TransactingContext {
             security: self.security,
         )
 
-        for (budget, weights, tier):
-            (Int64, [InelasticBudgetTier.Weight], ResourceTierIdentifier) in [
-                (budget.l.inelastic, weights.l.inelastic.x, .l),
-                (budget.e.inelastic, weights.e.inelastic.x, .e),
-                (budget.x.inelastic, weights.x.inelastic.x, .x),
-            ] {
-            guard budget > 0,
-            let allocations: [Int64] = weights.distribute(budget, share: \.value) else {
-                continue
-            }
-            for (allocation, x): (Int64, InelasticBudgetTier.Weight) in zip(
-                    allocations,
-                    weights
-                ) where allocation > 0 {
-                map.localMarkets[self.state.tile, x.id].bid(
-                    budget: allocation,
-                    by: self.lei,
-                    in: tier,
-                    limit: x.units
-                )
-            }
-        }
+        map.localMarkets.place(
+            bids: (
+                (budget.l.inelastic, weights.l.inelastic.x),
+                (budget.e.inelastic, weights.e.inelastic.x),
+                (budget.x.inelastic, weights.x.inelastic.x),
+            ),
+            as: self.lei,
+            in: self.state.tile,
+        )
 
         for (id, output): (Resource, InelasticOutput) in self.state.out.inelastic {
             let ask: Int64 = output.unitsProduced
@@ -444,19 +424,17 @@ extension FactoryContext {
         stockpileTarget: TradeableInput.StockpileTarget,
         map: inout GameMap
     ) {
-        guard budget.tradeable > 0 else {
-            return
+        if  budget.tradeable > 0 {
+            let (gain, loss): (Int64, loss: Int64) = self.state.nv.trade(
+                stockpileDays: stockpileTarget,
+                spendingLimit: budget.tradeable,
+                in: policy.currency.id,
+                on: &map.exchange,
+            )
+
+            self.state.cash.v += loss
+            self.state.cash.r += gain
         }
-
-        let (gain, loss): (Int64, loss: Int64) = self.state.nv.trade(
-            stockpileDays: stockpileTarget,
-            spendingLimit: budget.tradeable,
-            in: policy.currency.id,
-            on: &map.exchange,
-        )
-
-        self.state.cash.v += loss
-        self.state.cash.r += gain
 
         let growthFactor: Int64 = self.productivity * (self.state.size.level + 1)
         if  growthFactor == self.state.nv.width(limit: growthFactor, tier: self.type.costs) {

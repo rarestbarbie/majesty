@@ -3,10 +3,7 @@
     "shares_per_level": 5000000,
     "construction": {
         "*": {
-            "Appliances":  100000,
-            "Storage":     100000,
-            "Instruments":  40000,
-            "Vehicles":     40000
+            "Construction": 10000
         }
     },
     "maintenance": {

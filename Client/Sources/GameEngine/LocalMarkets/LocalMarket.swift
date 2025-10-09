@@ -51,7 +51,7 @@ extension LocalMarket {
     mutating func bid(
         budget: Int64,
         by entity: LEI,
-        in tier: ResourceTierIdentifier,
+        in tier: UInt8,
         limit: Int64,
     ) {
         let amount: Int64 = min(budget / self.today.price, limit)
