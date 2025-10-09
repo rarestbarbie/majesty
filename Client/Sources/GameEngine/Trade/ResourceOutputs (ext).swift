@@ -9,6 +9,7 @@ extension ResourceOutputs {
         tier: ResourceTier,
         unit: String,
         factor: Double,
+        productivity: Int64
     ) -> Tooltip? {
         guard let amount: Int64 = tier.tradeable[id] ?? tier.inelastic[id] else {
             return nil
@@ -31,14 +32,17 @@ extension ResourceOutputs {
             return nil
         }
 
+        let productivity: Double = .init(productivity)
+
         return .instructions {
             $0["Units sold today", +] = unitsSold[/3] / unitsProduced
             $0[>] {
                 $0["Proceeds earned", +] = +?valueSold[/3]
             }
-            $0["Production per \(unit)"] = (factor * Double.init(amount))[..3]
+            $0["Production per \(unit)"] = (productivity * factor * Double.init(amount))[..3]
             $0[>] {
                 $0["Base"] = amount[/3]
+                $0["Productivity", +] = productivity[%2]
                 $0["Efficiency", +] = +?(factor - 1)[%2]
             }
             if unitsSold < unitsProduced {

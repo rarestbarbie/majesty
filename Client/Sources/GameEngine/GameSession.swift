@@ -328,7 +328,8 @@ extension GameSession {
             need,
             tier: factory.type.output,
             unit: "worker",
-            factor: factory.state.today.eo
+            factor: factory.state.today.eo,
+            productivity: factory.productivity
         )
     }
 
@@ -654,7 +655,8 @@ extension GameSession {
             need,
             tier: pop.type.output,
             unit: "worker",
-            factor: 1
+            factor: 1,
+            productivity: 1,
         )
     }
 

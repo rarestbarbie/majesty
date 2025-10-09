@@ -14,7 +14,7 @@ struct FactoryContext: LegalEntityContext, RuntimeContext {
     private(set) var governedBy: CountryProperties?
     private(set) var occupiedBy: CountryProperties?
 
-    private var productivity: Int64
+    private(set) var productivity: Int64
 
     private(set) var workers: Workforce?
     private(set) var clerks: Workforce?
@@ -227,7 +227,7 @@ extension FactoryContext: TransactingContext {
             let unused: Double
             if  let workers: Workforce = self.workers,
                 workers.limit > 0 {
-                unused = Double.init(workers.limit - workers.count) / Double.init(workers.limit)
+                unused = min(1, Double.init(workers.limit - workers.count) / Double.init(workers.limit))
             } else {
                 unused = 1
             }
