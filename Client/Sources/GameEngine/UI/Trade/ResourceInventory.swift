@@ -47,8 +47,8 @@ extension ResourceInventory {
                 ResourceNeed.init(
                     label: snapshot.rules[id],
                     tier: tier,
-                    unitsAcquired: nil,
-                    unitsConsumed: input.unitsConsumed,
+                    unitsAcquired: input.unitsAcquired,
+                    unitsConsumed: input.unitsPurchased,
                     unitsDemanded: input.unitsDemanded,
                     priceAtMarket: nil,
                     price: market?.price,

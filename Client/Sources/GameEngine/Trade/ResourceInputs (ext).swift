@@ -81,7 +81,7 @@ extension ResourceInputs {
         } else if let input: InelasticInput = self.inelastic[id] {
             return .instructions {
                 // We always want this to show, for the indent to make sense
-                $0["Purchased today", +] = +input.unitsConsumed[/3]
+                $0["Purchased today", +] = +input.unitsPurchased[/3]
                 $0[>] {
                     $0["Average cost"] = ??input.averageCost[..2]
                 }
