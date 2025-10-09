@@ -41,12 +41,10 @@ extension ResourceInput {
     }
 
     @inlinable public var averageCost: Double {
-        let quantity: Int64 = self.unitsAcquired + self.unitsConsumed
-        if  quantity == 0 {
-            return 0
-        } else {
-            return Double.init(self.valueAcquired + self.valueConsumed) / Double.init(quantity)
-        }
+        let denominator: Int64 = self.unitsConsumed + self.unitsAcquired
+        return denominator == 0 ? 0 : Double.init(
+            self.valueConsumed + self.valueAcquired
+        ) / Double.init(denominator)
     }
 
     @inlinable public var fulfilled: Double {

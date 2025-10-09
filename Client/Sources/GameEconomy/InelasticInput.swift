@@ -57,19 +57,6 @@ extension InelasticInput {
         self.valueAcquired += valuePurchased
     }
 }
-extension InelasticInput {
-    @inlinable public var fulfilled: Double {
-        let denominator: Int64 = self.unitsDemanded
-        return denominator == 0 ? 0 : Double.init(self.unitsConsumed) / Double.init(denominator)
-    }
-
-    @inlinable public var averageCost: Double {
-        let denominator: Int64 = self.unitsConsumed + self.unitsAcquired
-        return denominator == 0 ? 0 : Double.init(
-            self.valueConsumed + self.valueAcquired
-        ) / Double.init(denominator)
-    }
-}
 
 #if TESTABLE
 extension InelasticInput: Equatable, Hashable {}
