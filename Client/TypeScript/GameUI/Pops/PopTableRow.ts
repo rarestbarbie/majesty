@@ -25,7 +25,7 @@ export class PopTableRow implements DiffableListElement<GameID> {
     private readonly nat: HTMLElement;
     private readonly mil: Ticker;
     private readonly con: Ticker;
-    private readonly jobs: HTMLElement;
+    private readonly jobs: ProgressCell;
     private readonly px: Ticker;
     private readonly fl: ProgressCell;
     private readonly fe: ProgressCell;
@@ -39,7 +39,7 @@ export class PopTableRow implements DiffableListElement<GameID> {
             "Location",
             "Militancy",
             "Consciousness",
-            "Unemployment",
+            "Unemp.",
             "Net worth",
             "Needs",
             "",
@@ -59,9 +59,9 @@ export class PopTableRow implements DiffableListElement<GameID> {
         this.mil = new Ticker(Fortune.Malus);
         this.con = new Ticker(Fortune.Malus);
 
-        this.jobs = document.createElement('div');
-        this.jobs.setAttribute('data-tooltip-type', TooltipType.PopJobs);
-        this.jobs.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
+        this.jobs = new ProgressCell();
+        this.jobs.node.setAttribute('data-tooltip-type', TooltipType.PopJobs);
+        this.jobs.node.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
 
         this.px = new Ticker(Fortune.Bonus);
         this.px.outer.setAttribute('data-tooltip-type', TooltipType.PopAccount);
@@ -98,7 +98,7 @@ export class PopTableRow implements DiffableListElement<GameID> {
         this.node.appendChild(this.location);
         this.node.appendChild(this.mil.outer);
         this.node.appendChild(this.con.outer);
-        this.node.appendChild(this.jobs);
+        this.node.appendChild(this.jobs.node);
         this.node.appendChild(this.px.outer);
         this.node.appendChild(this.fl.node);
         this.node.appendChild(this.fe.node);
@@ -117,7 +117,8 @@ export class PopTableRow implements DiffableListElement<GameID> {
         this.mil.updatePriceChange(pop.y_mil, pop.t_mil);
         this.con.updatePriceChange(pop.y_con, pop.t_con);
 
-        UpdateDecimal(this.jobs, pop.une * 100, 2);
+        UpdateDecimal(this.jobs.summary, pop.une * 100, 2);
+        this.jobs.set(pop.une * 100);
 
         this.px.updatePriceChange(pop.y_px, pop.t_px);
 

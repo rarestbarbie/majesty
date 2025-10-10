@@ -204,8 +204,15 @@ extension PopContext {
             return
         }
 
-        let unemployed: Int64 = self.state.unemployed
-        self.unemployment = Double.init(unemployed) / Double.init(self.state.today.size)
+        self.unemployment = self.state.out.inelastic.values.reduce(
+            Double.init(self.state.unemployed) / Double.init(self.state.today.size)
+        ) {
+            let sold: Double = $1.unitsProduced > 0
+                ? Double.init($1.unitsSold) / Double.init($1.unitsProduced)
+                : 1
+
+            return min($0, 1 - sold)
+        }
 
         self.income.removeAll(keepingCapacity: true)
         for id: FactoryID in self.state.jobs.keys {
