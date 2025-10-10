@@ -304,14 +304,16 @@ extension GameSession {
                 need,
                 tier: factory.type.inputs,
                 unit: "worker",
-                factor: 1
+                factor: 1,
+                productivity: Double.init(factory.productivity)
             )
         case .v:
             return factory.state.nv.tooltipDemand(
                 need,
                 tier: factory.type.costs,
                 unit: "level",
-                factor: 1
+                factor: 1,
+                productivity: Double.init(factory.productivity)
             )
         default:
             return nil
@@ -624,21 +626,27 @@ extension GameSession {
                 need,
                 tier: pop.type.l,
                 unit: "capita",
-                factor: pop.state.needsPerCapita.l
+                factor: 1,
+                productivity: pop.state.needsPerCapita.l,
+                productivityLabel: "Consciousness"
             )
         case .e:
             return pop.state.ne.tooltipDemand(
                 need,
                 tier: pop.type.e,
                 unit: "capita",
-                factor: pop.state.needsPerCapita.e
+                factor: 1,
+                productivity: pop.state.needsPerCapita.e,
+                productivityLabel: "Consciousness"
             )
         case .x:
             return pop.state.nx.tooltipDemand(
                 need,
                 tier: pop.type.x,
                 unit: "capita",
-                factor: pop.state.needsPerCapita.x
+                factor: 1,
+                productivity: pop.state.needsPerCapita.x,
+                productivityLabel: "Consciousness"
             )
         default:
             return nil

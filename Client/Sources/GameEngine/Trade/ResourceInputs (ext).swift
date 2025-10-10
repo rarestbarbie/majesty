@@ -33,6 +33,8 @@ extension ResourceInputs {
         tier: ResourceTier,
         unit: String,
         factor: Double,
+        productivity: Double,
+        productivityLabel: String = "Productivity"
     ) -> Tooltip? {
         guard let amount: Int64 = tier.tradeable[id] ?? tier.inelastic[id] else {
             return nil
@@ -55,7 +57,12 @@ extension ResourceInputs {
         return .instructions {
             $0["Consumed today", +] = unitsConsumed[/3] / unitsDemanded
             $0[>] {
-                $0["Demand per \(unit)"] = (factor * Double.init(amount))[..3]
+                $0["Demand per \(unit)"] = (productivity * factor * Double.init(amount))[..3]
+                $0[>] {
+                    $0["Base"] = amount[/3]
+                    $0[productivityLabel, +] = productivity[%2]
+                    $0["Efficiency", -] = +?(1 - factor)[%2]
+                }
             }
         }
     }
