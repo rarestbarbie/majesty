@@ -1,4 +1,4 @@
-import GameEconomy
+import GameIDs
 
 struct CurrencyLabel: Identifiable {
     let id: Fiat

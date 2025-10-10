@@ -1,4 +1,4 @@
-import GameEconomy
+import GameIDs
 
 extension LocalMarkets {
     struct Key: Equatable, Hashable {

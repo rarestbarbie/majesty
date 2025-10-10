@@ -1,4 +1,4 @@
-import GameState
+import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 import VectorCharts

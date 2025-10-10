@@ -1,3 +1,4 @@
+import Fraction
 import GameEconomy
 import JavaScriptKit
 import JavaScriptInterop

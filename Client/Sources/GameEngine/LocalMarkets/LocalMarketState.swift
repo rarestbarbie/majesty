@@ -1,4 +1,4 @@
-import GameEconomy
+import Fraction
 
 struct LocalMarketState {
     var price: Int64

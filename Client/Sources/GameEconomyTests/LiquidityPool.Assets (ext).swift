@@ -1,4 +1,4 @@
-import GameEconomy
+import LiquidityPool
 
 extension LiquidityPool.Assets {
     static func == (self: Self, liquidity: (base: Int64, quote: Int64)) -> Bool {

@@ -1,6 +1,5 @@
-import GameEconomy
 import GameRules
-import GameState
+import GameIDs
 
 final class CountryProperties {
     var intrinsic: Country

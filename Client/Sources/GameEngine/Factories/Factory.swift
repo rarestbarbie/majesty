@@ -1,6 +1,8 @@
 import JavaScriptKit
 import JavaScriptInterop
+import Fraction
 import GameEconomy
+import GameIDs
 import GameRules
 import GameState
 import OrderedCollections

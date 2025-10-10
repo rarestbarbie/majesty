@@ -1,3 +1,5 @@
+import GameIDs
+import LiquidityPool
 import OrderedCollections
 
 /// To spend all of an amount of currency to buy a resource:

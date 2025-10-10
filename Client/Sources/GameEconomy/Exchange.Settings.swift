@@ -1,3 +1,6 @@
+import Fraction
+import LiquidityPool
+
 extension Exchange {
     @frozen public struct Settings {
         /// The fraction of the pool’s liquidity that will be drained each day. It is

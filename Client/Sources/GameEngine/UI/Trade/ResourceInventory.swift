@@ -1,5 +1,5 @@
 import GameEconomy
-import GameRules
+import GameIDs
 
 struct ResourceInventory {
     private(set) var needs: [ResourceNeed]

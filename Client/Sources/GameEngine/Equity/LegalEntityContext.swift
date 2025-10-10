@@ -1,4 +1,5 @@
 import D
+import GameIDs
 import GameState
 
 protocol LegalEntityContext<State>: RuntimeContext where State: LegalEntityState {

@@ -1,5 +1,5 @@
 import Color
-import GameEconomy
+import GameIDs
 import OrderedCollections
 
 public final class GeologicalMetadata: Identifiable {

@@ -1,3 +1,5 @@
+import Fraction
+
 @frozen public struct LiquidityPool {
     public var assets: Assets
     public var volume: Volume

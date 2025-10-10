@@ -1,3 +1,5 @@
+import GameIDs
+
 @frozen public struct InelasticOutput: Identifiable {
     public let id: Resource
     public var unitsProduced: Int64

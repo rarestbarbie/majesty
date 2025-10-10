@@ -1,4 +1,4 @@
-import GameState
+import GameIDs
 
 protocol LegalEntityState<Dimensions>: CashAccountHolder, Turnable, Identifiable
     where Dimensions: LegalEntityMetrics, Self.ID: LegalEntityIdentifier {

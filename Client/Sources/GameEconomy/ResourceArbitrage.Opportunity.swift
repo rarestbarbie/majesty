@@ -1,3 +1,5 @@
+import GameIDs
+
 extension ResourceArbitrage {
     struct Opportunity {
         let market: Fiat

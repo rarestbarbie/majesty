@@ -1,4 +1,5 @@
 import Color
+import GameIDs
 import GameRules
 import GameState
 import GameTerrain

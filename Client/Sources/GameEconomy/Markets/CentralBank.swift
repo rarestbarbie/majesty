@@ -1,3 +1,5 @@
+import GameIDs
+
 struct CentralBank {
     let id: Fiat
     /// The balance of the central bank in its own currency.

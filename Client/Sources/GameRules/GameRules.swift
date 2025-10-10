@@ -1,5 +1,6 @@
 import Color
 import GameEconomy
+import GameIDs
 import OrderedCollections
 
 @frozen public struct GameRules {

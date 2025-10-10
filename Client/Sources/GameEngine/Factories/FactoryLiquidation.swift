@@ -1,6 +1,6 @@
 import JavaScriptKit
 import JavaScriptInterop
-import GameState
+import GameIDs
 
 struct FactoryLiquidation {
     let started: GameDate

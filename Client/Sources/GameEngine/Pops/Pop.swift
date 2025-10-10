@@ -1,6 +1,7 @@
 import Assert
 import GameConditions
 import GameEconomy
+import GameIDs
 import GameRules
 import GameState
 import JavaScriptKit

@@ -1,3 +1,5 @@
+import Fraction
+
 public protocol ResourceInput: ResourceStockpile {
     var unitsAcquired: Int64 { get set }
     var unitsConsumed: Int64 { get set }

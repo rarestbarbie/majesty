@@ -1,4 +1,4 @@
-import GameEconomy
+import GameIDs
 import GameState
 import JavaScriptKit
 import JavaScriptInterop

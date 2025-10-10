@@ -1,4 +1,4 @@
-import GameState
+import GameIDs
 import HexGrids
 import JavaScriptInterop
 import JavaScriptKit

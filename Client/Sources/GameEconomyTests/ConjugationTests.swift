@@ -1,4 +1,5 @@
 import GameEconomy
+import GameIDs
 import Testing
 
 @Suite struct ConjugationTests {

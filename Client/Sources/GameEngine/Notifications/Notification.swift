@@ -1,4 +1,4 @@
-import GameState
+import GameIDs
 
 struct Notification {
     let id: Int64

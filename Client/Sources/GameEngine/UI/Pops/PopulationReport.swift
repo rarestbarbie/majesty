@@ -1,4 +1,4 @@
-import GameState
+import GameIDs
 import GameTerrain
 import JavaScriptKit
 import JavaScriptInterop

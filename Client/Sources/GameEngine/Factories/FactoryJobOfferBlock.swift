@@ -1,4 +1,4 @@
-import GameState
+import GameIDs
 
 struct FactoryJobOfferBlock {
     let at: FactoryID

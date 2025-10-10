@@ -1,5 +1,4 @@
-import GameEconomy
-import GameState
+import GameIDs
 
 struct StockMarkets {
     private var regions: [Fiat: StockMarket]

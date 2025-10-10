@@ -1,3 +1,4 @@
+import GameIDs
 import OrderedCollections
 
 extension OrderedDictionary where Key == Resource, Value: ResourceStockpile {

@@ -1,4 +1,5 @@
 import GameEconomy
+import GameIDs
 
 struct ResourceInputWeights {
     let l: (tradeable: TradeableBudgetTier, inelastic: InelasticBudgetTier)

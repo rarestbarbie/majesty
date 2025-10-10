@@ -1,4 +1,4 @@
-import GameState
+import GameIDs
 import Testing
 
 @Suite struct GameDateTests {

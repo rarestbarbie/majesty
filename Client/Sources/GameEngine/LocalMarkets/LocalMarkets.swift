@@ -1,5 +1,5 @@
-import GameEconomy
-import GameState
+import Fraction
+import GameIDs
 
 struct LocalMarkets {
     private var markets: [Key: LocalMarket]

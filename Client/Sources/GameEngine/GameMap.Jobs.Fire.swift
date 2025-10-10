@@ -1,4 +1,4 @@
-import GameState
+import GameIDs
 
 extension GameMap.Jobs {
     struct Fire {

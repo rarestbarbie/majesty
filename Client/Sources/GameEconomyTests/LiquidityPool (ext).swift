@@ -1,4 +1,5 @@
-import GameEconomy
+import Fraction
+import LiquidityPool
 
 extension LiquidityPool {
     init(liquidity: (base: Int64, quote: Int64)) {

@@ -1,6 +1,6 @@
 import Assert
 import GameEconomy
-import GameState
+import GameIDs
 import Random
 
 struct Bank: ~Copyable {

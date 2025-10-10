@@ -1,3 +1,6 @@
+import Fraction
+import GameIDs
+
 @frozen public struct TradeableOutput: Identifiable {
     public let id: Resource
     public var unitsProduced: Int64

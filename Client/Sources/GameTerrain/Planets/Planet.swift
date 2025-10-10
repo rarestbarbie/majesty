@@ -1,6 +1,5 @@
 import Color
-import GameState
-import GameRules
+import GameIDs
 import JavaScriptInterop
 import JavaScriptKit
 

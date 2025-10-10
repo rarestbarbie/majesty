@@ -1,4 +1,4 @@
-import GameEconomy
+import Fraction
 
 struct ResourceBudgetTier {
     var tradeable: Int64

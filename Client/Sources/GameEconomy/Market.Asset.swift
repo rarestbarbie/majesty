@@ -1,3 +1,5 @@
+import GameIDs
+
 /// Conventionally, we order the assets in a ``Market.Pair`` in ascending order, and we
 /// want fiat currencies to appear on the right side of the pair, for pairs that contain one
 /// fiat currency and one good. Thus, we order ``fiat(_:)`` after ``good(_:)``.
