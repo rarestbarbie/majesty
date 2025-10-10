@@ -155,6 +155,7 @@ let package: Package = .init(
                 .target(name: "Assert"),
                 .target(name: "GameIDs"),
                 .target(name: "LiquidityPool"),
+                .target(name: "Random"),
                 .product(name: "DequeModule", package: "swift-collections"),
                 .product(name: "OrderedCollections", package: "swift-collections"),
                 .product(name: "RealModule", package: "swift-numerics"),
@@ -171,6 +172,7 @@ let package: Package = .init(
             name: "GameIDs",
             dependencies: [
                 .target(name: "GameStateMacros"),
+                .target(name: "HexGrids"),
             ]
         ),
 

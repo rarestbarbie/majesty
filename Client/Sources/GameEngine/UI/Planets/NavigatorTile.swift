@@ -1,3 +1,4 @@
+import GameIDs
 import GameRules
 import HexGrids
 import JavaScriptInterop

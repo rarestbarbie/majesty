@@ -1,3 +1,4 @@
+import GameIDs
 import GameRules
 
 extension Pop {

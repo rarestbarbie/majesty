@@ -1,3 +1,4 @@
+import GameIDs
 import GameState
 
 extension RuntimeContextTable<PlanetContext> {
