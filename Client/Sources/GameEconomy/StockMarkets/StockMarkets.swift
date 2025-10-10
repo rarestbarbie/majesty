@@ -1,4 +1,5 @@
 import GameIDs
+import Random
 
 @frozen public struct StockMarkets {
     @usableFromInline var regions: [Fiat: StockMarket]
@@ -8,12 +9,21 @@ import GameIDs
     }
 }
 extension StockMarkets {
-    @inlinable public mutating func turn(by turn: (Fiat, inout StockMarket) -> ()) {
+    private mutating func turn(by turn: (Fiat, inout StockMarket) -> ()) {
         var i: [Fiat: StockMarket].Index = self.regions.startIndex
         while i < self.regions.endIndex {
             let id: Fiat = self.regions.keys[i]
             turn(id, &self.regions.values[i])
             i = self.regions.index(after: i)
+        }
+    }
+
+    public mutating func turn(
+        random: inout PseudoRandom,
+        execute: (inout PseudoRandom, Fiat, StockMarket.Fill) -> ()
+    ) {
+        self.turn { (currency: Fiat, market: inout StockMarket) in
+            market.match(random: &random) { execute(&$0, currency, $1) }
         }
     }
 }
