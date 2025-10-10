@@ -97,10 +97,8 @@ export class ResourceNeedRow implements DiffableListElement<string> {
             this.stockpile.classList.remove(CellStyle.Bloody);
         }
 
-        if (need.priceAtMarket !== undefined) {
-            this.price.updatePriceChange(need.priceAtMarket.o, need.priceAtMarket.c, 2);
-        } else if (need.price !== undefined) {
-            this.price.updateBigIntChange(need.price.o, need.price.c);
+        if (need.price !== undefined) {
+            this.price.updatePriceChange(need.price.o, need.price.c, 2);
         }
     }
 }

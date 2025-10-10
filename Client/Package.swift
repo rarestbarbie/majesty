@@ -156,6 +156,7 @@ let package: Package = .init(
                 .target(name: "GameIDs"),
                 .target(name: "LiquidityPool"),
                 .target(name: "Random"),
+                .product(name: "D", package: "d"),
                 .product(name: "DequeModule", package: "swift-collections"),
                 .product(name: "OrderedCollections", package: "swift-collections"),
                 .product(name: "RealModule", package: "swift-numerics"),

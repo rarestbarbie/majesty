@@ -1,4 +1,5 @@
 import D
+import Fraction
 import GameEconomy
 import GameIDs
 import JavaScriptKit
@@ -57,10 +58,9 @@ extension ResourceOutputs {
     func tooltipExplainPrice(
         _ id: Resource,
         _ market: (
-            inelastic: (yesterday: LocalMarketState, today: LocalMarketState)?,
+            inelastic: LocalMarket?,
             tradeable: Candle<Double>?
         ),
-        _ country: CountryProperties
     ) -> Tooltip? {
         if  let output: TradeableOutput = self.tradeable[id],
             let price: Candle<Double> = market.tradeable {
@@ -76,26 +76,33 @@ extension ResourceOutputs {
             }
         } else if
             let _: InelasticOutput = self.inelastic[id],
-            let (yesterday, today): (LocalMarketState, LocalMarketState) = market.inelastic {
+            let market: LocalMarket = market.inelastic {
+            let today: LocalMarketState = market.today
+            let yesterday: LocalMarketState = market.yesterday
             return .instructions {
-                $0["Today’s local price", +] = today.price[/3] <- yesterday.price
+                $0["Today’s local price", +] = today.price.value[..] <- yesterday.price.value
                 $0[>] {
                     $0["Supply in this tile", -] = today.supply[/3] <- yesterday.supply
                     $0["Demand in this tile", +] = today.demand[/3] <- yesterday.demand
                 }
 
-                if today.supply > today.demand {
-                    $0[>] = today.price > country.minwage ? """
-                    There are not enough buyers in this region, and the price will decline if \
-                    the situation persists
-                    """ : """
-                    There are not enough buyers in this region, but the price is not allowed \
-                    to decline due to their Minimum Wage of \(em: country.minwage[/3])
-                    """
-                } else {
+                if today.supply <= today.demand {
                     $0[>] = """
                     There are not enough producers in this region, and the price will increase \
                     if the situation persists
+                    """
+                } else if
+                    let priceFloor: LocalMarket.PriceFloor = market.priceFloor,
+                        priceFloor.minimum >= today.price {
+                    $0[>] = """
+                    There are not enough buyers in this region, but the price is not allowed \
+                    to decline due to their \(priceFloor.type) of \
+                    \(em: priceFloor.minimum.value[..])
+                    """
+                } else {
+                    $0[>] = """
+                    There are not enough buyers in this region, and the price will decline if \
+                    the situation persists
                     """
                 }
             }

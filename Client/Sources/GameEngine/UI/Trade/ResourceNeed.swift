@@ -12,7 +12,7 @@ struct ResourceNeed {
     let unitsDemanded: Int64
 
     let priceAtMarket: Candle<Double>?
-    let price: Candle<Int64>?
+    let price: Candle<LocalPrice>?
 }
 extension ResourceNeed: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
@@ -23,7 +23,6 @@ extension ResourceNeed: JavaScriptEncodable {
         case unitsAcquired
         case unitsConsumed
         case unitsDemanded
-        case priceAtMarket
         case price
     }
 
@@ -35,7 +34,6 @@ extension ResourceNeed: JavaScriptEncodable {
         js[.unitsAcquired] = self.unitsAcquired
         js[.unitsConsumed] = self.unitsConsumed
         js[.unitsDemanded] = self.unitsDemanded
-        js[.priceAtMarket] = self.priceAtMarket
-        js[.price] = self.price
+        js[.price] = self.priceAtMarket ?? self.price?.map { Double.init($0.value) }
     }
 }

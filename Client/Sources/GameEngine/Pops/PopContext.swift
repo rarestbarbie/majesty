@@ -1,5 +1,6 @@
 import Assert
 import D
+import Fraction
 import GameConditions
 import GameEconomy
 import GameIDs
@@ -229,23 +230,24 @@ extension PopContext {
     mutating func credit(
         inelastic resource: Resource,
         units: Int64,
-        price: Int64
-    ) {
-        let value: Int64 = units * price
+        price: LocalPrice
+    ) -> Int64 {
+        let value: Int64 = units <> price.exact
         self.state.out.inelastic[resource]?.report(
             unitsSold: units,
             valueSold: value,
         )
         self.state.cash.r += value
+        return value
     }
 
     mutating func debit(
         inelastic resource: Resource,
         units: Int64,
-        price: Int64,
+        price: LocalPrice,
         tier: UInt8?
-    ) {
-        let value: Int64 = units * price
+    ) -> Int64 {
+        let value: Int64 = units >< price.exact
 
         switch tier {
         case 0?:
@@ -265,10 +267,11 @@ extension PopContext {
             )
 
         case _:
-            return
+            return 0
         }
 
         self.state.cash.b -= value
+        return value
     }
 }
 extension PopContext: TransactingContext {

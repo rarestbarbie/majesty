@@ -6,12 +6,14 @@ public final class ResourceMetadata: Identifiable {
     public let color: Color
     public let emoji: Character
     public let local: Bool
+    public let hours: Int64
 
-    init(name: String, color: Color, emoji: Character, local: Bool) {
+    init(name: String, color: Color, emoji: Character, local: Bool, hours: Int64) {
         self.name = name
         self.color = color
         self.emoji = emoji
         self.local = local
+        self.hours = hours
     }
 }
 extension ResourceMetadata {
@@ -22,6 +24,7 @@ extension ResourceMetadata {
         self.color.hash(into: &hasher)
         self.emoji.hash(into: &hasher)
         self.local.hash(into: &hasher)
+        self.hours.hash(into: &hasher)
 
         return hasher.finalize()
     }

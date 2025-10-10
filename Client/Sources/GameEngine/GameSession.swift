@@ -361,25 +361,25 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let factory: FactoryContext = self.context.factories[id],
-        let country: CountryProperties = context.planets[factory.state.tile]?.occupiedBy else {
+        let country: CountryProperties = factory.occupiedBy else {
             return nil
         }
 
         let market: (
-            inelastic: (yesterday: LocalMarketState, today: LocalMarketState)?,
+            inelastic: LocalMarket,
             tradeable: Candle<Double>?
         ) = (
-            self.map.localMarkets[factory.state.tile, need].history,
+            self.map.localMarkets[factory.state.tile, need],
             self.map.exchange.markets[need / country.currency.id]?.history.last?.prices
         )
 
         switch tier {
         case .i?:
-            return factory.state.ni.tooltipExplainPrice(need, market, country)
+            return factory.state.ni.tooltipExplainPrice(need, market)
         case .v?:
-            return factory.state.nv.tooltipExplainPrice(need, market, country)
+            return factory.state.nv.tooltipExplainPrice(need, market)
         case nil:
-            return factory.state.out.tooltipExplainPrice(need, market, country)
+            return factory.state.out.tooltipExplainPrice(need, market)
         default:
             return nil
         }
@@ -690,27 +690,27 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let pop: PopContext = self.context.pops[pop],
-        let country: CountryProperties = context.planets[pop.state.home]?.occupiedBy else {
+        let country: CountryProperties = pop.occupiedBy else {
             return nil
         }
 
         let market: (
-            inelastic: (yesterday: LocalMarketState, today: LocalMarketState)?,
+            inelastic: LocalMarket,
             tradeable: Candle<Double>?
         ) = (
-            self.map.localMarkets[pop.state.home, need].history,
+            self.map.localMarkets[pop.state.home, need],
             self.map.exchange.markets[need / country.currency.id]?.history.last?.prices
         )
 
         switch tier {
         case .l?:
-            return pop.state.nl.tooltipExplainPrice(need, market, country)
+            return pop.state.nl.tooltipExplainPrice(need, market)
         case .e?:
-            return pop.state.ne.tooltipExplainPrice(need, market, country)
+            return pop.state.ne.tooltipExplainPrice(need, market)
         case .x?:
-            return pop.state.nx.tooltipExplainPrice(need, market, country)
+            return pop.state.nx.tooltipExplainPrice(need, market)
         case nil:
-            return pop.state.out.tooltipExplainPrice(need, market, country)
+            return pop.state.out.tooltipExplainPrice(need, market)
         default:
             return nil
         }
