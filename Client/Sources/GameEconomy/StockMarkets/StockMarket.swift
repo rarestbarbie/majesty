@@ -10,7 +10,7 @@ import Random
     }
 }
 extension StockMarket {
-    public mutating func match(
+    mutating func match(
         random: inout PseudoRandom,
         execute: (inout PseudoRandom, StockMarket.Fill) -> ()
     ) {

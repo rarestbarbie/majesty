@@ -204,22 +204,20 @@ extension GameContext {
                 }
             }
         }
-        map.stockMarkets.turn {
-            $1.match(random: &map.random) {
-                switch $1.asset {
-                case .factory(let id):
-                    self.factories[modifying: id].state.equity.trade(
-                        random: &$0,
-                        bank: &map.bank,
-                        fill: $1
-                    )
-                case .pop(let id):
-                    self.pops[modifying: id].state.equity.trade(
-                        random: &$0,
-                        bank: &map.bank,
-                        fill: $1
-                    )
-                }
+        map.stockMarkets.turn(random: &map.random) {
+            switch $2.asset {
+            case .factory(let id):
+                self.factories[modifying: id].state.equity.trade(
+                    random: &$0,
+                    bank: &map.bank,
+                    fill: $2
+                )
+            case .pop(let id):
+                self.pops[modifying: id].state.equity.trade(
+                    random: &$0,
+                    bank: &map.bank,
+                    fill: $2
+                )
             }
         }
 
