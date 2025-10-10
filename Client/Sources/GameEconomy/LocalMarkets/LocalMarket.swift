@@ -1,13 +1,12 @@
-import GameEconomy
 import GameIDs
 import Random
 
-struct LocalMarket {
-    var yesterday: LocalMarketState
-    var today: LocalMarketState
+@frozen public struct LocalMarket {
+    public var yesterday: LocalMarketState
+    public var today: LocalMarketState
 
-    var asks: [Order]
-    var bids: [Order]
+    @usableFromInline var asks: [Order]
+    @usableFromInline var bids: [Order]
 
     init(
         yesterday: LocalMarketState,
@@ -21,7 +20,7 @@ struct LocalMarket {
         self.bids = bids
     }
 
-    init() {
+    @inlinable init() {
         self.yesterday = .init(price: 1, supply: 0, demand: 0)
         self.today = self.yesterday
         self.asks = []
@@ -29,7 +28,7 @@ struct LocalMarket {
     }
 }
 extension LocalMarket {
-    var price: Candle<Int64> {
+    @inlinable public var price: Candle<Int64> {
         .init(
             o: yesterday.price,
             l: min(yesterday.price, today.price),
@@ -38,17 +37,17 @@ extension LocalMarket {
         )
     }
 
-    var history: (yesterday: LocalMarketState, today: LocalMarketState)  {
+    @inlinable public var history: (yesterday: LocalMarketState, today: LocalMarketState)  {
         (self.yesterday, self.today)
     }
 }
 extension LocalMarket {
-    mutating func ask(amount: Int64, by entity: LEI) {
+    public mutating func ask(amount: Int64, by entity: LEI) {
         self.asks.append(.init(by: entity, tier: nil, amount: amount))
         self.today.supply += amount
     }
 
-    mutating func bid(
+    public mutating func bid(
         budget: Int64,
         by entity: LEI,
         in tier: UInt8,
@@ -60,13 +59,13 @@ extension LocalMarket {
     }
 }
 extension LocalMarket {
-    mutating func turn(minwage: Int64) {
+    public mutating func turn(minwage: Int64) {
         let price: Int64 = self.today.price + self.today.priceChange
         self.yesterday = self.today
         self.today = .init(price: max(price, minwage))
     }
 
-    mutating func match(using random: inout PseudoRandom) -> (asks: [Order], bids: [Order]) {
+    public mutating func match(using random: inout PseudoRandom) -> (asks: [Order], bids: [Order]) {
         if self.today.supply > self.today.demand {
             self.asks.shuffle(using: &random.generator)
 

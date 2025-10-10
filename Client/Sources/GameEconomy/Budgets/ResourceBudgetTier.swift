@@ -1,19 +1,19 @@
 import Fraction
 
-struct ResourceBudgetTier {
-    var tradeable: Int64
-    var inelastic: Int64
+@frozen public struct ResourceBudgetTier {
+    public var tradeable: Int64
+    public var inelastic: Int64
 
-    init(tradeable: Int64 = 0, inelastic: Int64 = 0) {
+    @inlinable public init(tradeable: Int64 = 0, inelastic: Int64 = 0) {
         self.tradeable = tradeable
         self.inelastic = inelastic
     }
 }
 extension ResourceBudgetTier {
-    var total: Int64 { self.tradeable + self.inelastic }
+    @inlinable public var total: Int64 { self.tradeable + self.inelastic }
 }
 extension ResourceBudgetTier {
-    mutating func distribute(
+    public mutating func distribute(
         funds available: Int64,
         inelastic: Int64,
         tradeable: Int64,
@@ -27,7 +27,7 @@ extension ResourceBudgetTier {
             self.inelastic += item[1]
         }
     }
-    mutating func distribute(
+    public mutating func distribute(
         funds available: Int64,
         inelastic: Int64,
         tradeable: Int64,

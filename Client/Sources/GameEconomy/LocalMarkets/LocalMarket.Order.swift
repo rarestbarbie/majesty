@@ -1,11 +1,11 @@
 import GameIDs
 
 extension LocalMarket {
-    struct Order {
-        let by: LEI
-        let tier: UInt8?
-        var amount: Int64
-        var filled: Int64
+    @frozen public struct Order {
+        public let by: LEI
+        public let tier: UInt8?
+        public var amount: Int64
+        public var filled: Int64
 
         init(by: LEI, tier: UInt8?, amount: Int64, filled: Int64 = 0) {
             self.by = by

@@ -1,3 +1,5 @@
+import Random
+
 extension TradeableInput {
     @frozen public struct StockpileTarget {
         public let lower: Int64
@@ -9,5 +11,17 @@ extension TradeableInput {
             self.today = today
             self.upper = upper
         }
+    }
+}
+extension TradeableInput.StockpileTarget {
+    @inlinable public static func random(
+        in range: ClosedRange<Int64>,
+        using generator: inout PseudoRandom
+    ) -> Self {
+        .init(
+            lower: range.lowerBound,
+            today: generator.int64(in: range),
+            upper: range.upperBound
+        )
     }
 }
