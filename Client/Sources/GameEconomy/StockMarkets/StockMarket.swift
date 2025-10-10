@@ -1,24 +1,16 @@
-import GameEconomy
-import GameState
 import Random
 
-struct StockMarket {
-    var buyers: [RandomPurchase]
-    var assets: [TradeableAsset]
+@frozen public struct StockMarket {
+    @usableFromInline var buyers: [RandomPurchase]
+    @usableFromInline var assets: [TradeableAsset]
 
-    init() {
+    @inlinable init() {
         self.buyers = []
         self.assets = []
     }
 }
 extension StockMarket {
-    struct TradeableAsset {
-        let security: Security
-        var issuable: Int64
-    }
-}
-extension StockMarket {
-    mutating func match(
+    public mutating func match(
         random: inout PseudoRandom,
         execute: (inout PseudoRandom, StockMarket.Fill) -> ()
     ) {

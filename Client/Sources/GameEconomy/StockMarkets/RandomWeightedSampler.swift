@@ -4,11 +4,11 @@ import Random
 ///
 /// This sampler has an O(n) initialization cost and an O(log n) cost for each
 /// subsequent sample.
-struct RandomWeightedSampler<Choices, Weight> where Choices: Collection,
+@frozen public struct RandomWeightedSampler<Choices, Weight> where Choices: Collection,
     Weight: BinaryFloatingPoint,
     Weight.RawSignificand: FixedWidthInteger {
-    private let cumulativeWeights: [(choice: Choices.Index, cumulativeWeight: Weight)]
-    private let totalWeight: Weight
+    @usableFromInline let cumulativeWeights: [(choice: Choices.Index, cumulativeWeight: Weight)]
+    @usableFromInline let totalWeight: Weight
 
     /// Creates a sampler for the given collection.
     ///
@@ -17,7 +17,7 @@ struct RandomWeightedSampler<Choices, Weight> where Choices: Collection,
     ///   - weight: A closure that returns the weight for a given element.
     /// - Returns: A new sampler, or `nil` if the collection is empty or the
     ///   total weight is zero.
-    init?(
+    @inlinable public init?(
         choices: borrowing Choices,
         sampleWeight: (Choices.Element) -> Weight
     ) {
@@ -41,7 +41,7 @@ struct RandomWeightedSampler<Choices, Weight> where Choices: Collection,
     }
 
     /// Returns the next weighted random element.
-    func next(using generator: inout some RandomNumberGenerator) -> Choices.Index {
+    @inlinable public func next(using generator: inout some RandomNumberGenerator) -> Choices.Index {
         let randomValue: Weight = .random(in: .zero ..< self.totalWeight, using: &generator)
 
         // `partitioningIndex` performs a binary search to find the index.
