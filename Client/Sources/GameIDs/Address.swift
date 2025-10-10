@@ -1,7 +1,4 @@
-import GameIDs
 import HexGrids
-import JavaScriptKit
-import JavaScriptInterop
 
 @frozen public struct Address: Equatable, Hashable, Sendable {
     public let planet: PlanetID
@@ -28,6 +25,4 @@ extension Address: LosslessStringConvertible {
 
         self.init(planet: planet, tile: tile)
     }
-}
-extension Address: LoadableFromJSString, ConvertibleToJSString {
 }
