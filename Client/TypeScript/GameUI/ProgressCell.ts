@@ -1,9 +1,9 @@
 export class ProgressCell {
     public readonly node: HTMLDivElement;
-    public readonly summary: HTMLSpanElement;
+    public readonly summary: HTMLElement;
 
-    constructor() {
-        this.summary = document.createElement('span');
+    constructor(summary: HTMLElement | null = null) {
+        this.summary = summary ?? document.createElement('span');
         this.node = document.createElement('div');
         this.node.appendChild(this.summary);
         this.node.setAttribute('data-cell', 'progress');

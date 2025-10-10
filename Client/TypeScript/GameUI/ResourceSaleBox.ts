@@ -61,10 +61,8 @@ export class ResourceSaleBox implements DiffableListElement<Resource> {
         UpdateBigInt(this.units, sale.unitsSold);
         UpdateBigInt(this.value, sale.valueSold);
 
-        if (sale.priceAtMarket !== undefined) {
-            this.price.updatePriceChange(sale.priceAtMarket.o, sale.priceAtMarket.c, 2);
-        } else if (sale.price !== undefined) {
-            this.price.updateBigIntChange(sale.price.o, sale.price.c);
+        if (sale.price !== undefined) {
+            this.price.updatePriceChange(sale.price.o, sale.price.c, 2);
         }
     }
 }

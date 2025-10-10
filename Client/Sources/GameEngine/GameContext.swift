@@ -151,34 +151,39 @@ extension GameContext {
         map.localMarkets.turn {
             /// Apply local minimum wages
             guard
-            let country: CountryProperties = self.planets[$0.location]?.governedBy else {
+            let country: CountryProperties = self.planets[$0.location]?.governedBy,
+            let resource: ResourceMetadata = self.rules.resources[$0.resource] else {
                 return
             }
 
-            $1.turn(minwage: country.minwage)
+            let priceFloor: LocalPrice = .init(per100: country.minwage * 100 / resource.hours)
+
+            $1.turn(priceFloor: priceFloor, type: .minimumWage)
         }
 
         self.factories.turn { $0.turn(on: &map) }
         self.pops.turn { $0.turn(on: &map) }
 
         map.localMarkets.turn {
-            let price: Int64 = $1.today.price
+            let price: LocalPrice = $1.today.price
             let (asks, bids): (
                 asks: [LocalMarket.Order],
                 bids: [LocalMarket.Order]
             ) = $1.match(using: &map.random)
 
+            var spread: Int64 = 0
+
             for order: LocalMarket.Order in asks {
                 switch order.by {
                 case .factory(let id):
-                    self.factories[modifying: id].credit(
+                    spread -= self.factories[modifying: id].credit(
                         inelastic: $0.resource,
                         units: order.filled,
                         price: price
                     )
 
                 case .pop(let id):
-                    self.pops[modifying: id].credit(
+                    spread -= self.pops[modifying: id].credit(
                         inelastic: $0.resource,
                         units: order.filled,
                         price: price
@@ -188,14 +193,14 @@ extension GameContext {
             for order: LocalMarket.Order in bids {
                 switch order.by {
                 case .factory(let id):
-                    self.factories[modifying: id].debit(
+                    spread += self.factories[modifying: id].debit(
                         inelastic: $0.resource,
                         units: order.filled,
                         price: price,
                         tier: order.tier
                     )
                 case .pop(let id):
-                    self.pops[modifying: id].debit(
+                    spread += self.pops[modifying: id].debit(
                         inelastic: $0.resource,
                         units: order.filled,
                         price: price,
@@ -203,6 +208,8 @@ extension GameContext {
                     )
                 }
             }
+
+            // TODO: do something with spread
         }
         map.stockMarkets.turn(random: &map.random) {
             switch $2.asset {

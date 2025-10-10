@@ -1,7 +1,9 @@
+import D
 import GameIDs
 import Random
 
 @frozen public struct LocalMarket {
+    public var priceFloor: PriceFloor?
     public var yesterday: LocalMarketState
     public var today: LocalMarketState
 
@@ -9,11 +11,13 @@ import Random
     @usableFromInline var bids: [Order]
 
     init(
+        priceFloor: PriceFloor?,
         yesterday: LocalMarketState,
         today: LocalMarketState,
         asks: [Order],
         bids: [Order]
     ) {
+        self.priceFloor = priceFloor
         self.yesterday = yesterday
         self.today = today
         self.asks = asks
@@ -21,14 +25,15 @@ import Random
     }
 
     @inlinable init() {
-        self.yesterday = .init(price: 1, supply: 0, demand: 0)
+        self.priceFloor = nil
+        self.yesterday = .init(price: .init(per100: 1), supply: 0, demand: 0)
         self.today = self.yesterday
         self.asks = []
         self.bids = []
     }
 }
 extension LocalMarket {
-    @inlinable public var price: Candle<Int64> {
+    @inlinable public var price: Candle<LocalPrice> {
         .init(
             o: yesterday.price,
             l: min(yesterday.price, today.price),
@@ -53,16 +58,17 @@ extension LocalMarket {
         in tier: UInt8,
         limit: Int64,
     ) {
-        let amount: Int64 = min(budget / self.today.price, limit)
+        let amount: Int64 = min(budget * 100 / self.today.price.per100, limit)
         self.bids.append(.init(by: entity, tier: tier, amount: amount))
         self.today.demand += amount
     }
 }
 extension LocalMarket {
-    public mutating func turn(minwage: Int64) {
-        let price: Int64 = self.today.price + self.today.priceChange
+    public mutating func turn(priceFloor: LocalPrice, type: PriceFloorType) {
+        let price: LocalPrice = .init(per100: self.today.price.per100 + self.today.priceChange)
         self.yesterday = self.today
-        self.today = .init(price: max(price, minwage))
+        self.today = .init(price: max(price, priceFloor))
+        self.priceFloor = .init(minimum: priceFloor, type: type)
     }
 
     public mutating func match(using random: inout PseudoRandom) -> (asks: [Order], bids: [Order]) {

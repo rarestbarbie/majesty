@@ -22,3 +22,13 @@ extension Candle {
         self.c = price
     }
 }
+extension Candle {
+    @inlinable public func map<T>(_ transform: (Price) throws -> T) rethrows -> Candle<T> {
+        .init(
+            o: try transform(self.o),
+            l: try transform(self.l),
+            h: try transform(self.h),
+            c: try transform(self.c)
+        )
+    }
+}

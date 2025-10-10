@@ -9,6 +9,5 @@ export interface ResourceSale {
     readonly unitsSold: bigint;
     readonly valueSold: bigint;
 
-    readonly priceAtMarket?: Candle<number>;
-    readonly price?: Candle<bigint>;
+    readonly price?: Candle<number>;
 }

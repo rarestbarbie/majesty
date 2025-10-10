@@ -20,6 +20,9 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
     public readonly id: GameID;
     public readonly node: HTMLAnchorElement;
 
+    private readonly label: HTMLSpanElement;
+    private readonly level: HTMLSpanElement;
+
     private readonly type: ProgressCell;
     private readonly location: HTMLElement;
     private readonly workers: FactoryWorkersCell;
@@ -42,7 +45,15 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
         this.id = factory.id;
         this.node = document.createElement('a');
 
-        this.type = new ProgressCell();
+        this.label = document.createElement('span');
+        this.level = document.createElement('span');
+        this.level.classList.add('level');
+
+        const summary = document.createElement('div');
+        summary.appendChild(this.label);
+        summary.appendChild(this.level);
+
+        this.type = new ProgressCell(summary);
         this.type.node.setAttribute('data-tooltip-type', TooltipType.FactorySize);
         this.type.node.setAttribute('data-tooltip-arguments', JSON.stringify([factory.id]));
         this.location = document.createElement('div');
@@ -76,7 +87,8 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
     }
 
     public update(factory: FactoryTableEntry): void {
-        UpdateText(this.type.summary, `${factory.type} (${factory.size_l})`);
+        UpdateText(this.label, `${factory.type}`);
+        UpdateText(this.level, factory.size_l > 1 ? `${factory.size_l}` : '+');
 
         UpdateText(this.location, factory.location);
 

@@ -8,6 +8,5 @@ export interface ResourceNeed {
     readonly unitsAcquired?: bigint
     readonly unitsDemanded: bigint
     readonly unitsConsumed: bigint
-    readonly priceAtMarket?: Candle<number>;
-    readonly price?: Candle<bigint>;
+    readonly price?: Candle<number>;
 }

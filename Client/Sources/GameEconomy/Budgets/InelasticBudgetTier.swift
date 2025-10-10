@@ -1,3 +1,4 @@
+import Fraction
 import GameIDs
 import OrderedCollections
 
@@ -16,7 +17,7 @@ extension InelasticBudgetTier {
                     id: $0,
                     unitsToPurchase: $1.needed($1.unitsDemanded),
                     units: $1.unitsDemanded,
-                    value: $1.unitsDemanded * markets[location, $0].yesterday.price
+                    value: $1.unitsDemanded >< markets[location, $0].yesterday.price.exact
                 )
             }
         )
