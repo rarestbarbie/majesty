@@ -1,12 +1,11 @@
-import GameEconomy
 import GameIDs
 import OrderedCollections
 
-struct InelasticBudgetTier {
-    let x: [Weight]
+@frozen public struct InelasticBudgetTier {
+    public let x: [Weight]
 }
 extension InelasticBudgetTier {
-    static func compute(
+    public static func compute(
         demands: OrderedDictionary<Resource, InelasticInput>,
         markets: LocalMarkets,
         location: Address,
@@ -23,7 +22,7 @@ extension InelasticBudgetTier {
         )
     }
 
-    var total: Int64 {
+    public var total: Int64 {
         self.x.reduce(into: 0) { $0 += $1.value }
     }
 }

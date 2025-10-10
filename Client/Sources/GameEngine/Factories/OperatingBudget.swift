@@ -1,3 +1,5 @@
+import GameEconomy
+
 struct OperatingBudget {
     let min: (l: Int64, e: Int64)
 

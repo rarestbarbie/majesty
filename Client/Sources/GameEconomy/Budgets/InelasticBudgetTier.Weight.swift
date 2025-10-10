@@ -1,7 +1,7 @@
 import GameIDs
 
 extension InelasticBudgetTier {
-    struct Weight {
+    @frozen public struct Weight {
         let id: Resource
         let unitsToPurchase: Int64
         let units: Int64

@@ -1,15 +1,19 @@
 import Fraction
 import GameIDs
 
-struct LocalMarkets {
-    private var markets: [Key: LocalMarket]
+@frozen public struct LocalMarkets {
+    @usableFromInline var markets: [Key: LocalMarket]
 
-    init(markets: [Key: LocalMarket] = [:]) {
+    @inlinable init(markets: [Key: LocalMarket] = [:]) {
         self.markets = markets
+    }
+
+    @inlinable public init() {
+        self.init(markets: [:])
     }
 }
 extension LocalMarkets {
-    subscript(location: Address, resource: Resource) -> LocalMarket {
+    @inlinable public subscript(location: Address, resource: Resource) -> LocalMarket {
         _read {
             yield  self.markets[.init(location: location, resource: resource), default: .init()]
         }
@@ -19,7 +23,7 @@ extension LocalMarkets {
     }
 }
 extension LocalMarkets {
-    mutating func turn(by turn: (Key, inout LocalMarket) -> ()) {
+    public mutating func turn(by turn: (Key, inout LocalMarket) -> ()) {
         var i: [Key: LocalMarket].Index = self.markets.startIndex
         while i < self.markets.endIndex {
             let id: Key = self.markets.keys[i]
@@ -29,7 +33,7 @@ extension LocalMarkets {
     }
 }
 extension LocalMarkets {
-    mutating func place(
+    public mutating func place(
         bids tier: (
             (budget: Int64, weights: [InelasticBudgetTier.Weight]),
             (budget: Int64, weights: [InelasticBudgetTier.Weight]),
