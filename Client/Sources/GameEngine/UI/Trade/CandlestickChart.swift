@@ -1,6 +1,6 @@
 import DequeModule
 import GameEconomy
-import GameState
+import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 

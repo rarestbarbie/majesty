@@ -1,4 +1,5 @@
 @_spi(testable) import GameEconomy
+import GameIDs
 import Testing
 
 @Suite struct ArbitrageTests {

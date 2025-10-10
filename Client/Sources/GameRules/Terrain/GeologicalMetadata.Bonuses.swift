@@ -1,4 +1,4 @@
-import GameEconomy
+import GameIDs
 import OrderedCollections
 
 extension GeologicalMetadata {

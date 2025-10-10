@@ -1,5 +1,4 @@
-import GameRules
-import GameState
+import GameIDs
 import OrderedCollections
 
 extension GameContext {

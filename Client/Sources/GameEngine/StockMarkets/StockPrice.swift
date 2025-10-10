@@ -1,4 +1,4 @@
-import GameEconomy
+import Fraction
 
 /// A stock price is a fraction whose numerator is greater than zero.
 struct StockPrice {

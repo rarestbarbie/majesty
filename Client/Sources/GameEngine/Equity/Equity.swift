@@ -1,4 +1,5 @@
 import Assert
+import GameIDs
 import GameState
 import JavaScriptInterop
 import JavaScriptKit

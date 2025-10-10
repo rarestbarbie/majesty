@@ -1,7 +1,9 @@
 import ColorText
 import D
+import Fraction
 import GameConditions
 import GameEconomy
+import GameIDs
 import GameRules
 import GameState
 import GameTerrain

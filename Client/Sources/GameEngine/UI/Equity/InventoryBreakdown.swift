@@ -1,5 +1,4 @@
-import GameRules
-import GameEconomy
+import GameIDs
 import JavaScriptInterop
 import JavaScriptKit
 import VectorCharts

@@ -51,25 +51,6 @@ extension Fraction {
     @inlinable public static func >< (a: Int64, self: Self) -> Int64 { self >< a }
     @inlinable public static func <> (a: Int64, self: Self) -> Int64 { self <> a }
 }
-extension Fraction {
-    @available(*, deprecated, message: "Use >< instead")
-    @inlinable public static func *< (self: Self, a: Int64) -> Int64 {
-        self >< a
-    }
-    @available(*, deprecated, message: "Use <> instead")
-    @inlinable public static func *> (self: Self, a: Int64) -> Int64 {
-        self <> a
-    }
-
-    @available(*, deprecated, message: "Use >< instead")
-    @inlinable public static func *> (a: Int64, self: Self) -> Int64 {
-        self <> a
-    }
-    @available(*, deprecated, message: "Use >< instead")
-    @inlinable public static func *< (a: Int64, self: Self) -> Int64 {
-        self >< a
-    }
-}
 extension Fraction: Equatable {
     @inlinable public static func == (a: Self, b: Self) -> Bool {
         Int128.init(a.n) * Int128.init(b.d) == Int128.init(b.n) * Int128.init(a.d)

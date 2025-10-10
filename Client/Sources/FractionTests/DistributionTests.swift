@@ -1,4 +1,4 @@
-import GameEconomy
+import Fraction
 import Testing
 
 @Suite struct DistributionTests {

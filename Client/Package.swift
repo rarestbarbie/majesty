@@ -107,6 +107,18 @@ let package: Package = .init(
         ),
 
         .target(
+            name: "Fraction",
+            dependencies: [
+            ],
+        ),
+        .testTarget(
+            name: "FractionTests",
+            dependencies: [
+                .target(name: "Fraction"),
+            ]
+        ),
+
+        .target(
             name: "GameConditions",
             dependencies: [
                 .target(name: "ColorText"),
@@ -141,6 +153,8 @@ let package: Package = .init(
             name: "GameEconomy",
             dependencies: [
                 .target(name: "Assert"),
+                .target(name: "GameIDs"),
+                .target(name: "LiquidityPool"),
                 .product(name: "DequeModule", package: "swift-collections"),
                 .product(name: "OrderedCollections", package: "swift-collections"),
                 .product(name: "RealModule", package: "swift-numerics"),
@@ -150,6 +164,13 @@ let package: Package = .init(
             name: "GameEconomyTests",
             dependencies: [
                 .target(name: "GameEconomy"),
+            ]
+        ),
+
+        .target(
+            name: "GameIDs",
+            dependencies: [
+                .target(name: "GameStateMacros"),
             ]
         ),
 
@@ -168,7 +189,7 @@ let package: Package = .init(
         .target(
             name: "GameState",
             dependencies: [
-                .target(name: "GameStateMacros"),
+                .target(name: "GameIDs"),
                 .product(name: "OrderedCollections", package: "swift-collections"),
             ],
         ),
@@ -190,8 +211,7 @@ let package: Package = .init(
             name: "GameTerrain",
             dependencies: [
                 .target(name: "Color"),
-                .target(name: "GameState"),
-                .target(name: "GameEconomy"),
+                .target(name: "GameIDs"),
                 .target(name: "GameRules"),
                 .target(name: "JavaScriptInterop"),
                 .target(name: "HexGrids"),
@@ -217,6 +237,13 @@ let package: Package = .init(
             dependencies: [
                 .product(name: "JavaScriptBigIntSupport", package: "JavaScriptKit"),
                 .product(name: "JavaScriptKit", package: "JavaScriptKit"),
+            ]
+        ),
+
+        .target(
+            name: "LiquidityPool",
+            dependencies: [
+                .target(name: "Fraction"),
             ]
         ),
 

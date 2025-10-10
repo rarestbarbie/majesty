@@ -1,3 +1,6 @@
+import Fraction
+import GameIDs
+
 @frozen public struct TradeableInput: Identifiable {
     public let id: Resource
 

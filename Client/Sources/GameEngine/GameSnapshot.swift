@@ -1,5 +1,5 @@
 import GameEconomy
-import GameState
+import GameIDs
 import OrderedCollections
 
 @dynamicMemberLookup struct GameSnapshot: ~Copyable {

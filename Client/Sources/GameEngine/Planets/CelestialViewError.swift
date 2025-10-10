@@ -1,4 +1,4 @@
-import GameState
+import GameIDs
 
 enum CelestialViewError: Error {
     case noSuchIndex(Int)

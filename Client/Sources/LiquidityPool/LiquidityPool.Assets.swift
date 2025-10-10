@@ -1,3 +1,5 @@
+import Fraction
+
 extension LiquidityPool {
     @frozen public struct Assets {
         public var base: Int64
@@ -35,7 +37,7 @@ extension LiquidityPool.Assets {
     }
 }
 extension LiquidityPool.Assets {
-    func quote(_ base: Int64) -> (cost: Int64, amount: Int64) {
+    @inlinable public func quote(_ base: Int64) -> (cost: Int64, amount: Int64) {
         let bl: Int128 = .init(self.base)
         let ql: Int128 = .init(self.quote)
 
@@ -46,7 +48,7 @@ extension LiquidityPool.Assets {
         return (r > 0 ? Int64.init(b) + 1 : Int64.init(b), Int64.init(q))
     }
 
-    func quote(_ base: Int64, limit: Int64) -> (cost: Int64, amount: Int64) {
+    @inlinable public func quote(_ base: Int64, limit: Int64) -> (cost: Int64, amount: Int64) {
         let bl: Int128 = .init(self.base)
         let ql: Int128 = .init(self.quote)
 
@@ -62,7 +64,7 @@ extension LiquidityPool.Assets {
     }
 
     @discardableResult
-    @inlinable mutating func drain(_ fraction: Fraction) -> Self {
+    @inlinable public mutating func drain(_ fraction: Fraction) -> Self {
         let drained: Self = .init(
             base: self.base <> fraction,
             quote: self.quote <> fraction

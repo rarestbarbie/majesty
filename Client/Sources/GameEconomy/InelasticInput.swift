@@ -1,3 +1,5 @@
+import GameIDs
+
 @frozen public struct InelasticInput: Identifiable, ResourceInput {
     public let id: Resource
 

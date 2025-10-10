@@ -1,6 +1,6 @@
 import D
 import GameEconomy
-import GameRules
+import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 

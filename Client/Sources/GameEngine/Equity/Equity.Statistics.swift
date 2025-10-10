@@ -1,6 +1,6 @@
 import Assert
-import GameEconomy
-import GameState
+import Fraction
+import GameIDs
 
 extension Equity {
     struct Statistics {

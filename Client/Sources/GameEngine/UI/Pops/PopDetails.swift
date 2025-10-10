@@ -1,6 +1,5 @@
 import GameEconomy
-import GameState
-import GameRules
+import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 import VectorCharts

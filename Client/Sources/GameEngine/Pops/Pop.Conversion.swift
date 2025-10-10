@@ -1,5 +1,5 @@
-import GameEconomy
-import GameState
+import Fraction
+import GameIDs
 
 extension Pop {
     struct Conversion {

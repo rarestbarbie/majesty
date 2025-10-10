@@ -1,4 +1,4 @@
-import GameEconomy
+import LiquidityPool
 import Testing
 
 @Suite struct LiquidityPoolTests {

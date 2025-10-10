@@ -1,6 +1,6 @@
 import GameEconomy
 import GameRules
-import GameState
+import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 import OrderedCollections

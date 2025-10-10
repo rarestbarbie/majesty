@@ -1,7 +1,7 @@
 import Color
 import GameEconomy
+import GameIDs
 import GameRules
-import GameState
 import JavaScriptInterop
 import JavaScriptKit
 

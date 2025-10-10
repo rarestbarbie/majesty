@@ -1,4 +1,4 @@
-import GameEconomy
+import GameIDs
 import GameRules
 
 extension GameRules {

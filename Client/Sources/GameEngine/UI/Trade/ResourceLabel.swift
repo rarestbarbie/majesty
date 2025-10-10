@@ -1,4 +1,4 @@
-import GameEconomy
+import GameIDs
 
 struct ResourceLabel: Identifiable {
     let id: Resource

@@ -1,3 +1,4 @@
+import GameIDs
 import OrderedCollections
 
 @frozen public struct DynamicContextTable<ElementContext>

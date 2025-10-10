@@ -1,3 +1,5 @@
+import LiquidityPool
+
 extension Market {
     @frozen public struct Interval {
         public let prices: Candle<Double>

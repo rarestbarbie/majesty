@@ -1,4 +1,4 @@
-import GameEconomy
+import GameIDs
 
 extension InelasticBudgetTier {
     struct Weight {

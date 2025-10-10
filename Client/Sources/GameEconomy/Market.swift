@@ -1,4 +1,6 @@
 import DequeModule
+import Fraction
+import LiquidityPool
 import RealModule
 
 @frozen public struct Market: Identifiable {

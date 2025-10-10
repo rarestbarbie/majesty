@@ -1,5 +1,5 @@
 import GameRules
-import GameState
+import GameIDs
 import GameTerrain
 import HexGrids
 import JavaScriptKit

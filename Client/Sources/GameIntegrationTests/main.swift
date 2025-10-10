@@ -1,6 +1,6 @@
 import GameEngine
+import GameIDs
 import GameRules
-import GameState
 import JavaScriptKit
 
 @main struct Main {

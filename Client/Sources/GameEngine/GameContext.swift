@@ -1,5 +1,7 @@
 import Assert
+import Fraction
 import GameEconomy
+import GameIDs
 import GameRules
 import GameState
 import GameTerrain
