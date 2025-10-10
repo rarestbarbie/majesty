@@ -1,14 +1,14 @@
 import GameIDs
 
-struct StockMarkets {
-    private var regions: [Fiat: StockMarket]
+@frozen public struct StockMarkets {
+    @usableFromInline var regions: [Fiat: StockMarket]
 
-    init() {
+    @inlinable public init() {
         self.regions = [:]
     }
 }
 extension StockMarkets {
-    mutating func turn(by turn: (Fiat, inout StockMarket) -> ()) {
+    @inlinable public mutating func turn(by turn: (Fiat, inout StockMarket) -> ()) {
         var i: [Fiat: StockMarket].Index = self.regions.startIndex
         while i < self.regions.endIndex {
             let id: Fiat = self.regions.keys[i]
@@ -18,7 +18,7 @@ extension StockMarkets {
     }
 }
 extension StockMarkets {
-    mutating func queueRandomPurchase(buyer: LEI, value: Int64, currency: Fiat) {
+    public mutating func queueRandomPurchase(buyer: LEI, value: Int64, currency: Fiat) {
         guard value > 0 else {
             return
         }
@@ -27,7 +27,7 @@ extension StockMarkets {
         )
     }
 
-    mutating func issueShares(currency: Fiat, quantity: Int64, security: StockMarket.Security) {
+    public mutating func issueShares(currency: Fiat, quantity: Int64, security: StockMarket.Security) {
         self.regions[currency, default: .init()].assets.append(
             .init(security: security, issuable: quantity)
         )

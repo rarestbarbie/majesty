@@ -1,7 +1,7 @@
 import GameIDs
 
 extension StockMarket {
-    struct RandomPurchase {
+    @frozen @usableFromInline struct RandomPurchase {
         let buyer: LEI
         let value: Int64
     }
