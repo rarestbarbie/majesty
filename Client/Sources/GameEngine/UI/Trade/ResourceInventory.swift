@@ -58,6 +58,7 @@ extension ResourceInventory {
     }
     mutating func update(
         from outputs: ResourceOutputs,
+        tier: ResourceTierIdentifier = .o,
         currency: Fiat,
         location: Address,
         snapshot: borrowing GameSnapshot,
@@ -67,6 +68,7 @@ extension ResourceInventory {
             self.sales.append(
                 ResourceSale.init(
                     label: snapshot.rules[output.id],
+                    tier: tier,
                     unitsProduced: output.unitsProduced,
                     unitsSold: output.unitsSold,
                     valueSold: output.valueSold,
@@ -80,6 +82,7 @@ extension ResourceInventory {
             self.sales.append(
                 ResourceSale.init(
                     label: snapshot.rules[output.id],
+                    tier: tier,
                     unitsProduced: output.unitsProduced,
                     unitsSold: output.unitsSold,
                     valueSold: output.valueSold,

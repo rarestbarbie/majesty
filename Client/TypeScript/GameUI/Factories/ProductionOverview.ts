@@ -22,8 +22,8 @@ import {
 
 export class ProductionOverview extends ScreenContent {
     private readonly factories: StaticList<FactoryTableRow, GameID>;
-    private readonly needs: StaticList<ResourceNeedRow, Resource>;
-    private readonly sales: StaticList<ResourceSaleBox, Resource>;
+    private readonly needs: StaticList<ResourceNeedRow, string>;
+    private readonly sales: StaticList<ResourceSaleBox, string>;
     private readonly charts: {
         readonly spending: PieChart<string>;
     };
@@ -42,8 +42,8 @@ export class ProductionOverview extends ScreenContent {
         this.factories = new StaticList<FactoryTableRow, GameID>(document.createElement('div'));
         this.factories.table('Factories', FactoryTableRow.columns);
 
-        this.needs = new StaticList<ResourceNeedRow, Resource>(document.createElement('div'));
-        this.sales = new StaticList<ResourceSaleBox, Resource>(document.createElement('div'));
+        this.needs = new StaticList<ResourceNeedRow, string>(document.createElement('div'));
+        this.sales = new StaticList<ResourceSaleBox, string>(document.createElement('div'));
 
         this.charts = {
             spending: new PieChart<string>(TooltipType.FactoryStatementItem),
@@ -161,7 +161,7 @@ export class ProductionOverview extends ScreenContent {
                 (need: ResourceNeed) => new ResourceNeedRow(
                     need,
                     id,
-                    TooltipType.FactoryDemand,
+                    TooltipType.FactoryResourceIO,
                     TooltipType.FactoryStockpile,
                     TooltipType.FactoryExplainPrice,
                 ),
@@ -172,7 +172,7 @@ export class ProductionOverview extends ScreenContent {
                 (sale: ResourceSale) => new ResourceSaleBox(
                     sale,
                     id,
-                    TooltipType.FactorySupply,
+                    TooltipType.FactoryResourceIO,
                     TooltipType.FactoryExplainPrice,
                 ),
                 (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),

@@ -1,7 +1,7 @@
-import { Candle, Resource } from './exports.js';
+import { Candle } from './exports.js';
 
 export interface ResourceSale {
-    readonly id: Resource;
+    readonly id: string;
     readonly name: string;
     readonly icon: string;
 

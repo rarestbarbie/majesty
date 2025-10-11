@@ -44,14 +44,8 @@ extension GameSession {
             self.tooltipFactorySize(
                 try arguments[0].decode(),
             )
-        case .FactoryDemand:
-            self.tooltipFactoryDemand(
-                try arguments[0].decode(),
-                try arguments[1].decode(),
-                try arguments[2].decode(),
-            )
-        case .FactorySupply:
-            self.tooltipFactorySupply(
+        case .FactoryResourceIO:
+            self.tooltipFactoryResourceIO(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
@@ -59,13 +53,11 @@ extension GameSession {
             self.tooltipFactoryStockpile(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
-                try arguments[2].decode(),
             )
         case .FactoryExplainPrice:
             self.tooltipFactoryExplainPrice(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
-                try arguments[2].decode(),
             )
         case .FactoryWorkers:
             self.tooltipFactoryWorkers(
@@ -105,14 +97,8 @@ extension GameSession {
             self.tooltipPopJobs(
                 try arguments[0].decode(),
             )
-        case .PopDemand:
-            self.tooltipPopDemand(
-                try arguments[0].decode(),
-                try arguments[1].decode(),
-                try arguments[2].decode(),
-            )
-        case .PopSupply:
-            self.tooltipPopSupply(
+        case .PopResourceIO:
+            self.tooltipPopResourceIO(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
@@ -120,13 +106,11 @@ extension GameSession {
             self.tooltipPopStockpile(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
-                try arguments[2].decode(),
             )
         case .PopExplainPrice:
             self.tooltipPopExplainPrice(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
-                try arguments[2].decode(),
             )
         case .PopNeeds:
             self.tooltipPopNeeds(

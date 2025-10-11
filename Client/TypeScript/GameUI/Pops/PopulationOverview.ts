@@ -20,8 +20,8 @@ import {
 } from '../exports.js';
 
 export class PopulationOverview extends ScreenContent {
-    private needs: StaticList<ResourceNeedRow, Resource>;
-    private sales: StaticList<ResourceSaleBox, Resource>;
+    private needs: StaticList<ResourceNeedRow, string>;
+    private sales: StaticList<ResourceSaleBox, string>;
     private readonly charts: {
         readonly spending: PieChart<string>;
     };
@@ -45,8 +45,8 @@ export class PopulationOverview extends ScreenContent {
         this.pops = new StaticList<PopTableRow, GameID>(document.createElement('div'));
         this.pops.table('Pops', PopTableRow.columns);
 
-        this.needs = new StaticList<ResourceNeedRow, Resource>(document.createElement('div'));
-        this.sales = new StaticList<ResourceSaleBox, Resource>(document.createElement('div'));
+        this.needs = new StaticList<ResourceNeedRow, string>(document.createElement('div'));
+        this.sales = new StaticList<ResourceSaleBox, string>(document.createElement('div'));
         this.charts = {
             spending: new PieChart<string>(TooltipType.PopStatementItem),
         };
@@ -179,7 +179,7 @@ export class PopulationOverview extends ScreenContent {
                 (need: ResourceNeed) => new ResourceNeedRow(
                     need,
                     id,
-                    TooltipType.PopDemand,
+                    TooltipType.PopResourceIO,
                     TooltipType.PopStockpile,
                     TooltipType.PopExplainPrice,
                 ),
@@ -191,7 +191,7 @@ export class PopulationOverview extends ScreenContent {
                 (sale: ResourceSale) => new ResourceSaleBox(
                     sale,
                     id,
-                    TooltipType.PopSupply,
+                    TooltipType.PopResourceIO,
                     TooltipType.PopExplainPrice,
                 ),
                 (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
