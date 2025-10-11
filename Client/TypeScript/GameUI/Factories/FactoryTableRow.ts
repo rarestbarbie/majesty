@@ -88,7 +88,7 @@ export class FactoryTableRow implements DiffableListElement<GameID> {
 
     public update(factory: FactoryTableEntry): void {
         UpdateText(this.label, `${factory.type}`);
-        UpdateText(this.level, factory.size_l > 1 ? `${factory.size_l}` : '+');
+        UpdateText(this.level, factory.size_l > 0 ? `${factory.size_l}` : '+');
 
         UpdateText(this.location, factory.location);
 
