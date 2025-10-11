@@ -3,7 +3,7 @@ import GameRules
 import JavaScriptKit
 import JavaScriptInterop
 
-struct ResourceNeed {
+struct ResourceNeed: ResourceInventoryLineEntry {
     let label: ResourceLabel
     let tier: ResourceTierIdentifier
 
@@ -27,7 +27,7 @@ extension ResourceNeed: JavaScriptEncodable {
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.id] = self.label.id
+        js[.id] = self.id
         js[.name] = self.label.name
         js[.icon] = self.label.icon
         js[.tier] = self.tier

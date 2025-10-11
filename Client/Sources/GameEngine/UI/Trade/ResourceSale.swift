@@ -3,8 +3,10 @@ import GameRules
 import JavaScriptKit
 import JavaScriptInterop
 
-struct ResourceSale {
+struct ResourceSale: ResourceInventoryLineEntry {
     let label: ResourceLabel
+    let tier: ResourceTierIdentifier
+
     let unitsProduced: Int64
     let unitsSold: Int64
     let valueSold: Int64
@@ -26,7 +28,7 @@ extension ResourceSale: JavaScriptEncodable {
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.id] = self.label.id
+        js[.id] = self.id
         js[.name] = self.label.name
         js[.icon] = self.label.icon
         js[.unitsProduced] = self.unitsProduced

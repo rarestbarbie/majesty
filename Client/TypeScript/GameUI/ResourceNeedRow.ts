@@ -37,7 +37,7 @@ export class ResourceNeedRow implements DiffableListElement<string> {
         stockpile: TooltipType,
         explainPrice: TooltipType,
     ) {
-        this.id = `${need.id}${need.tier}`;
+        this.id = need.id;
         this.node = document.createElement('a');
 
         const label: HTMLDivElement = document.createElement('div');
@@ -47,21 +47,21 @@ export class ResourceNeedRow implements DiffableListElement<string> {
         this.demand.node.setAttribute('data-tooltip-type', demand);
         this.demand.node.setAttribute(
             'data-tooltip-arguments',
-            JSON.stringify([owner, need.tier, need.id]),
+            JSON.stringify([owner, need.id]),
         );
 
         this.stockpile = document.createElement('div');
         this.stockpile.setAttribute('data-tooltip-type', stockpile);
         this.stockpile.setAttribute(
             'data-tooltip-arguments',
-            JSON.stringify([owner, need.tier, need.id]),
+            JSON.stringify([owner, need.id]),
         );
 
         this.price = new Ticker(Fortune.Malus);
         this.price.outer.setAttribute('data-tooltip-type', explainPrice);
         this.price.outer.setAttribute(
             'data-tooltip-arguments',
-            JSON.stringify([owner, need.tier, need.id]),
+            JSON.stringify([owner, need.id]),
         );
 
         this.node.appendChild(label);

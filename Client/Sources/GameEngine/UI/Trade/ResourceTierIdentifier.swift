@@ -15,4 +15,6 @@ import JavaScriptInterop
     case i = "i"
     /// Factory, expansion progress.
     case v = "v"
+
+    case o = "o"
 }

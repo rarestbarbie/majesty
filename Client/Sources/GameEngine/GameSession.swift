@@ -289,19 +289,18 @@ extension GameSession {
         }
     }
 
-    public func tooltipFactoryDemand(
+    public func tooltipFactoryResourceIO(
         _ id: FactoryID,
-        _ tier: ResourceTierIdentifier,
-        _ need: Resource,
+        _ resource: ResourceInventoryLine,
     ) -> Tooltip? {
         guard let factory: FactoryContext = self.context.factories[id] else {
             return nil
         }
 
-        switch tier {
+        switch resource.tier {
         case .i:
             return factory.state.ni.tooltipDemand(
-                need,
+                resource.type,
                 tier: factory.type.inputs,
                 unit: "worker",
                 factor: 1,
@@ -309,57 +308,44 @@ extension GameSession {
             )
         case .v:
             return factory.state.nv.tooltipDemand(
-                need,
+                resource.type,
                 tier: factory.type.costs,
                 unit: "level",
                 factor: 1,
                 productivity: Double.init(factory.productivity)
+            )
+
+        case .o:
+            return factory.state.out.tooltipSupply(
+                resource.type,
+                tier: factory.type.output,
+                unit: "worker",
+                factor: factory.state.today.eo,
+                productivity: factory.productivity
             )
         default:
             return nil
         }
     }
 
-    public func tooltipFactorySupply(
-        _ id: FactoryID,
-        _ need: Resource,
-    ) -> Tooltip? {
-        guard let factory: FactoryContext = self.context.factories[id] else {
-            return nil
-        }
-
-        return factory.state.out.tooltipSupply(
-            need,
-            tier: factory.type.output,
-            unit: "worker",
-            factor: factory.state.today.eo,
-            productivity: factory.productivity
-        )
-    }
-
     public func tooltipFactoryStockpile(
         _ id: FactoryID,
-        _ tier: ResourceTierIdentifier,
-        _ need: Resource,
+        _ resource: ResourceInventoryLine,
     ) -> Tooltip? {
         guard let factory: FactoryContext = self.context.factories[id] else {
             return nil
         }
 
-        switch tier {
-        case .i:
-            return factory.state.ni.tooltipStockpile(need)
-        case .v:
-            return factory.state.nv.tooltipStockpile(need)
-        default:
-            return nil
+        switch resource.tier {
+        case .i: return factory.state.ni.tooltipStockpile(resource.type)
+        case .v: return factory.state.nv.tooltipStockpile(resource.type)
+        default: return nil
         }
     }
 
     public func tooltipFactoryExplainPrice(
         _ id: FactoryID,
-        _ tier: ResourceTierIdentifier?,
-        _ need: Resource,
+        _ resource: ResourceInventoryLine,
     ) -> Tooltip? {
         guard
         let factory: FactoryContext = self.context.factories[id],
@@ -371,19 +357,15 @@ extension GameSession {
             inelastic: LocalMarket,
             tradeable: Candle<Double>?
         ) = (
-            self.map.localMarkets[factory.state.tile, need],
-            self.map.exchange.markets[need / country.currency.id]?.history.last?.prices
+            self.map.localMarkets[factory.state.tile, resource.type],
+            self.map.exchange.markets[resource.type / country.currency.id]?.history.last?.prices
         )
 
-        switch tier {
-        case .i?:
-            return factory.state.ni.tooltipExplainPrice(need, market)
-        case .v?:
-            return factory.state.nv.tooltipExplainPrice(need, market)
-        case nil:
-            return factory.state.out.tooltipExplainPrice(need, market)
-        default:
-            return nil
+        switch resource.tier {
+        case .i: return factory.state.ni.tooltipExplainPrice(resource.type, market)
+        case .v: return factory.state.nv.tooltipExplainPrice(resource.type, market)
+        case .o: return factory.state.out.tooltipExplainPrice(resource.type, market)
+        default: return nil
         }
     }
 
@@ -611,19 +593,18 @@ extension GameSession {
         }
     }
 
-    public func tooltipPopDemand(
+    public func tooltipPopResourceIO(
         _ id: PopID,
-        _ tier: ResourceTierIdentifier,
-        _ need: Resource,
+        _ resource: ResourceInventoryLine,
     ) -> Tooltip? {
         guard let pop: PopContext = self.context.pops[id] else {
             return nil
         }
 
-        switch tier {
+        switch resource.tier {
         case .l:
             return pop.state.nl.tooltipDemand(
-                need,
+                resource.type,
                 tier: pop.type.l,
                 unit: "capita",
                 factor: 1,
@@ -632,7 +613,7 @@ extension GameSession {
             )
         case .e:
             return pop.state.ne.tooltipDemand(
-                need,
+                resource.type,
                 tier: pop.type.e,
                 unit: "capita",
                 factor: 1,
@@ -641,60 +622,45 @@ extension GameSession {
             )
         case .x:
             return pop.state.nx.tooltipDemand(
-                need,
+                resource.type,
                 tier: pop.type.x,
                 unit: "capita",
                 factor: 1,
                 productivity: pop.state.needsPerCapita.x,
                 productivityLabel: "Consciousness"
             )
+        case .o:
+            return pop.state.out.tooltipSupply(
+                resource.type,
+                tier: pop.type.output,
+                unit: "worker",
+                factor: 1,
+                productivity: 1,
+            )
         default:
             return nil
         }
-    }
-
-    public func tooltipPopSupply(
-        _ id: PopID,
-        _ need: Resource,
-    ) -> Tooltip? {
-        guard let pop: PopContext = self.context.pops[id] else {
-            return nil
-        }
-
-        return pop.state.out.tooltipSupply(
-            need,
-            tier: pop.type.output,
-            unit: "worker",
-            factor: 1,
-            productivity: 1,
-        )
     }
 
     public func tooltipPopStockpile(
         _ id: PopID,
-        _ tier: ResourceTierIdentifier,
-        _ need: Resource,
+        _ resource: ResourceInventoryLine,
     ) -> Tooltip? {
         guard let pop: PopContext = self.context.pops[id] else {
             return nil
         }
 
-        switch tier {
-        case .l:
-            return pop.state.nl.tooltipStockpile(need)
-        case .e:
-            return pop.state.ne.tooltipStockpile(need)
-        case .x:
-            return pop.state.nx.tooltipStockpile(need)
-        default:
-            return nil
+        switch resource.tier {
+        case .l: return pop.state.nl.tooltipStockpile(resource.type)
+        case .e: return pop.state.ne.tooltipStockpile(resource.type)
+        case .x: return pop.state.nx.tooltipStockpile(resource.type)
+        default: return nil
         }
     }
 
     public func tooltipPopExplainPrice(
         _ pop: PopID,
-        _ tier: ResourceTierIdentifier?,
-        _ need: Resource,
+        _ resource: ResourceInventoryLine,
     ) -> Tooltip? {
         guard
         let pop: PopContext = self.context.pops[pop],
@@ -706,21 +672,16 @@ extension GameSession {
             inelastic: LocalMarket,
             tradeable: Candle<Double>?
         ) = (
-            self.map.localMarkets[pop.state.home, need],
-            self.map.exchange.markets[need / country.currency.id]?.history.last?.prices
+            self.map.localMarkets[pop.state.home, resource.type],
+            self.map.exchange.markets[resource.type / country.currency.id]?.history.last?.prices
         )
 
-        switch tier {
-        case .l?:
-            return pop.state.nl.tooltipExplainPrice(need, market)
-        case .e?:
-            return pop.state.ne.tooltipExplainPrice(need, market)
-        case .x?:
-            return pop.state.nx.tooltipExplainPrice(need, market)
-        case nil:
-            return pop.state.out.tooltipExplainPrice(need, market)
-        default:
-            return nil
+        switch resource.tier {
+        case .l: return pop.state.nl.tooltipExplainPrice(resource.type, market)
+        case .e: return pop.state.ne.tooltipExplainPrice(resource.type, market)
+        case .x: return pop.state.nx.tooltipExplainPrice(resource.type, market)
+        case .o: return pop.state.out.tooltipExplainPrice(resource.type, market)
+        default: return nil
         }
     }
 

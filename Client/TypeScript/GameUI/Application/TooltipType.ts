@@ -4,8 +4,7 @@ export enum TooltipType {
     // Pop Tooltips
     PopAccount = 'PopAccount',
     PopJobs = 'PopJobs',
-    PopDemand = 'PopDemand',
-    PopSupply = 'PopSupply',
+    PopResourceIO = 'PopResourceIO',
     PopStockpile = 'PopStockpile',
     PopExplainPrice = 'PopExplainPrice',
     PopNeeds = 'PopNeeds',
@@ -18,8 +17,7 @@ export enum TooltipType {
     // Factory Tooltips
     FactoryAccount = 'FactoryAccount',
     FactorySize = 'FactorySize',
-    FactoryDemand = 'FactoryDemand',
-    FactorySupply = 'FactorySupply',
+    FactoryResourceIO = 'FactoryResourceIO',
     FactoryStockpile = 'FactoryStockpile',
     FactoryExplainPrice = 'FactoryExplainPrice',
     FactoryWorkers = 'FactoryWorkers',

@@ -7,8 +7,8 @@ import {
 import { GameID } from '../GameEngine/exports.js';
 import { Resource, ResourceSale, TooltipType } from './exports.js';
 
-export class ResourceSaleBox implements DiffableListElement<Resource> {
-    public readonly id: Resource;
+export class ResourceSaleBox implements DiffableListElement<string> {
+    public readonly id: string;
     public readonly node: HTMLAnchorElement;
 
     private readonly units: HTMLElement;
