@@ -20,7 +20,6 @@ export class OwnershipBreakdown {
         tooltipCulture: TooltipType,
         tooltipSecurities: TooltipType
     ) {
-        this.node = document.createElement('div');
         this.byCountry = new PieChart<GameID>(tooltipCountry);
         this.byCulture = new PieChart<string>(tooltipCulture);
 
@@ -64,8 +63,10 @@ export class OwnershipBreakdown {
 
         left.classList.add('pie-charts');
 
+        this.node = document.createElement('div');
         this.node.appendChild(left);
         this.node.appendChild(right);
+        this.node.classList.add('hstack');
     }
 
     public update(id: GameID, state: OwnershipBreakdownState<any>): void {

@@ -1,21 +1,21 @@
 import {
     StaticList,
+    UpdateText
 } from '../../DOM/exports.js';
 import { GameID } from '../../GameEngine/GameID.js';
 import { ScreenContent } from '../Application/ScreenContent.js';
 import { Swift } from '../../Swift.js';
 import {
+    ConsumptionBreakdown,
     FactoryTableEntry,
     FactoryTableRow,
     FactoryDetailsTab,
     OwnershipBreakdown,
-    PieChart,
     ProductionReport,
     ResourceNeed,
     ResourceNeedRow,
     ResourceSale,
     ResourceSaleBox,
-    Resource,
     ScreenType,
     TooltipType,
 } from '../exports.js';
@@ -24,15 +24,15 @@ export class ProductionOverview extends ScreenContent {
     private readonly factories: StaticList<FactoryTableRow, GameID>;
     private readonly needs: StaticList<ResourceNeedRow, string>;
     private readonly sales: StaticList<ResourceSaleBox, string>;
-    private readonly charts: {
-        readonly spending: PieChart<string>;
-    };
 
+    private readonly consumption: ConsumptionBreakdown;
     private readonly ownership: OwnershipBreakdown;
 
     private dom?: {
         readonly index: HTMLUListElement;
         readonly panel: HTMLDivElement;
+        readonly title: HTMLElement;
+        readonly titleName: HTMLSpanElement;
         readonly stats: HTMLDivElement;
         readonly nav: HTMLElement;
     };
@@ -45,10 +45,9 @@ export class ProductionOverview extends ScreenContent {
         this.needs = new StaticList<ResourceNeedRow, string>(document.createElement('div'));
         this.sales = new StaticList<ResourceSaleBox, string>(document.createElement('div'));
 
-        this.charts = {
-            spending: new PieChart<string>(TooltipType.FactoryStatementItem),
-        }
-
+        this.consumption = new ConsumptionBreakdown(
+            TooltipType.FactoryStatementItem,
+        );
         this.ownership = new OwnershipBreakdown(
             TooltipType.FactoryOwnershipCountry,
             TooltipType.FactoryOwnershipCulture,
@@ -71,11 +70,16 @@ export class ProductionOverview extends ScreenContent {
             this.dom = {
                 index: document.createElement('ul'),
                 panel: document.createElement('div'),
+                title: document.createElement('header'),
+                titleName: document.createElement('span'),
                 stats: document.createElement('div'),
                 nav: document.createElement('nav'),
             }
 
+            this.dom.title.appendChild(this.dom.titleName);
+
             const upper: HTMLDivElement = document.createElement('div');
+            upper.appendChild(this.dom.title);
             upper.appendChild(this.dom.stats);
             upper.appendChild(this.dom.nav);
 
@@ -107,13 +111,13 @@ export class ProductionOverview extends ScreenContent {
 
         switch (state.factory?.open.type) {
         case FactoryDetailsTab.Inventory:
-            const right: HTMLDivElement = document.createElement('div');
-            right.appendChild(this.sales.node);
-            right.appendChild(this.charts.spending.node);
+            const left: HTMLDivElement = document.createElement('div');
+            left.appendChild(this.needs.node);
+            left.appendChild(this.consumption.node);
 
             this.dom.stats.setAttribute('data-subscreen', 'Inventory');
-            this.dom.stats.appendChild(this.needs.node);
-            this.dom.stats.appendChild(right);
+            this.dom.stats.appendChild(left);
+            this.dom.stats.appendChild(this.sales.node);
             break;
 
         case FactoryDetailsTab.Ownership:
@@ -152,7 +156,13 @@ export class ProductionOverview extends ScreenContent {
             state.factory?.id
         );
 
-        switch (state.factory?.open.type) {
+        if (state.factory === undefined) {
+            return;
+        }
+
+        UpdateText(this.dom.titleName, state.factory.type ?? '');
+
+        switch (state.factory.open.type) {
         case FactoryDetailsTab.Inventory:
             let id: GameID = state.factory.id;
 
@@ -178,7 +188,7 @@ export class ProductionOverview extends ScreenContent {
                 (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
             );
 
-            this.charts.spending.update([id], state.factory.open.spending ?? []);
+            this.consumption.update(id, state.factory.open);
             break;
 
         case FactoryDetailsTab.Ownership:

@@ -19,6 +19,7 @@ export * from './Factories/FactoryTableRow.js';
 export * from './Factories/FactoryWorkers.js';
 export * from './Factories/FactoryWorkersCell.js';
 export * from './Factories/ProductionOverview.js';
+export * from './Factories/ConsumptionBreakdown.js';
 export * from './Factories/InventoryBreakdownState.js';
 export * from './Factories/OwnershipBreakdown.js';
 export * from './Factories/OwnershipBreakdownState.js';

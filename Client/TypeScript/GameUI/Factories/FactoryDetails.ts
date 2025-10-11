@@ -7,6 +7,7 @@ import {
 
 export interface FactoryDetails {
     readonly id: GameID;
+    readonly type?: string;
     readonly open:
         InventoryBreakdownState<FactoryDetailsTab.Inventory> |
         OwnershipBreakdownState<FactoryDetailsTab.Ownership>;

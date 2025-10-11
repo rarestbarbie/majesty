@@ -56,8 +56,8 @@ extension CashFlowStatement {
 
             switch $0 {
             case .resource(let id): label = rules.resources[id]?.label
-            case .workers: label = .init(color: 0x7A8AFF, name: "Workers")
-            case .clerks: label = .init(color: 0xAAAAAA, name: "Clerks")
+            case .workers: label = .init(color: 0x71bac7, name: "Workers")
+            case .clerks: label = .init(color: 0xdbd5d3, name: "Clerks")
             }
 
             return ($0, ($1, label ?? .init(color: 0xFFFFFF, name: "???")))
