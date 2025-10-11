@@ -3,31 +3,33 @@ import Fraction
 import JavaScriptInterop
 import JavaScriptKit
 
-struct CashAccount {
-    var liq: Int64
+extension Bank {
+    struct Account {
+        var liq: Int64
 
-    /// Credit balance, negative if debt is owed.
-    var b: Int64
-    var v: Int64
+        /// Credit balance, negative if debt is owed.
+        var b: Int64
+        var v: Int64
 
-    /// Revenue.
-    var r: Int64
-    /// Subsidies.
-    var s: Int64
-    /// Salaries, negative if salaries are owed.
-    var c: Int64
-    /// Wages, negative if wages are owed.
-    var w: Int64
+        /// Revenue.
+        var r: Int64
+        /// Subsidies.
+        var s: Int64
+        /// Salaries, negative if salaries are owed.
+        var c: Int64
+        /// Wages, negative if wages are owed.
+        var w: Int64
 
-    /// Interest and dividends, negative if owed.
-    var i: Int64
-    /// Equity value, negative for purchasers of equity, positive for issuers.
-    var e: Int64
+        /// Interest and dividends, negative if owed.
+        var i: Int64
+        /// Equity value, negative for purchasers of equity, positive for issuers.
+        var e: Int64
 
-    /// Inheritance, from members leaving or joining a pop.
-    var d: Int64
+        /// Inheritance, from members leaving or joining a pop.
+        var d: Int64
+    }
 }
-extension CashAccount {
+extension Bank.Account {
     init(liq: Int64) {
         self.init(liq: liq, b: 0, v: 0, r: 0, s: 0, c: 0, w: 0, i: 0, e: 0, d: 0)
     }
@@ -35,8 +37,8 @@ extension CashAccount {
         self.init(liq: 0, b: 0, v: 0, r: 0, s: 0, c: 0, w: 0, i: 0, e: 0, d: 0)
     }
 }
-extension CashAccount {
-    static func += (self: inout Self, other: CashTransfers) {
+extension Bank.Account {
+    static func += (self: inout Self, other: Bank.Transfers) {
         self.s += other.s
         self.c += other.c
         self.w += other.w
@@ -59,7 +61,7 @@ extension CashAccount {
         )
     }
 }
-extension CashAccount {
+extension Bank.Account {
     var balance: Int64 {
         self.liq +
         self.b +
@@ -91,7 +93,7 @@ extension CashAccount {
         return inherited
     }
 }
-extension CashAccount {
+extension Bank.Account {
     enum ObjectKey: JSString, Sendable {
         case liq
         case b
@@ -105,7 +107,7 @@ extension CashAccount {
         case d
     }
 }
-extension CashAccount: JavaScriptEncodable {
+extension Bank.Account: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.liq] = self.liq
         js[.b] = self.b
@@ -119,7 +121,7 @@ extension CashAccount: JavaScriptEncodable {
         js[.d] = self.d
     }
 }
-extension CashAccount: JavaScriptDecodable {
+extension Bank.Account: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             liq: try js[.liq].decode(),
@@ -137,5 +139,5 @@ extension CashAccount: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension CashAccount: Equatable, Hashable {}
+extension Bank.Account: Equatable, Hashable {}
 #endif

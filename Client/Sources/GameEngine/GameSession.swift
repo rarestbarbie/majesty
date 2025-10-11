@@ -241,7 +241,7 @@ extension GameSession {
             return nil
         }
 
-        let account: CashAccount = factory.inventory.account
+        let account: Bank.Account = factory.inventory.account
         let y: Factory.Dimensions = factory.yesterday
         let t: Factory.Dimensions = factory.today
 
@@ -517,7 +517,7 @@ extension GameSession {
         }
 
         return .instructions {
-            let account: CashAccount = pop.inventory.account
+            let account: Bank.Account = pop.inventory.account
             $0["Liquid assets", +] = account.balance[/3] <- account.liq
             $0[>] {
                 $0["Market earnings", +] = +?account.r[/3]
