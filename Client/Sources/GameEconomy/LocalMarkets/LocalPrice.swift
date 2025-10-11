@@ -9,6 +9,7 @@ import D
     }
 }
 extension LocalPrice {
+    @inlinable public static var zero: Self { .init(per100: 0) }
     @inlinable public var exact: Fraction { self.per100 %/ 100 }
     @inlinable public var value: Decimal { .init(units: self.per100, power: -2) }
 }

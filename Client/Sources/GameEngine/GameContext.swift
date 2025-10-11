@@ -156,9 +156,12 @@ extension GameContext {
                 return
             }
 
-            let priceFloor: LocalPrice = .init(per100: country.minwage * 100 / resource.hours)
-
-            $1.turn(priceFloor: priceFloor, type: .minimumWage)
+            if let hours: Int64 = resource.hours {
+                let priceFloor: LocalPrice = .init(per100: country.minwage * 100 / hours)
+                $1.turn(priceFloor: priceFloor, type: .minimumWage)
+            } else {
+                $1.turn()
+            }
         }
 
         self.factories.turn { $0.turn(on: &map) }
