@@ -1,80 +1,5 @@
-[data-subscreen='Inventory'] {
-    display: flex;
-    flex-direction: row;
-
-    > * {
-        flex: 0 1 50%;
-    }
-
-    [data-table='Needs'] {
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-    }
-    [data-table='Needs'] > [data-tier='i'] {
-        --color: rgb(104, 104, 104);
-    }
-    [data-table='Needs'] > [data-tier='v'] {
-        --color: rgb(252, 183, 35);
-    }
-    [data-table='Needs'] > [data-tier='l'] {
-        --color: rgb(58, 145, 204);
-    }
-    [data-table='Needs'] > [data-tier='e'] {
-        --color: rgb(255, 145, 0);
-    }
-    [data-table='Needs'] > [data-tier='x'] {
-        --color: rgb(214, 0, 89);
-    }
-    [data-table='Needs'] > [data-tier]:not([data-tier='v']) + [data-tier='v'],
-    [data-table='Needs'] > [data-tier]:not([data-tier='e']) + [data-tier='e'],
-    [data-table='Needs'] > [data-tier]:not([data-tier='x']) + [data-tier='x'] {
-        margin-top: 1rem;
-    }
-    [data-table='Needs'] > * > *:nth-child(2) {
-        border-left: 3px solid var(--color);
-        padding-left: 0.5rem;
-    }
-
-    div.sales {
-        display: flex;
-        gap: 1rem;
-
-        > * {
-            padding: 1rem 0;
-            flex-grow: 1;
-
-            > *:nth-child(1) {
-                font-size: 2rem;
-                float: left;
-                margin: 0 1rem 1rem 0;
-            }
-            > *:nth-child(2) {
-                font-size: 1.25rem;
-            }
-            > *:nth-child(3)::after {
-                content: ' sold today';
-            }
-
-            > div.proceeds {
-                clear: left;
-                display: flex;
-                align-items: baseline;
-
-                > *:last-child::before {
-                    content: 'at';
-                    color: rgba(255, 255, 255, 0.5);
-                    margin: 0 0.5em;
-                }
-
-                &::before {
-                    content: '💵';
-                    margin-right: 0.6em;
-                }
-            }
-        }
-    }
-}
-[data-subscreen='Ownership'] {
-    > div {
+[data-subscreen] {
+    div.hstack {
         display: flex;
 
         > div.pie-charts {
@@ -111,5 +36,95 @@
             }
         }
     }
+}
+[data-subscreen='Inventory'] {
+    display: flex;
+    flex-direction: row;
 
+    div.hstack {
+        > div.pie-charts {
+            margin-top: 1rem;
+
+            > figure {
+                flex-direction: column-reverse;
+
+                > figcaption {
+                    margin-top: 0.5rem;
+                }
+            }
+        }
+    }
+
+    > *:first-child {
+        flex: 0 1 50%;
+    }
+
+    [data-table='Needs'] {
+        grid-template-columns: 1fr 1fr 1fr 1fr;
+
+        margin-top: 1rem;
+    }
+    [data-table='Needs'] > [data-tier='i'] {
+        --color: rgb(104, 104, 104);
+    }
+    [data-table='Needs'] > [data-tier='v'] {
+        --color: rgb(252, 183, 35);
+    }
+    [data-table='Needs'] > [data-tier='l'] {
+        --color: rgb(58, 145, 204);
+    }
+    [data-table='Needs'] > [data-tier='e'] {
+        --color: rgb(255, 145, 0);
+    }
+    [data-table='Needs'] > [data-tier='x'] {
+        --color: rgb(214, 0, 89);
+    }
+    [data-table='Needs'] > [data-tier]:not([data-tier='v']) + [data-tier='v'],
+    [data-table='Needs'] > [data-tier]:not([data-tier='e']) + [data-tier='e'],
+    [data-table='Needs'] > [data-tier]:not([data-tier='x']) + [data-tier='x'] {
+        margin-top: 1rem;
+    }
+    [data-table='Needs'] > * > *:nth-child(2) {
+        border-left: 3px solid var(--color);
+        padding-left: 0.5rem;
+    }
+
+    div.sales {
+        display: flex;
+        flex-direction: column;
+        gap: 2rem;
+
+        margin-top: 1rem;
+
+        > * {
+            > *:nth-child(1) {
+                font-size: 2rem;
+                float: left;
+                margin: 0 1rem 1rem 0;
+            }
+            > *:nth-child(2) {
+                font-size: 1.25rem;
+            }
+            > *:nth-child(3)::after {
+                content: ' sold today';
+            }
+
+            > div.proceeds {
+                clear: left;
+                display: flex;
+                align-items: baseline;
+
+                > *:last-child::before {
+                    content: 'at';
+                    color: rgba(255, 255, 255, 0.5);
+                    margin: 0 0.5em;
+                }
+
+                &::before {
+                    content: '💵';
+                    margin-right: 0.6em;
+                }
+            }
+        }
+    }
 }

@@ -173,7 +173,6 @@ export class PopulationOverview extends ScreenContent {
         case PopDetailsTab.Inventory:
             const id: GameID = state.pop.id;
 
-
             this.needs.update(
                 state.pop.open.needs,
                 (need: ResourceNeed) => new ResourceNeedRow(
