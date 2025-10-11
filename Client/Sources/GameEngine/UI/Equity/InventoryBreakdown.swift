@@ -20,34 +20,34 @@ extension InventoryBreakdown {
         }
 
         self.inventory.reset(
-            inputs: pop.state.nl.count + pop.state.ne.count + pop.state.nx.count,
+            inputs: pop.state.inventory.l.count + pop.state.inventory.e.count + pop.state.inventory.x.count,
         )
 
         self.inventory.update(
-            from: pop.state.nl,
+            from: pop.state.inventory.l,
             tier: .l,
             currency: currency,
             location: pop.state.home,
             snapshot: snapshot
         )
         self.inventory.update(
-            from: pop.state.ne,
+            from: pop.state.inventory.e,
             tier: .e,
             currency: currency,
             location: pop.state.home,
             snapshot: snapshot
         )
         self.inventory.update(
-            from: pop.state.nx,
+            from: pop.state.inventory.x,
             tier: .x,
             currency: currency,
             location: pop.state.home,
             snapshot: snapshot
         )
 
-        self.inventory.reset(outputs: pop.state.out.count)
+        self.inventory.reset(outputs: pop.state.inventory.out.count)
         self.inventory.update(
-            from: pop.state.out,
+            from: pop.state.inventory.out,
             currency: currency,
             location: pop.state.home,
             snapshot: snapshot
@@ -62,25 +62,25 @@ extension InventoryBreakdown {
             return
         }
 
-        self.inventory.reset(inputs: factory.state.ni.count + factory.state.nv.count)
+        self.inventory.reset(inputs: factory.state.inventory.e.count + factory.state.inventory.x.count)
         self.inventory.update(
-            from: factory.state.ni,
+            from: factory.state.inventory.e,
             tier: .i,
             currency: currency,
             location: factory.state.tile,
             snapshot: snapshot
         )
         self.inventory.update(
-            from: factory.state.nv,
+            from: factory.state.inventory.x,
             tier: .v,
             currency: currency,
             location: factory.state.tile,
             snapshot: snapshot
         )
 
-        self.inventory.reset(outputs: factory.state.out.count)
+        self.inventory.reset(outputs: factory.state.inventory.out.count)
         self.inventory.update(
-            from: factory.state.out,
+            from: factory.state.inventory.out,
             currency: currency,
             location: factory.state.tile,
             snapshot: snapshot

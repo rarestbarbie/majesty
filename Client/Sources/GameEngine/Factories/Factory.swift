@@ -13,12 +13,10 @@ struct Factory: LegalEntityState, Identifiable {
     let tile: Address
     var type: FactoryType
     var size: Size
-    var cash: CashAccount
+
     var liquidation: FactoryLiquidation?
 
-    var nv: ResourceInputs
-    var ni: ResourceInputs
-    var out: ResourceOutputs
+    var inventory: Inventory
     var yesterday: Dimensions
     var today: Dimensions
 
@@ -31,11 +29,8 @@ extension Factory: Sectionable {
             tile: section.tile,
             type: section.type,
             size: .init(level: 0),
-            cash: .init(),
             liquidation: nil,
-            nv: .init(),
-            ni: .init(),
-            out: .init(),
+            inventory: .init(),
             yesterday: .init(),
             today: .init(),
             equity: [:],
@@ -49,7 +44,7 @@ extension Factory: Sectionable {
 extension Factory: Deletable {
     var dead: Bool {
         if  case _? = self.liquidation,
-            self.cash.balance == 0,
+            self.inventory.account.balance == 0,
             self.equity.shares.values.allSatisfy({ $0.shares <= 0 }) {
             true
         } else {
@@ -64,26 +59,26 @@ extension Factory {
 }
 extension Factory: Turnable {
     mutating func turn() {
-        self.cash.settle()
+        self.inventory.account.settle()
         self.equity.turn()
     }
 }
 extension Factory {
     var grossProfit: Int64 {
         self.Δ.vi + // Change in stockpiled inputs
-        self.cash.b + // Spending on inputs
-        self.cash.w + // Spending on wages
-        self.cash.r // Revenue
+        self.inventory.account.b + // Spending on inputs
+        self.inventory.account.w + // Spending on wages
+        self.inventory.account.r // Revenue
     }
     var grossMargin: Fraction? {
-        self.cash.r > 0 ? self.grossProfit %/ self.cash.r : nil
+        self.inventory.account.r > 0 ? self.grossProfit %/ self.inventory.account.r : nil
     }
 
     var operatingProfit: Int64 {
-        self.grossProfit + self.cash.c
+        self.grossProfit + self.inventory.account.c
     }
     var operatingMargin: Fraction? {
-        self.cash.r > 0 ? self.operatingProfit %/ self.cash.r : nil
+        self.inventory.account.r > 0 ? self.operatingProfit %/ self.inventory.account.r : nil
     }
 }
 extension Factory {
@@ -93,11 +88,13 @@ extension Factory {
         case type
         case size_l
         case size_p
-        case cash
         case liquidation
-        case nv
-        case ni
-        case out
+
+        case inventory_account = "cash"
+        case inventory_out = "out"
+        case inventory_l = "nm"
+        case inventory_e = "ni"
+        case inventory_x = "nv"
 
         case yesterday_vi = "y_vi"
         case yesterday_vv = "y_vv"
@@ -143,15 +140,17 @@ extension Factory: JavaScriptEncodable {
         js[.type] = self.type.rawValue
         js[.size_l] = self.size.level
         js[.size_p] = self.size.growthProgress
-        js[.cash] = self.cash
         js[.liquidation] = self.liquidation
 
-        js[.nv] = self.nv
-        js[.ni] = self.ni
-        js[.out] = self.out
+        js[.inventory_account] = self.inventory.account
+        js[.inventory_out] = self.inventory.out
+        js[.inventory_l] = self.inventory.l
+        js[.inventory_e] = self.inventory.e
+        js[.inventory_x] = self.inventory.x
+        js[.inventory_out] = self.inventory.out
 
         js[.yesterday_vi] = self.yesterday.vi
-        js[.yesterday_vv] = self.yesterday.vv
+        js[.yesterday_vv] = self.yesterday.vx
         js[.yesterday_wf] = self.yesterday.wf
         js[.yesterday_wn] = self.yesterday.wn
         js[.yesterday_cf] = self.yesterday.cf
@@ -163,7 +162,7 @@ extension Factory: JavaScriptEncodable {
         js[.yesterday_pa] = self.yesterday.pa
 
         js[.today_vi] = self.today.vi
-        js[.today_vv] = self.today.vv
+        js[.today_vv] = self.today.vx
         js[.today_wf] = self.today.wf
         js[.today_wn] = self.today.wn
         js[.today_cf] = self.today.cf
@@ -181,7 +180,7 @@ extension Factory: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         let today: Dimensions = .init(
             vi: try js[.today_vi]?.decode() ?? 0,
-            vv: try js[.today_vv]?.decode() ?? 0,
+            vx: try js[.today_vv]?.decode() ?? 0,
             wf: try js[.today_wf]?.decode(),
             wn: try js[.today_wn]?.decode() ?? 1,
             cf: try js[.today_cf]?.decode(),
@@ -200,14 +199,17 @@ extension Factory: JavaScriptDecodable {
                 level: try js[.size_l]?.decode() ?? 1,
                 growthProgress: try js[.size_p]?.decode() ?? 0
             ),
-            cash: try js[.cash]?.decode() ?? .init(liq: 0),
             liquidation: try js[.liquidation]?.decode(),
-            nv: try js[.nv]?.decode() ?? .init(),
-            ni: try js[.ni]?.decode() ?? .init(),
-            out: try js[.out]?.decode() ?? .init(),
+            inventory: .init(
+                account: try js[.inventory_account]?.decode() ?? .init(),
+                out: try js[.inventory_out]?.decode() ?? .init(),
+                l: try js[.inventory_l]?.decode() ?? .init(),
+                e: try js[.inventory_e]?.decode() ?? .init(),
+                x: try js[.inventory_x]?.decode() ?? .init()
+            ),
             yesterday: .init(
                 vi: try js[.yesterday_vi]?.decode() ?? today.vi,
-                vv: try js[.yesterday_vv]?.decode() ?? today.vv,
+                vx: try js[.yesterday_vv]?.decode() ?? today.vx,
                 wf: try js[.yesterday_wf]?.decode(),
                 wn: try js[.yesterday_wn]?.decode() ?? today.wn,
                 cf: try js[.yesterday_cf]?.decode(),

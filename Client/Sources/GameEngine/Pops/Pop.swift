@@ -15,17 +15,7 @@ struct Pop: LegalEntityState, IdentityReplaceable {
     let type: PopType
     let nat: String
 
-    var cash: CashAccount
-
-    /// Life Needs
-    var nl: ResourceInputs
-    /// Everyday Needs
-    var ne: ResourceInputs
-    /// Luxury Needs
-    var nx: ResourceInputs
-
-    var out: ResourceOutputs
-
+    var inventory: Inventory
     var yesterday: Dimensions
     var today: Dimensions
 
@@ -39,11 +29,7 @@ extension Pop: Sectionable {
             home: section.home,
             type: section.type,
             nat: section.culture,
-            cash: .init(),
-            nl: .init(),
-            ne: .init(),
-            nx: .init(),
-            out: .init(),
+            inventory: .init(),
             yesterday: .init(),
             today: .init(),
             equity: [:],
@@ -58,7 +44,7 @@ extension Pop: Sectionable {
 extension Pop: Deletable {
     var dead: Bool {
         if  self.today.size == 0,
-            self.cash.balance == 0,
+            self.inventory.account.balance == 0,
             self.equity.shares.values.allSatisfy({ $0.shares <= 0 }) {
             true
         } else {
@@ -81,7 +67,7 @@ extension Pop: Turnable {
             $0.turn()
             return $0.count > 0
         }
-        self.cash.settle()
+        self.inventory.account.settle()
         self.equity.turn()
     }
 }
@@ -165,11 +151,12 @@ extension Pop {
         case home = "on"
         case type
         case nat
-        case cash
-        case nl
-        case ne
-        case nx
-        case out
+
+        case inventory_account = "cash"
+        case inventory_out = "out"
+        case inventory_l = "nl"
+        case inventory_e = "ne"
+        case inventory_x = "nx"
 
         case yesterday_size = "y_size"
         case yesterday_mil = "y_mil"
@@ -199,11 +186,11 @@ extension Pop: JavaScriptEncodable {
         js[.home] = self.home
         js[.type] = self.type
         js[.nat] = self.nat
-        js[.cash] = self.cash
-        js[.nl] = self.nl
-        js[.ne] = self.ne
-        js[.nx] = self.nx
-        js[.out] = self.out
+        js[.inventory_account] = self.inventory.account
+        js[.inventory_l] = self.inventory.l
+        js[.inventory_e] = self.inventory.e
+        js[.inventory_x] = self.inventory.x
+        js[.inventory_out] = self.inventory.out
 
         js[.yesterday_size] = self.yesterday.size
         js[.yesterday_mil] = self.yesterday.mil
@@ -244,11 +231,13 @@ extension Pop: JavaScriptDecodable {
             home: try js[.home].decode(),
             type: try js[.type].decode(),
             nat: try js[.nat].decode(),
-            cash: try js[.cash]?.decode() ?? .init(),
-            nl: try js[.nl]?.decode() ?? .init(),
-            ne: try js[.ne]?.decode() ?? .init(),
-            nx: try js[.nx]?.decode() ?? .init(),
-            out: try js[.out]?.decode() ?? .init(),
+            inventory: .init(
+                account: try js[.inventory_account]?.decode() ?? .init(),
+                out: try js[.inventory_out]?.decode() ?? .init(),
+                l: try js[.inventory_l]?.decode() ?? .init(),
+                e: try js[.inventory_e]?.decode() ?? .init(),
+                x: try js[.inventory_x]?.decode() ?? .init()
+            ),
             yesterday: .init(
                 size: try js[.yesterday_size]?.decode() ?? today.size,
                 mil: try js[.yesterday_mil]?.decode() ?? today.mil,

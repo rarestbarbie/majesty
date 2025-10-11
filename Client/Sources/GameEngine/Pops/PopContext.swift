@@ -204,7 +204,7 @@ extension PopContext {
             return
         }
 
-        self.unemployment = self.state.out.inelastic.values.reduce(
+        self.unemployment = self.state.inventory.out.inelastic.values.reduce(
             Double.init(self.state.unemployed) / Double.init(self.state.today.size)
         ) {
             let sold: Double = $1.unitsProduced > 0
@@ -220,65 +220,17 @@ extension PopContext {
         }
 
         self.cashFlow.reset()
-        self.cashFlow.update(with: self.state.nl.tradeable.values.elements)
-        self.cashFlow.update(with: self.state.nl.inelastic.values.elements)
-        self.cashFlow.update(with: self.state.ne.tradeable.values.elements)
-        self.cashFlow.update(with: self.state.ne.inelastic.values.elements)
-        self.cashFlow.update(with: self.state.nx.tradeable.values.elements)
-        self.cashFlow.update(with: self.state.nx.inelastic.values.elements)
+        self.cashFlow.update(with: self.state.inventory.l.tradeable.values.elements)
+        self.cashFlow.update(with: self.state.inventory.l.inelastic.values.elements)
+        self.cashFlow.update(with: self.state.inventory.e.tradeable.values.elements)
+        self.cashFlow.update(with: self.state.inventory.e.inelastic.values.elements)
+        self.cashFlow.update(with: self.state.inventory.x.tradeable.values.elements)
+        self.cashFlow.update(with: self.state.inventory.x.inelastic.values.elements)
 
         self.governedBy = governedBy
         self.occupiedBy = occupiedBy
 
-        self.equity = .compute(equity: self.state.equity, assets: self.state.cash, in: context)
-    }
-}
-extension PopContext {
-    mutating func credit(
-        inelastic resource: Resource,
-        units: Int64,
-        price: LocalPrice
-    ) -> Int64 {
-        let value: Int64 = units <> price.exact
-        self.state.out.inelastic[resource]?.report(
-            unitsSold: units,
-            valueSold: value,
-        )
-        self.state.cash.r += value
-        return value
-    }
-
-    mutating func debit(
-        inelastic resource: Resource,
-        units: Int64,
-        price: LocalPrice,
-        tier: UInt8?
-    ) -> Int64 {
-        let value: Int64 = units >< price.exact
-
-        switch tier {
-        case 0?:
-            self.state.nl.inelastic[resource]?.report(
-                unitsPurchased: units,
-                valuePurchased: value,
-            )
-        case 1?:
-            self.state.ne.inelastic[resource]?.report(
-                unitsPurchased: units,
-                valuePurchased: value,
-            )
-        case 2?:
-            self.state.nx.inelastic[resource]?.report(
-                unitsPurchased: units,
-                valuePurchased: value,
-            )
-
-        case _:
-            return 0
-        }
-
-        self.state.cash.b -= value
-        return value
+        self.equity = .compute(equity: self.state.equity, assets: self.state.inventory.account, in: context)
     }
 }
 extension PopContext: TransactingContext {
@@ -288,33 +240,33 @@ extension PopContext: TransactingContext {
         )
 
         let currency: Fiat = self.occupiedBy!.currency.id
-        let balance: Int64 = self.state.cash.balance
+        let balance: Int64 = self.state.inventory.account.balance
 
         /// Compute vertical weights.
         let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
 
-        self.state.nl.sync(
+        self.state.inventory.l.sync(
             with: self.type.l,
             scalingFactor: (self.state.today.size, z.l),
             stockpileDays: Self.stockpileDays.lowerBound,
         )
-        self.state.ne.sync(
+        self.state.inventory.e.sync(
             with: self.type.e,
             scalingFactor: (self.state.today.size, z.e),
             stockpileDays: Self.stockpileDays.lowerBound,
         )
-        self.state.nx.sync(
+        self.state.inventory.x.sync(
             with: self.type.x,
             scalingFactor: (self.state.today.size, z.x),
             stockpileDays: Self.stockpileDays.lowerBound,
         )
-        self.state.out.sync(
+        self.state.inventory.out.sync(
             with: self.type.output,
             scalingFactor: (self.state.today.size, 1)
         )
 
         let weights: ResourceInputWeights = .init(
-            tiers: (self.state.nl, self.state.ne, self.state.nx),
+            tiers: (self.state.inventory.l, self.state.inventory.e, self.state.inventory.x),
             location: self.state.home,
             currency: currency,
             map: map,
@@ -366,7 +318,7 @@ extension PopContext: TransactingContext {
             in: self.state.home,
         )
 
-        for (id, output): (Resource, InelasticOutput) in self.state.out.inelastic {
+        for (id, output): (Resource, InelasticOutput) in self.state.inventory.out.inelastic {
             let ask: Int64 = output.unitsProduced
             if  ask > 0 {
                 map.localMarkets[self.state.home, id].ask(amount: ask, by: self.lei)
@@ -383,12 +335,12 @@ extension PopContext: TransactingContext {
             return
         }
 
-        self.state.out.deposit(
+        self.state.inventory.out.deposit(
             from: self.type.output,
             scalingFactor: (self.state.today.size, 1)
         )
 
-        self.state.cash.r += self.state.out.sell(
+        self.state.inventory.account.r += self.state.inventory.out.sell(
             in: country.currency.id,
             on: &map.exchange
         )
@@ -400,54 +352,54 @@ extension PopContext: TransactingContext {
         let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
 
         if  budget.l.tradeable > 0 {
-            let (gain, loss): (Int64, loss: Int64) = self.state.nl.trade(
+            let (gain, loss): (Int64, loss: Int64) = self.state.inventory.l.trade(
                 stockpileDays: target,
                 spendingLimit: budget.l.tradeable,
                 in: country.currency.id,
                 on: &map.exchange,
             )
 
-            self.state.cash.b += loss
-            self.state.cash.r += gain
+            self.state.inventory.account.b += loss
+            self.state.inventory.account.r += gain
         }
 
-        self.state.today.fl = self.state.nl.fulfilled
-        self.state.nl.consume(
+        self.state.today.fl = self.state.inventory.l.fulfilled
+        self.state.inventory.l.consume(
             from: self.type.l,
             scalingFactor: (self.state.today.size, z.l)
         )
 
         if  budget.e.tradeable > 0 {
-            let (gain, loss): (Int64, loss: Int64) = self.state.ne.trade(
+            let (gain, loss): (Int64, loss: Int64) = self.state.inventory.e.trade(
                 stockpileDays: target,
                 spendingLimit: budget.e.tradeable,
                 in: country.currency.id,
                 on: &map.exchange,
             )
 
-            self.state.cash.b += loss
-            self.state.cash.r += gain
+            self.state.inventory.account.b += loss
+            self.state.inventory.account.r += gain
         }
 
-        self.state.today.fe = self.state.ne.fulfilled
-        self.state.ne.consume(
+        self.state.today.fe = self.state.inventory.e.fulfilled
+        self.state.inventory.e.consume(
             from: self.type.e,
             scalingFactor: (self.state.today.size, z.e)
         )
 
         if  budget.x.tradeable > 0 {
-            let (gain, loss): (Int64, loss: Int64) = self.state.nx.trade(
+            let (gain, loss): (Int64, loss: Int64) = self.state.inventory.x.trade(
                 stockpileDays: target,
                 spendingLimit: budget.x.tradeable,
                 in: country.currency.id,
                 on: &map.exchange,
             )
-            self.state.cash.b += loss
-            self.state.cash.r += gain
+            self.state.inventory.account.b += loss
+            self.state.inventory.account.r += gain
         }
 
-        self.state.today.fx = self.state.nx.fulfilled
-        self.state.nx.consume(
+        self.state.today.fx = self.state.inventory.x.fulfilled
+        self.state.inventory.x.consume(
             from: self.type.x,
             scalingFactor: (self.state.today.size, z.x)
         )
@@ -459,11 +411,11 @@ extension PopContext: TransactingContext {
             self.state.today.fx = 0
 
             // Pay dividends to shareholders, if any.
-            self.state.cash.i -= map.bank.pay(
+            self.state.inventory.account.i -= map.bank.pay(
                 dividend: budget.dividend,
                 to: self.state.equity.shares.values.shuffled(using: &map.random.generator)
             )
-            self.state.cash.e -= map.bank.buyback(
+            self.state.inventory.account.e -= map.bank.buyback(
                 random: &map.random,
                 equity: &self.state.equity,
                 budget: budget.buybacks,
@@ -472,7 +424,7 @@ extension PopContext: TransactingContext {
         }
 
         // Welfare
-        self.state.cash.s += self.state.today.size * country.minwage / 10
+        self.state.inventory.account.s += self.state.today.size * country.minwage / 10
     }
 }
 extension PopContext {

@@ -179,14 +179,14 @@ extension GameContext {
             for order: LocalMarket.Order in asks {
                 switch order.by {
                 case .factory(let id):
-                    spread -= self.factories[modifying: id].credit(
+                    spread -= self.factories[modifying: id].state.inventory.credit(
                         inelastic: $0.resource,
                         units: order.filled,
                         price: price
                     )
 
                 case .pop(let id):
-                    spread -= self.pops[modifying: id].credit(
+                    spread -= self.pops[modifying: id].state.inventory.credit(
                         inelastic: $0.resource,
                         units: order.filled,
                         price: price
@@ -196,14 +196,14 @@ extension GameContext {
             for order: LocalMarket.Order in bids {
                 switch order.by {
                 case .factory(let id):
-                    spread += self.factories[modifying: id].debit(
+                    spread += self.factories[modifying: id].state.inventory.debit(
                         inelastic: $0.resource,
                         units: order.filled,
                         price: price,
                         tier: order.tier
                     )
                 case .pop(let id):
-                    spread += self.pops[modifying: id].debit(
+                    spread += self.pops[modifying: id].state.inventory.debit(
                         inelastic: $0.resource,
                         units: order.filled,
                         price: price,
@@ -374,9 +374,9 @@ extension GameContext {
         map.bank.turn {
             switch $0 {
             case .factory(let id):
-                self.factories[modifying: id].state.cash += $1
+                self.factories[modifying: id].state.inventory.account += $1
             case .pop(let id):
-                self.pops[modifying: id].state.cash += $1
+                self.pops[modifying: id].state.inventory.account += $1
             }
         }
     }
@@ -543,7 +543,7 @@ extension GameContext {
         for conversion: Pop.Conversion in map.conversions {
             let inherited: (cash: Int64, mil: Double, con: Double) = {
                 (
-                    $0.state.cash.inherit(fraction: conversion.inherits),
+                    $0.state.inventory.account.inherit(fraction: conversion.inherits),
                     $0.state.today.mil,
                     $0.state.today.con
                 )
@@ -559,7 +559,7 @@ extension GameContext {
                 )
 
                 $0.today.size += conversion.size
-                $0.cash.d += inherited.cash
+                $0.inventory.account.d += inherited.cash
                 $0.today.mil = weight.mix(inherited.mil, $0.today.mil)
                 $0.today.con = weight.mix(inherited.con, $0.today.con)
             }
