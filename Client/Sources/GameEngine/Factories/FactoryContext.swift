@@ -237,12 +237,7 @@ extension FactoryContext: TransactingContext {
             in: self.state.tile,
         )
 
-        for (id, output): (Resource, InelasticOutput) in self.state.inventory.out.inelastic {
-            let ask: Int64 = output.unitsProduced
-            if  ask > 0 {
-                map.localMarkets[self.state.tile, id].ask(amount: ask, by: self.lei)
-            }
-        }
+        self.state.inventory.bid(in: self.state.tile, as: self.lei, on: &map)
     }
 
     mutating func transact(map: inout GameMap) {

@@ -318,13 +318,7 @@ extension PopContext: TransactingContext {
             in: self.state.home,
         )
 
-        for (id, output): (Resource, InelasticOutput) in self.state.inventory.out.inelastic {
-            let ask: Int64 = output.unitsProduced
-            if  ask > 0 {
-                map.localMarkets[self.state.home, id].ask(amount: ask, by: self.lei)
-            }
-        }
-
+        self.state.inventory.bid(in: self.state.home, as: self.lei, on: &map)
         self.budget = budget
     }
 
