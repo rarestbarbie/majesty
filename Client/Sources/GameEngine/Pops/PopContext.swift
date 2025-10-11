@@ -220,12 +220,9 @@ extension PopContext {
         }
 
         self.cashFlow.reset()
-        self.cashFlow.update(with: self.state.inventory.l.tradeable.values.elements)
-        self.cashFlow.update(with: self.state.inventory.l.inelastic.values.elements)
-        self.cashFlow.update(with: self.state.inventory.e.tradeable.values.elements)
-        self.cashFlow.update(with: self.state.inventory.e.inelastic.values.elements)
-        self.cashFlow.update(with: self.state.inventory.x.tradeable.values.elements)
-        self.cashFlow.update(with: self.state.inventory.x.inelastic.values.elements)
+        self.cashFlow.update(with: self.state.inventory.l)
+        self.cashFlow.update(with: self.state.inventory.e)
+        self.cashFlow.update(with: self.state.inventory.x)
 
         self.governedBy = governedBy
         self.occupiedBy = occupiedBy

@@ -103,7 +103,8 @@ extension FactoryContext {
         self.productivity = occupiedBy.factories.productivity[self.state.type]
 
         self.cashFlow.reset()
-        self.cashFlow.update(with: self.state.inventory.e.tradeable.values.elements)
+        self.cashFlow.update(with: self.state.inventory.l)
+        self.cashFlow.update(with: self.state.inventory.e)
         self.cashFlow[.workers] = -self.state.inventory.account.w
         self.cashFlow[.clerks] = -self.state.inventory.account.c
 
