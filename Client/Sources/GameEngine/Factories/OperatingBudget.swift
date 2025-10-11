@@ -41,7 +41,7 @@ extension OperatingBudget {
             x: tradeableCostPerDay.x + inelasticCostPerDay.x,
         )
 
-        let balance: Int64 = state.cash.balance
+        let balance: Int64 = state.inventory.account.balance
 
         let w: Int64 = workers.map { state.today.wn * Swift.min($0.limit, $0.count + 1) } ?? 0
         let c: Int64 = clerks.map { state.today.cn * Swift.min($0.limit, $0.count + 1) } ?? 0

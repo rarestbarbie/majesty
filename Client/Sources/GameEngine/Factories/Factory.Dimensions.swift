@@ -3,7 +3,7 @@ import GameEconomy
 extension Factory {
     struct Dimensions: LegalEntityMetrics {
         var vi: Int64
-        var vv: Int64
+        var vx: Int64
 
         /// Worker raise probability, set if the factory couldn’t hire any workers.
         ///
@@ -34,7 +34,7 @@ extension Factory.Dimensions {
     init() {
         self.init(
             vi: 0,
-            vv: 0,
+            vx: 0,
             wf: nil,
             wn: 1,
             cf: nil,

@@ -10,7 +10,7 @@ extension FactoryBudget {
         state: Factory,
         sharePrice: Fraction
     ) -> Self {
-        let balance: Int64 = state.cash.balance
+        let balance: Int64 = state.inventory.account.balance
         return .liquidating(
             .init(buybacks: min(balance, max(balance / 100, sharePrice.roundedUp)))
         )

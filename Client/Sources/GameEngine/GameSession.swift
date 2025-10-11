@@ -241,11 +241,12 @@ extension GameSession {
             return nil
         }
 
+        let account: CashAccount = factory.inventory.account
         let y: Factory.Dimensions = factory.yesterday
         let t: Factory.Dimensions = factory.today
 
-        let liquid: (y: Int64, t: Int64) = (factory.cash.liq, factory.cash.balance)
-        let assets: (y: Int64, t: Int64) = (y.vi + y.vv, t.vi + t.vv)
+        let liquid: (y: Int64, t: Int64) = (account.liq, account.balance)
+        let assets: (y: Int64, t: Int64) = (y.vi + y.vx, t.vi + t.vx)
         let value: (y: Int64, t: Int64) = (liquid.y + assets.y, liquid.t + assets.t)
 
         let operatingProfit: Int64 = factory.operatingProfit
@@ -267,24 +268,24 @@ extension GameSession {
             $0["Illiquid assets", +] = assets.t[/3] <- assets.y
             $0[>] {
                 $0["Stockpiled inputs", +] = t.vi[/3] <- y.vi
-                $0["Stockpiled equipment", +] = t.vv[/3] <- y.vv
+                $0["Stockpiled equipment", +] = t.vx[/3] <- y.vx
             }
 
             $0["Liquid assets", +] = liquid.t[/3] <- liquid.y
             $0[>] {
-                $0["Market spending", +] = +factory.cash.b[/3]
-                $0["Market spending (amortized)", +] = +?(factory.cash.b + factory.Δ.vi)[/3]
-                $0["Market earnings", +] = +?factory.cash.r[/3]
-                $0["Subsidies", +] = +?factory.cash.s[/3]
-                $0["Salaries", +] = +?factory.cash.c[/3]
-                $0["Wages", +] = +?factory.cash.w[/3]
-                $0["Interest and dividends", +] = +?factory.cash.i[/3]
-                if factory.cash.e < 0 {
-                    $0["Stock buybacks", +] = factory.cash.e[/3]
+                $0["Market spending", +] = +account.b[/3]
+                $0["Market spending (amortized)", +] = +?(account.b + factory.Δ.vi)[/3]
+                $0["Market earnings", +] = +?account.r[/3]
+                $0["Subsidies", +] = +?account.s[/3]
+                $0["Salaries", +] = +?account.c[/3]
+                $0["Wages", +] = +?account.w[/3]
+                $0["Interest and dividends", +] = +?account.i[/3]
+                if account.e < 0 {
+                    $0["Stock buybacks", +] = account.e[/3]
                 } else {
-                    $0["Market capitalization", +] = +?factory.cash.e[/3]
+                    $0["Market capitalization", +] = +?account.e[/3]
                 }
-                $0["Capital expenditures", +] = +?factory.cash.v[/3]
+                $0["Capital expenditures", +] = +?account.v[/3]
             }
         }
     }
@@ -299,7 +300,7 @@ extension GameSession {
 
         switch resource.tier {
         case .i:
-            return factory.state.ni.tooltipDemand(
+            return factory.state.inventory.e.tooltipDemand(
                 resource.type,
                 tier: factory.type.inputs,
                 unit: "worker",
@@ -307,7 +308,7 @@ extension GameSession {
                 productivity: Double.init(factory.productivity)
             )
         case .v:
-            return factory.state.nv.tooltipDemand(
+            return factory.state.inventory.x.tooltipDemand(
                 resource.type,
                 tier: factory.type.costs,
                 unit: "level",
@@ -316,7 +317,7 @@ extension GameSession {
             )
 
         case .o:
-            return factory.state.out.tooltipSupply(
+            return factory.state.inventory.out.tooltipSupply(
                 resource.type,
                 tier: factory.type.output,
                 unit: "worker",
@@ -337,8 +338,8 @@ extension GameSession {
         }
 
         switch resource.tier {
-        case .i: return factory.state.ni.tooltipStockpile(resource.type)
-        case .v: return factory.state.nv.tooltipStockpile(resource.type)
+        case .i: return factory.state.inventory.e.tooltipStockpile(resource.type)
+        case .v: return factory.state.inventory.x.tooltipStockpile(resource.type)
         default: return nil
         }
     }
@@ -362,9 +363,9 @@ extension GameSession {
         )
 
         switch resource.tier {
-        case .i: return factory.state.ni.tooltipExplainPrice(resource.type, market)
-        case .v: return factory.state.nv.tooltipExplainPrice(resource.type, market)
-        case .o: return factory.state.out.tooltipExplainPrice(resource.type, market)
+        case .i: return factory.state.inventory.e.tooltipExplainPrice(resource.type, market)
+        case .v: return factory.state.inventory.x.tooltipExplainPrice(resource.type, market)
+        case .o: return factory.state.inventory.out.tooltipExplainPrice(resource.type, market)
         default: return nil
         }
     }
@@ -516,23 +517,24 @@ extension GameSession {
         }
 
         return .instructions {
-            $0["Liquid assets", +] = pop.cash.balance[/3] <- pop.cash.liq
+            let account: CashAccount = pop.inventory.account
+            $0["Liquid assets", +] = account.balance[/3] <- account.liq
             $0[>] {
-                $0["Market earnings", +] = +?pop.cash.r[/3]
-                $0["Welfare", +] = +?pop.cash.s[/3]
-                $0["Salaries", +] = +?pop.cash.c[/3]
-                $0["Wages", +] = +?pop.cash.w[/3]
-                $0["Interest and dividends", +] = +?pop.cash.i[/3]
+                $0["Market earnings", +] = +?account.r[/3]
+                $0["Welfare", +] = +?account.s[/3]
+                $0["Salaries", +] = +?account.c[/3]
+                $0["Wages", +] = +?account.w[/3]
+                $0["Interest and dividends", +] = +?account.i[/3]
 
-                $0["Market spending", +] = +?pop.cash.b[/3]
-                $0["Stock sales", +] = +?pop.cash.v[/3]
+                $0["Market spending", +] = +?account.b[/3]
+                $0["Stock sales", +] = +?account.v[/3]
                 if case .Ward = pop.type.stratum {
-                    $0["Loans taken", +] = +?pop.cash.e[/3]
+                    $0["Loans taken", +] = +?account.e[/3]
                 } else {
-                    $0["Investments", +] = +?pop.cash.e[/3]
+                    $0["Investments", +] = +?account.e[/3]
                 }
 
-                $0["Inheritances", +] = +?pop.cash.d[/3]
+                $0["Inheritances", +] = +?account.d[/3]
             }
         }
     }
@@ -603,7 +605,7 @@ extension GameSession {
 
         switch resource.tier {
         case .l:
-            return pop.state.nl.tooltipDemand(
+            return pop.state.inventory.l.tooltipDemand(
                 resource.type,
                 tier: pop.type.l,
                 unit: "capita",
@@ -612,7 +614,7 @@ extension GameSession {
                 productivityLabel: "Consciousness"
             )
         case .e:
-            return pop.state.ne.tooltipDemand(
+            return pop.state.inventory.e.tooltipDemand(
                 resource.type,
                 tier: pop.type.e,
                 unit: "capita",
@@ -621,7 +623,7 @@ extension GameSession {
                 productivityLabel: "Consciousness"
             )
         case .x:
-            return pop.state.nx.tooltipDemand(
+            return pop.state.inventory.x.tooltipDemand(
                 resource.type,
                 tier: pop.type.x,
                 unit: "capita",
@@ -630,7 +632,7 @@ extension GameSession {
                 productivityLabel: "Consciousness"
             )
         case .o:
-            return pop.state.out.tooltipSupply(
+            return pop.state.inventory.out.tooltipSupply(
                 resource.type,
                 tier: pop.type.output,
                 unit: "worker",
@@ -651,9 +653,9 @@ extension GameSession {
         }
 
         switch resource.tier {
-        case .l: return pop.state.nl.tooltipStockpile(resource.type)
-        case .e: return pop.state.ne.tooltipStockpile(resource.type)
-        case .x: return pop.state.nx.tooltipStockpile(resource.type)
+        case .l: return pop.state.inventory.l.tooltipStockpile(resource.type)
+        case .e: return pop.state.inventory.e.tooltipStockpile(resource.type)
+        case .x: return pop.state.inventory.x.tooltipStockpile(resource.type)
         default: return nil
         }
     }
@@ -677,10 +679,10 @@ extension GameSession {
         )
 
         switch resource.tier {
-        case .l: return pop.state.nl.tooltipExplainPrice(resource.type, market)
-        case .e: return pop.state.ne.tooltipExplainPrice(resource.type, market)
-        case .x: return pop.state.nx.tooltipExplainPrice(resource.type, market)
-        case .o: return pop.state.out.tooltipExplainPrice(resource.type, market)
+        case .l: return pop.state.inventory.l.tooltipExplainPrice(resource.type, market)
+        case .e: return pop.state.inventory.e.tooltipExplainPrice(resource.type, market)
+        case .x: return pop.state.inventory.x.tooltipExplainPrice(resource.type, market)
+        case .o: return pop.state.inventory.out.tooltipExplainPrice(resource.type, market)
         default: return nil
         }
     }
