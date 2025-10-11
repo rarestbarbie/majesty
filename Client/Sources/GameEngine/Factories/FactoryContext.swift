@@ -343,6 +343,9 @@ extension FactoryContext: TransactingContext {
                 case nil:
                     break
                 case .fire(let block):
+                    guard map.random.roll(1, 21) else {
+                        break
+                    }
                     map.jobs.fire.clerk[self.state.id] = block
                 case .hire(let block, let type):
                     map.jobs.hire.clerk[self.state.tile.planet, type].append(block)
@@ -369,6 +372,9 @@ extension FactoryContext: TransactingContext {
                     break
 
                 case .fire(let block):
+                    guard map.random.roll(1, 7) else {
+                        break
+                    }
                     map.jobs.fire.worker[self.state.id] = block
 
                 case .hire(let block, let type):
