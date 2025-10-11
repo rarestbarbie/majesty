@@ -4,30 +4,34 @@ import GameRules
 import VectorCharts
 
 struct CashFlowStatement {
-    private var items: [CashFlowItem: Int64]
+    private var costs: [CashFlowItem: Int64]
 
     init() {
-        self.items = [:]
+        self.costs = [:]
     }
 }
 extension CashFlowStatement {
     mutating func reset() {
-        self.items.removeAll(keepingCapacity: true)
+        self.costs.removeAll(keepingCapacity: true)
+    }
+    mutating func update(with inputs: ResourceInputs) {
+        self.update(with: inputs.tradeable.values.elements)
+        self.update(with: inputs.inelastic.values.elements)
     }
     mutating func update<Input>(with inputs: [Input]) where Input: ResourceInput {
         for input: Input in inputs where input.valueConsumed > 0 {
-            self.items[.resource(input.id), default: 0] += input.valueConsumed
+            self.costs[.resource(input.id), default: 0] += input.valueConsumed
         }
     }
 
     subscript(item: CashFlowItem) -> Int64 {
-        get { self.items[item] ?? 0 }
-        set { self.items[item] = newValue == 0 ? nil : newValue }
+        get { self.costs[item] ?? 0 }
+        set { self.costs[item] = newValue == 0 ? nil : newValue }
     }
 }
 extension CashFlowStatement {
     func tooltip(rules: GameRules, item: CashFlowItem) -> Tooltip {
-        let (share, total): (share: Int64, total: Int64) = self.items.reduce(into: (0, 0)) {
+        let (share, total): (share: Int64, total: Int64) = self.costs.reduce(into: (0, 0)) {
             if $1.key == item {
                 $0.share += $1.value
             }
@@ -47,11 +51,11 @@ extension CashFlowStatement {
     }
 
     func chart(rules: GameRules) -> PieChart<CashFlowItem, PieChartLabel>? {
-        if self.items.isEmpty {
+        if self.costs.isEmpty {
             return nil
         }
 
-        var values: [(CashFlowItem, (Int64, PieChartLabel))] = self.items.map {
+        var values: [(CashFlowItem, (Int64, PieChartLabel))] = self.costs.map {
             let label: PieChartLabel?
 
             switch $0 {
