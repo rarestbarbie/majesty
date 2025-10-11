@@ -6,9 +6,9 @@ public final class ResourceMetadata: Identifiable {
     public let color: Color
     public let emoji: Character
     public let local: Bool
-    public let hours: Int64
+    public let hours: Int64?
 
-    init(name: String, color: Color, emoji: Character, local: Bool, hours: Int64) {
+    init(name: String, color: Color, emoji: Character, local: Bool, hours: Int64?) {
         self.name = name
         self.color = color
         self.emoji = emoji

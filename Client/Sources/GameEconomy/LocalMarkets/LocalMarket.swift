@@ -64,11 +64,18 @@ extension LocalMarket {
     }
 }
 extension LocalMarket {
+    public mutating func turn() {
+        self.turn(priceFloor: .zero)
+        self.priceFloor = nil
+    }
     public mutating func turn(priceFloor: LocalPrice, type: PriceFloorType) {
+        self.turn(priceFloor: priceFloor)
+        self.priceFloor = .init(minimum: priceFloor, type: type)
+    }
+    private mutating func turn(priceFloor: LocalPrice) {
         let price: LocalPrice = .init(per100: self.today.price.per100 + self.today.priceChange)
         self.yesterday = self.today
         self.today = .init(price: max(price, priceFloor))
-        self.priceFloor = .init(minimum: priceFloor, type: type)
     }
 
     public mutating func match(using random: inout PseudoRandom) -> (asks: [Order], bids: [Order]) {

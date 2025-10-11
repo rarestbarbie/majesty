@@ -172,17 +172,19 @@ extension FactoryContext: TransactingContext {
         self.state.today.wf = nil
         self.state.today.cf = nil
 
+        let throughput: Int64 = self.workers.map {
+            self.productivity * min($0.limit, $0.count + 1)
+        } ?? 0
+
+        self.state.out.sync(
+            with: self.type.output,
+            scalingFactor: (throughput, self.state.today.eo),
+        )
         self.state.ni.sync(
             with: self.type.inputs,
-            scalingFactor: (
-                self.workers.map {
-                    self.productivity * min($0.limit, $0.count + 1)
-                } ?? 0,
-                self.state.today.ei
-            ),
+            scalingFactor: (throughput, self.state.today.ei),
             stockpileDays: Self.stockpileDays.lowerBound,
         )
-
         self.state.nv.sync(
             with: self.type.costs,
             scalingFactor: (
