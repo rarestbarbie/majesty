@@ -4,24 +4,24 @@ import GameIDs
 import Random
 
 struct Bank: ~Copyable {
-    private var transfers: [LEI: CashTransfers]
+    private var transfers: [LEI: Transfers]
 
     init() {
         self.transfers = [:]
     }
 }
 extension Bank {
-    subscript(id: LEI) -> CashTransfers {
+    subscript(id: LEI) -> Transfers {
         _read   { yield  self.transfers[id, default: .init()] }
         _modify { yield &self.transfers[id, default: .init()] }
     }
 }
 extension Bank {
-    mutating func turn(_ yield: (LEI, CashTransfers) -> ()) {
+    mutating func turn(_ yield: (LEI, Transfers) -> ()) {
         defer {
             self.transfers.removeAll(keepingCapacity: true)
         }
-        for (id, transfers): (LEI, CashTransfers) in self.transfers {
+        for (id, transfers): (LEI, Transfers) in self.transfers {
             yield(id, transfers)
         }
     }

@@ -17,7 +17,7 @@ extension Equity.Statistics {
 extension Equity<LEI>.Statistics {
     static func compute(
         equity: Equity<LEI>,
-        assets: CashAccount,
+        assets: Bank.Account,
         in context: GameContext.ResidentPass,
     ) -> Self {
         let shareCount: Int64 = equity.shares.reduce(into: 0) { $0 += $1.value.shares }

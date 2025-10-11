@@ -3,7 +3,7 @@ import GameEconomy
 import GameIDs
 
 struct Inventory {
-    var account: CashAccount
+    var account: Bank.Account
     var out: ResourceOutputs
     var l: ResourceInputs
     var e: ResourceInputs
