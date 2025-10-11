@@ -21,6 +21,15 @@ extension Inventory {
     }
 }
 extension Inventory {
+    mutating func bid(in tile: Address, as lei: LEI, on map: inout GameMap) {
+        for (id, output): (Resource, InelasticOutput) in self.out.inelastic {
+            let ask: Int64 = output.unitsProduced
+            if  ask > 0 {
+                map.localMarkets[tile, id].ask(amount: ask, by: lei)
+            }
+        }
+    }
+
     mutating func credit(
         inelastic resource: Resource,
         units: Int64,
