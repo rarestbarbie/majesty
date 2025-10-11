@@ -1,11 +1,10 @@
 {
     "Hydroelectric Dam": {
         "inputs": {
-            "Influence": 1
         },
         "output": {
             "Electricity": 12,
-            "Water": 48
+            "Water": 64
         },
         "workers": {
             "Driver": 1000,
@@ -20,6 +19,50 @@
             "Steppe",
             "Taiga"
         ]
+    },
+    "Nuclear Power Plant": {
+        "inputs": {
+            "Water": 1,
+            "Uranium": 1
+        },
+        "output": {
+            "Electricity": 240
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+    "Cereal Farm": {
+        "inputs": {
+            "Water": 4,
+            "Fertilizer": 1
+        },
+        "output": {
+            "Wheat": 12,
+            "Fertilizer": 1
+        },
+        "workers": {
+            "Driver": 100000,
+            "Farmer": 30000
+        },
+        "terrain": ["Desert", "Forest", "Rainforest", "Steppe"]
+    },
+    "Plantation": {
+        "inputs": {
+            "Water": 8,
+            "Fertilizer": 2
+        },
+        "output": {
+            "Wheat": 8,
+            "Produce": 8,
+            "Fertilizer": 1
+        },
+        "workers": {
+            "Driver": 100000,
+            "Farmer": 30000
+        },
+        "terrain": ["Desert", "Steppe", "Forest", "Rainforest"]
     },
 
 
@@ -64,20 +107,6 @@
             "Driver": 50000,
             "Engineer": 50000
         }
-    },
-    "Cereal Farm": {
-        "inputs": {
-            "Water": 4,
-            "Fertilizer": 1
-        },
-        "output": {
-            "Wheat": 12
-        },
-        "workers": {
-            "Driver": 100000,
-            "Farmer": 30000
-        },
-        "terrain": ["Desert", "Forest", "Rainforest", "Steppe"]
     },
     "Chemical Synthesis Plant": {
         "inputs": {
@@ -136,21 +165,6 @@
             "Engineer": 50000
         }
     },
-    "Fertilizer Plant (2)": {
-        "inputs": {
-            "Ammonia": 2,
-            "Potash": 2,
-            "Phosphate": 2,
-            "Sulfur": 2
-        },
-        "output": {
-            "Fertilizer": 8
-        },
-        "workers": {
-            "Driver": 100000,
-            "Engineer": 30000
-        }
-    },
     "Fertilizer Plant": {
         "inputs": {
             "Electricity": 2
@@ -191,33 +205,6 @@
             "Driver": 50000,
             "Engineer": 50000
         }
-    },
-    "Nuclear Power Plant": {
-        "inputs": {
-            "Uranium": 1,
-            "Influence": 1
-        },
-        "output": {
-            "Electricity": 24
-        },
-        "workers": {
-            "Driver": 50000,
-            "Engineer": 50000
-        }
-    },
-    "Plantation": {
-        "inputs": {
-            "Water": 4,
-            "Fertilizer": 1
-        },
-        "output": {
-            "Produce": 12
-        },
-        "workers": {
-            "Driver": 100000,
-            "Farmer": 30000
-        },
-        "terrain": ["Desert", "Steppe", "Forest", "Rainforest"]
     },
     "Polypropylene Plant": {
         "inputs": {

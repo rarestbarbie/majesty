@@ -6,12 +6,13 @@
             "Wheat": 3
         },
         "e": {
-            "Produce": 6,
-            "Beef": 6,
+            "Produce": 3,
+            "Beef": 3,
             "Services": 1
         },
         "x": {
-            "Cocaine": 12
+            "Services": 3,
+            "Advertising": 3
         }
     },
     "Livestock": {
@@ -37,7 +38,7 @@
     "Server": {
         "color": "#1f224b",
         "output": {
-            "Services": 4
+            "Services": 8
         }
     },
     "Driver": {
@@ -58,7 +59,7 @@
     "Influencer": {
         "color": "#bf97ff",
         "output": {
-            "Advertising": 4
+            "Advertising": 8
         }
     },
     "Executive": {
@@ -66,9 +67,10 @@
         "e": {
             "Produce": 6,
             "Beef": 6,
-            "Services": 48
+            "Services": 6
         },
         "x": {
+            "Services": 48,
             "Influence": 8
         }
     },
@@ -77,10 +79,11 @@
         "e": {
             "Produce": 6,
             "Beef": 6,
-            "Services": 48,
+            "Services": 6,
             "Influence": 1
         },
         "x": {
+            "Services": 48,
             "Advertising": 1024
         },
         "output": {
