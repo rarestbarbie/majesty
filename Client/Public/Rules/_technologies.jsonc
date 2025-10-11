@@ -3,7 +3,7 @@
         "starter": true,
         "effects": {
             "factory_productivity": {
-                "*": 1
+                "*": 2
             }
         },
         "summary": "The definition of stupidity is doing the same thing over and over again and expecting different results."

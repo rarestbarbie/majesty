@@ -2,22 +2,26 @@
     "Housing": {
         "emoji": "🏠",
         "color": "#575a7e",
-        "local": true
+        "local": true,
+        "hours": 1
     },
     "Construction": {
         "emoji": "🦺",
         "color": "#f77c4c",
-        "local": true
+        "local": true,
+        "hours": 1
     },
     "Services": {
         "emoji": "💼",
         "color": "#242753",
-        "local": true
+        "local": true,
+        "hours": 8
     },
     "Influence": {
         "emoji": "⚖️",
         "color": "#873a8a",
-        "local": true
+        "local": true,
+        "hours": 1
     },
 
     "Beef": {

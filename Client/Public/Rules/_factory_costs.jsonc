@@ -4,6 +4,10 @@
     "construction": {
         "*": {
             "Construction": 10000
+        },
+        "Nuclear Power Plant": {
+            "Construction": 10000,
+            "Influence": 10000
         }
     },
     "maintenance": {

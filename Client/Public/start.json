@@ -20,6 +20,7 @@
             "Cereal Farm": 4,
             "Hydroponic Farm": 5,
             "Fertilizer Plant": 6,
+            "Hydroelectric Dam": 7,
             "Uranium Enrichment Facility": 20,
             "Nuclear Power Plant": 21
         },
@@ -221,19 +222,31 @@
             "id": 5,
             "on": "399N0,-2",
             "type": 21,
-            "size_l": 19
+            "size_l": 2
         },
         {
             "id": 6,
+            "on": "399N0,-2",
+            "type": 7,
+            "size_l": 15
+        },
+        {
+            "id": 14,
             "on": "399N-1,-1",
             "type": 21,
-            "size_l": 25
+            "size_l": 1
+        },
+        {
+            "id": 15,
+            "on": "399N-1,-1",
+            "type": 7,
+            "size_l": 13
         },
         {
             "id": 7,
             "on": "399N0,2",
             "type": 21,
-            "size_l": 24
+            "size_l": 1
         },
         {
             "id": 8,
@@ -324,7 +337,7 @@
             "id": 108,
             "on": "499E2",
             "type": 21,
-            "size_l": 17
+            "size_l": 4
         },
 
         {
