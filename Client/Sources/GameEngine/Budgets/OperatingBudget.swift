@@ -1,4 +1,7 @@
+import D
 import GameEconomy
+import GameRules
+import VectorCharts
 
 struct OperatingBudget {
     let min: (l: Int64, e: Int64)
@@ -75,5 +78,11 @@ extension OperatingBudget {
             inelastic: inelasticCostPerDay.x * stockpileMaxDays,
             tradeable: tradeableCostPerDay.x * stockpileMaxDays,
         )
+    }
+}
+extension OperatingBudget {
+    func chart() -> PieChart<OperatingBudgetItem, PieChartLabel>? {
+        let statement: OperatingBudgetStatement = .init(from: self)
+        return statement.chart()
     }
 }

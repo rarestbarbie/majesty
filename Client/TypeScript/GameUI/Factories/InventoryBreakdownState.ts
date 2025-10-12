@@ -8,5 +8,6 @@ export interface InventoryBreakdownState<Type extends string> {
     readonly type: Type;
     readonly needs: ResourceNeed[];
     readonly sales: ResourceSale[];
-    readonly spending?: PieChartSector<string>[];
+    readonly costs?: PieChartSector<string>[];
+    readonly budget?: PieChartSector<string>[];
 }

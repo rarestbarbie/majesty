@@ -46,7 +46,8 @@ export class ProductionOverview extends ScreenContent {
         this.sales = new StaticList<ResourceSaleBox, string>(document.createElement('div'));
 
         this.consumption = new ConsumptionBreakdown(
-            TooltipType.FactoryStatementItem,
+            TooltipType.FactoryCashFlowItem,
+            TooltipType.FactoryBudgetItem,
         );
         this.ownership = new OwnershipBreakdown(
             TooltipType.FactoryOwnershipCountry,

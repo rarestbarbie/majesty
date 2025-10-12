@@ -48,7 +48,7 @@ export class PopulationOverview extends ScreenContent {
         this.needs = new StaticList<ResourceNeedRow, string>(document.createElement('div'));
         this.sales = new StaticList<ResourceSaleBox, string>(document.createElement('div'));
         this.charts = {
-            spending: new PieChart<string>(TooltipType.PopStatementItem),
+            spending: new PieChart<string>(TooltipType.PopCashFlowItem),
         };
 
         this.ownership = new OwnershipBreakdown(
@@ -196,7 +196,7 @@ export class PopulationOverview extends ScreenContent {
                 (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
             );
 
-            this.charts.spending.update([id], state.pop.open.spending ?? []);
+            this.charts.spending.update([id], state.pop.open.costs ?? []);
             break;
 
         case PopDetailsTab.Ownership:
