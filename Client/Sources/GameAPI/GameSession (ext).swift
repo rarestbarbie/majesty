@@ -78,8 +78,13 @@ extension GameSession {
             self.tooltipFactoryOwnership(
                 try arguments[0].decode(),
             )
-        case .FactoryStatementItem:
-            self.tooltipFactoryStatementItem(
+        case .FactoryCashFlowItem:
+            self.tooltipFactoryCashFlowItem(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+            )
+        case .FactoryBudgetItem:
+            self.tooltipFactoryBudgetItem(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
@@ -135,8 +140,8 @@ extension GameSession {
             self.tooltipPopOwnership(
                 try arguments[0].decode(),
             )
-        case .PopStatementItem:
-            self.tooltipPopStatementItem(
+        case .PopCashFlowItem:
+            self.tooltipPopCashFlowItem(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )

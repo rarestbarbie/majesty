@@ -462,7 +462,7 @@ extension GameSession {
         self.context.factories[id]?.tooltipOwnership()
     }
 
-    public func tooltipFactoryStatementItem(
+    public func tooltipFactoryCashFlowItem(
         _ id: FactoryID,
         _ item: CashFlowItem,
     ) -> Tooltip? {
@@ -470,6 +470,20 @@ extension GameSession {
             rules: self.context.rules,
             item: item
         )
+    }
+
+    public func tooltipFactoryBudgetItem(
+        _ id: FactoryID,
+        _ item: OperatingBudgetItem,
+    ) -> Tooltip? {
+        switch self.context.factories[id]?.budget {
+        case .active(let budget)?:
+            let statement: OperatingBudgetStatement = .init(from: budget)
+            return statement.tooltip(item: item)
+
+        default:
+            return nil
+        }
     }
 }
 extension GameSession {
@@ -744,7 +758,7 @@ extension GameSession {
         self.context.pops[id]?.tooltipOwnership()
     }
 
-    public func tooltipPopStatementItem(
+    public func tooltipPopCashFlowItem(
         _ id: PopID,
         _ item: CashFlowItem,
     ) -> Tooltip? {

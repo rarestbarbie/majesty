@@ -23,8 +23,7 @@ struct FactoryContext: LegalEntityContext, RuntimeContext {
     private(set) var equity: Equity<LEI>.Statistics
 
     private(set) var cashFlow: CashFlowStatement
-
-    private var budget: FactoryBudget?
+    private(set) var budget: FactoryBudget?
 
     init(type: FactoryMetadata, state: Factory) {
         self.type = type

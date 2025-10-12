@@ -5,11 +5,13 @@ import VectorCharts
 
 struct InventoryBreakdown<Tab> where Tab: InventoryTab {
     private var inventory: ResourceInventory
-    private var spending: PieChart<CashFlowItem, PieChartLabel>?
+    private var costs: PieChart<CashFlowItem, PieChartLabel>?
+    private var budget: PieChart<OperatingBudgetItem, PieChartLabel>?
 
     init() {
         self.inventory = .init()
-        self.spending = nil
+        self.costs = nil
+        self.budget = nil
     }
 }
 extension InventoryBreakdown {
@@ -53,7 +55,8 @@ extension InventoryBreakdown {
             snapshot: snapshot
         )
 
-        self.spending = pop.cashFlow.chart(rules: snapshot.rules)
+        self.costs = pop.cashFlow.chart(rules: snapshot.rules)
+        self.budget = nil
     }
 
     mutating func update(from factory: FactoryContext, in snapshot: borrowing GameSnapshot) {
@@ -86,7 +89,17 @@ extension InventoryBreakdown {
             snapshot: snapshot
         )
 
-        self.spending = factory.cashFlow.chart(rules: snapshot.rules)
+        self.costs = factory.cashFlow.chart(rules: snapshot.rules)
+
+
+        switch factory.budget {
+        case .active(let budget)?:
+            let statement: OperatingBudgetStatement = .init(from: budget)
+            self.budget = statement.chart()
+
+        default:
+            self.budget = nil
+        }
     }
 }
 extension InventoryBreakdown: JavaScriptEncodable {
@@ -94,13 +107,15 @@ extension InventoryBreakdown: JavaScriptEncodable {
         case type
         case needs
         case sales
-        case spending
+        case costs
+        case budget
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.type] = Tab.Inventory
         js[.needs] = self.inventory.needs
         js[.sales] = self.inventory.sales
-        js[.spending] = self.spending
+        js[.costs] = self.costs
+        js[.budget] = self.budget
     }
 }

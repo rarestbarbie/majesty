@@ -10,7 +10,8 @@ enum TooltipType: String, LoadableFromJSValue {
     case FactoryOwnershipCulture
     case FactoryOwnershipSecurities
     case FactoryWorkers
-    case FactoryStatementItem
+    case FactoryCashFlowItem
+    case FactoryBudgetItem
 
     case PlanetCell
 
@@ -24,7 +25,7 @@ enum TooltipType: String, LoadableFromJSValue {
     case PopOwnershipCountry
     case PopOwnershipCulture
     case PopOwnershipSecurities
-    case PopStatementItem
+    case PopCashFlowItem
 
     case MarketLiquidity
 

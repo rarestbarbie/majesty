@@ -9,17 +9,21 @@ import {
 export class ConsumptionBreakdown {
     public readonly node: HTMLDivElement;
 
-    private readonly byItem: PieChart<string>;
+    private readonly costs: PieChart<string>;
+    private readonly budget: PieChart<string>;
 
     constructor(
-        tooltipStatementItem: TooltipType
+        tooltipCashFlowItem: TooltipType,
+        tooltipBudgetItem: TooltipType
     ) {
-        this.byItem = new PieChart<string>(tooltipStatementItem);
+        this.costs = new PieChart<string>(tooltipCashFlowItem);
+        this.budget = new PieChart<string>(tooltipBudgetItem);
 
         const left: HTMLDivElement = document.createElement('div');
 
         const charts: [PieChart<any>, string][] = [
-            [this.byItem, 'Costs'],
+            [this.costs, 'Costs'],
+            [this.budget, 'Budget'],
         ];
 
         for (const [chart, label] of charts) {
@@ -53,6 +57,7 @@ export class ConsumptionBreakdown {
     }
 
     public update(id: GameID, state: InventoryBreakdownState<any>): void {
-        this.byItem.update([id], state.spending ?? []);
+        this.costs.update([id], state.costs ?? []);
+        this.budget.update([id], state.budget ?? []);
     }
 }
