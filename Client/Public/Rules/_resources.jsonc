@@ -1,26 +1,35 @@
 {
+    "Water": {
+        "emoji": "💧",
+        "color": "#5ea9ff",
+        "local": true,
+        "floor": "none"
+    },
     "Housing": {
         "emoji": "🏠",
         "color": "#575a7e",
         "local": true,
-        "hours": 1
+        "floor": "none"
     },
     "Construction": {
         "emoji": "🦺",
         "color": "#f77c4c",
         "local": true,
-        "hours": 1
+        "floor": "wage",
+        "hours": 8
     },
     "Services": {
         "emoji": "💼",
         "color": "#242753",
         "local": true,
+        "floor": "wage",
         "hours": 8
     },
     "Influence": {
         "emoji": "⚖️",
         "color": "#873a8a",
         "local": true,
+        "floor": "wage",
         "hours": 1
     },
 
@@ -224,10 +233,6 @@
     "Uranium": {
         "emoji": "☢️",
         "color": "#30ff8d"
-    },
-    "Water": {
-        "emoji": "💧",
-        "color": "#5ea9ff"
     },
     "Yttrium": {
         "emoji": "🟢",
