@@ -92,9 +92,9 @@ extension Factory {
 
         case inventory_account = "cash"
         case inventory_out = "out"
-        case inventory_l = "nm"
-        case inventory_e = "ni"
-        case inventory_x = "nv"
+        case inventory_l = "nl"
+        case inventory_e = "ne"
+        case inventory_x = "nx"
 
         case yesterday_vi = "y_vi"
         case yesterday_vv = "y_vv"
