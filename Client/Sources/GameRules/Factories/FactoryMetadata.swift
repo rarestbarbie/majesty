@@ -2,8 +2,9 @@ import GameEconomy
 
 public final class FactoryMetadata: Identifiable, Sendable {
     public let name: String
-    public let costs: ResourceTier
     public let inputs: ResourceTier
+    public let office: ResourceTier
+    public let costs: ResourceTier
     public let output: ResourceTier
     public let workers: Quantity<PopType>
     public let clerks: Quantity<PopType>?
@@ -15,8 +16,9 @@ public final class FactoryMetadata: Identifiable, Sendable {
 
     init(
         name: String,
-        costs: ResourceTier,
         inputs: ResourceTier,
+        office: ResourceTier,
+        costs: ResourceTier,
         output: ResourceTier,
         workers divisions: [Quantity<PopType>],
         sharesInitial: Int64,
@@ -24,8 +26,10 @@ public final class FactoryMetadata: Identifiable, Sendable {
         terrainAllowed: Set<TerrainType>
     ) throws {
         self.name = name
-        self.costs = costs
+
         self.inputs = inputs
+        self.office = office
+        self.costs = costs
         self.output = output
 
         let workers: [Quantity<PopType>] = divisions.filter { $0.unit.stratum <= .Worker }
@@ -52,8 +56,9 @@ extension FactoryMetadata {
         var hasher: Hasher = .init()
 
         self.name.hash(into: &hasher)
-        self.costs.hash(into: &hasher)
         self.inputs.hash(into: &hasher)
+        self.office.hash(into: &hasher)
+        self.costs.hash(into: &hasher)
         self.output.hash(into: &hasher)
 
         self.workers.hash(into: &hasher)

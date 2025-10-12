@@ -29,12 +29,12 @@ extension OperatingBudget {
         self.x = .init()
 
         let inelasticCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: 0,
+            l: weights.l.inelastic.total,
             e: weights.e.inelastic.total,
             x: weights.x.inelastic.total,
         )
         let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: 0,
+            l: Int64.init(weights.l.tradeable.total.rounded(.up)),
             e: Int64.init(weights.e.tradeable.total.rounded(.up)),
             x: Int64.init(weights.x.tradeable.total.rounded(.up)),
         )

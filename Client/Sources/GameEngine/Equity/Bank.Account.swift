@@ -1,5 +1,6 @@
 import Assert
 import Fraction
+import GameEconomy
 import JavaScriptInterop
 import JavaScriptKit
 
@@ -45,6 +46,10 @@ extension Bank.Account {
         self.i += other.i
         self.e += other.e
         self.v += other.j
+    }
+    static func += (self: inout Self, trade: TradeProceeds) {
+        self.b += trade.loss
+        self.r += trade.gain
     }
     static func += (self: inout Self, other: Self) {
         self = .init(

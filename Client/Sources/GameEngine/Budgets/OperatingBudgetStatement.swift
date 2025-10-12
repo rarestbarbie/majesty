@@ -26,18 +26,18 @@ extension OperatingBudgetStatement {
         let label: String
         let share: Int64
         switch item {
-        case .maintenance:
-            label = "Maintenance"
-            share = l
         case .inputs:
             label = "Inputs"
-            share = e
+            share = self.l
+        case .office:
+            label = "Office"
+            share = self.e
         case .labor:
             label = "Labor"
-            share = labor
+            share = self.labor
         case .capex:
             label = "CapEx"
-            share = x
+            share = self.x
         case .dividend:
             label = "Dividends"
             share = self.dividend
@@ -72,7 +72,7 @@ extension OperatingBudgetStatement {
             case .dividend: color = 0x59A8F0
             case .labor: color = 0xE15759
             case .inputs: color = 0xCABAAA
-            case .maintenance: color = 0x9A9FAA
+            case .office: color = 0x9ADFFA
             case .capex: color = 0xF2CE6B
             }
             return ($0, (share, .init(color: color, name: name)))

@@ -60,7 +60,7 @@ extension ResourceInputs {
         spendingLimit budget: Int64,
         in currency: Fiat,
         on exchange: inout Exchange,
-    ) -> (gain: Int64, loss: Int64) {
+    ) -> TradeProceeds {
         let weights: [Double] = self.tradeable.values.map {
             Double.init(
                 $0.needed($0.unitsDemanded * target.lower)
@@ -83,7 +83,7 @@ extension ResourceInputs {
         in currency: Fiat,
         on exchange: inout Exchange,
         weights: ArraySlice<Double>,
-    ) -> (gain: Int64, loss: Int64) {
+    ) -> TradeProceeds {
         let budget: [Int64]? = weights.distribute(spendingLimit)
 
         var gain: Int64 = 0
@@ -112,7 +112,7 @@ extension ResourceInputs {
             """
         )
 
-        return (gain: gain, loss: loss)
+        return .init(gain: gain, loss: loss)
     }
 }
 

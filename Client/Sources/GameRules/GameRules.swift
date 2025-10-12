@@ -91,15 +91,19 @@ extension GameRules {
                 let (type, (symbol, factory)): (FactoryType, (Symbol, FactoryDescription)) = $1
                 $0[type] = try .init(
                     name: symbol.name,
+                    inputs: .init(
+                        metadata: resources,
+                        quantity: try symbols.resources.resolve(factory.inputs)
+                    ),
+                    office: .init(
+                        metadata: resources,
+                        quantity: try symbols.resources.resolve(factory.office)
+                    ),
                     costs: .init(
                         metadata: resources,
                         quantity: try symbols.resources.resolve(
                             try factoryCosts[type] ?? factoryCosts[*]
                         )
-                    ),
-                    inputs: .init(
-                        metadata: resources,
-                        quantity: try symbols.resources.resolve(factory.inputs)
                     ),
                     output: .init(
                         metadata: resources,

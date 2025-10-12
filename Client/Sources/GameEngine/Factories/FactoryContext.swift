@@ -136,8 +136,13 @@ extension FactoryContext: TransactingContext {
             with: self.type.output,
             scalingFactor: (throughput, self.state.today.eo),
         )
-        self.state.inventory.e.sync(
+        self.state.inventory.l.sync(
             with: self.type.inputs,
+            scalingFactor: (throughput, self.state.today.ei),
+            stockpileDays: Self.stockpileDays.lowerBound,
+        )
+        self.state.inventory.e.sync(
+            with: self.type.office,
             scalingFactor: (throughput, self.state.today.ei),
             stockpileDays: Self.stockpileDays.lowerBound,
         )
@@ -195,7 +200,7 @@ extension FactoryContext: TransactingContext {
             }
 
             weights = .init(
-                tiers: (.init(), self.state.inventory.e, self.state.inventory.x),
+                tiers: (self.state.inventory.l, self.state.inventory.e, self.state.inventory.x),
                 location: self.state.tile,
                 currency: country.currency.id,
                 map: map,
@@ -206,7 +211,7 @@ extension FactoryContext: TransactingContext {
                 state: self.state,
                 weights: weights,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
-                d: (7, 30, Int64.init(3650 * unused + 365 / (0.1 + self.state.today.pa))),
+                d: (30, 60, Int64.init(3650 * unused + 365 / (0.1 + self.state.today.pa))),
             )
 
             let sharesTarget: Int64 = self.state.size.level * self.type.sharesPerLevel
@@ -396,15 +401,15 @@ extension FactoryContext {
         map: inout GameMap
     ) {
         if  budget.tradeable > 0 {
-            let (gain, loss): (Int64, loss: Int64) = self.state.inventory.x.trade(
+            let trade: TradeProceeds = self.state.inventory.x.trade(
                 stockpileDays: stockpileTarget,
                 spendingLimit: budget.tradeable,
                 in: policy.currency.id,
                 on: &map.exchange,
             )
 
-            self.state.inventory.account.v += loss
-            self.state.inventory.account.r += gain
+            self.state.inventory.account.v += trade.loss
+            self.state.inventory.account.r += trade.gain
         }
 
         let growthFactor: Int64 = self.productivity * (self.state.size.level + 1)
@@ -425,26 +430,34 @@ extension FactoryContext {
         map: inout GameMap
     ) {
         let stockpileNone: TradeableInput.StockpileTarget = .init(lower: 0, today: 0, upper: 0)
-        let ne: (gain: Int64, loss: Int64) = self.state.inventory.e.trade(
+        let tl: TradeProceeds = self.state.inventory.l.trade(
             stockpileDays: stockpileNone,
             spendingLimit: 0,
             in: policy.currency.id,
             on: &map.exchange,
         )
-        let nx: (gain: Int64, loss: Int64) = self.state.inventory.x.trade(
+        let te: TradeProceeds = self.state.inventory.e.trade(
+            stockpileDays: stockpileNone,
+            spendingLimit: 0,
+            in: policy.currency.id,
+            on: &map.exchange,
+        )
+        let tx: TradeProceeds = self.state.inventory.x.trade(
             stockpileDays: stockpileNone,
             spendingLimit: 0,
             in: policy.currency.id,
             on: &map.exchange,
         )
 
-        #assert(ne.loss == 0, "ne loss during liquidation is non-zero! (\(ne.loss))")
-        #assert(nx.loss == 0, "nx loss during liquidation is non-zero! (\(nx.loss))")
+        #assert(tl.loss == 0, "nl loss during liquidation is non-zero! (\(tl.loss))")
+        #assert(te.loss == 0, "ne loss during liquidation is non-zero! (\(te.loss))")
+        #assert(tx.loss == 0, "nx loss during liquidation is non-zero! (\(tx.loss))")
 
-        self.state.inventory.account.r += ne.gain
-        self.state.inventory.account.r += nx.gain
+        self.state.inventory.account.r += tl.gain
+        self.state.inventory.account.r += te.gain
+        self.state.inventory.account.r += tx.gain
 
-        self.state.today.vi = self.state.inventory.e.valueAcquired
+        self.state.today.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
         self.state.today.vx = self.state.inventory.x.valueAcquired
     }
 
@@ -455,15 +468,19 @@ extension FactoryContext {
         stockpileTarget: TradeableInput.StockpileTarget,
         map: inout GameMap
     ) -> Paychecks {
-        let (gain, loss): (Int64, loss: Int64) = self.state.inventory.e.trade(
+        self.state.inventory.account += self.state.inventory.l.trade(
+            stockpileDays: stockpileTarget,
+            spendingLimit: budget.l.tradeable,
+            in: policy.currency.id,
+            on: &map.exchange,
+        )
+
+        self.state.inventory.account += self.state.inventory.e.trade(
             stockpileDays: stockpileTarget,
             spendingLimit: budget.e.tradeable,
             in: policy.currency.id,
             on: &map.exchange,
         )
-
-        self.state.inventory.account.b += loss
-        self.state.inventory.account.r += gain
 
         #assert(
             self.state.inventory.account.balance >= 0,
@@ -483,13 +500,18 @@ extension FactoryContext {
         /// estimate of the factory’s profitability, we need to credit the day’s balance with
         /// the amount of currency that was sunk into purchasing inputs, and subtract the
         /// approximate value of the inputs consumed today.
+        let throughput: Int64 = self.productivity * hours
+        self.state.inventory.l.consume(
+            from: self.type.inputs,
+            scalingFactor: (throughput, self.state.today.ei)
+        )
         self.state.inventory.e.consume(
             from: self.type.inputs,
-            scalingFactor: (self.productivity * hours, self.state.today.ei)
+            scalingFactor: (throughput, self.state.today.ei)
         )
         self.state.inventory.out.deposit(
             from: self.type.output,
-            scalingFactor: (self.productivity * hours, self.state.today.eo)
+            scalingFactor: (throughput, self.state.today.eo)
         )
 
         // Sell outputs.
@@ -497,8 +519,8 @@ extension FactoryContext {
 
         #assert(self.state.inventory.account.balance >= 0, "Factory has negative cash! (\(self.state.inventory.account))")
 
-        self.state.today.fi = self.state.inventory.e.fulfilled
-        self.state.today.vi = self.state.inventory.e.valueAcquired
+        self.state.today.fi = self.state.inventory.l.fulfilled
+        self.state.today.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
 
         return wages
     }
@@ -595,7 +617,7 @@ extension FactoryContext {
         /// Compute hours workable, assuming each worker works 1 “hour” per day for mathematical
         /// convenience. This can be larger than the actual number of workers available, but it
         /// will never be larger than the number of workers that can fit in the factory.
-        let hoursWorkable: Int64 = self.state.inventory.e.width(
+        let hoursWorkable: Int64 = self.state.inventory.l.width(
             limit: workers.limit,
             tier: self.type.inputs
         )

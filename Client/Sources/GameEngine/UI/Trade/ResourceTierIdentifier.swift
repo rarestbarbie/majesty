@@ -13,6 +13,8 @@ import JavaScriptInterop
 
     /// Factory, input.
     case i = "i"
+    /// Factory, office supply.
+    case j = "j"
     /// Factory, expansion progress.
     case v = "v"
 
