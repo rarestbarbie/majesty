@@ -3,22 +3,11 @@
     "shares_per_level": 5000000,
     "construction": {
         "*": {
-            "Construction": 10000
+            "Construction": 100000
         },
         "Nuclear Power Plant": {
-            "Construction": 10000,
+            "Construction": 100000,
             "Influence": 10000
-        }
-    },
-    "maintenance": {
-        "*": {
-            "Electricity": 100000,
-            "Storage":     100000,
-            "Ice":           1000,
-            "Machine Parts": 1000,
-            "Autocomplete":  1000,
-            "Instruments":     50,
-            "Vehicles":        50
         }
     }
 }

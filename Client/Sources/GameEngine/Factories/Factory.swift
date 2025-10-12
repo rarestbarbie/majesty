@@ -143,7 +143,6 @@ extension Factory: JavaScriptEncodable {
         js[.liquidation] = self.liquidation
 
         js[.inventory_account] = self.inventory.account
-        js[.inventory_out] = self.inventory.out
         js[.inventory_l] = self.inventory.l
         js[.inventory_e] = self.inventory.e
         js[.inventory_x] = self.inventory.x

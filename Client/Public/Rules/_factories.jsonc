@@ -2,6 +2,9 @@
     "Hydroelectric Dam": {
         "inputs": {
         },
+        "office": {
+            "Construction": 1
+        },
         "output": {
             "Electricity": 12,
             "Water": 64

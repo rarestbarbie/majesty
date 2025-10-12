@@ -47,7 +47,7 @@
     "Contractor": {
         "color": "#ff7a3d",
         "output": {
-            "Construction": 1
+            "Construction": 8
         }
     },
     "Engineer": {
@@ -59,7 +59,7 @@
     "Influencer": {
         "color": "#bf97ff",
         "output": {
-            "Advertising": 8
+            "Advertising": 50
         }
     },
     "Executive": {
@@ -70,8 +70,9 @@
             "Services": 6
         },
         "x": {
-            "Services": 48,
-            "Influence": 8
+            "Influence": 1,
+            "Services": 12,
+            "Advertising": 3
         }
     },
     "Politician": {
@@ -83,8 +84,9 @@
             "Influence": 1
         },
         "x": {
-            "Services": 48,
-            "Advertising": 1024
+            "Influence": 1,
+            "Services": 12,
+            "Advertising": 256
         },
         "output": {
             "Influence": 8
