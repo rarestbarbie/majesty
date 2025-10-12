@@ -343,15 +343,12 @@ extension PopContext: TransactingContext {
         let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
 
         if  budget.l.tradeable > 0 {
-            let (gain, loss): (Int64, loss: Int64) = self.state.inventory.l.trade(
+            self.state.inventory.account += self.state.inventory.l.trade(
                 stockpileDays: target,
                 spendingLimit: budget.l.tradeable,
                 in: country.currency.id,
                 on: &map.exchange,
             )
-
-            self.state.inventory.account.b += loss
-            self.state.inventory.account.r += gain
         }
 
         self.state.today.fl = self.state.inventory.l.fulfilled
@@ -361,15 +358,12 @@ extension PopContext: TransactingContext {
         )
 
         if  budget.e.tradeable > 0 {
-            let (gain, loss): (Int64, loss: Int64) = self.state.inventory.e.trade(
+            self.state.inventory.account += self.state.inventory.e.trade(
                 stockpileDays: target,
                 spendingLimit: budget.e.tradeable,
                 in: country.currency.id,
                 on: &map.exchange,
             )
-
-            self.state.inventory.account.b += loss
-            self.state.inventory.account.r += gain
         }
 
         self.state.today.fe = self.state.inventory.e.fulfilled
@@ -379,14 +373,12 @@ extension PopContext: TransactingContext {
         )
 
         if  budget.x.tradeable > 0 {
-            let (gain, loss): (Int64, loss: Int64) = self.state.inventory.x.trade(
+            self.state.inventory.account += self.state.inventory.x.trade(
                 stockpileDays: target,
                 spendingLimit: budget.x.tradeable,
                 in: country.currency.id,
                 on: &map.exchange,
             )
-            self.state.inventory.account.b += loss
-            self.state.inventory.account.r += gain
         }
 
         self.state.today.fx = self.state.inventory.x.fulfilled

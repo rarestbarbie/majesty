@@ -48,7 +48,7 @@ export class ResourceSaleBox implements DiffableListElement<string> {
         proceeds.setAttribute('data-tooltip-type', explainPrice);
         proceeds.setAttribute(
             'data-tooltip-arguments',
-            JSON.stringify([owner, null, sale.id]),
+            JSON.stringify([owner, sale.id]),
         );
 
         this.node.appendChild(icon);

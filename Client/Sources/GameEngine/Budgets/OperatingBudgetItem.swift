@@ -6,7 +6,7 @@ import JavaScriptKit
     case dividend = "D"
     case labor = "L"
     case inputs = "I"
-    case maintenance = "M"
+    case office = "O"
     case capex = "X"
 }
 extension OperatingBudgetItem: ConvertibleToJSValue, LoadableFromJSValue {

@@ -22,7 +22,10 @@ extension InventoryBreakdown {
         }
 
         self.inventory.reset(
-            inputs: pop.state.inventory.l.count + pop.state.inventory.e.count + pop.state.inventory.x.count,
+            inputs:
+            pop.state.inventory.l.count +
+            pop.state.inventory.e.count +
+            pop.state.inventory.x.count,
         )
 
         self.inventory.update(
@@ -65,10 +68,22 @@ extension InventoryBreakdown {
             return
         }
 
-        self.inventory.reset(inputs: factory.state.inventory.e.count + factory.state.inventory.x.count)
+        self.inventory.reset(
+            inputs:
+            factory.state.inventory.l.count +
+            factory.state.inventory.e.count +
+            factory.state.inventory.x.count
+        )
+        self.inventory.update(
+            from: factory.state.inventory.l,
+            tier: .i,
+            currency: currency,
+            location: factory.state.tile,
+            snapshot: snapshot
+        )
         self.inventory.update(
             from: factory.state.inventory.e,
-            tier: .i,
+            tier: .j,
             currency: currency,
             location: factory.state.tile,
             snapshot: snapshot

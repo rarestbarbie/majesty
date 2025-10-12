@@ -300,6 +300,14 @@ extension GameSession {
 
         switch resource.tier {
         case .i:
+            return factory.state.inventory.l.tooltipDemand(
+                resource.type,
+                tier: factory.type.inputs,
+                unit: "worker",
+                factor: 1,
+                productivity: Double.init(factory.productivity)
+            )
+        case .j:
             return factory.state.inventory.e.tooltipDemand(
                 resource.type,
                 tier: factory.type.inputs,
@@ -338,7 +346,8 @@ extension GameSession {
         }
 
         switch resource.tier {
-        case .i: return factory.state.inventory.e.tooltipStockpile(resource.type)
+        case .i: return factory.state.inventory.l.tooltipStockpile(resource.type)
+        case .j: return factory.state.inventory.e.tooltipStockpile(resource.type)
         case .v: return factory.state.inventory.x.tooltipStockpile(resource.type)
         default: return nil
         }
@@ -363,7 +372,8 @@ extension GameSession {
         )
 
         switch resource.tier {
-        case .i: return factory.state.inventory.e.tooltipExplainPrice(resource.type, market)
+        case .i: return factory.state.inventory.l.tooltipExplainPrice(resource.type, market)
+        case .j: return factory.state.inventory.e.tooltipExplainPrice(resource.type, market)
         case .v: return factory.state.inventory.x.tooltipExplainPrice(resource.type, market)
         case .o: return factory.state.inventory.out.tooltipExplainPrice(resource.type, market)
         default: return nil
