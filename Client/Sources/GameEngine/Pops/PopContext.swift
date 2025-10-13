@@ -227,7 +227,11 @@ extension PopContext {
         self.governedBy = governedBy
         self.occupiedBy = occupiedBy
 
-        self.equity = .compute(equity: self.state.equity, assets: self.state.inventory.account, in: context)
+        self.equity = .compute(
+            equity: self.state.equity,
+            assets: self.state.inventory.account,
+            in: context
+        )
     }
 }
 extension PopContext: TransactingContext {

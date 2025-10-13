@@ -6,7 +6,9 @@ extension RandomAccessCollection {
     /// The collection must be partitioned by the predicate.
     ///
     /// - Complexity: O(log n), where n is the number of elements in the collection.
-    @inlinable func partitioningIndex(where predicate: (Element) throws -> Bool) rethrows -> Index {
+    @inlinable func partitioningIndex(
+        where predicate: (Element) throws -> Bool
+    ) rethrows -> Index {
         var low: Index = self.startIndex
         var high: Index = self.endIndex
 

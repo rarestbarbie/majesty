@@ -64,7 +64,9 @@ extension OperatingBudgetStatement {
             return nil
         }
 
-        let values: [(OperatingBudgetItem, (Int64, PieChartLabel))] = OperatingBudgetItem.allCases.map {
+        let values: [
+            (OperatingBudgetItem, (Int64, PieChartLabel))
+        ] = OperatingBudgetItem.allCases.map {
             let (name, share): (String, Int64) = self[$0]
             let color: Color
             switch $0 {

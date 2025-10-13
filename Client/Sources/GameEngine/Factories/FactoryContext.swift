@@ -107,7 +107,11 @@ extension FactoryContext {
         self.cashFlow[.workers] = -self.state.inventory.account.w
         self.cashFlow[.clerks] = -self.state.inventory.account.c
 
-        self.equity = .compute(equity: self.state.equity, assets: self.state.inventory.account, in: context)
+        self.equity = .compute(
+            equity: self.state.equity,
+            assets: self.state.inventory.account,
+            in: context
+        )
     }
 }
 extension FactoryContext: TransactingContext {
@@ -194,7 +198,10 @@ extension FactoryContext: TransactingContext {
             let unused: Double
             if  let workers: Workforce = self.workers,
                 workers.limit > 0 {
-                unused = min(1, Double.init(workers.limit - workers.count) / Double.init(workers.limit))
+                unused = min(
+                    1,
+                    Double.init(workers.limit - workers.count) / Double.init(workers.limit)
+                )
             } else {
                 unused = 1
             }
@@ -413,7 +420,10 @@ extension FactoryContext {
         }
 
         let growthFactor: Int64 = self.productivity * (self.state.size.level + 1)
-        if  growthFactor == self.state.inventory.x.width(limit: growthFactor, tier: self.type.costs) {
+        if  growthFactor == self.state.inventory.x.width(
+                limit: growthFactor,
+                tier: self.type.costs
+            ) {
             self.state.size.grow()
             self.state.inventory.x.consume(
                 from: self.type.costs,
@@ -515,9 +525,15 @@ extension FactoryContext {
         )
 
         // Sell outputs.
-        self.state.inventory.account.r += self.state.inventory.out.sell(in: policy.currency.id, on: &map.exchange)
+        self.state.inventory.account.r += self.state.inventory.out.sell(
+            in: policy.currency.id,
+            on: &map.exchange
+        )
 
-        #assert(self.state.inventory.account.balance >= 0, "Factory has negative cash! (\(self.state.inventory.account))")
+        #assert(
+            self.state.inventory.account.balance >= 0,
+            "Factory has negative cash! (\(self.state.inventory.account))"
+        )
 
         self.state.today.fi = self.state.inventory.l.fulfilled
         self.state.today.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired

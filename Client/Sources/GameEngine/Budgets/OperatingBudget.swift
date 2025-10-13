@@ -52,7 +52,7 @@ extension OperatingBudget {
         /// These are the minimum theoretical balances the factory would need to purchase 100%
         /// of its needs in that tier on any particular day.
         self.min = (
-            l:  totalCostPerDay.l * d.l,
+            l: totalCostPerDay.l * d.l,
             e: (totalCostPerDay.e + w + c) * d.e,
         )
 
