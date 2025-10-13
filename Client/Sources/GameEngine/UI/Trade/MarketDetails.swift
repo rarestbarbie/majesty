@@ -3,13 +3,22 @@ import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 
-struct MarketDetails {
+struct MarketDetails: Identifiable {
     let id: Market.AssetPair
     var chart: CandlestickChart
 
     init(id: Market.AssetPair) {
         self.id = id
         self.chart = .init()
+    }
+}
+extension MarketDetails: PersistentReportDetails {
+    init(id: Self.ID, open: ()) {
+        self.init(id: id)
+    }
+    var open: () {
+        get { () }
+        set { }
     }
 }
 extension MarketDetails {

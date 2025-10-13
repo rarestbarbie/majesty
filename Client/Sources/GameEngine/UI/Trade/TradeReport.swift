@@ -6,126 +6,81 @@ import JavaScriptInterop
 public struct TradeReport {
     private var currencies: [CurrencyLabel]
     private var resources: [ResourceLabel]
+    private var selection: PersistentSelection<Filter, Void>
 
     private var markets: [MarketTableEntry]
     private var market: MarketDetails?
-    private var filter: Market.Asset?
-    private var cursor: [Market.Asset: Market.AssetPair]
 
     init() {
         self.currencies = []
         self.resources = []
+        self.selection = .init(details: ())
         self.markets = []
         self.market = nil
-        self.filter = nil
-        self.cursor = [:]
     }
 }
 extension TradeReport: PersistentReport {
     mutating func select(
         subject: Market.AssetPair?,
-        details: Never?,
-        filter: Market.Asset?
+        details: Void?,
+        filter: Filter?
     ) {
-        if  let filter: Market.Asset {
-            self.filter = filter
-        }
-
         if  let subject: Market.AssetPair {
-            // We were specifically asked to select a market, so we are done
-            self.market = .init(id: subject)
-            return
-        }
-
-        guard
-        let filter: Market.Asset = self.filter else {
-            return
-        }
-
-        guard
-        let id: Market.AssetPair = self.market?.id, id.x != filter, id.y != filter else {
-            // The currently selected market is still valid.
-            return
-        }
-
-        if  let saved: Market.AssetPair = self.cursor[filter] {
-            self.market = .init(id: saved)
-        } else {
-            self.market = nil
+            self.selection.select(subject, details: details)
+        } else if
+            let filter: Filter {
+            self.selection.filter(filter)
         }
     }
 
     mutating func update(from snapshot: borrowing GameSnapshot) {
         self.markets.removeAll()
 
-        var resourcesTraded: [Resource: ResourceLabel] = [:]
-        var currenciesTraded: [Fiat: CurrencyLabel] = [:]
-        let currencies: [Fiat: Country.Currency] = snapshot.countries.state.reduce(
-            into: [:]
-        ) { $0[$1.currency.id] = $1.currency }
-        let currencyPlayer: Fiat? = snapshot.countries.state[snapshot.player]?.currency.id
+        let currencies: [Fiat: Country.Currency] = snapshot.countries.state.reduce(into: [:]) {
+            $0[$1.currency.id] = $1.currency
+        }
 
-        for market: Market in snapshot.markets.tradeable.values {
+        let filterlists: (
+            resource: [Resource: ResourceLabel],
+            currency: [Fiat: CurrencyLabel]
+        ) = snapshot.markets.tradeable.values.reduce(into: ([:], [:])) {
+            if  case .good(let id) = $1.id.x {
+                $0.resource[id] = snapshot.rules[id]
+            }
+            if  case .fiat(let id) = $1.id.y,
+                let currency: Country.Currency = currencies[id] {
+                $0.currency[id] = currency.label
+            }
+        }
+
+        self.selection.rebuild(
+            filtering: snapshot.markets.tradeable.values,
+            entries: &self.markets,
+            details: &self.market,
+            default: .init(rawValue: .fiat(snapshot.player.currency.id))
+        ) {
             guard
-            let today: Market.Interval = market.history.last,
-            case .good(let good) = market.id.x,
-            case .fiat(let fiat) = market.id.y,
+            let today: Market.Interval = $0.history.last,
+            case .good(let good) = $0.id.x,
+            case .fiat(let fiat) = $0.id.y,
             let currency: Country.Currency = currencies[fiat] else {
-                continue
+                return nil
             }
 
             let resource: ResourceLabel = snapshot.rules[good]
 
-            resourcesTraded[good] = resource
-            currenciesTraded[fiat] = currency.label
-
-            switch self.filter {
-            case nil:           break
-            case .good(good)?:  break
-            case .fiat(fiat)?:  break
-            case _?:            continue
-            }
-
-            self.markets.append(
-                .init(
-                    id: market.id,
-                    name: "\(resource.nameWithIcon) / \(currency.name)",
-                    price: today.prices,
-                    volume: today.volume.base.total
-                )
+            return .init(
+                id: $0.id,
+                name: "\(resource.nameWithIcon) / \(currency.name)",
+                price: today.prices,
+                volume: today.volume.base.total
             )
-
-            switch self.market?.id {
-            case nil:
-                // If no market is selected, select the first one denominated in the player’s
-                // national currency. If the filter is set to a specific currency, take the
-                // first market regardless of the currency.
-                if  case .fiat? = self.filter  {
-                } else if
-                    case fiat? = currencyPlayer {
-                } else {
-                    continue
-                }
-
-                self.market = .init(id: market.id)
-                fallthrough
-
-            case market.id?:
-                self.market?.update(from: market, date: snapshot.date)
-
-            case _?:
-                continue
-            }
+        } update: {
+            $0.update(from: $2, date: snapshot.date)
         }
 
-        //  If we have a valid market selected, save it in the cursor state.
-        if  let subject: Market.AssetPair = self.market?.id,
-            let filter: Market.Asset = self.filter {
-            self.cursor[filter] = subject
-        }
-
-        self.currencies = currenciesTraded.values.sorted { $0.name < $1.name }
-        self.resources = resourcesTraded.values.sorted { $0.id < $1.id }
+        self.currencies = filterlists.currency.values.sorted { $0.name < $1.name }
+        self.resources = filterlists.resource.values.sorted { $0.id < $1.id }
     }
 }
 extension TradeReport {
@@ -144,9 +99,9 @@ extension TradeReport: JavaScriptEncodable {
         js[.type] = GameUI.ScreenType.Trade
         js[.markets] = self.markets
         js[.market] = self.market
-        js[.filter] = self.filter
+        js[.filter] = self.selection.filter
 
-        switch self.filter {
+        switch self.selection.filter?.rawValue {
         case .good?:    js[.filterlist] = 0
         case .fiat?:    js[.filterlist] = 1
         case nil:       break

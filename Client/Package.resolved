@@ -1,5 +1,5 @@
 {
-  "originHash" : "29aa843826f0c4754ef3e28233132ea95a666fb2c450ded9c93d318d763767c5",
+  "originHash" : "b0ac4eb66ea3e0a060d9766d0ed4b400eef555105ff26fa8283839b8e84e61e8",
   "pins" : [
     {
       "identity" : "d",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tayloraswift/dollup",
       "state" : {
-        "revision" : "da8c8d669e535568f1394b1bfa18728612a74d35",
-        "version" : "0.3.0"
+        "revision" : "7f92b02ecac9d01a7eb96ce000fa66c9372a6e05",
+        "version" : "0.3.1"
       }
     },
     {
@@ -33,8 +33,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-argument-parser",
       "state" : {
-        "revision" : "309a47b2b1d9b5e991f36961c983ecec72275be3",
-        "version" : "1.6.1"
+        "revision" : "cdd0ef3755280949551dc26dee5de9ddeda89f54",
+        "version" : "1.6.2"
       }
     },
     {
