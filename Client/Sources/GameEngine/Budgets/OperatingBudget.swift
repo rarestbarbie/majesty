@@ -52,26 +52,26 @@ extension OperatingBudget {
         /// These are the minimum theoretical balances the factory would need to purchase 100%
         /// of its needs in that tier on any particular day.
         self.min = (
-            l: totalCostPerDay.l * d.l,
-            e: (totalCostPerDay.e + w + c) * d.e,
+            l: (totalCostPerDay.l + w + c) * d.l,
+            e: (totalCostPerDay.e) * d.e,
         )
 
         self.dividend = max(0, (balance - self.min.l - self.min.e) / 3650)
         self.buybacks = max(0, (balance - self.min.l - self.min.e - self.dividend) / 365)
 
-        self.l.distribute(
+        (w: self.workers, c: self.clerks) = self.l.distribute(
             funds: balance / d.l,
             inelastic: inelasticCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
-        )
-
-        (w: self.workers, c: self.clerks) = self.e.distribute(
-            funds: (balance - self.min.l) / d.e,
-            inelastic: inelasticCostPerDay.e * stockpileMaxDays,
-            tradeable: tradeableCostPerDay.e * stockpileMaxDays,
             w: w * stockpileMaxDays,
             c: c * stockpileMaxDays,
         ) ?? (0, 0)
+
+        self.e.distribute(
+            funds: (balance - self.min.l) / d.e,
+            inelastic: inelasticCostPerDay.e * stockpileMaxDays,
+            tradeable: tradeableCostPerDay.e * stockpileMaxDays,
+        )
 
         self.x.distribute(
             funds: (balance - self.min.l - self.min.e) / d.x,
