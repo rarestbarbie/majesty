@@ -506,7 +506,7 @@ extension FactoryContext {
             scalingFactor: (throughput, self.state.today.ei)
         )
         self.state.inventory.e.consume(
-            from: self.type.inputs,
+            from: self.type.office,
             scalingFactor: (throughput, self.state.today.ei)
         )
         self.state.inventory.out.deposit(
