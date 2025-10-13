@@ -160,7 +160,7 @@ extension GameSession {
 
     public mutating func openTrade(
         subject: Market.AssetPair?,
-        filter: Market.Asset?
+        filter: TradeReport.Filter?
     ) throws -> TradeReport {
         self.ui.screen = .Trade
         return try self.ui.report.trade.open(

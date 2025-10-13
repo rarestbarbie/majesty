@@ -30,13 +30,9 @@ extension ProductionReport: PersistentReport {
     mutating func update(from snapshot: borrowing GameSnapshot) {
         self.factories.removeAll()
 
-        guard
-        let country: CountryContext = snapshot.countries[snapshot.player] else {
-            return
-        }
-
+        let country: CountryProperties = snapshot.player
         for factory: FactoryContext in snapshot.factories {
-            guard case country.state.id? = factory.governedBy?.id else {
+            guard case country.id? = factory.governedBy?.id else {
                 continue
             }
             guard

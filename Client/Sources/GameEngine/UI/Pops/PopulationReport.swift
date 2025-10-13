@@ -29,13 +29,9 @@ extension PopulationReport: PersistentReport {
     mutating func update(from snapshot: borrowing GameSnapshot) {
         self.pops.removeAll()
 
-        guard
-        let country: CountryContext = snapshot.countries[snapshot.player] else {
-            return
-        }
-
+        let country: CountryProperties = snapshot.player
         for pop: PopContext in snapshot.pops {
-            guard case country.state.id? = pop.governedBy?.id else {
+            guard case country.id? = pop.governedBy?.id else {
                 continue
             }
 

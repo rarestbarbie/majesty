@@ -3,7 +3,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 public struct GameUI {
-    private var player: Country?
+    private var player: CountryProperties?
     private var date: GameDate
 
     var navigator: Navigator
@@ -35,7 +35,7 @@ public struct GameUI {
 }
 extension GameUI {
     mutating func sync(with snapshot: borrowing GameSnapshot) throws {
-        self.player = snapshot.countries.state[snapshot.player]
+        self.player = snapshot.player
         self.date = snapshot.date
 
         self.navigator.update(in: snapshot.context)
@@ -68,7 +68,7 @@ extension GameUI {
 extension GameUI: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.date] = self.date
-        js[.player] = self.player
+        js[.player] = self.player?.intrinsic
 
         js[.navigator] = self.navigator
 
