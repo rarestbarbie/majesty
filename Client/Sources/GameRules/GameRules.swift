@@ -75,7 +75,13 @@ extension GameRules {
             Resource,
             ResourceMetadata
         > = table.resources.mapValues {
-            .init(name: $0.name, color: $1.color, emoji: $1.emoji, local: $1.local, hours: $1.hours)
+            .init(
+                name: $0.name,
+                color: $1.color,
+                emoji: $1.emoji,
+                local: $1.local,
+                hours: $1.hours
+            )
         }
 
         let factoryCosts: EffectsTable<

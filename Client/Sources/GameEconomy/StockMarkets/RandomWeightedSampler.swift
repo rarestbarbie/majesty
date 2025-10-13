@@ -41,7 +41,9 @@ import Random
     }
 
     /// Returns the next weighted random element.
-    @inlinable public func next(using generator: inout some RandomNumberGenerator) -> Choices.Index {
+    @inlinable public func next(
+        using generator: inout some RandomNumberGenerator
+    ) -> Choices.Index {
         let randomValue: Weight = .random(in: .zero ..< self.totalWeight, using: &generator)
 
         // `partitioningIndex` performs a binary search to find the index.

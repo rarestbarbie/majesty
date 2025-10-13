@@ -7,7 +7,9 @@ extension OrderedDictionary {
     ///
     /// Returns true if any values were removed.
     @discardableResult
-    @inlinable public mutating func update(with yield: (_ value: inout Value) throws -> Bool) rethrows -> Bool {
+    @inlinable public mutating func update(
+        with yield: (_ value: inout Value) throws -> Bool
+    ) rethrows -> Bool {
         let remove: [Int] = try self.values.indices.reduce(into: []) {
             if try !yield(&self.values[$1]) {
                 $0.append($1)

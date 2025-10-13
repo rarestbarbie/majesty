@@ -37,7 +37,11 @@ extension StockMarkets {
         )
     }
 
-    public mutating func issueShares(currency: Fiat, quantity: Int64, security: StockMarket.Security) {
+    public mutating func issueShares(
+        currency: Fiat,
+        quantity: Int64,
+        security: StockMarket.Security
+    ) {
         self.regions[currency, default: .init()].assets.append(
             .init(security: security, issuable: quantity)
         )

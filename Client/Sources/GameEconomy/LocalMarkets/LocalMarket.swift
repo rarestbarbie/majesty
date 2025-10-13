@@ -78,7 +78,10 @@ extension LocalMarket {
         self.today = .init(price: max(price, priceFloor))
     }
 
-    public mutating func match(using random: inout PseudoRandom) -> (asks: [Order], bids: [Order]) {
+    public mutating func match(using random: inout PseudoRandom) -> (
+        asks: [Order],
+        bids: [Order]
+    ) {
         if self.today.supply > self.today.demand {
             self.asks.shuffle(using: &random.generator)
 
