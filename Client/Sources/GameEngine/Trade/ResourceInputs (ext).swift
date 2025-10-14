@@ -13,7 +13,8 @@ extension ResourceInputs {
     }
 
     var valueAcquired: Int64 {
-        self.tradeable.values.reduce(0) { $0 + $1.valueAcquired }
+        self.tradeable.values.reduce(0) { $0 + $1.valueAcquired } +
+        self.inelastic.values.reduce(0) { $0 + $1.valueAcquired }
     }
 
     func width(limit: Int64, tier: ResourceTier) -> Int64 {
