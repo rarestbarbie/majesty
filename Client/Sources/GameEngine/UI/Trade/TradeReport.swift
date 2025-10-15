@@ -4,17 +4,15 @@ import JavaScriptKit
 import JavaScriptInterop
 
 public struct TradeReport {
-    private var currencies: [CurrencyLabel]
-    private var resources: [ResourceLabel]
     private var selection: PersistentSelection<Filter, Void>
 
+    private var filters: ([MarketFilterLabel], [MarketFilterLabel])
     private var markets: [MarketTableEntry]
     private var market: MarketDetails?
 
     init() {
-        self.currencies = []
-        self.resources = []
         self.selection = .init(details: ())
+        self.filters = ([], [])
         self.markets = []
         self.market = nil
     }
@@ -79,8 +77,11 @@ extension TradeReport: PersistentReport {
             $0.update(from: $2, date: snapshot.date)
         }
 
-        self.currencies = filterlists.currency.values.sorted { $0.name < $1.name }
-        self.resources = filterlists.resource.values.sorted { $0.id < $1.id }
+        self.filters.0 = filterlists.resource.values.map(MarketFilterLabel.resource(_:))
+        self.filters.1 = filterlists.currency.values.map(MarketFilterLabel.currency(_:))
+
+        self.filters.0.sort()
+        self.filters.1.sort()
     }
 }
 extension TradeReport {
@@ -107,9 +108,6 @@ extension TradeReport: JavaScriptEncodable {
         case nil:       break
         }
 
-        js[.filterlists] = [
-            self.resources.lazy.map(MarketFilterLabel.resource(_:)),
-            self.currencies.lazy.map(MarketFilterLabel.currency(_:))
-        ]
+        js[.filterlists] = [self.filters.0, self.filters.1]
     }
 }

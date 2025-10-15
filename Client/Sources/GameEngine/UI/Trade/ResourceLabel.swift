@@ -1,6 +1,6 @@
 import GameIDs
 
-struct ResourceLabel: Identifiable {
+struct ResourceLabel: Equatable, Identifiable {
     let id: Resource
     let name: String
     let icon: Character

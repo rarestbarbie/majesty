@@ -2,7 +2,7 @@ import GameEconomy
 import JavaScriptKit
 import JavaScriptInterop
 
-enum MarketFilterLabel {
+enum MarketFilterLabel: Equatable {
     case currency(CurrencyLabel)
     case resource(ResourceLabel)
 }
@@ -13,6 +13,17 @@ extension MarketFilterLabel: Identifiable {
         case .resource(let label): .good(label.id)
         }
     }
+}
+extension MarketFilterLabel {
+    var name: String {
+        switch self {
+        case .currency(let label): label.name
+        case .resource(let label): label.name
+        }
+    }
+}
+extension MarketFilterLabel: Comparable {
+    static func < (a: Self, b: Self) -> Bool { (a.name, a.id) < (b.name, b.id) }
 }
 extension MarketFilterLabel: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {

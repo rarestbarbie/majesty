@@ -5,6 +5,8 @@ export * from './Diffing/DiffableListElement.js';
 export * from './Diffing/ManagedList.js';
 export * from './Diffing/ManagedListElement.js';
 export * from './Diffing/StaticList.js';
+export * from './Filters/FilterList.js';
+export * from './Filters/FilterTabs.js';
 export * from './Menus/ContextMenu.js';
 export * from './Menus/ContextMenuItem.js';
 export * from './Menus/ContextMenuState.js';

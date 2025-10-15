@@ -1,0 +1,46 @@
+div.tabs {
+    position: relative;
+    display: flex;
+    flex-direction: row;
+    gap: 0.5rem;
+
+    --tab-height: 2rem;
+}
+div.tabs > * {
+    flex-grow: 1;
+}
+div.tabs > * > label {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    height: var(--tab-height);
+    width: 100%;
+
+    cursor: pointer;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+}
+div.tabs > * > label:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+}
+div.tabs > * > input[type=radio] {
+    display: none;
+}
+div.tabs > * > input[type=radio]:not(:checked) + label + *.tabcontent {
+    display: none;
+}
+div.tabs > * > input[type=radio]:checked + label + *.tabcontent {
+    display: block;
+
+    position: absolute;
+    top: var(--tab-height);
+    left: 0;
+
+    margin-top: 1rem;
+    width: 100%;
+}
+div.tabs > * > input[type=radio]:checked + label {
+    background-color: rgba(255, 255, 255, 0.1);
+    border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+}
