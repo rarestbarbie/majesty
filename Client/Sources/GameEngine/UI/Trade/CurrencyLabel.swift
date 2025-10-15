@@ -1,6 +1,6 @@
 import GameIDs
 
-struct CurrencyLabel: Identifiable {
+struct CurrencyLabel: Equatable, Identifiable {
     let id: Fiat
     let name: String
 }
