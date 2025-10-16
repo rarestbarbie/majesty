@@ -23,10 +23,8 @@ extension PopulationReport: PersistentReport {
         details: PopDetailsTab?,
         filter: Filter?
     ) {
-        if  let subject: PopID {
-            self.selection.select(subject, details: details)
-        } else if
-            let filter: Filter {
+        self.selection.select(subject, detailsTab: details)
+        if  let filter: Filter {
             self.selection.filter(filter)
         }
     }

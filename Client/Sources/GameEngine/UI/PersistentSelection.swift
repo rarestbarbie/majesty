@@ -1,11 +1,11 @@
 struct PersistentSelection<Filter, DetailsTab> where Filter: PersistentSelectionFilter {
-    private var details: DetailsTab
+    private var detailsTab: DetailsTab
     private var cursors: [Filter: Filter.Subject.ID]
     private var cursor: Filter.Subject.ID?
     private(set) var filter: Filter?
 
     init(defaultTab: DetailsTab) {
-        self.details = defaultTab
+        self.detailsTab = defaultTab
         self.cursors = [:]
         self.cursor = nil
         self.filter = nil
@@ -13,14 +13,14 @@ struct PersistentSelection<Filter, DetailsTab> where Filter: PersistentSelection
 }
 extension PersistentSelection {
     /// Sets the currently selected item and records it for stickiness.
-    mutating func select(_ selected: Filter.Subject.ID?, details: DetailsTab?) {
+    mutating func select(_ selected: Filter.Subject.ID?, detailsTab: DetailsTab?) {
         self.cursor = selected
         if  let selected: Filter.Subject.ID,
             let filter: Filter = self.filter {
             self.cursors[filter] = selected
         }
-        if  let details: DetailsTab {
-            self.details = details
+        if  let detailsTab: DetailsTab {
+            self.detailsTab = detailsTab
         }
     }
 
@@ -63,7 +63,7 @@ extension PersistentSelection {
             if case selected? = details?.id {
                 // no change
             } else {
-                details = .init(id: selected, open: self.details)
+                details = .init(id: selected, open: self.detailsTab)
             }
         } else {
             // will be populated below
@@ -82,12 +82,12 @@ extension PersistentSelection {
 
             if  var state: Details = consume details {
                 if  state.id == object.id {
-                    state.open = self.details
+                    state.open = self.detailsTab
                     update(&state, entry, object)
                 }
                 details = state
             } else {
-                var state: Details = .init(id: object.id, open: self.details)
+                var state: Details = .init(id: object.id, open: self.detailsTab)
                 update(&state, entry, object)
                 details = state
             }
