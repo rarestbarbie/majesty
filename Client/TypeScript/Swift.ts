@@ -44,10 +44,12 @@ export class Swift {
     declare public static openProduction: (
         factory: GameID | null,
         details: FactoryDetailsTab | null,
+        filter: string | null,
     ) => ProductionReport;
     declare public static openPopulation: (
         id: GameID | null,
-        details: PopDetailsTab | null
+        details: PopDetailsTab | null,
+        filter: string | null,
     ) => PopulationReport;
     declare public static openTrade: (
         market: string | null,

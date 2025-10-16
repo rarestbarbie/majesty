@@ -40,6 +40,9 @@ struct PopContext: RuntimeContext, LegalEntityContext {
         self.budget = nil
     }
 }
+extension PopContext: Identifiable {
+    var id: PopID { self.state.id }
+}
 extension PopContext {
     private static var stockpileDays: ClosedRange<Int64> { 3 ... 7 }
 

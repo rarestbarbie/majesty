@@ -134,26 +134,28 @@ extension GameSession {
 
     public mutating func openProduction(
         subject: FactoryID?,
-        details: FactoryDetailsTab?
+        details: FactoryDetailsTab?,
+        filter: ProductionReport.Filter?
     ) throws -> ProductionReport {
         self.ui.screen = .Production
         return try self.ui.report.production.open(
             subject: subject,
             details: details,
-            filter: nil,
+            filter: filter,
             snapshot: self.snapshot
         )
     }
 
     public mutating func openPopulation(
         subject: PopID?,
-        details: PopDetailsTab?
+        details: PopDetailsTab?,
+        filter: PopulationReport.Filter?
     ) throws -> PopulationReport {
         self.ui.screen = .Population
         return try self.ui.report.population.open(
             subject: subject,
             details: details,
-            filter: nil,
+            filter: filter,
             snapshot: self.snapshot
         )
     }

@@ -11,7 +11,7 @@ public struct TradeReport {
     private var market: MarketDetails?
 
     init() {
-        self.selection = .init(details: ())
+        self.selection = .init(defaultTab: ())
         self.filters = ([], [])
         self.markets = []
         self.market = nil

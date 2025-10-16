@@ -12,9 +12,8 @@ extension TradeReport {
 }
 extension TradeReport.Filter: ConvertibleToJSValue, LoadableFromJSValue {}
 extension TradeReport.Filter: PersistentSelectionFilter {
-    typealias Selection = Market.AssetPair
-
-    static func ~= (self: Self, value: Market.AssetPair) -> Bool {
-        self.rawValue == value.x || self.rawValue == value.y
+    typealias Subject = Market
+    static func ~= (self: Self, value: Market) -> Bool {
+        self.rawValue == value.id.x || self.rawValue == value.id.y
     }
 }

@@ -16,6 +16,7 @@ import {
     CandlestickChartInterval,
     MarketTableRow,
     MarketTableEntry,
+    ScreenType,
 } from '../exports.js';
 
 export class TradeOverview extends ScreenContent {
@@ -91,7 +92,7 @@ export class TradeOverview extends ScreenContent {
         for (let i: number = 0; i < this.dom.index.tabs.length; i++) {
             this.filters[i].update(
                 state.filterlists[i],
-                (label: MarketFilterLabel) => new MarketFilter(label),
+                (label: MarketFilterLabel) => new MarketFilter(label, ScreenType.Trade),
                 () => {},
                 state.filter
             );

@@ -1,11 +1,11 @@
 struct PersistentSelection<Filter, DetailsTab> where Filter: PersistentSelectionFilter {
     private var details: DetailsTab
-    private var cursors: [Filter: Filter.Selection]
-    private var cursor: Filter.Selection?
+    private var cursors: [Filter: Filter.Subject.ID]
+    private var cursor: Filter.Subject.ID?
     private(set) var filter: Filter?
 
-    init(details: DetailsTab) {
-        self.details = details
+    init(defaultTab: DetailsTab) {
+        self.details = defaultTab
         self.cursors = [:]
         self.cursor = nil
         self.filter = nil
@@ -13,9 +13,9 @@ struct PersistentSelection<Filter, DetailsTab> where Filter: PersistentSelection
 }
 extension PersistentSelection {
     /// Sets the currently selected item and records it for stickiness.
-    mutating func select(_ selected: Filter.Selection?, details: DetailsTab?) {
+    mutating func select(_ selected: Filter.Subject.ID?, details: DetailsTab?) {
         self.cursor = selected
-        if  let selected: Filter.Selection,
+        if  let selected: Filter.Subject.ID,
             let filter: Filter = self.filter {
             self.cursors[filter] = selected
         }
@@ -27,30 +27,18 @@ extension PersistentSelection {
     /// Changes the active filter.
     mutating func filter(_ filter: Filter) {
         self.filter = filter
-
-        guard
-        let current: Filter.Selection = self.cursor else {
-            self.cursor = self.cursors[filter]
-            return
-        }
-
-        if  filter ~= current {
-            self.cursors[filter] = current
-        } else {
-            self.cursor = self.cursors[filter]
-        }
+        self.cursor = self.cursor ?? self.cursors[filter]
     }
 }
 extension PersistentSelection {
-    mutating func rebuild<Source, Entry, Details>(
-        filtering objects: some Collection<Source>,
+    mutating func rebuild<Entry, Details>(
+        filtering objects: some Collection<Filter.Subject>,
         entries: inout [Entry],
         details: inout Details?,
         default: @autoclosure () -> Filter,
-        _ entry: (Source) -> Entry?,
-        update: (inout Details, Entry, Source) -> Void
-    ) where Details: PersistentReportDetails<Filter.Selection, DetailsTab>,
-        Source: Identifiable<Filter.Selection> {
+        _ entry: (Filter.Subject) -> Entry?,
+        update: (inout Details, Entry, Filter.Subject) -> Void
+    ) where Details: PersistentReportDetails<Filter.Subject.ID, DetailsTab> {
         let filter: Filter
 
         if  let current: Filter = self.filter {
@@ -60,7 +48,18 @@ extension PersistentSelection {
             self.filter(filter)
         }
 
-        if  let selected: Filter.Selection = self.cursor {
+        // i wonder if there is a more efficient way to do this
+        if  let selected: Filter.Subject.ID = self.cursor {
+            if  objects.contains(where: { filter ~= $0 }) {
+                // if we’ve changed filters, but the old selection is still valid, keep it
+                self.cursors[filter] = selected
+            } else {
+                self.cursor = nil
+            }
+        }
+
+        if  let selected: Filter.Subject.ID = self.cursor {
+
             if case selected? = details?.id {
                 // no change
             } else {
@@ -73,7 +72,7 @@ extension PersistentSelection {
 
         entries.removeAll(keepingCapacity: true)
 
-        for object: Source in objects where filter ~= object.id {
+        for object: Filter.Subject in objects where filter ~= object {
             guard
             let entry: Entry = entry(object) else {
                 continue
