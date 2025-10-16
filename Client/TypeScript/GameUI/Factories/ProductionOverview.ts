@@ -1,4 +1,6 @@
 import {
+    FilterTabs,
+    FilterList,
     StaticList,
     UpdateText
 } from '../../DOM/exports.js';
@@ -10,6 +12,8 @@ import {
     FactoryTableEntry,
     FactoryTableRow,
     FactoryDetailsTab,
+    LegalEntityFilterLabel,
+    MarketFilter,
     OwnershipBreakdown,
     ProductionReport,
     ResourceNeed,
@@ -21,6 +25,7 @@ import {
 } from '../exports.js';
 
 export class ProductionOverview extends ScreenContent {
+    private readonly filters: FilterList<MarketFilter, string>[];
     private readonly factories: StaticList<FactoryTableRow, GameID>;
     private readonly needs: StaticList<ResourceNeedRow, string>;
     private readonly sales: StaticList<ResourceSaleBox, string>;
@@ -29,7 +34,7 @@ export class ProductionOverview extends ScreenContent {
     private readonly ownership: OwnershipBreakdown;
 
     private dom?: {
-        readonly index: HTMLUListElement;
+        readonly index: FilterTabs;
         readonly panel: HTMLDivElement;
         readonly title: HTMLElement;
         readonly titleName: HTMLSpanElement;
@@ -39,6 +44,11 @@ export class ProductionOverview extends ScreenContent {
 
     constructor() {
         super();
+
+        this.filters = [
+            new FilterList<MarketFilter, string>('🌐'),
+        ];
+
         this.factories = new StaticList<FactoryTableRow, GameID>(document.createElement('div'));
         this.factories.table('Factories', FactoryTableRow.columns);
 
@@ -70,7 +80,7 @@ export class ProductionOverview extends ScreenContent {
 
         if (!this.dom) {
             this.dom = {
-                index: document.createElement('ul'),
+                index: new FilterTabs(this.filters),
                 panel: document.createElement('div'),
                 title: document.createElement('header'),
                 titleName: document.createElement('span'),
@@ -129,10 +139,11 @@ export class ProductionOverview extends ScreenContent {
         }
 
         if (root) {
-            root.appendChild(this.dom.index);
+            root.appendChild(this.dom.index.node);
             root.appendChild(this.dom.panel);
         }
 
+        this.dom.index.tabs[state.filterlist ?? 0].checked = true;
         this.update(state);
     }
 
@@ -141,7 +152,7 @@ export class ProductionOverview extends ScreenContent {
             throw new Error('ProductionOverview not attached');
         }
 
-        this.dom.index.remove();
+        this.dom.index.node.remove();
         this.dom.panel.remove();
         this.dom = undefined;
     }
@@ -157,6 +168,22 @@ export class ProductionOverview extends ScreenContent {
             (factory: FactoryTableEntry, row: FactoryTableRow) => row.update(factory),
             state.factory?.id
         );
+
+        for (let i: number = 0; i < this.dom.index.tabs.length; i++) {
+            this.filters[i].update(
+                state.filterlists[i],
+                (label: LegalEntityFilterLabel) => new MarketFilter(
+                    {
+                        id: label.id,
+                        name: label.name,
+                        icon: '',
+                    },
+                    ScreenType.Production
+                ),
+                () => {},
+                state.filter
+            );
+        }
 
         if (state.factory === undefined) {
             return;
