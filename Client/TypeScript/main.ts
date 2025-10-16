@@ -46,6 +46,7 @@ async function main(user: Firebase.User): Promise<void> {
         persistence.currentMap = oldMap;
         terrain = await persistence.loadMap();
     } else {
+        console.log(`Creating new map: ${newMap}`);
         persistence.currentMap = newMap ?? 'untitled';
         terrain = await json('/majesty/terrain.json') as any[];
     }

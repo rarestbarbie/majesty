@@ -42,7 +42,7 @@ extension PopulationReport: PersistentReport {
             if case country.id? = $1.governedBy?.id {
                 {
                     $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
-                } (&$0.location[$1.state.home])
+                } (&$0.location[tile])
             }
         }
 

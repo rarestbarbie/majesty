@@ -6,11 +6,15 @@ import JavaScriptInterop
 
 public struct ProductionReport {
     private var selection: PersistentSelection<Filter, FactoryDetailsTab>
+
+    private var filters: ([FilterLabel], [Never])
     private var factories: [FactoryTableEntry]
     private var factory: FactoryDetails?
 
     init() {
         self.selection = .init(defaultTab: .Inventory)
+
+        self.filters = ([], [])
         self.factories = []
         self.factory = nil
     }
@@ -31,6 +35,19 @@ extension ProductionReport: PersistentReport {
         self.factories.removeAll()
 
         let country: CountryProperties = snapshot.player
+
+        let filterlists: (
+            location: [Address: FilterLabel],
+            Never?
+        ) = snapshot.factories.reduce(into: ([:], nil)) {
+            let tile: Address = $1.state.tile
+            if case country.id? = $1.governedBy?.id {
+                {
+                    $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
+                } (&$0.location[tile])
+            }
+        }
+
         self.selection.rebuild(
             filtering: snapshot.factories,
             entries: &self.factories,
@@ -67,6 +84,8 @@ extension ProductionReport: PersistentReport {
         } update: {
             $0.update(to: $2, from: snapshot) ;
         }
+
+        self.filters.0 = [.all] + filterlists.location.values.sorted()
     }
 }
 extension ProductionReport {
@@ -74,6 +93,10 @@ extension ProductionReport {
         case type
         case factories
         case factory
+
+        case filter
+        case filterlist
+        case filterlists
     }
 }
 extension ProductionReport: JavaScriptEncodable {
@@ -81,5 +104,15 @@ extension ProductionReport: JavaScriptEncodable {
         js[.type] = GameUI.ScreenType.Production
         js[.factories] = self.factories
         js[.factory] = self.factory
+
+        js[.filter] = self.selection.filter
+
+        switch self.selection.filter {
+        case nil: break
+        case .all?: js[.filterlist] = 0
+        case .location?: js[.filterlist] = 0
+        }
+
+        js[.filterlists] = [self.filters.0]
     }
 }
