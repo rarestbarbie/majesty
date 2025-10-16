@@ -21,10 +21,8 @@ extension ProductionReport: PersistentReport {
         details: FactoryDetailsTab?,
         filter: Filter?
     ) {
-        if  let subject: FactoryID {
-            self.selection.select(subject, details: details)
-        } else if
-            let filter: Filter {
+        self.selection.select(subject, detailsTab: details)
+        if  let filter: Filter {
             self.selection.filter(filter)
         }
     }

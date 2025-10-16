@@ -23,10 +23,8 @@ extension TradeReport: PersistentReport {
         details: Void?,
         filter: Filter?
     ) {
-        if  let subject: Market.AssetPair {
-            self.selection.select(subject, details: details)
-        } else if
-            let filter: Filter {
+        self.selection.select(subject, detailsTab: details)
+        if  let filter: Filter {
             self.selection.filter(filter)
         }
     }
