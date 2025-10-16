@@ -5,10 +5,12 @@ import JavaScriptKit
 import JavaScriptInterop
 
 public struct ProductionReport {
+    private var selection: PersistentSelection<Filter, FactoryDetailsTab>
     private var factories: [FactoryTableEntry]
     private var factory: FactoryDetails?
 
     init() {
+        self.selection = .init(defaultTab: .Inventory)
         self.factories = []
         self.factory = nil
     }
@@ -17,13 +19,13 @@ extension ProductionReport: PersistentReport {
     mutating func select(
         subject: FactoryID?,
         details: FactoryDetailsTab?,
-        filter: Never?
+        filter: Filter?
     ) {
         if  let subject: FactoryID {
-            self.factory = .init(id: subject, open: self.factory?.open ?? .Inventory)
-        }
-        if  let details: FactoryDetailsTab {
-            self.factory?.open = details
+            self.selection.select(subject, details: details)
+        } else if
+            let filter: Filter {
+            self.selection.filter(filter)
         }
     }
 
@@ -31,38 +33,42 @@ extension ProductionReport: PersistentReport {
         self.factories.removeAll()
 
         let country: CountryProperties = snapshot.player
-        for factory: FactoryContext in snapshot.factories {
-            guard case country.id? = factory.governedBy?.id else {
-                continue
+        self.selection.rebuild(
+            filtering: snapshot.factories,
+            entries: &self.factories,
+            details: &self.factory,
+            default: .all
+        ) {
+            guard case country.id? = $0.governedBy?.id else {
+                return nil
             }
             guard
-            let planet: PlanetContext = snapshot.planets[factory.state.tile.planet],
-            let tile: PlanetGrid.Tile = planet.grid.tiles[factory.state.tile.tile] else {
-                continue
+            let planet: PlanetContext = snapshot.planets[$0.state.tile.planet],
+            let tile: PlanetGrid.Tile = planet.grid.tiles[$0.state.tile.tile] else {
+                return nil
             }
 
-            let liquidationProgress: Double? = factory.state.liquidation.map {
+            let equity: Equity<LEI>.Statistics = $0.equity
+            let liquidationProgress: Double? = $0.state.liquidation.map {
                 $0.burning == 0 ? 1 : Double(
-                    $0.burning - factory.equity.shareCount
+                    $0.burning - equity.shareCount
                 ) / Double($0.burning)
             }
 
-            self.factories.append(
-                .init(
-                    id: factory.state.id,
-                    location: tile.name ?? planet.state.name,
-                    type: factory.type.name,
-                    size: factory.state.size,
-                    liquidationProgress: liquidationProgress,
-                    yesterday: factory.state.yesterday,
-                    today: factory.state.today,
-                    workers: factory.workers.map(FactoryWorkers.init(aggregate:)),
-                    clerks: factory.clerks.map(FactoryWorkers.init(aggregate:))
-                )
+            return .init(
+                id: $0.state.id,
+                location: tile.name ?? planet.state.name,
+                type: $0.type.name,
+                size: $0.state.size,
+                liquidationProgress: liquidationProgress,
+                yesterday: $0.state.yesterday,
+                today: $0.state.today,
+                workers: $0.workers.map(FactoryWorkers.init(aggregate:)),
+                clerks: $0.clerks.map(FactoryWorkers.init(aggregate:))
             )
+        } update: {
+            $0.update(to: $2, from: snapshot) ;
         }
-
-        self.factory?.update(from: snapshot)
     }
 }
 extension ProductionReport {

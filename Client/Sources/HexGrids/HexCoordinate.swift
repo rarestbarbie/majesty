@@ -1,4 +1,4 @@
-@frozen public enum HexCoordinate: Equatable, Hashable, Sendable {
+@frozen public enum HexCoordinate: Equatable, Hashable, Comparable, Sendable {
     /// Solitary tile.
     case x
     /// Northern hemisphere tile.

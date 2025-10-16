@@ -7,6 +7,8 @@ export * from './Developer/PlanetTile.js';
 export * from './Developer/PlanetTileEditor.js';
 export * from './Developer/PlanetTileEditorState.js';
 
+export * from './LegalEntityFilterLabel.js';
+
 export * from './Markets/Candle.js';
 export * from './Markets/CandleGeometry.js';
 export * from './Charts/PieChart.js';

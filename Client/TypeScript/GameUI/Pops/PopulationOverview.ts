@@ -1,8 +1,10 @@
-import { StaticList, UpdateText } from '../../DOM/exports.js';
+import { FilterList, FilterTabs, StaticList, UpdateText } from '../../DOM/exports.js';
 import { GameID } from '../../GameEngine/GameID.js';
 import { ScreenContent } from '../Application/ScreenContent.js';
 import { Swift } from '../../Swift.js';
 import {
+    LegalEntityFilterLabel,
+    MarketFilter,
     PieChart,
     PopulationReport,
     PopDetailsTab,
@@ -20,6 +22,7 @@ import {
 } from '../exports.js';
 
 export class PopulationOverview extends ScreenContent {
+    private filters: FilterList<MarketFilter, string>[];
     private needs: StaticList<ResourceNeedRow, string>;
     private sales: StaticList<ResourceSaleBox, string>;
     private readonly charts: {
@@ -30,7 +33,7 @@ export class PopulationOverview extends ScreenContent {
 
     private pops: StaticList<PopTableRow, GameID>;
     private dom?: {
-        readonly index: HTMLUListElement;
+        readonly index: FilterTabs;
         readonly panel: HTMLDivElement;
         readonly title: HTMLElement;
         readonly titleIcon: PopIcon;
@@ -41,6 +44,10 @@ export class PopulationOverview extends ScreenContent {
 
     constructor() {
         super();
+
+        this.filters = [
+            new FilterList<MarketFilter, string>('🌐'),
+        ];
 
         this.pops = new StaticList<PopTableRow, GameID>(document.createElement('div'));
         this.pops.table('Pops', PopTableRow.columns);
@@ -62,7 +69,8 @@ export class PopulationOverview extends ScreenContent {
         let subject: string | null = parameters.get('id');
         let state: PopulationReport = Swift.openPopulation(
             subject ? parseInt(subject) as GameID : null,
-            parameters.get('details') as PopDetailsTab
+            parameters.get('details') as PopDetailsTab,
+            parameters.get('filter')
         );
 
         // We need to empty the upper content, as we will need to replace the IDs.
@@ -72,7 +80,7 @@ export class PopulationOverview extends ScreenContent {
 
         if (!this.dom) {
             this.dom = {
-                index: document.createElement('ul'),
+                index: new FilterTabs(this.filters),
                 panel: document.createElement('div'),
                 title: document.createElement('header'),
                 titleIcon: new PopIcon(),
@@ -133,10 +141,11 @@ export class PopulationOverview extends ScreenContent {
         }
 
         if (root) {
-            root.appendChild(this.dom.index);
+            root.appendChild(this.dom.index.node);
             root.appendChild(this.dom.panel);
         }
 
+        this.dom.index.tabs[state.filterlist ?? 0].checked = true;
         this.update(state);
     }
 
@@ -145,7 +154,7 @@ export class PopulationOverview extends ScreenContent {
             throw new Error('PopulationOverview not attached');
         }
 
-        this.dom.index.remove();
+        this.dom.index.node.remove();
         this.dom.panel.remove();
         this.dom = undefined;
     }
@@ -161,6 +170,22 @@ export class PopulationOverview extends ScreenContent {
             (pop: PopTableEntry, row: PopTableRow) => row.update(pop),
             state.pop?.id
         );
+
+        for (let i: number = 0; i < this.dom.index.tabs.length; i++) {
+            this.filters[i].update(
+                state.filterlists[i],
+                (label: LegalEntityFilterLabel) => new MarketFilter(
+                    {
+                        id: label.id,
+                        name: label.name,
+                        icon: '',
+                    },
+                    ScreenType.Population
+                ),
+                () => {},
+                state.filter
+            );
+        }
 
         if (state.pop === undefined) {
             return;

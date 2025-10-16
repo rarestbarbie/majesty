@@ -9,6 +9,11 @@ import HexGrids
         self.tile = tile
     }
 }
+extension Address: Comparable {
+    @inlinable public static func < (a: Self, b: Self) -> Bool {
+        (a.planet, a.tile) < (b.planet, b.tile)
+    }
+}
 extension Address: CustomStringConvertible {
     @inlinable public var description: String {
         "\(self.planet)\(self.tile)"

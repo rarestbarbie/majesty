@@ -3,7 +3,7 @@ import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 
-struct FactoryDetails {
+struct FactoryDetails: PersistentReportDetails {
     let id: FactoryID
     var open: FactoryDetailsTab
     private var inventory: InventoryBreakdown<FactoryDetailsTab>
@@ -22,12 +22,7 @@ struct FactoryDetails {
     }
 }
 extension FactoryDetails {
-    mutating func update(from snapshot: borrowing GameSnapshot) {
-        guard
-        let factory: FactoryContext = snapshot.factories[self.id] else {
-            return
-        }
-
+    mutating func update(to factory: FactoryContext, from snapshot: borrowing GameSnapshot) {
         switch self.open {
         case .Inventory: self.inventory.update(from: factory, in: snapshot)
         case .Ownership: self.ownership.update(from: factory, in: snapshot.context)

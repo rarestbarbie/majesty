@@ -9,7 +9,7 @@ export class MarketFilter implements DiffableListElement<string> {
     private readonly icon: HTMLSpanElement;
     private readonly name: HTMLSpanElement;
 
-    constructor(market: MarketFilterLabel) {
+    constructor(market: MarketFilterLabel, screen: ScreenType) {
         this.id = market.id;
         this.node = document.createElement('li');
         this.link = document.createElement('a');
@@ -19,7 +19,7 @@ export class MarketFilter implements DiffableListElement<string> {
         this.icon.textContent = market.icon;
         this.name.textContent = market.name;
 
-        this.link.href = `#screen=${ScreenType.Trade}&filter=${market.id}`;
+        this.link.href = `#screen=${screen}&filter=${market.id}`;
         this.link.appendChild(this.icon);
         this.link.appendChild(this.name);
         this.node.appendChild(this.link);

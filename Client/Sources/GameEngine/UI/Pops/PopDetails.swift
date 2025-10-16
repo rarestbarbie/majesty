@@ -4,7 +4,7 @@ import JavaScriptKit
 import JavaScriptInterop
 import VectorCharts
 
-struct PopDetails {
+struct PopDetails: PersistentReportDetails {
     let id: PopID
     var open: PopDetailsTab
 
@@ -23,12 +23,7 @@ struct PopDetails {
     }
 }
 extension PopDetails {
-    mutating func update(from snapshot: borrowing GameSnapshot) {
-        guard
-        let pop: PopContext = snapshot.pops[self.id] else {
-            return
-        }
-
+    mutating func update(to pop: PopContext, from snapshot: borrowing GameSnapshot) {
         self.state = pop.state
 
         switch self.open {

@@ -42,6 +42,9 @@ struct FactoryContext: LegalEntityContext, RuntimeContext {
         self.budget = nil
     }
 }
+extension FactoryContext: Identifiable {
+    var id: FactoryID { self.state.id }
+}
 extension FactoryContext {
     private static var stockpileDays: ClosedRange<Int64> { 3 ... 7 }
     static var pr: Int { 8 }

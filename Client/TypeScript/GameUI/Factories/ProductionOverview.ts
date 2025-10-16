@@ -60,7 +60,8 @@ export class ProductionOverview extends ScreenContent {
         const factory: string | null = parameters.get('id');
         const state: ProductionReport = Swift.openProduction(
             factory ? parseInt(factory) as GameID : null,
-            parameters.get('details') as FactoryDetailsTab
+            parameters.get('details') as FactoryDetailsTab,
+            parameters.get('filter')
         );
 
         this.needs.table('Needs', ResourceNeedRow.columns);
