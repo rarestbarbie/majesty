@@ -27,7 +27,7 @@ extension PersistentSelection {
     /// Changes the active filter.
     mutating func filter(_ filter: Filter) {
         self.filter = filter
-        self.cursor = self.cursor ?? self.cursors[filter]
+        self.cursor = self.cursors[filter] ?? self.cursor
     }
 }
 extension PersistentSelection {
@@ -50,7 +50,7 @@ extension PersistentSelection {
 
         // i wonder if there is a more efficient way to do this
         if  let selected: Filter.Subject.ID = self.cursor {
-            if  objects.contains(where: { filter ~= $0 }) {
+            if  objects.contains(where: { $0.id == selected && filter ~= $0 }) {
                 // if we’ve changed filters, but the old selection is still valid, keep it
                 self.cursors[filter] = selected
             } else {
