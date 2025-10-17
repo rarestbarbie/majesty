@@ -166,6 +166,7 @@ extension Pop {
         case yesterday_fx = "y_fx"
         case yesterday_px = "y_px"
         case yesterday_pa = "y_pa"
+        case yesterday_vi = "y_vi"
 
         case today_size = "t_size"
         case today_mil = "t_mil"
@@ -175,6 +176,7 @@ extension Pop {
         case today_fx = "t_fx"
         case today_px = "t_px"
         case today_pa = "t_pa"
+        case today_vi = "t_vi"
 
         case equity
         case jobs
@@ -200,6 +202,7 @@ extension Pop: JavaScriptEncodable {
         js[.yesterday_fx] = self.yesterday.fx
         js[.yesterday_px] = self.yesterday.px
         js[.yesterday_pa] = self.yesterday.pa
+        js[.yesterday_vi] = self.yesterday.vi
 
         js[.today_size] = self.today.size
         js[.today_mil] = self.today.mil
@@ -209,6 +212,7 @@ extension Pop: JavaScriptEncodable {
         js[.today_fx] = self.today.fx
         js[.today_px] = self.today.px
         js[.today_pa] = self.today.pa
+        js[.today_vi] = self.today.vi
 
         js[.equity] = self.equity
         js[.jobs] = self.jobs.isEmpty ? nil : self.jobs
@@ -225,6 +229,7 @@ extension Pop: JavaScriptDecodable {
             fx: try js[.today_fx]?.decode() ?? 0,
             px: try js[.today_px]?.decode() ?? 1,
             pa: try js[.today_pa]?.decode() ?? 0.5,
+            vi: try js[.today_vi]?.decode() ?? 0
         )
         self.init(
             id: try js[.id]?.decode() ?? 0,
@@ -247,6 +252,7 @@ extension Pop: JavaScriptDecodable {
                 fx: try js[.yesterday_fx]?.decode() ?? today.fx,
                 px: try js[.yesterday_px]?.decode() ?? today.px,
                 pa: try js[.yesterday_pa]?.decode() ?? today.pa,
+                vi: try js[.yesterday_vi]?.decode() ?? today.vi,
             ),
             today: today,
             equity: try js[.equity]?.decode() ?? [:],

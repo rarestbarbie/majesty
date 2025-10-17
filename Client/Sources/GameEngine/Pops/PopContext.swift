@@ -239,9 +239,19 @@ extension PopContext {
 }
 extension PopContext: TransactingContext {
     mutating func allocate(map: inout GameMap) {
-        self.state.today.size += Binomial[self.state.today.size, 0.000_02].sample(
-            using: &map.random.generator
-        )
+        if  self.state.type.stratum == .Ward {
+            if  self.state.today.pa < 0.5 {
+                let p: Double = 0.000_1 * (0.5 - self.state.today.pa)
+                self.state.today.size -= Binomial[self.state.today.size, p].sample(
+                    using: &map.random.generator
+                )
+            } else {
+                let p: Double = 0.000_1 * (self.state.today.pa - 0.5)
+                self.state.today.size += Binomial[self.state.today.size, p].sample(
+                    using: &map.random.generator
+                )
+            }
+        }
 
         let currency: Fiat = self.occupiedBy!.currency.id
         let balance: Int64 = self.state.inventory.account.balance
@@ -394,11 +404,20 @@ extension PopContext: TransactingContext {
             scalingFactor: (self.state.today.size, z.x)
         )
 
+        self.state.today.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
+
         liquidation:
         if case .Ward = self.state.type.stratum {
             // Pop is enslaved
             self.state.today.fe = 1
             self.state.today.fx = 0
+
+            let operatingProfit: Int64 = self.state.operatingProfit
+            if  operatingProfit > 0 {
+                self.state.today.pa = min(1, self.state.today.pa + 0.005)
+            } else {
+                self.state.today.pa = max(0.01, self.state.today.pa - 0.005)
+            }
 
             // Pay dividends to shareholders, if any.
             self.state.inventory.account.i -= map.bank.pay(
