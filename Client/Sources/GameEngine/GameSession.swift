@@ -542,8 +542,30 @@ extension GameSession {
             return nil
         }
 
+        let account: Bank.Account = pop.inventory.account
+        let liquid: (y: Int64, t: Int64) = (account.liq, account.balance)
+        let assets: (y: Int64, t: Int64) = (pop.yesterday.vi, pop.today.vi)
+        let value: (y: Int64, t: Int64) = (liquid.y + assets.y, liquid.t + assets.t)
+
         return .instructions {
-            let account: Bank.Account = pop.inventory.account
+            if case .Ward = pop.type.stratum {
+                let operatingProfit: Int64 = pop.operatingProfit
+                let operatingMargin: Fraction? = pop.operatingMargin
+                let grossMargin: Fraction? = pop.grossMargin
+                $0["Total valuation", +] = value.t[/3] <- value.y
+                $0[>] {
+                    $0["Today’s profit", +] = +operatingProfit[/3]
+                    $0["Gross margin", +] = grossMargin.map {
+                        (Double.init($0))[%2]
+                    }
+                    $0["Operating margin", +] = operatingMargin.map {
+                        (Double.init($0))[%2]
+                    }
+                }
+            }
+
+            $0["Illiquid assets", +] = assets.t[/3] <- assets.y
+
             $0["Liquid assets", +] = account.balance[/3] <- account.liq
             $0[>] {
                 $0["Market earnings", +] = +?account.r[/3]

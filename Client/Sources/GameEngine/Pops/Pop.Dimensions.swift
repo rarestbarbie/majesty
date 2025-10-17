@@ -11,11 +11,12 @@ extension Pop {
         var px: Double
         /// Investor confidence, a number between 0 and 1.
         var pa: Double
+        var vi: Int64
     }
 }
 extension Pop.Dimensions {
     init() {
-        self.init(size: 0, mil: 0, con: 0, fl: 0, fe: 0, fx: 0, px: 1, pa: 0.5)
+        self.init(size: 0, mil: 0, con: 0, fl: 0, fe: 0, fx: 0, px: 1, pa: 0.5, vi: 0)
     }
 }
 
