@@ -1,6 +1,4 @@
 import Bijection
-import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public enum PopType: CaseIterable, Comparable {
     // Slaves
@@ -50,7 +48,6 @@ extension PopType: RawRepresentable {
         }
     }
 }
-extension PopType: ConvertibleToJSValue, LoadableFromJSValue {}
 extension PopType {
     @inlinable public var stratum: PopStratum {
         switch self {

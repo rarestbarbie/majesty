@@ -1,4 +1,4 @@
-import GameRules
+import GameIDs
 import JavaScriptInterop
 import JavaScriptKit
 

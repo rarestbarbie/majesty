@@ -1,4 +1,4 @@
-import GameRules
+import GameIDs
 
 extension FactoryContext {
     enum EmployeeOperations {

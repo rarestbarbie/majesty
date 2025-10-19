@@ -1,3 +1,5 @@
+import GameIDs
+
 enum FactoryMetadataError: Error {
     case workers([PopType])
     case clerks([PopType])

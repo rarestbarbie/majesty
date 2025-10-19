@@ -1,4 +1,5 @@
 import GameEconomy
+import GameIDs
 
 public final class FactoryMetadata: Identifiable, Sendable {
     public let name: String
