@@ -1,5 +1,4 @@
-import GameRules
-import GameState
+import GameIDs
 
 extension GameMap.Jobs.Hire {
     struct Key: Hashable {
