@@ -119,58 +119,24 @@ extension GameSession {
         self.ui.screen = screen
     }
 
-    public mutating func openPlanet(
-        subject: PlanetID?,
-        details: PlanetDetailsTab? = nil
-    ) throws -> PlanetReport {
+    public mutating func openPlanet(_ request: PlanetReportRequest) throws -> PlanetReport {
         self.ui.screen = .Planet
-        return try self.ui.report.planet.open(
-            subject: subject,
-            details: details,
-            filter: nil,
-            snapshot: self.snapshot
-        )
+        return try self.ui.report.planet.open(request: request, snapshot: self.snapshot)
     }
 
-    public mutating func openProduction(
-        subject: FactoryID?,
-        details: FactoryDetailsTab?,
-        filter: ProductionReport.Filter?
-    ) throws -> ProductionReport {
+    public mutating func openProduction(_ request: ProductionReportRequest) throws -> ProductionReport {
         self.ui.screen = .Production
-        return try self.ui.report.production.open(
-            subject: subject,
-            details: details,
-            filter: filter,
-            snapshot: self.snapshot
-        )
+        return try self.ui.report.production.open(request: request, snapshot: self.snapshot)
     }
 
-    public mutating func openPopulation(
-        subject: PopID?,
-        details: PopDetailsTab?,
-        filter: PopulationReport.Filter?
-    ) throws -> PopulationReport {
+    public mutating func openPopulation(_ request: PopulationReportRequest) throws -> PopulationReport {
         self.ui.screen = .Population
-        return try self.ui.report.population.open(
-            subject: subject,
-            details: details,
-            filter: filter,
-            snapshot: self.snapshot
-        )
+        return try self.ui.report.population.open(request: request, snapshot: self.snapshot)
     }
 
-    public mutating func openTrade(
-        subject: Market.AssetPair?,
-        filter: TradeReport.Filter?
-    ) throws -> TradeReport {
+    public mutating func openTrade(_ request: TradeReportRequest) throws -> TradeReport {
         self.ui.screen = .Trade
-        return try self.ui.report.trade.open(
-            subject: subject,
-            details: nil,
-            filter: filter,
-            snapshot: self.snapshot
-        )
+        return try self.ui.report.trade.open(request: request, snapshot: self.snapshot)
     }
 
     public mutating func minimap(

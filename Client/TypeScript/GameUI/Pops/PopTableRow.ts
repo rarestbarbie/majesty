@@ -31,22 +31,6 @@ export class PopTableRow implements DiffableListElement<GameID> {
     private readonly fe: ProgressCell;
     private readonly fx: ProgressCell;
 
-    public static get columns(): string[] {
-        return [
-            "Size",
-            "Type",
-            "Race",
-            "Location",
-            "Militancy",
-            "Consciousness",
-            "Unemp.",
-            "Net worth",
-            "Needs",
-            "",
-            "",
-        ];
-    }
-
     constructor(pop: PopTableEntry) {
         this.id = pop.id;
         this.node = document.createElement('a');

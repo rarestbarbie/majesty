@@ -11,12 +11,15 @@ import {
     FactoryDetailsTab,
     MinimapLayer,
     NavigatorState,
-    PlanetDetailsTab,
+    PlanetReportRequest,
     PlanetReport,
     PlanetTileEditorState,
+    ProductionReportRequest,
     ProductionReport,
+    PopulationReportRequest,
     PopulationReport,
     PopDetailsTab,
+    TradeReportRequest,
     TradeReport,
     TooltipType,
     GameUI
@@ -37,24 +40,10 @@ export class Swift {
     declare public static orbit: (id: GameID) => Float32Array | null;
     declare public static gregorian: (date: GameDate) => GameDateComponents;
 
-    declare public static openPlanet: (
-        planet: GameID | null,
-        details: PlanetDetailsTab | null,
-    ) => PlanetReport;
-    declare public static openProduction: (
-        factory: GameID | null,
-        details: FactoryDetailsTab | null,
-        filter: string | null,
-    ) => ProductionReport;
-    declare public static openPopulation: (
-        id: GameID | null,
-        details: PopDetailsTab | null,
-        filter: string | null,
-    ) => PopulationReport;
-    declare public static openTrade: (
-        market: string | null,
-        filter: string | null
-    ) => TradeReport;
+    declare public static openPlanet: (request: PlanetReportRequest) => PlanetReport;
+    declare public static openProduction: (request: ProductionReportRequest) => ProductionReport;
+    declare public static openPopulation: (request: PopulationReportRequest) => PopulationReport;
+    declare public static openTrade: (request: TradeReportRequest) => TradeReport;
     declare public static closeScreen: () => void;
 
     declare public static switch: (planet: GameID) => GameUI;

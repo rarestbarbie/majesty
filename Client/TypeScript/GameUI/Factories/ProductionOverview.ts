@@ -69,9 +69,11 @@ export class ProductionOverview extends ScreenContent {
     public override attach(root: HTMLElement | null, parameters: URLSearchParams): void {
         const factory: string | null = parameters.get('id');
         const state: ProductionReport = Swift.openProduction(
-            factory ? parseInt(factory) as GameID : null,
-            parameters.get('details') as FactoryDetailsTab,
-            parameters.get('filter')
+            {
+                subject: factory ? parseInt(factory) as GameID ?? undefined : undefined,
+                details: parameters.get('details') as FactoryDetailsTab ?? undefined,
+                filter: parameters.get('filter') ?? undefined
+            }
         );
 
         this.needs.table('Needs', ResourceNeedRow.columns);
