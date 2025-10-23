@@ -45,8 +45,10 @@ export class TradeOverview extends ScreenContent {
 
     public override attach(root: HTMLElement | null, parameters: URLSearchParams): void {
         let state: TradeReport = Swift.openTrade(
-            parameters.get('id'),
-            parameters.get('filter')
+            {
+                subject: parameters.get('id') ?? undefined,
+                filter: parameters.get('filter') ?? undefined,
+            }
         );
 
         if (!this.dom) {

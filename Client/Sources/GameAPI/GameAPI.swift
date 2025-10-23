@@ -54,14 +54,10 @@ extension GameAPI {
 
         self[.push] = { stream.yield(($0, $1)) }
 
-        self[.openPlanet] = { try Self.game?.openPlanet(subject: $0, details: $1) }
-        self[.openProduction] = {
-            try Self.game?.openProduction(subject: $0, details: $1, filter: $2)
-        }
-        self[.openPopulation] = {
-            try Self.game?.openPopulation(subject: $0, details: $1, filter: $2)
-        }
-        self[.openTrade] = { try Self.game?.openTrade(subject: $0, filter: $1) }
+        self[.openPlanet] = { try Self.game?.openPlanet($0) }
+        self[.openProduction] = { try Self.game?.openProduction($0) }
+        self[.openPopulation] = { try Self.game?.openPopulation($0) }
+        self[.openTrade] = { try Self.game?.openTrade($0) }
         self[.closeScreen] = { Self.game?.open(nil) }
         self[.minimap] = { Self.game?.minimap(planet: $0, layer: $1, cell: $2) }
         self[.view] = { try Self.game?.view($0, to: $1) }

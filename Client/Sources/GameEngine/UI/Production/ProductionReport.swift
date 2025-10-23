@@ -20,20 +20,11 @@ public struct ProductionReport {
     }
 }
 extension ProductionReport: PersistentReport {
-    mutating func select(
-        subject: FactoryID?,
-        details: FactoryDetailsTab?,
-        filter: Filter?
-    ) {
-        self.selection.select(subject, detailsTab: details)
-        if  let filter: Filter {
-            self.selection.filter(filter)
-        }
+    mutating func select(request: ProductionReportRequest) {
+        self.selection.select(request.subject, filter: request.filter, detailsTab: request.details)
     }
 
     mutating func update(from snapshot: borrowing GameSnapshot) {
-        self.factories.removeAll()
-
         let country: CountryProperties = snapshot.player
 
         let filterlists: (

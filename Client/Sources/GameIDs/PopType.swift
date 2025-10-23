@@ -49,6 +49,17 @@ extension PopType: RawRepresentable {
     }
 }
 extension PopType {
+    @inlinable public init?(_ string: some StringProtocol) {
+        guard
+        let first: Unicode.Scalar = string.unicodeScalars.first,
+        string.unicodeScalars.endIndex == string.unicodeScalars.index(
+            after: string.startIndex
+        ) else {
+            return nil
+        }
+        self.init(rawValue: first)
+    }
+
     @inlinable public var stratum: PopStratum {
         switch self {
         case .Livestock:    .Ward

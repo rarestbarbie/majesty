@@ -13,11 +13,14 @@ struct PersistentSelection<Filter, DetailsTab> where Filter: PersistentSelection
 }
 extension PersistentSelection {
     /// Sets the currently selected item and records it for stickiness.
-    mutating func select(_ selected: Filter.Subject.ID?, detailsTab: DetailsTab?) {
+    mutating func select(_ selected: Filter.Subject.ID?, filter: Filter?, detailsTab: DetailsTab?) {
         if  let selected: Filter.Subject.ID,
             let filter: Filter = self.filter {
             self.cursor = selected
             self.cursors[filter] = selected
+        }
+        if  let filter: Filter {
+            self.filter(filter)
         }
         if  let detailsTab: DetailsTab {
             self.detailsTab = detailsTab
@@ -25,7 +28,7 @@ extension PersistentSelection {
     }
 
     /// Changes the active filter.
-    mutating func filter(_ filter: Filter) {
+    private mutating func filter(_ filter: Filter) {
         self.filter = filter
         self.cursor = self.cursors[filter] ?? self.cursor
     }

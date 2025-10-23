@@ -3,7 +3,7 @@ import {
     FactoryTableEntry,
     LegalEntityFilterLabel,
     ScreenType
-} from './exports.js';
+} from '../exports.js';
 
 export interface ProductionReport {
     readonly type: ScreenType.Production;

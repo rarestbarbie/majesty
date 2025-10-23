@@ -26,9 +26,9 @@ export class StaticList<T extends DiffableListElement<ID>, ID> extends DiffableL
     public table(type: string, columns: string[]): void {
         this.clear();
 
-        const header: HTMLElement = document.createElement("header");
+        const header: HTMLElement = document.createElement('header');
         for (const column of columns) {
-            const heading: HTMLDivElement = document.createElement("div");
+            const heading: HTMLDivElement = document.createElement('div');
             heading.textContent = column;
             header.appendChild(heading);
         }

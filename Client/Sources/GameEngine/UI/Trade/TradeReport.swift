@@ -18,20 +18,11 @@ public struct TradeReport {
     }
 }
 extension TradeReport: PersistentReport {
-    mutating func select(
-        subject: Market.AssetPair?,
-        details: Void?,
-        filter: Filter?
-    ) {
-        self.selection.select(subject, detailsTab: details)
-        if  let filter: Filter {
-            self.selection.filter(filter)
-        }
+    mutating func select(request: TradeReportRequest) {
+        self.selection.select(request.subject, filter: request.filter, detailsTab: ())
     }
 
     mutating func update(from snapshot: borrowing GameSnapshot) {
-        self.markets.removeAll()
-
         let currencies: [Fiat: Country.Currency] = snapshot.countries.state.reduce(into: [:]) {
             $0[$1.currency.id] = $1.currency
         }

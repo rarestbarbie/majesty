@@ -41,7 +41,7 @@ export class PlanetOverview extends ScreenContent {
             root.appendChild(this.dom.panel);
         }
 
-        const state: PlanetReport | null = Swift.openPlanet(id, null);
+        const state: PlanetReport | null = Swift.openPlanet({ subject: id });
         if (!state) {
             console.error(`PlanetOverview: Could not retrieve report for planet ID ${id}.`);
             return;

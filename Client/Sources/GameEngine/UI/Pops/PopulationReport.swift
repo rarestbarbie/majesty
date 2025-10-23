@@ -7,31 +7,48 @@ public struct PopulationReport {
     private var selection: PersistentSelection<Filter, PopDetailsTab>
 
     private var filters: ([FilterLabel], [Never])
+    private var columns: (
+        TableColumnMetadata<ColumnControl>,
+        type: TableColumnMetadata<ColumnControl>,
+        TableColumnMetadata<ColumnControl>,
+        TableColumnMetadata<ColumnControl>,
+        TableColumnMetadata<ColumnControl>,
+        TableColumnMetadata<ColumnControl>,
+        TableColumnMetadata<ColumnControl>,
+        TableColumnMetadata<ColumnControl>,
+        TableColumnMetadata<ColumnControl>,
+        TableColumnMetadata<ColumnControl>,
+        TableColumnMetadata<ColumnControl>
+    )
     private var pops: [PopTableEntry]
     private var pop: PopDetails?
 
     init() {
         self.selection = .init(defaultTab: .Inventory)
         self.filters = ([], [])
+        self.columns = (
+            .init(id: 0, name: "Size"),
+            .init(id: 1, name: "Type"),
+            .init(id: 2, name: "Location"),
+            .init(id: 3, name: "Race"),
+            .init(id: 4, name: "Militancy"),
+            .init(id: 5, name: "Consciousness"),
+            .init(id: 6, name: "Unemp."),
+            .init(id: 7, name: "Net worth"),
+            .init(id: 8, name: "Needs"),
+            .init(id: 9, name: ""),
+            .init(id: 10, name: ""),
+        )
         self.pops = []
         self.pop = nil
     }
 }
 extension PopulationReport: PersistentReport {
-    mutating func select(
-        subject: PopID?,
-        details: PopDetailsTab?,
-        filter: Filter?
-    ) {
-        self.selection.select(subject, detailsTab: details)
-        if  let filter: Filter {
-            self.selection.filter(filter)
-        }
+    mutating func select(request: PopulationReportRequest)  {
+        self.selection.select(request.subject, filter: request.filter, detailsTab: request.details)
     }
 
     mutating func update(from snapshot: borrowing GameSnapshot) {
-        self.pops.removeAll()
-
         let country: CountryProperties = snapshot.player
 
         let filterlists: (
@@ -86,11 +103,14 @@ extension PopulationReport: PersistentReport {
         }
 
         self.filters.0 = [.all] + filterlists.location.values.sorted()
+        self.columns.type.update(from: self.pops, on: \.type, as: ColumnControl.type(_:))
     }
 }
 extension PopulationReport {
     @frozen public enum ObjectKey: JSString, Sendable {
         case type
+
+        case columns
         case pops
         case pop
 
@@ -102,6 +122,20 @@ extension PopulationReport {
 extension PopulationReport: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.type] = GameUI.ScreenType.Population
+
+        js[.columns] = [
+            self.columns.0,
+            self.columns.1,
+            self.columns.2,
+            self.columns.3,
+            self.columns.4,
+            self.columns.5,
+            self.columns.6,
+            self.columns.7,
+            self.columns.8,
+            self.columns.9,
+            self.columns.10,
+        ]
         js[.pops] = self.pops
         js[.pop] = self.pop
 

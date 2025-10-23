@@ -1,4 +1,10 @@
-import { FilterList, FilterTabs, StaticList, UpdateText } from '../../DOM/exports.js';
+import {
+    FilterList,
+    FilterTabs,
+    StaticList,
+    Table,
+    UpdateText
+} from '../../DOM/exports.js';
 import { GameID } from '../../GameEngine/GameID.js';
 import { ScreenContent } from '../Application/ScreenContent.js';
 import { Swift } from '../../Swift.js';
@@ -31,7 +37,7 @@ export class PopulationOverview extends ScreenContent {
 
     private readonly ownership: OwnershipBreakdown;
 
-    private pops: StaticList<PopTableRow, GameID>;
+    private pops: Table<PopTableRow, GameID>;
     private dom?: {
         readonly index: FilterTabs;
         readonly panel: HTMLDivElement;
@@ -49,8 +55,7 @@ export class PopulationOverview extends ScreenContent {
             new FilterList<MarketFilter, string>('🌐'),
         ];
 
-        this.pops = new StaticList<PopTableRow, GameID>(document.createElement('div'));
-        this.pops.table('Pops', PopTableRow.columns);
+        this.pops = new Table<PopTableRow, GameID>('Pops');
 
         this.needs = new StaticList<ResourceNeedRow, string>(document.createElement('div'));
         this.sales = new StaticList<ResourceSaleBox, string>(document.createElement('div'));
@@ -68,9 +73,11 @@ export class PopulationOverview extends ScreenContent {
     public override attach(root: HTMLElement | null, parameters: URLSearchParams): void {
         let subject: string | null = parameters.get('id');
         let state: PopulationReport = Swift.openPopulation(
-            subject ? parseInt(subject) as GameID : null,
-            parameters.get('details') as PopDetailsTab,
-            parameters.get('filter')
+            {
+                subject: subject ? parseInt(subject) as GameID : undefined,
+                details: parameters.get('details') as PopDetailsTab ?? undefined,
+                filter: parameters.get('filter') ?? undefined,
+            }
         );
 
         // We need to empty the upper content, as we will need to replace the IDs.
@@ -164,6 +171,7 @@ export class PopulationOverview extends ScreenContent {
             return;
         }
 
+        this.pops.updateHeader(state.columns);
         this.pops.update(
             state.pops,
             (pop: PopTableEntry) => new PopTableRow(pop),
