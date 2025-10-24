@@ -76,10 +76,25 @@ export class PopulationOverview extends ScreenContent {
             {
                 subject: subject ? parseInt(subject) as GameID : undefined,
                 details: parameters.get('details') as PopDetailsTab ?? undefined,
+                column: parameters.get('column') ?? undefined,
                 filter: parameters.get('filter') ?? undefined,
             }
         );
 
+        this.switch(state, root);
+    }
+
+    public override detach(): void {
+        if (!this.dom) {
+            throw new Error('PopulationOverview not attached');
+        }
+
+        this.dom.index.node.remove();
+        this.dom.panel.remove();
+        this.dom = undefined;
+    }
+
+    public switch(state: PopulationReport, root: HTMLElement | null = null): void {
         // We need to empty the upper content, as we will need to replace the IDs.
         this.needs.table('Needs', ResourceNeedRow.columns);
         this.sales.clear();
@@ -156,22 +171,16 @@ export class PopulationOverview extends ScreenContent {
         this.update(state);
     }
 
-    public override detach(): void {
-        if (!this.dom) {
-            throw new Error('PopulationOverview not attached');
-        }
-
-        this.dom.index.node.remove();
-        this.dom.panel.remove();
-        this.dom = undefined;
-    }
-
     public update(state: PopulationReport): void {
         if (!this.dom || state.pops.length == 0) {
             return;
         }
 
-        this.pops.updateHeader(state.columns);
+        this.pops.updateHeader(
+            state.columns,
+            state.column,
+            (target: string) => `screen=${ScreenType.Population}&column=${target}`
+        );
         this.pops.update(
             state.pops,
             (pop: PopTableEntry) => new PopTableRow(pop),

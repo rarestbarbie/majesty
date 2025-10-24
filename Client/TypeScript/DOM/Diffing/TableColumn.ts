@@ -13,11 +13,14 @@ export class TableColumn implements DiffableListElement<number> {
         this.node = document.createElement('div');
     }
 
-    public update(column: TableColumnMetadata<any>): void {
+    public update<Stop>(
+        column: TableColumnMetadata<Stop>,
+        destination: (value: Stop) => string
+    ): void {
         UpdateText(this.node, column.name);
         if (column.next !== undefined && column.previous !== undefined) {
-            this.node.setAttribute('data-cc-prev', `${column.previous}`);
-            this.node.setAttribute('data-cc-next', `${column.next}`);
+            this.node.setAttribute('data-cl-destination', destination(column.next));
+            this.node.setAttribute('data-cr-destination', destination(column.previous));
         }
     }
 }

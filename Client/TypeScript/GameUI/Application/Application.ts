@@ -304,27 +304,46 @@ export class Application {
         });
 
         document.addEventListener('contextmenu', (event) => {
-            const target: HTMLElement | null = (event.target as HTMLElement).closest(
+            const owner: HTMLElement | null = (event.target as HTMLElement).closest(
                 '[data-menu-type]'
             );
 
-            if (target !== null) {
+            if (owner !== null) {
                 event.preventDefault();
-                const type: ContextMenuType = target.getAttribute(
+                const type: ContextMenuType = owner.getAttribute(
                     'data-menu-type'
                 ) as ContextMenuType;
-                const argumentsText: string | null = target.getAttribute('data-menu-arguments');
+                const argumentsText: string | null = owner.getAttribute('data-menu-arguments');
                 const argumentsList: any[] = argumentsText ? JSON.parse(argumentsText) : [];
                 const contextMenu: ContextMenuState = Swift.contextMenu(type, argumentsList);
                 this.contextMenu.show(contextMenu.items, event.clientX, event.clientY);
+                return;
             } else {
                 this.contextMenu.hide();
+            }
+
+            const target: HTMLElement | null = (event.target as HTMLElement).closest(
+                '[data-cr-destination]'
+            );
+            if (target !== null) {
+                event.preventDefault();
+                window.location.hash = `#${target.getAttribute('data-cr-destination')}`;
+                this.navigate();
             }
         });
 
         document.addEventListener('click', (event) => {
             if (this.contextMenu.isOpen && !this.contextMenu.node.contains(event.target as Node)) {
                 this.contextMenu.hide();
+            } else {
+                const target: HTMLElement | null = (event.target as HTMLElement).closest(
+                    '[data-cl-destination]'
+                );
+
+                if (target !== null) {
+                    window.location.hash = `#${target.getAttribute('data-cl-destination')}`;
+                    this.navigate();
+                }
             }
         });
     }

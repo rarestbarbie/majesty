@@ -1,7 +1,14 @@
 extension PopulationReport {
     struct Sort {
         private var columns: [ColumnControl]
+
+        init() {
+            self.columns = []
+        }
     }
+}
+extension PopulationReport.Sort {
+    var first: PopulationReport.ColumnControlType? { self.columns.first?.type }
 }
 extension PopulationReport.Sort {
     mutating func update(column: PopulationReport.ColumnControl) {
