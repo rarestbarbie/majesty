@@ -304,16 +304,18 @@ export class Application {
         });
 
         document.addEventListener('contextmenu', (event) => {
-            const owner: HTMLElement | null = (event.target as HTMLElement).closest(
+            const menuOwner: HTMLElement | null = (event.target as HTMLElement).closest(
                 '[data-menu-type]'
             );
 
-            if (owner !== null) {
+            if (menuOwner !== null) {
                 event.preventDefault();
-                const type: ContextMenuType = owner.getAttribute(
+                const type: ContextMenuType = menuOwner.getAttribute(
                     'data-menu-type'
                 ) as ContextMenuType;
-                const argumentsText: string | null = owner.getAttribute('data-menu-arguments');
+                const argumentsText: string | null = menuOwner.getAttribute(
+                    'data-menu-arguments'
+                );
                 const argumentsList: any[] = argumentsText ? JSON.parse(argumentsText) : [];
                 const contextMenu: ContextMenuState = Swift.contextMenu(type, argumentsList);
                 this.contextMenu.show(contextMenu.items, event.clientX, event.clientY);
@@ -332,18 +334,24 @@ export class Application {
             }
         });
 
+        document.addEventListener('mousedown', (event) => {
+            if (event.button !== 0) {
+                return;
+            }
+
+            const target: HTMLElement | null = (event.target as HTMLElement).closest(
+                '[data-cl-destination]'
+            );
+
+            if (target !== null) {
+                event.preventDefault();
+                window.location.hash = `#${target.getAttribute('data-cl-destination')}`;
+                this.navigate();
+            }
+        });
         document.addEventListener('click', (event) => {
             if (this.contextMenu.isOpen && !this.contextMenu.node.contains(event.target as Node)) {
                 this.contextMenu.hide();
-            } else {
-                const target: HTMLElement | null = (event.target as HTMLElement).closest(
-                    '[data-cl-destination]'
-                );
-
-                if (target !== null) {
-                    window.location.hash = `#${target.getAttribute('data-cl-destination')}`;
-                    this.navigate();
-                }
             }
         });
     }

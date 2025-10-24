@@ -34,9 +34,12 @@ extension StringUnionMacro: MemberMacro {
             switch type {\(
             raw: cases.map {
                 if let payload: TypeSyntax = $0.type {
+                    // separate binding needed in case the initializer is actually non-failable
                     return """
                     case .\($0.name):
-                        guard let value: \(payload) = .init($string[next...]) else {
+                        let value: \(payload)? = .init($string[next...])
+                        guard
+                        let value: \(payload) else {
                             return nil
                         }
                         self = .\($0.name)(value)
