@@ -20,6 +20,7 @@ public struct PopulationReport {
         TableColumnMetadata<ColumnControl>,
         TableColumnMetadata<ColumnControl>
     )
+    private var sort: Sort
     private var pops: [PopTableEntry]
     private var pop: PopDetails?
 
@@ -39,13 +40,25 @@ public struct PopulationReport {
             .init(id: 9, name: ""),
             .init(id: 10, name: ""),
         )
+        self.sort = .init()
         self.pops = []
         self.pop = nil
+    }
+}
+extension PopulationReport {
+    var columnSelected: Int32? {
+        switch self.sort.first {
+        case .type?: self.columns.type.id
+        case nil: nil
+        }
     }
 }
 extension PopulationReport: PersistentReport {
     mutating func select(request: PopulationReportRequest)  {
         self.selection.select(request.subject, filter: request.filter, detailsTab: request.details)
+        if  let column: ColumnControl = request.column {
+            self.sort.update(column: column)
+        }
     }
 
     mutating func update(from snapshot: borrowing GameSnapshot) {
@@ -102,8 +115,15 @@ extension PopulationReport: PersistentReport {
             $0.update(to: $2, from: snapshot)
         }
 
+        self.pops.sort(by: self.sort.ascending)
+
         self.filters.0 = [.all] + filterlists.location.values.sorted()
-        self.columns.type.update(from: self.pops, on: \.type, as: ColumnControl.type(_:))
+        self.columns.type.updateStops(
+            columnSelected: self.columnSelected,
+            from: self.pops,
+            on: \.type,
+            as: ColumnControl.type(_:)
+        )
     }
 }
 extension PopulationReport {
@@ -111,6 +131,7 @@ extension PopulationReport {
         case type
 
         case columns
+        case column
         case pops
         case pop
 
@@ -123,6 +144,7 @@ extension PopulationReport: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.type] = GameUI.ScreenType.Population
 
+        js[.column] = self.columnSelected
         js[.columns] = [
             self.columns.0,
             self.columns.1,
@@ -136,6 +158,7 @@ extension PopulationReport: JavaScriptEncodable {
             self.columns.9,
             self.columns.10,
         ]
+
         js[.pops] = self.pops
         js[.pop] = self.pop
 

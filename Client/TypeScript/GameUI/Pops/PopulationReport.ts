@@ -12,6 +12,7 @@ export interface PopulationReport {
     readonly type: ScreenType.Population;
 
     readonly columns: TableColumnMetadata<string>[];
+    readonly column?: number;
     readonly pops: PopTableEntry[];
     readonly pop?: PopDetails;
 

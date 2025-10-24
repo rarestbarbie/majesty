@@ -8,5 +8,6 @@ import {
 export interface PopulationReportRequest {
     subject?: GameID,
     details?: PopDetailsTab,
+    column?: string,
     filter?: string,
 }

@@ -16,11 +16,15 @@ extension PopulationReport.ColumnControl {
     func ascending(_ a: PopTableEntry, _ b: PopTableEntry) -> Bool? {
         switch self {
         case .type(let first):
-            if a.type == b.type {
+            if  a.type == b.type {
                 return nil
-            } else if a.type < first, b.type >= first {
+            }
+            switch (a.type < first, b.type < first) {
+            case (false, true):
+                return true
+            case (true, false):
                 return false
-            } else {
+            default:
                 return a.type < b.type
             }
         }

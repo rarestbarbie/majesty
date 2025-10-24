@@ -48,7 +48,10 @@ extension PopType: RawRepresentable {
         }
     }
 }
-extension PopType {
+extension PopType: CustomStringConvertible {
+    @inlinable public var description: String { "\(self.rawValue)" }
+}
+extension PopType: LosslessStringConvertible {
     @inlinable public init?(_ string: some StringProtocol) {
         guard
         let first: Unicode.Scalar = string.unicodeScalars.first,
@@ -59,7 +62,8 @@ extension PopType {
         }
         self.init(rawValue: first)
     }
-
+}
+extension PopType {
     @inlinable public var stratum: PopStratum {
         switch self {
         case .Livestock:    .Ward
