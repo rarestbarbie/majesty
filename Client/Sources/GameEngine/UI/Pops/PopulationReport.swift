@@ -10,7 +10,7 @@ public struct PopulationReport {
     private var columns: (
         TableColumnMetadata<ColumnControl>,
         type: TableColumnMetadata<ColumnControl>,
-        TableColumnMetadata<ColumnControl>,
+        race: TableColumnMetadata<ColumnControl>,
         TableColumnMetadata<ColumnControl>,
         TableColumnMetadata<ColumnControl>,
         TableColumnMetadata<ColumnControl>,
@@ -30,8 +30,8 @@ public struct PopulationReport {
         self.columns = (
             .init(id: 0, name: "Size"),
             .init(id: 1, name: "Type"),
-            .init(id: 2, name: "Location"),
-            .init(id: 3, name: "Race"),
+            .init(id: 2, name: "Race"),
+            .init(id: 3, name: "Location"),
             .init(id: 4, name: "Militancy"),
             .init(id: 5, name: "Consciousness"),
             .init(id: 6, name: "Unemp."),
@@ -49,6 +49,7 @@ extension PopulationReport {
     var columnSelected: Int32? {
         switch self.sort.first {
         case .type?: self.columns.type.id
+        case .race?: self.columns.race.id
         case nil: nil
         }
     }
@@ -123,6 +124,12 @@ extension PopulationReport: PersistentReport {
             from: self.pops,
             on: \.type,
             as: ColumnControl.type(_:)
+        )
+        self.columns.race.updateStops(
+            columnSelected: self.columnSelected,
+            from: self.pops,
+            on: \.nat,
+            as: ColumnControl.race(_:)
         )
     }
 }
