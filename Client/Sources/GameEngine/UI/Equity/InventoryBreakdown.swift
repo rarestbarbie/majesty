@@ -32,21 +32,21 @@ extension InventoryBreakdown {
             from: pop.state.inventory.l,
             tier: .l,
             currency: currency,
-            location: pop.state.home,
+            location: pop.state.tile,
             snapshot: snapshot
         )
         self.inventory.update(
             from: pop.state.inventory.e,
             tier: .e,
             currency: currency,
-            location: pop.state.home,
+            location: pop.state.tile,
             snapshot: snapshot
         )
         self.inventory.update(
             from: pop.state.inventory.x,
             tier: .x,
             currency: currency,
-            location: pop.state.home,
+            location: pop.state.tile,
             snapshot: snapshot
         )
 
@@ -54,7 +54,7 @@ extension InventoryBreakdown {
         self.inventory.update(
             from: pop.state.inventory.out,
             currency: currency,
-            location: pop.state.home,
+            location: pop.state.tile,
             snapshot: snapshot
         )
 

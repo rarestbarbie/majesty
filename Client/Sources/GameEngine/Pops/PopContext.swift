@@ -201,7 +201,7 @@ extension PopContext {
         context: GameContext.ResidentPass
     ) throws {
         guard
-        let tile: PlanetGrid.Tile = context.planets[self.state.home],
+        let tile: PlanetGrid.Tile = context.planets[self.state.tile],
         let governedBy: CountryProperties = tile.governedBy,
         let occupiedBy: CountryProperties = tile.occupiedBy else {
             return
@@ -218,7 +218,7 @@ extension PopContext {
         }
 
         self.income.removeAll(keepingCapacity: true)
-        for id: FactoryID in self.state.jobs.keys {
+        for id: FactoryID in self.state.factories.keys {
             self.income[id] = context.factories[id]?.today.wn
         }
 
@@ -281,7 +281,7 @@ extension PopContext: TransactingContext {
 
         let weights: ResourceInputWeights = .init(
             tiers: (self.state.inventory.l, self.state.inventory.e, self.state.inventory.x),
-            location: self.state.home,
+            location: self.state.tile,
             currency: currency,
             map: map,
         )
@@ -329,10 +329,10 @@ extension PopContext: TransactingContext {
                 (budget.x.inelastic, weights.x.inelastic.x),
             ),
             as: self.lei,
-            in: self.state.home,
+            in: self.state.tile,
         )
 
-        self.state.inventory.bid(in: self.state.home, as: self.lei, on: &map)
+        self.state.inventory.bid(in: self.state.tile, as: self.lei, on: &map)
         self.budget = budget
     }
 
@@ -491,17 +491,17 @@ extension PopContext {
 
         // We do not need to remove jobs that have no employees left, that will be done
         // automatically by ``Pop.turn``.
-        let jobs: Range<Int> = self.state.jobs.values.indices
+        let jobs: Range<Int> = self.state.factories.values.indices
         let w0: Double = self.occupiedBy.map { Double.init($0.minwage) } ?? 1
         for i: Int in jobs {
             {
                 /// At this rate, if the factory pays minimum wage or less, about half of
                 /// non-union workers, and one third of union workers, will quit every year.
                 $0.quit(
-                    rate: 0.002 * w0 / max(w0, self.income[$0.at].map(Double.init(_:)) ?? 1),
+                    rate: 0.002 * w0 / max(w0, self.income[$0.id].map(Double.init(_:)) ?? 1),
                     using: &map.random.generator
                 )
-            } (&self.state.jobs.values[i])
+            } (&self.state.factories.values[i])
         }
 
         let unemployed: Int64 = self.state.unemployed
@@ -522,7 +522,7 @@ extension PopContext {
                     let quit: Int64 = min(nonexistent, $0.count)
                     $0.quit(quit)
                     nonexistent -= quit
-                } (&self.state.jobs.values[i])
+                } (&self.state.factories.values[i])
             }
         }
     }
