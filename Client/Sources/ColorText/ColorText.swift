@@ -57,20 +57,27 @@ extension ColorText: StringInterpolationProtocol {
     }
 
     @inlinable public mutating func appendInterpolation(
+        _ value: some CustomStringConvertible,
+        style: Style
+    ) {
+        self.buffer.append("<\(style)>\(value)</\(style)>")
+    }
+
+    @inlinable public mutating func appendInterpolation(
         em value: some CustomStringConvertible
     ) {
-        self.buffer.append("<em>\(value)</em>")
+        self.appendInterpolation(value, style: .em)
     }
 
     @inlinable public mutating func appendInterpolation(
         pos value: some CustomStringConvertible
     ) {
-        self.buffer.append("<ins>\(value)</ins>")
+        self.appendInterpolation(value, style: .pos)
     }
 
     @inlinable public mutating func appendInterpolation(
         neg value: some CustomStringConvertible
     ) {
-        self.buffer.append("<del>\(value)</del>")
+        self.appendInterpolation(value, style: .neg)
     }
 }

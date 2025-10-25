@@ -482,18 +482,36 @@ extension GameSession {
                 $0[>] = "\(tile.terrain.name) (\(tile.geology.name))"
 
             case .Population:
-                $0["Population"] = tile.population[/3]
+                $0["Population"] = tile.pops.free.total[/3]
+                $0[>] {
+                    $0["Free"] = tile.pops.free.total[/3]
+                    $0["Enslaved"] = ??tile.pops.enslaved.total[/3]
+                }
 
             case .AverageMilitancy:
-                let value: Double = tile.population > 0
-                    ? (tile.weighted.mil / Double.init(tile.population))
-                    : 0
-                $0["Average militancy"] = value[..2]
+                let (free, _): (Double, of: Double) = tile.pops.free.mil
+                $0["Average militancy"] = free[..2]
+                let enslaved: (average: Double, of: Double) = tile.pops.enslaved.mil
+                if  enslaved.of > 0 {
+                    $0[>] = """
+                    The average militancy of the slave population is \(
+                        enslaved.average[..2],
+                        style: enslaved.average > 1.0 ? .neg : .em
+                    )
+                    """
+                }
             case .AverageConsciousness:
-                let value: Double = tile.population > 0
-                    ? (tile.weighted.con / Double.init(tile.population))
-                    : 0
-                $0["Average consciousness"] = value[..2]
+                let (free, _): (Double, of: Double) = tile.pops.free.con
+                $0["Average consciousness"] = free[..2]
+                let enslaved: (average: Double, of: Double) = tile.pops.enslaved.con
+                if  enslaved.of > 0 {
+                    $0[>] = """
+                    The average consciousness of the slave population is \(
+                        enslaved.average[..2],
+                        style: enslaved.average > 1.0 ? .neg : .em
+                    )
+                    """
+                }
             }
 
             if let name: String = tile.name {
@@ -815,17 +833,13 @@ extension GameSession {
             return nil
         }
 
-        let (share, total): (share: Int64, total: Int64) = tile.pops.reduce(
-            into: (0, 0)
-        ) {
-            guard let pop: Pop = context.pops.state[$1] else {
-                return
-            }
+        let share: Int64 = tile.pops.free.cultures[culture]
+            ?? tile.pops.enslaved.cultures[culture]
+            ?? 0
+        let total: Int64 = tile.pops.total
 
-            if  culture == pop.nat {
-                $0.share += pop.today.size
-            }
-            $0.total += pop.today.size
+        if  total == 0 {
+            return nil
         }
 
         return .instructions(style: .borderless) {
@@ -842,17 +856,11 @@ extension GameSession {
             return nil
         }
 
-        let (share, total): (share: Int64, total: Int64) = tile.pops.reduce(
-            into: (0, 0)
-        ) {
-            guard let pop: Pop = context.pops.state[$1] else {
-                return
-            }
+        let share: Int64 = tile.pops.type[type] ?? 0
+        let total: Int64 = tile.pops.free.total
 
-            if  type == pop.type {
-                $0.share += pop.today.size
-            }
-            $0.total += pop.today.size
+        if  total == 0 {
+            return nil
         }
 
         return .instructions(style: .borderless) {

@@ -36,25 +36,25 @@ extension NavigatorTile {
         self.name = "\(tile.name ?? tile.terrain.name) (\(planet.state.name))"
         self.terrain = tile.terrain.name
 
-        let (culture, popType): (
-            [String: (share: Int64, PieChartLabel)],
-            [PopType: (share: Int64, PieChartLabel)]
-        ) = tile.pops.reduce(
-            into: (culture: [:], popType: [:])
-        ) {
-            guard
-            let pop: PopContext = context.pops[$1] else {
-                return
+        let culture: [
+            (key: String, (share: Int64, PieChartLabel))
+        ] = tile.pops.free.cultures.compactMap {
+            guard let culture: Culture = context.cultures.state[$0] else {
+                return nil
+            }
+            let label: PieChartLabel = .init(color: culture.color, name: $0)
+            return ($0, ($1, label))
+        }
+        let popType: [
+            (key: PopType, (share: Int64, PieChartLabel))
+        ] = tile.pops.type.compactMap {
+            guard $0.stratum > .Ward,
+            let type: PopMetadata = context.rules.pops[$0] else {
+                return nil
             }
 
-            if  let culture: Culture = context.cultures.state[pop.state.nat] {
-                let label: PieChartLabel = .init(color: culture.color, name: culture.id)
-                $0.culture[culture.id, default: (0, label)].share += pop.state.today.size
-            }
-            do {
-                let label: PieChartLabel = .init(color: pop.type.color, name: pop.type.singular)
-                $0.popType[pop.state.type, default: (0, label)].share += pop.state.today.size
-            }
+            let label: PieChartLabel = .init(color: type.color, name: $0.singular)
+            return ($0, ($1, label))
         }
 
         self._neighbors = self.id.tile.neighbors(size: planet.grid.size)

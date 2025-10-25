@@ -33,38 +33,28 @@ extension Minimap {
 
         case .Population:
             let scale: Double = .init(
-                planet.grid.tiles.values.reduce(0) { max($0, $1.population) }
+                planet.grid.tiles.values.reduce(0) { max($0, $1.pops.free.total) }
             )
             self.grid = planet.grid.color {
-                scale > 0 ? Double.init($0.population) / scale : 0
+                scale > 0 ? Double.init($0.pops.free.total) / scale : 0
             }
 
         case .AverageMilitancy:
             let scale: Double = .init(
-                planet.grid.tiles.values.reduce(0) { max($0, $1.population) }
+                planet.grid.tiles.values.reduce(0) { max($0, $1.pops.free.total) }
             )
             self.grid = planet.grid.color {
-                guard $0.population > 0 else {
-                    return (0, 0)
-                }
-                // Scale militancy (0-10) to a red color channel (0-255)
-                let population: Double = .init($0.population)
-                let value: Double = 0.1 * ($0.weighted.mil / population)
-                return (value, population / scale)
+                let (value, population): (Double, of: Double) = $0.pops.free.mil
+                return (0.1 * value, population / scale)
             }
 
         case .AverageConsciousness:
             let scale: Double = .init(
-                planet.grid.tiles.values.reduce(0) { max($0, $1.population) }
+                planet.grid.tiles.values.reduce(0) { max($0, $1.pops.free.total) }
             )
             self.grid = planet.grid.color {
-                guard $0.population > 0 else {
-                    return (0, 0)
-                }
-                // Scale consciousness (0-10) to a blue color channel (0-255)
-                let population: Double = .init($0.population)
-                let value: Double = 0.1 * ($0.weighted.con / population)
-                return (value, population / scale)
+                let (value, population): (Double, of: Double) = $0.pops.free.con
+                return (0.1 * value, population / scale)
             }
         }
     }
