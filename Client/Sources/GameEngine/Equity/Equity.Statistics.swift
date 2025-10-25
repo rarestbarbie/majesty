@@ -43,7 +43,7 @@ extension Equity<LEI>.Statistics {
                         return
                     }
 
-                    location = pop.home
+                    location = pop.tile
                     culture = pop.nat
 
                 case .factory(let id):

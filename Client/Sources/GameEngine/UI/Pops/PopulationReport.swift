@@ -69,7 +69,7 @@ extension PopulationReport: PersistentReport {
             location: [Address: FilterLabel],
             Never?
         ) = snapshot.pops.reduce(into: ([:], nil)) {
-            let tile: Address = $1.state.home
+            let tile: Address = $1.state.tile
             if case country.id? = $1.governedBy?.id {
                 {
                     $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
@@ -87,8 +87,8 @@ extension PopulationReport: PersistentReport {
                 return nil
             }
             guard
-            let planet: PlanetContext = snapshot.planets[$0.state.home.planet],
-            let tile: PlanetGrid.Tile = planet.grid.tiles[$0.state.home.tile],
+            let planet: PlanetContext = snapshot.planets[$0.state.tile.planet],
+            let tile: PlanetGrid.Tile = planet.grid.tiles[$0.state.tile.tile],
             let culture: Culture = snapshot.cultures.state[$0.state.nat] else {
                 return nil
             }
@@ -102,9 +102,9 @@ extension PopulationReport: PersistentReport {
                 une: $0.unemployment,
                 yesterday: $0.state.yesterday,
                 today: $0.state.today,
-                jobs: $0.state.jobs.values.map {
+                jobs: $0.state.factories.values.map {
                     .init(
-                        name: snapshot.factories[$0.at]?.type.name ?? "Unknown",
+                        name: snapshot.factories[$0.id]?.type.name ?? "Unknown",
                         size: $0.count,
                         hire: $0.hired,
                         fire: $0.fired,

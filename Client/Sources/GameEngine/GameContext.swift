@@ -321,12 +321,12 @@ extension GameContext {
         for i: Int in self.pops.indices {
             /// avoid copy-on-write
             let pop: Pop = self.pops.state[i]
-            let counted: ()? = self.planets[pop.home]?.addResidentCount(pop)
+            let counted: ()? = self.planets[pop.tile]?.addResidentCount(pop)
 
             #assert(counted != nil, "Pop \(pop.id) has no home tile!!!")
 
-            for job: FactoryJob in pop.jobs.values {
-                self.factories[modifying: job.at].addWorkforceCount(pop: pop, job: job)
+            for job: FactoryJob in pop.factories.values {
+                self.factories[modifying: job.id].addWorkforceCount(pop: pop, job: job)
             }
             for stake: EquityStake<LEI> in pop.equity.shares.values {
                 switch stake.id {
@@ -397,14 +397,14 @@ extension GameContext {
 
         self.pops.turn {
             let stratum: PopStratum = $0.state.type.stratum
-            for j: Int in $0.state.jobs.values.indices {
+            for j: Int in $0.state.factories.values.indices {
                 {
                     if stratum <= .Worker {
-                        $0.fire(&layoffs.workers[$0.at])
+                        $0.fire(&layoffs.workers[$0.id])
                     } else {
-                        $0.fire(&layoffs.clerks[$0.at])
+                        $0.fire(&layoffs.clerks[$0.id])
                     }
-                } (&$0.state.jobs.values[j])
+                } (&$0.state.factories.values[j])
             }
         }
     }
@@ -420,13 +420,13 @@ extension GameContext {
             }
             if  pop.type.stratum <= .Worker {
                 let key: GameMap.Jobs.Hire<Address>.Key = .init(
-                    location: pop.home,
+                    location: pop.tile,
                     type: pop.type
                 )
                 $0.worker[key, default: []].append(($1, unemployed))
             } else {
                 let key: GameMap.Jobs.Hire<PlanetID>.Key = .init(
-                    location: pop.home.planet,
+                    location: pop.tile.planet,
                     type: pop.type
                 )
                 $0.clerk[key, default: []].append(($1, unemployed))
@@ -504,7 +504,7 @@ extension GameContext {
                 offers.removeLast()
             }
 
-            self.pops[pop].state.jobs[block.at, default: .init(at: block.at)].hire(
+            self.pops[pop].state.factories[block.at, default: .init(id: block.at)].hire(
                 count
             )
         }

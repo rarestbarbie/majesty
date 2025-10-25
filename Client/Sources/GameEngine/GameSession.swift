@@ -581,7 +581,7 @@ extension GameSession {
             hired: Int64,
             fired: Int64,
             quit: Int64
-        ) = pop.jobs.values.reduce(into: (0, 0, 0, 0)) {
+        ) = pop.factories.values.reduce(into: (0, 0, 0, 0)) {
             $0.count += $1.count
             $0.hired += $1.hired
             $0.fired += $1.fired
@@ -591,9 +591,9 @@ extension GameSession {
         return .instructions {
             $0["Total employment"] = total.count[/3]
             $0[>] {
-                for job: FactoryJob in pop.jobs.values {
+                for job: FactoryJob in pop.factories.values {
                     let change: Int64 = job.hired - job.fired - job.quit
-                    let name: String = self.context.factories[job.at]?.type.name ?? "Unknown"
+                    let name: String = self.context.factories[job.id]?.type.name ?? "Unknown"
                     $0[name, +] = job.count[/3] <- job.count - change
                 }
             }
@@ -706,7 +706,7 @@ extension GameSession {
             inelastic: LocalMarket,
             tradeable: Candle<Double>?
         ) = (
-            self.map.localMarkets[pop.state.home, resource.type],
+            self.map.localMarkets[pop.state.tile, resource.type],
             self.map.exchange.markets[resource.type / country.currency.id]?.history.last?.prices
         )
 
@@ -724,7 +724,7 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let pop: PopContext = self.context.pops[id],
-        let country: CountryProperties = self.context.planets[pop.state.home]?.occupiedBy else {
+        let country: CountryProperties = self.context.planets[pop.state.tile]?.occupiedBy else {
             return nil
         }
 

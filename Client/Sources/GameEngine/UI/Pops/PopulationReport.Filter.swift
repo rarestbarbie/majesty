@@ -17,7 +17,7 @@ extension PopulationReport.Filter: PersistentSelectionFilter {
     static func ~= (self: Self, value: PopContext) -> Bool {
         switch self {
         case .all: true
-        case .location(let location): location == value.state.home
+        case .location(let location): location == value.state.tile
         }
     }
 }

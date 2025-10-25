@@ -2,23 +2,22 @@ import Assert
 import GameIDs
 import JavaScriptInterop
 import JavaScriptKit
-import Random
 
-@frozen public struct FactoryJob {
-    public let at: FactoryID
-    public private(set) var xp: Int64
-    public private(set) var count: Int64
+struct FactoryJob: PopJob, Identifiable {
+    let id: FactoryID
+    var xp: Int64
+    var count: Int64
 
-    public private(set) var hired: Int64
-    public private(set) var fired: Int64
-    public private(set) var quit: Int64
-    public private(set) var strike: Bool
-    public private(set) var unionization: Double
+    var hired: Int64
+    var fired: Int64
+    var quit: Int64
+    var strike: Bool
+    var unionization: Double
 }
 extension FactoryJob {
-    init(at: FactoryID) {
+    init(id: FactoryID) {
         self.init(
-            at: at,
+            id: id,
             xp: 0,
             count: 0,
             hired: 0,
@@ -28,12 +27,8 @@ extension FactoryJob {
             unionization: 0
         )
     }
-
-    mutating func fireAll() {
-        self.fired += self.count
-        self.count = 0
-    }
-
+}
+extension FactoryJob {
     mutating func fire(_ layoff: inout FactoryJobLayoffBlock?) {
         guard
         let size: Int64 = layoff?.size, size > 0 else {
@@ -48,49 +43,10 @@ extension FactoryJob {
             self.fire(size)
         }
     }
-
-    mutating func fire(_ count: Int64) {
-        self.fired += count
-        self.count -= count
-    }
-
-    mutating func hire(_ count: Int64) {
-        self.hired += count
-        self.count += count
-    }
-
-    mutating func quit(_ count: Int64) {
-        self.quit += count
-        self.count -= count
-
-        #assert(
-            self.count >= 0,
-            "Negative employee count (count = \(self.count)) in job \(self.at)!!!"
-        )
-    }
-
-    mutating func quit(
-        rate: Double,
-        using generator: inout some RandomNumberGenerator
-    ) {
-        let quit: Int64 = Binomial[self.count, rate].sample(using: &generator)
-
-        self.quit += quit
-        self.count -= quit
-    }
-
-    mutating func turn() {
-        self.hired = 0
-        self.fired = 0
-        self.quit = 0
-    }
-}
-extension FactoryJob: Identifiable {
-    @inlinable public var id: FactoryID { self.at }
 }
 extension FactoryJob {
-    @frozen public enum ObjectKey: JSString, Sendable {
-        case at
+    enum ObjectKey: JSString, Sendable {
+        case id
         case xp
         case count
         case hired
@@ -101,8 +57,8 @@ extension FactoryJob {
     }
 }
 extension FactoryJob: JavaScriptEncodable {
-    public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.at] = self.at
+    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+        js[.id] = self.id
         js[.xp] = self.xp == 0 ? nil : self.xp
         js[.count] = self.count == 0 ? nil : self.count
         js[.hired] = self.hired == 0 ? nil : self.hired
@@ -113,9 +69,9 @@ extension FactoryJob: JavaScriptEncodable {
     }
 }
 extension FactoryJob: JavaScriptDecodable {
-    public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+    init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
-            at: try js[.at].decode(),
+            id: try js[.id].decode(),
             xp: try js[.xp]?.decode() ?? 0,
             count: try js[.count].decode(),
             hired: try js[.hired]?.decode() ?? 0,

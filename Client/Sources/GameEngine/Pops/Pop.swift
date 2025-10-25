@@ -11,7 +11,7 @@ import OrderedCollections
 
 struct Pop: LegalEntityState, IdentityReplaceable {
     var id: PopID
-    let home: Address
+    let tile: Address
     let type: PopType
     let nat: String
 
@@ -20,25 +20,28 @@ struct Pop: LegalEntityState, IdentityReplaceable {
     var today: Dimensions
 
     var equity: Equity<LEI>
-    var jobs: OrderedDictionary<FactoryID, FactoryJob>
+
+    var factories: OrderedDictionary<FactoryID, FactoryJob>
+    var mines: OrderedDictionary<Address, MiningJob>
 }
 extension Pop: Sectionable {
     init(id: PopID, section: Section) {
         self.init(
             id: id,
-            home: section.home,
+            tile: section.tile,
             type: section.type,
             nat: section.culture,
             inventory: .init(),
             yesterday: .init(),
             today: .init(),
             equity: [:],
-            jobs: [:]
+            factories: [:],
+            mines: [:]
         )
     }
 
     var section: Section {
-        .init(culture: self.nat, type: self.type, home: self.home)
+        .init(culture: self.nat, type: self.type, tile: self.tile)
     }
 }
 extension Pop: Deletable {
@@ -55,15 +58,19 @@ extension Pop: Deletable {
 extension Pop {
     mutating func prune(in context: GameContext.PruningPass) {
         self.equity.prune(in: context)
-        self.jobs.update {
+        self.factories.update {
             // don’t prune empty jobs yet, they may have interesting deltas
-            context.factories.contains($0.at)
+            context.factories.contains($0.id)
         }
     }
 }
 extension Pop: Turnable {
     mutating func turn() {
-        self.jobs.update {
+        self.factories.update {
+            $0.turn()
+            return $0.count > 0
+        }
+        self.mines.update {
             $0.turn()
             return $0.count > 0
         }
@@ -109,7 +116,7 @@ extension Pop {
             let section: Section = .init(
                 culture: self.nat,
                 type: target,
-                home: self.home
+                tile: self.tile
             )
 
             map.conversions.append(
@@ -129,7 +136,9 @@ extension Pop {
     /// It is better to compute this dynamically, as the pop count itself can change, and that
     /// might invalidate cached values for unemployment!
     var unemployed: Int64 {
-        self.jobs.values.reduce(self.today.size) { $0 - $1.count }
+        self.today.size
+            - self.factories.values.reduce(0) { $0 + $1.count }
+            - self.mines.values.reduce(0) { $0 + $1.count }
     }
 
     var decadence: Double {
@@ -148,7 +157,7 @@ extension Pop {
 extension Pop {
     enum ObjectKey: JSString, Sendable {
         case id
-        case home = "on"
+        case tile = "on"
         case type
         case nat
 
@@ -179,13 +188,14 @@ extension Pop {
         case today_vi = "t_vi"
 
         case equity
-        case jobs
+        case factories
+        case mines
     }
 }
 extension Pop: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
-        js[.home] = self.home
+        js[.tile] = self.tile
         js[.type] = self.type
         js[.nat] = self.nat
         js[.inventory_account] = self.inventory.account
@@ -215,7 +225,8 @@ extension Pop: JavaScriptEncodable {
         js[.today_vi] = self.today.vi
 
         js[.equity] = self.equity
-        js[.jobs] = self.jobs.isEmpty ? nil : self.jobs
+        js[.factories] = self.factories.isEmpty ? nil : self.factories
+        js[.mines] = self.mines.isEmpty ? nil : self.mines
     }
 }
 extension Pop: JavaScriptDecodable {
@@ -233,7 +244,7 @@ extension Pop: JavaScriptDecodable {
         )
         self.init(
             id: try js[.id]?.decode() ?? 0,
-            home: try js[.home].decode(),
+            tile: try js[.tile].decode(),
             type: try js[.type].decode(),
             nat: try js[.nat].decode(),
             inventory: .init(
@@ -256,7 +267,8 @@ extension Pop: JavaScriptDecodable {
             ),
             today: today,
             equity: try js[.equity]?.decode() ?? [:],
-            jobs: try js[.jobs]?.decode() ?? [:],
+            factories: try js[.factories]?.decode() ?? [:],
+            mines: try js[.mines]?.decode() ?? [:]
         )
     }
 }
