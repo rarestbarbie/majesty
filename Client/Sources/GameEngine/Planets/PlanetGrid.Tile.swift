@@ -6,6 +6,92 @@ import HexGrids
 import OrderedCollections
 import Random
 
+extension PopulationStratum {
+    struct Fields {
+        var mil: Double
+        var con: Double
+    }
+}
+extension PopulationStratum.Fields {
+    static var zero: Self {
+        .init(
+            mil: 0,
+            con: 0
+        )
+    }
+}
+
+@dynamicMemberLookup
+struct PopulationStratum {
+    var all: [PopID]
+    var total: Int64
+    var cultures: [String: Int64]
+    var weighted: Fields
+}
+extension PopulationStratum {
+    init() {
+        self.init(all: [], total: 0, cultures: [:], weighted: .zero)
+    }
+}
+extension PopulationStratum {
+    subscript<Float>(dynamicMember keyPath: KeyPath<Fields, Float>) -> (Float, of: Float) where Float: BinaryFloatingPoint {
+        let population: Float = .init(self.total)
+        if  population < 0 {
+            return (0, 0)
+        } else {
+            return (self.weighted[keyPath: keyPath] / population, population)
+        }
+    }
+}
+extension PopulationStratum {
+    mutating func startIndexCount() {
+        self.all.removeAll(keepingCapacity: true)
+        self.total = 0
+        self.cultures.removeAll(keepingCapacity: true)
+        self.weighted = .zero
+    }
+
+    mutating func addResidentCount(_ pop: Pop) {
+        let weight: Double = .init(pop.today.size)
+        self.all.append(pop.id)
+        self.total += pop.today.size
+        self.cultures[pop.nat, default: 0] += pop.today.size
+        self.weighted.mil += pop.today.mil * weight
+        self.weighted.con += pop.today.con * weight
+    }
+}
+
+struct PopulationStats {
+    var type: [PopType: Int64]
+    var free: PopulationStratum
+    var enslaved: PopulationStratum
+}
+extension PopulationStats {
+    init() {
+        self.init(type: [:], free: .init(), enslaved: .init())
+    }
+}
+extension PopulationStats {
+    var total: Int64 { self.free.total + self.enslaved.total }
+}
+extension PopulationStats {
+    mutating func startIndexCount() {
+        self.type.removeAll(keepingCapacity: true)
+        self.free.startIndexCount()
+        self.enslaved.startIndexCount()
+    }
+
+    mutating func addResidentCount(_ pop: Pop) {
+        self.type[pop.type, default: 0] += pop.today.size
+
+        if pop.type.stratum <= .Ward {
+            self.enslaved.addResidentCount(pop)
+        } else {
+            self.free.addResidentCount(pop)
+        }
+    }
+}
+
 extension PlanetGrid {
     struct Tile: Identifiable {
         let id: HexCoordinate
@@ -20,13 +106,7 @@ extension PlanetGrid {
         private(set) var factoriesUnderConstruction: Int64
         private(set) var factoriesAlreadyPresent: Set<FactoryType>
         private(set) var factories: [FactoryID]
-        private(set) var pops: [PopID]
-
-        private(set) var population: Int64
-        private(set) var weighted: (
-            mil: Double,
-            con: Double
-        )
+        private(set) var pops: PopulationStats
 
         init(
             id: HexCoordinate,
@@ -45,10 +125,8 @@ extension PlanetGrid {
             self.factoriesUnderConstruction = 0
             self.factoriesAlreadyPresent = []
             self.factories = []
-            self.pops = []
-            self.population = 0
-            self.weighted.mil = 0
-            self.weighted.con = 0
+
+            self.pops = .init()
         }
     }
 }
@@ -64,18 +142,12 @@ extension PlanetGrid.Tile {
         self.factoriesUnderConstruction = 0
         self.factoriesAlreadyPresent.removeAll(keepingCapacity: true)
         self.factories.removeAll(keepingCapacity: true)
-        self.pops.removeAll(keepingCapacity: true)
-        self.population = 0
-        self.weighted.mil = 0
-        self.weighted.con = 0
+
+        self.pops.startIndexCount()
     }
 
     mutating func addResidentCount(_ pop: Pop) {
-        let weight: Double = .init(pop.today.size)
-        self.pops.append(pop.id)
-        self.population += pop.today.size
-        self.weighted.mil += pop.today.mil * weight
-        self.weighted.con += pop.today.con * weight
+        self.pops.addResidentCount(pop)
     }
     mutating func addResidentCount(_ factory: Factory) {
         self.factories.append(factory.id)
@@ -92,7 +164,7 @@ extension PlanetGrid.Tile {
         using random: inout PseudoRandom,
     ) -> FactoryType? {
         guard random.roll(
-            self.population / (1 + self.factoriesUnderConstruction),
+            self.pops.free.total / (1 + self.factoriesUnderConstruction),
             1_000_000_000
         ) else {
             return nil
