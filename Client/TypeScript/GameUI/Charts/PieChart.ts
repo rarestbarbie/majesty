@@ -69,7 +69,12 @@ export class PieChart<Sector> {
                     element.geometry.setAttribute('r', '1');
                 }
 
-                element.geometry.setAttribute('fill', GameEngine.hex(sector.value.color));
+                if (sector.value.color !== undefined) {
+                    element.geometry.setAttribute('fill', GameEngine.hex(sector.value.color));
+                }
+                if (sector.value.style !== undefined) {
+                    element.geometry.setAttribute('class', sector.value.style);
+                }
 
                 element.node.setAttribute('data-tooltip-type', this.type);
                 element.node.setAttribute(

@@ -4,7 +4,7 @@ export interface ResourceNeed {
     readonly id: string;
     readonly name: string;
     readonly icon: string;
-    readonly tier: 'l' | 'e' | 'x' | 'i' | 'j' | 'v';
+    readonly tier: 'l' | 'e' | 'x';
     readonly unitsAcquired?: bigint
     readonly unitsDemanded: bigint
     readonly unitsConsumed: bigint

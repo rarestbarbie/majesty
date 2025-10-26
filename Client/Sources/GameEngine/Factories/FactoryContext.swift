@@ -437,6 +437,7 @@ extension FactoryContext {
             )
         }
 
+        self.state.today.fx = self.state.inventory.x.fulfilled
         self.state.today.vx = self.state.inventory.x.valueAcquired
     }
 
@@ -541,7 +542,8 @@ extension FactoryContext {
             "Factory has negative cash! (\(self.state.inventory.account))"
         )
 
-        self.state.today.fi = self.state.inventory.l.fulfilled
+        self.state.today.fl = self.state.inventory.l.fulfilled
+        self.state.today.fe = self.state.inventory.e.fulfilled
         self.state.today.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
 
         return update.headcount

@@ -145,6 +145,11 @@ extension GameSession {
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
+        case .PopBudgetItem:
+            self.tooltipPopBudgetItem(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+            )
         case .MarketLiquidity:
             self.tooltipMarketLiquidity(
                 try arguments[0].decode(),

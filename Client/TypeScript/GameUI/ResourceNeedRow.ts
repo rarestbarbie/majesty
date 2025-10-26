@@ -10,7 +10,7 @@ import {
     CellStyle,
     ResourceNeed,
     ProgressCell,
-    TooltipType,
+    PersistentOverviewType,
 } from './exports.js';
 
 export class ResourceNeedRow implements DiffableListElement<string> {
@@ -32,10 +32,8 @@ export class ResourceNeedRow implements DiffableListElement<string> {
 
     constructor(
         need: ResourceNeed,
+        type: PersistentOverviewType,
         owner: GameID,
-        demand: TooltipType,
-        stockpile: TooltipType,
-        explainPrice: TooltipType,
     ) {
         this.id = need.id;
         this.node = document.createElement('a');
@@ -44,21 +42,21 @@ export class ResourceNeedRow implements DiffableListElement<string> {
         label.textContent = `${need.icon} ${need.name}`;
 
         this.demand = new ProgressCell();
-        this.demand.node.setAttribute('data-tooltip-type', demand);
+        this.demand.node.setAttribute('data-tooltip-type', type.tooltipResourceIO);
         this.demand.node.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([owner, need.id]),
         );
 
         this.stockpile = document.createElement('div');
-        this.stockpile.setAttribute('data-tooltip-type', stockpile);
+        this.stockpile.setAttribute('data-tooltip-type', type.tooltipStockpile);
         this.stockpile.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([owner, need.id]),
         );
 
         this.price = new Ticker(Fortune.Malus);
-        this.price.outer.setAttribute('data-tooltip-type', explainPrice);
+        this.price.outer.setAttribute('data-tooltip-type', type.tooltipExplainPrice);
         this.price.outer.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([owner, need.id]),

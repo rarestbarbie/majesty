@@ -11,7 +11,7 @@ public struct TradeReport {
     private var market: MarketDetails?
 
     init() {
-        self.selection = .init(defaultTab: ())
+        self.selection = .init(defaultFocus: ())
         self.filters = ([], [])
         self.markets = []
         self.market = nil
@@ -19,7 +19,7 @@ public struct TradeReport {
 }
 extension TradeReport: PersistentReport {
     mutating func select(request: TradeReportRequest) {
-        self.selection.select(request.subject, filter: request.filter, detailsTab: ())
+        self.selection.select(request.subject, filter: request.filter)
     }
 
     mutating func update(from snapshot: borrowing GameSnapshot) {

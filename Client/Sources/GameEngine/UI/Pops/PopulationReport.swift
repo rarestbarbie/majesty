@@ -4,7 +4,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 public struct PopulationReport {
-    private var selection: PersistentSelection<Filter, PopDetailsTab>
+    private var selection: PersistentSelection<Filter, InventoryBreakdown<PopDetailsTab>.Focus>
 
     private var filters: ([FilterLabel], [Never])
     private var columns: (
@@ -25,7 +25,7 @@ public struct PopulationReport {
     private var pop: PopDetails?
 
     init() {
-        self.selection = .init(defaultTab: .Inventory)
+        self.selection = .init(defaultFocus: .init(tab: .Inventory, needs: .l))
         self.filters = ([], [])
         self.columns = (
             .init(id: 0, name: "Size"),
@@ -56,7 +56,10 @@ extension PopulationReport {
 }
 extension PopulationReport: PersistentReport {
     mutating func select(request: PopulationReportRequest)  {
-        self.selection.select(request.subject, filter: request.filter, detailsTab: request.details)
+        self.selection.select(request.subject, filter: request.filter)
+        self.selection.tab = request.details
+        self.selection.needs = request.detailsTier
+
         if  let column: ColumnControl = request.column {
             self.sort.update(column: column)
         }

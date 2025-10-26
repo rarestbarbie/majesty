@@ -53,14 +53,14 @@ extension FactoryTableEntry: JavaScriptEncodable {
         js[.yesterday_cn] = self.yesterday.cn
         js[.yesterday_ei] = self.yesterday.ei
         js[.yesterday_eo] = self.yesterday.eo
-        js[.yesterday_fi] = self.yesterday.fi
+        js[.yesterday_fi] = self.yesterday.fl
         js[.yesterday_px] = self.yesterday.px
 
         js[.today_wn] = self.today.wn
         js[.today_cn] = self.today.cn
         js[.today_ei] = self.today.ei
         js[.today_eo] = self.today.eo
-        js[.today_fi] = self.today.fi
+        js[.today_fi] = self.today.fl
         js[.today_px] = self.today.px
 
         js[.workers] = self.workers

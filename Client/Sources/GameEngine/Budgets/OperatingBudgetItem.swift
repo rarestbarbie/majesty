@@ -1,13 +1,14 @@
 import JavaScriptInterop
 import JavaScriptKit
 
-@frozen public enum OperatingBudgetItem: Unicode.Scalar, CaseIterable {
-    case buybacks = "B"
-    case dividend = "D"
-    case labor = "L"
-    case inputs = "I"
-    case office = "O"
-    case capex = "X"
+@frozen public enum CashAllocationItem: Unicode.Scalar, CaseIterable {
+    case buybacks = "b"
+    case dividend = "d"
+    case x = "x"
+    case e = "e"
+    case l = "l"
+    case wages = "w"
+    case salaries = "c"
 }
-extension OperatingBudgetItem: ConvertibleToJSValue, LoadableFromJSValue {
+extension CashAllocationItem: ConvertibleToJSValue, LoadableFromJSValue {
 }
