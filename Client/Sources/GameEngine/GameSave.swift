@@ -14,6 +14,7 @@ public struct GameSave {
     let cultures: [Culture]
     var countries: [Country]
     let factories: [Factory]
+    let mines: [Mine]
     var pops: [Pop]
 
     let markets: OrderedDictionary<Market.AssetPair, Market>
@@ -30,6 +31,7 @@ extension GameSave {
         case cultures
         case countries
         case factories
+        case mines
         case pops
 
         case markets
@@ -44,6 +46,7 @@ extension GameSave: JavaScriptEncodable {
         js[.cultures] = self.cultures
         js[.countries] = self.countries
         js[.factories] = self.factories
+        js[.mines] = self.mines
         js[.pops] = self.pops
 
         js[.markets] = self.markets
@@ -58,6 +61,7 @@ extension GameSave: JavaScriptDecodable {
             cultures: try js[.cultures].decode(),
             countries: try js[.countries].decode(),
             factories: try js[.factories].decode(),
+            mines: try js[.mines]?.decode() ?? [],
             pops: try js[.pops].decode(),
             markets: try js[.markets].decode(),
         )

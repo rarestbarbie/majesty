@@ -2,7 +2,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 struct FactoryWorkers {
-    let aggregate: FactoryContext.Workforce
+    let aggregate: Workforce
 }
 extension FactoryWorkers: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {

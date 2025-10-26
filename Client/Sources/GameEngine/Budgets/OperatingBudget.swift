@@ -17,8 +17,8 @@ struct OperatingBudget {
 }
 extension OperatingBudget {
     init(
-        workers: FactoryContext.Workforce?,
-        clerks: FactoryContext.Workforce?,
+        workers: Workforce?,
+        clerks: Workforce?,
         state: Factory,
         weights: __shared ResourceInputWeights,
         stockpileMaxDays: Int64,

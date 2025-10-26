@@ -22,7 +22,7 @@ struct Pop: LegalEntityState, IdentityReplaceable {
     var equity: Equity<LEI>
 
     var factories: OrderedDictionary<FactoryID, FactoryJob>
-    var mines: OrderedDictionary<Address, MiningJob>
+    var mines: OrderedDictionary<MineID, MiningJob>
 }
 extension Pop: Sectionable {
     init(id: PopID, section: Section) {
@@ -58,10 +58,9 @@ extension Pop: Deletable {
 extension Pop {
     mutating func prune(in context: GameContext.PruningPass) {
         self.equity.prune(in: context)
-        self.factories.update {
-            // don’t prune empty jobs yet, they may have interesting deltas
-            context.factories.contains($0.id)
-        }
+        // don’t prune empty jobs yet, they may have interesting deltas
+        self.factories.update { context.factories.contains($0.id) }
+        self.mines.update { context.mines.contains($0.id) }
     }
 }
 extension Pop: Turnable {

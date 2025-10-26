@@ -11,8 +11,11 @@ struct GameMap: ~Copyable {
 
     var conversions: [Pop.Conversion]
     var jobs: (
-        hire: (worker: Jobs.Hire<Address>, clerk: Jobs.Hire<PlanetID>),
-        fire: (worker: Jobs.Fire, clerk: Jobs.Fire)
+        hire: (
+            remote: Jobs.Hire<PlanetID>,
+            local: Jobs.Hire<Address>
+        ),
+        fire: Jobs.Fire
     )
     var localMarkets: LocalMarkets
     var stockMarkets: StockMarkets
@@ -28,7 +31,7 @@ struct GameMap: ~Copyable {
         self.notifications = .init(date: date)
 
         self.conversions = []
-        self.jobs = ((.init(), .init()), (.init(), .init()))
+        self.jobs = ((.init(), .init()), .init())
         self.localMarkets = .init()
         self.stockMarkets = .init()
         self.bank = .init()
