@@ -3,14 +3,14 @@ import JavaScriptKit
 import JavaScriptInterop
 
 struct MiningJob: PopJob, Identifiable {
-    let id: Address
+    let id: MineID
     var count: Int64
     var hired: Int64
     var fired: Int64
     var quit: Int64
 }
 extension MiningJob {
-    init(id: Address) {
+    init(id: MineID) {
         self.init(
             id: id,
             count: 0,

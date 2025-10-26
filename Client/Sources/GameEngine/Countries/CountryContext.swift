@@ -43,12 +43,3 @@ extension CountryContext {
 extension CountryContext {
     mutating func advance(map: inout GameMap, context: GameContext) throws {}
 }
-extension CountryContext: JavaScriptEncodable {
-    enum ObjectKey: JSString, Sendable {
-        case state
-    }
-
-    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.state] = self.state
-    }
-}

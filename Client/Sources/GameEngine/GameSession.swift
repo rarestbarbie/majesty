@@ -383,15 +383,15 @@ extension GameSession {
             return nil
         }
 
-        let workforce: FactoryContext.Workforce
+        let workforce: Workforce
         let type: PopType
 
         if case .Worker = stratum,
-            let workers: FactoryContext.Workforce = factory.workers {
+            let workers: Workforce = factory.workers {
             workforce = workers
             type = factory.type.workers.unit
         } else if
-            let clerks: FactoryContext.Workforce = factory.clerks,
+            let clerks: Workforce = factory.clerks,
             let clerkTeam: Quantity<PopType> = factory.type.clerks {
             workforce = clerks
             type = clerkTeam.unit

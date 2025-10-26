@@ -53,9 +53,12 @@ extension FactoryContext {
         if self.state.size.level == 0 {
             self.workers = nil
             self.clerks = nil
+        } else if case _? = self.type.clerks {
+            self.workers = .empty
+            self.clerks = .empty
         } else {
-            self.workers = .init()
-            self.clerks = self.type.clerks == nil ? nil : .init()
+            self.workers = .empty
+            self.clerks = nil
         }
     }
 
@@ -294,27 +297,27 @@ extension FactoryContext: TransactingContext {
 
             #assert(self.state.size.level > 0, "Active factory has size level 0?!?!")
 
-            if  let (salaries, bonus): (Paychecks, Double) = self.clerkEffects(
+            if  let (clerks, bonus): (Update, Double) = self.clerkEffects(
                     budget: budget.clerks,
                     map: &map
                 ) {
                 self.state.today.eo = 1 + bonus
                 self.state.today.cn = max(
                     country.minwage,
-                    self.state.today.cn + salaries.change
+                    self.state.today.cn + clerks.wagesChange
                 )
-                self.state.inventory.account.c -= salaries.paid
+                self.state.inventory.account.c -= clerks.wagesPaid
 
-                switch salaries.headcount {
+                switch clerks.headcount {
                 case nil:
                     break
-                case .fire(let block):
+                case .fire(let type, let block):
                     guard map.random.roll(1, 21) else {
                         break
                     }
-                    map.jobs.fire.clerk[self.state.id] = block
-                case .hire(let block, let type):
-                    map.jobs.hire.clerk[self.state.tile.planet, type].append(block)
+                    map.jobs.fire[self.state.id, type] = block
+                case .hire(let type, let block):
+                    map.jobs.hire.remote[self.state.tile.planet, type].append(block)
                 }
             } else {
                 self.state.today.eo = 1
@@ -323,7 +326,7 @@ extension FactoryContext: TransactingContext {
             let operatingProfit: Int64
 
             if  let workers: Workforce = self.workers {
-                let wages: Paychecks = self.operate(
+                let changes: WorkforceChanges? = self.operate(
                     workers: workers,
                     policy: country,
                     budget: budget,
@@ -333,22 +336,22 @@ extension FactoryContext: TransactingContext {
 
                 operatingProfit = self.state.operatingProfit
 
-                switch wages.headcount {
+                switch changes {
                 case nil:
                     break
 
-                case .fire(let block):
+                case .fire(let type, let block)?:
                     guard map.random.roll(1, 7) else {
                         break
                     }
-                    map.jobs.fire.worker[self.state.id] = block
+                    map.jobs.fire[self.state.id, type] = block
 
-                case .hire(let block, let type):
+                case .hire(let type, let block)?:
                     guard operatingProfit >= 0 || workers.count == 0 else {
                         break
                     }
 
-                    map.jobs.hire.worker[self.state.tile, type].append(block)
+                    map.jobs.hire.local[self.state.tile, type].append(block)
                 }
             } else {
                 operatingProfit = self.state.operatingProfit
@@ -480,7 +483,7 @@ extension FactoryContext {
         budget: OperatingBudget,
         stockpileTarget: TradeableInput.StockpileTarget,
         map: inout GameMap
-    ) -> Paychecks {
+    ) -> WorkforceChanges? {
         self.state.inventory.account += self.state.inventory.l.trade(
             stockpileDays: stockpileTarget,
             spendingLimit: budget.l.tradeable,
@@ -500,14 +503,14 @@ extension FactoryContext {
             "Factory has negative cash! (\(self.state.inventory.account))"
         )
 
-        let (wages, hours): (Paychecks, Int64) = self.workerEffects(
+        let (update, hours): (Update, Int64) = self.workerEffects(
             workers: workers,
             budget: budget.workers,
             map: &map
         )
 
-        self.state.today.wn = max(policy.minwage, self.state.today.wn + wages.change)
-        self.state.inventory.account.w -= wages.paid
+        self.state.today.wn = max(policy.minwage, self.state.today.wn + update.wagesChange)
+        self.state.inventory.account.w -= update.wagesPaid
 
         /// On some days, the factory purchases more inputs than others. To get a more accurate
         /// estimate of the factory’s profitability, we need to credit the day’s balance with
@@ -541,14 +544,14 @@ extension FactoryContext {
         self.state.today.fi = self.state.inventory.l.fulfilled
         self.state.today.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
 
-        return wages
+        return update.headcount
     }
 }
 extension FactoryContext {
     private func clerkEffects(
         budget: Int64,
         map: inout GameMap
-    ) -> (salaries: Paychecks, bonus: Double)? {
+    ) -> (salaries: Update, bonus: Double)? {
         guard
         let clerks: Workforce = self.clerks,
         let clerkTeam: Quantity<PopType> = self.type.clerks else {
@@ -558,36 +561,36 @@ extension FactoryContext {
         let clerkRatio: Fraction = clerkTeam.amount %/ self.type.workers.amount
         let clerksOptimal: Int64 = self.workers.map { $0.count >< clerkRatio } ?? 0
 
-        let owed: Int64 = clerks.count * self.state.today.cn
-        let paid: Int64 = map.bank.pay(
+        let wagesOwed: Int64 = clerks.count * self.state.today.cn
+        let wagesPaid: Int64 = map.bank.pay(
             salariesBudget: budget,
             salaries: [
                 map.payscale(shuffling: clerks.pops, rate: self.state.today.cn),
             ]
         )
 
-        let headcount: EmployeeOperations?
-        let change: Int64
+        let headcount: WorkforceChanges?
+        let wagesChange: Int64
 
-        if  paid < owed {
+        if  wagesPaid < wagesOwed {
             // Not enough money to pay all clerks.
-            let retention: Fraction = paid %/ owed
+            let retention: Fraction = wagesPaid %/ wagesOwed
             let retained: Int64 = clerks.count <> retention
 
-            let layoff: FactoryJobLayoffBlock = .init(
+            let layoff: PopJobLayoffBlock = .init(
                 size: clerks.count - retained
             )
 
             if  layoff.size > 0 {
-                headcount = .fire(layoff)
+                headcount = .fire(clerkTeam.unit, layoff)
             } else {
                 headcount = nil
             }
 
-            change = -1
+            wagesChange = -1
 
         } else {
-            let clerksAffordable: Int64 = (budget - paid) / self.state.today.cn
+            let clerksAffordable: Int64 = (budget - wagesPaid) / self.state.today.cn
             let clerksNeeded: Int64 = clerksOptimal - clerks.count
             let clerksToHire: Int64 = min(clerksNeeded, clerksAffordable)
 
@@ -596,27 +599,27 @@ extension FactoryContext {
                 map.random.roll(Int64.init(p), Int64.init(Self.pr)) {
                 // Was last in line to hire clerks yesterday, did not hire any clerks, and has
                 // fewer than half of the target number of clerks today.
-                change = 1
+                wagesChange = 1
             } else {
-                change = 0
+                wagesChange = 0
             }
 
-            let bid: FactoryJobOfferBlock = .init(
-                at: self.state.id,
+            let bid: PopJobOfferBlock = .init(
+                job: .factory(self.state.id),
                 bid: self.state.today.cn,
                 size: Binomial[clerksToHire, 0.05].sample(using: &map.random.generator)
             )
 
             if  bid.size > 0 {
-                headcount = .hire(bid, clerkTeam.unit)
+                headcount = .hire(clerkTeam.unit, bid)
             } else {
                 headcount = nil
             }
         }
 
-        let salaries: Paychecks = .init(
-            change: change,
-            paid: paid,
+        let update: Update = .init(
+            wagesChange: wagesChange,
+            wagesPaid: wagesPaid,
             headcount: headcount
         )
 
@@ -625,14 +628,14 @@ extension FactoryContext {
             ? Double.init(clerks.count) / Double.init(clerksOptimal)
             : 1
 
-        return (salaries, bonus)
+        return (update, bonus)
     }
 
     private func workerEffects(
         workers: Workforce,
         budget: Int64,
         map: inout GameMap
-    ) -> (wages: Paychecks, hours: Int64) {
+    ) -> (wages: Update, hours: Int64) {
         /// Compute hours workable, assuming each worker works 1 “hour” per day for mathematical
         /// convenience. This can be larger than the actual number of workers available, but it
         /// will never be larger than the number of workers that can fit in the factory.
@@ -647,30 +650,30 @@ extension FactoryContext {
             min(workers.count, hoursWorkable),
             budget / self.state.today.wn
         )
-        let paid: Int64 = hours <= 0 ? 0 : map.bank.pay(
+        let wagesPaid: Int64 = hours <= 0 ? 0 : map.bank.pay(
             wagesBudget: hours * self.state.today.wn,
             wages: map.payscale(shuffling: workers.pops, rate: self.state.today.wn)
         )
 
-        let headcount: EmployeeOperations?
-        let change: Int64
+        let headcount: WorkforceChanges?
+        let wagesChange: Int64
 
         if  hours < workers.count {
             // Not enough money to pay all workers, or not enough work to do.
-            let layoff: FactoryJobLayoffBlock = .init(
+            let layoff: PopJobLayoffBlock = .init(
                 size: workers.count - hours
             )
 
             if  layoff.size > 0 {
-                headcount = .fire(layoff)
+                headcount = .fire(self.type.workers.unit, layoff)
             } else {
                 headcount = nil
             }
 
-            change = -1
+            wagesChange = -1
 
         } else {
-            let unspent: Int64 = budget - paid
+            let unspent: Int64 = budget - wagesPaid
             let open: Int64 = workers.limit - workers.count
             let hire: Int64 = min(open, unspent / self.state.today.wn)
 
@@ -680,34 +683,34 @@ extension FactoryContext {
                     map.random.roll(Int64.init(p), Int64.init(Self.pr)) {
                     // Was last in line to hire workers yesterday, did not hire any workers, and has
                     // far more inputs stockpiled than workers to process them.
-                    change = 1
+                    wagesChange = 1
                 } else {
-                    change = 0
+                    wagesChange = 0
                 }
 
-                let bid: FactoryJobOfferBlock = .init(
-                    at: self.state.id,
+                let bid: PopJobOfferBlock = .init(
+                    job: .factory(self.state.id),
                     bid: self.state.today.wn,
                     size: Binomial[hire, 0.1].sample(using: &map.random.generator)
                 )
 
                 if  bid.size > 0 {
-                    headcount = .hire(bid, self.type.workers.unit)
+                    headcount = .hire(self.type.workers.unit, bid)
                 } else {
                     headcount = nil
                 }
             } else {
                 headcount = nil
-                change = 0
+                wagesChange = 0
             }
         }
 
-        let wages: Paychecks = .init(
-            change: change,
-            paid: paid,
+        let update: Update = .init(
+            wagesChange: wagesChange,
+            wagesPaid: wagesPaid,
             headcount: headcount
         )
 
-        return (wages, hours)
+        return (update, hours)
     }
 }

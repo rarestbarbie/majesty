@@ -491,9 +491,11 @@ extension PopContext {
 
         // We do not need to remove jobs that have no employees left, that will be done
         // automatically by ``Pop.turn``.
-        let jobs: Range<Int> = self.state.factories.values.indices
+        let factoryJobs: Range<Int> = self.state.factories.values.indices
+        let miningJobs: Range<Int> = self.state.mines.values.indices
+
         let w0: Double = self.occupiedBy.map { Double.init($0.minwage) } ?? 1
-        for i: Int in jobs {
+        for i: Int in factoryJobs {
             {
                 /// At this rate, if the factory pays minimum wage or less, about half of
                 /// non-union workers, and one third of union workers, will quit every year.
@@ -502,6 +504,14 @@ extension PopContext {
                     using: &map.random.generator
                 )
             } (&self.state.factories.values[i])
+        }
+        for i: Int in miningJobs {
+            {
+                $0.quit(
+                    rate: 0.001,
+                    using: &map.random.generator
+                )
+            } (&self.state.mines.values[i])
         }
 
         let unemployed: Int64 = self.state.unemployed
@@ -513,16 +523,19 @@ extension PopContext {
             /// we could draw indices on demand, but that would have very pathological
             /// performance in the rare case that we have many empty jobs that have not yet
             /// been linted.
-            for i: Int in jobs.shuffled(using: &map.random.generator) {
+            for i: Int in factoryJobs.shuffled(using: &map.random.generator) {
                 guard 0 < nonexistent else {
                     break
                 }
 
-                {
-                    let quit: Int64 = min(nonexistent, $0.count)
-                    $0.quit(quit)
-                    nonexistent -= quit
-                } (&self.state.factories.values[i])
+                self.state.factories.values[i].remove(excess: &nonexistent)
+            }
+            for i: Int in miningJobs.shuffled(using: &map.random.generator) {
+                guard 0 < nonexistent else {
+                    break
+                }
+
+                self.state.mines.values[i].remove(excess: &nonexistent)
             }
         }
     }

@@ -14,6 +14,7 @@ struct GameContext {
     private(set) var cultures: RuntimeContextTable<CultureContext>
     private(set) var countries: RuntimeContextTable<CountryContext>
     private(set) var factories: DynamicContextTable<FactoryContext>
+    private(set) var mines: DynamicContextTable<MineContext>
     private(set) var pops: DynamicContextTable<PopContext>
 
     let symbols: GameRules.Symbols
@@ -24,12 +25,14 @@ struct GameContext {
         /// We do not use metadata for these types of objects:
         let country: CountryContext.Metadata = .init()
         let culture: CultureContext.Metadata = .init()
+        let _none: _NoMetadata = .init()
 
         self.player = save.player
         self.planets = [:]
         self.cultures = try .init(states: save.cultures) { _ in culture }
         self.countries = try .init(states: save.countries) { _ in country }
         self.factories = try .init(states: save.factories) { rules.factories[$0.type] }
+        self.mines = try .init(states: save.mines) { _ in _none }
         self.pops = try .init(states: save.pops) { rules.pops[$0.type] }
 
         self.symbols = save.symbols
@@ -106,6 +109,7 @@ extension GameContext {
     var pruningPass: PruningPass {
         .init(
             factories: self.factories.keys,
+            mines: self.mines.keys,
             pops: self.pops.keys,
         )
     }
@@ -231,14 +235,13 @@ extension GameContext {
             }
         }
 
-        var order: [Resident] = []
+        let shuffled: ResidentOrder = .randomize(
+            (self.factories, Resident.factory(_:)),
+            (self.pops, Resident.pop(_:)),
+            with: &map.random.generator
+        )
 
-        order.reserveCapacity(self.factories.count + self.pops.count)
-        order += self.factories.indices.lazy.map(Resident.factory(_:))
-        order += self.pops.indices.lazy.map(Resident.pop(_:))
-        order.shuffle(using: &map.random.generator)
-
-        for i: Resident in order {
+        for i: Resident in shuffled.residents {
             switch i {
             case .factory(let i): self.factories[i].transact(map: &map)
             case .pop(let i): self.pops[i].transact(map: &map)
@@ -248,10 +251,11 @@ extension GameContext {
         map.exchange.turn()
 
         self.factories.turn { $0.advance(map: &map) }
+        self.mines.turn { $0.advance(map: &map) }
         self.pops.turn { $0.advance(map: &map) }
 
         self.postCashTransfers(&map)
-        self.postPopEmployment(&map, p: order.compactMap(\.pop))
+        self.postPopEmployment(&map, order: shuffled)
 
         try self.executeMovements(&map)
 
@@ -267,6 +271,8 @@ extension GameContext {
             self.pops[i].state.prune(in: retain)
         }
 
+        self.index()
+
         for i: Int in self.planets.indices {
             try self.planets[i].compute(map: map, context: self.territoryPass)
         }
@@ -277,10 +283,11 @@ extension GameContext {
             try self.countries[i].compute(map: map, context: self.territoryPass)
         }
 
-        self.index()
-
         for i: Int in self.factories.indices {
             try self.factories[i].compute(map: map, context: self.residentPass)
+        }
+        for i: Int in self.mines.indices {
+            try self.mines[i].compute(map: map, context: self.residentPass)
         }
         for i: Int in self.pops.indices {
             try self.pops[i].compute(map: map, context: self.residentPass)
@@ -315,6 +322,9 @@ extension GameContext {
         for i: Int in self.factories.indices {
             self.factories[i].startIndexCount()
         }
+        for i: Int in self.mines.indices {
+            self.mines[i].startIndexCount()
+        }
         for i: Int in self.pops.indices {
             self.pops[i].startIndexCount()
         }
@@ -327,6 +337,9 @@ extension GameContext {
 
             for job: FactoryJob in pop.factories.values {
                 self.factories[modifying: job.id].addWorkforceCount(pop: pop, job: job)
+            }
+            for job: MiningJob in pop.mines.values {
+                self.mines[modifying: job.id].addWorkforceCount(pop: pop, job: job)
             }
             for stake: EquityStake<LEI> in pop.equity.shares.values {
                 switch stake.id {
@@ -381,79 +394,89 @@ extension GameContext {
         }
     }
 
-    private mutating func postPopEmployment(_ map: inout GameMap, p: [Int]) {
-        self.postPopHirings(&map, p: p)
-        self.postPopFirings(&map, p: p)
+    private mutating func postPopEmployment(_ map: inout GameMap, order: ResidentOrder) {
+        self.postPopHirings(&map, order: order)
+        self.postPopFirings(&map)
     }
 
-    private mutating func postPopFirings(_ map: inout GameMap, p: [Int]) {
-        var layoffs: (
-            workers: [FactoryID: FactoryJobLayoffBlock],
-            clerks: [FactoryID: FactoryJobLayoffBlock]
-        ) = (
-            map.jobs.fire.worker.turn(),
-            map.jobs.fire.clerk.turn()
-        )
+    private mutating func postPopFirings(_ map: inout GameMap) {
+        var layoffs: [GameMap.Jobs.Fire.Key: PopJobLayoffBlock] = map.jobs.fire.turn()
 
         self.pops.turn {
-            let stratum: PopStratum = $0.state.type.stratum
+            let type: PopType = $0.state.type
             for j: Int in $0.state.factories.values.indices {
                 {
-                    if stratum <= .Worker {
-                        $0.fire(&layoffs.workers[$0.id])
-                    } else {
-                        $0.fire(&layoffs.clerks[$0.id])
-                    }
+                    $0.fire(&layoffs[.factory(type, $0.id)])
                 } (&$0.state.factories.values[j])
+            }
+            for j: Int in $0.state.mines.values.indices {
+                {
+                    $0.fire(&layoffs[.mine(type, $0.id)])
+                } (&$0.state.mines.values[j])
             }
         }
     }
-    private mutating func postPopHirings(_ map: inout GameMap, p: [Int]) {
-        let (workers, clerks): (
-            [GameMap.Jobs.Hire<Address>.Key: [(Int, Int64)]],
-            [GameMap.Jobs.Hire<PlanetID>.Key: [(Int, Int64)]]
-        ) = p.reduce(into: (worker: [:], clerk: [:])) {
-            let pop: Pop = self.pops.state[$1]
+    private mutating func postPopHirings(_ map: inout GameMap, order: ResidentOrder) {
+        let offers: (
+            remote: [GameMap.Jobs.Hire<PlanetID>.Key: [(Int, Int64)]],
+            local: [GameMap.Jobs.Hire<Address>.Key: [(Int, Int64)]]
+        ) = order.residents.reduce(into: ([:], [:])) {
+            guard case .pop(let i) = $1 else {
+                return
+            }
+
+            let pop: Pop = self.pops.state[i]
+
+            guard
+            let jobMode: PopJobMode = pop.type.jobMode else {
+                return
+            }
+
             let unemployed: Int64 = pop.unemployed
             if  unemployed <= 0 {
                 return
             }
-            if  pop.type.stratum <= .Worker {
+
+            switch jobMode {
+            case .hourly, .mining:
                 let key: GameMap.Jobs.Hire<Address>.Key = .init(
                     location: pop.tile,
                     type: pop.type
                 )
-                $0.worker[key, default: []].append(($1, unemployed))
-            } else {
+                $0.local[key, default: []].append((i, unemployed))
+
+            case .remote:
                 let key: GameMap.Jobs.Hire<PlanetID>.Key = .init(
                     location: pop.tile.planet,
                     type: pop.type
                 )
-                $0.clerk[key, default: []].append(($1, unemployed))
+                $0.remote[key, default: []].append((i, unemployed))
             }
         }
 
         let workersUnavailable: [
-            (PopType, [FactoryJobOfferBlock])
-        ] = map.jobs.hire.worker.turn {
-            if var pops: [(index: Int, unemployed: Int64)] = workers[$0] {
+            (PopType, [PopJobOfferBlock])
+        ] = map.jobs.hire.local.turn {
+            if var pops: [(index: Int, unemployed: Int64)] = offers.local[$0] {
                 self.postPopHirings(matching: &pops, with: &$1)
             }
         }
-        let clerksUnavailable: [(PopType, [FactoryJobOfferBlock])] = map.jobs.hire.clerk.turn {
-            if var pops: [(index: Int, unemployed: Int64)] = clerks[$0] {
+        let clerksUnavailable: [
+            (PopType, [PopJobOfferBlock])
+        ] = map.jobs.hire.remote.turn {
+            if var pops: [(index: Int, unemployed: Int64)] = offers.remote[$0] {
                 self.postPopHirings(matching: &pops, with: &$1)
             }
         }
 
-        for (type, unfilled): (PopType, [FactoryJobOfferBlock])
+        for (type, unfilled): (PopType, [PopJobOfferBlock])
             in [clerksUnavailable, workersUnavailable].joined() {
             /// The last `q` factories will always raise wages. The next factory after the first
             /// `q` will raise wages with probability `r / 8`.
             let (q, r): (Int, remainder: Int) = unfilled.count.quotientAndRemainder(
                 dividingBy: FactoryContext.pr
             )
-            for (position, block): (Int, FactoryJobOfferBlock) in unfilled.enumerated() {
+            for (position, block): (Int, PopJobOfferBlock) in unfilled.enumerated() {
                 let probability: Int
 
                 switch position {
@@ -465,10 +488,18 @@ extension GameContext {
                     probability = 0
                 }
 
-                if type.stratum <= .Worker {
-                    self.factories[modifying: block.at].state.today.wf = probability
-                } else {
-                    self.factories[modifying: block.at].state.today.cf = probability
+                switch block.job {
+                case .factory(let id):
+                    {
+                        if type.stratum <= .Worker {
+                            $0.wf = probability
+                        } else {
+                            $0.cf = probability
+                        }
+                    } (&self.factories[modifying: id].state.today)
+
+                case .mine:
+                    break
                 }
             }
         }
@@ -476,7 +507,7 @@ extension GameContext {
 
     private mutating func postPopHirings(
         matching pops: inout [(index: Int, unemployed: Int64)],
-        with offers: inout [FactoryJobOfferBlock]
+        with offers: inout [PopJobOfferBlock]
     ) {
         /// We iterate through the pops for as many times as there are job offers. This
         /// means pops near the front of the list are more likely to be visited multiple
@@ -485,28 +516,31 @@ extension GameContext {
         let iterations: Int = offers.count
         var iteration: Int = 0
         while let i: Int = offers.indices.last, iteration < iterations {
-            let block: FactoryJobOfferBlock = offers[i]
-            let match: (id: Int, (count: Int64, remaining: FactoryJobOfferBlock?))? = {
+            let block: PopJobOfferBlock = offers[i]
+            let match: (id: Int, (count: Int64, remaining: PopJobOfferBlock?))? = {
                 $0.unemployed > 0 ? ($0.index, block.matched(with: &$0.unemployed)) : nil
             } (&pops[iteration % candidates])
 
             iteration += 1
 
             guard
-            let (pop, (count, remaining)): (Int, (Int64, FactoryJobOfferBlock?)) = match else {
+            let (pop, (count, remaining)): (Int, (Int64, PopJobOfferBlock?)) = match else {
                 // Pop has no more unemployed members.
                 continue
             }
 
-            if  let remaining: FactoryJobOfferBlock {
+            if  let remaining: PopJobOfferBlock {
                 offers[i] = remaining
             } else {
                 offers.removeLast()
             }
 
-            self.pops[pop].state.factories[block.at, default: .init(id: block.at)].hire(
-                count
-            )
+            switch block.job {
+            case .factory(let id):
+                self.pops[pop].state.factories[id, default: .init(id: id)].hire(count)
+            case .mine(let id):
+                self.pops[pop].state.mines[id, default: .init(id: id)].hire(count)
+            }
         }
     }
 }
@@ -600,6 +634,7 @@ extension GameContext {
 extension GameContext {
     private mutating func destroyObjects() {
         self.factories.lint()
+        self.mines.lint()
         self.pops.lint()
     }
 }

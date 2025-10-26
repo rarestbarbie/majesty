@@ -29,22 +29,6 @@ extension FactoryJob {
     }
 }
 extension FactoryJob {
-    mutating func fire(_ layoff: inout FactoryJobLayoffBlock?) {
-        guard
-        let size: Int64 = layoff?.size, size > 0 else {
-            return
-        }
-
-        if  size > self.count {
-            layoff?.size -= self.count
-            self.fireAll()
-        } else {
-            layoff = nil
-            self.fire(size)
-        }
-    }
-}
-extension FactoryJob {
     enum ObjectKey: JSString, Sendable {
         case id
         case xp

@@ -1,11 +1,11 @@
 import GameIDs
 
-struct FactoryJobOfferBlock {
-    let at: FactoryID
+struct PopJobOfferBlock {
+    let job: PopJobOffer
     let bid: Int64
     var size: Int64
 }
-extension FactoryJobOfferBlock {
+extension PopJobOfferBlock {
     consuming func matched(with workers: inout Int64) -> (count: Int64, remaining: Self?) {
         if  self.size <= workers {
             workers -= self.size

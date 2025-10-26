@@ -8,6 +8,22 @@ protocol PopJob<ID>: Identifiable {
     var quit: Int64 { get set }
 }
 extension PopJob {
+    mutating func fire(_ layoff: inout PopJobLayoffBlock?) {
+        guard
+        let size: Int64 = layoff?.size, size > 0 else {
+            return
+        }
+
+        if  size > self.count {
+            layoff?.size -= self.count
+            self.fireAll()
+        } else {
+            layoff = nil
+            self.fire(size)
+        }
+    }
+}
+extension PopJob {
     mutating func fireAll() {
         self.fired += self.count
         self.count = 0
@@ -41,6 +57,12 @@ extension PopJob {
 
         self.quit += quit
         self.count -= quit
+    }
+
+    mutating func remove(excess: inout Int64) {
+        let quit: Int64 = min(excess, self.count)
+        self.quit(quit)
+        excess -= quit
     }
 
     mutating func turn() {
