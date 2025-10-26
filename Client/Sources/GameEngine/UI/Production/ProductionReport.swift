@@ -5,14 +5,17 @@ import JavaScriptKit
 import JavaScriptInterop
 
 public struct ProductionReport {
-    private var selection: PersistentSelection<Filter, FactoryDetailsTab>
+    private var selection: PersistentSelection<
+        Filter,
+        InventoryBreakdown<FactoryDetailsTab>.Focus
+    >
 
     private var filters: ([FilterLabel], [Never])
     private var factories: [FactoryTableEntry]
     private var factory: FactoryDetails?
 
     init() {
-        self.selection = .init(defaultTab: .Inventory)
+        self.selection = .init(defaultFocus: .init(tab: .Inventory, needs: .l))
 
         self.filters = ([], [])
         self.factories = []
@@ -21,7 +24,9 @@ public struct ProductionReport {
 }
 extension ProductionReport: PersistentReport {
     mutating func select(request: ProductionReportRequest) {
-        self.selection.select(request.subject, filter: request.filter, detailsTab: request.details)
+        self.selection.select(request.subject, filter: request.filter)
+        self.selection.tab = request.details
+        self.selection.needs = request.detailsTier
     }
 
     mutating func update(from snapshot: borrowing GameSnapshot) {

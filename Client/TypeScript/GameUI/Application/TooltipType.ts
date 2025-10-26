@@ -10,6 +10,7 @@ export enum TooltipType {
     PopNeeds = 'PopNeeds',
     PopType = 'PopType',
     PopCashFlowItem = 'PopCashFlowItem',
+    PopBudgetItem = 'PopBudgetItem',
     PopOwnershipCountry = 'PopOwnershipCountry',
     PopOwnershipCulture = 'PopOwnershipCulture',
     PopOwnershipSecurities = 'PopOwnershipSecurities',

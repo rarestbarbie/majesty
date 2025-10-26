@@ -37,9 +37,26 @@
         }
     }
 }
+
 [data-subscreen='Inventory'] {
     display: flex;
     flex-direction: row;
+
+    div.tiers {
+        margin-bottom: 0.5rem;
+        display: flex;
+        gap: 0.3em;
+        > * {
+            flex: 1 1 0;
+
+            a {
+                display: block;
+                padding: 0.25em;
+                border: 1px solid rgba(255, 255, 255, 0.1);
+                text-align: center;
+            }
+        }
+    }
 
     div.hstack {
         > div.pie-charts {
@@ -61,8 +78,6 @@
 
     [data-table='Needs'] {
         grid-template-columns: 1fr 1fr 1fr 1fr;
-
-        margin-top: 1rem;
     }
     [data-table='Needs'] > [data-tier='i'] {
         --color: rgb(104, 104, 104);

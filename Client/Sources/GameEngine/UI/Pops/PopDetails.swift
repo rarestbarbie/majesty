@@ -4,22 +4,26 @@ import JavaScriptKit
 import JavaScriptInterop
 import VectorCharts
 
-struct PopDetails: PersistentReportDetails {
+struct PopDetails {
     let id: PopID
-    var open: PopDetailsTab
-
+    private var open: PopDetailsTab
     private var inventory: InventoryBreakdown<PopDetailsTab>
     private var ownership: OwnershipBreakdown<PopDetailsTab>
 
     private var state: Pop?
 
-    init(id: PopID, open: PopDetailsTab) {
+    init(id: PopID, focus: InventoryBreakdown<PopDetailsTab>.Focus) {
         self.id = id
-        self.open = open
-
-        self.inventory = .init()
+        self.open = focus.tab
+        self.inventory = .init(focus: focus.needs)
         self.ownership = .init()
         self.state = nil
+    }
+}
+extension PopDetails: PersistentReportDetails {
+    mutating func refocus(on focus: InventoryBreakdown<PopDetailsTab>.Focus) {
+        self.open = focus.tab
+        self.inventory.focus = focus.needs
     }
 }
 extension PopDetails {
@@ -54,8 +58,8 @@ extension PopDetails: JavaScriptEncodable {
         js[.type] = self.state?.type
 
         switch self.open {
-        case .Inventory:    js[.open] = self.inventory
-        case .Ownership:    js[.open] = self.ownership
+        case .Inventory: js[.open] = self.inventory
+        case .Ownership: js[.open] = self.ownership
         }
     }
 }

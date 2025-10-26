@@ -1,5 +1,5 @@
-protocol PersistentReportDetails<ID, Tab>: Identifiable {
-    associatedtype Tab
-    init(id: Self.ID, open: Tab)
-    var open: Tab { get set }
+protocol PersistentReportDetails<ID, Focus>: Identifiable {
+    associatedtype Focus
+    init(id: Self.ID, focus: Focus)
+    mutating func refocus(on focus: Focus)
 }

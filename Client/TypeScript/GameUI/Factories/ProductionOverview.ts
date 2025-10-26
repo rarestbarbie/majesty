@@ -27,7 +27,6 @@ import {
 export class ProductionOverview extends ScreenContent {
     private readonly filters: FilterList<MarketFilter, string>[];
     private readonly factories: StaticList<FactoryTableRow, GameID>;
-    private readonly needs: StaticList<ResourceNeedRow, string>;
     private readonly sales: StaticList<ResourceSaleBox, string>;
 
     private readonly consumption: ConsumptionBreakdown;
@@ -42,6 +41,13 @@ export class ProductionOverview extends ScreenContent {
         readonly nav: HTMLElement;
     };
 
+    static readonly screen: ScreenType = ScreenType.Production;
+    static readonly tooltipCashFlowItem: TooltipType = TooltipType.FactoryCashFlowItem;
+    static readonly tooltipBudgetItem: TooltipType = TooltipType.FactoryBudgetItem;
+    static readonly tooltipExplainPrice: TooltipType = TooltipType.FactoryExplainPrice;
+    static readonly tooltipResourceIO: TooltipType = TooltipType.FactoryResourceIO;
+    static readonly tooltipStockpile: TooltipType = TooltipType.FactoryStockpile;
+
     constructor() {
         super();
 
@@ -52,13 +58,9 @@ export class ProductionOverview extends ScreenContent {
         this.factories = new StaticList<FactoryTableRow, GameID>(document.createElement('div'));
         this.factories.table('Factories', FactoryTableRow.columns);
 
-        this.needs = new StaticList<ResourceNeedRow, string>(document.createElement('div'));
         this.sales = new StaticList<ResourceSaleBox, string>(document.createElement('div'));
 
-        this.consumption = new ConsumptionBreakdown(
-            TooltipType.FactoryCashFlowItem,
-            TooltipType.FactoryBudgetItem,
-        );
+        this.consumption = new ConsumptionBreakdown(ProductionOverview);
         this.ownership = new OwnershipBreakdown(
             TooltipType.FactoryOwnershipCountry,
             TooltipType.FactoryOwnershipCulture,
@@ -72,11 +74,11 @@ export class ProductionOverview extends ScreenContent {
             {
                 subject: factory ? parseInt(factory) as GameID ?? undefined : undefined,
                 details: parameters.get('details') as FactoryDetailsTab ?? undefined,
+                detailsTier: parameters.get('detailsTier') ?? undefined,
                 filter: parameters.get('filter') ?? undefined
             }
         );
 
-        this.needs.table('Needs', ResourceNeedRow.columns);
         this.sales.clear();
         this.sales.node.classList.add('sales');
 
@@ -125,12 +127,8 @@ export class ProductionOverview extends ScreenContent {
 
         switch (state.factory?.open.type) {
         case FactoryDetailsTab.Inventory:
-            const left: HTMLDivElement = document.createElement('div');
-            left.appendChild(this.needs.node);
-            left.appendChild(this.consumption.node);
-
             this.dom.stats.setAttribute('data-subscreen', 'Inventory');
-            this.dom.stats.appendChild(left);
+            this.dom.stats.appendChild(this.consumption.node);
             this.dom.stats.appendChild(this.sales.node);
             break;
 
@@ -197,29 +195,18 @@ export class ProductionOverview extends ScreenContent {
         case FactoryDetailsTab.Inventory:
             let id: GameID = state.factory.id;
 
-            this.needs.update(
-                state.factory.open.needs,
-                (need: ResourceNeed) => new ResourceNeedRow(
-                    need,
-                    id,
-                    TooltipType.FactoryResourceIO,
-                    TooltipType.FactoryStockpile,
-                    TooltipType.FactoryExplainPrice,
-                ),
-                (need: ResourceNeed, row: ResourceNeedRow) => row.update(need),
-            );
+            this.consumption.update(id, state.factory.open, ProductionOverview);
             this.sales.update(
                 state.factory.open.sales,
                 (sale: ResourceSale) => new ResourceSaleBox(
                     sale,
                     id,
-                    TooltipType.FactoryResourceIO,
-                    TooltipType.FactoryExplainPrice,
+                    ProductionOverview.tooltipResourceIO,
+                    ProductionOverview.tooltipExplainPrice,
                 ),
                 (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
             );
 
-            this.consumption.update(id, state.factory.open);
             break;
 
         case FactoryDetailsTab.Ownership:

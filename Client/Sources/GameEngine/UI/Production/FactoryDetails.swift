@@ -3,22 +3,28 @@ import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 
-struct FactoryDetails: PersistentReportDetails {
+struct FactoryDetails {
     let id: FactoryID
-    var open: FactoryDetailsTab
+    private var open: FactoryDetailsTab
     private var inventory: InventoryBreakdown<FactoryDetailsTab>
     private var ownership: OwnershipBreakdown<FactoryDetailsTab>
 
     private var name: String?
 
-    init(id: FactoryID, open: FactoryDetailsTab) {
+    init(id: FactoryID, focus: InventoryBreakdown<FactoryDetailsTab>.Focus) {
         self.id = id
-        self.open = open
+        self.open = focus.tab
 
-        self.inventory = .init()
+        self.inventory = .init(focus: focus.needs)
         self.ownership = .init()
 
         self.name = nil
+    }
+}
+extension FactoryDetails: PersistentReportDetails {
+    mutating func refocus(on focus: InventoryBreakdown<FactoryDetailsTab>.Focus) {
+        self.open = focus.tab
+        self.inventory.focus = focus.needs
     }
 }
 extension FactoryDetails {

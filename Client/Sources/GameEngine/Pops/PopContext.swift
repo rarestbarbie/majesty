@@ -23,7 +23,7 @@ struct PopContext: RuntimeContext, LegalEntityContext {
 
     private(set) var cashFlow: CashFlowStatement
 
-    private var budget: PopBudget?
+    private(set) var budget: PopBudget?
 
     public init(type: PopMetadata, state: Pop) {
         self.type = type

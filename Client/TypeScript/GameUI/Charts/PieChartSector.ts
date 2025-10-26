@@ -4,5 +4,5 @@ export interface PieChartSector<ID> {
     readonly id: ID;
     readonly d?: string;
     readonly share: number;
-    readonly value: { color: Color; name: string; };
+    readonly value: { color?: Color; style?: string; name: string; };
 }

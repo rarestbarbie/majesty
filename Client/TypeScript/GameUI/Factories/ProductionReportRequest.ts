@@ -8,5 +8,6 @@ import {
 export interface ProductionReportRequest {
     subject?: GameID,
     details?: FactoryDetailsTab,
+    detailsTier?: string,
     filter?: string,
 }

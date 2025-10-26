@@ -13,12 +13,10 @@ struct MarketDetails: Identifiable {
     }
 }
 extension MarketDetails: PersistentReportDetails {
-    init(id: Self.ID, open: ()) {
+    init(id: Self.ID, focus: ()) {
         self.init(id: id)
     }
-    var open: () {
-        get { () }
-        set { }
+    mutating func refocus(on focus: ()) {
     }
 }
 extension MarketDetails {

@@ -10,13 +10,4 @@ import JavaScriptInterop
     case e = "e"
     /// Pop, luxury need.
     case x = "x"
-
-    /// Factory, input.
-    case i = "i"
-    /// Factory, office supply.
-    case j = "j"
-    /// Factory, expansion progress.
-    case v = "v"
-
-    case o = "o"
 }

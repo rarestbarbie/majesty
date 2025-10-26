@@ -89,7 +89,10 @@ extension Factory {
 
         case yesterday_ei = "y_ei"
         case yesterday_eo = "y_eo"
-        case yesterday_fi = "y_fi"
+
+        case yesterday_fl = "y_fl"
+        case yesterday_fe = "y_fe"
+        case yesterday_fx = "y_fx"
 
         case yesterday_px = "y_px"
         case yesterday_pa = "y_pa"
@@ -107,7 +110,10 @@ extension Factory {
 
         case today_ei = "t_ei"
         case today_eo = "t_eo"
-        case today_fi = "t_fi"
+
+        case today_fl = "t_fl"
+        case today_fe = "t_fe"
+        case today_fx = "t_fx"
 
         case today_px = "t_px"
         case today_pa = "t_pa"
@@ -138,7 +144,9 @@ extension Factory: JavaScriptEncodable {
         js[.yesterday_cn] = self.yesterday.cn
         js[.yesterday_ei] = self.yesterday.ei
         js[.yesterday_eo] = self.yesterday.eo
-        js[.yesterday_fi] = self.yesterday.fi
+        js[.yesterday_fl] = self.yesterday.fl
+        js[.yesterday_fe] = self.yesterday.fe
+        js[.yesterday_fx] = self.yesterday.fx
         js[.yesterday_px] = self.yesterday.px
         js[.yesterday_pa] = self.yesterday.pa
 
@@ -150,7 +158,9 @@ extension Factory: JavaScriptEncodable {
         js[.today_cn] = self.today.cn
         js[.today_ei] = self.today.ei
         js[.today_eo] = self.today.eo
-        js[.today_fi] = self.today.fi
+        js[.today_fl] = self.today.fl
+        js[.today_fe] = self.today.fe
+        js[.today_fx] = self.today.fx
         js[.today_px] = self.today.px
         js[.today_pa] = self.today.pa
 
@@ -168,7 +178,9 @@ extension Factory: JavaScriptDecodable {
             cn: try js[.today_cn]?.decode() ?? 1,
             ei: try js[.today_ei]?.decode() ?? 1,
             eo: try js[.today_eo]?.decode() ?? 1,
-            fi: try js[.today_fi]?.decode() ?? 0,
+            fl: try js[.today_fl]?.decode() ?? 0,
+            fe: try js[.today_fe]?.decode() ?? 0,
+            fx: try js[.today_fx]?.decode() ?? 0,
             px: try js[.today_px]?.decode() ?? 0,
             pa: try js[.today_pa]?.decode() ?? 1,
         )
@@ -197,7 +209,9 @@ extension Factory: JavaScriptDecodable {
                 cn: try js[.yesterday_cn]?.decode() ?? today.cn,
                 ei: try js[.yesterday_ei]?.decode() ?? today.ei,
                 eo: try js[.yesterday_eo]?.decode() ?? today.eo,
-                fi: try js[.yesterday_fi]?.decode() ?? today.fi,
+                fl: try js[.yesterday_fl]?.decode() ?? today.fl,
+                fe: try js[.yesterday_fe]?.decode() ?? today.fe,
+                fx: try js[.yesterday_fx]?.decode() ?? today.fx,
                 px: try js[.yesterday_px]?.decode() ?? today.px,
                 pa: try js[.yesterday_pa]?.decode() ?? today.pa
             ),

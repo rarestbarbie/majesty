@@ -11,30 +11,25 @@ import { Swift } from '../../Swift.js';
 import {
     LegalEntityFilterLabel,
     MarketFilter,
-    PieChart,
     PopulationReport,
     PopDetailsTab,
     PopTableEntry,
     PopTableRow,
-    ResourceNeed,
-    ResourceNeedRow,
     ResourceSale,
     ResourceSaleBox,
     Resource,
     ScreenType,
     TooltipType,
     PopIcon,
+    ConsumptionBreakdown,
     OwnershipBreakdown,
 } from '../exports.js';
 
 export class PopulationOverview extends ScreenContent {
     private filters: FilterList<MarketFilter, string>[];
-    private needs: StaticList<ResourceNeedRow, string>;
     private sales: StaticList<ResourceSaleBox, string>;
-    private readonly charts: {
-        readonly spending: PieChart<string>;
-    };
 
+    private readonly consumption: ConsumptionBreakdown;
     private readonly ownership: OwnershipBreakdown;
 
     private pops: Table<PopTableRow, GameID>;
@@ -48,6 +43,13 @@ export class PopulationOverview extends ScreenContent {
         readonly nav: HTMLElement;
     };
 
+    static readonly screen: ScreenType = ScreenType.Population;
+    static readonly tooltipCashFlowItem: TooltipType = TooltipType.PopCashFlowItem;
+    static readonly tooltipBudgetItem: TooltipType = TooltipType.PopBudgetItem;
+    static readonly tooltipExplainPrice: TooltipType = TooltipType.PopExplainPrice;
+    static readonly tooltipResourceIO: TooltipType = TooltipType.PopResourceIO;
+    static readonly tooltipStockpile: TooltipType = TooltipType.PopStockpile;
+
     constructor() {
         super();
 
@@ -56,13 +58,9 @@ export class PopulationOverview extends ScreenContent {
         ];
 
         this.pops = new Table<PopTableRow, GameID>('Pops');
-
-        this.needs = new StaticList<ResourceNeedRow, string>(document.createElement('div'));
         this.sales = new StaticList<ResourceSaleBox, string>(document.createElement('div'));
-        this.charts = {
-            spending: new PieChart<string>(TooltipType.PopCashFlowItem),
-        };
 
+        this.consumption = new ConsumptionBreakdown(PopulationOverview);
         this.ownership = new OwnershipBreakdown(
             TooltipType.PopOwnershipCountry,
             TooltipType.PopOwnershipCulture,
@@ -76,6 +74,7 @@ export class PopulationOverview extends ScreenContent {
             {
                 subject: subject ? parseInt(subject) as GameID : undefined,
                 details: parameters.get('details') as PopDetailsTab ?? undefined,
+                detailsTier: parameters.get('detailsTier') ?? undefined,
                 column: parameters.get('column') ?? undefined,
                 filter: parameters.get('filter') ?? undefined,
             }
@@ -95,8 +94,6 @@ export class PopulationOverview extends ScreenContent {
     }
 
     public switch(state: PopulationReport, root: HTMLElement | null = null): void {
-        // We need to empty the upper content, as we will need to replace the IDs.
-        this.needs.table('Needs', ResourceNeedRow.columns);
         this.sales.clear();
         this.sales.node.classList.add('sales');
 
@@ -147,13 +144,9 @@ export class PopulationOverview extends ScreenContent {
 
         switch (state.pop?.open.type) {
         case PopDetailsTab.Inventory:
-            const right: HTMLDivElement = document.createElement('div');
-            right.appendChild(this.sales.node);
-            right.appendChild(this.charts.spending.node);
-
             this.dom.stats.setAttribute('data-subscreen', 'Inventory');
-            this.dom.stats.appendChild(this.needs.node);
-            this.dom.stats.appendChild(right);
+            this.dom.stats.appendChild(this.consumption.node);
+            this.dom.stats.appendChild(this.sales.node);
             break;
 
         case PopDetailsTab.Ownership:
@@ -215,18 +208,7 @@ export class PopulationOverview extends ScreenContent {
         case PopDetailsTab.Inventory:
             const id: GameID = state.pop.id;
 
-            this.needs.update(
-                state.pop.open.needs,
-                (need: ResourceNeed) => new ResourceNeedRow(
-                    need,
-                    id,
-                    TooltipType.PopResourceIO,
-                    TooltipType.PopStockpile,
-                    TooltipType.PopExplainPrice,
-                ),
-                (need: ResourceNeed, row: ResourceNeedRow) => row.update(need),
-            );
-
+            this.consumption.update(id, state.pop.open, PopulationOverview);
             this.sales.update(
                 state.pop.open.sales,
                 (sale: ResourceSale) => new ResourceSaleBox(
@@ -237,8 +219,6 @@ export class PopulationOverview extends ScreenContent {
                 ),
                 (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
             );
-
-            this.charts.spending.update([id], state.pop.open.costs ?? []);
             break;
 
         case PopDetailsTab.Ownership:

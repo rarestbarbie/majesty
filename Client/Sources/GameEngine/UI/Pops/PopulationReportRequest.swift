@@ -5,6 +5,7 @@ import JavaScriptInterop
 @frozen public struct PopulationReportRequest {
     @usableFromInline let subject: PopID?
     @usableFromInline let details: PopDetailsTab?
+    @usableFromInline let detailsTier: ResourceTierIdentifier?
     @usableFromInline let column: PopulationReport.ColumnControl?
     @usableFromInline let filter: PopulationReport.Filter?
 }
@@ -12,16 +13,9 @@ extension PopulationReportRequest {
     @frozen public enum ObjectKey: JSString, Sendable {
         case subject
         case details
+        case detailsTier
         case column
         case filter
-    }
-}
-extension PopulationReportRequest: JavaScriptEncodable {
-    public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.subject] = self.subject
-        js[.details] = self.details
-        js[.column] = self.column
-        js[.filter] = self.filter
     }
 }
 extension PopulationReportRequest: JavaScriptDecodable {
@@ -29,6 +23,7 @@ extension PopulationReportRequest: JavaScriptDecodable {
         self.init(
             subject: try js[.subject]?.decode(),
             details: try js[.details]?.decode(),
+            detailsTier: try js[.detailsTier]?.decode(),
             column: try js[.column]?.decode(),
             filter: try js[.filter]?.decode()
         )

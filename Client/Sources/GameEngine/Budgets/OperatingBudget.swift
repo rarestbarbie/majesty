@@ -80,9 +80,3 @@ extension OperatingBudget {
         )
     }
 }
-extension OperatingBudget {
-    func chart() -> PieChart<OperatingBudgetItem, PieChartLabel>? {
-        let statement: OperatingBudgetStatement = .init(from: self)
-        return statement.chart()
-    }
-}

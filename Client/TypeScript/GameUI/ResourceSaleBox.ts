@@ -5,7 +5,7 @@ import {
     UpdateBigInt,
 } from '../DOM/exports.js';
 import { GameID } from '../GameEngine/exports.js';
-import { Resource, ResourceSale, TooltipType } from './exports.js';
+import { ResourceSale, TooltipType } from './exports.js';
 
 export class ResourceSaleBox implements DiffableListElement<string> {
     public readonly id: string;

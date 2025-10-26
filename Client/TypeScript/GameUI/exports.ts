@@ -1,6 +1,7 @@
 export * from './ProgressCell.js';
 export * from './Application/ContextMenuType.js';
 export * from './Application/TooltipType.js';
+export * from './Application/ScreenType.js';
 
 export * from './Developer/DeveloperToolsPanel.js';
 export * from './Developer/PlanetTile.js';
@@ -27,6 +28,7 @@ export * from './Factories/OwnershipBreakdown.js';
 export * from './Factories/OwnershipBreakdownState.js';
 export * from './Factories/ProductionReportRequest.js';
 export * from './Factories/ProductionReport.js';
+export * from './PersistentOverviewType.js';
 export * from './PersistentReport.js';
 
 export * from './Pops/PopDetails.js';
@@ -43,6 +45,8 @@ export * from './Pops/PopulationOverview.js';
 
 export * from './Resource.js';
 export * from './ResourceNeed.js';
+export * from './ResourceNeedMeter.js';
+export * from './ResourceNeedMeterState.js';
 export * from './ResourceNeedRow.js';
 export * from './ResourceSale.js';
 export * from './ResourceSaleBox.js';
@@ -84,7 +88,6 @@ export * from './Clock.js';
 export * from './Country.js';
 export * from './Application/Screen.js';
 export * from './Application/ScreenLayout.js';
-export * from './Application/ScreenType.js';
 export * from './Application/ScreenContent.js';
 export * from './GameUI.js';
 export * from './Application/Application.js';

@@ -22,7 +22,9 @@ extension Factory {
         /// Output efficiency.
         var eo: Double
 
-        var fi: Double
+        var fl: Double
+        var fe: Double
+        var fx: Double
 
         /// Share price.
         var px: Double
@@ -41,7 +43,9 @@ extension Factory.Dimensions {
             cn: 1,
             ei: 1,
             eo: 1,
-            fi: 0,
+            fl: 0,
+            fe: 0,
+            fx: 0,
             px: 1,
             pa: 1
         )
