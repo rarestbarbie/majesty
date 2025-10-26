@@ -278,7 +278,7 @@ extension GameSession {
         case .e(let resource):
             return factory.state.inventory.e.tooltipDemand(
                 resource,
-                tier: factory.type.inputs,
+                tier: factory.type.office,
                 unit: "worker",
                 factor: 1,
                 productivity: Double.init(factory.productivity)
