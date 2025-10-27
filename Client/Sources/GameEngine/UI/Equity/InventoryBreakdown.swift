@@ -203,6 +203,7 @@ extension InventoryBreakdown {
 extension InventoryBreakdown: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
         case type
+        case focus
         case tiers
         case needs
         case sales
@@ -212,6 +213,7 @@ extension InventoryBreakdown: JavaScriptEncodable {
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.type] = Tab.Inventory
+        js[.focus] = self.focus
         js[.tiers] = self.tiers
         js[.needs] = self.needs
         js[.sales] = self.sales

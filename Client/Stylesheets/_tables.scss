@@ -12,11 +12,17 @@
         top: 0;
         height: 100%;
 
-        background-color: white;
-        opacity: 0.1;
+        background-color: var(--progress-bar-bg);
+        opacity: var(--progress-bar-opacity);
 
         z-index: -1;
     }
+}
+[data-cell='progress'].needs-cup {
+    --progress-bar-opacity: 0.25;
+}
+[data-cell='progress'].bloody {
+    --progress-bar-bg: rgb(255, 0, 0);
 }
 
 [data-table] {
@@ -56,6 +62,10 @@
             white-space: nowrap;
             text-overflow: '...';
         }
+
+        > *.bloody {
+            background-color: rgba(255, 0, 0, 0.15);
+        }
     }
     > a:hover {
         background-color: rgba(255, 255, 255, 0.05);
@@ -63,8 +73,19 @@
     > a.selected {
         background-color: rgba(255, 255, 255, 0.1);
     }
-}
 
+    > *:hover,
+    > *.selected {
+        --progress-bar-opacity: 0.2;
+
+        > [data-cell='progress'] {
+            background-color: rgba(0, 0, 0, 0.2);
+        }
+        > [data-cell='progress'].bloody {
+            background-color: rgba(255, 0, 0, 0.2);
+        }
+    }
+}
 
 [data-table='Factories'] {
     grid-template-columns: 2fr 1fr 0.5fr 0.5fr 1fr 1fr 1fr;
@@ -85,54 +106,26 @@
     height: 50%;
 }
 
-[data-table='Pops'] > * > [data-cell='progress'].needs-cup > *:first-child::before {
-    opacity: 0.25;
-}
 [data-table='Pops'] > *:hover    > [data-cell='progress'].needs-cup,
 [data-table='Pops'] > *.selected > [data-cell='progress'].needs-cup {
     background-color: transparent;
 }
-[data-table='Pops'] > *:hover    > [data-cell='progress'].needs-cup > *:first-child::before,
-[data-table='Pops'] > *.selected > [data-cell='progress'].needs-cup > *:first-child::before {
-    opacity: 0.5;
+[data-table='Pops'] > *:hover    > [data-cell='progress'].needs-cup,
+[data-table='Pops'] > *.selected > [data-cell='progress'].needs-cup {
+    --progress-bar-opacity: 0.5;
 }
 
-[data-table='Pops'] > * > [data-cell='progress']:nth-last-child(3) > *:first-child::before {
-    background-color: rgb(0, 153, 255);
+[data-table='Pops'] > * > [data-cell='progress']:nth-last-child(3) {
+    --progress-bar-bg: var(--color-bg-l);
 }
-[data-table='Pops'] > * > [data-cell='progress']:nth-last-child(2) > *:first-child::before {
-    background-color: rgb(255, 145, 0);
+[data-table='Pops'] > * > [data-cell='progress']:nth-last-child(2) {
+    --progress-bar-bg: var(--color-bg-e);
 }
-[data-table='Pops'] > * > [data-cell='progress']:nth-last-child(1) > *:first-child::before {
-    background-color: rgb(255, 0, 106);
+[data-table='Pops'] > * > [data-cell='progress']:nth-last-child(1) {
+    --progress-bar-bg: var(--color-bg-x);
 }
 
 [data-table='Markets'] {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 2fr;
     height: 50%;
-}
-
-
-[data-table] > * > *.bloody {
-    background-color: rgba(255, 0, 0, 0.15);
-}
-[data-table] > * > [data-cell='progress'] {
-    &.bloody > *:first-child::before {
-        background-color: rgb(255, 0, 0);
-    }
-}
-
-[data-table] > *:hover,
-[data-table] > *.selected {
-    > [data-cell='progress'] {
-        background-color: rgba(0, 0, 0, 0.2);
-
-        &.bloody {
-            background-color: rgba(255, 0, 0, 0.2);
-        }
-
-        > *:first-child::before {
-            opacity: 0.2;
-        }
-    }
 }

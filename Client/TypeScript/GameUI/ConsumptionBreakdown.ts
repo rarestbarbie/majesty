@@ -1,7 +1,7 @@
 import {
     StaticList
- } from '../../DOM/exports.js';
-import { GameID } from '../../GameEngine/exports.js';
+ } from '../DOM/exports.js';
+import { GameID } from '../GameEngine/exports.js';
 import {
     InventoryBreakdownState,
     PersistentOverviewType,
@@ -11,7 +11,7 @@ import {
     ResourceNeedRow,
     ResourceNeed,
     TooltipType,
-} from '../exports.js';
+} from './exports.js';
 
 export class ConsumptionBreakdown {
     public readonly node: HTMLDivElement;
@@ -82,6 +82,7 @@ export class ConsumptionBreakdown {
                 tier: ResourceNeedMeterState,
                 meter: ResourceNeedMeter
             ) => meter.update(tier, type.screen),
+            state.focus
         );
         this.needs.update(
             state.needs,

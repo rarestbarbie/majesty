@@ -23,6 +23,7 @@ export class ResourceNeedMeter implements DiffableListElement<string> {
 
     public update(state: ResourceNeedMeterState, screen: ScreenType): void {
         this.cell.set(100 * state.value);
+        this.cell.node.setAttribute('data-tier', this.id);
         this.name.href = `#screen=${screen}&detailsTier=${this.id}`;
         UpdateText(this.name, state.label);
     }

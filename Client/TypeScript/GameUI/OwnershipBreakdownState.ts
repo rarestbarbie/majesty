@@ -1,5 +1,5 @@
-import { PieChartSector } from '../exports.js';
-import { GameID } from '../../GameEngine/exports.js';
+import { PieChartSector } from './exports.js';
+import { GameID } from '../GameEngine/exports.js';
 
 export interface OwnershipBreakdownState<Type extends string> {
     readonly type: Type;
