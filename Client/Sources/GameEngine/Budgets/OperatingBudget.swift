@@ -18,7 +18,7 @@ struct OperatingBudget {
 extension OperatingBudget {
     init(
         workers: Workforce?,
-        clerks: Workforce?,
+        clerks: (Workforce, FactoryMetadata.ClerkBonus)?,
         state: Factory,
         weights: __shared ResourceInputWeights,
         stockpileMaxDays: Int64,
@@ -46,13 +46,20 @@ extension OperatingBudget {
 
         let balance: Int64 = state.inventory.account.balance
 
-        let w: Int64 = workers.map { state.today.wn * Swift.min($0.limit, $0.count + 1) } ?? 0
-        let c: Int64 = clerks.map { state.today.cn * Swift.min($0.limit, $0.count + 1) } ?? 0
+        let workersTarget: Int64 = workers.map { Swift.min($0.limit, $0.count + 1) } ?? 0
+        let clerksTarget: Int64 = clerks.map {
+            Swift.min($0.limit, $1.optimal(for: workersTarget))
+        } ?? 0
+
+        let laborCostPerDay: (w: Int64, c: Int64) = (
+            w: state.today.wn * workersTarget,
+            c: state.today.cn * clerksTarget,
+        )
 
         /// These are the minimum theoretical balances the factory would need to purchase 100%
         /// of its needs in that tier on any particular day.
         self.min = (
-            l: (totalCostPerDay.l + w + c) * d.l,
+            l: (totalCostPerDay.l + laborCostPerDay.w + laborCostPerDay.c) * d.l,
             e: (totalCostPerDay.e) * d.e,
         )
 
@@ -63,8 +70,8 @@ extension OperatingBudget {
             funds: balance / d.l,
             inelastic: inelasticCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
-            w: w * stockpileMaxDays,
-            c: c * stockpileMaxDays,
+            w: laborCostPerDay.w * stockpileMaxDays,
+            c: laborCostPerDay.c * stockpileMaxDays,
         ) ?? (0, 0)
 
         self.e.distribute(

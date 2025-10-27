@@ -220,7 +220,7 @@ extension FactoryContext: TransactingContext {
             )
             budget = .init(
                 workers: self.workers,
-                clerks: self.clerks,
+                clerks: self.clerks.map { ($0, self.type.clerkBonus!) },
                 state: self.state,
                 weights: weights,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
@@ -549,6 +549,26 @@ extension FactoryContext {
         return update.headcount
     }
 }
+extension FactoryMetadata {
+    var clerkBonus: ClerkBonus? {
+        guard
+        let clerks: Quantity<PopType> = self.clerks else {
+            return nil
+        }
+        return .init(ratio: clerks.amount %/ self.workers.amount, type: clerks.unit)
+    }
+}
+extension FactoryMetadata {
+    struct ClerkBonus {
+        let ratio: Fraction
+        let type: PopType
+    }
+}
+extension FactoryMetadata.ClerkBonus {
+    func optimal(for workers: Int64) -> Int64 {
+        workers >< self.ratio
+    }
+}
 extension FactoryContext {
     private func clerkEffects(
         budget: Int64,
@@ -556,12 +576,11 @@ extension FactoryContext {
     ) -> (salaries: Update, bonus: Double)? {
         guard
         let clerks: Workforce = self.clerks,
-        let clerkTeam: Quantity<PopType> = self.type.clerks else {
+        let clerkTeam: FactoryMetadata.ClerkBonus = self.type.clerkBonus else {
             return nil
         }
 
-        let clerkRatio: Fraction = clerkTeam.amount %/ self.type.workers.amount
-        let clerksOptimal: Int64 = self.workers.map { $0.count >< clerkRatio } ?? 0
+        let clerksOptimal: Int64 = self.workers.map { clerkTeam.optimal(for: $0.count) } ?? 0
 
         let wagesOwed: Int64 = clerks.count * self.state.today.cn
         let wagesPaid: Int64 = map.bank.pay(
@@ -584,7 +603,7 @@ extension FactoryContext {
             )
 
             if  layoff.size > 0 {
-                headcount = .fire(clerkTeam.unit, layoff)
+                headcount = .fire(clerkTeam.type, layoff)
             } else {
                 headcount = nil
             }
@@ -613,7 +632,7 @@ extension FactoryContext {
             )
 
             if  bid.size > 0 {
-                headcount = .hire(clerkTeam.unit, bid)
+                headcount = .hire(clerkTeam.type, bid)
             } else {
                 headcount = nil
             }
