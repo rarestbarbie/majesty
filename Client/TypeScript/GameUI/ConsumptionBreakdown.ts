@@ -69,6 +69,7 @@ export class ConsumptionBreakdown {
         this.charts.classList.add('hstack');
 
         this.node = document.createElement('div');
+        this.node.classList.add('consumption');
         this.node.appendChild(this.tiers.node);
         this.node.appendChild(this.needs.node);
         this.node.appendChild(this.charts);

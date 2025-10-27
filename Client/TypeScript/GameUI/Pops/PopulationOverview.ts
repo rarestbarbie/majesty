@@ -112,6 +112,7 @@ export class PopulationOverview extends ScreenContent {
             this.dom.title.appendChild(this.dom.titleName);
 
             const upper: HTMLDivElement = document.createElement('div');
+            upper.classList.add('upper');
             upper.appendChild(this.dom.title);
             upper.appendChild(this.dom.stats);
             upper.appendChild(this.dom.nav);

@@ -42,51 +42,6 @@
     display: flex;
     flex-direction: row;
 
-    div.tiers {
-        margin-bottom: 0.5rem;
-        display: flex;
-        gap: 0.3em;
-        > * {
-            flex: 1 1 0;
-            font-style: italic;
-
-            a {
-                display: block;
-                padding: 0.25em;
-                text-align: center;
-            }
-
-            --progress-bar-opacity: 0.15;
-
-            // background-color: rgb(from var(--progress-bar-bg) r g b / 5%);
-            border-bottom: 2px solid rgb(from var(--color-fg) r g b / 30%);
-        }
-
-        > [data-tier='l'] {
-            --progress-bar-bg: var(--color-bg-l);
-            --color-fg: var(--color-fg-l);
-        }
-        > [data-tier='e'] {
-            --progress-bar-bg: var(--color-bg-e);
-            --color-fg: var(--color-fg-e);
-        }
-        > [data-tier='x'] {
-            --progress-bar-bg: var(--color-bg-x);
-            --color-fg: var(--color-fg-x);
-        }
-
-        > *:hover {
-            --progress-bar-opacity: 0.2;
-        }
-
-        > *.selected {
-            // font-style: normal;
-            font-weight: bold;
-            border-color: var(--color-fg);
-            --progress-bar-opacity: 0.3;
-        }
-    }
-
     div.hstack {
         > div.pie-charts {
             margin-top: 1rem;
@@ -101,38 +56,90 @@
         }
     }
 
-    > *:first-child {
+    > div.consumption {
         flex: 0 1 50%;
+
+        display: flex;
+        flex-direction: column;
+
+        div.tiers {
+            margin-bottom: 0.5rem;
+            display: flex;
+            gap: 0.3em;
+
+            > * {
+                flex: 1 1 0;
+                font-style: italic;
+
+                a {
+                    display: block;
+                    padding: 0.25em;
+                    text-align: center;
+                }
+
+                --progress-bar-opacity: 0.15;
+                --border-opacity: 30%;
+
+                border-bottom:
+                    2px solid rgb(from var(--color-fg) r g b / var(--border-opacity));
+            }
+
+            > [data-tier='l'] {
+                --progress-bar-bg: var(--color-bg-l);
+                --color-fg: var(--color-fg-l);
+            }
+            > [data-tier='e'] {
+                --progress-bar-bg: var(--color-bg-e);
+                --color-fg: var(--color-fg-e);
+            }
+            > [data-tier='x'] {
+                --progress-bar-bg: var(--color-bg-x);
+                --color-fg: var(--color-fg-x);
+            }
+
+            > *:hover {
+                --progress-bar-opacity: 0.2;
+                --border-opacity: 50%;
+            }
+
+            > *.selected {
+                // font-style: normal;
+                font-weight: bold;
+                --border-opacity: 100%;
+                --progress-bar-opacity: 0.3;
+            }
+        }
+
+        [data-table='Needs'] {
+            flex: 1 1 auto;
+            grid-template-columns: 1fr 1fr 1fr 1fr;
+
+            > [data-tier='l'] {
+                --color: var(--color-fg-l);
+            }
+            > [data-tier='e'] {
+                --color: var(--color-fg-e);
+            }
+            > [data-tier='x'] {
+                --color: var(--color-fg-x);
+            }
+
+            > * > *:nth-child(2) {
+                border-left: 3px solid var(--color);
+                padding-left: 0.5rem;
+            }
+        }
     }
 
-    [data-table='Needs'] {
-        grid-template-columns: 1fr 1fr 1fr 1fr;
-    }
-    [data-table='Needs'] > [data-tier='l'] {
-        --color: var(--color-fg-l);
-    }
-    [data-table='Needs'] > [data-tier='e'] {
-        --color: var(--color-fg-e);
-    }
-    [data-table='Needs'] > [data-tier='x'] {
-        --color: var(--color-fg-x);
-    }
-    [data-table='Needs'] > [data-tier]:not([data-tier='v']) + [data-tier='v'],
-    [data-table='Needs'] > [data-tier]:not([data-tier='e']) + [data-tier='e'],
-    [data-table='Needs'] > [data-tier]:not([data-tier='x']) + [data-tier='x'] {
-        margin-top: 1rem;
-    }
-    [data-table='Needs'] > * > *:nth-child(2) {
-        border-left: 3px solid var(--color);
-        padding-left: 0.5rem;
-    }
+    > div.sales {
+        flex: 0 1 20%;
 
-    div.sales {
         display: flex;
         flex-direction: column;
         gap: 2rem;
 
-        margin-top: 1rem;
+        margin-left: 1rem;
+        margin-top: 0.25rem;
 
         > * {
             > *:nth-child(1) {
