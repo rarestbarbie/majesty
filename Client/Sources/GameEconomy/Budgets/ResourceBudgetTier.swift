@@ -22,9 +22,13 @@ extension ResourceBudgetTier {
             return
         }
 
-        if let item: [Int64] = [tradeable, inelastic].distribute(available) {
-            self.tradeable += item[0]
-            self.inelastic += item[1]
+        let items: [Int64]? = [tradeable, inelastic].distribute(share: \.self) {
+            min($0, available)
+        }
+
+        if  let items: [Int64] {
+            self.tradeable += items[0]
+            self.inelastic += items[1]
         }
     }
     public mutating func distribute(
@@ -38,10 +42,14 @@ extension ResourceBudgetTier {
             return nil
         }
 
-        if let item: [Int64] = [tradeable, inelastic, w, c].distribute(available) {
-            self.tradeable += item[0]
-            self.inelastic += item[1]
-            return (w: item[2], c: item[3])
+        let items: [Int64]? = [tradeable, inelastic, w, c].distribute(share: \.self) {
+            min($0, available)
+        }
+
+        if  let items: [Int64] {
+            self.tradeable += items[0]
+            self.inelastic += items[1]
+            return (w: items[2], c: items[3])
         } else {
             return nil
         }
