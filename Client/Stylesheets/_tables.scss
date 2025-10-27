@@ -89,7 +89,6 @@
 
 [data-table='Factories'] {
     grid-template-columns: 2fr 1fr 0.5fr 0.5fr 1fr 1fr 1fr;
-    height: 50%;
 }
 [data-table='Factories'] > * > [data-cell='progress']:nth-child(1) {
     > div {
@@ -103,7 +102,6 @@
 }
 [data-table='Pops'] {
     grid-template-columns: 2fr 0.4fr 1fr 1.5fr 1fr 1fr 1fr 1fr 0.5fr 0.5fr 0.5fr 0.1fr;
-    height: 50%;
 }
 
 [data-table='Pops'] > *:hover    > [data-cell='progress'].needs-cup,
@@ -127,5 +125,4 @@
 
 [data-table='Markets'] {
     grid-template-columns: 1fr 1fr 1fr 1fr 1fr 2fr;
-    height: 50%;
 }

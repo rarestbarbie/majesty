@@ -57,11 +57,11 @@ export class TradeOverview extends ScreenContent {
                 panel: document.createElement('div'),
             }
 
-            const stats: HTMLDivElement = document.createElement('div');
-            stats.appendChild(this.history.node);
-            stats.classList.add('stats');
+            const upper: HTMLDivElement = document.createElement('div');
+            upper.appendChild(this.history.node);
+            upper.classList.add('upper');
 
-            this.dom.panel.appendChild(stats);
+            this.dom.panel.appendChild(upper);
             this.dom.panel.appendChild(this.markets.node);
             this.dom.panel.classList.add('panel');
         }
