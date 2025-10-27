@@ -79,6 +79,18 @@ body {
 
     --color-em-text: #ffd781;
 
+    --color-bg-l: rgb(0, 153, 255);
+    --color-fg-l: rgb(58, 145, 204);
+
+    --color-bg-e: rgb(255, 145, 0);
+    --color-fg-e: rgb(255, 145, 0);
+
+    --color-bg-x: rgb(255, 0, 106);
+    --color-fg-x: rgb(214, 0, 89);
+
+    --progress-bar-bg: white;
+    --progress-bar-opacity: 0.1;
+
     /* This is needed for the left-border on table header cells */
     --color: transparent;
 

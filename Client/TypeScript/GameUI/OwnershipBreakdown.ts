@@ -1,10 +1,10 @@
-import { Fortune, Ticker } from '../../DOM/exports.js';
-import { GameID } from '../../GameEngine/exports.js';
+import { Fortune, Ticker } from '../DOM/exports.js';
+import { GameID } from '../GameEngine/exports.js';
 import {
     OwnershipBreakdownState,
     PieChart,
     TooltipType,
-} from '../exports.js';
+} from './exports.js';
 
 export class OwnershipBreakdown {
     public readonly node: HTMLDivElement;

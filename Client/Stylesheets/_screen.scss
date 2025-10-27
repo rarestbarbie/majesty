@@ -173,6 +173,16 @@
     }
 }
 
+#screen[data-screen='Production'] {
+    --color-bg-l: rgb(104, 104, 104);
+    --color-fg-l: rgb(104, 104, 104);
+
+    --color-bg-e: rgb(255, 145, 0);
+    --color-fg-e: rgb(255, 145, 0);
+
+    --color-bg-x: rgb(252, 183, 35);
+    --color-fg-x: rgb(252, 183, 35);
+}
 #screen[data-screen='Planet'] {
     width: 50rem;
     height: 30rem;

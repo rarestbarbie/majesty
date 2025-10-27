@@ -9,6 +9,10 @@ export * from './Developer/PlanetTileEditor.js';
 export * from './Developer/PlanetTileEditorState.js';
 
 export * from './LegalEntityFilterLabel.js';
+export * from './ConsumptionBreakdown.js';
+export * from './InventoryBreakdownState.js';
+export * from './OwnershipBreakdown.js';
+export * from './OwnershipBreakdownState.js';
 
 export * from './Markets/Candle.js';
 export * from './Markets/CandleGeometry.js';
@@ -22,10 +26,6 @@ export * from './Factories/FactoryTableRow.js';
 export * from './Factories/FactoryWorkers.js';
 export * from './Factories/FactoryWorkersCell.js';
 export * from './Factories/ProductionOverview.js';
-export * from './Factories/ConsumptionBreakdown.js';
-export * from './Factories/InventoryBreakdownState.js';
-export * from './Factories/OwnershipBreakdown.js';
-export * from './Factories/OwnershipBreakdownState.js';
 export * from './Factories/ProductionReportRequest.js';
 export * from './Factories/ProductionReport.js';
 export * from './PersistentOverviewType.js';
