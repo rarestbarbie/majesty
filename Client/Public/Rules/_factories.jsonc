@@ -1,9 +1,9 @@
 {
     "Hydroelectric Dam": {
         "inputs": {
+            "Construction": 1
         },
         "office": {
-            "Construction": 1
         },
         "output": {
             "Electricity": 12,
@@ -38,34 +38,75 @@
     },
     "Cereal Farm": {
         "inputs": {
-            "Water": 4,
-            "Fertilizer": 1
+            "Water": 20,
+            "Fertilizer": 5
         },
         "output": {
-            "Wheat": 12,
-            "Fertilizer": 1
+            "Wheat": 60,
+            "Fertilizer": 5
         },
         "workers": {
-            "Driver": 100000,
-            "Farmer": 30000
+            "Driver": 20000,
+            "Farmer": 5000
         },
         "terrain": ["Desert", "Forest", "Rainforest", "Steppe"]
     },
     "Plantation": {
         "inputs": {
-            "Water": 8,
-            "Fertilizer": 2
+            "Water": 40,
+            "Fertilizer": 10
         },
         "output": {
-            "Wheat": 8,
-            "Produce": 8,
-            "Fertilizer": 1
+            "Wheat": 40,
+            "Produce": 40,
+            "Fertilizer": 5
         },
         "workers": {
-            "Driver": 100000,
-            "Farmer": 30000
+            "Driver": 20000,
+            "Farmer": 5000
         },
         "terrain": ["Desert", "Steppe", "Forest", "Rainforest"]
+    },
+    "Hydroponic Farm": {
+        "inputs": {
+            "Water": 5,
+            "Fertilizer": 10
+        },
+        "output": {
+            "Produce": 30,
+            "Wheat": 30
+        },
+        "workers": {
+            "Driver": 10000,
+            "Engineer": 3000
+        }
+    },
+    "Fertilizer Plant": {
+        "inputs": {
+            "Electricity": 20
+        },
+        "output": {
+            "Fertilizer": 40
+        },
+        "workers": {
+            "Driver": 10000,
+            "Engineer": 3000
+        }
+    },
+
+    "Slaughterhouse": {
+        "inputs": {
+            "Livestock": 160,
+            "Water": 20
+        },
+        "output": {
+            "Poultry": 240,
+            "Beef": 80
+        },
+        "workers": {
+            "Driver": 10000,
+            "Engineer": 3000
+        }
     },
 
 
@@ -81,8 +122,8 @@
             "Alloys": 16
         },
         "workers": {
-            "Driver": 50000,
-            "Engineer": 50000
+            "Driver": 5000,
+            "Engineer": 5000
         }
     },
     "Ammonia Plant": {
@@ -93,8 +134,8 @@
             "Ammonia": 12
         },
         "workers": {
-            "Driver": 50000,
-            "Engineer": 50000
+            "Driver": 5000,
+            "Engineer": 5000
         }
     },
     "Battery Plant": {
@@ -107,8 +148,8 @@
             "Batteries": 8
         },
         "workers": {
-            "Driver": 50000,
-            "Engineer": 50000
+            "Driver": 5000,
+            "Engineer": 5000
         }
     },
     "Chemical Synthesis Plant": {
@@ -122,8 +163,8 @@
             "Hormones": 8
         },
         "workers": {
-            "Driver": 50000,
-            "Engineer": 50000
+            "Driver": 5000,
+            "Engineer": 5000
         }
     },
     "Compute Cluster": {
@@ -164,34 +205,8 @@
             "Antibiotics": 8
         },
         "workers": {
-            "Driver": 50000,
-            "Engineer": 50000
-        }
-    },
-    "Fertilizer Plant": {
-        "inputs": {
-            "Electricity": 2
-        },
-        "output": {
-            "Fertilizer": 8
-        },
-        "workers": {
-            "Driver": 100000,
-            "Engineer": 30000
-        }
-    },
-    "Hydroponic Farm": {
-        "inputs": {
-            "Water": 1,
-            "Fertilizer": 2
-        },
-        "output": {
-            "Produce": 6,
-            "Wheat": 6
-        },
-        "workers": {
-            "Driver": 100000,
-            "Engineer": 30000
+            "Driver": 5000,
+            "Engineer": 5000
         }
     },
     "Machine Parts Factory": {
@@ -205,8 +220,8 @@
             "Machine Parts": 12
         },
         "workers": {
-            "Driver": 50000,
-            "Engineer": 50000
+            "Driver": 5000,
+            "Engineer": 5000
         }
     },
     "Polypropylene Plant": {
@@ -218,8 +233,8 @@
             "Polymers": 8
         },
         "workers": {
-            "Driver": 50000,
-            "Engineer": 50000
+            "Driver": 5000,
+            "Engineer": 5000
         }
     },
     "Semiconductor Foundry": {
@@ -234,46 +249,32 @@
             "Semiconductor Devices": 8
         },
         "workers": {
-            "Driver": 50000,
-            "Engineer": 50000
-        }
-    },
-    "Slaughterhouse": {
-        "inputs": {
-            "Livestock": 16,
-            "Water": 2
-        },
-        "output": {
-            "Poultry": 24,
-            "Beef": 8
-        },
-        "workers": {
-            "Driver": 100000,
-            "Engineer": 30000
+            "Driver": 5000,
+            "Engineer": 5000
         }
     },
     "Water Treatment Plant": {
         "inputs": {
-            "Electricity": 8
+            "Electricity": 80
         },
         "output": {
-            "Water": 16
+            "Water": 160
         },
         "workers": {
-            "Driver": 30000,
-            "Engineer": 20000
+            "Driver": 3000,
+            "Engineer": 2000
         }
     },
     "Uranium Enrichment Facility": {
         "inputs": {
-            "Electricity": 4
+            "Electricity": 40
         },
         "output": {
-            "Uranium": 2
+            "Uranium": 20
         },
         "workers": {
-            "Driver": 50000,
-            "Engineer": 20000
+            "Driver": 5000,
+            "Engineer": 2000
         }
     }
 }

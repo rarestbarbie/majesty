@@ -22,7 +22,7 @@ extension OperatingBudget {
         state: Factory,
         weights: __shared ResourceInputWeights,
         stockpileMaxDays: Int64,
-        d: (l: Int64, e: Int64, x: Int64)
+        d: (l: Int64, e: Int64, x: Int64, v: Double?)
     ) {
         self.l = .init()
         self.e = .init()
@@ -80,8 +80,17 @@ extension OperatingBudget {
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
         )
 
+        let investmentBase: Int64 = (balance - self.min.l - self.min.e) / d.x
+        let investment: Int64
+
+        if  let v: Double = d.v, v < 1 {
+            investment = Int64.init(Double.init(investmentBase) * v)
+        } else {
+            investment = investmentBase
+        }
+
         self.x.distribute(
-            funds: (balance - self.min.l - self.min.e) / d.x,
+            funds: investment,
             inelastic: inelasticCostPerDay.x * stockpileMaxDays,
             tradeable: tradeableCostPerDay.x * stockpileMaxDays,
         )
