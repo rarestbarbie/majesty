@@ -17,7 +17,7 @@ extension InelasticBudgetTier {
                     id: $0,
                     unitsToPurchase: $1.needed($1.unitsDemanded),
                     units: $1.unitsDemanded,
-                    value: $1.unitsDemanded >< markets[location, $0].yesterday.price.exact
+                    value: $1.unitsDemanded >< markets[location, $0].yesterday.price.value
                 )
             }
         )

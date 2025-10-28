@@ -1,4 +1,5 @@
 import D
+import Fraction
 import GameIDs
 import Random
 
@@ -26,7 +27,7 @@ import Random
 
     @inlinable init() {
         self.priceFloor = nil
-        self.yesterday = .init(price: .init(per100: 1), supply: 0, demand: 0)
+        self.yesterday = .init(price: .init(), supply: 0, demand: 0)
         self.today = self.yesterday
         self.asks = []
         self.bids = []
@@ -58,14 +59,23 @@ extension LocalMarket {
         in tier: UInt8,
         limit: Int64,
     ) {
-        let amount: Int64 = min(budget * 100 / self.today.price.per100, limit)
+        let quotient: Int64
+
+        switch self.today.price.value.fraction {
+        case (let n, denominator: let d?):
+            quotient = budget <> (d %/ n)
+        case (let n, denominator: nil):
+            quotient = budget / n
+        }
+
+        let amount: Int64 = min(quotient, limit)
         self.bids.append(.init(by: entity, tier: tier, amount: amount))
         self.today.demand += amount
     }
 }
 extension LocalMarket {
     public mutating func turn() {
-        self.turn(priceFloor: .zero)
+        self.turn(priceFloor: .init(1 %/ 10_000))
         self.priceFloor = nil
     }
     public mutating func turn(priceFloor: LocalPrice, type: PriceFloorType) {
@@ -73,7 +83,7 @@ extension LocalMarket {
         self.priceFloor = .init(minimum: priceFloor, type: type)
     }
     private mutating func turn(priceFloor: LocalPrice) {
-        let price: LocalPrice = .init(per100: self.today.price.per100 + self.today.priceChange)
+        let price: LocalPrice = self.today.priceUpdate
         self.yesterday = self.today
         self.today = .init(price: max(price, priceFloor))
     }

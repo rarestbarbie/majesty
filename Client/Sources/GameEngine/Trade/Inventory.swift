@@ -35,7 +35,7 @@ extension Inventory {
         units: Int64,
         price: LocalPrice
     ) -> Int64 {
-        let value: Int64 = units <> price.exact
+        let value: Int64 = units <> price.value
         self.out.inelastic[resource]?.report(
             unitsSold: units,
             valueSold: value,
@@ -50,7 +50,7 @@ extension Inventory {
         price: LocalPrice,
         tier: UInt8?
     ) -> Int64 {
-        let value: Int64 = units >< price.exact
+        let value: Int64 = units >< price.value
 
         switch tier {
         case 0?:
