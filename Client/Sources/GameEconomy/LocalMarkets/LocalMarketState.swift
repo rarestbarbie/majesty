@@ -15,21 +15,21 @@ extension LocalMarketState {
     /// To prevent the price from oscillating around a fractional value, we only allow it to
     /// move if the relative deficit, or excess, is greater than the relative change in the
     /// price itself.
-    var priceChange: Int64 {
+    var priceUpdate: LocalPrice {
         if  self.supply < self.demand {
             if self.supply == 0 {
-                return 1
+                return self.price.tickedUp()
             }
-            if (self.demand %/ self.supply) > ((self.price.per100 + 1) %/ self.price.per100) {
-                return 1
+            if (self.demand %/ self.supply) > (LocalPrice.cent %/ (LocalPrice.cent - 1)) {
+                return self.price.tickedUp()
             }
-        } else if self.price.per100 > 0,
+        } else if self.price.value.units > 0,
             self.supply > self.demand {
-            if (self.demand %/ self.supply) < ((self.price.per100 - 1) %/ self.price.per100) {
-                return -1
+            if (self.demand %/ self.supply) < ((LocalPrice.cent - 1) %/ LocalPrice.cent) {
+                return self.price.tickedDown()
             }
         }
 
-        return 0
+        return self.price
     }
 }
