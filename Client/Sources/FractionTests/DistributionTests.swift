@@ -37,6 +37,20 @@ import Testing
         #expect(distribution.reduce(0, +) == funds)
     }
 
+    @Test func IntrinsicDistribution() throws {
+        let shares: [Int64] = [10, 30, 60]
+        let distribution: [Int64] = try #require(shares.distribute(share: \.self) { $0 })
+
+        #expect(distribution == [10, 30, 60])
+    }
+
+    @Test func IntrinsicDistributionAvoidsOverfilling() throws {
+        let shares: [Int64] = [0, 1, 2]
+        let distribution: [Int64] = try #require(shares.distribute(share: \.self) { $0 - 1 })
+
+        #expect(distribution == [0, 1, 1])
+    }
+
     @Test func RoundingFavorsEarlierShareholders() throws {
         let shares: [Int64] = [1, 1, 1]
         let funds: Int64 = 10
