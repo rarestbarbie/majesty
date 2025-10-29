@@ -84,15 +84,22 @@ extension ResourceInputs {
         on exchange: inout Exchange,
         weights: ArraySlice<Double>,
     ) -> TradeProceeds {
-        let budget: [Int64]? = weights.distribute(spendingLimit)
+        /// we want to guarantee that each resource gets at least 1 unit of budget
+        var reserved: Int64 = min(Int64.init(weights.count), spendingLimit)
+        let budget: [Int64]? = weights.distribute(spendingLimit - reserved)
 
         var gain: Int64 = 0
         var loss: Int64 = 0
 
         for i: Int in self.tradeable.values.indices {
+            var budgeted: Int64 = budget?[i] ?? 0
+            if  reserved > 0 {
+                reserved -= 1
+                budgeted += 1
+            }
             let value: Int64 = self.tradeable.values[i].trade(
                 stockpileDays: stockpileDays,
-                budget: budget?[i] ?? 0,
+                budget: budgeted,
                 in: currency,
                 on: &exchange
             )
