@@ -27,6 +27,14 @@ extension Fraction: ExpressibleByIntegerLiteral {
     }
 }
 extension Fraction {
+    @inlinable public static func * (a: Self, b: Self) -> Self {
+        .init(a.n * b.n, a.d * b.d)
+    }
+    @inlinable public static func / (a: Self, b: Self) -> Self {
+        .init(a.n * b.d, a.d * b.n)
+    }
+}
+extension Fraction {
     /// Multiply the operand by this fraction, rounding away from zero.
     @inlinable public static func >< (self: Self, a: Int64) -> Int64 {
         let (d, r): (Int64, Int64) = self.d.dividingFullWidth(self.n.multipliedFullWidth(by: a))

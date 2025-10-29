@@ -57,144 +57,6 @@ extension PopContext {
         // TODO
     }
 }
-
-extension PopContext {
-    func buildDemotionMatrix<Matrix>(
-        country: CountryProperties,
-        type: Matrix.Type = Matrix.self,
-    ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
-        .init(base: 0%) {
-            $0[self.unemployment] {
-                $0[$1 >= 0.1] = +2‱
-                $0[$1 >= 0.2] = +1‱
-                $0[$1 >= 0.3] = +1‱
-                $0[$1 >= 0.4] = +1‱
-            } = { "\(+$0[%]): Unemployment is above \(em: $1[%0])" }
-
-            $0[self.state.yesterday.fl] {
-                $0[$1 < 1.00] = +1‰
-                $0[$1 < 0.75] = +5‰
-                $0[$1 < 0.50] = +2‰
-                $0[$1 < 0.25] = +2‰
-            } = { "\(+$0[%]): Getting less than \(em: $1[%0]) of Life Needs" }
-
-        } factors: {
-            $0[self.state.yesterday.fx] {
-                $0[$1 > 0.25] = -90%
-            } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Luxury Needs" }
-            $0[self.state.yesterday.fe] {
-                $0[$1 > 0.75] = -50%
-                $0[$1 > 0.5] = -25%
-            } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Everyday Needs" }
-
-            $0[self.state.yesterday.mil] {
-                $0[$1 >= 1.0] = -10%
-                $0[$1 >= 2.0] = -10%
-                $0[$1 >= 3.0] = -10%
-                $0[$1 >= 4.0] = -10%
-                $0[$1 >= 5.0] = -10%
-                $0[$1 >= 6.0] = -10%
-                $0[$1 >= 7.0] = -10%
-                $0[$1 >= 8.0] = -10%
-                $0[$1 >= 9.0] = -10%
-            } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
-
-            switch self.state.type.stratum {
-            case .Ward:
-                $0[true] {
-                    $0 = -100%
-                } = { "\(+$0[%]): Pop is \(em: "enslaved")" }
-
-            default:
-                $0[self.state.nat] {
-                    $0[$1 != country.culturePreferred] = +100%
-                } = { "\(+$0[%]): Culture is not \(em: $1)" }
-                $0[self.state.nat] {
-                    $0[$1 == country.culturePreferred] = -5%
-                } = { "\(+$0[%]): Culture is \(em: $1)" }
-            }
-        }
-    }
-
-    func buildPromotionMatrix<Matrix>(
-        country: CountryProperties,
-        type: Matrix.Type = Matrix.self,
-    ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
-        .init(base: 0%) {
-            $0[self.state.yesterday.mil] {
-                $0[$1 >= 3.0] = -2‱
-                $0[$1 >= 5.0] = -2‱
-                $0[$1 >= 7.0] = -3‱
-                $0[$1 >= 9.0] = -3‱
-            } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
-
-            switch self.state.type.stratum {
-            case .Owner:
-                $0[self.state.yesterday.fx] {
-                    $0[$1 >= 0.25] = +3‰
-                    $0[$1 >= 0.50] = +3‰
-                    $0[$1 >= 0.75] = +3‰
-                } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Luxury Needs" }
-
-            case _:
-                break
-            }
-
-            $0[self.state.yesterday.con] {
-                $0[$1 >= 1.0] = +1‱
-                $0[$1 >= 2.0] = +1‱
-                $0[$1 >= 3.0] = +1‱
-                $0[$1 >= 4.0] = +1‱
-                $0[$1 >= 5.0] = +1‱
-                $0[$1 >= 6.0] = +1‱
-                $0[$1 >= 7.0] = +1‱
-                $0[$1 >= 8.0] = +1‱
-                $0[$1 >= 9.0] = +1‱
-            } = { "\(+$0[%]): Consciousness is above \(em: $1[..1])" }
-
-        } factors: {
-            $0[self.state.yesterday.fl] {
-                $0[$1 < 1.00] = -100%
-            } = { "\(+$0[%]): Getting less than \(em: $1[%0]) of Life Needs" }
-
-            $0[self.state.yesterday.fe] {
-                $0[$1 >= 0.1] = -10%
-                $0[$1 >= 0.2] = -10%
-                $0[$1 >= 0.3] = -10%
-                $0[$1 >= 0.4] = -10%
-                $0[$1 >= 0.5] = -10%
-                $0[$1 >= 0.6] = -10%
-                $0[$1 >= 0.7] = -10%
-                $0[$1 >= 0.8] = -10%
-                $0[$1 >= 0.9] = -10%
-            } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Everyday Needs" }
-
-            $0[self.state.yesterday.mil] {
-                $0[$1 >= 2.0] = -20%
-                $0[$1 >= 4.0] = -10%
-                $0[$1 >= 6.0] = -10%
-                $0[$1 >= 8.0] = -10%
-            } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
-
-            switch self.state.type.stratum {
-            case .Ward:
-                $0[true] {
-                    $0 = -100%
-                } = { "\(+$0[%]): Pop is \(em: "enslaved")" }
-
-            case _:
-                break
-            }
-
-            $0[self.state.nat] {
-                $0[$1 != country.culturePreferred] = -75%
-            } = { "\(+$0[%]): Culture is not \(em: $1)" }
-            $0[self.state.nat] {
-                $0[$1 == country.culturePreferred] = +5%
-            } = { "\(+$0[%]): Culture is \(em: $1)" }
-        }
-    }
-}
 extension PopContext {
     mutating func compute(
         map _: borrowing GameMap,
@@ -455,32 +317,7 @@ extension PopContext {
         self.state.today.con = max(0, min(10, self.state.today.con))
 
         if  self.state.type.stratum > .Ward {
-            self.state.egress(
-                evaluator: self.buildDemotionMatrix(country: country),
-                on: &map,
-            ) {
-                switch ($0, $1) {
-                case (.Owner, .Owner): true
-                case (.Owner, .Clerk): true
-                case (.Clerk, .Clerk): true
-                case (.Clerk, .Worker): true
-                case (.Worker, .Worker): true
-                default: false
-                }
-            }
-            self.state.egress(
-                evaluator: self.buildPromotionMatrix(country: country),
-                on: &map,
-            ) {
-                switch ($0, $1) {
-                case (.Owner, .Owner): true
-                case (.Clerk, .Owner): true
-                case (.Clerk, .Clerk): true
-                case (.Worker, .Clerk): true
-                case (.Worker, .Worker): true
-                default: false
-                }
-            }
+            self.convert(map: &map, country: country)
         } else {
             self.state.equity.split(
                 price: self.state.today.px,
@@ -537,6 +374,193 @@ extension PopContext {
 
                 self.state.mines.values[i].remove(excess: &nonexistent)
             }
+        }
+    }
+}
+extension PopContext {
+    private mutating func convert(
+        map: inout GameMap,
+        country: CountryProperties,
+    ) {
+        var targetDemotions: [(id: PopType, weight: Int64)] = PopType.allCases.compactMap {
+            switch (self.state.type.stratum, $0.stratum) {
+            case (.Owner, .Owner):  break
+            case (.Owner, .Clerk):  break
+            case (.Clerk, .Clerk):  break
+            case (.Clerk, .Worker):  break
+            case (.Worker, .Worker):  break
+            default: return nil
+            }
+
+            return (id: $0, weight: 1)
+        }
+
+        targetDemotions.shuffle(using: &map.random.generator)
+
+        // when demoting, inherit 1/4
+        self.state.egress(
+            evaluator: self.buildDemotionMatrix(country: country),
+            targets: targetDemotions,
+            inherit: 1 %/ 4,
+            on: &map,
+        )
+
+        var targetPromotions: [(id: PopType, weight: Int64)] = PopType.allCases.compactMap {
+            switch (self.state.type.stratum, $0.stratum) {
+            case (.Owner, .Owner): break
+            case (.Clerk, .Owner): break
+            case (.Clerk, .Clerk): break
+            case (.Worker, .Clerk): break
+            case (.Worker, .Worker): break
+            default: return nil
+            }
+
+            return (id: $0, weight: 1)
+        }
+
+        targetPromotions.shuffle(using: &map.random.generator)
+
+        // when promoting, inherit all
+        self.state.egress(
+            evaluator: self.buildPromotionMatrix(country: country),
+            targets: targetPromotions,
+            inherit: nil,
+            on: &map,
+        )
+    }
+    func buildDemotionMatrix<Matrix>(
+        country: CountryProperties,
+        type: Matrix.Type = Matrix.self,
+    ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
+        .init(base: 0%) {
+            $0[self.unemployment] {
+                $0[$1 >= 0.1] = +2‱
+                $0[$1 >= 0.2] = +1‱
+                $0[$1 >= 0.3] = +1‱
+                $0[$1 >= 0.4] = +1‱
+            } = { "\(+$0[%]): Unemployment is above \(em: $1[%0])" }
+
+            $0[self.state.yesterday.fl] {
+                $0[$1 < 1.00] = +1‰
+                $0[$1 < 0.75] = +5‰
+                $0[$1 < 0.50] = +2‰
+                $0[$1 < 0.25] = +2‰
+            } = { "\(+$0[%]): Getting less than \(em: $1[%0]) of Life Needs" }
+
+        } factors: {
+            $0[self.state.yesterday.fx] {
+                $0[$1 > 0.25] = -90%
+            } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Luxury Needs" }
+            $0[self.state.yesterday.fe] {
+                $0[$1 > 0.75] = -50%
+                $0[$1 > 0.5] = -25%
+            } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Everyday Needs" }
+
+            $0[self.state.yesterday.mil] {
+                $0[$1 >= 1.0] = -10%
+                $0[$1 >= 2.0] = -10%
+                $0[$1 >= 3.0] = -10%
+                $0[$1 >= 4.0] = -10%
+                $0[$1 >= 5.0] = -10%
+                $0[$1 >= 6.0] = -10%
+                $0[$1 >= 7.0] = -10%
+                $0[$1 >= 8.0] = -10%
+                $0[$1 >= 9.0] = -10%
+            } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
+
+            switch self.state.type.stratum {
+            case .Ward:
+                $0[true] {
+                    $0 = -100%
+                } = { "\(+$0[%]): Pop is \(em: "enslaved")" }
+
+            default:
+                $0[self.state.nat] {
+                    $0[$1 != country.culturePreferred] = +100%
+                } = { "\(+$0[%]): Culture is not \(em: $1)" }
+                $0[self.state.nat] {
+                    $0[$1 == country.culturePreferred] = -5%
+                } = { "\(+$0[%]): Culture is \(em: $1)" }
+            }
+        }
+    }
+
+    func buildPromotionMatrix<Matrix>(
+        country: CountryProperties,
+        type: Matrix.Type = Matrix.self,
+    ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
+        .init(base: 0%) {
+            $0[self.state.yesterday.mil] {
+                $0[$1 >= 3.0] = -2‱
+                $0[$1 >= 5.0] = -2‱
+                $0[$1 >= 7.0] = -3‱
+                $0[$1 >= 9.0] = -3‱
+            } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
+
+            switch self.state.type.stratum {
+            case .Owner:
+                $0[self.state.yesterday.fx] {
+                    $0[$1 >= 0.25] = +3‰
+                    $0[$1 >= 0.50] = +3‰
+                    $0[$1 >= 0.75] = +3‰
+                } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Luxury Needs" }
+
+            case _:
+                break
+            }
+
+            $0[self.state.yesterday.con] {
+                $0[$1 >= 1.0] = +1‱
+                $0[$1 >= 2.0] = +1‱
+                $0[$1 >= 3.0] = +1‱
+                $0[$1 >= 4.0] = +1‱
+                $0[$1 >= 5.0] = +1‱
+                $0[$1 >= 6.0] = +1‱
+                $0[$1 >= 7.0] = +1‱
+                $0[$1 >= 8.0] = +1‱
+                $0[$1 >= 9.0] = +1‱
+            } = { "\(+$0[%]): Consciousness is above \(em: $1[..1])" }
+
+        } factors: {
+            $0[self.state.yesterday.fl] {
+                $0[$1 < 1.00] = -100%
+            } = { "\(+$0[%]): Getting less than \(em: $1[%0]) of Life Needs" }
+
+            $0[self.state.yesterday.fe] {
+                $0[$1 >= 0.1] = -10%
+                $0[$1 >= 0.2] = -10%
+                $0[$1 >= 0.3] = -10%
+                $0[$1 >= 0.4] = -10%
+                $0[$1 >= 0.5] = -10%
+                $0[$1 >= 0.6] = -10%
+                $0[$1 >= 0.7] = -10%
+                $0[$1 >= 0.8] = -10%
+                $0[$1 >= 0.9] = -10%
+            } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Everyday Needs" }
+
+            $0[self.state.yesterday.mil] {
+                $0[$1 >= 2.0] = -20%
+                $0[$1 >= 4.0] = -10%
+                $0[$1 >= 6.0] = -10%
+                $0[$1 >= 8.0] = -10%
+            } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
+
+            switch self.state.type.stratum {
+            case .Ward:
+                $0[true] {
+                    $0 = -100%
+                } = { "\(+$0[%]): Pop is \(em: "enslaved")" }
+
+            case _:
+                break
+            }
+
+            $0[self.state.nat] {
+                $0[$1 != country.culturePreferred] = -75%
+            } = { "\(+$0[%]): Culture is not \(em: $1)" }
+            $0[self.state.nat] {
+                $0[$1 == country.culturePreferred] = +5%
+            } = { "\(+$0[%]): Culture is \(em: $1)" }
         }
     }
 }
