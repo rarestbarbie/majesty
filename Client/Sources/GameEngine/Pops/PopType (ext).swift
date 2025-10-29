@@ -14,7 +14,7 @@ extension PopType {
         case .Farmer: .remote
         case .Influencer: nil
 
-        case .Executive: nil
+        case .Aristocrat: nil
         case .Politician: .mining
         }
     }
