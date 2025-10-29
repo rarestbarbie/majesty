@@ -498,7 +498,10 @@ extension FactoryContext {
 
         #assert(
             self.state.inventory.account.balance >= 0,
-            "Factory has negative cash! (\(self.state.inventory.account))"
+            """
+            Factory (id = \(self.id), type = '\(self.type.name)') has negative cash! \
+            (\(self.state.inventory.account))
+            """
         )
 
         let (update, hours): (Update, Int64) = self.workerEffects(
