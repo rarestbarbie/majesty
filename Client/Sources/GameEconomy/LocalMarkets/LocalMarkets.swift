@@ -1,10 +1,12 @@
 import Fraction
 import GameIDs
+import OrderedCollections
 
 @frozen public struct LocalMarkets {
-    @usableFromInline var markets: [Key: LocalMarket]
+    // iteration order matters, because the RNG is called statefully during matching
+    @usableFromInline var markets: OrderedDictionary<Key, LocalMarket>
 
-    @inlinable init(markets: [Key: LocalMarket] = [:]) {
+    @inlinable init(markets: OrderedDictionary<Key, LocalMarket> = [:]) {
         self.markets = markets
     }
 
@@ -24,11 +26,9 @@ extension LocalMarkets {
 }
 extension LocalMarkets {
     public mutating func turn(by turn: (Key, inout LocalMarket) -> ()) {
-        var i: [Key: LocalMarket].Index = self.markets.startIndex
-        while i < self.markets.endIndex {
+        for i: Int in self.markets.elements.indices {
             let id: Key = self.markets.keys[i]
             turn(id, &self.markets.values[i])
-            i = self.markets.index(after: i)
         }
     }
 }

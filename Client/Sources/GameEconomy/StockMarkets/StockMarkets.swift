@@ -1,8 +1,10 @@
 import GameIDs
 import Random
+import OrderedCollections
 
 @frozen public struct StockMarkets {
-    @usableFromInline var regions: [Fiat: StockMarket]
+    // iteration order currently does not matter, but it might in the future
+    @usableFromInline var regions: OrderedDictionary<Fiat, StockMarket>
 
     @inlinable public init() {
         self.regions = [:]
@@ -10,11 +12,9 @@ import Random
 }
 extension StockMarkets {
     private mutating func turn(by turn: (Fiat, inout StockMarket) -> ()) {
-        var i: [Fiat: StockMarket].Index = self.regions.startIndex
-        while i < self.regions.endIndex {
+        for i: Int in self.regions.elements.indices {
             let id: Fiat = self.regions.keys[i]
             turn(id, &self.regions.values[i])
-            i = self.regions.index(after: i)
         }
     }
 
