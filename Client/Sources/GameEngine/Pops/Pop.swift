@@ -1,4 +1,5 @@
 import Assert
+import Fraction
 import GameConditions
 import GameEconomy
 import GameIDs
@@ -80,8 +81,9 @@ extension Pop: Turnable {
 extension Pop {
     mutating func egress(
         evaluator: ConditionEvaluator,
+        targets: [(id: PopType, weight: Int64)],
+        inherit: Fraction?,
         on map: inout GameMap,
-        direction: (PopStratum, PopStratum) -> Bool,
     ) {
         let rate: Double = evaluator.output
         if  rate <= 0 {
@@ -91,13 +93,6 @@ extension Pop {
         let count: Int64 = Binomial[self.today.size, rate].sample(
             using: &map.random.generator
         )
-        var targets: [(id: PopType, weight: Int64)] = PopType.allCases.filter {
-            direction(self.type.stratum, $0.stratum)
-        }.map {
-            (id: $0, weight: 1)
-        }
-
-        targets.shuffle(using: &map.random.generator)
 
         guard
         let breakdown: [Int64] = targets.distribute(count, share: \.weight) else {
@@ -118,8 +113,11 @@ extension Pop {
                 tile: self.tile
             )
 
+            let fraction: Fraction = size %/ self.today.size
+            let inherits: Fraction = inherit.map { $0 * fraction } ?? fraction
+
             map.conversions.append(
-                .init(from: self.id, size: size, of: self.today.size, to: section)
+                .init(from: self.id, size: size, to: section, inherits: inherits)
             )
             // we must deduct this now, because we might have multiple calls to `egress`
             self.today.size -= size
