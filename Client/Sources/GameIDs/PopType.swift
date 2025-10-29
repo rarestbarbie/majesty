@@ -24,7 +24,7 @@ import Bijection
     // case therapist
 
     // Owners
-    case Executive
+    case Aristocrat
     case Politician
 }
 extension PopType: RawRepresentable {
@@ -43,7 +43,7 @@ extension PopType: RawRepresentable {
         case .Farmer:       "F"
         case .Influencer:   "I"
 
-        case .Executive:    "O"
+        case .Aristocrat:   "O"
         case .Politician:   "P"
         }
     }
@@ -75,7 +75,7 @@ extension PopType {
         case .Engineer:     .Clerk
         case .Farmer:       .Clerk
         case .Influencer:   .Clerk
-        case .Executive:    .Owner
+        case .Aristocrat:   .Owner
         case .Politician:   .Owner
         }
     }
@@ -95,7 +95,7 @@ extension PopType {
         case .Farmer: "Farmer"
         case .Influencer: "Influencer"
 
-        case .Executive: "Executive"
+        case .Aristocrat: "Aristocrat"
         case .Politician: "Politician"
         }
     }
@@ -113,7 +113,7 @@ extension PopType {
         case .Farmer: "Farmers"
         case .Influencer: "Influencers"
 
-        case .Executive: "Executives"
+        case .Aristocrat: "Aristocrats"
         case .Politician: "Politicians"
         }
     }
