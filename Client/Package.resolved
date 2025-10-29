@@ -1,13 +1,13 @@
 {
-  "originHash" : "b0ac4eb66ea3e0a060d9766d0ed4b400eef555105ff26fa8283839b8e84e61e8",
+  "originHash" : "550fb7e1dfad4870abffa5d7c946663e456b99e84da352f97b6d6825c29228f2",
   "pins" : [
     {
       "identity" : "d",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tayloraswift/d",
       "state" : {
-        "revision" : "b04060f8a6260f58b19d47bd065765cdba8548ec",
-        "version" : "0.2.0"
+        "revision" : "9fd9cd85b2c922223575c6819b1bb6c4d26c1c1f",
+        "version" : "0.4.0"
       }
     },
     {
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tayloraswift/dollup",
       "state" : {
-        "revision" : "7f92b02ecac9d01a7eb96ce000fa66c9372a6e05",
-        "version" : "0.3.1"
+        "revision" : "6138a0ff84df2fd02dce0db510c2729a97e7474f",
+        "version" : "0.5.0"
       }
     },
     {
@@ -25,7 +25,7 @@
       "location" : "https://github.com/swiftwasm/JavaScriptKit",
       "state" : {
         "branch" : "main",
-        "revision" : "c6353c446993a33c875052d384bd1106b89bdebd"
+        "revision" : "689fdd26a5a13a1ca203018e93e9739ca345b3d9"
       }
     },
     {
