@@ -198,6 +198,8 @@ extension GameContext {
                 }
             }
             for order: LocalMarket.Order in bids {
+                #assert(order.filled <= order.amount, "Order overfilled! (\(order))")
+
                 switch order.by {
                 case .factory(let id):
                     spread += self.factories[modifying: id].state.inventory.debit(
