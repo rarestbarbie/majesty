@@ -91,10 +91,16 @@ extension Collection {
         }
 
         // Second pass: distribute remaining funds to earlier shareholders
-        for i: Int in allocations.indices {
+        // who have a non-zero share
+        for (i, element): (Int, Element) in zip(allocations.indices, self) {
             guard allocated < funds else {
                 break
             }
+
+            guard share(element) > 0 else {
+                continue
+            }
+
             allocations[i] += 1
             allocated += 1
         }
@@ -120,9 +126,12 @@ extension Collection {
         }
 
         // Second pass: distribute remaining funds to earlier shareholders
-        for i: Int in allocations.indices {
+        for (i, element): (Int, Element) in zip(allocations.indices, self) {
             guard allocated < funds else {
                 break
+            }
+            guard share(element) > 0 else {
+                continue
             }
             allocations[i] += 1
             allocated += 1

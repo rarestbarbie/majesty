@@ -6,7 +6,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/tayloraswift/d",
       "state" : {
-        "revision" : "9fd9cd85b2c922223575c6819b1bb6c4d26c1c1f",
+        "revision" : "90df881f8583c58a223a94779c64ae30c1e3b459",
         "version" : "0.4.0"
       }
     },
