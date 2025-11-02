@@ -4,11 +4,8 @@ import JavaScriptInterop
 import JavaScriptKit
 import Random
 
-final class _NoMetadata {
-    init() {}
-}
-
 struct MineContext: RuntimeContext {
+    let type: MineMetadata
     var state: Mine
 
     private(set) var governedBy: CountryProperties?
@@ -16,7 +13,8 @@ struct MineContext: RuntimeContext {
 
     private(set) var miners: Workforce
 
-    init(type _: _NoMetadata, state: Mine) {
+    init(type: MineMetadata, state: Mine) {
+        self.type = type
         self.state = state
         self.governedBy = nil
         self.occupiedBy = nil
@@ -34,7 +32,11 @@ extension MineContext {
 }
 extension MineContext {
     mutating func compute(map _: borrowing GameMap, context: GameContext.ResidentPass) throws {
-        self.miners.limit = self.state.size / 10_000
+        if  self.type.decay {
+            self.miners.limit = self.state.size / 10_000
+        } else {
+            self.miners.limit = self.state.size
+        }
 
         guard
         let tile: PlanetGrid.Tile = context.planets[self.state.tile],
@@ -58,15 +60,17 @@ extension MineContext {
             )
 
             if  bid.size > 0 {
-                map.jobs.hire.local[self.state.tile, self.state.type.minerPop].append(bid)
+                map.jobs.hire.local[self.state.tile, self.type.miner].append(bid)
             }
         } else {
             let layoff: PopJobLayoffBlock = .init(size: -minersToHire)
             if  layoff.size > 0 {
-                map.jobs.fire[self.state.id, self.state.type.minerPop] = layoff
+                map.jobs.fire[self.state.id, self.type.miner] = layoff
             }
         }
 
-        self.state.size = max(0, self.state.size - self.miners.count)
+        if  self.type.decay {
+            self.state.size = max(0, self.state.size - self.miners.count)
+        }
     }
 }

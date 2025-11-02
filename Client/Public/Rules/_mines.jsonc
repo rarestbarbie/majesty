@@ -1,0 +1,9 @@
+{
+    "Regional Government": {
+        "miner": "Politician",
+        "decay": false,
+        "base": {
+            "Influence": 4
+        }
+    }
+}

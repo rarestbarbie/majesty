@@ -1,5 +1,7 @@
 import Color
+import GameIDs
 import GameEconomy
+import OrderedCollections
 
 public final class PopMetadata: Identifiable, Sendable {
     public let singular: String
@@ -10,7 +12,7 @@ public final class PopMetadata: Identifiable, Sendable {
     public let x: ResourceTier
     public let output: ResourceTier
 
-    init(
+    private init(
         singular: String,
         plural: String,
         color: Color,
@@ -26,6 +28,32 @@ public final class PopMetadata: Identifiable, Sendable {
         self.e = e
         self.x = x
         self.output = output
+    }
+}
+extension PopMetadata {
+    convenience init(
+        type: PopType,
+        pops: EffectsTable<PopType, PopDescription>,
+        symbols: GameRules.Symbols,
+        resources: OrderedDictionary<Resource, ResourceMetadata>
+    ) throws {
+        let pop: PopDescription? = pops[type]
+        let l: SymbolTable<Int64> = try pop?.l ?? pops[*].l ?? [:]
+        let e: SymbolTable<Int64> = try pop?.e ?? pops[*].e ?? [:]
+        let x: SymbolTable<Int64> = try pop?.x ?? pops[*].x ?? [:]
+        let output: SymbolTable<Int64> = try pop?.output ?? pops[*].output ?? [:]
+        self.init(
+            singular: type.singular,
+            plural: type.plural,
+            color: try pop?.color ?? pops[*].color ?? 0xFFFFFF,
+            l: .init(metadata: resources, quantity: try l.quantities(keys: symbols.resources)),
+            e: .init(metadata: resources, quantity: try e.quantities(keys: symbols.resources)),
+            x: .init(metadata: resources, quantity: try x.quantities(keys: symbols.resources)),
+            output: .init(
+                metadata: resources,
+                quantity: try output.quantities(keys: symbols.resources)
+            )
+        )
     }
 }
 extension PopMetadata {

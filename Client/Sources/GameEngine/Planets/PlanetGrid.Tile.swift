@@ -20,6 +20,10 @@ extension PlanetGrid {
         private(set) var factoriesUnderConstruction: Int64
         private(set) var factoriesAlreadyPresent: Set<FactoryType>
         private(set) var factories: [FactoryID]
+
+        private(set) var minesAlreadyPresent: Set<MineType>
+        private(set) var mines: [MineID]
+
         private(set) var pops: PopulationStats
 
         init(
@@ -40,6 +44,9 @@ extension PlanetGrid {
             self.factoriesAlreadyPresent = []
             self.factories = []
 
+            self.minesAlreadyPresent = []
+            self.mines = []
+
             self.pops = .init()
         }
     }
@@ -57,6 +64,9 @@ extension PlanetGrid.Tile {
         self.factoriesAlreadyPresent.removeAll(keepingCapacity: true)
         self.factories.removeAll(keepingCapacity: true)
 
+        self.minesAlreadyPresent.removeAll(keepingCapacity: true)
+        self.mines.removeAll(keepingCapacity: true)
+
         self.pops.startIndexCount()
     }
 
@@ -70,6 +80,10 @@ extension PlanetGrid.Tile {
         if factory.size.level == 0 {
             self.factoriesUnderConstruction += 1
         }
+    }
+    mutating func addResidentCount(_ mine: Mine) {
+        self.mines.append(mine.id)
+        self.minesAlreadyPresent.insert(mine.type)
     }
 }
 extension PlanetGrid.Tile {
@@ -96,5 +110,39 @@ extension PlanetGrid.Tile {
             }
         }
         return choices.randomElement(using: &random.generator)
+    }
+    func pickMine(
+        among mines: OrderedDictionary<MineType, MineMetadata>,
+        using random: inout PseudoRandom,
+    ) -> MineType? {
+        // mandatory mines
+        for (missing, mine): (MineType, MineMetadata) in mines {
+            if !self.minesAlreadyPresent.contains(missing), mine.geology.isEmpty {
+                return missing
+            }
+        }
+
+        guard random.roll(
+            self.pops.free.total,
+            1_000_000_000
+        ) else {
+            return nil
+        }
+
+        let choices: [(type: MineType, chance: Int64)] = mines.reduce(into: []) {
+            if self.minesAlreadyPresent.contains($1.key) {
+                return
+            }
+            if  let chance: Int64 = $1.value.geology[self.geology.id] {
+                $0.append(($1.key, chance))
+            }
+        }
+        let sampler: RandomWeightedSampler<[(MineType, chance: Int64)], Double>? = .init(
+            choices: choices
+        ) {
+            Double.init($0.chance)
+        }
+        return sampler.map { choices[$0.next(using: &random.generator)].type }
+
     }
 }
