@@ -6,6 +6,7 @@ import OrderedCollections
 @frozen public struct GameRules {
     public let resources: OrderedDictionary<Resource, ResourceMetadata>
     public let factories: OrderedDictionary<FactoryType, FactoryMetadata>
+    public let mines: OrderedDictionary<MineType, MineMetadata>
     public let technologies: OrderedDictionary<Technology, TechnologyMetadata>
     public let geology: OrderedDictionary<GeologicalType, GeologicalMetadata>
     public let terrains: OrderedDictionary<TerrainType, TerrainMetadata>
@@ -17,6 +18,7 @@ import OrderedCollections
     @inlinable public init(
         resources: OrderedDictionary<Resource, ResourceMetadata>,
         factories: OrderedDictionary<FactoryType, FactoryMetadata>,
+        mines: OrderedDictionary<MineType, MineMetadata>,
         technologies: OrderedDictionary<Technology, TechnologyMetadata>,
         geology: OrderedDictionary<GeologicalType, GeologicalMetadata>,
         terrains: OrderedDictionary<TerrainType, TerrainMetadata>,
@@ -25,6 +27,7 @@ import OrderedCollections
     ) {
         self.resources = resources
         self.factories = factories
+        self.mines = mines
         self.technologies = technologies
         self.geology = geology
         self.terrains = terrains
@@ -36,6 +39,7 @@ extension GameRules {
     private typealias Tables = (
         resources: OrderedDictionary<Resource, (Symbol, ResourceDescription)>,
         factories: OrderedDictionary<FactoryType, (Symbol, FactoryDescription)>,
+        mines: OrderedDictionary<MineType, (Symbol, MineDescription)>,
         technologies: OrderedDictionary<Technology, (Symbol, TechnologyDescription)>,
         geology: OrderedDictionary<GeologicalType, (Symbol, GeologicalDescription)>,
         terrains: OrderedDictionary<TerrainType, (Symbol, TerrainDescription)>
@@ -51,6 +55,7 @@ extension GameRules {
             table: (
                 try symbols.resources.extend(over: rules.resources),
                 try symbols.factories.extend(over: rules.factories),
+                try symbols.mines.extend(over: rules.mines),
                 try symbols.technologies.extend(over: rules.technologies),
                 try symbols.geology.extend(over: rules.geology),
                 try symbols.terrains.extend(over: rules.terrains),
@@ -70,7 +75,10 @@ extension GameRules {
         symbols: GameRules.Symbols,
         settings: Settings
     ) throws {
-        let pops: EffectsTable<PopType, PopDescription> = try symbols.pops.resolve(rules.pops)
+        let pops: EffectsTable<PopType, PopDescription> = try rules.pops.effects(
+            keys: symbols.pops,
+            wildcard: "*"
+        )
         let resources: OrderedDictionary<
             Resource,
             ResourceMetadata
@@ -87,7 +95,7 @@ extension GameRules {
         let factoryCosts: EffectsTable<
             FactoryType,
             SymbolTable<Int64>
-        > = try symbols.factories.resolve(rules.factoryCosts.construction)
+        > = try rules.factoryCosts.construction.effects(keys: symbols.factories, wildcard: "*")
 
         self.init(
             resources: resources,
@@ -99,28 +107,40 @@ extension GameRules {
                     name: symbol.name,
                     inputs: .init(
                         metadata: resources,
-                        quantity: try symbols.resources.resolve(factory.inputs)
+                        quantity: try factory.inputs.quantities(keys: symbols.resources)
                     ),
                     office: .init(
                         metadata: resources,
-                        quantity: try symbols.resources.resolve(factory.office)
+                        quantity: try factory.office.quantities(keys: symbols.resources)
                     ),
                     costs: .init(
                         metadata: resources,
-                        quantity: try symbols.resources.resolve(
-                            try factoryCosts[type] ?? factoryCosts[*]
-                        )
+                        quantity: try (try factoryCosts[type] ?? factoryCosts[*]).quantities(keys: symbols.resources)
                     ),
                     output: .init(
                         metadata: resources,
-                        quantity: try symbols.resources.resolve(factory.output)
+                        quantity: try factory.output.quantities(keys: symbols.resources)
                     ),
-                    workers: try symbols.pops.resolve(factory.workers),
+                    workers: try factory.workers.quantities(keys: symbols.pops),
                     sharesInitial: rules.factoryCosts.sharesInitial,
                     sharesPerLevel: rules.factoryCosts.sharesPerLevel,
                     terrainAllowed: .init(
                         try factory.terrain.lazy.map { try symbols.terrains[$0] }
                     )
+                )
+            },
+            mines: try table.mines.reduce(into: [:]) {
+                let (type, (symbol, mine)): (MineType, (Symbol, MineDescription)) = $1
+
+                $0[type] = MineMetadata.init(
+                    name: symbol.name,
+                    base: .init(
+                        metadata: resources,
+                        quantity: try mine.base.quantities(keys: symbols.resources)
+                    ),
+                    miner: try symbols.pops[mine.miner],
+                    decay: mine.decay,
+                    geology: try mine.geology.map(keys: symbols.geology)
                 )
             },
             technologies: try table.technologies.mapValues {
@@ -131,9 +151,7 @@ extension GameRules {
                     summary: $1.summary
                 )
             },
-            geology: try table.geology.reduce(
-                into: [:]
-            ) {
+            geology: try table.geology.reduce(into: [:]) {
                 let (type, (symbol, province)): (
                     GeologicalType, (Symbol, GeologicalDescription)
                 ) = $1
@@ -142,11 +160,11 @@ extension GameRules {
                     id: type,
                     symbol: symbol,
                     name: province.name,
-                    base: try symbols.resources.resolve(province.base),
-                    bonus: try symbols.resources.resolve(province.bonus) {
+                    base: try province.base.map(keys: symbols.resources),
+                    bonus: try province.bonus.map(keys: symbols.resources) {
                         .init(
                             weightNone: $0.weightNone,
-                            weights: try symbols.resources.resolve($0.weights)
+                            weights: try $0.weights.map(keys: symbols.resources)
                         )
                     },
                     color: province.color
@@ -156,23 +174,7 @@ extension GameRules {
                 $0[$1.key] = .init(id: $1.key, symbol: $1.value.0, color: $1.value.1.color)
             },
             pops: try PopType.allCases.reduce(into: [:]) {
-                let pop: PopDescription? = pops[$1]
-                let l: SymbolTable<Int64> = try pop?.l ?? pops[*].l ?? [:]
-                let e: SymbolTable<Int64> = try pop?.e ?? pops[*].e ?? [:]
-                let x: SymbolTable<Int64> = try pop?.x ?? pops[*].x ?? [:]
-                let output: SymbolTable<Int64> = try pop?.output ?? pops[*].output ?? [:]
-                $0[$1] = .init(
-                    singular: $1.singular,
-                    plural: $1.plural,
-                    color: try pop?.color ?? pops[*].color ?? 0xFFFFFF,
-                    l: .init(metadata: resources, quantity: try symbols.resources.resolve(l)),
-                    e: .init(metadata: resources, quantity: try symbols.resources.resolve(e)),
-                    x: .init(metadata: resources, quantity: try symbols.resources.resolve(x)),
-                    output: .init(
-                        metadata: resources,
-                        quantity: try symbols.resources.resolve(output)
-                    )
-                )
+                $0[$1] = try .init(type: $1, pops: pops, symbols: symbols, resources: resources)
             },
             settings: settings
         )
@@ -190,6 +192,10 @@ extension GameRules {
             value.hash.hash(into: &hasher)
         }
         for (key, value): (FactoryType, FactoryMetadata) in self.factories {
+            key.hash(into: &hasher)
+            value.hash.hash(into: &hasher)
+        }
+        for (key, value): (MineType, MineMetadata) in self.mines {
             key.hash(into: &hasher)
             value.hash.hash(into: &hasher)
         }

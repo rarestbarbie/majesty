@@ -569,16 +569,48 @@ extension GameSession {
     }
 
     public func tooltipPopJobs(_ id: PopID) -> Tooltip? {
-        guard let pop: Pop = self.context.pops.state[id] else {
+        guard let pop: PopContext = self.context.pops[id] else {
             return nil
         }
 
+        if !pop.state.factories.isEmpty {
+            return self.tooltipPopJobs(list: pop.state.factories.values.elements) {
+                self.context.factories[$0]?.type.name ?? "Unknown"
+            }
+        }
+        if !pop.state.mines.isEmpty {
+            return self.tooltipPopJobs(list: pop.state.mines.values.elements) {
+                self.context.mines[$0]?.type.name ?? "Unknown"
+            }
+        } else {
+            let employment: Int64 = .init(
+                (pop.unemployment * Double.init(pop.state.today.size)).rounded()
+            )
+            return .instructions {
+                $0["Total employment"] = employment[/3]
+                for output: InelasticOutput in pop.state.inventory.out.inelastic.values {
+                    let name: String? = self.context.rules.resources[output.id]?.name
+                    $0[>] = """
+                    Today these \(pop.state.type.plural) sold \(
+                        output.unitsSold[/3],
+                        style: output.unitsSold < output.unitsProduced ? .neg : .pos
+                    ) of \
+                    \(em: output.unitsProduced[/3]) \(name ?? "?") produced
+                    """
+                }
+            }
+        }
+    }
+    private func tooltipPopJobs<Job>(
+        list: [Job],
+        name: (Job.ID) -> String
+    ) -> Tooltip where Job: PopJob {
         let total: (
             count: Int64,
             hired: Int64,
             fired: Int64,
             quit: Int64
-        ) = pop.factories.values.reduce(into: (0, 0, 0, 0)) {
+        ) = list.reduce(into: (0, 0, 0, 0)) {
             $0.count += $1.count
             $0.hired += $1.hired
             $0.fired += $1.fired
@@ -588,10 +620,9 @@ extension GameSession {
         return .instructions {
             $0["Total employment"] = total.count[/3]
             $0[>] {
-                for job: FactoryJob in pop.factories.values {
+                for job: Job in list {
                     let change: Int64 = job.hired - job.fired - job.quit
-                    let name: String = self.context.factories[job.id]?.type.name ?? "Unknown"
-                    $0[name, +] = job.count[/3] <- job.count - change
+                    $0[name(job.id), +] = job.count[/3] <- job.count - change
                 }
             }
             $0["Today’s change", +] = +?(total.hired - total.fired - total.quit)[/3]

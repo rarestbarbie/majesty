@@ -5,6 +5,7 @@ extension GameRules {
         case factories
         case factory_costs
         case resources
+        case mines
         case pops
         case technologies
 

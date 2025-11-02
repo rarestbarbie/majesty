@@ -25,14 +25,13 @@ struct GameContext {
         /// We do not use metadata for these types of objects:
         let country: CountryContext.Metadata = .init()
         let culture: CultureContext.Metadata = .init()
-        let _none: _NoMetadata = .init()
 
         self.player = save.player
         self.planets = [:]
         self.cultures = try .init(states: save.cultures) { _ in culture }
         self.countries = try .init(states: save.countries) { _ in country }
         self.factories = try .init(states: save.factories) { rules.factories[$0.type] }
-        self.mines = try .init(states: save.mines) { _ in _none }
+        self.mines = try .init(states: save.mines) { rules.mines[$0.type] }
         self.pops = try .init(states: save.pops) { rules.pops[$0.type] }
 
         self.symbols = save.symbols
@@ -382,6 +381,12 @@ extension GameContext {
                 }
             }
         }
+        for i: Int in self.mines.indices {
+            let mine: Mine = self.mines.state[i]
+            let counted: ()? = self.planets[mine.tile]?.addResidentCount(mine)
+
+            #assert(counted != nil, "Mine \(mine.id) has no home tile!!!")
+        }
     }
 }
 extension GameContext {
@@ -604,30 +609,39 @@ extension GameContext {
     private mutating func executeConstructions(_ map: inout GameMap) throws {
         for i: Int in self.planets.indices {
             for j: Int in self.planets[i].grid.tiles.values.indices {
-                let factory: Factory.Section? = {
+                let (factory, mine): (Factory.Section?, Mine.Section?) = {
                     let id: PlanetID = $0.state.id
                     return {
-                        guard
-                        let selected: FactoryType = $0.pickFactory(
+                        let factory: FactoryType? = $0.pickFactory(
                             among: self.rules.factories,
                             using: &map.random
-                        )  else {
-                            return nil
-                        }
-                        return .init(type: selected, tile: .init(planet: id, tile: $0.id))
-
+                        )
+                        let mine: MineType? = $0.pickMine(
+                            among: self.rules.mines,
+                            using: &map.random
+                        )
+                        let tile: Address = .init(planet: id, tile: $0.id)
+                        return (
+                            factory: factory.map { .init(type: $0, tile: tile) },
+                            mine: mine.map { .init(type: $0, tile: tile) }
+                        )
                     } (&$0[j])
                 } (&self.planets[i])
 
-                guard
-                let factory: Factory.Section else {
-                    continue
+                if  let factory: Factory.Section {
+                    try self.factories[factory] {
+                        self.rules.factories[$0.type]
+                    } update: {
+                        $0.size = .init(level: 0)
+                    }
                 }
 
-                try self.factories[factory] {
-                    self.rules.factories[$0.type]
-                } update: {
-                    $0.size = .init(level: 0)
+                if  let mine: Mine.Section {
+                    try self.mines[mine] {
+                        self.rules.mines[$0.type]
+                    } update: {
+                        $0.size = 400
+                    }
                 }
             }
         }

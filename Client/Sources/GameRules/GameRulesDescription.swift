@@ -5,6 +5,7 @@ public struct GameRulesDescription {
     let factories: SymbolTable<FactoryDescription>
     let factoryCosts: FactoryCosts
     let resources: SymbolTable<ResourceDescription>
+    let mines: SymbolTable<MineDescription>
     let pops: SymbolTable<PopDescription>
     let technologies: SymbolTable<TechnologyDescription>
     let geology: SymbolTable<GeologicalDescription>
@@ -17,6 +18,7 @@ extension GameRulesDescription: JavaScriptDecodable {
             factories: try js[.factories].decode(),
             factoryCosts: try js[.factory_costs].decode(),
             resources: try js[.resources].decode(),
+            mines: try js[.mines].decode(),
             pops: try js[.pops].decode(),
             technologies: try js[.technologies].decode(),
             geology: try js[.geology].decode(),

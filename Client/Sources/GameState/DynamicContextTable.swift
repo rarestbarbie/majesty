@@ -115,7 +115,7 @@ extension DynamicContextTable {
                 if let type: ElementContext.Metadata = create(state) {
                     new = .init(type: type, state: state)
                 } else {
-                    throw RuntimeMetadataError<Void>.missing(())
+                    throw RuntimeMetadataError<ElementContext.State.ID>.missing(state.id)
                 }
             }
 

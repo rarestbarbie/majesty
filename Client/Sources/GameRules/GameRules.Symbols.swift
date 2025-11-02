@@ -6,6 +6,7 @@ extension GameRules {
         /// Pop types are not moddable.
         let pops: SymbolTable<PopType>
 
+        var mines: SymbolTable<MineType>
         var factories: SymbolTable<FactoryType>
         var resources: SymbolTable<Resource>
         var technologies: SymbolTable<Technology>
@@ -29,6 +30,7 @@ extension GameRules.Symbols {
 }
 extension GameRules.Symbols: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<GameRules.Namespace>) {
+        js[.mines] = self.mines
         js[.factories] = self.factories
         js[.resources] = self.resources
         js[.technologies] = self.technologies
@@ -44,6 +46,7 @@ extension GameRules.Symbols: JavaScriptDecodable {
                     $0[.init(name: $1.singular)] = $1
                 }
             ),
+            mines: try js[.mines]?.decode() ?? [:],
             factories: try js[.factories]?.decode() ?? [:],
             resources: try js[.resources]?.decode() ?? [:],
             technologies: try js[.technologies]?.decode() ?? [:],

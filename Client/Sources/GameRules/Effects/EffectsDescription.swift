@@ -8,7 +8,7 @@ extension EffectsDescription {
     func resolved(with symbols: GameRules.Symbols) throws -> [Effect] {
         var effects: [Effect] = []
         if let productivity: SymbolTable<Int64> = self.factoryProductivity {
-            effects.append(.factoryProductivity(try symbols.factories.resolve(productivity)))
+            effects.append(.factoryProductivity(try productivity.effects(keys: symbols.factories, wildcard: "*")))
         }
         return effects
     }

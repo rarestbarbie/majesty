@@ -25,35 +25,20 @@ extension SymbolTable {
         }
     }
 }
-extension SymbolTable where Value: Hashable {
-    func resolve<Metadata>(_ table: SymbolTable<Metadata>) throws -> [Value: Metadata] {
-        try self.resolve(table, \.self)
+extension SymbolTable {
+    func map<T>(keys: SymbolTable<T>) throws -> [T: Value] {
+        try self.map(keys: keys, value: \.self)
     }
-    func resolve<T, Metadata>(
-        _ table: SymbolTable<T>,
-        _ yield: (T) throws -> Metadata
-    ) throws -> [Value: Metadata] {
-        try table.index.reduce(into: [:]) { $0[try self[$1.key]] = try yield($1.value) }
+    func map<T, U>(keys: SymbolTable<T>, value: (Value) throws -> U) throws -> [T: U] {
+        try self.index.reduce(into: [:]) { $0[try keys[$1.key]] = try value($1.value) }
     }
 
-    func resolve<Metadata>(
-        _ table: OrderedDictionary<Symbol, Metadata>
-    ) throws -> OrderedDictionary<Value, Metadata> {
-        try self.resolve(table, \.self)
-    }
-    func resolve<T, Metadata>(
-        _ table: OrderedDictionary<Symbol, T>,
-        _ yield: (T) throws -> Metadata
-    ) throws -> OrderedDictionary<Value, Metadata> {
-        try table.reduce(into: [:]) { $0[try self[$1.key]] = try yield($1.value) }
-    }
-
-    func resolve<Metadata>(
-        _ table: SymbolTable<Metadata>,
-        wildcard: Symbol = "*",
-    ) throws -> EffectsTable<Value, Metadata> {
-        try table.index.reduce(into: [:]) {
-            if let id: Value = self.index[$1.key] {
+    func effects<ID>(
+        keys: SymbolTable<ID>,
+        wildcard: Symbol,
+    ) throws -> EffectsTable<ID, Value> {
+        try self.index.reduce(into: [:]) {
+            if let id: ID = keys.index[$1.key] {
                 $0[id] = $1.value
             } else if wildcard == $1.key {
                 $0[*] = $1.value
@@ -63,9 +48,10 @@ extension SymbolTable where Value: Hashable {
         }
     }
 }
-extension SymbolTable where Value: Hashable & Comparable {
-    func resolve(_ table: SymbolTable<Int64>) throws -> [Quantity<Value>] {
-        var quantities: [Quantity<Value>] = try self.resolve(table).map {
+extension SymbolTable<Int64> {
+    func quantities<T>(keys: SymbolTable<T>) throws -> [Quantity<T>]
+        where T: Hashable, T: Comparable {
+        var quantities: [Quantity<T>] = try self.map(keys: keys).map {
             .init(amount: $1, unit: $0)
         }
 
