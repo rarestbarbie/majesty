@@ -69,14 +69,20 @@ extension PopContext {
             return
         }
 
-        self.unemployment = self.state.inventory.out.inelastic.values.reduce(
-            Double.init(self.state.unemployed) / Double.init(self.state.today.size)
-        ) {
-            let sold: Double = $1.unitsProduced > 0
-                ? Double.init($1.unitsSold) / Double.init($1.unitsProduced)
-                : 1
+        if  self.state.inventory.out.inelastic.isEmpty {
+            self.unemployment = Double.init(
+                self.state.unemployed
+            ) / Double.init(
+                self.state.today.size
+            )
+        } else {
+            self.unemployment = self.state.inventory.out.inelastic.values.reduce(1) {
+                let sold: Double = $1.units.added > 0
+                    ? Double.init($1.unitsSold) / Double.init($1.units.added)
+                    : 1
 
-            return min($0, 1 - sold)
+                return min($0, 1 - sold)
+            }
         }
 
         self.income.removeAll(keepingCapacity: true)
@@ -121,24 +127,18 @@ extension PopContext: TransactingContext {
         /// Compute vertical weights.
         let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
 
+        self.state.inventory.out.sync(with: self.type.output, releasing: 1 %/ 4)
         self.state.inventory.l.sync(
             with: self.type.l,
             scalingFactor: (self.state.today.size, z.l),
-            stockpileDays: Self.stockpileDays.lowerBound,
         )
         self.state.inventory.e.sync(
             with: self.type.e,
             scalingFactor: (self.state.today.size, z.e),
-            stockpileDays: Self.stockpileDays.lowerBound,
         )
         self.state.inventory.x.sync(
             with: self.type.x,
             scalingFactor: (self.state.today.size, z.x),
-            stockpileDays: Self.stockpileDays.lowerBound,
-        )
-        self.state.inventory.out.sync(
-            with: self.type.output,
-            scalingFactor: (self.state.today.size, 1)
         )
 
         let weights: ResourceInputWeights = .init(
@@ -190,11 +190,11 @@ extension PopContext: TransactingContext {
                 (budget.e.inelastic, weights.e.inelastic.x),
                 (budget.x.inelastic, weights.x.inelastic.x),
             ),
+            asks: self.state.inventory.out.inelastic,
             as: self.lei,
             in: self.state.tile,
         )
 
-        self.state.inventory.bid(in: self.state.tile, as: self.lei, on: &map)
         self.budget = budget
     }
 
@@ -205,17 +205,16 @@ extension PopContext: TransactingContext {
             return
         }
 
+        self.state.inventory.account.r += self.state.inventory.out.sell(
+            in: country.currency.id,
+            on: &map.exchange
+        )
         self.state.inventory.out.deposit(
             from: self.type.output,
             scalingFactor: (self.state.today.size, 1)
         )
 
-        self.state.inventory.account.r += self.state.inventory.out.sell(
-            in: country.currency.id,
-            on: &map.exchange
-        )
-
-        let target: TradeableInput.StockpileTarget = .random(
+        let target: ResourceStockpileTarget = .random(
             in: Self.stockpileDays,
             using: &map.random
         )

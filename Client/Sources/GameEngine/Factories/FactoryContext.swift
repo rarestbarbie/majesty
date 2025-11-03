@@ -142,19 +142,14 @@ extension FactoryContext: TransactingContext {
             self.productivity * min($0.limit, $0.count + 1)
         } ?? 0
 
-        self.state.inventory.out.sync(
-            with: self.type.output,
-            scalingFactor: (throughput, self.state.today.eo),
-        )
+        self.state.inventory.out.sync(with: self.type.output, releasing: 1 %/ 4)
         self.state.inventory.l.sync(
             with: self.type.inputs,
             scalingFactor: (throughput, self.state.today.ei),
-            stockpileDays: Self.stockpileDays.lowerBound,
         )
         self.state.inventory.e.sync(
             with: self.type.office,
             scalingFactor: (throughput, self.state.today.ei),
-            stockpileDays: Self.stockpileDays.lowerBound,
         )
         self.state.inventory.x.sync(
             with: self.type.costs,
@@ -162,7 +157,6 @@ extension FactoryContext: TransactingContext {
                 self.productivity * (self.state.size.level + 1),
                 self.state.today.ei
             ),
-            stockpileDays: Self.stockpileDays.lowerBound,
         )
 
         if  self.equity.sharePrice.n > 0 {
@@ -248,11 +242,10 @@ extension FactoryContext: TransactingContext {
                 (budget.e.inelastic, weights.e.inelastic.x),
                 (budget.x.inelastic, weights.x.inelastic.x),
             ),
+            asks: self.state.inventory.out.inelastic,
             as: self.lei,
             in: self.state.tile,
         )
-
-        self.state.inventory.bid(in: self.state.tile, as: self.lei, on: &map)
     }
 
     mutating func transact(map: inout GameMap) {
@@ -262,7 +255,7 @@ extension FactoryContext: TransactingContext {
             return
         }
 
-        let stockpileTarget: TradeableInput.StockpileTarget = .random(
+        let stockpileTarget: ResourceStockpileTarget = .random(
             in: Self.stockpileDays,
             using: &map.random,
         )
@@ -407,7 +400,7 @@ extension FactoryContext {
     private mutating func construct(
         policy: CountryProperties,
         budget: ResourceBudgetTier,
-        stockpileTarget: TradeableInput.StockpileTarget,
+        stockpileTarget: ResourceStockpileTarget,
         map: inout GameMap
     ) {
         if  budget.tradeable > 0 {
@@ -443,7 +436,7 @@ extension FactoryContext {
         budget: FactoryBudget.Liquidating,
         map: inout GameMap
     ) {
-        let stockpileNone: TradeableInput.StockpileTarget = .init(lower: 0, today: 0, upper: 0)
+        let stockpileNone: ResourceStockpileTarget = .init(lower: 0, today: 0, upper: 0)
         let tl: TradeProceeds = self.state.inventory.l.trade(
             stockpileDays: stockpileNone,
             spendingLimit: 0,
@@ -479,7 +472,7 @@ extension FactoryContext {
         workers: Workforce,
         policy: CountryProperties,
         budget: OperatingBudget,
-        stockpileTarget: TradeableInput.StockpileTarget,
+        stockpileTarget: ResourceStockpileTarget,
         map: inout GameMap
     ) -> WorkforceChanges? {
         self.state.inventory.account += self.state.inventory.l.trade(
@@ -526,15 +519,14 @@ extension FactoryContext {
             from: self.type.office,
             scalingFactor: (throughput, self.state.today.ei)
         )
-        self.state.inventory.out.deposit(
-            from: self.type.output,
-            scalingFactor: (throughput, self.state.today.eo)
-        )
 
-        // Sell outputs.
         self.state.inventory.account.r += self.state.inventory.out.sell(
             in: policy.currency.id,
             on: &map.exchange
+        )
+        self.state.inventory.out.deposit(
+            from: self.type.output,
+            scalingFactor: (throughput, self.state.today.eo)
         )
 
         #assert(

@@ -307,14 +307,16 @@ extension GameSession {
         _ id: FactoryID,
         _ resource: InventoryLine,
     ) -> Tooltip? {
-        guard let factory: FactoryContext = self.context.factories[id] else {
+        guard
+        let factory: FactoryContext = self.context.factories[id],
+        let country: CountryProperties = factory.occupiedBy else {
             return nil
         }
 
         switch resource {
-        case .l(let resource): return factory.state.inventory.l.tooltipStockpile(resource)
-        case .e(let resource): return factory.state.inventory.e.tooltipStockpile(resource)
-        case .x(let resource): return factory.state.inventory.x.tooltipStockpile(resource)
+        case .l(let id): return factory.state.inventory.l.tooltipStockpile(id, country: country)
+        case .e(let id): return factory.state.inventory.e.tooltipStockpile(id, country: country)
+        case .x(let id): return factory.state.inventory.x.tooltipStockpile(id, country: country)
         case .o: return nil
         }
     }
@@ -588,14 +590,14 @@ extension GameSession {
             )
             return .instructions {
                 $0["Total employment"] = employment[/3]
-                for output: InelasticOutput in pop.state.inventory.out.inelastic.values {
+                for output: ResourceOutput<Never> in pop.state.inventory.out.inelastic.values {
                     let name: String? = self.context.rules.resources[output.id]?.name
                     $0[>] = """
                     Today these \(pop.state.type.plural) sold \(
                         output.unitsSold[/3],
-                        style: output.unitsSold < output.unitsProduced ? .neg : .pos
+                        style: output.unitsSold < output.units.added ? .neg : .pos
                     ) of \
-                    \(em: output.unitsProduced[/3]) \(name ?? "?") produced
+                    \(em: output.units.added[/3]) \(name ?? "?") produced
                     """
                 }
             }
@@ -704,14 +706,16 @@ extension GameSession {
         _ id: PopID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        guard let pop: PopContext = self.context.pops[id] else {
+        guard
+        let pop: PopContext = self.context.pops[id],
+        let country: CountryProperties = pop.occupiedBy else {
             return nil
         }
 
         switch line {
-        case .l(let resource): return pop.state.inventory.l.tooltipStockpile(resource)
-        case .e(let resource): return pop.state.inventory.e.tooltipStockpile(resource)
-        case .x(let resource): return pop.state.inventory.x.tooltipStockpile(resource)
+        case .l(let id): return pop.state.inventory.l.tooltipStockpile(id, country: country)
+        case .e(let id): return pop.state.inventory.e.tooltipStockpile(id, country: country)
+        case .x(let id): return pop.state.inventory.x.tooltipStockpile(id, country: country)
         case .o: return nil
         }
     }

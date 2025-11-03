@@ -13,18 +13,18 @@ extension ResourceInputs {
     }
 
     var valueAcquired: Int64 {
-        self.tradeable.values.reduce(0) { $0 + $1.valueAcquired } +
-        self.inelastic.values.reduce(0) { $0 + $1.valueAcquired }
+        self.tradeable.values.reduce(0) { $0 + $1.value.total } +
+        self.inelastic.values.reduce(0) { $0 + $1.value.total }
     }
 
     func width(limit: Int64, tier: ResourceTier) -> Int64 {
         let limit: Int64 = zip(self.inelastic.values, tier.inelastic).reduce(limit) {
-            let (resource, (_, amount)): (InelasticInput, (Resource, Int64)) = $1
-            return min($0, resource.unitsAcquired / amount)
+            let (resource, (_, amount)): (ResourceInput<Never>, (Resource, Int64)) = $1
+            return min($0, resource.units.total / amount)
         }
         return zip(self.tradeable.values, tier.tradeable).reduce(limit) {
-            let (resource, (_, amount)): (TradeableInput, (Resource, Int64)) = $1
-            return min($0, resource.unitsAcquired / amount)
+            let (resource, (_, amount)): (ResourceInput<Double>, (Resource, Int64)) = $1
+            return min($0, resource.units.total / amount)
         }
     }
 }
@@ -43,14 +43,17 @@ extension ResourceInputs {
 
         let unitsConsumed: Int64
         let unitsDemanded: Int64
+        let averageCost: Double?
 
-        if  let input: TradeableInput = self.tradeable[id] {
+        if  let input: ResourceInput<Double> = self.tradeable[id] {
             unitsConsumed = input.unitsConsumed
             unitsDemanded = input.unitsDemanded
+            averageCost = input.averageCost
         } else if
-            let input: InelasticInput = self.inelastic[id] {
+            let input: ResourceInput<Never> = self.inelastic[id] {
             unitsConsumed = input.unitsConsumed
             unitsDemanded = input.unitsDemanded
+            averageCost = input.averageCost
         } else {
             return nil
         }
@@ -64,38 +67,49 @@ extension ResourceInputs {
                     $0[productivityLabel, +] = productivity[%2]
                     $0["Efficiency", -] = +?(1 - factor)[%2]
                 }
+                $0["Average cost"] = averageCost?[..2]
             }
         }
     }
 
-    func tooltipStockpile(_ id: Resource) -> Tooltip? {
-        if  let input: TradeableInput = self.tradeable[id] {
-            return .instructions {
-                let change: Int64 = input.unitsPurchased - input.unitsConsumed
+    func tooltipStockpile(_ id: Resource, country: CountryProperties) -> Tooltip? {
+        let currency: String = country.currency.name
 
-                $0["Total stockpile", +] = input.unitsAcquired[/3]
-                    <- input.unitsAcquired - change
-                $0[>] {
-                    $0["Average cost"] = ??input.averageCost[..2]
-                    $0["Supply (days)"] = input.unitsAcquired == 0
-                        ? nil
-                        : (
-                        Double.init(input.unitsAcquired) / Double.init(input.unitsDemanded)
-                    )[..3]
-                }
-                $0["Purchased today", +] = +?input.unitsPurchased[/3]
-                $0["Returned today", +] = +?input.unitsReturned[/3]
-            }
-        } else if let input: InelasticInput = self.inelastic[id] {
-            return .instructions {
-                // We always want this to show, for the indent to make sense
-                $0["Purchased today", +] = +input.unitsPurchased[/3]
-                $0[>] {
-                    $0["Average cost"] = ??input.averageCost[..2]
-                }
-            }
+        let units: Reservoir
+        let value: Reservoir
+        let unitsReturned: Int64
+        let supplyDays: Double?
+
+        if  let input: ResourceInput<Double> = self.tradeable[id] {
+            units = input.units
+            value = input.value
+            unitsReturned = input.unitsReturned
+            supplyDays = input.units.total == 0 ? nil : (
+                Double.init(input.units.total) / Double.init(input.unitsDemanded)
+            )
+        } else if
+            let input: ResourceInput<Never> = self.inelastic[id] {
+            units = input.units
+            value = input.value
+            unitsReturned = input.unitsReturned
+            supplyDays = nil
         } else {
             return nil
+        }
+
+        return .instructions {
+            $0["Total stockpile", +] = units.total[/3] <- units.before
+            $0[>] {
+                $0["Supply (days)"] = supplyDays?[..3]
+            }
+            if  units.added > 0 {
+                $0["Purchased today", +] = units.added[/3]
+                $0[>] {
+                    $0["Cost (\(currency))"] = value.added[/3]
+                }
+            } else if unitsReturned > 0 {
+                $0["Returned today", +] = +?unitsReturned[/3]
+            }
         }
     }
 
@@ -106,20 +120,25 @@ extension ResourceInputs {
             tradeable: Candle<Double>?
         ),
     ) -> Tooltip? {
-        if  let input: TradeableInput = self.tradeable[id],
+        if  let input: ResourceInput<Double> = self.tradeable[id],
             let price: Candle<Double> = market.tradeable {
             return .instructions {
                 $0["Today’s closing price", -] = price.c[..2] <- price.o
-                $0[>] = input.price == price.c ? nil : """
+
+                guard let actual: Double = input.price else {
+                    return
+                }
+
+                $0[>] = actual == price.c ? nil : """
                 Due to their position in line, and the available liquidity on the market, the \
-                average price they actually paid today was \(em: input.price[..2])
+                average price they actually paid today was \(em: actual[..2])
                 """
-                $0[>] = input.price <= price.l ? nil : """
+                $0[>] = actual <= price.l ? nil : """
                 The luckiest buyers paid \(em: price.l[..2]) today
                 """
             }
         } else if
-            let _: InelasticInput = self.inelastic[id],
+            let _: ResourceInput<Never> = self.inelastic[id],
             let market: LocalMarket = market.inelastic {
             let today: LocalMarketState = market.today
             let yesterday: LocalMarketState = market.yesterday
