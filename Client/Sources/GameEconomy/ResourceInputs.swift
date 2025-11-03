@@ -3,12 +3,12 @@ import GameIDs
 import OrderedCollections
 
 @frozen public struct ResourceInputs {
-    public var tradeable: OrderedDictionary<Resource, TradeableInput>
-    public var inelastic: OrderedDictionary<Resource, InelasticInput>
+    public var tradeable: OrderedDictionary<Resource, ResourceInput<Double>>
+    public var inelastic: OrderedDictionary<Resource, ResourceInput<Never>>
 
     @inlinable public init(
-        tradeable: OrderedDictionary<Resource, TradeableInput>,
-        inelastic: OrderedDictionary<Resource, InelasticInput>
+        tradeable: OrderedDictionary<Resource, ResourceInput<Double>>,
+        inelastic: OrderedDictionary<Resource, ResourceInput<Never>>
     ) {
         self.tradeable = tradeable
         self.inelastic = inelastic
@@ -25,20 +25,12 @@ extension ResourceInputs {
     public mutating func sync(
         with resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
-        stockpileDays: Int64,
     ) {
         self.tradeable.sync(with: resourceTier.tradeable) {
-            $0.turn(
-                unitsDemanded: $1 * scalingFactor.x,
-                stockpileDays: stockpileDays,
-                efficiency: scalingFactor.z
-            )
+            $0.turn(unitsDemanded: $1 * scalingFactor.x, efficiency: scalingFactor.z)
         }
         self.inelastic.sync(with: resourceTier.inelastic) {
-            $0.turn(
-                unitsDemanded: $1 * scalingFactor.x,
-                efficiency: scalingFactor.z
-            )
+            $0.turn(unitsDemanded: $1 * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }
     public mutating func consume(
@@ -55,8 +47,8 @@ extension ResourceInputs {
 }
 extension ResourceInputs {
     /// Returns the amount of funds actually spent.
-    @inlinable public mutating func trade(
-        stockpileDays target: TradeableInput.StockpileTarget,
+    public mutating func trade(
+        stockpileDays target: ResourceStockpileTarget,
         spendingLimit budget: Int64,
         in currency: Fiat,
         on exchange: inout Exchange,
@@ -77,7 +69,7 @@ extension ResourceInputs {
     }
 
     /// Loss is negative, Gain is positive.
-    @usableFromInline mutating func trade(
+    private mutating func trade(
         stockpileDays: ClosedRange<Int64>,
         spendingLimit: Int64,
         in currency: Fiat,

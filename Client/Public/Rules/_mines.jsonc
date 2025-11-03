@@ -3,7 +3,7 @@
         "miner": "Politician",
         "decay": false,
         "base": {
-            "Influence": 4
+            "Influence": 8
         }
     }
 }

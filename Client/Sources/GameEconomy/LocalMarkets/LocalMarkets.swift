@@ -39,12 +39,19 @@ extension LocalMarkets {
             (budget: Int64, weights: [InelasticBudgetTier.Weight]),
             (budget: Int64, weights: [InelasticBudgetTier.Weight])
         ),
+        asks: OrderedDictionary<Resource, ResourceOutput<Never>>,
         as lei: LEI,
         in tile: Address,
     ) {
         self.bid(budget: tier.0.budget, as: lei, in: tile, tier: 0, weights: tier.0.weights)
         self.bid(budget: tier.1.budget, as: lei, in: tile, tier: 1, weights: tier.1.weights)
         self.bid(budget: tier.2.budget, as: lei, in: tile, tier: 2, weights: tier.2.weights)
+        for (id, output): (Resource, ResourceOutput<Never>) in asks {
+            let ask: Int64 = output.unitsReleased
+            if  ask > 0 {
+                self[tile, id].ask(amount: ask, by: lei)
+            }
+        }
     }
 
     private mutating func bid(

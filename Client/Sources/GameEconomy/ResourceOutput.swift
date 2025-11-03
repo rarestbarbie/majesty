@@ -1,48 +1,61 @@
 import Fraction
 import GameIDs
 
-@frozen public struct TradeableOutput: Identifiable {
+@frozen public struct ResourceOutput<Price>: Identifiable where Price: Equatable & Hashable {
     public let id: Resource
-    public var unitsProduced: Int64
+    public var units: Reservoir
     public var unitsSold: Int64
     public var valueSold: Int64
-    public var price: Double
+    public var price: Price?
 
     @inlinable public init(
         id: Resource,
-        unitsProduced: Int64,
+        units: Reservoir,
         unitsSold: Int64,
         valueSold: Int64,
-        price: Double
+        price: Price?
     ) {
         self.id = id
-        self.unitsProduced = unitsProduced
+        self.units = units
         self.unitsSold = unitsSold
         self.valueSold = valueSold
         self.price = price
     }
 }
-extension TradeableOutput: ResourceStockpile {
+extension ResourceOutput: ResourceStockpile {
     @inlinable public init(id: Resource) {
-        self.init(
-            id: id,
-            unitsProduced: 0,
-            unitsSold: 0,
-            valueSold: 0,
-            price: 0
-        )
+        self.init(id: id, units: .zero, unitsSold: 0, valueSold: 0, price: nil)
     }
 }
-extension TradeableOutput {
-    mutating func deposit(unitsProduced: Int64, efficiency: Double) {
-        self.unitsProduced = Int64.init((Double.init(unitsProduced) * efficiency))
+extension ResourceOutput {
+    @inlinable public var unitsReleased: Int64 {
+        self.units.removed - self.unitsSold
+    }
+
+    mutating func turn(releasing fraction: Fraction) {
+        self.units.turn()
+        self.units -= self.units.total <> fraction
         self.unitsSold = 0
         self.valueSold = 0
     }
 
+    mutating func deposit(unitsProduced: Int64, efficiency: Double) {
+        self.units += .init(Double.init(unitsProduced) * efficiency)
+    }
+}
+extension ResourceOutput<Never> {
+    @inlinable public mutating func report(
+        unitsSold: Int64,
+        valueSold: Int64,
+    ) {
+        self.unitsSold += unitsSold
+        self.valueSold += valueSold
+    }
+}
+extension ResourceOutput<Double> {
     public mutating func sell(in currency: Fiat, on exchange: inout Exchange) -> Int64 {
         {
-            let units: Int64 = self.unitsProduced - self.unitsSold
+            let units: Int64 = self.units.removed - self.unitsSold
             var unitsRemaining: Int64 = units
             if  unitsRemaining > 0 {
                 let value: Int64 = $0.sell(&unitsRemaining)
@@ -63,5 +76,5 @@ extension TradeableOutput {
 }
 
 #if TESTABLE
-extension TradeableOutput: Equatable, Hashable {}
+extension ResourceOutput: Equatable, Hashable {}
 #endif

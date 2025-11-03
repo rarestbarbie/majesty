@@ -70,26 +70,26 @@ export class ResourceNeedRow implements DiffableListElement<string> {
     }
 
     public update(need: ResourceNeed): void {
-        UpdateBigInt(this.demand.summary, need.unitsDemanded);
+        UpdateBigInt(this.demand.summary, need.demand);
 
         let fraction: number;
-        if (need.unitsDemanded === 0n) {
+        if (need.demand === 0n) {
             fraction = 0; // Avoid division by zero
-        } else if (need.unitsConsumed > need.unitsDemanded) {
+        } else if (need.filled > need.demand) {
             fraction = 1;
         } else {
-            fraction = Number(need.unitsConsumed) / Number(need.unitsDemanded);
+            fraction = Number(need.filled) / Number(need.demand);
         }
 
         this.demand.set(fraction * 100);
 
-        if (need.unitsAcquired !== undefined) {
-            UpdateBigInt(this.stockpile, need.unitsAcquired);
+        if (need.stockpile !== undefined) {
+            UpdateBigInt(this.stockpile, need.stockpile);
         } else {
             UpdateText(this.stockpile, '');
         }
 
-        if (need.unitsConsumed < need.unitsDemanded) {
+        if (need.filled < need.demand) {
             this.stockpile.classList.add(CellStyle.Bloody);
         } else {
             this.stockpile.classList.remove(CellStyle.Bloody);

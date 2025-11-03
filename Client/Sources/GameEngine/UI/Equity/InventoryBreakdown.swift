@@ -136,29 +136,29 @@ extension InventoryBreakdown {
         location: Address,
         snapshot: borrowing GameSnapshot,
     ) {
-        for (id, input): (Resource, TradeableInput) in inputs.tradeable {
+        for (id, input): (Resource, ResourceInput<Double>) in inputs.tradeable {
             let market: Market? = snapshot.markets.tradeable[id / currency]
             self.needs.append(
                 ResourceNeed.init(
                     label: snapshot.rules[id],
                     tier: tier,
-                    unitsAcquired: input.unitsAcquired,
-                    unitsConsumed: input.unitsConsumed,
-                    unitsDemanded: input.unitsDemanded,
+                    stockpile: input.units.total,
+                    filled: input.unitsConsumed,
+                    demand: input.unitsDemanded,
                     priceAtMarket: market?.history.last?.prices,
                     price: nil
                 )
             )
         }
-        for (id, input): (Resource, InelasticInput) in inputs.inelastic {
+        for (id, input): (Resource, ResourceInput<Never>) in inputs.inelastic {
             let market: LocalMarket? = snapshot.markets.inelastic[location, id]
             self.needs.append(
                 ResourceNeed.init(
                     label: snapshot.rules[id],
                     tier: tier,
-                    unitsAcquired: input.unitsAcquired,
-                    unitsConsumed: input.unitsPurchased,
-                    unitsDemanded: input.unitsDemanded,
+                    stockpile: input.units.total,
+                    filled: input.units.added,
+                    demand: input.unitsDemanded,
                     priceAtMarket: nil,
                     price: market?.price,
                 )
@@ -172,12 +172,12 @@ extension InventoryBreakdown {
         location: Address,
         snapshot: borrowing GameSnapshot,
     ) {
-        for (id, output): (Resource, TradeableOutput) in outputs.tradeable {
+        for (id, output): (Resource, ResourceOutput<Double>) in outputs.tradeable {
             let market: Market? = snapshot.markets.tradeable[id / currency]
             self.sales.append(
                 ResourceSale.init(
                     label: snapshot.rules[output.id],
-                    unitsProduced: output.unitsProduced,
+                    unitsProduced: output.units.added,
                     unitsSold: output.unitsSold,
                     valueSold: output.valueSold,
                     priceAtMarket: market?.history.last?.prices,
@@ -185,12 +185,12 @@ extension InventoryBreakdown {
                 )
             )
         }
-        for (id, output): (Resource, InelasticOutput) in outputs.inelastic {
+        for (id, output): (Resource, ResourceOutput<Never>) in outputs.inelastic {
             let market: LocalMarket? = snapshot.markets.inelastic[location, id]
             self.sales.append(
                 ResourceSale.init(
                     label: snapshot.rules[output.id],
-                    unitsProduced: output.unitsProduced,
+                    unitsProduced: output.units.added,
                     unitsSold: output.unitsSold,
                     valueSold: output.valueSold,
                     priceAtMarket: nil,

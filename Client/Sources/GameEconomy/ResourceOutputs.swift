@@ -1,14 +1,15 @@
 import Assert
+import Fraction
 import GameIDs
 import OrderedCollections
 
 @frozen public struct ResourceOutputs {
-    public var tradeable: OrderedDictionary<Resource, TradeableOutput>
-    public var inelastic: OrderedDictionary<Resource, InelasticOutput>
+    public var tradeable: OrderedDictionary<Resource, ResourceOutput<Double>>
+    public var inelastic: OrderedDictionary<Resource, ResourceOutput<Never>>
 
     @inlinable public init(
-        tradeable: OrderedDictionary<Resource, TradeableOutput>,
-        inelastic: OrderedDictionary<Resource, InelasticOutput>
+        tradeable: OrderedDictionary<Resource, ResourceOutput<Double>>,
+        inelastic: OrderedDictionary<Resource, ResourceOutput<Never>>
     ) {
         self.tradeable = tradeable
         self.inelastic = inelastic
@@ -24,24 +25,24 @@ extension ResourceOutputs {
 extension ResourceOutputs {
     public mutating func sync(
         with resourceTier: ResourceTier,
-        scalingFactor: (x: Int64, z: Double),
+        releasing fraction: Fraction
     ) {
         self.inelastic.sync(with: resourceTier.inelastic) {
-            $0.turn(
-                unitsProduced: $1 * scalingFactor.x,
-                efficiency: scalingFactor.z
-            )
+            $0.turn(releasing: fraction) ; _ = $1
+        }
+        self.tradeable.sync(with: resourceTier.tradeable) {
+            $0.turn(releasing: fraction) ; _ = $1
         }
     }
     public mutating func deposit(
         from resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
+        self.inelastic.sync(with: resourceTier.inelastic) {
+            $0.deposit(unitsProduced: $1 * scalingFactor.x, efficiency: scalingFactor.z)
+        }
         self.tradeable.sync(with: resourceTier.tradeable) {
-            $0.deposit(
-                unitsProduced: $1 * scalingFactor.x,
-                efficiency: scalingFactor.z
-            )
+            $0.deposit(unitsProduced: $1 * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }
 }
