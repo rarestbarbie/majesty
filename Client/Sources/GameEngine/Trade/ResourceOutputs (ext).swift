@@ -11,6 +11,7 @@ extension ResourceOutputs {
         tier: ResourceTier,
         unit: String,
         factor: Double,
+        factorLabel: String? = nil,
         productivity: Int64
     ) -> Tooltip? {
         guard let amount: Int64 = tier.tradeable[id] ?? tier.inelastic[id] else {
@@ -49,7 +50,7 @@ extension ResourceOutputs {
             $0[>] {
                 $0["Base"] = amount[/3]
                 $0["Productivity", +] = productivity[%2]
-                $0["Efficiency", +] = +?(factor - 1)[%2]
+                $0[factorLabel ?? "Efficiency", +] = +?(factor - 1)[%2]
             }
             if unitsSold < units.removed {
                 $0[>] = """

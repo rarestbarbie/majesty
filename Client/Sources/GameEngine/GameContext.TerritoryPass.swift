@@ -9,6 +9,7 @@ extension GameContext {
         let cultures: RuntimeStateTable<CultureContext>
         let countries: RuntimeStateTable<CountryContext>
         let factories: RuntimeStateTable<FactoryContext>
+        let mines: RuntimeStateTable<MineContext>
         let pops: RuntimeStateTable<PopContext>
         let rules: GameRules
     }

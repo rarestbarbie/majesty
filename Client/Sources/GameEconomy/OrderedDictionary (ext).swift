@@ -2,9 +2,14 @@ import GameIDs
 import OrderedCollections
 
 extension OrderedDictionary where Key == Resource, Value: ResourceStockpile {
+    @inlinable subscript(resource: Resource) -> Value {
+        _read   { yield  self[resource, default: .init(id: resource)] }
+        _modify { yield &self[resource, default: .init(id: resource)] }
+    }
+
     @inlinable public mutating func sync(
         with coefficients: OrderedDictionary<Resource, Int64>,
-        sync: (inout Value, Int64) -> Void
+        sync: (Int64, inout Value) -> Void
     ) {
         // Fast path: in-place update
         inplace: do {
@@ -20,7 +25,7 @@ extension OrderedDictionary where Key == Resource, Value: ResourceStockpile {
                     self.values.indices,
                     coefficients
                 ) {
-                sync(&self.values[i], amount)
+                sync(amount, &self.values[i])
             }
 
             return
@@ -31,7 +36,7 @@ extension OrderedDictionary where Key == Resource, Value: ResourceStockpile {
 
         for (id, amount): (Resource, Int64) in coefficients {
             var value: Value = self[id] ?? .init(id: id)
-            sync(&value, amount)
+            sync(amount, &value)
             reallocated[id] = value
         }
 

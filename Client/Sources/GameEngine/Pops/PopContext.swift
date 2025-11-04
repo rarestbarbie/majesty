@@ -14,8 +14,7 @@ struct PopContext: RuntimeContext, LegalEntityContext {
     let type: PopMetadata
     var state: Pop
 
-    private(set) var governedBy: CountryProperties?
-    private(set) var occupiedBy: CountryProperties?
+    private(set) var region: RegionalProperties?
 
     private(set) var unemployment: Double
     private(set) var income: [FactoryID: Int64]
@@ -25,12 +24,12 @@ struct PopContext: RuntimeContext, LegalEntityContext {
 
     private(set) var budget: PopBudget?
 
+    private(set) var mines: [MineID: (output: ResourceTier, factor: Double)]
+
     public init(type: PopMetadata, state: Pop) {
         self.type = type
         self.state = state
-
-        self.governedBy = nil
-        self.occupiedBy = nil
+        self.region = nil
 
         self.unemployment = 0
         self.income = [:]
@@ -38,6 +37,7 @@ struct PopContext: RuntimeContext, LegalEntityContext {
         self.cashFlow = .init()
 
         self.budget = nil
+        self.mines = [:]
     }
 }
 extension PopContext: Identifiable {
@@ -63,9 +63,7 @@ extension PopContext {
         context: GameContext.ResidentPass
     ) throws {
         guard
-        let tile: PlanetGrid.Tile = context.planets[self.state.tile],
-        let governedBy: CountryProperties = tile.governedBy,
-        let occupiedBy: CountryProperties = tile.occupiedBy else {
+        let tile: PlanetGrid.Tile = context.planets[self.state.tile] else {
             return
         }
 
@@ -85,6 +83,12 @@ extension PopContext {
             }
         }
 
+        self.mines.removeAll(keepingCapacity: true)
+        for job: MiningJob in self.state.mines.values {
+            let (state, type): (Mine, MineMetadata) = try context.mines[job.id]
+            self.mines[job.id] = (type.base, state.efficiency)
+        }
+
         self.income.removeAll(keepingCapacity: true)
         for id: FactoryID in self.state.factories.keys {
             self.income[id] = context.factories[id]?.today.wn
@@ -95,8 +99,7 @@ extension PopContext {
         self.cashFlow.update(with: self.state.inventory.e)
         self.cashFlow.update(with: self.state.inventory.x)
 
-        self.governedBy = governedBy
-        self.occupiedBy = occupiedBy
+        self.region = tile.properties
 
         self.equity = .compute(
             equity: self.state.equity,
@@ -121,13 +124,23 @@ extension PopContext: TransactingContext {
             }
         }
 
-        let currency: Fiat = self.occupiedBy!.currency.id
+        let currency: Fiat = self.region!.occupiedBy!.currency.id
         let balance: Int64 = self.state.inventory.account.balance
+
+        self.state.inventory.out.sync(with: self.type.output, releasing: 1)
+        for j: Int in self.state.mines.values.indices {
+            {
+                guard
+                let (output, _): (ResourceTier, Double) = self.mines[$0.id] else {
+                    fatalError("missing stored info for mine '\($0.id)'!!!")
+                }
+
+                $0.out.sync(with: output, releasing: 1 %/ 4)
+            } (&self.state.mines.values[j])
+        }
 
         /// Compute vertical weights.
         let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
-
-        self.state.inventory.out.sync(with: self.type.output, releasing: 1 %/ 4)
         self.state.inventory.l.sync(
             with: self.type.l,
             scalingFactor: (self.state.today.size, z.l),
@@ -194,13 +207,21 @@ extension PopContext: TransactingContext {
             as: self.lei,
             in: self.state.tile,
         )
+        for job: MiningJob in self.state.mines.values {
+            map.localMarkets.ask(
+                asks: job.out.inelastic,
+                memo: job.id,
+                as: self.lei,
+                in: self.state.tile,
+            )
+        }
 
         self.budget = budget
     }
 
     mutating func transact(map: inout GameMap) {
         guard
-        let country: CountryProperties = self.occupiedBy,
+        let country: CountryProperties = self.region?.occupiedBy,
         let budget: PopBudget = self.budget else {
             return
         }
@@ -213,6 +234,18 @@ extension PopContext: TransactingContext {
             from: self.type.output,
             scalingFactor: (self.state.today.size, 1)
         )
+
+        for j: Int in self.state.mines.values.indices {
+            self.state.inventory.account.r += {
+                guard
+                let (output, factor): (ResourceTier, Double) = self.mines[$0.id] else {
+                    fatalError("missing stored info for mine '\($0.id)'!!!")
+                }
+
+                $0.out.deposit(from: output, scalingFactor: ($0.count, factor))
+                return $0.out.sell(in: country.currency.id, on: &map.exchange)
+            } (&self.state.mines.values[j])
+        }
 
         let target: ResourceStockpileTarget = .random(
             in: Self.stockpileDays,
@@ -300,7 +333,7 @@ extension PopContext: TransactingContext {
 extension PopContext {
     mutating func advance(map: inout GameMap) {
         guard
-        let country: CountryProperties = self.occupiedBy else {
+        let country: CountryProperties = self.region?.occupiedBy else {
             return
         }
 
@@ -330,7 +363,7 @@ extension PopContext {
         let factoryJobs: Range<Int> = self.state.factories.values.indices
         let miningJobs: Range<Int> = self.state.mines.values.indices
 
-        let w0: Double = self.occupiedBy.map { Double.init($0.minwage) } ?? 1
+        let w0: Double = .init(country.minwage)
         for i: Int in factoryJobs {
             {
                 /// At this rate, if the factory pays minimum wage or less, about half of

@@ -99,27 +99,29 @@ extension DynamicContextTable {
     @inlinable public subscript<T>(
         section: ElementContext.State.Section,
         create create: (ElementContext.State) -> ElementContext.Metadata?,
-        update update: (inout ElementContext.State) throws -> T,
+        update update: (ElementContext.Metadata, inout ElementContext.State) throws -> T,
     ) -> T {
         mutating get throws {
+            let result: T
             var new: ElementContext
 
             if let index: Int = self.indices[section] {
-                return try update(&self.contexts[index].state)
+                let type: ElementContext.Metadata = self.contexts[index].type
+                return try update(type, &self.contexts[index].state)
             } else {
                 /// Important: `incremented`, not `increment`
                 let state: ElementContext.State = .init(
                     id: self.highest.incremented(),
                     section: section
                 )
-                if let type: ElementContext.Metadata = create(state) {
-                    new = .init(type: type, state: state)
-                } else {
+                guard
+                let type: ElementContext.Metadata = create(state) else {
                     throw RuntimeMetadataError<ElementContext.State.ID>.missing(state.id)
                 }
+                new = .init(type: type, state: state)
+                result = try update(type, &new.state)
             }
 
-            let result: T = try update(&new.state)
             let index: Int = self.contexts.append(new)
 
             self.highest = new.state.id

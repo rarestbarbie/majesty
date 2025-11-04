@@ -87,9 +87,6 @@
             "Influence": 1,
             "Services": 12,
             "Advertising": 256
-        },
-        "output": {
-            "Influence": 8
         }
     }
 }

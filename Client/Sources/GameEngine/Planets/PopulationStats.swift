@@ -1,3 +1,4 @@
+import D
 import GameIDs
 
 struct PopulationStats {
@@ -27,6 +28,34 @@ extension PopulationStats {
             self.enslaved.addResidentCount(pop)
         } else {
             self.free.addResidentCount(pop)
+        }
+    }
+}
+extension PopulationStats {
+    func tooltip(culture: String) -> Tooltip? {
+        let share: Int64 = self.free.cultures[culture]
+            ?? self.enslaved.cultures[culture]
+            ?? 0
+        let total: Int64 = self.total
+
+        if  total == 0 {
+            return nil
+        }
+
+        return .instructions(style: .borderless) {
+            $0[culture] = (Double.init(share) / Double.init(total))[%3]
+        }
+    }
+    func tooltip(popType: PopType) -> Tooltip? {
+        let share: Int64 = self.type[popType] ?? 0
+        let total: Int64 = self.free.total
+
+        if  total == 0 {
+            return nil
+        }
+
+        return .instructions(style: .borderless) {
+            $0[popType.plural] = (Double.init(share) / Double.init(total))[%3]
         }
     }
 }

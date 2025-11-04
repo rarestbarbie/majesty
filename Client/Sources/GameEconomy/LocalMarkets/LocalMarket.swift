@@ -48,8 +48,8 @@ extension LocalMarket {
     }
 }
 extension LocalMarket {
-    public mutating func ask(amount: Int64, by entity: LEI) {
-        self.asks.append(.init(by: entity, tier: nil, amount: amount))
+    public mutating func ask(amount: Int64, by entity: LEI, memo: MineID?) {
+        self.asks.append(.init(by: entity, tier: nil, memo: memo, amount: amount))
         self.today.supply += amount
     }
 
@@ -69,7 +69,7 @@ extension LocalMarket {
         }
 
         let amount: Int64 = min(quotient, limit)
-        self.bids.append(.init(by: entity, tier: tier, amount: amount))
+        self.bids.append(.init(by: entity, tier: tier, memo: nil, amount: amount))
         self.today.demand += amount
     }
 }

@@ -8,7 +8,7 @@ import OrderedCollections
 }
 extension TradeableBudgetTier {
     public static func compute(
-        demands: OrderedDictionary<Resource, TradeableInput>,
+        demands: OrderedDictionary<Resource, ResourceInput<Double>>,
         markets: borrowing Exchange,
         currency: Fiat
     ) -> Self {

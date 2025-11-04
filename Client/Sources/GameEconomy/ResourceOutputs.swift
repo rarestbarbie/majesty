@@ -28,21 +28,21 @@ extension ResourceOutputs {
         releasing fraction: Fraction
     ) {
         self.inelastic.sync(with: resourceTier.inelastic) {
-            $0.turn(releasing: fraction) ; _ = $1
+            $1.turn(releasing: fraction)
         }
         self.tradeable.sync(with: resourceTier.tradeable) {
-            $0.turn(releasing: fraction) ; _ = $1
+            $1.turn(releasing: fraction)
         }
     }
     public mutating func deposit(
         from resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
-        self.inelastic.sync(with: resourceTier.inelastic) {
-            $0.deposit(unitsProduced: $1 * scalingFactor.x, efficiency: scalingFactor.z)
+        for (id, amount): (Resource, Int64) in resourceTier.inelastic {
+            self.inelastic[id].deposit(amount * scalingFactor.x, efficiency: scalingFactor.z)
         }
-        self.tradeable.sync(with: resourceTier.tradeable) {
-            $0.deposit(unitsProduced: $1 * scalingFactor.x, efficiency: scalingFactor.z)
+        for (id, amount): (Resource, Int64) in resourceTier.tradeable {
+            self.tradeable[id].deposit(amount * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }
 }

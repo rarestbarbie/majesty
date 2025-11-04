@@ -7,6 +7,7 @@ import JavaScriptInterop
     @tag("e") case e(Resource)
     @tag("x") case x(Resource)
     @tag("o") case o(Resource)
+    @tag("m") case m(MineVein)
 }
 extension InventoryLine {
     var resource: Resource {
@@ -15,6 +16,7 @@ extension InventoryLine {
         case .e(let resource): resource
         case .x(let resource): resource
         case .o(let resource): resource
+        case .m(let vein): vein.resource
         }
     }
 }

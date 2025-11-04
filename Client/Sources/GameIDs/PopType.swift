@@ -64,6 +64,14 @@ extension PopType: LosslessStringConvertible {
     }
 }
 extension PopType {
+    @inlinable public var miner: Bool {
+        switch self {
+        case .Politician: true
+        case .Miner: true
+        default: false
+        }
+    }
+
     @inlinable public var stratum: PopStratum {
         switch self {
         case .Livestock:    .Ward

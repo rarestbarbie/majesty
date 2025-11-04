@@ -5,5 +5,16 @@
         "base": {
             "Influence": 8
         }
+    },
+
+    "Alumina Mine": {
+        "miner": "Miner",
+        "decay": true,
+        "base": {
+            "Alumina": 800
+        },
+        "geology": {
+            "Earth_Continental_Crust": 5
+        }
     }
 }

@@ -22,14 +22,12 @@ struct GameContext {
 
     /// Initialize a fresh game context from the given game state.
     init(save: borrowing GameSave, rules: GameRules) throws {
-        /// We do not use metadata for these types of objects:
-        let country: CountryContext.Metadata = .init()
-        let culture: CultureContext.Metadata = .init()
+        let _none: _NoMetadata = .init()
 
         self.player = save.player
         self.planets = [:]
-        self.cultures = try .init(states: save.cultures) { _ in culture }
-        self.countries = try .init(states: save.countries) { _ in country }
+        self.cultures = try .init(states: save.cultures) { _ in _none }
+        self.countries = try .init(states: save.countries) { _ in _none }
         self.factories = try .init(states: save.factories) { rules.factories[$0.type] }
         self.mines = try .init(states: save.mines) { rules.mines[$0.type] }
         self.pops = try .init(states: save.pops) { rules.pops[$0.type] }
@@ -120,6 +118,7 @@ extension GameContext {
             cultures: self.cultures.state,
             countries: self.countries.state,
             factories: self.factories.state,
+            mines: self.mines.state,
             pops: self.pops.state,
             rules: self.rules
         )
@@ -132,6 +131,7 @@ extension GameContext {
             cultures: self.cultures,
             countries: self.countries,
             factories: self.factories.state,
+            mines: self.mines.state,
             pops: self.pops.state,
             rules: self.rules
         )
@@ -154,13 +154,13 @@ extension GameContext {
         map.localMarkets.turn {
             /// Apply local minimum wages
             guard
-            let country: CountryProperties = self.planets[$0.location]?.governedBy,
+            let region: RegionalProperties = self.planets[$0.location]?.properties,
             let resource: ResourceMetadata = self.rules.resources[$0.resource] else {
                 return
             }
 
             if let hours: Int64 = resource.hours {
-                let priceFloor: LocalPrice = .init(country.minwage %/ hours)
+                let priceFloor: LocalPrice = .init(region.minwage %/ hours)
                 $1.turn(priceFloor: priceFloor, type: .minimumWage)
             } else {
                 $1.turn()
@@ -182,18 +182,29 @@ extension GameContext {
             for order: LocalMarket.Order in asks {
                 switch order.by {
                 case .factory(let id):
-                    spread -= self.factories[modifying: id].state.inventory.credit(
+                    let (credited, reported): (Int64, Bool) = self.factories[modifying: id].state.inventory.credit(
+                        inelastic: $0.resource,
+                        units: order.filled,
+                        price: price
+                    )
+                    spread -= credited
+
+                case .pop(let id):
+                    let (credited, reported): (Int64, Bool) = self.pops[modifying: id].state.inventory.credit(
                         inelastic: $0.resource,
                         units: order.filled,
                         price: price
                     )
 
-                case .pop(let id):
-                    spread -= self.pops[modifying: id].state.inventory.credit(
-                        inelastic: $0.resource,
-                        units: order.filled,
-                        price: price
-                    )
+                    spread -= credited
+
+                    if let memo: MineID = order.memo {
+                        // Log unreported mining output
+                        self.pops[modifying: id].state.mines[memo]?.out.inelastic[$0.resource]?.report(
+                            unitsSold: order.filled,
+                            valueSold: credited,
+                        )
+                    }
                 }
             }
             for order: LocalMarket.Order in bids {
@@ -305,10 +316,9 @@ extension GameContext {
                 )
             }
             for address: Address in country.state.controlledTiles {
-                self.planets[address.planet]?.grid.assign(
+                self.planets[address]?.properties.assign(
                     governedBy: country.properties,
                     occupiedBy: country.properties,
-                    to: address.tile
                 )
             }
         }
@@ -596,13 +606,13 @@ extension GameContext {
                 self.rules.pops[$0.type]
             } update: {
                 let weight: Fraction.Interpolator<Double> = .init(
-                    conversion.size %/ (conversion.size + $0.today.size)
+                    conversion.size %/ (conversion.size + $1.today.size)
                 )
 
-                $0.today.size += conversion.size
-                $0.inventory.account.d += inherited.cash
-                $0.today.mil = weight.mix(inherited.mil, $0.today.mil)
-                $0.today.con = weight.mix(inherited.con, $0.today.con)
+                $1.today.size += conversion.size
+                $1.inventory.account.d += inherited.cash
+                $1.today.mil = weight.mix(inherited.mil, $1.today.mil)
+                $1.today.con = weight.mix(inherited.con, $1.today.con)
             }
         }
     }
@@ -632,7 +642,7 @@ extension GameContext {
                     try self.factories[factory] {
                         self.rules.factories[$0.type]
                     } update: {
-                        $0.size = .init(level: 0)
+                        $1.size = .init(level: 0)
                     }
                 }
 
@@ -640,7 +650,12 @@ extension GameContext {
                     try self.mines[mine] {
                         self.rules.mines[$0.type]
                     } update: {
-                        $0.size = 400
+                        switch $0.miner {
+                        case .Politician:
+                            $1.size = 400
+                        default:
+                            $1.size = 100_000_000
+                        }
                     }
                 }
             }

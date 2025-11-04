@@ -34,7 +34,7 @@ extension InventoryBreakdown {
 
     mutating func update(from pop: PopContext, in snapshot: borrowing GameSnapshot) {
         guard
-        let currency: Fiat = pop.governedBy?.currency.id else {
+        let currency: Fiat = pop.region?.governedBy?.currency.id else {
             return
         }
 
@@ -69,6 +69,17 @@ extension InventoryBreakdown {
             snapshot: snapshot
         )
 
+        for mine: MiningJob in pop.state.mines.values {
+            self.update(
+                from: mine.out,
+                mine: mine.id,
+                name: snapshot.mines[mine.id]?.type.name,
+                currency: currency,
+                location: pop.state.tile,
+                snapshot: snapshot
+            )
+        }
+
         self.costs = pop.cashFlow.chart(rules: snapshot.rules)
         if  let budget: PopBudget = pop.budget {
             let statement: CashAllocationStatement = .init(from: budget)
@@ -80,7 +91,7 @@ extension InventoryBreakdown {
 
     mutating func update(from factory: FactoryContext, in snapshot: borrowing GameSnapshot) {
         guard
-        let currency: Fiat = factory.occupiedBy?.currency.id else {
+        let currency: Fiat = factory.region?.occupiedBy?.currency.id else {
             return
         }
 
@@ -168,6 +179,8 @@ extension InventoryBreakdown {
 
     private mutating func update(
         from outputs: ResourceOutputs,
+        mine: MineID? = nil,
+        name: String? = nil,
         currency: Fiat,
         location: Address,
         snapshot: borrowing GameSnapshot,
@@ -177,6 +190,8 @@ extension InventoryBreakdown {
             self.sales.append(
                 ResourceSale.init(
                     label: snapshot.rules[output.id],
+                    mine: mine,
+                    name: name,
                     unitsProduced: output.units.added,
                     unitsSold: output.unitsSold,
                     valueSold: output.valueSold,
@@ -190,6 +205,8 @@ extension InventoryBreakdown {
             self.sales.append(
                 ResourceSale.init(
                     label: snapshot.rules[output.id],
+                    mine: mine,
+                    name: name,
                     unitsProduced: output.units.added,
                     unitsSold: output.unitsSold,
                     valueSold: output.valueSold,
