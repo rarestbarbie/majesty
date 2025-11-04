@@ -202,8 +202,7 @@ export class ProductionOverview extends ScreenContent {
                 (sale: ResourceSale) => new ResourceSaleBox(
                     sale,
                     id,
-                    ProductionOverview.tooltipResourceIO,
-                    ProductionOverview.tooltipExplainPrice,
+                    ProductionOverview,
                 ),
                 (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
             );

@@ -6,6 +6,7 @@ protocol TransactingContext: RuntimeContext where State: Turnable {
 }
 extension TransactingContext where State: Turnable {
     mutating func turn(on map: inout GameMap) {
-        { $0.yesterday = $0.today ; $0.turn() } (&self.state) ; self.allocate(map: &map)
+        self.state.turnToNextDay()
+        self.allocate(map: &map)
     }
 }

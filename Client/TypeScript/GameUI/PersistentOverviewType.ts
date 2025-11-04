@@ -5,6 +5,7 @@ export interface PersistentOverviewType {
     readonly tooltipCashFlowItem: TooltipType;
     readonly tooltipBudgetItem: TooltipType;
     readonly tooltipExplainPrice: TooltipType;
+    readonly tooltipResourceOrigin?: TooltipType;
     readonly tooltipResourceIO: TooltipType;
     readonly tooltipStockpile: TooltipType;
 }

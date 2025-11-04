@@ -1,5 +1,3 @@
-import GameEconomy
-
 extension Pop {
     struct Dimensions: LegalEntityMetrics {
         var size: Int64

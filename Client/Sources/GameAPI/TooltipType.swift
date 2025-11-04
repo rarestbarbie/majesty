@@ -18,6 +18,7 @@ enum TooltipType: String, LoadableFromJSValue {
     case PopAccount
     case PopJobs
     case PopResourceIO
+    case PopResourceOrigin
     case PopStockpile
     case PopExplainPrice
     case PopNeeds
