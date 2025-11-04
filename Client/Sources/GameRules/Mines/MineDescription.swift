@@ -7,6 +7,7 @@ struct MineDescription {
     let decay: Bool
     let base: SymbolTable<Int64>
     let geology: SymbolTable<Int64>
+    let initialSize: Int64
 }
 extension MineDescription: JavaScriptDecodable {
     enum ObjectKey: JSString {
@@ -14,6 +15,7 @@ extension MineDescription: JavaScriptDecodable {
         case decay
         case base
         case geology
+        case initial_size
     }
 
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
@@ -21,7 +23,8 @@ extension MineDescription: JavaScriptDecodable {
             miner: try js[.miner].decode(),
             decay: try js[.decay]?.decode() ?? true,
             base: try js[.base].decode(),
-            geology: try js[.geology]?.decode() ?? [:]
+            geology: try js[.geology]?.decode() ?? [:],
+            initialSize: try js[.initial_size].decode()
         )
     }
 }

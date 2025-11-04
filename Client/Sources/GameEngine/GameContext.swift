@@ -652,9 +652,9 @@ extension GameContext {
                     } update: {
                         switch $0.miner {
                         case .Politician:
-                            $1.size = 400
+                            $1.size = $0.initialSize
                         default:
-                            $1.size = 100_000_000
+                            $1.size = $0.initialSize
                         }
                     }
                 }
