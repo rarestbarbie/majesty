@@ -747,7 +747,6 @@ extension GameSession {
                 return nil
             }
             return .instructions {
-                $0["Estimated deposits"] = mine.state.today.size[/3] <- mine.state.yesterday.size
                 $0[mine.type.miner.plural, +] = mine.miners.count[/3] / mine.miners.limit
                 $0["Today’s change", +] = mine.miners.count[/3] <- mine.miners.before
                 $0[>] {
@@ -755,6 +754,10 @@ extension GameSession {
                     $0["Fired", -] = +?mine.miners.fired[/3]
                     $0["Quit", -] = +?mine.miners.quit[/3]
                 }
+                if mine.type.decay {
+                    $0["Estimated deposits"] = mine.state.today.size[/3] <- mine.state.yesterday.size
+                }
+
                 $0[>] = "\(mine.type.name)"
             }
         }
