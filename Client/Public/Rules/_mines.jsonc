@@ -8,6 +8,18 @@
         "initial_size": 400
     },
 
+    "Ice Mine": {
+        "miner": "Miner",
+        "decay": true,
+        "base": {
+            "Water Ice": 800
+        },
+        "geology": {
+            "Earth_Polar": 5
+        },
+        "initial_size": 1000000000
+    },
+
     "Alumina Mine": {
         "miner": "Miner",
         "decay": true,
@@ -16,6 +28,18 @@
         },
         "geology": {
             "Earth_Continental_Crust": 5
+        },
+        "initial_size": 1000000000
+    },
+
+    "Natural Gas Field": {
+        "miner": "Miner",
+        "decay": true,
+        "base": {
+            "Hydrocarbons": 800
+        },
+        "geology": {
+            "Earth_Sedimentary_Basin": 5
         },
         "initial_size": 1000000000
     }
