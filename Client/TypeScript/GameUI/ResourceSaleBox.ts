@@ -5,7 +5,7 @@ import {
     UpdateBigInt,
 } from '../DOM/exports.js';
 import { GameID } from '../GameEngine/exports.js';
-import { ResourceSale, TooltipType } from './exports.js';
+import { PersistentOverviewType, ResourceSale, TooltipType } from './exports.js';
 
 export class ResourceSaleBox implements DiffableListElement<string> {
     public readonly id: string;
@@ -18,8 +18,7 @@ export class ResourceSaleBox implements DiffableListElement<string> {
     constructor(
         sale: ResourceSale,
         owner: GameID,
-        supply: TooltipType,
-        explainPrice: TooltipType,
+        type: PersistentOverviewType,
     ) {
         this.id = sale.id;
         this.node = document.createElement('a');
@@ -31,7 +30,7 @@ export class ResourceSaleBox implements DiffableListElement<string> {
         resource.textContent = sale.name;
 
         this.units = document.createElement('div');
-        this.units.setAttribute('data-tooltip-type', supply);
+        this.units.setAttribute('data-tooltip-type', type.tooltipResourceIO);
         this.units.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([owner, sale.id]),
@@ -45,7 +44,7 @@ export class ResourceSaleBox implements DiffableListElement<string> {
         proceeds.appendChild(this.value);
         proceeds.appendChild(this.price.outer);
         proceeds.classList.add('proceeds');
-        proceeds.setAttribute('data-tooltip-type', explainPrice);
+        proceeds.setAttribute('data-tooltip-type', type.tooltipExplainPrice);
         proceeds.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([owner, sale.id]),
@@ -60,6 +59,15 @@ export class ResourceSaleBox implements DiffableListElement<string> {
             const subtitle: HTMLDivElement = document.createElement('div');
             subtitle.classList.add('subtitle');
             subtitle.textContent = sale.source;
+
+            if (type.tooltipResourceOrigin !== undefined) {
+                subtitle.setAttribute('data-tooltip-type', type.tooltipResourceOrigin);
+                subtitle.setAttribute(
+                    'data-tooltip-arguments',
+                    JSON.stringify([owner, sale.id]),
+                );
+            }
+
             this.node.appendChild(subtitle);
         }
     }

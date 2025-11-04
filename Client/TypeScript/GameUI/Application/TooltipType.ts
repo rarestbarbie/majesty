@@ -5,6 +5,7 @@ export enum TooltipType {
     PopAccount = 'PopAccount',
     PopJobs = 'PopJobs',
     PopResourceIO = 'PopResourceIO',
+    PopResourceOrigin = 'PopResourceOrigin',
     PopStockpile = 'PopStockpile',
     PopExplainPrice = 'PopExplainPrice',
     PopNeeds = 'PopNeeds',

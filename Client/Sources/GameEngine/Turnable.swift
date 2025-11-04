@@ -11,3 +11,9 @@ extension Turnable {
         .init(yesterday: self.yesterday, today: self.today)
     }
 }
+extension Turnable {
+    mutating func turnToNextDay() {
+        self.yesterday = self.today
+        self.turn()
+    }
+}

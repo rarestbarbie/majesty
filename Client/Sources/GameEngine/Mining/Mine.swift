@@ -8,8 +8,10 @@ struct Mine {
     let id: MineID
     let type: MineType
     let tile: Address
-    var size: Int64
     var efficiency: Double
+
+    var yesterday: Dimensions
+    var today: Dimensions
 }
 extension Mine: Sectionable {
     init(id: MineID, section: Section) {
@@ -17,8 +19,9 @@ extension Mine: Sectionable {
             id: id,
             type: section.type,
             tile: section.tile,
-            size: 0,
-            efficiency: 1
+            efficiency: 1,
+            yesterday: .init(),
+            today: .init()
         )
     }
 
@@ -26,16 +29,23 @@ extension Mine: Sectionable {
         .init(type: self.type, tile: self.tile)
     }
 }
+extension Mine: Turnable {
+    mutating func turn() {
+    }
+}
 extension Mine: Deletable {
-    var dead: Bool { self.size <= 0 }
+    var dead: Bool { self.today.size <= 0 }
 }
 extension Mine {
     enum ObjectKey: JSString, Sendable {
         case id
         case type
         case tile
-        case size
         case efficiency
+
+        case y_size
+
+        case t_size
     }
 }
 extension Mine: JavaScriptEncodable {
@@ -43,18 +53,27 @@ extension Mine: JavaScriptEncodable {
         js[.id] = self.id
         js[.tile] = self.tile
         js[.type] = self.type
-        js[.size] = self.size
         js[.efficiency] = self.efficiency
+
+        js[.y_size] = self.yesterday.size
+
+        js[.t_size] = self.today.size
     }
 }
 extension Mine: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+        let today: Dimensions = .init(
+            size: try js[.t_size].decode(),
+        )
         self.init(
             id: try js[.id].decode(),
             type: try js[.type].decode(),
             tile: try js[.tile].decode(),
-            size: try js[.size].decode(),
-            efficiency: try js[.efficiency].decode()
+            efficiency: try js[.efficiency].decode(),
+            yesterday: .init(
+                size: try js[.y_size]?.decode() ?? today.size,
+            ),
+            today: today
         )
     }
 }

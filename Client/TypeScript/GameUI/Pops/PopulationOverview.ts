@@ -47,6 +47,7 @@ export class PopulationOverview extends ScreenContent {
     static readonly tooltipCashFlowItem: TooltipType = TooltipType.PopCashFlowItem;
     static readonly tooltipBudgetItem: TooltipType = TooltipType.PopBudgetItem;
     static readonly tooltipExplainPrice: TooltipType = TooltipType.PopExplainPrice;
+    static readonly tooltipResourceOrigin: TooltipType = TooltipType.PopResourceOrigin;
     static readonly tooltipResourceIO: TooltipType = TooltipType.PopResourceIO;
     static readonly tooltipStockpile: TooltipType = TooltipType.PopStockpile;
 
@@ -215,8 +216,7 @@ export class PopulationOverview extends ScreenContent {
                 (sale: ResourceSale) => new ResourceSaleBox(
                     sale,
                     id,
-                    TooltipType.PopResourceIO,
-                    TooltipType.PopExplainPrice,
+                    PopulationOverview,
                 ),
                 (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
             );

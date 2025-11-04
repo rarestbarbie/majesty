@@ -168,6 +168,7 @@ extension GameContext {
         }
 
         self.factories.turn { $0.turn(on: &map) }
+        self.mines.turn { $0.state.turnToNextDay() }
         self.pops.turn { $0.turn(on: &map) }
 
         map.localMarkets.turn {
@@ -652,9 +653,9 @@ extension GameContext {
                     } update: {
                         switch $0.miner {
                         case .Politician:
-                            $1.size = $0.initialSize
+                            $1.today.size = $0.initialSize
                         default:
-                            $1.size = $0.initialSize
+                            $1.today.size = $0.initialSize
                         }
                     }
                 }

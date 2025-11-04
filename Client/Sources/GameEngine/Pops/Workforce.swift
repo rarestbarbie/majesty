@@ -23,6 +23,10 @@ extension Workforce {
     }
 }
 extension Workforce {
+    var change: Int64 { self.hired - self.fired - self.quit }
+    var before: Int64 { self.count - self.change }
+}
+extension Workforce {
     mutating func count(pop: PopID, job: some PopJob) {
         // self.xp += job.count * Int64.init(job.xp)
         self.count += job.count

@@ -30,9 +30,9 @@ extension MineContext {
 extension MineContext {
     mutating func compute(map _: borrowing GameMap, context: GameContext.ResidentPass) throws {
         if  self.type.decay {
-            self.miners.limit = self.state.size / 10_000
+            self.miners.limit = self.state.today.size / 10_000
         } else {
-            self.miners.limit = self.state.size
+            self.miners.limit = self.state.today.size
         }
 
         guard
@@ -64,7 +64,7 @@ extension MineContext {
         }
 
         if  self.type.decay {
-            self.state.size = max(0, self.state.size - self.miners.count)
+            self.state.today.size = max(0, self.state.today.size - self.miners.count)
         }
 
         if case .Politician = self.type.miner,

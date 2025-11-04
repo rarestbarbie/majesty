@@ -107,6 +107,11 @@ extension GameSession {
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
+        case .PopResourceOrigin:
+            self.tooltipPopResourceOrigin(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+            )
         case .PopStockpile:
             self.tooltipPopStockpile(
                 try arguments[0].decode(),
