@@ -36,9 +36,11 @@ extension NavigatorTile {
         self.name = "\(tile.name ?? tile.terrain.name) (\(planet.state.name))"
         self.terrain = tile.terrain.name
 
+        let pops: PopulationStats = tile.properties.pops
+
         let culture: [
             (key: String, (share: Int64, PieChartLabel))
-        ] = tile.pops.free.cultures.compactMap {
+        ] = pops.free.cultures.compactMap {
             guard let culture: Culture = context.cultures.state[$0] else {
                 return nil
             }
@@ -47,7 +49,7 @@ extension NavigatorTile {
         }
         let popType: [
             (key: PopType, (share: Int64, PieChartLabel))
-        ] = tile.pops.type.compactMap {
+        ] = pops.type.compactMap {
             guard $0.stratum > .Ward,
             let type: PopMetadata = context.rules.pops[$0] else {
                 return nil

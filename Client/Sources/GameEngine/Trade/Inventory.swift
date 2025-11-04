@@ -25,14 +25,17 @@ extension Inventory {
         inelastic resource: Resource,
         units: Int64,
         price: LocalPrice
-    ) -> Int64 {
+    ) -> (Int64, reported: Bool) {
         let value: Int64 = units <> price.value
-        self.out.inelastic[resource]?.report(
+        self.account.r += value
+        if case ()? = self.out.inelastic[resource]?.report(
             unitsSold: units,
             valueSold: value,
-        )
-        self.account.r += value
-        return value
+        ) {
+            return (value, true)
+        } else {
+            return (value, false)
+        }
     }
 
     mutating func debit(

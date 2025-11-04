@@ -4,9 +4,11 @@ import JavaScriptInterop
 import JavaScriptKit
 
 struct CountryContext {
+    let type: _NoMetadata
     let properties: CountryProperties
 
-    init(type _: Metadata, state: Country) {
+    init(type: _NoMetadata, state: Country) {
+        self.type = type
         self.properties = .init(intrinsic: state)
     }
 }

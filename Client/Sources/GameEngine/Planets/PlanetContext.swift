@@ -8,6 +8,7 @@ import Vector
 import VectorCharts
 
 struct PlanetContext: RuntimeContext {
+    let type: _NoMetadata
     var state: Planet
 
     var motion: (global: CelestialMotion?, local: CelestialMotion?)
@@ -15,7 +16,8 @@ struct PlanetContext: RuntimeContext {
 
     var grid: PlanetGrid
 
-    init(type _: Metadata, state: Planet) {
+    init(type: _NoMetadata, state: Planet) {
+        self.type = type
         self.state = state
 
         self.motion = (nil, nil)

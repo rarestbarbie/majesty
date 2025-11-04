@@ -5,4 +5,5 @@ public protocol RuntimeContext<State> {
     init(type: Metadata, state: State)
 
     var state: State { get set }
+    var type: Metadata { get }
 }

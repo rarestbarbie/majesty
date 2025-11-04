@@ -73,7 +73,7 @@ extension PopulationReport: PersistentReport {
             Never?
         ) = snapshot.pops.reduce(into: ([:], nil)) {
             let tile: Address = $1.state.tile
-            if case country.id? = $1.governedBy?.id {
+            if case country.id? = $1.region?.governedBy?.id {
                 {
                     $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
                 } (&$0.location[tile])
@@ -86,7 +86,7 @@ extension PopulationReport: PersistentReport {
             details: &self.pop,
             default: .all
         ) {
-            guard case country.id? = $0.governedBy?.id else {
+            guard case country.id? = $0.region?.governedBy?.id else {
                 return nil
             }
             guard

@@ -196,7 +196,7 @@ extension GameSession {
 
         return .items {
             $0["Switch to Player"] {
-                if  let country: CountryProperties = tile.governedBy {
+                if  let country: CountryProperties = tile.properties.governedBy {
                     $0[.SwitchToPlayer] = country.id
                 }
             }
@@ -300,6 +300,9 @@ extension GameSession {
                 factor: factory.state.today.eo,
                 productivity: factory.productivity
             )
+
+        case .m:
+            return nil
         }
     }
 
@@ -309,7 +312,7 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let factory: FactoryContext = self.context.factories[id],
-        let country: CountryProperties = factory.occupiedBy else {
+        let country: CountryProperties = factory.region?.occupiedBy else {
             return nil
         }
 
@@ -318,6 +321,7 @@ extension GameSession {
         case .e(let id): return factory.state.inventory.e.tooltipStockpile(id, country: country)
         case .x(let id): return factory.state.inventory.x.tooltipStockpile(id, country: country)
         case .o: return nil
+        case .m: return nil
         }
     }
 
@@ -327,7 +331,7 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let factory: FactoryContext = self.context.factories[id],
-        let country: CountryProperties = factory.occupiedBy else {
+        let country: CountryProperties = factory.region?.occupiedBy else {
             return nil
         }
 
@@ -344,6 +348,7 @@ extension GameSession {
         case .e(let id): return factory.state.inventory.e.tooltipExplainPrice(id, market)
         case .x(let id): return factory.state.inventory.x.tooltipExplainPrice(id, market)
         case .o(let id): return factory.state.inventory.out.tooltipExplainPrice(id, market)
+        case .m: return nil
         }
     }
 
@@ -475,22 +480,24 @@ extension GameSession {
             return nil
         }
 
+        let pops: PopulationStats = tile.properties.pops
+
         return .instructions(style: .borderless) {
             switch layer {
             case .Terrain:
                 $0[>] = "\(tile.terrain.name) (\(tile.geology.name))"
 
             case .Population:
-                $0["Population"] = tile.pops.free.total[/3]
+                $0["Population"] = pops.free.total[/3]
                 $0[>] {
-                    $0["Free"] = tile.pops.free.total[/3]
-                    $0["Enslaved"] = ??tile.pops.enslaved.total[/3]
+                    $0["Free"] = pops.free.total[/3]
+                    $0["Enslaved"] = ??pops.enslaved.total[/3]
                 }
 
             case .AverageMilitancy:
-                let (free, _): (Double, of: Double) = tile.pops.free.mil
+                let (free, _): (Double, of: Double) = pops.free.mil
                 $0["Average militancy"] = free[..2]
-                let enslaved: (average: Double, of: Double) = tile.pops.enslaved.mil
+                let enslaved: (average: Double, of: Double) = pops.enslaved.mil
                 if  enslaved.of > 0 {
                     $0[>] = """
                     The average militancy of the slave population is \(
@@ -500,9 +507,9 @@ extension GameSession {
                     """
                 }
             case .AverageConsciousness:
-                let (free, _): (Double, of: Double) = tile.pops.free.con
+                let (free, _): (Double, of: Double) = pops.free.con
                 $0["Average consciousness"] = free[..2]
-                let enslaved: (average: Double, of: Double) = tile.pops.enslaved.con
+                let enslaved: (average: Double, of: Double) = pops.enslaved.con
                 if  enslaved.of > 0 {
                     $0[>] = """
                     The average consciousness of the slave population is \(
@@ -699,6 +706,25 @@ extension GameSession {
                 factor: 1,
                 productivity: 1,
             )
+        case .m(let id):
+            guard let (output, factor): (ResourceTier, Double) = pop.mines[id.mine] else {
+                return nil
+            }
+            let factorLabel: String
+            switch pop.state.type {
+            case .Politician:
+                factorLabel = "Militancy of Free Population"
+            default:
+                factorLabel = "Efficiency"
+            }
+            return pop.state.mines[id.mine]?.out.tooltipSupply(
+                id.resource,
+                tier: output,
+                unit: "miner",
+                factor: factor,
+                factorLabel: factorLabel,
+                productivity: 1,
+            )
         }
     }
 
@@ -708,7 +734,7 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let pop: PopContext = self.context.pops[id],
-        let country: CountryProperties = pop.occupiedBy else {
+        let country: CountryProperties = pop.region?.occupiedBy else {
             return nil
         }
 
@@ -717,6 +743,7 @@ extension GameSession {
         case .e(let id): return pop.state.inventory.e.tooltipStockpile(id, country: country)
         case .x(let id): return pop.state.inventory.x.tooltipStockpile(id, country: country)
         case .o: return nil
+        case .m: return nil
         }
     }
 
@@ -726,7 +753,7 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let pop: PopContext = self.context.pops[pop],
-        let country: CountryProperties = pop.occupiedBy else {
+        let country: CountryProperties = pop.region?.occupiedBy else {
             return nil
         }
 
@@ -739,10 +766,16 @@ extension GameSession {
         )
 
         switch line {
-        case .l(let id): return pop.state.inventory.l.tooltipExplainPrice(id, market)
-        case .e(let id): return pop.state.inventory.e.tooltipExplainPrice(id, market)
-        case .x(let id): return pop.state.inventory.x.tooltipExplainPrice(id, market)
-        case .o(let id): return pop.state.inventory.out.tooltipExplainPrice(id, market)
+        case .l(let id):
+            return pop.state.inventory.l.tooltipExplainPrice(id, market)
+        case .e(let id):
+            return pop.state.inventory.e.tooltipExplainPrice(id, market)
+        case .x(let id):
+            return pop.state.inventory.x.tooltipExplainPrice(id, market)
+        case .o(let id):
+            return pop.state.inventory.out.tooltipExplainPrice(id, market)
+        case .m(let id):
+            return pop.state.mines[id.mine]?.out.tooltipExplainPrice(id.resource, market)
         }
     }
 
@@ -751,7 +784,7 @@ extension GameSession {
     ) -> Tooltip? {
         guard
         let pop: PopContext = self.context.pops[id],
-        let country: CountryProperties = self.context.planets[pop.state.tile]?.occupiedBy else {
+        let country: CountryProperties = pop.region?.occupiedBy else {
             return nil
         }
 
@@ -866,45 +899,13 @@ extension GameSession {
         _ id: Address,
         _ culture: String,
     ) -> Tooltip? {
-        guard
-        let planet: PlanetContext = context.planets[id.planet],
-        let tile: PlanetGrid.Tile = planet.grid.tiles[id.tile] else {
-            return nil
-        }
-
-        let share: Int64 = tile.pops.free.cultures[culture]
-            ?? tile.pops.enslaved.cultures[culture]
-            ?? 0
-        let total: Int64 = tile.pops.total
-
-        if  total == 0 {
-            return nil
-        }
-
-        return .instructions(style: .borderless) {
-            $0[culture] = (Double.init(share) / Double.init(total))[%3]
-        }
+        context.planets[id]?.properties.pops.tooltip(culture: culture)
     }
     public func tooltipTilePopType(
         _ id: Address,
-        _ type: PopType,
+        _ popType: PopType,
     ) -> Tooltip? {
-        guard
-        let planet: PlanetContext = context.planets[id.planet],
-        let tile: PlanetGrid.Tile = planet.grid.tiles[id.tile] else {
-            return nil
-        }
-
-        let share: Int64 = tile.pops.type[type] ?? 0
-        let total: Int64 = tile.pops.free.total
-
-        if  total == 0 {
-            return nil
-        }
-
-        return .instructions(style: .borderless) {
-            $0[type.plural] = (Double.init(share) / Double.init(total))[%3]
-        }
+        context.planets[id]?.properties.pops.tooltip(popType: popType)
     }
 }
 

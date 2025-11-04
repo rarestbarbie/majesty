@@ -27,21 +27,21 @@ extension ResourceInputs {
         scalingFactor: (x: Int64, z: Double),
     ) {
         self.tradeable.sync(with: resourceTier.tradeable) {
-            $0.turn(unitsDemanded: $1 * scalingFactor.x, efficiency: scalingFactor.z)
+            $1.turn(unitsDemanded: $0 * scalingFactor.x, efficiency: scalingFactor.z)
         }
         self.inelastic.sync(with: resourceTier.inelastic) {
-            $0.turn(unitsDemanded: $1 * scalingFactor.x, efficiency: scalingFactor.z)
+            $1.turn(unitsDemanded: $0 * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }
     public mutating func consume(
         from resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
-        self.tradeable.sync(with: resourceTier.tradeable) {
-            $0.consume($1 * scalingFactor.x, efficiency: scalingFactor.z)
+        for (id, amount): (Resource, Int64) in resourceTier.tradeable {
+            self.tradeable[id].consume(amount * scalingFactor.x, efficiency: scalingFactor.z)
         }
-        self.inelastic.sync(with: resourceTier.inelastic) {
-            $0.consume($1 * scalingFactor.x, efficiency: scalingFactor.z)
+        for (id, amount): (Resource, Int64) in resourceTier.inelastic {
+            self.inelastic[id].consume(amount * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }
 }

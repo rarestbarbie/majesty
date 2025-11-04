@@ -4,6 +4,7 @@ export interface ResourceSale {
     readonly id: string;
     readonly name: string;
     readonly icon: string;
+    readonly source?: string;
 
     readonly unitsProduced: bigint;
     readonly unitsSold: bigint;

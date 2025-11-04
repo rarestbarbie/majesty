@@ -8,16 +8,13 @@ struct MineContext: RuntimeContext {
     let type: MineMetadata
     var state: Mine
 
-    private(set) var governedBy: CountryProperties?
-    private(set) var occupiedBy: CountryProperties?
-
+    private(set) var region: RegionalProperties?
     private(set) var miners: Workforce
 
     init(type: MineMetadata, state: Mine) {
         self.type = type
         self.state = state
-        self.governedBy = nil
-        self.occupiedBy = nil
+        self.region = nil
         self.miners = .empty
     }
 }
@@ -39,14 +36,11 @@ extension MineContext {
         }
 
         guard
-        let tile: PlanetGrid.Tile = context.planets[self.state.tile],
-        let governedBy: CountryProperties = tile.governedBy,
-        let occupiedBy: CountryProperties = tile.occupiedBy else {
+        let tile: PlanetGrid.Tile = context.planets[self.state.tile] else {
             return
         }
 
-        self.governedBy = governedBy
-        self.occupiedBy = occupiedBy
+        self.region = tile.properties
     }
 }
 extension MineContext {
@@ -71,6 +65,13 @@ extension MineContext {
 
         if  self.type.decay {
             self.state.size = max(0, self.state.size - self.miners.count)
+        }
+
+        if case .Politician = self.type.miner,
+            let mil: Double = self.region?.pops.free.mil.average {
+            self.state.efficiency = 1 + 0.1 * mil
+        } else {
+            self.state.efficiency = 0.01
         }
     }
 }

@@ -9,6 +9,7 @@ struct Mine {
     let type: MineType
     let tile: Address
     var size: Int64
+    var efficiency: Double
 }
 extension Mine: Sectionable {
     init(id: MineID, section: Section) {
@@ -16,7 +17,8 @@ extension Mine: Sectionable {
             id: id,
             type: section.type,
             tile: section.tile,
-            size: 0
+            size: 0,
+            efficiency: 1
         )
     }
 
@@ -33,6 +35,7 @@ extension Mine {
         case type
         case tile
         case size
+        case efficiency
     }
 }
 extension Mine: JavaScriptEncodable {
@@ -41,6 +44,7 @@ extension Mine: JavaScriptEncodable {
         js[.tile] = self.tile
         js[.type] = self.type
         js[.size] = self.size
+        js[.efficiency] = self.efficiency
     }
 }
 extension Mine: JavaScriptDecodable {
@@ -49,7 +53,8 @@ extension Mine: JavaScriptDecodable {
             id: try js[.id].decode(),
             type: try js[.type].decode(),
             tile: try js[.tile].decode(),
-            size: try js[.size].decode()
+            size: try js[.size].decode(),
+            efficiency: try js[.efficiency].decode()
         )
     }
 }

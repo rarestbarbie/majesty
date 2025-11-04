@@ -40,4 +40,13 @@ extension RuntimeStateTable {
     @inlinable public subscript(id: ElementContext.State.ID) -> ElementContext.State? {
         self.index[id]?.state
     }
+    @inlinable public subscript(id: ElementContext.State.ID) -> (state: ElementContext.State, type: ElementContext.Metadata) {
+        get throws(LookupError) {
+            if  let context: ElementContext = self.index[id] {
+                return (context.state, context.type)
+            } else {
+                throw LookupError.undefined(id)
+            }
+        }
+    }
 }

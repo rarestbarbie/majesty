@@ -55,6 +55,13 @@ export class ResourceSaleBox implements DiffableListElement<string> {
         this.node.appendChild(resource);
         this.node.appendChild(this.units);
         this.node.appendChild(proceeds);
+
+        if (sale.source !== undefined) {
+            const subtitle: HTMLDivElement = document.createElement('div');
+            subtitle.classList.add('subtitle');
+            subtitle.textContent = sale.source;
+            this.node.appendChild(subtitle);
+        }
     }
 
     public update(sale: ResourceSale): void {

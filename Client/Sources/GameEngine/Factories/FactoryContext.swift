@@ -13,8 +13,7 @@ struct FactoryContext: LegalEntityContext, RuntimeContext {
     let type: FactoryMetadata
     var state: Factory
 
-    private(set) var governedBy: CountryProperties?
-    private(set) var occupiedBy: CountryProperties?
+    private(set) var region: RegionalProperties?
 
     private(set) var productivity: Int64
 
@@ -30,8 +29,7 @@ struct FactoryContext: LegalEntityContext, RuntimeContext {
         self.state = state
 
         self.productivity = 0
-        self.governedBy = nil
-        self.occupiedBy = nil
+        self.region = nil
 
         self.workers = nil
         self.clerks = nil
@@ -97,14 +95,11 @@ extension FactoryContext {
 
         guard
         let tile: PlanetGrid.Tile = context.planets[self.state.tile],
-        let governedBy: CountryProperties = tile.governedBy,
-        let occupiedBy: CountryProperties = tile.occupiedBy else {
+        let occupiedBy: CountryProperties = tile.properties.occupiedBy else {
             return
         }
 
-
-        self.governedBy = governedBy
-        self.occupiedBy = occupiedBy
+        self.region = tile.properties
         self.productivity = occupiedBy.factories.productivity[self.state.type]
 
         self.cashFlow.reset()
@@ -123,7 +118,7 @@ extension FactoryContext {
 extension FactoryContext: TransactingContext {
     mutating func allocate(map: inout GameMap) {
         guard
-        let country: CountryProperties = self.occupiedBy else {
+        let country: CountryProperties = self.region?.occupiedBy else {
             return
         }
 
@@ -250,7 +245,7 @@ extension FactoryContext: TransactingContext {
 
     mutating func transact(map: inout GameMap) {
         guard
-        let country: CountryProperties = self.occupiedBy,
+        let country: CountryProperties = self.region?.occupiedBy,
         let budget: FactoryBudget = self.budget else {
             return
         }
@@ -378,7 +373,7 @@ extension FactoryContext: TransactingContext {
 
     mutating func advance(map: inout GameMap) {
         guard case nil = self.state.liquidation,
-        let country: CountryProperties = self.occupiedBy else {
+        let country: CountryProperties = self.region?.occupiedBy else {
             return
         }
 

@@ -34,13 +34,14 @@ extension ResourceOutput {
 
     mutating func turn(releasing fraction: Fraction) {
         self.units.turn()
-        self.units -= self.units.total <> fraction
+        // is `min` necessary here?
+        self.units -= min(self.units.total, self.units.total >< fraction)
         self.unitsSold = 0
         self.valueSold = 0
     }
 
-    mutating func deposit(unitsProduced: Int64, efficiency: Double) {
-        self.units += .init(Double.init(unitsProduced) * efficiency)
+    mutating func deposit(_ amount: Int64, efficiency: Double) {
+        self.units += .init(Double.init(amount) * efficiency)
     }
 }
 extension ResourceOutput<Never> {

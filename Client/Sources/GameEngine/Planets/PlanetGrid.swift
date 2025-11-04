@@ -23,21 +23,11 @@ extension PlanetGrid {
         occupiedBy: CountryProperties?,
     ) {
         for tile: Int in self.tiles.values.indices {
-            {
-                $0.governedBy = governedBy
-                $0.occupiedBy = occupiedBy
-            } (&self.tiles.values[tile])
+            self.tiles.values[tile].properties.assign(
+                governedBy: governedBy,
+                occupiedBy: occupiedBy
+            )
         }
-    }
-    mutating func assign(
-        governedBy: CountryProperties?,
-        occupiedBy: CountryProperties?,
-        to tile: HexCoordinate
-    ) {
-        {
-            $0?.governedBy = governedBy
-            $0?.occupiedBy = occupiedBy
-        } (&self.tiles[tile])
     }
 }
 extension PlanetGrid {
