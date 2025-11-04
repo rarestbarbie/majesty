@@ -592,9 +592,9 @@ extension GameSession {
                 self.context.mines[$0]?.type.name ?? "Unknown"
             }
         } else {
-            let employment: Int64 = .init(
+            let employment: Int64 = pop.state.today.size > 0 ? .init(
                 (pop.unemployment * Double.init(pop.state.today.size)).rounded()
-            )
+            ) : 0
             return .instructions {
                 $0["Total employment"] = employment[/3]
                 for output: ResourceOutput<Never> in pop.state.inventory.out.inelastic.values {
