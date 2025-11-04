@@ -122,9 +122,14 @@ extension PlanetGrid.Tile {
             }
         }
 
+        guard
+        let miners: Int64 = self.properties.pops.type[.Miner] else {
+            return nil
+        }
+
         guard random.roll(
-            self.properties.pops.free.total,
-            1_000_000_000
+            1 + max(miners / 100, 10) + max(miners / 10000, 20),
+            90 * (1 + Int64(self.minesAlreadyPresent.count))
         ) else {
             return nil
         }

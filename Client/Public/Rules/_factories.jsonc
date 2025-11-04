@@ -7,7 +7,7 @@
         },
         "output": {
             "Electricity": 12,
-            "Water": 64
+            "Water": 128
         },
         "workers": {
             "Driver": 1000,
@@ -23,13 +23,27 @@
             "Taiga"
         ]
     },
+    "Fossil Power Plant": {
+        "inputs": {
+            "Construction": 1,
+            "Hydrocarbons": 5,
+            "Water": 5
+        },
+        "output": {
+            "Electricity": 200
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 2500
+        }
+    },
     "Nuclear Power Plant": {
         "inputs": {
             "Water": 1,
             "Uranium": 1
         },
         "output": {
-            "Electricity": 240
+            "Electricity": 1200
         },
         "workers": {
             "Driver": 5000,
@@ -96,6 +110,7 @@
 
     "Slaughterhouse": {
         "inputs": {
+            "Machine Parts": 1,
             "Livestock": 160,
             "Water": 20
         },
@@ -110,22 +125,36 @@
     },
 
 
-    "Alloy Foundry": {
+    "Aluminum Mill": {
         "inputs": {
-            "Aluminum": 8,
-            "Iron": 8,
-            "Graphite": 2,
-            "Sulfur": 2,
-            "Electricity": 16
+            "Machine Parts": 1,
+            "Alumina": 20,
+            "Electricity": 20
         },
         "output": {
-            "Alloys": 16
+            "Aluminum": 16
         },
         "workers": {
             "Driver": 5000,
             "Engineer": 5000
         }
     },
+    "Machine Parts Factory": {
+        "inputs": {
+            "Aluminum": 16,
+            // "Sulfur": 1,
+            "Water": 1
+        },
+        "output": {
+            "Machine Parts": 12
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+
+
     "Ammonia Plant": {
         "inputs": {
             "Hydrocarbons": 12
@@ -209,21 +238,7 @@
             "Engineer": 5000
         }
     },
-    "Machine Parts Factory": {
-        "inputs": {
-            "Hydrocarbons": 1,
-            "Alloys": 5,
-            "Sulfur": 1,
-            "Water": 1
-        },
-        "output": {
-            "Machine Parts": 12
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
+
     "Polypropylene Plant": {
         "inputs": {
             "Hydrocarbons": 8,
@@ -237,36 +252,38 @@
             "Engineer": 5000
         }
     },
-    "Semiconductor Foundry": {
-        "inputs": {
-            "Batteries": 1,
-            "Graphite": 1,
-            "Gold": 2,
-            "Neon": 1,
-            "Helium": 1
-        },
-        "output": {
-            "Semiconductor Devices": 8
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
+    // "Semiconductor Foundry": {
+    //     "inputs": {
+    //         "Batteries": 1,
+    //         "Graphite": 1,
+    //         "Gold": 2,
+    //         "Neon": 1,
+    //         "Helium": 1
+    //     },
+    //     "output": {
+    //         "Semiconductor Devices": 8
+    //     },
+    //     "workers": {
+    //         "Driver": 5000,
+    //         "Engineer": 5000
+    //     }
+    // },
     "Water Treatment Plant": {
         "inputs": {
-            "Electricity": 80
+            "Water Ice": 10,
+            "Electricity": 10
         },
         "output": {
-            "Water": 160
+            "Water": 100
         },
         "workers": {
-            "Driver": 3000,
-            "Engineer": 2000
+            "Driver": 2000,
+            "Engineer": 4000
         }
     },
     "Uranium Enrichment Facility": {
         "inputs": {
+            "Machine Parts": 2,
             "Electricity": 40
         },
         "output": {
