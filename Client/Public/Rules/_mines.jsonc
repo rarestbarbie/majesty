@@ -4,7 +4,8 @@
         "decay": false,
         "base": {
             "Influence": 8
-        }
+        },
+        "initial_size": 400
     },
 
     "Alumina Mine": {
@@ -15,6 +16,7 @@
         },
         "geology": {
             "Earth_Continental_Crust": 5
-        }
+        },
+        "initial_size": 1000000000
     }
 }
