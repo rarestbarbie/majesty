@@ -1,6 +1,7 @@
 import ColorText
 import D
 import GameConditions
+import GameUI
 
 extension [ConditionListItem] {
     static func list(_ headings: ColorText..., breakdown: ConditionBreakdown) -> Self {

@@ -7,6 +7,7 @@ import GameIDs
 import GameRules
 import GameState
 import GameTerrain
+import GameUI
 import HexGrids
 import JavaScriptInterop
 import JavaScriptKit

@@ -1,21 +1,21 @@
 import JavaScriptKit
 import JavaScriptInterop
 
-struct ContextMenuActionEncoder: ~Copyable {
-    private var call: ContextMenuAction.Call?
+@frozen public struct ContextMenuActionEncoder: ~Copyable {
+    @usableFromInline var call: ContextMenuAction.Call?
 
-    init() {
+    @inlinable init() {
         self.call = nil
     }
 }
 extension ContextMenuActionEncoder {
-    subscript(_ action: ContextMenuAction) -> () {
+    @inlinable public subscript(_ action: ContextMenuAction) -> () {
         mutating get {
             self.call = .init(id: action, arguments: nil)
         }
     }
 
-    subscript<each Argument>(
+    @inlinable public subscript<each Argument>(
         _ action: ContextMenuAction
     ) -> (repeat each Argument)? where repeat each Argument: ConvertibleToJSValue {
         get { nil }
@@ -28,7 +28,7 @@ extension ContextMenuActionEncoder {
         }
     }
 
-    var registration: ContextMenuAction.Call? {
+    @inlinable var registration: ContextMenuAction.Call? {
         consuming get { self.call }
     }
 }

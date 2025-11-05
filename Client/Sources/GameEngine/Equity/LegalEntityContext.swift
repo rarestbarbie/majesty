@@ -2,6 +2,7 @@ import D
 import GameEconomy
 import GameIDs
 import GameState
+import GameUI
 
 protocol LegalEntityContext<State>: RuntimeContext where State: LegalEntityState {
     var equity: Equity<LEI>.Statistics { get }
