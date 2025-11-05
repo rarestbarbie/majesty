@@ -1,5 +1,6 @@
 import D
 import GameIDs
+import GameUI
 
 struct PopulationStats {
     var type: [PopType: Int64]

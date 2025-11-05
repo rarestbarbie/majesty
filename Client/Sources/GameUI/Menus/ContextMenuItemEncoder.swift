@@ -1,12 +1,12 @@
 public struct ContextMenuItemEncoder: ~Copyable {
-    private var items: [ContextMenuItem]
+    @usableFromInline var items: [ContextMenuItem]
 
-    init() {
+    @inlinable init() {
         self.items = []
     }
 }
 extension ContextMenuItemEncoder {
-    subscript(label: String, action: (inout ContextMenuActionEncoder) -> ()) -> () {
+    @inlinable public subscript(label: String, action: (inout ContextMenuActionEncoder) -> ()) -> () {
         mutating get {
             var encoder: ContextMenuActionEncoder = .init()
             action(&encoder)
@@ -18,7 +18,7 @@ extension ContextMenuItemEncoder {
             self.items.append(item)
         }
     }
-    subscript(submenu label: String, action: (inout Self) -> ()) -> () {
+    @inlinable public subscript(submenu label: String, action: (inout Self) -> ()) -> () {
         mutating get {
             var encoder: Self = .init()
             action(&encoder)
@@ -31,7 +31,7 @@ extension ContextMenuItemEncoder {
         }
     }
 
-    var menu: [ContextMenuItem] {
+    @inlinable var menu: [ContextMenuItem] {
         consuming get { self.items }
     }
 }

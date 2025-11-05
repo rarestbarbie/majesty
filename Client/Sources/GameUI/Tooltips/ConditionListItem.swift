@@ -3,12 +3,12 @@ import JavaScriptInterop
 import JavaScriptKit
 
 @frozen public struct ConditionListItem: Equatable, Sendable {
-    let fulfilled: Bool?
-    let highlight: Bool
-    let description: ColorText
-    let indent: Int
+    @usableFromInline let fulfilled: Bool?
+    @usableFromInline let highlight: Bool
+    @usableFromInline let description: ColorText
+    @usableFromInline let indent: Int
 
-    init(fulfilled: Bool?, highlight: Bool, description: ColorText, indent: Int = 0) {
+    @inlinable public init(fulfilled: Bool?, highlight: Bool, description: ColorText, indent: Int = 0) {
         self.fulfilled = fulfilled
         self.highlight = highlight
         self.description = description

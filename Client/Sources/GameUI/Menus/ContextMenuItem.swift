@@ -2,9 +2,19 @@ import JavaScriptKit
 import JavaScriptInterop
 
 @frozen @usableFromInline struct ContextMenuItem {
-    let label: String
-    let enabled: ContextMenuAction.Call?
-    let submenu: [Self]
+    @usableFromInline let label: String
+    @usableFromInline let enabled: ContextMenuAction.Call?
+    @usableFromInline let submenu: [Self]
+
+    @inlinable init(
+        label: String,
+        enabled: ContextMenuAction.Call?,
+        submenu: [Self]
+    ) {
+        self.label = label
+        self.enabled = enabled
+        self.submenu = submenu
+    }
 }
 extension ContextMenuItem: JavaScriptEncodable {
     @frozen @usableFromInline enum ObjectKey: JSString {

@@ -1,7 +1,7 @@
 import D
 
 extension BigIntRepresentation {
-    static func / (self: Self, limit: Value) -> TooltipInstruction.Count {
+    @inlinable public static func / (self: Self, limit: Value) -> TooltipInstruction.Count {
         return .init(
             value: "\(self)",
             limit: "\(self.map { _ in limit })",
@@ -9,7 +9,7 @@ extension BigIntRepresentation {
         )
     }
 
-    static func ^^ (self: Self, change: Value) -> TooltipInstruction.Ticker {
+    @inlinable public static func ^^ (self: Self, change: Value) -> TooltipInstruction.Ticker {
         let delta: Self
         let sign: TooltipInstruction.Sign?
         if change == 0 {
@@ -25,7 +25,7 @@ extension BigIntRepresentation {
         return .init(value: "\(self)", delta: "\(delta)", sign: sign)
     }
 
-    static func <- (self: Self, before: Value) -> TooltipInstruction.Ticker {
+    @inlinable public static func <- (self: Self, before: Value) -> TooltipInstruction.Ticker {
         let delta: Self
         let sign: TooltipInstruction.Sign?
         if self.value == before {

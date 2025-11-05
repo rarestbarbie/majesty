@@ -1,6 +1,7 @@
 import Color
 import D
 import GameEconomy
+import GameUI
 import VectorCharts
 
 struct CashAllocationStatement {

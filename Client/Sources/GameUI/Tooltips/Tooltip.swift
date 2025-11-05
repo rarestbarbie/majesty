@@ -4,9 +4,14 @@ import JavaScriptInterop
 @frozen public struct Tooltip {
     @usableFromInline let content: Content
     @usableFromInline let display: DisplayStyle?
+
+    @inlinable init(content: Content, display: DisplayStyle?) {
+        self.content = content
+        self.display = display
+    }
 }
 extension Tooltip {
-    static func instructions(
+    @inlinable public static func instructions(
         style: DisplayStyle? = nil,
         build: (inout TooltipInstructionEncoder) -> ()
     ) -> Self {
@@ -15,7 +20,7 @@ extension Tooltip {
         return .init(content: .instructions(encoder.instructions), display: style)
     }
 
-    static func conditions(_ lists: [ConditionListItem]...) -> Self {
+    @inlinable public static func conditions(_ lists: [ConditionListItem]...) -> Self {
         .init(content: .conditions(lists), display: nil)
     }
 }

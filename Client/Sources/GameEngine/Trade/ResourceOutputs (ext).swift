@@ -2,6 +2,7 @@ import D
 import Fraction
 import GameEconomy
 import GameIDs
+import GameUI
 import JavaScriptKit
 import JavaScriptInterop
 

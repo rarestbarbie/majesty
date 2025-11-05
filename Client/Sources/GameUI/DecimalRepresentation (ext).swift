@@ -1,7 +1,7 @@
 import D
 
 extension DecimalRepresentation where Value: DecimalFormattable & AdditiveArithmetic {
-    static func <- (self: Self, before: Value) -> TooltipInstruction.Ticker {
+    @inlinable public static func <- (self: Self, before: Value) -> TooltipInstruction.Ticker {
         let (sign, magnitude): (Bool?, Value) = before.delta(to: self.value)
         return .init(
             value: "\(self)",

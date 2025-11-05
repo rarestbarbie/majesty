@@ -2,10 +2,14 @@ import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public struct ContextMenu {
-    let items: [ContextMenuItem]
+    @usableFromInline let items: [ContextMenuItem]
+
+    @inlinable init(items: [ContextMenuItem]) {
+        self.items = items
+    }
 }
 extension ContextMenu {
-    static func items(
+    @inlinable public static func items(
         build: (inout ContextMenuItemEncoder) -> ()
     ) -> Self {
         var encoder: ContextMenuItemEncoder = .init()

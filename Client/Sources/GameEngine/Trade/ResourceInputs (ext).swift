@@ -1,6 +1,7 @@
 import D
 import GameEconomy
 import GameIDs
+import GameUI
 import JavaScriptKit
 import JavaScriptInterop
 

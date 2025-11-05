@@ -1,4 +1,5 @@
 import GameEngine
+import GameUI
 import JavaScriptInterop
 
 extension GameSession {

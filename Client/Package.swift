@@ -141,6 +141,7 @@ let package: Package = .init(
                 .target(name: "GameRules"),
                 .target(name: "GameState"),
                 .target(name: "GameTerrain"),
+                .target(name: "GameUI"),
                 .target(name: "JavaScriptInterop"),
                 .target(name: "Random"),
                 .target(name: "Vector"),
@@ -218,6 +219,15 @@ let package: Package = .init(
                 .target(name: "GameRules"),
                 .target(name: "JavaScriptInterop"),
                 .target(name: "HexGrids"),
+            ]
+        ),
+
+        .target(
+            name: "GameUI",
+            dependencies: [
+                .target(name: "ColorText"),
+                .target(name: "JavaScriptInterop"),
+                .product(name: "D", package: "d"),
             ]
         ),
 
