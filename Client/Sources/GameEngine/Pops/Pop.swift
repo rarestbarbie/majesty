@@ -113,8 +113,13 @@ extension Pop {
                 tile: self.tile
             )
 
-            let fraction: Fraction = size %/ self.today.size
-            let inherits: Fraction = inherit.map { $0 * fraction } ?? fraction
+            let inherits: Fraction
+            if  size < self.today.size {
+                let fraction: Fraction = size %/ self.today.size
+                inherits = inherit.map { $0 * fraction } ?? fraction
+            } else {
+                inherits = 1
+            }
 
             map.conversions.append(
                 .init(from: self.id, size: size, to: section, inherits: inherits)
