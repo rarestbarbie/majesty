@@ -119,6 +119,12 @@ let package: Package = .init(
         ),
 
         .target(
+            name: "GameClock",
+            dependencies: [
+            ]
+        ),
+
+        .target(
             name: "GameConditions",
             dependencies: [
                 .target(name: "ColorText"),
@@ -136,6 +142,7 @@ let package: Package = .init(
             name: "GameEngine",
             dependencies: [
                 .target(name: "Assert"),
+                .target(name: "GameClock"),
                 .target(name: "GameConditions"),
                 .target(name: "GameEconomy"),
                 .target(name: "GameRules"),
