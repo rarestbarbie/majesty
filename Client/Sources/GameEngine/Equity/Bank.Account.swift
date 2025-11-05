@@ -93,7 +93,18 @@ extension Bank.Account {
     }
 
     mutating func inherit(fraction: Fraction) -> Int64 {
-        let inherited: Int64 = self.balance <> fraction
+        guard fraction.n > 0 else {
+            return 0
+        }
+
+        let inherited: Int64
+
+        if fraction.n < fraction.d {
+            inherited = self.balance <> fraction
+        } else {
+            inherited = self.balance
+        }
+
         self.d -= inherited
         return inherited
     }
