@@ -1,3 +1,4 @@
+import GameClock
 import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
@@ -15,7 +16,7 @@ public struct GameUI {
         trade: TradeReport
     )
     var views: (CelestialView?, CelestialView?)
-    var clock: Clock
+    var clock: GameClock
 
     init() {
         self.player = nil

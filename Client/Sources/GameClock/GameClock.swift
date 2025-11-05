@@ -1,29 +1,27 @@
-extension GameUI {
-    struct Clock {
-        private(set) var speed: GameSpeed
-        private(set) var phase: Int
+@frozen public struct GameClock {
+    public var speed: GameSpeed
+    @usableFromInline var phase: Int
 
-        init(speed: GameSpeed = .init(), phase: Int = 0) {
-            self.speed = speed
-            self.phase = phase
-        }
+    @inlinable public init(speed: GameSpeed = .init(), phase: Int = 0) {
+        self.speed = speed
+        self.phase = phase
     }
 }
-extension GameUI.Clock {
-    mutating func faster() {
+extension GameClock {
+    @inlinable public mutating func faster() {
         self.speed.ticks = max(1, self.speed.ticks - 1)
         self.phase = min(self.phase, self.speed.period - 1)
     }
-    mutating func slower() {
+    @inlinable public mutating func slower() {
         self.speed.ticks = min(5, self.speed.ticks + 1)
         self.phase = min(self.phase, self.speed.period - 1)
     }
-    mutating func pause() {
+    @inlinable public mutating func pause() {
         self.speed.paused.toggle()
         self.phase = 0
     }
 
-    mutating func tick() -> Bool {
+    @inlinable public mutating func tick() -> Bool {
         if self.speed.paused {
             return false
         }
