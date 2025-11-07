@@ -10,7 +10,7 @@ public struct GameRulesDescription {
     let technologies: SymbolTable<TechnologyDescription>
     let geology: SymbolTable<GeologicalDescription>
     let terrains: SymbolTable<TerrainDescription>
-    let exchange: Exchange.Settings
+    let exchange: BlocMarkets.Settings
 }
 extension GameRulesDescription: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<GameRules.Namespace>) throws {

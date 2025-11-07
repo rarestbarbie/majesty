@@ -23,20 +23,20 @@ import OrderedCollections
 /// ```swift
 /// $0[resource / currency].swap(&resourceAmount, limit: currencyAmount)
 /// ```
-@frozen public struct Exchange: ~Copyable {
+@frozen public struct BlocMarkets: ~Copyable {
     @usableFromInline let settings: Settings
-    @usableFromInline var table: OrderedDictionary<Market.AssetPair, Market>
+    @usableFromInline var table: OrderedDictionary<BlocMarket.AssetPair, BlocMarket>
 
     @inlinable public init(
         settings: Settings = .default,
-        table: OrderedDictionary<Market.AssetPair, Market> = [:],
+        table: OrderedDictionary<BlocMarket.AssetPair, BlocMarket> = [:],
     ) {
         self.settings = settings
         self.table = table
     }
 }
-extension Exchange {
-    public subscript(_ pair: Market.AssetPair) -> LiquidityPool {
+extension BlocMarkets {
+    public subscript(_ pair: BlocMarket.AssetPair) -> LiquidityPool {
         get {
             self.table[pair]?.canonical ??
             self.table[pair.conjugated, default: self.settings.new(pair.conjugated)].conjugate
@@ -48,10 +48,10 @@ extension Exchange {
                 let i: Int = self.table.index(forKey: pair.conjugated) {
                 yield &self.table.values[i].conjugate
             } else if pair.x < pair.y {
-                let new: Market = self.settings.new(pair)
+                let new: BlocMarket = self.settings.new(pair)
                 yield &self.table[pair, default: new].canonical
             } else {
-                let new: Market = self.settings.new(pair.conjugated)
+                let new: BlocMarket = self.settings.new(pair.conjugated)
                 yield &self.table[pair.conjugated, default: new].conjugate
             }
         }
@@ -67,12 +67,12 @@ extension Exchange {
         }
     }
 }
-extension Exchange {
-    @inlinable public var markets: OrderedDictionary<Market.AssetPair, Market> {
+extension BlocMarkets {
+    @inlinable public var markets: OrderedDictionary<BlocMarket.AssetPair, BlocMarket> {
         self.table
     }
 }
-extension Exchange {
+extension BlocMarkets {
     /// This has O(n²) complexity, where n is the number of trading partners.
     public mutating func arbitrate(
         currency: Fiat,
@@ -117,7 +117,7 @@ extension Exchange {
     }
 
     @_spi(testable) public mutating func arbitrate(
-        resource: Market.Asset,
+        resource: BlocMarket.Asset,
         currency: Fiat,
         partners: [Fiat],
         capital: inout Int64

@@ -1,6 +1,6 @@
 import LiquidityPool
 
-extension Market {
+extension BlocMarket {
     @frozen public struct Interval {
         public let prices: Candle<Double>
         public let volume: LiquidityPool.Volume

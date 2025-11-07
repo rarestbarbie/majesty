@@ -47,7 +47,7 @@ extension TradeReport: PersistentReport {
             default: .init(rawValue: .fiat(snapshot.player.currency.id))
         ) {
             guard
-            let today: Market.Interval = $0.history.last,
+            let today: BlocMarket.Interval = $0.history.last,
             case .good(let good) = $0.id.x,
             case .fiat(let fiat) = $0.id.y,
             let currency: Country.Currency = currencies[fiat] else {

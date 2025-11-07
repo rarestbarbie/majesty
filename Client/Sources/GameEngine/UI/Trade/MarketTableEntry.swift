@@ -3,7 +3,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 struct MarketTableEntry {
-    let id: Market.AssetPair
+    let id: BlocMarket.AssetPair
     let name: String
     let price: Candle<Double>
     let volume: Int64

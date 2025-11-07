@@ -6,7 +6,7 @@ import Random
 
 struct GameMap: ~Copyable {
     var random: PseudoRandom
-    var exchange: Exchange
+    var exchange: BlocMarkets
     var notifications: Notifications
 
     var conversions: [Pop.Conversion]
@@ -24,7 +24,7 @@ struct GameMap: ~Copyable {
     init(
         date: GameDate,
         settings: GameRules.Settings,
-        markets: OrderedDictionary<Market.AssetPair, Market> = [:]
+        markets: OrderedDictionary<BlocMarket.AssetPair, BlocMarket> = [:]
     ) {
         self.random = .init(seed: 12345)
         self.exchange = .init(settings: settings.exchange, table: markets)

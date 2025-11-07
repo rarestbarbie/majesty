@@ -18,8 +18,8 @@ struct CandlestickChart {
     }
 }
 extension CandlestickChart {
-    mutating func update(with market: Market, date: GameDate) {
-        guard let first: Market.Interval = market.history.first else {
+    mutating func update(with market: BlocMarket, date: GameDate) {
+        guard let first: BlocMarket.Interval = market.history.first else {
             self.history = []
             self.min = 0
             self.max = 1
@@ -36,7 +36,7 @@ extension CandlestickChart {
 
         var date: GameDate = date
 
-        for interval: Market.Interval in market.history.reversed() {
+        for interval: BlocMarket.Interval in market.history.reversed() {
             let interval: CandlestickChartInterval = .init(
                 id: date,
                 prices: interval.prices.log10,
