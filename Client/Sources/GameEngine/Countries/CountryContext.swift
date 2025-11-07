@@ -1,7 +1,5 @@
 import GameRules
 import GameState
-import JavaScriptInterop
-import JavaScriptKit
 
 struct CountryContext {
     let type: _NoMetadata

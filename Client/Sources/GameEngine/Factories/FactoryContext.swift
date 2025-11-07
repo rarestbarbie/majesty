@@ -4,8 +4,6 @@ import GameEconomy
 import GameIDs
 import GameRules
 import GameState
-import JavaScriptKit
-import JavaScriptInterop
 import OrderedCollections
 import Random
 

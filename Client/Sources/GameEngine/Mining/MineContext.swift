@@ -1,7 +1,5 @@
 import GameRules
 import GameState
-import JavaScriptInterop
-import JavaScriptKit
 import Random
 
 struct MineContext: RuntimeContext {
