@@ -17,7 +17,7 @@ extension PopulationReport.ColumnControl {
     func ascending(_ a: PopTableEntry, _ b: PopTableEntry) -> Bool? {
         switch self {
         case .type(let first):
-            return Self.order(a.type, b.type, around: first)
+            return Self.order(a.type, b.type, around: first).map(!)
         case .race(let first):
             return Self.order(a.nat, b.nat, around: first)
         }
