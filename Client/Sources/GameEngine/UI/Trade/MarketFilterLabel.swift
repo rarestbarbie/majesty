@@ -7,7 +7,7 @@ enum MarketFilterLabel: Equatable {
     case resource(ResourceLabel)
 }
 extension MarketFilterLabel: Identifiable {
-    var id: Market.Asset {
+    var id: BlocMarket.Asset {
         switch self {
         case .currency(let label): .fiat(label.id)
         case .resource(let label): .good(label.id)

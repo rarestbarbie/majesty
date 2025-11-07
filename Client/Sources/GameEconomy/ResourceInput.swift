@@ -90,7 +90,7 @@ extension ResourceInput<Double> {
         stockpileDays: ClosedRange<Int64>,
         budget: Int64,
         in currency: Fiat,
-        on exchange: inout Exchange
+        on exchange: inout BlocMarkets
     ) -> Int64 {
         {
             let target: Int64 = self.unitsDemanded * stockpileDays.lowerBound

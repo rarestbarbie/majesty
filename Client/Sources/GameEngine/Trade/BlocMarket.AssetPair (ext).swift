@@ -1,13 +1,14 @@
 import GameEconomy
+import GameRules
 import JavaScriptKit
 import JavaScriptInterop
 
-extension Market.Asset: ConvertibleToJSValue {
+extension BlocMarket.AssetPair: ConvertibleToJSValue {
     public var jsValue: JSValue {
         .string(.init(self.code))
     }
 }
-extension Market.Asset: LoadableFromJSValue {
+extension BlocMarket.AssetPair: LoadableFromJSValue {
     public static func load(from js: JSValue) throws -> Self {
         guard case .string(let js) = js,
         let value: Self = .code(js.description) else {

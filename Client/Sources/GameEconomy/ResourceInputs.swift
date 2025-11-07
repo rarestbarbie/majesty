@@ -51,7 +51,7 @@ extension ResourceInputs {
         stockpileDays target: ResourceStockpileTarget,
         spendingLimit budget: Int64,
         in currency: Fiat,
-        on exchange: inout Exchange,
+        on exchange: inout BlocMarkets,
     ) -> TradeProceeds {
         let weights: [Double] = self.tradeable.values.map {
             Double.init(
@@ -73,7 +73,7 @@ extension ResourceInputs {
         stockpileDays: ClosedRange<Int64>,
         spendingLimit: Int64,
         in currency: Fiat,
-        on exchange: inout Exchange,
+        on exchange: inout BlocMarkets,
         weights: ArraySlice<Double>,
     ) -> TradeProceeds {
         /// we want to guarantee that each resource gets at least 1 unit of budget

@@ -1,4 +1,4 @@
-extension Market {
+extension BlocMarket {
     @frozen public struct AssetPair: Hashable {
         public let x: Asset
         public let y: Asset
@@ -9,16 +9,16 @@ extension Market {
         }
     }
 }
-extension Market.AssetPair {
+extension BlocMarket.AssetPair {
     @inlinable var conjugated: Self {
         .init(self.y, self.x)
     }
 }
-extension Market.AssetPair {
+extension BlocMarket.AssetPair {
     @inlinable public static func code(_ code: some StringProtocol) -> Self? {
         if  let slash: String.Index = code.firstIndex(of: "/"),
-            let x: Market.Asset = .code(code[..<slash]),
-            let y: Market.Asset = .code(code[code.index(after: slash)...]) {
+            let x: BlocMarket.Asset = .code(code[..<slash]),
+            let y: BlocMarket.Asset = .code(code[code.index(after: slash)...]) {
             return .init(x, y)
         } else {
             return nil

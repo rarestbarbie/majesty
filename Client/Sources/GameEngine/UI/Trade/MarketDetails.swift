@@ -4,10 +4,10 @@ import JavaScriptKit
 import JavaScriptInterop
 
 struct MarketDetails: Identifiable {
-    let id: Market.AssetPair
+    let id: BlocMarket.AssetPair
     var chart: CandlestickChart
 
-    init(id: Market.AssetPair) {
+    init(id: BlocMarket.AssetPair) {
         self.id = id
         self.chart = .init()
     }
@@ -20,7 +20,7 @@ extension MarketDetails: PersistentReportDetails {
     }
 }
 extension MarketDetails {
-    mutating func update(from market: Market, date: GameDate) {
+    mutating func update(from market: BlocMarket, date: GameDate) {
         self.chart.update(with: market, date: date)
     }
 }

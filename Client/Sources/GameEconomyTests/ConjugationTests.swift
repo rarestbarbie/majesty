@@ -4,7 +4,7 @@ import Testing
 
 @Suite struct ConjugationTests {
     @Test static func Symmetry() throws {
-        var exchange: Exchange = .init()
+        var exchange: BlocMarkets = .init()
         let UNB: Fiat = 0
         let MAR: Fiat = 1
 

@@ -54,7 +54,7 @@ extension ResourceOutput<Never> {
     }
 }
 extension ResourceOutput<Double> {
-    public mutating func sell(in currency: Fiat, on exchange: inout Exchange) -> Int64 {
+    public mutating func sell(in currency: Fiat, on exchange: inout BlocMarkets) -> Int64 {
         {
             let units: Int64 = self.units.removed - self.unitsSold
             var unitsRemaining: Int64 = units

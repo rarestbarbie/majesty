@@ -3,7 +3,7 @@ import Fraction
 import LiquidityPool
 import RealModule
 
-@frozen public struct Market: Identifiable {
+@frozen public struct BlocMarket: Identifiable {
     public let id: AssetPair
     public let dividend: Fraction
     public var pool: LiquidityPool
@@ -23,7 +23,7 @@ import RealModule
         self.current = .open(self.pool.price)
     }
 }
-extension Market {
+extension BlocMarket {
     /// Unlike ``pool``, this property updates the candle on mutation.
     var canonical: LiquidityPool {
         _read {
@@ -46,7 +46,7 @@ extension Market {
         }
     }
 }
-extension Market {
+extension BlocMarket {
     @inlinable public mutating func turn(history: Int) {
         if  self.history.count >= history {
             self.history.removeFirst(self.history.count - history + 1)

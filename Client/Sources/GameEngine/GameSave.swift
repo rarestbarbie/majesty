@@ -17,7 +17,7 @@ public struct GameSave {
     let mines: [Mine]
     var pops: [Pop]
 
-    let markets: OrderedDictionary<Market.AssetPair, Market>
+    let markets: OrderedDictionary<BlocMarket.AssetPair, BlocMarket>
 }
 extension GameSave {
     public enum ObjectKey: JSString, Sendable {

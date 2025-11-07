@@ -3,13 +3,13 @@ import GameIDs
 /// Conventionally, we order the assets in a ``Market.Pair`` in ascending order, and we
 /// want fiat currencies to appear on the right side of the pair, for pairs that contain one
 /// fiat currency and one good. Thus, we order ``fiat(_:)`` after ``good(_:)``.
-extension Market {
+extension BlocMarket {
     @frozen public enum Asset: Equatable, Hashable, Comparable, Sendable {
         case good(Resource)
         case fiat(Fiat)
     }
 }
-extension Market.Asset {
+extension BlocMarket.Asset {
     @inlinable public static func code(_ code: some StringProtocol) -> Self? {
         if case "F"? = code.first,
             let fiat: Fiat = .init(code[code.index(after: code.startIndex)...]) {
