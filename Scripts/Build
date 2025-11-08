@@ -3,10 +3,12 @@ set -e # Exit immediately if a command exits with a non-zero status.
 
 # --- Default values ---
 # 'engine' is the default component if no asset flag is given
-COMPONENT="engine"   # engine, integration, json, sprites
-PLATFORM="wasm"     # wasm, host
-CONFIG="debug"      # debug, release
+COMPONENT='engine'  # engine, integration, json, sprites
+PLATFORM='host'     # wasm, host
+CONFIG='debug'      # debug, release
 NOASSERT=false
+
+SWIFT_WASM_SDK='6.1-RELEASE-wasm32-unknown-wasip1-threads'
 
 # --- Usage Function ---
 usage() {
@@ -18,8 +20,8 @@ usage() {
     echo
     echo "Swift Build Flags (can be combined):"
     echo "  -i              Component to build (default: engine)"
-    echo "  -h              Build for host platform (default: wasm)"
-    echo "  -w              Build for wasm platform (default)"
+    echo "  -h              Build for host platform"
+    echo "  -w              Build for wasm platform"
     echo "  -c <config>     Set build configuration: 'debug' or 'release' (default: debug)"
     echo "  -x              Shortcut for: -w -c release"
     echo "  --noassert      Use release build without assertions (only affects wasm 'engine' component)"
@@ -197,13 +199,12 @@ build_host() {
     fi
 
     echo "--- Building Engine for Host (debug) ---"
-    cd Client
     export SWIFT_TESTABLE="1"
 
     swift build -c debug --build-tests \
         --explicit-target-dependency-import-check=error
 
-    echo "Host build complete."
+    echo "Host build complete!"
 }
 
 build_wasm() {
@@ -211,7 +212,6 @@ build_wasm() {
     local scratch_path
 
     export SWIFT_WASM_SIMD128="1"
-    cd Client
 
     if [ "$COMPONENT" = "engine" ]; then
         product="engine"
@@ -229,7 +229,7 @@ build_wasm() {
 
     elif [ "$COMPONENT" = "integration" ]; then
         product="integration-tests"
-        scratch_path="../ClientIntegrationTests/.build.wasm"
+        scratch_path="IntegrationTests/.build.wasm"
 
         if [ "$NOASSERT" = true ]; then
             echo "Warning: --noassert flag is ignored for integration-tests component."
@@ -247,12 +247,10 @@ build_wasm() {
     # Execute the common swift package command
     swift package \
         --scratch-path "$scratch_path" \
-        --swift-sdk 6.1-RELEASE-wasm32-unknown-wasip1-threads \
-        js \
-        --product "$product" \
-        -c "$CONFIG"
+        --swift-sdk "$SWIFT_WASM_SDK" \
+        js --product "$product" -c "$CONFIG"
 
-    echo "Wasm build complete."
+    echo "Wasm build complete!"
 }
 
 # --- Execute Build Task ---
