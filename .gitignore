@@ -2,19 +2,16 @@ node_modules
 package-lock.json
 *.svg
 
-/Client/.build
-/Client/.build.*
-/Client/Art/Pops/Icons/*.png
-/Client/Public/Fonts/*.otf
-/Client/Public/Fonts/*.woff2
-/Client/Public/rules.json
-/ClientIntegrationTests/.build/
-/ClientIntegrationTests/.build.*
+/.build
+/.build.*
+/Art/Pops/Icons/*.png
+/Public/Fonts/*.otf
+/Public/Fonts/*.woff2
+/Public/rules.json
+/IntegrationTests/.build/
+/IntegrationTests/.build.*
 
 /Server/build/
-
-/DataExtract/dist
-/DataExtract/output.json
 
 /.vscode/launch.json
 /*.code-workspace
