@@ -1,18 +1,33 @@
 {
     "*": {
         "l": {
+            "Appliances": 1,
             "Electricity": 1,
-            "Poultry": 3,
-            "Wheat": 3
+            "Clothing": 2,
+            "Medical Equipment": 1,
+            "Poultry": 2,
+            "Wheat": 2,
+            "Vehicles": 1,
+            "Water": 1
         },
         "e": {
-            "Produce": 3,
-            "Beef": 3,
-            "Services": 1
+            "Electronics": 1,
+            "Makeup": 1,
+            "Produce": 2,
+            "Beef": 2,
+            "Storage": 1,
+            "Services": 2,
+            "Liquor": 1,
+            "Vapes": 1
         },
         "x": {
-            "Services": 3,
-            "Advertising": 3
+            "Electronics": 2,
+            "Services": 4,
+            "Firearms": 1,
+            "Advertising": 4,
+            "Instruments": 1,
+            "Jewelry": 1,
+            "Lingerie": 4
         }
     },
     "Livestock": {
@@ -64,29 +79,70 @@
     },
     "Aristocrat": {
         "color": "#fd6dd2",
+        "l": {
+            "Appliances": 2,
+            "Electricity": 1,
+            "Clothing": 6,
+            "Medical Equipment": 2,
+            "Poultry": 2,
+            "Wheat": 2,
+            "Vehicles": 4,
+            "Water": 1
+        },
         "e": {
-            "Produce": 6,
-            "Beef": 6,
-            "Services": 6
+            "Electronics": 2,
+            "Makeup": 2,
+            "Clothing": 6,
+            "Produce": 2,
+            "Beef": 2,
+            "Storage": 2,
+            "Services": 6,
+            "Lingerie": 4,
+            "Vapes": 1
         },
         "x": {
-            "Influence": 1,
-            "Services": 12,
-            "Advertising": 3
+            "Electronics": 2,
+            "Firearms": 2,
+            "Advertising": 4,
+            "Instruments": 4,
+            "Jewelry": 2,
+            "Lingerie": 10,
+            "Influence": 2,
+            "Services": 12
         }
     },
     "Politician": {
         "color": "#401249",
+        "l": {
+            "Appliances": 2,
+            "Electricity": 1,
+            "Clothing": 6,
+            "Medical Equipment": 2,
+            "Poultry": 2,
+            "Wheat": 2,
+            "Vehicles": 4,
+            "Water": 1
+        },
         "e": {
-            "Produce": 6,
-            "Beef": 6,
+            "Electronics": 2,
+            "Makeup": 2,
+            "Clothing": 6,
+            "Produce": 2,
+            "Beef": 2,
+            "Storage": 2,
             "Services": 6,
-            "Influence": 1
+            "Lingerie": 4,
+            "Vapes": 1
         },
         "x": {
-            "Influence": 1,
-            "Services": 12,
-            "Advertising": 256
+            "Electronics": 2,
+            "Firearms": 2,
+            "Advertising": 16,
+            "Instruments": 4,
+            "Jewelry": 2,
+            "Lingerie": 10,
+            "Influence": 2,
+            "Services": 12
         }
     }
 }

@@ -32,6 +32,19 @@
         "initial_size": 1000000000
     },
 
+    "Lithium Mine": {
+        "miner": "Miner",
+        "decay": true,
+        "base": {
+            "Lithium": 800
+        },
+        "geology": {
+            "Earth_Continental_Crust": 2,
+            "Earth_Sedimentary_Basin": 2
+        },
+        "initial_size": 1000000000
+    },
+
     "Natural Gas Field": {
         "miner": "Miner",
         "decay": true,
