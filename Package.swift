@@ -16,6 +16,7 @@ let package: Package = .init(
         .package(url: "https://github.com/swiftwasm/JavaScriptKit", branch: "main"),
         .package(url: "https://github.com/apple/swift-numerics", from: "1.0.3"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.2.1"),
+        .package(url: "https://github.com/ordo-one/package-distributions", from: "0.1.0"),
         .package(url: "https://github.com/tayloraswift/dollup", from: "0.3.0"),
         .package(url: "https://github.com/tayloraswift/d", from: "0.4.0"),
     ],
@@ -150,7 +151,6 @@ let package: Package = .init(
                 .target(name: "GameTerrain"),
                 .target(name: "GameUI"),
                 .target(name: "JavaScriptInterop"),
-                .target(name: "Random"),
                 .target(name: "Vector"),
                 .target(name: "VectorCharts"),
                 .target(name: "VectorCharts_JavaScript"),
@@ -163,8 +163,8 @@ let package: Package = .init(
                 .target(name: "Assert"),
                 .target(name: "GameIDs"),
                 .target(name: "LiquidityPool"),
-                .target(name: "Random"),
                 .product(name: "D", package: "d"),
+                .product(name: "Random", package: "package-distributions"),
                 .product(name: "DequeModule", package: "swift-collections"),
                 .product(name: "OrderedCollections", package: "swift-collections"),
                 .product(name: "RealModule", package: "swift-numerics"),
@@ -265,23 +265,6 @@ let package: Package = .init(
             dependencies: [
                 .target(name: "Fraction"),
             ]
-        ),
-
-        .target(
-            name: "Random",
-            dependencies: [
-                .product(name: "RealModule", package: "swift-numerics"),
-            ],
-            linkerSettings: [
-                .linkedLibrary("m"),
-            ],
-        ),
-
-        .testTarget(
-            name: "RandomTests",
-            dependencies: [
-                .target(name: "Random"),
-            ],
         ),
 
         .target(
