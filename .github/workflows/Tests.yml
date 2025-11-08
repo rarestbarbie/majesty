@@ -24,7 +24,7 @@ jobs:
                 run: |
                     swift sdk install \
                     "https://github.com/swiftwasm/swift/releases/download/swift-wasm-$SWIFTWASM_VERSION/swift-wasm-$SWIFTWASM_VERSION-$SWIFTWASM_TRIPLE.artifactbundle.zip" \
-                    --checksum df8dee548a572f9325e997e1378f4dbab1dbfc986f92a35887b313e19007835d
+                    --checksum 0dd273be28741f8e1eb00682c39bdc956361ed24b5572e183dd8a4e9d1c5f6ec
 
             -   name: Checkout repository
                 uses: actions/checkout@v3
