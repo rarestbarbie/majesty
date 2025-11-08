@@ -11,6 +11,9 @@ jobs:
         runs-on: ubuntu-24.04
         name: Ubuntu 24.04
         steps:
+            -   name: Checkout repository
+                uses: actions/checkout@v3
+
             -   name: Install Dependencies
                 run: |
                     sudo apt update
@@ -34,9 +37,6 @@ jobs:
                     swift sdk install \
                     "https://github.com/swiftwasm/swift/releases/download/swift-wasm-$SWIFTWASM_VERSION/swift-wasm-$SWIFTWASM_VERSION-$SWIFTWASM_TRIPLE.artifactbundle.zip" \
                     --checksum 0dd273be28741f8e1eb00682c39bdc956361ed24b5572e183dd8a4e9d1c5f6ec
-
-            -   name: Checkout repository
-                uses: actions/checkout@v3
 
             -   name: Run tests
                 run: Scripts/TestAll
