@@ -8,7 +8,8 @@ import {
     InstantiateOptions
 } from '../.build.wasm/plugins/PackageToJS/outputs/Package/instantiate.js';
 import {
-    defaultNodeSetup
+    defaultNodeSetup,
+    createDefaultWorkerFactory
 } from '../.build.wasm/plugins/PackageToJS/outputs/Package/platforms/node.js';
 
 // Helper to resolve paths relative to the current file
@@ -29,5 +30,9 @@ global.start = JSON.parse(fs.readFileSync(start, 'utf8'));
 global.rules = JSON.parse(fs.readFileSync(rules, 'utf8'));
 global.terrain = JSON.parse(fs.readFileSync(terrain, 'utf8'));
 
-const options: InstantiateOptions = await defaultNodeSetup({});
+const options: InstantiateOptions = await defaultNodeSetup(
+    {
+        spawnWorker: createDefaultWorkerFactory()
+    }
+);
 await instantiate(options);
