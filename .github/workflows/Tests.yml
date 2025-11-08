@@ -11,6 +11,12 @@ jobs:
         runs-on: ubuntu-24.04
         name: Ubuntu 24.04
         steps:
+            -   name: Install Dependencies
+                run: |
+                    sudo apt update
+                    sudo apt install -y \
+                        imagemagick
+
             -   name: Install Swift
                 uses: tayloraswift/swift-install-action@master
                 with:
