@@ -1,0 +1,287 @@
+#!/bin/bash
+set -e # Exit immediately if a command exits with a non-zero status.
+
+# --- Default values ---
+# 'engine' is the default component if no asset flag is given
+COMPONENT="engine"   # engine, integration, json, sprites
+PLATFORM="wasm"     # wasm, host
+CONFIG="debug"      # debug, release
+NOASSERT=false
+
+# --- Usage Function ---
+usage() {
+    echo "Usage: $0 [options]"
+    echo
+    echo "Asset Pipeline Flags (run one task and exit):"
+    echo "  -j              Build JSON rules"
+    echo "  -s              Bake spritesheet"
+    echo
+    echo "Swift Build Flags (can be combined):"
+    echo "  -i              Component to build (default: engine)"
+    echo "  -h              Build for host platform (default: wasm)"
+    echo "  -w              Build for wasm platform (default)"
+    echo "  -c <config>     Set build configuration: 'debug' or 'release' (default: debug)"
+    echo "  -x              Shortcut for: -w -c release"
+    echo "  --noassert      Use release build without assertions (only affects wasm 'engine' component)"
+    echo
+    echo "  -? | --help     Show this help message"
+    echo
+    exit 1
+}
+
+# --- Parse Arguments ---
+while [[ $# -gt 0 ]]; do
+    case "$1" in
+        -j)
+            COMPONENT="json"
+            shift
+            ;;
+        -s)
+            COMPONENT="sprites"
+            shift
+            ;;
+        -i)
+            COMPONENT="integration" # Overrides 'swift' default
+            shift
+            ;;
+        -h)
+            PLATFORM="host"
+            shift
+            ;;
+        -w)
+            PLATFORM="wasm"
+            shift
+            ;;
+        -c)
+            if [[ -z "$2" || "$2" == -* ]]; then
+                echo "Error: -c option requires an argument (debug or release)." >&2
+                usage
+            fi
+            if [[ "$2" != "debug" && "$2" != "release" ]]; then
+                  echo "Error: -c argument must be 'debug' or 'release'." >&2
+                  usage
+            fi
+            CONFIG="$2"
+            shift
+            shift
+            ;;
+        -x)
+            PLATFORM="wasm"
+            CONFIG="release"
+            shift
+            ;;
+        --noassert)
+            NOASSERT=true
+            shift
+            ;;
+        -? | --help)
+            usage
+            ;;
+        *)
+            echo "Unknown option: $1" >&2
+            usage
+            ;;
+    esac
+done
+
+# --- Set Project Root ---
+# Move to the project root directory (one level up from this script)
+cd "$(dirname "$0")/.."
+
+# --- Build Task Functions ---
+
+build_json() {
+    echo "--- Building JSON Rules ---"
+    node Scripts/collate_json.js Public/Rules/ Public/rules.json
+    echo "JSON build complete."
+}
+
+build_sprites() {
+    echo "--- Baking Sprites ---"
+
+    local SPRITE_WIDTH=56
+    local CONFIG_FILE="crop.cfg"
+
+    # Navigate to the pop art directory
+    cd Art/Pops/
+    rm -f Icons/*.png
+
+    for file in Sources/*.png; do
+        local filename
+        filename=$(basename "$file" .png)
+
+        # --- Read settings from config file ---
+        local config_line
+        config_line=$(grep "^${filename}," "$CONFIG_FILE" || echo "")
+
+        # Default crop is 0 pixels from each side
+        local crop_t=0
+        local crop_r=0
+        local crop_b=0
+        local crop_l=0
+
+        if [[ -n "$config_line" ]]; then
+            # If a config is found, parse it
+            crop_t=$(echo "$config_line" | cut -d',' -f2)
+            crop_r=$(echo "$config_line" | cut -d',' -f3)
+            crop_b=$(echo "$config_line" | cut -d',' -f4)
+            crop_l=$(echo "$config_line" | cut -d',' -f5)
+        fi
+
+        echo "Processing $filename with adjustments (T,R,B,L): ${crop_t},${crop_r},${crop_b},${crop_l}"
+
+        # --- Build crop/pad arguments for ImageMagick ---
+        local op_args=()
+
+        # Top: positive=chop, negative=splice
+        if [[ ${crop_t} -gt 0 ]]; then
+            op_args+=(-gravity North -chop "0x${crop_t}")
+        elif [[ ${crop_t} -lt 0 ]]; then
+            local padding_t=$(( -crop_t ))
+            op_args+=(-gravity North -splice "0x${padding_t}")
+        fi
+
+        # Right: positive=chop, negative=splice
+        if [[ ${crop_r} -gt 0 ]]; then
+            op_args+=(-gravity East -chop "${crop_r}x0")
+        elif [[ ${crop_r} -lt 0 ]]; then
+            local padding_r=$(( -crop_r ))
+            op_args+=(-gravity East -splice "${padding_r}x0")
+        fi
+
+        # Bottom: positive=chop, negative=splice
+        if [[ ${crop_b} -gt 0 ]]; then
+            op_args+=(-gravity South -chop "0x${crop_b}")
+        elif [[ ${crop_b} -lt 0 ]]; then
+            local padding_b=$(( -crop_b ))
+            op_args+=(-gravity South -splice "0x${padding_b}")
+        fi
+
+        # Left: positive=chop, negative=splice
+        if [[ ${crop_l} -gt 0 ]]; then
+            op_args+=(-gravity West -chop "${crop_l}x0")
+        elif [[ ${crop_l} -lt 0 ]]; then
+            local padding_l=$(( -crop_l ))
+            op_args+=(-gravity West -splice "${padding_l}x0")
+        fi
+
+        convert "$file" \
+            -fuzz 5% \
+            -fill none -draw "color 0,0 floodfill" \
+            -background none \
+            "${op_args[@]}" \
+            +repage \
+            -morphology Erode Diamond:1 \
+            -filter box -resize ${SPRITE_WIDTH} \
+            "Icons/${filename}.png"
+    done
+
+    # Return to project root
+    cd ../..
+
+    mkdir -p Public/Icons
+    node Scripts/spritesheet.js
+
+    local TIMESTAMP
+    TIMESTAMP=$(date +%s)
+    echo "\$spritesheet-url: '/Icons/Pops.png?v=$TIMESTAMP';" > Stylesheets/generated/_sprite-url.scss
+
+    echo "Spritesheet and URL variable baked successfully."
+}
+
+build_host() {
+    # Corresponds to "Build (debug, host)"
+    # This task is always debug and always builds the main target
+    if [ "$COMPONENT" = "integration" ]; then
+        echo "Warning: Host build (-h) for integration tests is not defined in tasks.json. Building engine instead."
+    fi
+
+    if [ "$CONFIG" != "debug" ]; then
+        echo "Warning: Host build (-h) ignores config flag (-c). Building debug."
+    fi
+
+    echo "--- Building Engine for Host (debug) ---"
+    cd Client
+    export SWIFT_TESTABLE="1"
+
+    swift build -c debug --build-tests \
+        --explicit-target-dependency-import-check=error
+
+    echo "Host build complete."
+}
+
+build_wasm() {
+    local product
+    local scratch_path
+
+    export SWIFT_WASM_SIMD128="1"
+    cd Client
+
+    if [ "$COMPONENT" = "engine" ]; {
+        product="engine"
+        scratch_path=".build.wasm"
+
+        if [ "$CONFIG" = "release" ] && [ "$NOASSERT" = true ]; then
+            # "Build (release, noassert)"
+            echo "--- Building Engine for Wasm (release, noassert) ---"
+            # SWIFT_TESTABLE is NOT set for noassert build
+        else
+            # "Build (release)" or "Build (debug)"
+            echo "--- Building Engine for Wasm ($CONFIG) ---"
+            export SWIFT_TESTABLE="1"
+        fi
+
+    } elif [ "$COMPONENT" = "integration" ]; {
+        product="integration-tests"
+        scratch_path="../ClientIntegrationTests/.build.wasm"
+
+        if [ "$NOASSERT" = true ]; then
+            echo "Warning: --noassert flag is ignored for integration-tests component."
+        fi
+
+        # "Build Integration Tests (debug)" or "(release)"
+        echo "--- Building Integration Tests for Wasm ($CONFIG) ---"
+        export SWIFT_TESTABLE="1"
+
+    } else {
+        echo "Error: Unknown component '$COMPONENT' for Wasm build." >&2
+        exit 1
+    } fi
+
+    # Execute the common swift package command
+    swift package \
+        --scratch-path "$scratch_path" \
+        --swift-sdk 6.1-RELEASE-wasm32-unknown-wasip1-threads \
+        js \
+        --product "$product" \
+        -c "$CONFIG"
+
+    echo "Wasm build complete."
+}
+
+# --- Execute Build Task ---
+
+case "$COMPONENT" in
+    json)
+        build_json
+        ;;
+    sprites)
+        build_sprites
+        ;;
+    engine | integration)
+        # This is a Swift build
+        if [ "$PLATFORM" = "host" ]; then
+            build_host
+        elif [ "$PLATFORM" = "wasm" ]; then
+            build_wasm
+        else
+            echo "Error: Unknown platform '$PLATFORM'." >&2
+            usage
+        fi
+        ;;
+    *)
+        # This should be unreachable due to the default
+        echo "Error: Unhandled component '$COMPONENT'." >&2
+        usage
+        ;;
+esac
