@@ -19,3 +19,6 @@ extension PopType {
         }
     }
 }
+extension PopType {
+    var descending: PopTypeDescending { .init(rawValue: self) }
+}

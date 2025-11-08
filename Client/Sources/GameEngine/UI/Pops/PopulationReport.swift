@@ -125,7 +125,7 @@ extension PopulationReport: PersistentReport {
         self.columns.type.updateStops(
             columnSelected: self.columnSelected,
             from: self.pops,
-            on: \.type,
+            on: \.type.descending,
             as: ColumnControl.type(_:)
         )
         self.columns.race.updateStops(

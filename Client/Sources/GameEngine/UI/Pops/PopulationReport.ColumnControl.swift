@@ -4,7 +4,7 @@ import JavaScriptInterop
 
 extension PopulationReport {
     @StringUnion @frozen @usableFromInline enum ColumnControl {
-        @tag("T") case type(PopType)
+        @tag("T") case type(PopTypeDescending)
         @tag("R") case race(String)
     }
 }
@@ -17,7 +17,7 @@ extension PopulationReport.ColumnControl {
     func ascending(_ a: PopTableEntry, _ b: PopTableEntry) -> Bool? {
         switch self {
         case .type(let first):
-            return Self.order(a.type, b.type, around: first).map(!)
+            return Self.order(a.type.descending, b.type.descending, around: first)
         case .race(let first):
             return Self.order(a.nat, b.nat, around: first)
         }
