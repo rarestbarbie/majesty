@@ -16,6 +16,9 @@ jobs:
                     sudo apt update
                     sudo apt install -y \
                         imagemagick
+                    npm install
+                    cd IntegrationTests
+                    npm install
 
             -   name: Install Swift
                 uses: tayloraswift/swift-install-action@master
