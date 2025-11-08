@@ -1,0 +1,20 @@
+#!/bin/bash
+
+cd "$(dirname "$0")/.."
+
+set -e
+
+echo '🝮 Running unit tests 🝮'
+
+swift test
+
+Scripts/Build -s
+Scripts/Build -j
+
+Scripts/Build -x
+
+echo '🝮 Running integration tests 🝮'
+
+cd IntegrationTests
+npx tsc
+npm test

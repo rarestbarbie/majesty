@@ -43,7 +43,8 @@ while [[ $# -gt 0 ]]; do
             shift
             ;;
         -i)
-            COMPONENT="integration" # Overrides 'swift' default
+            COMPONENT="integration"
+            PLATFORM="wasm"
             shift
             ;;
         -h)
@@ -191,7 +192,7 @@ build_host() {
     # Corresponds to "Build (debug, host)"
     # This task is always debug and always builds the main target
     if [ "$COMPONENT" = "integration" ]; then
-        echo "Warning: Host build (-h) for integration tests is not defined in tasks.json. Building engine instead."
+        echo "Warning: integration tests are not built for host platform. Building engine instead."
     fi
 
     if [ "$CONFIG" != "debug" ]; then
@@ -199,7 +200,6 @@ build_host() {
     fi
 
     echo "--- Building Engine for Host (debug) ---"
-    export SWIFT_TESTABLE="1"
 
     swift build -c debug --build-tests \
         --explicit-target-dependency-import-check=error
@@ -213,6 +213,10 @@ build_wasm() {
 
     export SWIFT_WASM_SIMD128="1"
 
+    # The `--scratch-path` is important — this path is hard-coded into the TypeScript sources,
+    # and if the WebAssembly and generated JavaScript files are not there, Vite won’t be able to
+    # link them with the rest of the app.
+
     if [ "$COMPONENT" = "engine" ]; then
         product="engine"
         scratch_path=".build.wasm"
@@ -220,11 +224,10 @@ build_wasm() {
         if [ "$CONFIG" = "release" ] && [ "$NOASSERT" = true ]; then
             # "Build (release, noassert)"
             echo "--- Building Engine for Wasm (release, noassert) ---"
-            # SWIFT_TESTABLE is NOT set for noassert build
+            export SWIFT_NOASSERT="1"
         else
             # "Build (release)" or "Build (debug)"
             echo "--- Building Engine for Wasm ($CONFIG) ---"
-            export SWIFT_TESTABLE="1"
         fi
 
     elif [ "$COMPONENT" = "integration" ]; then
@@ -237,7 +240,6 @@ build_wasm() {
 
         # "Build Integration Tests (debug)" or "(release)"
         echo "--- Building Integration Tests for Wasm ($CONFIG) ---"
-        export SWIFT_TESTABLE="1"
 
     else
         echo "Error: Unknown component '$COMPONENT' for Wasm build." >&2
@@ -246,6 +248,7 @@ build_wasm() {
 
     # Execute the common swift package command
     swift package \
+        --explicit-target-dependency-import-check=error \
         --scratch-path "$scratch_path" \
         --swift-sdk "$SWIFT_WASM_SDK" \
         js --product "$product" -c "$CONFIG"

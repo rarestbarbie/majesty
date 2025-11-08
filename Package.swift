@@ -305,21 +305,21 @@ for target: Target in package.targets {
     let swift: [SwiftSetting]
     let c: [CSetting]
 
-    switch ProcessInfo.processInfo.environment["SWIFT_TESTABLE"]
+    switch ProcessInfo.processInfo.environment["SWIFT_NOASSERT"]
     {
     case "1"?, "true"?:
         swift = [
             .enableUpcomingFeature("ExistentialAny"),
-            .define("TESTABLE")
         ]
 
     case "0"?, "false"?, nil:
         swift = [
             .enableUpcomingFeature("ExistentialAny"),
+            .define("TESTABLE"),
         ]
 
     case let value?:
-        fatalError("Unexpected 'SWIFT_TESTABLE' value: \(value)")
+        fatalError("Unexpected 'SWIFT_NOASSERT' value: \(value)")
     }
 
     switch ProcessInfo.processInfo.environment["SWIFT_WASM_SIMD128"]

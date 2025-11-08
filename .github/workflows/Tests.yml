@@ -1,0 +1,33 @@
+name: tests
+
+on:
+    push:
+        branches: [ master ]
+    pull_request:
+        branches: [ master ]
+
+jobs:
+    linux:
+        runs-on: ubuntu-24.04
+        name: Ubuntu 24.04
+        steps:
+            -   name: Install Swift
+                uses: tayloraswift/swift-install-action@master
+                with:
+                    swift-prefix: "swift-6.1.2-release/ubuntu2404/swift-6.1.2-RELEASE"
+                    swift-id: "swift-6.1.2-RELEASE-ubuntu24.04"
+
+            -   name: Install Swift WebAssembly SDK
+                env:
+                    SWIFTWASM_VERSION: "6.1-RELEASE"
+                    SWIFTWASM_TRIPLE: "wasm32-unknown-wasip1-threads"
+                run: |
+                    swift sdk install \
+                    "https://github.com/swiftwasm/swift/releases/download/swift-wasm-$SWIFTWASM_VERSION/swift-wasm-$SWIFTWASM_VERSION-$SWIFTWASM_TRIPLE.artifactbundle.zip" \
+                    --checksum df8dee548a572f9325e997e1378f4dbab1dbfc986f92a35887b313e19007835d
+
+            -   name: Checkout repository
+                uses: actions/checkout@v3
+
+            -   name: Run tests
+                run: Scripts/TestAll
