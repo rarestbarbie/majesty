@@ -102,17 +102,15 @@ build_sprites() {
     local SPRITE_WIDTH=56
     local CONFIG_FILE="crop.cfg"
 
-    # Navigate to the pop art directory
     cd Art/Pops/
+    mkdir -p Icons/
     rm -f Icons/*.png
 
     for file in Sources/*.png; do
-        local filename
-        filename=$(basename "$file" .png)
+        local filename=$(basename "$file" .png)
 
         # --- Read settings from config file ---
-        local config_line
-        config_line=$(grep "^${filename}," "$CONFIG_FILE" || echo "")
+        local config_line=$(grep "^${filename}," "$CONFIG_FILE" || echo "")
 
         # Default crop is 0 pixels from each side
         local crop_t=0
@@ -176,16 +174,14 @@ build_sprites() {
             "Icons/${filename}.png"
     done
 
-    # Return to project root
-    cd ../..
+    cd ..
+    cd ..
 
     mkdir -p Public/Icons
     node Scripts/spritesheet.js
 
-    local TIMESTAMP
-    TIMESTAMP=$(date +%s)
+    local TIMESTAMP=$(date +%s)
     echo "\$spritesheet-url: '/Icons/Pops.png?v=$TIMESTAMP';" > Stylesheets/generated/_sprite-url.scss
-
     echo "Spritesheet and URL variable baked successfully."
 }
 
@@ -217,7 +213,7 @@ build_wasm() {
     export SWIFT_WASM_SIMD128="1"
     cd Client
 
-    if [ "$COMPONENT" = "engine" ]; {
+    if [ "$COMPONENT" = "engine" ]; then
         product="engine"
         scratch_path=".build.wasm"
 
@@ -231,7 +227,7 @@ build_wasm() {
             export SWIFT_TESTABLE="1"
         fi
 
-    } elif [ "$COMPONENT" = "integration" ]; {
+    elif [ "$COMPONENT" = "integration" ]; then
         product="integration-tests"
         scratch_path="../ClientIntegrationTests/.build.wasm"
 
@@ -243,10 +239,10 @@ build_wasm() {
         echo "--- Building Integration Tests for Wasm ($CONFIG) ---"
         export SWIFT_TESTABLE="1"
 
-    } else {
+    else
         echo "Error: Unknown component '$COMPONENT' for Wasm build." >&2
         exit 1
-    } fi
+    fi
 
     # Execute the common swift package command
     swift package \
