@@ -47,7 +47,7 @@ extension TradeReport: PersistentReport {
             default: .init(rawValue: .fiat(snapshot.player.currency.id))
         ) {
             guard
-            let today: BlocMarket.Interval = $0.history.last,
+            let today: BlocMarket.Interval = $0.state.history.last,
             case .good(let good) = $0.id.x,
             case .fiat(let fiat) = $0.id.y,
             let currency: Country.Currency = currencies[fiat] else {
@@ -63,7 +63,7 @@ extension TradeReport: PersistentReport {
                 volume: today.volume.base.total
             )
         } update: {
-            $0.update(from: $2, date: snapshot.date)
+            $0.update(from: $2.state, date: snapshot.date)
         }
 
         self.filters.0 = filterlists.resource.values.map(MarketFilterLabel.resource(_:))

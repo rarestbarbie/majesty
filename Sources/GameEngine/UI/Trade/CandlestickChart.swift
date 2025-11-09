@@ -18,7 +18,7 @@ struct CandlestickChart {
     }
 }
 extension CandlestickChart {
-    mutating func update(with market: BlocMarket, date: GameDate) {
+    mutating func update(with market: BlocMarket.State, date: GameDate) {
         guard let first: BlocMarket.Interval = market.history.first else {
             self.history = []
             self.min = 0

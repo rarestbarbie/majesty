@@ -11,27 +11,39 @@ public struct GameSession: ~Copyable {
     private var world: GameWorld
     private var ui: GameUI
 
-    public init(
-        save: consuming GameSave,
+    private init(context: GameContext, world: consuming GameWorld) {
+        self.context = context
+        self.world = world
+        self.ui = .init()
+    }
+}
+extension GameSession {
+    public static func load(
+        _ save: consuming GameSave,
         rules: borrowing GameRulesDescription,
-        terrain: borrowing TerrainMap,
-    ) throws {
+        map: borrowing TerrainMap,
+    ) throws -> Self {
         Self.address(&save.countries)
         Self.address(&save.pops)
 
         let rules: GameRules = try .init(resolving: rules, with: &save.symbols)
 
-        var context: GameContext = try .init(save: save, rules: rules)
-        try context.loadTerrain(terrain)
+        var context: GameContext = try .load(save, rules: rules)
+        try context.loadTerrain(map)
 
-        self.context = context
-        self.world = .init(
-            notifications: .init(date: save.date),
-            tradeableMarkets: save.markets,
-            inelasticMarkets: [:],
-            random: .init(seed: 12345),
+        return .init(
+            context: context,
+            world: .init(
+                notifications: .init(date: save.date),
+                tradeableMarkets: save.tradeableMarkets,
+                inelasticMarkets: save.inelasticMarkets,
+                random: save.random,
+            )
         )
-        self.ui = .init()
+    }
+
+    public var save: GameSave {
+        self.context.save(self.world)
     }
 }
 extension GameSession {

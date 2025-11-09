@@ -10,8 +10,8 @@ import OrderedCollections
 @dynamicMemberLookup struct GameSnapshot: ~Copyable {
     let context: GameContext
     let markets: (
-        tradeable: OrderedDictionary<BlocMarket.AssetPair, BlocMarket>,
-        inelastic: OrderedDictionary<LocalMarkets.Key, LocalMarket>
+        tradeable: OrderedDictionary<BlocMarket.ID, BlocMarket>,
+        inelastic: OrderedDictionary<LocalMarket.ID, LocalMarket>
     )
     let date: GameDate
 }
@@ -162,11 +162,11 @@ extension GameSnapshot {
         }
 
         let market: (
-            inelastic: LocalMarket?,
-            tradeable: Candle<Double>?
+            inelastic: LocalMarket.State?,
+            tradeable: BlocMarket.State?
         ) = (
-            self.markets.inelastic[line.resource / factory.state.tile],
-            self.markets.tradeable[line.resource / country.currency.id]?.history.last?.prices
+            self.markets.inelastic[line.resource / factory.state.tile]?.state,
+            self.markets.tradeable[line.resource / country.currency.id]?.state
         )
 
         switch line {
@@ -618,12 +618,13 @@ extension GameSnapshot {
             return nil
         }
 
+        let resource: Resource = line.resource
         let market: (
-            inelastic: LocalMarket?,
-            tradeable: Candle<Double>?
+            inelastic: LocalMarket.State?,
+            tradeable: BlocMarket.State?
         ) = (
-            self.markets.inelastic[line.resource / pop.state.tile],
-            self.markets.tradeable[line.resource / country.currency.id]?.history.last?.prices
+            self.markets.inelastic[resource / pop.state.tile]?.state,
+            self.markets.tradeable[resource / country.currency.id]?.state
         )
 
         switch line {
@@ -718,10 +719,10 @@ extension GameSnapshot {
 }
 extension GameSnapshot {
     func tooltipMarketLiquidity(
-        _ id: BlocMarket.AssetPair
+        _ id: BlocMarket.ID
     ) -> Tooltip? {
         guard
-        let market: BlocMarket = self.markets.tradeable[id],
+        let market: BlocMarket.State = self.markets.tradeable[id]?.state,
         let last: Int = market.history.indices.last else {
             return nil
         }
@@ -740,8 +741,8 @@ extension GameSnapshot {
         let today: (quote: Int64, base: Int64)
         let yesterday: (quote: Int64, base: Int64)
 
-        today.quote = market.pool.assets.quote
-        today.base = market.pool.assets.base
+        today.quote = market.capital.quote
+        today.base = market.capital.base
 
         yesterday.quote = today.quote - flow.quote
         yesterday.base = today.base - flow.base

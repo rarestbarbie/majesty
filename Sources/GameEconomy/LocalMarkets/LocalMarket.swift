@@ -3,34 +3,61 @@ import Fraction
 import GameIDs
 import Random
 
-@frozen public struct LocalMarket {
+@frozen public struct LocalMarket: Identifiable {
+    public let id: ID
     public var priceFloor: PriceFloor?
-    public var yesterday: LocalMarketState
-    public var today: LocalMarketState
+    public var yesterday: Interval
+    public var today: Interval
 
     @usableFromInline var asks: [Order]
     @usableFromInline var bids: [Order]
 
-    init(
+    @inlinable init(
+        id: ID,
         priceFloor: PriceFloor?,
-        yesterday: LocalMarketState,
-        today: LocalMarketState,
+        yesterday: Interval,
+        today: Interval,
         asks: [Order],
         bids: [Order]
     ) {
+        self.id = id
         self.priceFloor = priceFloor
         self.yesterday = yesterday
         self.today = today
         self.asks = asks
         self.bids = bids
     }
+}
+extension LocalMarket {
+    @inlinable init(id: ID) {
+        let interval: Interval = .init(price: .init(), supply: 0, demand: 0)
+        self.init(
+            id: id,
+            priceFloor: nil,
+            yesterday: interval,
+            today: interval,
+            asks: [],
+            bids: []
+        )
+    }
 
-    @inlinable init() {
-        self.priceFloor = nil
-        self.yesterday = .init(price: .init(), supply: 0, demand: 0)
-        self.today = self.yesterday
-        self.asks = []
-        self.bids = []
+    @inlinable public init(state: State) {
+        self.init(
+            id: state.id,
+            priceFloor: state.priceFloor,
+            yesterday: state.yesterday,
+            today: state.today,
+            asks: [],
+            bids: []
+        )
+    }
+    @inlinable public var state: State {
+        .init(
+            id: self.id,
+            priceFloor: self.priceFloor,
+            yesterday: self.yesterday,
+            today: self.today
+        )
     }
 }
 extension LocalMarket {
@@ -43,7 +70,7 @@ extension LocalMarket {
         )
     }
 
-    @inlinable public var history: (yesterday: LocalMarketState, today: LocalMarketState)  {
+    @inlinable public var history: (yesterday: Interval, today: Interval)  {
         (self.yesterday, self.today)
     }
 }

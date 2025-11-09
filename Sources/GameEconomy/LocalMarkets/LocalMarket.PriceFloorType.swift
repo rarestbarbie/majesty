@@ -1,5 +1,5 @@
 extension LocalMarket {
-    @frozen public enum PriceFloorType {
+    @frozen public enum PriceFloorType: Comparable, Equatable, Hashable, Sendable {
         case minimumWage
     }
 }

@@ -3,13 +3,17 @@ import GameRules
 import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
+import Random
 import OrderedCollections
 
 public struct GameSave {
-    var symbols: GameRules.Symbols
-
-    let date: GameDate
+    var symbols: GameSaveSymbols
+    let random: PseudoRandom
     let player: CountryID
+
+    let tradeableMarkets: OrderedDictionary<BlocMarket.ID, BlocMarket>
+    let inelasticMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
+    let date: GameDate
 
     let cultures: [Culture]
     var countries: [Country]
@@ -17,14 +21,16 @@ public struct GameSave {
     let mines: [Mine]
     var pops: [Pop]
 
-    let markets: OrderedDictionary<BlocMarket.AssetPair, BlocMarket>
 }
 extension GameSave {
     public enum ObjectKey: JSString, Sendable {
         case symbols
-
-        case date
+        case random
         case player
+
+        case markets_tradeable
+        case markets_inelastic
+        case date
 
         // case terrain
         // case planets
@@ -33,37 +39,38 @@ extension GameSave {
         case factories
         case mines
         case pops
-
-        case markets
     }
 }
 extension GameSave: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.symbols] = self.symbols
-        js[.date] = self.date
+        js[.random] = self.random
         js[.player] = self.player
+        js[.markets_tradeable] = self.tradeableMarkets
+        js[.markets_inelastic] = self.inelasticMarkets
+        js[.date] = self.date
 
         js[.cultures] = self.cultures
         js[.countries] = self.countries
         js[.factories] = self.factories
         js[.mines] = self.mines
         js[.pops] = self.pops
-
-        js[.markets] = self.markets
     }
 }
 extension GameSave: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             symbols: try js[.symbols].decode(),
-            date: try js[.date].decode(),
+            random: try js[.random]?.decode() ?? .init(seed: 12345),
             player: try js[.player].decode(),
+            tradeableMarkets: try js[.markets_tradeable]?.decode() ?? [:],
+            inelasticMarkets: try js[.markets_inelastic]?.decode() ?? [:],
+            date: try js[.date].decode(),
             cultures: try js[.cultures].decode(),
             countries: try js[.countries].decode(),
             factories: try js[.factories].decode(),
             mines: try js[.mines]?.decode() ?? [],
             pops: try js[.pops].decode(),
-            markets: try js[.markets].decode(),
         )
     }
 }

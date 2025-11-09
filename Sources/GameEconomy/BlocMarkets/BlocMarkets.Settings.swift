@@ -37,14 +37,14 @@ extension BlocMarkets.Settings {
     }
 }
 extension BlocMarkets.Settings {
-    func new(_ pair: BlocMarket.AssetPair) -> BlocMarket {
+    func new(_ pair: BlocMarket.ID) -> BlocMarket {
         .init(
-            id: pair,
-            dividend: self.dividend,
-            pool: .init(
-                assets: .init(base: self.capital.base, quote: self.capital.quote),
-                volume: .init(),
-                fee: self.fee
+            state: .init(
+                id: pair,
+                dividend: self.dividend,
+                history: [],
+                capital: self.capital,
+                fee: self.fee,
             )
         )
     }

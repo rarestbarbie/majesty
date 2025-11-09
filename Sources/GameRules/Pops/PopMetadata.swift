@@ -34,7 +34,7 @@ extension PopMetadata {
     convenience init(
         type: PopType,
         pops: EffectsTable<PopType, PopDescription>,
-        symbols: GameRules.Symbols,
+        symbols: GameSaveSymbols,
         resources: OrderedDictionary<Resource, ResourceMetadata>
     ) throws {
         let pop: PopDescription? = pops[type]

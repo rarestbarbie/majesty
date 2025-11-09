@@ -7,14 +7,14 @@ import Random
 struct GameWorld: ~Copyable {
     var random: PseudoRandom
     var notifications: Notifications
-    var tradeableMarkets: OrderedDictionary<BlocMarket.AssetPair, BlocMarket>
-    var inelasticMarkets: OrderedDictionary<LocalMarkets.Key, LocalMarket>
+    var tradeableMarkets: OrderedDictionary<BlocMarket.ID, BlocMarket>
+    var inelasticMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
 }
 extension GameWorld {
     init(
         notifications: Notifications,
-        tradeableMarkets: OrderedDictionary<BlocMarket.AssetPair, BlocMarket>,
-        inelasticMarkets: OrderedDictionary<LocalMarkets.Key, LocalMarket>,
+        tradeableMarkets: OrderedDictionary<BlocMarket.ID, BlocMarket>,
+        inelasticMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>,
         random: PseudoRandom,
     ) {
         self.random = random

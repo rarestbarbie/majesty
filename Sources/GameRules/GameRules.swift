@@ -48,7 +48,7 @@ extension GameRules {
 extension GameRules {
     public init(
         resolving rules: borrowing GameRulesDescription,
-        with symbols: inout GameRules.Symbols
+        with symbols: inout GameSaveSymbols
     ) throws {
         try self.init(
             resolving: rules,
@@ -72,7 +72,7 @@ extension GameRules {
     private init(
         resolving rules: borrowing GameRulesDescription,
         table: Tables,
-        symbols: GameRules.Symbols,
+        symbols: GameSaveSymbols,
         settings: Settings
     ) throws {
         let pops: EffectsTable<PopType, PopDescription> = try rules.pops.effects(

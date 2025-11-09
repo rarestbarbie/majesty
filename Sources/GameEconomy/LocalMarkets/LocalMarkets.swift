@@ -4,9 +4,9 @@ import OrderedCollections
 
 @frozen public struct LocalMarkets {
     // iteration order matters, because the RNG is called statefully during matching
-    @usableFromInline var table: OrderedDictionary<Key, LocalMarket>
+    @usableFromInline var table: OrderedDictionary<LocalMarket.ID, LocalMarket>
 
-    @inlinable public init(table: OrderedDictionary<Key, LocalMarket>) {
+    @inlinable public init(table: OrderedDictionary<LocalMarket.ID, LocalMarket>) {
         self.table = table
     }
 
@@ -15,24 +15,23 @@ import OrderedCollections
     }
 }
 extension LocalMarkets {
-    @inlinable public var markets: OrderedDictionary<Key, LocalMarket> {
+    @inlinable public var markets: OrderedDictionary<LocalMarket.ID, LocalMarket> {
         self.table
     }
 
-    @inlinable public subscript(key: Key) -> LocalMarket {
+    @inlinable public subscript(id: LocalMarket.ID) -> LocalMarket {
         _read {
-            yield  self.table[key, default: .init()]
+            yield  self.table[id, default: .init(id: id)]
         }
         _modify {
-            yield &self.table[key, default: .init()]
+            yield &self.table[id, default: .init(id: id)]
         }
     }
 }
 extension LocalMarkets {
-    public mutating func turn(by turn: (Key, inout LocalMarket) -> ()) {
+    public mutating func turn(by turn: (inout LocalMarket) -> ()) {
         for i: Int in self.table.elements.indices {
-            let id: Key = self.table.keys[i]
-            turn(id, &self.table.values[i])
+            turn(&self.table.values[i])
         }
     }
 }

@@ -17,23 +17,39 @@ struct GameContext {
     private(set) var mines: DynamicContextTable<MineContext>
     private(set) var pops: DynamicContextTable<PopContext>
 
-    let symbols: GameRules.Symbols
+    let symbols: GameSaveSymbols
     let rules: GameRules
-
-    /// Initialize a fresh game context from the given game state.
-    init(save: borrowing GameSave, rules: GameRules) throws {
+}
+extension GameContext {
+    static func load(_ save: borrowing GameSave, rules: GameRules) throws -> Self {
         let _none: _NoMetadata = .init()
+        return .init(
+            player: save.player,
+            planets: [:],
+            cultures: try .init(states: save.cultures) { _ in _none },
+            countries: try .init(states: save.countries) { _ in _none },
+            factories: try .init(states: save.factories) { rules.factories[$0.type] },
+            mines: try .init(states: save.mines) { rules.mines[$0.type] },
+            pops: try .init(states: save.pops) { rules.pops[$0.type] },
+            symbols: save.symbols,
+            rules: rules,
+        )
+    }
 
-        self.player = save.player
-        self.planets = [:]
-        self.cultures = try .init(states: save.cultures) { _ in _none }
-        self.countries = try .init(states: save.countries) { _ in _none }
-        self.factories = try .init(states: save.factories) { rules.factories[$0.type] }
-        self.mines = try .init(states: save.mines) { rules.mines[$0.type] }
-        self.pops = try .init(states: save.pops) { rules.pops[$0.type] }
-
-        self.symbols = save.symbols
-        self.rules = rules
+    func save(_ world: borrowing GameWorld) -> GameSave {
+        .init(
+            symbols: self.symbols,
+            random: world.random,
+            player: self.player,
+            tradeableMarkets: world.tradeableMarkets,
+            inelasticMarkets: world.inelasticMarkets,
+            date: world.date,
+            cultures: [_].init(self.cultures.state),
+            countries: [_].init(self.countries.state),
+            factories: [_].init(self.factories.state),
+            mines: [_].init(self.mines.state),
+            pops: [_].init(self.pops.state),
+        )
     }
 }
 extension GameContext {
@@ -154,16 +170,16 @@ extension GameContext {
         turn.localMarkets.turn {
             /// Apply local minimum wages
             guard
-            let region: RegionalProperties = self.planets[$0.location]?.properties,
-            let resource: ResourceMetadata = self.rules.resources[$0.resource] else {
+            let region: RegionalProperties = self.planets[$0.id.location]?.properties,
+            let resource: ResourceMetadata = self.rules.resources[$0.id.resource] else {
                 return
             }
 
             if let hours: Int64 = resource.hours {
                 let priceFloor: LocalPrice = .init(region.minwage %/ hours)
-                $1.turn(priceFloor: priceFloor, type: .minimumWage)
+                $0.turn(priceFloor: priceFloor, type: .minimumWage)
             } else {
-                $1.turn()
+                $0.turn()
             }
         }
 
@@ -172,27 +188,27 @@ extension GameContext {
         self.pops.turn { $0.turn(on: &turn) }
 
         turn.localMarkets.turn {
-            let price: LocalPrice = $1.today.price
+            let price: LocalPrice = $0.today.price
             let (asks, bids): (
                 asks: [LocalMarket.Order],
                 bids: [LocalMarket.Order]
-            ) = $1.match(using: &turn.random)
+            ) = $0.match(using: &turn.random)
 
             var spread: Int64 = 0
 
             for order: LocalMarket.Order in asks {
                 switch order.by {
                 case .factory(let id):
-                    let (credited, reported): (Int64, Bool) = self.factories[modifying: id].state.inventory.credit(
-                        inelastic: $0.resource,
+                    let (credited, _): (Int64, reported: Bool) = self.factories[modifying: id].state.inventory.credit(
+                        inelastic: $0.id.resource,
                         units: order.filled,
                         price: price
                     )
                     spread -= credited
 
                 case .pop(let id):
-                    let (credited, reported): (Int64, Bool) = self.pops[modifying: id].state.inventory.credit(
-                        inelastic: $0.resource,
+                    let (credited, _): (Int64, reported: Bool) = self.pops[modifying: id].state.inventory.credit(
+                        inelastic: $0.id.resource,
                         units: order.filled,
                         price: price
                     )
@@ -201,7 +217,7 @@ extension GameContext {
 
                     if let memo: MineID = order.memo {
                         // Log unreported mining output
-                        self.pops[modifying: id].state.mines[memo]?.out.inelastic[$0.resource]?.report(
+                        self.pops[modifying: id].state.mines[memo]?.out.inelastic[$0.id.resource]?.report(
                             unitsSold: order.filled,
                             valueSold: credited,
                         )
@@ -214,14 +230,14 @@ extension GameContext {
                 switch order.by {
                 case .factory(let id):
                     spread += self.factories[modifying: id].state.inventory.debit(
-                        inelastic: $0.resource,
+                        inelastic: $0.id.resource,
                         units: order.filled,
                         price: price,
                         tier: order.tier
                     )
                 case .pop(let id):
                     spread += self.pops[modifying: id].state.inventory.debit(
-                        inelastic: $0.resource,
+                        inelastic: $0.id.resource,
                         units: order.filled,
                         price: price,
                         tier: order.tier

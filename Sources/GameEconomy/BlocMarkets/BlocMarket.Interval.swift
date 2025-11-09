@@ -6,7 +6,7 @@ extension BlocMarket {
         public let volume: LiquidityPool.Volume
         public let liquidity: Double
 
-        @inlinable init(
+        @inlinable public init(
             prices: Candle<Double>,
             volume: LiquidityPool.Volume,
             liquidity: Double

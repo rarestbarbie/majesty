@@ -1,3 +1,4 @@
+import GameIDs
 import GameRules
 
 struct FactoryModifiers {

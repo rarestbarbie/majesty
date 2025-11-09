@@ -9,23 +9,24 @@ extension BlocMarket {
         case fiat(Fiat)
     }
 }
-extension BlocMarket.Asset {
-    @inlinable public static func code(_ code: some StringProtocol) -> Self? {
-        if case "F"? = code.first,
-            let fiat: Fiat = .init(code[code.index(after: code.startIndex)...]) {
-            return .fiat(fiat)
-        } else if
-            let good: Resource = .init(code) {
-            return .good(good)
-        } else {
-            return nil
-        }
-    }
-
-    @inlinable public var code: String {
+extension BlocMarket.Asset: CustomStringConvertible {
+    @inlinable public var description: String {
         switch self {
         case .fiat(let fiat):   "F\(fiat)"
         case .good(let good):   "\(good)"
+        }
+    }
+}
+extension BlocMarket.Asset: LosslessStringConvertible {
+    @inlinable public init?(_ code: borrowing some StringProtocol) {
+        if case "F"? = code.first,
+            let fiat: Fiat = .init(code[code.index(after: code.startIndex)...]) {
+            self = .fiat(fiat)
+        } else if
+            let good: Resource = .init(code) {
+            self = .good(good)
+        } else {
+            return nil
         }
     }
 }

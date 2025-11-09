@@ -1,21 +1,19 @@
 import GameIDs
 import JavaScriptInterop
 
-extension GameRules {
-    @frozen public struct Symbols {
-        /// Pop types are not moddable.
-        let pops: SymbolTable<PopType>
+@frozen public struct GameSaveSymbols {
+    /// Pop types are not moddable.
+    let pops: SymbolTable<PopType>
 
-        var mines: SymbolTable<MineType>
-        var factories: SymbolTable<FactoryType>
-        var resources: SymbolTable<Resource>
-        var technologies: SymbolTable<Technology>
+    var mines: SymbolTable<MineType>
+    var factories: SymbolTable<FactoryType>
+    var resources: SymbolTable<Resource>
+    var technologies: SymbolTable<Technology>
 
-        @usableFromInline var geology: SymbolTable<GeologicalType>
-        @usableFromInline var terrains: SymbolTable<TerrainType>
-    }
+    @usableFromInline var geology: SymbolTable<GeologicalType>
+    @usableFromInline var terrains: SymbolTable<TerrainType>
 }
-extension GameRules.Symbols {
+extension GameSaveSymbols {
     @inlinable public subscript(geology symbol: Symbol) -> GeologicalType {
         get throws {
             return try self.geology[symbol]
@@ -28,7 +26,7 @@ extension GameRules.Symbols {
         }
     }
 }
-extension GameRules.Symbols: JavaScriptEncodable {
+extension GameSaveSymbols: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<GameRules.Namespace>) {
         js[.mines] = self.mines
         js[.factories] = self.factories
@@ -38,7 +36,7 @@ extension GameRules.Symbols: JavaScriptEncodable {
         js[.terrains] = self.terrains
     }
 }
-extension GameRules.Symbols: JavaScriptDecodable {
+extension GameSaveSymbols: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<GameRules.Namespace>) throws {
         self.init(
             pops: .init(

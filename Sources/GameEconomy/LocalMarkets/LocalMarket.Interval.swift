@@ -1,17 +1,20 @@
 import Fraction
 
-@frozen public struct LocalMarketState {
-    public var price: LocalPrice
-    public var supply: Int64
-    public var demand: Int64
+extension LocalMarket {
+    @frozen public struct Interval {
+        public var price: LocalPrice
+        public var supply: Int64
+        public var demand: Int64
 
-    @inlinable init(price: LocalPrice, supply: Int64 = 0, demand: Int64 = 0) {
-        self.price = price
-        self.supply = supply
-        self.demand = demand
+        @inlinable public init(price: LocalPrice, supply: Int64 = 0, demand: Int64 = 0) {
+            self.price = price
+            self.supply = supply
+            self.demand = demand
+        }
     }
 }
-extension LocalMarketState {
+
+extension LocalMarket.Interval {
     /// To prevent the price from oscillating around a fractional value, we only allow it to
     /// move if the relative deficit, or excess, is greater than the relative change in the
     /// price itself.
