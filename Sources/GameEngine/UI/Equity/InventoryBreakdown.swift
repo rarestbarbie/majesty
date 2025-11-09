@@ -162,7 +162,7 @@ extension InventoryBreakdown {
             )
         }
         for (id, input): (Resource, ResourceInput<Never>) in inputs.inelastic {
-            let market: LocalMarket? = snapshot.markets.inelastic[location, id]
+            let market: LocalMarket? = snapshot.markets.inelastic[id / location]
             self.needs.append(
                 ResourceNeed.init(
                     label: snapshot.rules[id],
@@ -201,7 +201,7 @@ extension InventoryBreakdown {
             )
         }
         for (id, output): (Resource, ResourceOutput<Never>) in outputs.inelastic {
-            let market: LocalMarket? = snapshot.markets.inelastic[location, id]
+            let market: LocalMarket? = snapshot.markets.inelastic[id / location]
             self.sales.append(
                 ResourceSale.init(
                     label: snapshot.rules[output.id],

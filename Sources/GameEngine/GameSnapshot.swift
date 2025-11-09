@@ -11,7 +11,7 @@ import OrderedCollections
     let context: GameContext
     let markets: (
         tradeable: OrderedDictionary<BlocMarket.AssetPair, BlocMarket>,
-        inelastic: LocalMarkets
+        inelastic: OrderedDictionary<LocalMarkets.Key, LocalMarket>
     )
     let date: GameDate
 }
@@ -162,10 +162,10 @@ extension GameSnapshot {
         }
 
         let market: (
-            inelastic: LocalMarket,
+            inelastic: LocalMarket?,
             tradeable: Candle<Double>?
         ) = (
-            self.markets.inelastic[factory.state.tile, line.resource],
+            self.markets.inelastic[line.resource / factory.state.tile],
             self.markets.tradeable[line.resource / country.currency.id]?.history.last?.prices
         )
 
@@ -619,10 +619,10 @@ extension GameSnapshot {
         }
 
         let market: (
-            inelastic: LocalMarket,
+            inelastic: LocalMarket?,
             tradeable: Candle<Double>?
         ) = (
-            self.markets.inelastic[pop.state.tile, line.resource],
+            self.markets.inelastic[line.resource / pop.state.tile],
             self.markets.tradeable[line.resource / country.currency.id]?.history.last?.prices
         )
 

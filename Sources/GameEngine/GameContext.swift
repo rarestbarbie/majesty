@@ -138,20 +138,20 @@ extension GameContext {
     }
 }
 extension GameContext {
-    mutating func advance(_ map: inout GameMap) throws {
-        map.notifications.turn()
+    mutating func advance(_ turn: inout Turn) throws {
+        turn.notifications.turn()
 
         for i: Int in self.planets.indices {
-            try self.planets[i].advance(map: &map, context: self)
+            try self.planets[i].advance(turn: &turn, context: self)
         }
         for i: Int in self.cultures.indices {
-            try self.cultures[i].advance(map: &map, context: self)
+            try self.cultures[i].advance(turn: &turn, context: self)
         }
         for i: Int in self.countries.indices {
-            try self.countries[i].advance(map: &map, context: self)
+            try self.countries[i].advance(turn: &turn, context: self)
         }
 
-        map.localMarkets.turn {
+        turn.localMarkets.turn {
             /// Apply local minimum wages
             guard
             let region: RegionalProperties = self.planets[$0.location]?.properties,
@@ -167,16 +167,16 @@ extension GameContext {
             }
         }
 
-        self.factories.turn { $0.turn(on: &map) }
+        self.factories.turn { $0.turn(on: &turn) }
         self.mines.turn { $0.state.turnToNextDay() }
-        self.pops.turn { $0.turn(on: &map) }
+        self.pops.turn { $0.turn(on: &turn) }
 
-        map.localMarkets.turn {
+        turn.localMarkets.turn {
             let price: LocalPrice = $1.today.price
             let (asks, bids): (
                 asks: [LocalMarket.Order],
                 bids: [LocalMarket.Order]
-            ) = $1.match(using: &map.random)
+            ) = $1.match(using: &turn.random)
 
             var spread: Int64 = 0
 
@@ -231,18 +231,18 @@ extension GameContext {
 
             // TODO: do something with spread
         }
-        map.stockMarkets.turn(random: &map.random) {
+        turn.stockMarkets.turn(random: &turn.random) {
             switch $2.asset {
             case .factory(let id):
                 self.factories[modifying: id].state.equity.trade(
                     random: &$0,
-                    bank: &map.bank,
+                    bank: &turn.bank,
                     fill: $2
                 )
             case .pop(let id):
                 self.pops[modifying: id].state.equity.trade(
                     random: &$0,
-                    bank: &map.bank,
+                    bank: &turn.bank,
                     fill: $2
                 )
             }
@@ -251,31 +251,31 @@ extension GameContext {
         let shuffled: ResidentOrder = .randomize(
             (self.factories, Resident.factory(_:)),
             (self.pops, Resident.pop(_:)),
-            with: &map.random.generator
+            with: &turn.random.generator
         )
 
         for i: Resident in shuffled.residents {
             switch i {
-            case .factory(let i): self.factories[i].transact(map: &map)
-            case .pop(let i): self.pops[i].transact(map: &map)
+            case .factory(let i): self.factories[i].transact(turn: &turn)
+            case .pop(let i): self.pops[i].transact(turn: &turn)
             }
         }
 
-        map.exchange.turn()
+        turn.worldMarkets.turn()
 
-        self.factories.turn { $0.advance(map: &map) }
-        self.mines.turn { $0.advance(map: &map) }
-        self.pops.turn { $0.advance(map: &map) }
+        self.factories.turn { $0.advance(turn: &turn) }
+        self.mines.turn { $0.advance(turn: &turn) }
+        self.pops.turn { $0.advance(turn: &turn) }
 
-        self.postCashTransfers(&map)
-        self.postPopEmployment(&map, order: shuffled)
+        self.postCashTransfers(&turn)
+        self.postPopEmployment(&turn, order: shuffled)
 
-        try self.executeMovements(&map)
+        try self.executeMovements(&turn)
 
         self.destroyObjects()
     }
 
-    mutating func compute(_ map: borrowing GameMap) throws {
+    mutating func compute(_ world: borrowing GameWorld) throws {
         let retain: PruningPass = self.pruningPass
         for i: Int in self.factories.indices {
             self.factories[i].state.prune(in: retain)
@@ -287,23 +287,23 @@ extension GameContext {
         self.index()
 
         for i: Int in self.planets.indices {
-            try self.planets[i].compute(map: map, context: self.territoryPass)
+            try self.planets[i].compute(world: world, context: self.territoryPass)
         }
         for i: Int in self.cultures.indices {
-            try self.cultures[i].compute(map: map, context: self.territoryPass)
+            try self.cultures[i].compute(world: world, context: self.territoryPass)
         }
         for i: Int in self.countries.indices {
-            try self.countries[i].compute(map: map, context: self.territoryPass)
+            try self.countries[i].compute(world: world, context: self.territoryPass)
         }
 
         for i: Int in self.factories.indices {
-            try self.factories[i].compute(map: map, context: self.residentPass)
+            try self.factories[i].compute(world: world, context: self.residentPass)
         }
         for i: Int in self.mines.indices {
-            try self.mines[i].compute(map: map, context: self.residentPass)
+            try self.mines[i].compute(world: world, context: self.residentPass)
         }
         for i: Int in self.pops.indices {
-            try self.pops[i].compute(map: map, context: self.residentPass)
+            try self.pops[i].compute(world: world, context: self.residentPass)
         }
     }
 }
@@ -401,8 +401,8 @@ extension GameContext {
     }
 }
 extension GameContext {
-    private mutating func postCashTransfers(_ map: inout GameMap) {
-        map.bank.turn {
+    private mutating func postCashTransfers(_ turn: inout Turn) {
+        turn.bank.turn {
             switch $0 {
             case .factory(let id):
                 self.factories[modifying: id].state.inventory.account += $1
@@ -412,13 +412,13 @@ extension GameContext {
         }
     }
 
-    private mutating func postPopEmployment(_ map: inout GameMap, order: ResidentOrder) {
-        self.postPopHirings(&map, order: order)
-        self.postPopFirings(&map)
+    private mutating func postPopEmployment(_ turn: inout Turn, order: ResidentOrder) {
+        self.postPopHirings(&turn, order: order)
+        self.postPopFirings(&turn)
     }
 
-    private mutating func postPopFirings(_ map: inout GameMap) {
-        var layoffs: [GameMap.Jobs.Fire.Key: PopJobLayoffBlock] = map.jobs.fire.turn()
+    private mutating func postPopFirings(_ turn: inout Turn) {
+        var layoffs: [Turn.Jobs.Fire.Key: PopJobLayoffBlock] = turn.jobs.fire.turn()
 
         self.pops.turn {
             let type: PopType = $0.state.type
@@ -434,10 +434,10 @@ extension GameContext {
             }
         }
     }
-    private mutating func postPopHirings(_ map: inout GameMap, order: ResidentOrder) {
+    private mutating func postPopHirings(_ turn: inout Turn, order: ResidentOrder) {
         let offers: (
-            remote: [GameMap.Jobs.Hire<PlanetID>.Key: [(Int, Int64)]],
-            local: [GameMap.Jobs.Hire<Address>.Key: [(Int, Int64)]]
+            remote: [Turn.Jobs.Hire<PlanetID>.Key: [(Int, Int64)]],
+            local: [Turn.Jobs.Hire<Address>.Key: [(Int, Int64)]]
         ) = order.residents.reduce(into: ([:], [:])) {
             guard case .pop(let i) = $1 else {
                 return
@@ -457,14 +457,14 @@ extension GameContext {
 
             switch jobMode {
             case .hourly, .mining:
-                let key: GameMap.Jobs.Hire<Address>.Key = .init(
+                let key: Turn.Jobs.Hire<Address>.Key = .init(
                     location: pop.tile,
                     type: pop.type
                 )
                 $0.local[key, default: []].append((i, unemployed))
 
             case .remote:
-                let key: GameMap.Jobs.Hire<PlanetID>.Key = .init(
+                let key: Turn.Jobs.Hire<PlanetID>.Key = .init(
                     location: pop.tile.planet,
                     type: pop.type
                 )
@@ -474,14 +474,14 @@ extension GameContext {
 
         let workersUnavailable: [
             (PopType, [PopJobOfferBlock])
-        ] = map.jobs.hire.local.turn {
+        ] = turn.jobs.hire.local.turn {
             if var pops: [(index: Int, unemployed: Int64)] = offers.local[$0] {
                 self.postPopHirings(matching: &pops, with: &$1)
             }
         }
         let clerksUnavailable: [
             (PopType, [PopJobOfferBlock])
-        ] = map.jobs.hire.remote.turn {
+        ] = turn.jobs.hire.remote.turn {
             if var pops: [(index: Int, unemployed: Int64)] = offers.remote[$0] {
                 self.postPopHirings(matching: &pops, with: &$1)
             }
@@ -563,13 +563,13 @@ extension GameContext {
     }
 }
 extension GameContext {
-    private mutating func executeMovements(_ map: inout GameMap) throws {
-        try self.executeConversions(&map)
-        try self.executeConstructions(&map)
+    private mutating func executeMovements(_ turn: inout Turn) throws {
+        try self.executeConversions(&turn)
+        try self.executeConstructions(&turn)
     }
-    private mutating func executeConversions(_ map: inout GameMap) throws {
+    private mutating func executeConversions(_ turn: inout Turn) throws {
         defer {
-            map.conversions.removeAll(keepingCapacity: true)
+            turn.conversions.removeAll(keepingCapacity: true)
         }
 
         // let investments: (
@@ -592,7 +592,7 @@ extension GameContext {
         //     }
         // )
 
-        for conversion: Pop.Conversion in map.conversions {
+        for conversion: Pop.Conversion in turn.conversions {
             let inherited: (cash: Int64, mil: Double, con: Double) = {
                 (
                     $0.state.inventory.account.inherit(fraction: conversion.inherits),
@@ -617,7 +617,7 @@ extension GameContext {
             }
         }
     }
-    private mutating func executeConstructions(_ map: inout GameMap) throws {
+    private mutating func executeConstructions(_ turn: inout Turn) throws {
         for i: Int in self.planets.indices {
             for j: Int in self.planets[i].grid.tiles.values.indices {
                 let (factory, mine): (Factory.Section?, Mine.Section?) = {
@@ -625,11 +625,11 @@ extension GameContext {
                     return {
                         let factory: FactoryType? = $0.pickFactory(
                             among: self.rules.factories,
-                            using: &map.random
+                            using: &turn.random
                         )
                         let mine: MineType? = $0.pickMine(
                             among: self.rules.mines,
-                            using: &map.random
+                            using: &turn.random
                         )
                         let tile: Address = .init(planet: id, tile: $0.id)
                         return (

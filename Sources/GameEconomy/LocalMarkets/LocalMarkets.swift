@@ -4,31 +4,35 @@ import OrderedCollections
 
 @frozen public struct LocalMarkets {
     // iteration order matters, because the RNG is called statefully during matching
-    @usableFromInline var markets: OrderedDictionary<Key, LocalMarket>
+    @usableFromInline var table: OrderedDictionary<Key, LocalMarket>
 
-    @inlinable init(markets: OrderedDictionary<Key, LocalMarket> = [:]) {
-        self.markets = markets
+    @inlinable public init(table: OrderedDictionary<Key, LocalMarket>) {
+        self.table = table
     }
 
     @inlinable public init() {
-        self.init(markets: [:])
+        self.init(table: [:])
     }
 }
 extension LocalMarkets {
-    @inlinable public subscript(location: Address, resource: Resource) -> LocalMarket {
+    @inlinable public var markets: OrderedDictionary<Key, LocalMarket> {
+        self.table
+    }
+
+    @inlinable public subscript(key: Key) -> LocalMarket {
         _read {
-            yield  self.markets[.init(location: location, resource: resource), default: .init()]
+            yield  self.table[key, default: .init()]
         }
         _modify {
-            yield &self.markets[.init(location: location, resource: resource), default: .init()]
+            yield &self.table[key, default: .init()]
         }
     }
 }
 extension LocalMarkets {
     public mutating func turn(by turn: (Key, inout LocalMarket) -> ()) {
-        for i: Int in self.markets.elements.indices {
-            let id: Key = self.markets.keys[i]
-            turn(id, &self.markets.values[i])
+        for i: Int in self.table.elements.indices {
+            let id: Key = self.table.keys[i]
+            turn(id, &self.table.values[i])
         }
     }
 }
@@ -58,7 +62,7 @@ extension LocalMarkets {
         for (id, output): (Resource, ResourceOutput<Never>) in asks {
             let ask: Int64 = output.unitsReleased
             if  ask > 0 {
-                self[tile, id].ask(amount: ask, by: lei, memo: memo)
+                self[id / tile].ask(amount: ask, by: lei, memo: memo)
             }
         }
     }
@@ -77,7 +81,7 @@ extension LocalMarkets {
 
         for (budget, x): (Int64, InelasticBudgetTier.Weight) in zip(budgets, weights) {
             if budget > 0, x.unitsToPurchase > 0 {
-                self[tile, x.id].bid(
+                self[x.id / tile].bid(
                     budget: budget,
                     by: lei,
                     in: tier,

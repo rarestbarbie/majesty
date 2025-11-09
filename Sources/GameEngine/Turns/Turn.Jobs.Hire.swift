@@ -1,6 +1,6 @@
 import GameIDs
 
-extension GameMap.Jobs {
+extension Turn.Jobs {
     struct Hire<Location> where Location: Hashable {
         private var blocks: [Key: [PopJobOfferBlock]]
 
@@ -9,13 +9,13 @@ extension GameMap.Jobs {
         }
     }
 }
-extension GameMap.Jobs.Hire {
+extension Turn.Jobs.Hire {
     subscript(location: Location, type: PopType) -> [PopJobOfferBlock] {
         _read   { yield  self.blocks[Key.init(location: location, type: type), default: []] }
         _modify { yield &self.blocks[Key.init(location: location, type: type), default: []] }
     }
 }
-extension GameMap.Jobs.Hire {
+extension Turn.Jobs.Hire {
     mutating func turn(
         _ yield: (Key, inout [PopJobOfferBlock]) -> ()
     ) -> [(PopType, [PopJobOfferBlock])] {

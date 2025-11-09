@@ -8,7 +8,7 @@ import JavaScriptKit
 
 public struct GameSession: ~Copyable {
     private var context: GameContext
-    private var map: GameMap
+    private var world: GameWorld
     private var ui: GameUI
 
     public init(
@@ -25,7 +25,12 @@ public struct GameSession: ~Copyable {
         try context.loadTerrain(terrain)
 
         self.context = context
-        self.map = .init(date: save.date, settings: rules.settings, markets: save.markets)
+        self.world = .init(
+            notifications: .init(date: save.date),
+            tradeableMarkets: save.markets,
+            inelasticMarkets: [:],
+            random: .init(seed: 12345),
+        )
         self.ui = .init()
     }
 }
@@ -75,8 +80,8 @@ extension GameSession {
     private var snapshot: GameSnapshot {
         .init(
             context: self.context,
-            markets: (self.map.exchange.markets, self.map.localMarkets),
-            date: self.map.date
+            markets: (self.world.tradeableMarkets, self.world.inelasticMarkets),
+            date: self.world.date
         )
     }
 
@@ -95,15 +100,15 @@ extension GameSession {
     }
 
     public mutating func start() throws -> GameUI {
-        try self.context.compute(self.map)
+        try self.context.compute(self.world)
         try self.ui.sync(with: self.snapshot)
         return self.ui
     }
 
     public mutating func tick() throws -> GameUI {
         if  self.ui.clock.tick() {
-            try self.context.advance(&self.map)
-            try self.context.compute(self.map)
+            try self.context.advance(&self.world[self.rules.settings])
+            try self.context.compute(self.world)
         }
 
         try self.ui.sync(with: self.snapshot)
@@ -357,12 +362,12 @@ extension GameSession {
 #if TESTABLE
 extension GameSession {
     public mutating func run(until date: GameDate) throws {
-        try self.context.compute(self.map)
-        while self.map.date < date {
-            try self.context.advance(&self.map)
-            try self.context.compute(self.map)
+        try self.context.compute(self.world)
+        while self.world.date < date {
+            try self.context.advance(&self.world[self.rules.settings])
+            try self.context.compute(self.world)
 
-            if case (year: let year, month: 1, day: 1) = self.map.date.gregorian {
+            if case (year: let year, month: 1, day: 1) = self.world.date.gregorian {
                 print("Year \(year) has started.")
             }
         }

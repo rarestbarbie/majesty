@@ -1,4 +1,4 @@
-extension GameMap {
+extension Turn {
     enum Jobs {
     }
 }

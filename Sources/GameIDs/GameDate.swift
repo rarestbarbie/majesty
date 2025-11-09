@@ -6,6 +6,10 @@
         self.rawValue = rawValue
     }
 }
+extension GameDate {
+    @inlinable public static var min: Self { .init(rawValue: .min) }
+    @inlinable public static var max: Self { .init(rawValue: .max) }
+}
 extension GameDate: Comparable {
     @inlinable public static func < (a: Self, b: Self) -> Bool { a.rawValue < b.rawValue }
 }

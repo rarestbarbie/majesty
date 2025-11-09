@@ -83,7 +83,7 @@ extension Pop {
         evaluator: ConditionEvaluator,
         targets: [(id: PopType, weight: Int64)],
         inherit: Fraction?,
-        on map: inout GameMap,
+        on turn: inout Turn,
     ) {
         let rate: Double = evaluator.output
         if  rate <= 0 {
@@ -91,7 +91,7 @@ extension Pop {
         }
 
         let count: Int64 = Binomial[self.today.size, rate].sample(
-            using: &map.random.generator
+            using: &turn.random.generator
         )
 
         guard
@@ -121,7 +121,7 @@ extension Pop {
                 inherits = 1
             }
 
-            map.conversions.append(
+            turn.conversions.append(
                 .init(from: self.id, size: size, to: section, inherits: inherits)
             )
             // we must deduct this now, because we might have multiple calls to `egress`

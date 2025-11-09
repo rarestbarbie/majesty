@@ -74,7 +74,7 @@ extension Equity {
 
     mutating func split(
         price: Double,
-        map: inout GameMap,
+        turn: inout Turn,
         notifying subscribers: [CountryID]
     ) {
         if self.shares.isEmpty {
@@ -99,15 +99,15 @@ extension Equity {
                 chance = 1
             }
 
-            guard map.random.roll(chance, 128) else {
+            guard turn.random.roll(chance, 128) else {
                 return
             }
 
-            let exponent: Int64 = .random(in: 1 ... 3, using: &map.random.generator)
+            let exponent: Int64 = .random(in: 1 ... 3, using: &turn.random.generator)
             let factor: Int64 = 1 << exponent
-            split = .forward(factor: factor, on: map.date)
+            split = .forward(factor: factor, on: turn.date)
 
-            map.notifications[subscribers] = """
+            turn.notifications[subscribers] = """
             Stock split executed for factor of \(factor)x.
             """
         } else if price < 0.5 {
@@ -125,15 +125,15 @@ extension Equity {
                 chance = 1
             }
 
-            guard map.random.roll(chance, 128) else {
+            guard turn.random.roll(chance, 128) else {
                 return
             }
 
-            let exponent: Int64 = .random(in: exponentRange, using: &map.random.generator)
+            let exponent: Int64 = .random(in: exponentRange, using: &turn.random.generator)
             let factor: Int64 = 1 << exponent
-            split = .reverse(factor: factor, on: map.date)
+            split = .reverse(factor: factor, on: turn.date)
 
-            map.notifications[subscribers] = """
+            turn.notifications[subscribers] = """
             Reverse stock split executed for factor of \(factor)x.
             """
         } else {

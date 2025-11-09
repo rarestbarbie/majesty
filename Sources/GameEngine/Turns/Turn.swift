@@ -1,15 +1,16 @@
 import GameEconomy
-import GameRules
 import GameIDs
-import OrderedCollections
 import Random
 
-struct GameMap: ~Copyable {
+struct Turn: ~Copyable {
     var random: PseudoRandom
-    var exchange: BlocMarkets
     var notifications: Notifications
+    var worldMarkets: BlocMarkets
+    var localMarkets: LocalMarkets
+    var stockMarkets: StockMarkets
 
     var conversions: [Pop.Conversion]
+    var bank: Bank
     var jobs: (
         hire: (
             remote: Jobs.Hire<PlanetID>,
@@ -17,30 +18,29 @@ struct GameMap: ~Copyable {
         ),
         fire: Jobs.Fire
     )
-    var localMarkets: LocalMarkets
-    var stockMarkets: StockMarkets
-    var bank: Bank
-
+}
+extension Turn {
     init(
-        date: GameDate,
-        settings: GameRules.Settings,
-        markets: OrderedDictionary<BlocMarket.AssetPair, BlocMarket> = [:]
+        random: PseudoRandom,
+        notifications: Notifications,
+        worldMarkets: consuming BlocMarkets,
+        localMarkets: consuming LocalMarkets,
     ) {
-        self.random = .init(seed: 12345)
-        self.exchange = .init(settings: settings.exchange, table: markets)
-        self.notifications = .init(date: date)
-
+        self.random = random
+        self.notifications = notifications
+        self.worldMarkets = worldMarkets
+        self.localMarkets = localMarkets
+        self.stockMarkets = .init()
         self.conversions = []
         self.jobs = ((.init(), .init()), .init())
-        self.localMarkets = .init()
-        self.stockMarkets = .init()
         self.bank = .init()
     }
 }
-extension GameMap {
+
+extension Turn {
     var date: GameDate { self.notifications.date }
 }
-extension GameMap {
+extension Turn {
     mutating func payscale(
         shuffling pops: [(id: PopID, count: Int64)],
         rate: Int64

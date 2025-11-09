@@ -11,10 +11,10 @@ struct CultureContext: RuntimeContext {
 }
 extension CultureContext {
     mutating func compute(
-        map _: borrowing GameMap,
+        world _: borrowing GameWorld,
         context: GameContext.TerritoryPass
     ) throws {
     }
 
-    mutating func advance(map: inout GameMap, context: GameContext) throws {}
+    mutating func advance(turn: inout Turn, context: GameContext) throws {}
 }

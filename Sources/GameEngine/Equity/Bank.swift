@@ -47,7 +47,7 @@ extension Bank {
     }
 }
 extension Bank {
-    mutating func pay(salariesBudget: Int64, salaries recipients: [GameMap.Payscale]) -> Int64 {
+    mutating func pay(salariesBudget: Int64, salaries recipients: [Turn.Payscale]) -> Int64 {
         guard let payments: [Int64] = recipients.joined().split(
             limit: salariesBudget,
             share: \.owed
@@ -65,7 +65,7 @@ extension Bank {
         return salariesPaid
     }
 
-    mutating func pay(wagesBudget: Int64, wages recipients: GameMap.Payscale) -> Int64 {
+    mutating func pay(wagesBudget: Int64, wages recipients: Turn.Payscale) -> Int64 {
         guard let payments: [Int64] = recipients.split(limit: wagesBudget, share: \.owed) else {
             return 0
         }

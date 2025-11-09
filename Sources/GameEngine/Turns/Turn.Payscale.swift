@@ -1,12 +1,12 @@
 import GameIDs
 
-extension GameMap {
+extension Turn {
     struct Payscale {
         let pops: [(id: PopID, count: Int64)]
         let rate: Int64
     }
 }
-extension GameMap.Payscale: RandomAccessCollection {
+extension Turn.Payscale: RandomAccessCollection {
     var startIndex: Int { self.pops.startIndex }
     var endIndex: Int { self.pops.endIndex }
 

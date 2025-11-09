@@ -1,6 +1,6 @@
 import GameIDs
 
-extension GameMap.Jobs.Fire {
+extension Turn.Jobs.Fire {
     enum Key: Hashable {
         case factory(PopType, FactoryID)
         case mine(PopType, MineID)
