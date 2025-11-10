@@ -57,7 +57,7 @@ extension FactoryJob: JavaScriptDecodable {
         self.init(
             id: try js[.id].decode(),
             xp: try js[.xp]?.decode() ?? 0,
-            count: try js[.count].decode(),
+            count: try js[.count]?.decode() ?? 0,
             hired: try js[.hired]?.decode() ?? 0,
             fired: try js[.fired]?.decode() ?? 0,
             quit: try js[.quit]?.decode() ?? 0,
