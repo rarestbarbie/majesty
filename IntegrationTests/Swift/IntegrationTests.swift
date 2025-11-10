@@ -2,8 +2,41 @@ import GameEngine
 import GameIDs
 import JavaScriptKit
 
+import JavaScriptInterop
+import JavaScriptKit
+
+struct IntegrationTestFile {
+    let name: String
+    let save: GameSave
+}
+extension IntegrationTestFile {
+    enum ObjectKey: JSString {
+        case name
+        case save
+    }
+}
+extension IntegrationTestFile: JavaScriptEncodable {
+    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+        js[.name] = self.name
+        js[.save] = self.save
+    }
+}
+extension IntegrationTestFile: JavaScriptDecodable {
+    init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+        self.init(
+            name: try js[.name].decode(),
+            save: try js[.save].decode()
+        )
+    }
+}
+
 @main struct IntegrationTests {
     static func main() throws {
+        var outputs: [IntegrationTestFile] = []
+        defer {
+            JSObject.global["outputs"] = outputs.jsValue
+        }
+
         do {
             try Self.HashRules()
         } catch {
@@ -12,11 +45,12 @@ import JavaScriptKit
 
         for year: Int32 in [
             // 2426,
-            2452
+            2431
         ] {
             let target: GameDate = .gregorian(year: year, month: 1, day: 1)
+            let save: GameSave
             do {
-                try Self.HashGameState(target: target)
+                save = try Self.HashGameState(target: target)
                 print(
                     """
                     Integration test 'HashGameState' passed for target \(target)
@@ -28,7 +62,15 @@ import JavaScriptKit
                     Integration test 'HashGameState' failed for target \(target): \(error)
                     """
                 )
+                continue
             }
+
+            outputs.append(
+                .init(
+                    name: "HashGameState_\(year)",
+                    save: save
+                )
+            )
         }
     }
 }
@@ -46,7 +88,7 @@ extension IntegrationTests {
             """ as IntegrationTestFailure
         }
     }
-    static func HashGameState(target: GameDate) throws {
+    static func HashGameState(target: GameDate) throws -> GameSave {
         var s1: GameSession = try .reload()
         var s2: GameSession = try .reload()
 
@@ -58,5 +100,7 @@ extension IntegrationTests {
             GameSession mismatch after running until \(target)!
             """ as IntegrationTestFailure
         }
+
+        return s1.save
     }
 }

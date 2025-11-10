@@ -35,9 +35,7 @@ let package: Package = .init(
                 .target(name: "GameEngine"),
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
             ],
-            swiftSettings: [
-                .enableExperimentalFeature("Testing"),
-            ]
+            path: "IntegrationTests/Swift",
         ),
 
         .executableTarget(

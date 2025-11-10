@@ -7,7 +7,8 @@
         "test": "node .build/main.test.js"
     },
     "dependencies": {
-        "@bjorn3/browser_wasi_shim": "^0.4.1"
+        "@bjorn3/browser_wasi_shim": "^0.4.1",
+        "msgpackr": "^1.11.5"
     },
     "devDependencies": {
         "@types/node": "^20.14.9",
