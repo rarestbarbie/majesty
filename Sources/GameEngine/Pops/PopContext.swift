@@ -57,7 +57,7 @@ extension PopContext {
 }
 extension PopContext {
     mutating func compute(
-        map _: borrowing GameMap,
+        world _: borrowing GameWorld,
         context: GameContext.ResidentPass
     ) throws {
         guard
@@ -107,17 +107,17 @@ extension PopContext {
     }
 }
 extension PopContext: TransactingContext {
-    mutating func allocate(map: inout GameMap) {
+    mutating func allocate(turn: inout Turn) {
         if  self.state.type.stratum == .Ward {
             if  self.state.today.pa < 0.5 {
                 let p: Double = 0.000_1 * (0.5 - self.state.today.pa)
                 self.state.today.size -= Binomial[self.state.today.size, p].sample(
-                    using: &map.random.generator
+                    using: &turn.random.generator
                 )
             } else {
                 let p: Double = 0.000_1 * (self.state.today.pa - 0.5)
                 self.state.today.size += Binomial[self.state.today.size, p].sample(
-                    using: &map.random.generator
+                    using: &turn.random.generator
                 )
             }
         }
@@ -156,7 +156,7 @@ extension PopContext: TransactingContext {
             tiers: (self.state.inventory.l, self.state.inventory.e, self.state.inventory.x),
             location: self.state.tile,
             currency: currency,
-            map: map,
+            turn: turn,
         )
 
         let d: (l: Int64, e: Int64, x: Int64) = (7, 30, 365)
@@ -174,7 +174,7 @@ extension PopContext: TransactingContext {
             budget.buybacks = max(0, (balance - budget.min.l - budget.dividend) / 365)
             // Align share price
             self.state.today.px = Double.init(self.equity.sharePrice)
-            map.stockMarkets.issueShares(
+            turn.stockMarkets.issueShares(
                 currency: currency,
                 quantity: max(0, self.state.today.size - self.equity.shareCount),
                 security: self.security,
@@ -185,7 +185,7 @@ extension PopContext: TransactingContext {
             if  valueToInvest <= 0 {
                 break equity
             }
-            map.stockMarkets.queueRandomPurchase(
+            turn.stockMarkets.queueRandomPurchase(
                 buyer: .pop(self.state.id),
                 value: valueToInvest,
                 currency: currency
@@ -195,7 +195,7 @@ extension PopContext: TransactingContext {
             break
         }
 
-        map.localMarkets.place(
+        turn.localMarkets.place(
             bids: (
                 (budget.l.inelastic, weights.l.inelastic.x),
                 (budget.e.inelastic, weights.e.inelastic.x),
@@ -206,7 +206,7 @@ extension PopContext: TransactingContext {
             in: self.state.tile,
         )
         for job: MiningJob in self.state.mines.values {
-            map.localMarkets.ask(
+            turn.localMarkets.ask(
                 asks: job.out.inelastic,
                 memo: job.id,
                 as: self.lei,
@@ -217,7 +217,7 @@ extension PopContext: TransactingContext {
         self.budget = budget
     }
 
-    mutating func transact(map: inout GameMap) {
+    mutating func transact(turn: inout Turn) {
         guard
         let country: CountryProperties = self.region?.occupiedBy,
         let budget: PopBudget = self.budget else {
@@ -226,7 +226,7 @@ extension PopContext: TransactingContext {
 
         self.state.inventory.account.r += self.state.inventory.out.sell(
             in: country.currency.id,
-            on: &map.exchange
+            on: &turn.worldMarkets
         )
         self.state.inventory.out.deposit(
             from: self.type.output,
@@ -241,13 +241,13 @@ extension PopContext: TransactingContext {
                 }
 
                 $0.out.deposit(from: output, scalingFactor: ($0.count, factor))
-                return $0.out.sell(in: country.currency.id, on: &map.exchange)
+                return $0.out.sell(in: country.currency.id, on: &turn.worldMarkets)
             } (&self.state.mines.values[j])
         }
 
         let target: ResourceStockpileTarget = .random(
             in: Self.stockpileDays,
-            using: &map.random
+            using: &turn.random
         )
         let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
 
@@ -256,7 +256,7 @@ extension PopContext: TransactingContext {
                 stockpileDays: target,
                 spendingLimit: budget.l.tradeable,
                 in: country.currency.id,
-                on: &map.exchange,
+                on: &turn.worldMarkets,
             )
         }
 
@@ -271,7 +271,7 @@ extension PopContext: TransactingContext {
                 stockpileDays: target,
                 spendingLimit: budget.e.tradeable,
                 in: country.currency.id,
-                on: &map.exchange,
+                on: &turn.worldMarkets,
             )
         }
 
@@ -286,7 +286,7 @@ extension PopContext: TransactingContext {
                 stockpileDays: target,
                 spendingLimit: budget.x.tradeable,
                 in: country.currency.id,
-                on: &map.exchange,
+                on: &turn.worldMarkets,
             )
         }
 
@@ -312,12 +312,12 @@ extension PopContext: TransactingContext {
             }
 
             // Pay dividends to shareholders, if any.
-            self.state.inventory.account.i -= map.bank.pay(
+            self.state.inventory.account.i -= turn.bank.pay(
                 dividend: budget.dividend,
-                to: self.state.equity.shares.values.shuffled(using: &map.random.generator)
+                to: self.state.equity.shares.values.shuffled(using: &turn.random.generator)
             )
-            self.state.inventory.account.e -= map.bank.buyback(
-                random: &map.random,
+            self.state.inventory.account.e -= turn.bank.buyback(
+                random: &turn.random,
                 equity: &self.state.equity,
                 budget: budget.buybacks,
                 security: self.security,
@@ -329,7 +329,7 @@ extension PopContext: TransactingContext {
     }
 }
 extension PopContext {
-    mutating func advance(map: inout GameMap) {
+    mutating func advance(turn: inout Turn) {
         guard
         let country: CountryProperties = self.region?.occupiedBy else {
             return
@@ -347,11 +347,11 @@ extension PopContext {
         self.state.today.con = max(0, min(10, self.state.today.con))
 
         if  self.state.type.stratum > .Ward {
-            self.convert(map: &map, country: country)
+            self.convert(turn: &turn, country: country)
         } else {
             self.state.equity.split(
                 price: self.state.today.px,
-                map: &map,
+                turn: &turn,
                 notifying: [country.id]
             )
         }
@@ -368,7 +368,7 @@ extension PopContext {
                 /// non-union workers, and one third of union workers, will quit every year.
                 $0.quit(
                     rate: 0.002 * w0 / max(w0, self.income[$0.id].map(Double.init(_:)) ?? 1),
-                    using: &map.random.generator
+                    using: &turn.random.generator
                 )
             } (&self.state.factories.values[i])
         }
@@ -376,7 +376,7 @@ extension PopContext {
             {
                 $0.quit(
                     rate: 0.001,
-                    using: &map.random.generator
+                    using: &turn.random.generator
                 )
             } (&self.state.mines.values[i])
         }
@@ -390,14 +390,14 @@ extension PopContext {
             /// we could draw indices on demand, but that would have very pathological
             /// performance in the rare case that we have many empty jobs that have not yet
             /// been linted.
-            for i: Int in factoryJobs.shuffled(using: &map.random.generator) {
+            for i: Int in factoryJobs.shuffled(using: &turn.random.generator) {
                 guard 0 < nonexistent else {
                     break
                 }
 
                 self.state.factories.values[i].remove(excess: &nonexistent)
             }
-            for i: Int in miningJobs.shuffled(using: &map.random.generator) {
+            for i: Int in miningJobs.shuffled(using: &turn.random.generator) {
                 guard 0 < nonexistent else {
                     break
                 }
@@ -409,7 +409,7 @@ extension PopContext {
 }
 extension PopContext {
     private mutating func convert(
-        map: inout GameMap,
+        turn: inout Turn,
         country: CountryProperties,
     ) {
         var targetDemotions: [(id: PopType, weight: Int64)] = PopType.allCases.compactMap {
@@ -425,14 +425,14 @@ extension PopContext {
             return (id: $0, weight: 1)
         }
 
-        targetDemotions.shuffle(using: &map.random.generator)
+        targetDemotions.shuffle(using: &turn.random.generator)
 
         // when demoting, inherit 1/4
         self.state.egress(
             evaluator: self.buildDemotionMatrix(country: country),
             targets: targetDemotions,
             inherit: 1 %/ 4,
-            on: &map,
+            on: &turn,
         )
 
         var targetPromotions: [(id: PopType, weight: Int64)] = PopType.allCases.compactMap {
@@ -448,14 +448,14 @@ extension PopContext {
             return (id: $0, weight: 1)
         }
 
-        targetPromotions.shuffle(using: &map.random.generator)
+        targetPromotions.shuffle(using: &turn.random.generator)
 
         // when promoting, inherit all
         self.state.egress(
             evaluator: self.buildPromotionMatrix(country: country),
             targets: targetPromotions,
             inherit: nil,
-            on: &map,
+            on: &turn,
         )
     }
     func buildDemotionMatrix<Matrix>(

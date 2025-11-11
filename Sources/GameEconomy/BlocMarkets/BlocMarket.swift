@@ -4,23 +4,49 @@ import LiquidityPool
 import RealModule
 
 @frozen public struct BlocMarket: Identifiable {
-    public let id: AssetPair
+    public let id: ID
     public let dividend: Fraction
-    public var pool: LiquidityPool
-    public var history: Deque<Interval>
-    public var current: Candle<Double>
+    @usableFromInline var history: Deque<Interval>
+    @usableFromInline var current: Candle<Double>
+    @usableFromInline var pool: LiquidityPool
 
-    @inlinable public init(
-        id: AssetPair,
+    @inlinable init(
+        id: ID,
         dividend: Fraction,
+        history: Deque<Interval>,
+        current: Candle<Double>,
         pool: LiquidityPool,
-        history: Deque<Interval> = []
     ) {
         self.id = id
         self.dividend = dividend
         self.pool = pool
         self.history = history
-        self.current = .open(self.pool.price)
+        self.current = current
+    }
+}
+extension BlocMarket {
+    @inlinable public init(state: State) {
+        let pool: LiquidityPool = .init(
+            assets: state.capital,
+            volume: .init(),
+            fee: state.fee
+        )
+        self.init(
+            id: state.id,
+            dividend: state.dividend,
+            history: state.history,
+            current: .open(pool.price),
+            pool: pool,
+        )
+    }
+    @inlinable public var state: State {
+        .init(
+            id: self.id,
+            dividend: self.dividend,
+            history: self.history,
+            capital: self.pool.assets,
+            fee: self.pool.fee,
+        )
     }
 }
 extension BlocMarket {

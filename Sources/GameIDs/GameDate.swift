@@ -6,6 +6,10 @@
         self.rawValue = rawValue
     }
 }
+extension GameDate {
+    @inlinable public static var min: Self { .init(rawValue: .min) }
+    @inlinable public static var max: Self { .init(rawValue: .max) }
+}
 extension GameDate: Comparable {
     @inlinable public static func < (a: Self, b: Self) -> Bool { a.rawValue < b.rawValue }
 }
@@ -56,6 +60,12 @@ extension GameDate {
         let J: Int32 = d + ((153 * m + 2) / 5) + 365 * y + y / 4 - y / 100 + y / 400 - 32045
         // Days since 0000-01-01 is J - 1721425
         return .init(rawValue: J - 1721425)
+    }
+}
+extension GameDate: CustomStringConvertible {
+    @inlinable public var description: String {
+        let (y, m, d): (Int32, Int32, Int32) = self.gregorian
+        return "\(y)-\(m)-\(d)"
     }
 }
 extension GameDate {

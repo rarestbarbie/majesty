@@ -16,7 +16,7 @@ let package: Package = .init(
         .package(url: "https://github.com/swiftwasm/JavaScriptKit", branch: "main"),
         .package(url: "https://github.com/apple/swift-numerics", from: "1.0.3"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.2.1"),
-        .package(url: "https://github.com/ordo-one/package-distributions", from: "0.1.0"),
+        .package(url: "https://github.com/ordo-one/package-distributions", from: "0.2.0"),
         .package(url: "https://github.com/tayloraswift/dollup", from: "0.3.0"),
         .package(url: "https://github.com/tayloraswift/d", from: "0.4.0"),
     ],
@@ -35,9 +35,7 @@ let package: Package = .init(
                 .target(name: "GameEngine"),
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
             ],
-            swiftSettings: [
-                .enableExperimentalFeature("Testing"),
-            ]
+            path: "IntegrationTests/Swift",
         ),
 
         .executableTarget(

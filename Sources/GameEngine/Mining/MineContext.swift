@@ -26,7 +26,7 @@ extension MineContext {
     }
 }
 extension MineContext {
-    mutating func compute(map _: borrowing GameMap, context: GameContext.ResidentPass) throws {
+    mutating func compute(world _: borrowing GameWorld, context: GameContext.ResidentPass) throws {
         if  self.type.decay {
             self.miners.limit = self.state.today.size / 10_000
         } else {
@@ -42,22 +42,22 @@ extension MineContext {
     }
 }
 extension MineContext {
-    mutating func advance(map: inout GameMap) {
+    mutating func advance(turn: inout Turn) {
         let minersToHire: Int64 = self.miners.limit - self.miners.count
         if  minersToHire > 0 {
             let bid: PopJobOfferBlock = .init(
                 job: .mine(self.state.id),
                 bid: 1,
-                size: Binomial[minersToHire, 0.05].sample(using: &map.random.generator)
+                size: Binomial[minersToHire, 0.05].sample(using: &turn.random.generator)
             )
 
             if  bid.size > 0 {
-                map.jobs.hire.local[self.state.tile, self.type.miner].append(bid)
+                turn.jobs.hire.local[self.state.tile, self.type.miner].append(bid)
             }
         } else {
             let layoff: PopJobLayoffBlock = .init(size: -minersToHire)
             if  layoff.size > 0 {
-                map.jobs.fire[self.state.id, self.type.miner] = layoff
+                turn.jobs.fire[self.state.id, self.type.miner] = layoff
             }
         }
 

@@ -20,6 +20,19 @@ extension LocalPrice {
         self.init(value: .init(units: Self.low, power: -3))
     }
 }
+extension LocalPrice: CustomStringConvertible {
+    @inlinable public var description: String { self.value.description }
+}
+extension LocalPrice: LosslessStringConvertible {
+    @inlinable public init?(
+        _ string: consuming some StringProtocol & RangeReplaceableCollection
+    ) {
+        guard let decimal: Decimal = .init(string) else {
+            return nil
+        }
+        self.init(value: decimal)
+    }
+}
 extension LocalPrice: Hashable {
     @inlinable public func hash(into hasher: inout Hasher) {
         self.value.units.hash(into: &hasher)

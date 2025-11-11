@@ -1,3 +1,4 @@
+import GameIDs
 import GameRules
 import GameState
 
@@ -18,7 +19,7 @@ extension CountryContext: RuntimeContext {
 }
 extension CountryContext {
     mutating func compute(
-        map _: borrowing GameMap,
+        world _: borrowing GameWorld,
         context: GameContext.TerritoryPass
     ) throws {
         self.properties.technology { (
@@ -41,5 +42,5 @@ extension CountryContext {
     }
 }
 extension CountryContext {
-    mutating func advance(map: inout GameMap, context: GameContext) throws {}
+    mutating func advance(turn: inout Turn, context: GameContext) throws {}
 }

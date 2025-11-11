@@ -117,12 +117,12 @@ extension ResourceInputs {
     func tooltipExplainPrice(
         _ id: Resource,
         _ market: (
-            inelastic: LocalMarket?,
-            tradeable: Candle<Double>?
+            inelastic: LocalMarket.State?,
+            tradeable: BlocMarket.State?
         ),
     ) -> Tooltip? {
         if  let input: ResourceInput<Double> = self.tradeable[id],
-            let price: Candle<Double> = market.tradeable {
+            let price: Candle<Double> = market.tradeable?.history.last?.prices {
             return .instructions {
                 $0["Today’s closing price", -] = price.c[..2] <- price.o
 
@@ -140,9 +140,9 @@ extension ResourceInputs {
             }
         } else if
             let _: ResourceInput<Never> = self.inelastic[id],
-            let market: LocalMarket = market.inelastic {
-            let today: LocalMarketState = market.today
-            let yesterday: LocalMarketState = market.yesterday
+            let market: LocalMarket.State = market.inelastic {
+            let today: LocalMarket.Interval = market.today
+            let yesterday: LocalMarket.Interval = market.yesterday
             return .instructions {
                 $0["Today’s local price", -] = today.price.value[..] <- yesterday.price.value
                 $0[>] {
@@ -156,12 +156,18 @@ extension ResourceInputs {
                     if the situation persists
                     """
                 } else if
-                    let priceFloor: LocalMarket.PriceFloor = market.priceFloor,
-                        priceFloor.minimum >= today.price {
+                    let floor: LocalPriceLevel = market.limit.min,
+                        floor.price >= today.price {
                     $0[>] = """
                     There are not enough buyers in this region, but the price is not allowed \
-                    to decline due to their \(priceFloor.type) of \
-                    \(em: priceFloor.minimum.value[..])
+                    to decline due to their \(floor.label) of \(em: floor.price.value[..])
+                    """
+                } else if
+                    let cap: LocalPriceLevel = market.limit.max,
+                        cap.price <= today.price {
+                    $0[>] = """
+                    There is not enough supply in this region, but the price is not allowed \
+                    to increase due to their \(cap.label) of \(em: cap.price.value[..])
                     """
                 } else {
                     $0[>] = """

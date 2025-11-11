@@ -34,7 +34,7 @@ extension PlanetContext {
 }
 extension PlanetContext {
     mutating func compute(
-        map: borrowing GameMap,
+        world: borrowing GameWorld,
         context: GameContext.TerritoryPass
     ) throws {
         if  let orbit: Planet.Orbit = self.state.orbit,
@@ -45,7 +45,7 @@ extension PlanetContext {
                 around: orbits.mass
             )
 
-            self.position.global = motion.position(map.date)
+            self.position.global = motion.position(world.date)
             self.motion.global = motion
         }
 
@@ -62,12 +62,12 @@ extension PlanetContext {
                 massOfPrimary: self.state.mass
             )
 
-            self.position.local = motion.position(map.date)
+            self.position.local = motion.position(world.date)
             self.motion.local = motion
         } else {
             self.motion.local = nil
         }
     }
 
-    mutating func advance(map: inout GameMap, context: GameContext) throws {}
+    mutating func advance(turn: inout Turn, context: GameContext) throws {}
 }

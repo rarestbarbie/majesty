@@ -83,7 +83,7 @@ extension FactoryContext {
 }
 extension FactoryContext {
     mutating func compute(
-        map _: borrowing GameMap,
+        world _: borrowing GameWorld,
         context: GameContext.ResidentPass
     ) throws {
         if  let area: Int64 = self.state.size.area {
@@ -114,7 +114,7 @@ extension FactoryContext {
     }
 }
 extension FactoryContext: TransactingContext {
-    mutating func allocate(map: inout GameMap) {
+    mutating func allocate(turn: inout Turn) {
         guard
         let country: CountryProperties = self.region?.occupiedBy else {
             return
@@ -174,7 +174,7 @@ extension FactoryContext: TransactingContext {
                 tiers: (.init(), .init(), self.state.inventory.x),
                 location: self.state.tile,
                 currency: country.currency.id,
-                map: map,
+                turn: turn,
             )
             budget = .init(
                 workers: nil,
@@ -200,7 +200,7 @@ extension FactoryContext: TransactingContext {
                 tiers: (self.state.inventory.l, self.state.inventory.e, self.state.inventory.x),
                 location: self.state.tile,
                 currency: country.currency.id,
-                map: map,
+                turn: turn,
             )
             budget = .init(
                 workers: self.workers,
@@ -223,13 +223,13 @@ extension FactoryContext: TransactingContext {
         // only issue shares if the factory is not performing buybacks
         // but this needs to be called even if quantity is zero, or the security will not
         // be tradeable today
-        map.stockMarkets.issueShares(
+        turn.stockMarkets.issueShares(
             currency: country.currency.id,
             quantity: sharesToIssue,
             security: self.security,
         )
 
-        map.localMarkets.place(
+        turn.localMarkets.place(
             bids: (
                 (budget.l.inelastic, weights.l.inelastic.x),
                 (budget.e.inelastic, weights.e.inelastic.x),
@@ -241,7 +241,7 @@ extension FactoryContext: TransactingContext {
         )
     }
 
-    mutating func transact(map: inout GameMap) {
+    mutating func transact(turn: inout Turn) {
         guard
         let country: CountryProperties = self.region?.occupiedBy,
         let budget: FactoryBudget = self.budget else {
@@ -250,7 +250,7 @@ extension FactoryContext: TransactingContext {
 
         let stockpileTarget: ResourceStockpileTarget = .random(
             in: Self.stockpileDays,
-            using: &map.random,
+            using: &turn.random,
         )
 
         switch budget {
@@ -260,15 +260,15 @@ extension FactoryContext: TransactingContext {
                 policy: country,
                 budget: budget.l,
                 stockpileTarget: stockpileTarget,
-                map: &map
+                turn: &turn
             )
 
         case .liquidating(let budget):
-            self.liquidate(policy: country, budget: budget, map: &map)
+            self.liquidate(policy: country, budget: budget, turn: &turn)
 
             self.state.today.pa = 0
-            self.state.inventory.account.e -= map.bank.buyback(
-                random: &map.random,
+            self.state.inventory.account.e -= turn.bank.buyback(
+                random: &turn.random,
                 equity: &self.state.equity,
                 budget: budget.buybacks,
                 security: self.security,
@@ -282,7 +282,7 @@ extension FactoryContext: TransactingContext {
 
             if  let (clerks, bonus): (Update, Double) = self.clerkEffects(
                     budget: budget.clerks,
-                    map: &map
+                    turn: &turn
                 ) {
                 self.state.today.eo = 1 + bonus
                 self.state.today.cn = max(
@@ -295,12 +295,12 @@ extension FactoryContext: TransactingContext {
                 case nil:
                     break
                 case .fire(let type, let block):
-                    guard map.random.roll(1, 21) else {
+                    guard turn.random.roll(1, 21) else {
                         break
                     }
-                    map.jobs.fire[self.state.id, type] = block
+                    turn.jobs.fire[self.state.id, type] = block
                 case .hire(let type, let block):
-                    map.jobs.hire.remote[self.state.tile.planet, type].append(block)
+                    turn.jobs.hire.remote[self.state.tile.planet, type].append(block)
                 }
             } else {
                 self.state.today.eo = 1
@@ -314,7 +314,7 @@ extension FactoryContext: TransactingContext {
                     policy: country,
                     budget: budget,
                     stockpileTarget: stockpileTarget,
-                    map: &map
+                    turn: &turn
                 )
 
                 operatingProfit = self.state.operatingProfit
@@ -324,17 +324,17 @@ extension FactoryContext: TransactingContext {
                     break
 
                 case .fire(let type, let block)?:
-                    guard map.random.roll(1, 7) else {
+                    guard turn.random.roll(1, 7) else {
                         break
                     }
-                    map.jobs.fire[self.state.id, type] = block
+                    turn.jobs.fire[self.state.id, type] = block
 
                 case .hire(let type, let block)?:
                     guard operatingProfit >= 0 || workers.count == 0 else {
                         break
                     }
 
-                    map.jobs.hire.local[self.state.tile, type].append(block)
+                    turn.jobs.hire.local[self.state.tile, type].append(block)
                 }
             } else {
                 operatingProfit = self.state.operatingProfit
@@ -344,19 +344,19 @@ extension FactoryContext: TransactingContext {
                 policy: country,
                 budget: budget.x,
                 stockpileTarget: stockpileTarget,
-                map: &map
+                turn: &turn
             )
 
-            self.state.inventory.account.e -= map.bank.buyback(
-                random: &map.random,
+            self.state.inventory.account.e -= turn.bank.buyback(
+                random: &turn.random,
                 equity: &self.state.equity,
                 budget: budget.buybacks,
                 security: self.security,
             )
             // Pay dividends to shareholders, if any.
-            self.state.inventory.account.i -= map.bank.pay(
+            self.state.inventory.account.i -= turn.bank.pay(
                 dividend: budget.dividend,
-                to: self.state.equity.shares.values.shuffled(using: &map.random.generator)
+                to: self.state.equity.shares.values.shuffled(using: &turn.random.generator)
             )
 
             if  self.state.size.level == 0 {
@@ -369,7 +369,7 @@ extension FactoryContext: TransactingContext {
         }
     }
 
-    mutating func advance(map: inout GameMap) {
+    mutating func advance(turn: inout Turn) {
         guard case nil = self.state.liquidation,
         let country: CountryProperties = self.region?.occupiedBy else {
             return
@@ -379,11 +379,11 @@ extension FactoryContext: TransactingContext {
             self.clerks?.count ?? 0 == 0,
             self.state.yesterday.pa <= 0,
             self.state.today.pa <= 0 {
-            self.state.liquidation = .init(started: map.date, burning: self.equity.shareCount)
+            self.state.liquidation = .init(started: turn.date, burning: self.equity.shareCount)
         } else {
             self.state.equity.split(
                 price: self.state.today.px,
-                map: &map,
+                turn: &turn,
                 notifying: [country.id]
             )
         }
@@ -394,14 +394,14 @@ extension FactoryContext {
         policy: CountryProperties,
         budget: ResourceBudgetTier,
         stockpileTarget: ResourceStockpileTarget,
-        map: inout GameMap
+        turn: inout Turn
     ) {
         if  budget.tradeable > 0 {
             let trade: TradeProceeds = self.state.inventory.x.trade(
                 stockpileDays: stockpileTarget,
                 spendingLimit: budget.tradeable,
                 in: policy.currency.id,
-                on: &map.exchange,
+                on: &turn.worldMarkets,
             )
 
             self.state.inventory.account.v += trade.loss
@@ -427,26 +427,26 @@ extension FactoryContext {
     private mutating func liquidate(
         policy: CountryProperties,
         budget: FactoryBudget.Liquidating,
-        map: inout GameMap
+        turn: inout Turn
     ) {
         let stockpileNone: ResourceStockpileTarget = .init(lower: 0, today: 0, upper: 0)
         let tl: TradeProceeds = self.state.inventory.l.trade(
             stockpileDays: stockpileNone,
             spendingLimit: 0,
             in: policy.currency.id,
-            on: &map.exchange,
+            on: &turn.worldMarkets,
         )
         let te: TradeProceeds = self.state.inventory.e.trade(
             stockpileDays: stockpileNone,
             spendingLimit: 0,
             in: policy.currency.id,
-            on: &map.exchange,
+            on: &turn.worldMarkets,
         )
         let tx: TradeProceeds = self.state.inventory.x.trade(
             stockpileDays: stockpileNone,
             spendingLimit: 0,
             in: policy.currency.id,
-            on: &map.exchange,
+            on: &turn.worldMarkets,
         )
 
         #assert(tl.loss == 0, "nl loss during liquidation is non-zero! (\(tl.loss))")
@@ -466,20 +466,20 @@ extension FactoryContext {
         policy: CountryProperties,
         budget: OperatingBudget,
         stockpileTarget: ResourceStockpileTarget,
-        map: inout GameMap
+        turn: inout Turn
     ) -> WorkforceChanges? {
         self.state.inventory.account += self.state.inventory.l.trade(
             stockpileDays: stockpileTarget,
             spendingLimit: budget.l.tradeable,
             in: policy.currency.id,
-            on: &map.exchange,
+            on: &turn.worldMarkets,
         )
 
         self.state.inventory.account += self.state.inventory.e.trade(
             stockpileDays: stockpileTarget,
             spendingLimit: budget.e.tradeable,
             in: policy.currency.id,
-            on: &map.exchange,
+            on: &turn.worldMarkets,
         )
 
         #assert(
@@ -493,7 +493,7 @@ extension FactoryContext {
         let (update, hours): (Update, Int64) = self.workerEffects(
             workers: workers,
             budget: budget.workers,
-            map: &map
+            turn: &turn
         )
 
         self.state.today.wn = max(policy.minwage, self.state.today.wn + update.wagesChange)
@@ -515,7 +515,7 @@ extension FactoryContext {
 
         self.state.inventory.account.r += self.state.inventory.out.sell(
             in: policy.currency.id,
-            on: &map.exchange
+            on: &turn.worldMarkets
         )
         self.state.inventory.out.deposit(
             from: self.type.output,
@@ -557,7 +557,7 @@ extension FactoryMetadata.ClerkBonus {
 extension FactoryContext {
     private func clerkEffects(
         budget: Int64,
-        map: inout GameMap
+        turn: inout Turn
     ) -> (salaries: Update, bonus: Double)? {
         guard
         let clerks: Workforce = self.clerks,
@@ -568,10 +568,10 @@ extension FactoryContext {
         let clerksOptimal: Int64 = self.workers.map { clerkTeam.optimal(for: $0.count) } ?? 0
 
         let wagesOwed: Int64 = clerks.count * self.state.today.cn
-        let wagesPaid: Int64 = map.bank.pay(
+        let wagesPaid: Int64 = turn.bank.pay(
             salariesBudget: budget,
             salaries: [
-                map.payscale(shuffling: clerks.pops, rate: self.state.today.cn),
+                turn.payscale(shuffling: clerks.pops, rate: self.state.today.cn),
             ]
         )
 
@@ -602,7 +602,7 @@ extension FactoryContext {
 
             if  clerks.count < clerksNeeded,
                 let p: Int = self.state.yesterday.cf,
-                map.random.roll(Int64.init(p), Int64.init(Self.pr)) {
+                turn.random.roll(Int64.init(p), Int64.init(Self.pr)) {
                 // Was last in line to hire clerks yesterday, did not hire any clerks, and has
                 // fewer than half of the target number of clerks today.
                 wagesChange = 1
@@ -613,7 +613,7 @@ extension FactoryContext {
             let bid: PopJobOfferBlock = .init(
                 job: .factory(self.state.id),
                 bid: self.state.today.cn,
-                size: Binomial[clerksToHire, 0.05].sample(using: &map.random.generator)
+                size: Binomial[clerksToHire, 0.05].sample(using: &turn.random.generator)
             )
 
             if  bid.size > 0 {
@@ -640,7 +640,7 @@ extension FactoryContext {
     private func workerEffects(
         workers: Workforce,
         budget: Int64,
-        map: inout GameMap
+        turn: inout Turn
     ) -> (wages: Update, hours: Int64) {
         /// Compute hours workable, assuming each worker works 1 “hour” per day for mathematical
         /// convenience. This can be larger than the actual number of workers available, but it
@@ -656,9 +656,9 @@ extension FactoryContext {
             min(workers.count, hoursWorkable),
             budget / self.state.today.wn
         )
-        let wagesPaid: Int64 = hours <= 0 ? 0 : map.bank.pay(
+        let wagesPaid: Int64 = hours <= 0 ? 0 : turn.bank.pay(
             wagesBudget: hours * self.state.today.wn,
-            wages: map.payscale(shuffling: workers.pops, rate: self.state.today.wn)
+            wages: turn.payscale(shuffling: workers.pops, rate: self.state.today.wn)
         )
 
         let headcount: WorkforceChanges?
@@ -686,7 +686,7 @@ extension FactoryContext {
             if  hire > 0 {
                 if  workers.count < hire,
                     let p: Int = self.state.yesterday.wf,
-                    map.random.roll(Int64.init(p), Int64.init(Self.pr)) {
+                    turn.random.roll(Int64.init(p), Int64.init(Self.pr)) {
                     // Was last in line to hire workers yesterday, did not hire any workers, and has
                     // far more inputs stockpiled than workers to process them.
                     wagesChange = 1
@@ -697,7 +697,7 @@ extension FactoryContext {
                 let bid: PopJobOfferBlock = .init(
                     job: .factory(self.state.id),
                     bid: self.state.today.wn,
-                    size: Binomial[hire, 0.1].sample(using: &map.random.generator)
+                    size: Binomial[hire, 0.1].sample(using: &turn.random.generator)
                 )
 
                 if  bid.size > 0 {

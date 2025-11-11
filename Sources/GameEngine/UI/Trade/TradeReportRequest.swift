@@ -4,7 +4,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public struct TradeReportRequest {
-    @usableFromInline let subject: BlocMarket.AssetPair?
+    @usableFromInline let subject: BlocMarket.ID?
     @usableFromInline let filter: TradeReport.Filter?
 }
 extension TradeReportRequest {

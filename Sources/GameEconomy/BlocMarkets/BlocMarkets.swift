@@ -25,18 +25,18 @@ import OrderedCollections
 /// ```
 @frozen public struct BlocMarkets: ~Copyable {
     @usableFromInline let settings: Settings
-    @usableFromInline var table: OrderedDictionary<BlocMarket.AssetPair, BlocMarket>
+    @usableFromInline var table: OrderedDictionary<BlocMarket.ID, BlocMarket>
 
     @inlinable public init(
         settings: Settings = .default,
-        table: OrderedDictionary<BlocMarket.AssetPair, BlocMarket> = [:],
+        table: OrderedDictionary<BlocMarket.ID, BlocMarket> = [:],
     ) {
         self.settings = settings
         self.table = table
     }
 }
 extension BlocMarkets {
-    public subscript(_ pair: BlocMarket.AssetPair) -> LiquidityPool {
+    public subscript(_ pair: BlocMarket.ID) -> LiquidityPool {
         get {
             self.table[pair]?.canonical ??
             self.table[pair.conjugated, default: self.settings.new(pair.conjugated)].conjugate
@@ -68,7 +68,7 @@ extension BlocMarkets {
     }
 }
 extension BlocMarkets {
-    @inlinable public var markets: OrderedDictionary<BlocMarket.AssetPair, BlocMarket> {
+    @inlinable public var markets: OrderedDictionary<BlocMarket.ID, BlocMarket> {
         self.table
     }
 }

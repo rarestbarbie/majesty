@@ -1,4 +1,5 @@
 import Color
+import GameIDs
 
 public final class TerrainMetadata: Identifiable {
     public let id: TerrainType

@@ -1,4 +1,0 @@
-extension GameMap {
-    enum Jobs {
-    }
-}

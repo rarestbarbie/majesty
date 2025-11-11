@@ -38,9 +38,10 @@ extension GameAPI {
             try await Self.handle(events: events, ui: $0)
         }
         self[.call] = { try Self.game?.call($0, with: .init(array: $1)) }
+        self[.save] = { Self.game?.save }
         self[.load] = {
             do {
-                Self.game = try .init(save: $0, rules: $1, terrain: $2)
+                Self.game = try .load($0, rules: $1, map: $2)
             } catch let error {
                 print("Error loading game: \(error)")
             }

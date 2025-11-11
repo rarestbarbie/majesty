@@ -3,34 +3,67 @@ import Fraction
 import GameIDs
 import Random
 
-@frozen public struct LocalMarket {
-    public var priceFloor: PriceFloor?
-    public var yesterday: LocalMarketState
-    public var today: LocalMarketState
+@frozen public struct LocalMarket: Identifiable {
+    public let id: ID
+    public var yesterday: Interval
+    public var today: Interval
+    public var limit: (
+        min: LocalPriceLevel?,
+        max: LocalPriceLevel?
+    )
 
     @usableFromInline var asks: [Order]
     @usableFromInline var bids: [Order]
 
-    init(
-        priceFloor: PriceFloor?,
-        yesterday: LocalMarketState,
-        today: LocalMarketState,
+    @inlinable init(
+        id: ID,
+        yesterday: Interval,
+        today: Interval,
+        limit: (
+            min: LocalPriceLevel?,
+            max: LocalPriceLevel?
+        ),
         asks: [Order],
         bids: [Order]
     ) {
-        self.priceFloor = priceFloor
+        self.id = id
         self.yesterday = yesterday
         self.today = today
+        self.limit = limit
         self.asks = asks
         self.bids = bids
     }
+}
+extension LocalMarket {
+    @inlinable init(id: ID) {
+        let interval: Interval = .init(price: .init(), supply: 0, demand: 0)
+        self.init(
+            id: id,
+            yesterday: interval,
+            today: interval,
+            limit: (min: nil, max: nil),
+            asks: [],
+            bids: []
+        )
+    }
 
-    @inlinable init() {
-        self.priceFloor = nil
-        self.yesterday = .init(price: .init(), supply: 0, demand: 0)
-        self.today = self.yesterday
-        self.asks = []
-        self.bids = []
+    @inlinable public init(state: State) {
+        self.init(
+            id: state.id,
+            yesterday: state.yesterday,
+            today: state.today,
+            limit: state.limit,
+            asks: [],
+            bids: []
+        )
+    }
+    @inlinable public var state: State {
+        .init(
+            id: self.id,
+            yesterday: self.yesterday,
+            today: self.today,
+            limit: self.limit,
+        )
     }
 }
 extension LocalMarket {
@@ -43,7 +76,7 @@ extension LocalMarket {
         )
     }
 
-    @inlinable public var history: (yesterday: LocalMarketState, today: LocalMarketState)  {
+    @inlinable public var history: (yesterday: Interval, today: Interval)  {
         (self.yesterday, self.today)
     }
 }
@@ -74,18 +107,33 @@ extension LocalMarket {
     }
 }
 extension LocalMarket {
-    public mutating func turn() {
-        self.turn(priceFloor: .init(1 %/ 10_000))
-        self.priceFloor = nil
+    private static var minDefault: LocalPrice { .init(1 %/ 10_000) }
+    private static var maxDefault: LocalPrice { .init(100_000_000 %/ 1) }
+}
+extension LocalMarket {
+    public mutating func turn(
+        priceControls: (min: LocalPriceLevel?, max: LocalPriceLevel?)
+    ) {
+        self.turn(
+            priceControls: (
+                priceControls.min?.price ?? Self.minDefault,
+                priceControls.max?.price ?? Self.maxDefault
+            )
+        )
+        self.limit = priceControls
     }
-    public mutating func turn(priceFloor: LocalPrice, type: PriceFloorType) {
-        self.turn(priceFloor: priceFloor)
-        self.priceFloor = .init(minimum: priceFloor, type: type)
-    }
-    private mutating func turn(priceFloor: LocalPrice) {
+    private mutating func turn(priceControls: (min: LocalPrice, max: LocalPrice)) {
         let price: LocalPrice = self.today.priceUpdate
+
         self.yesterday = self.today
-        self.today = .init(price: max(price, priceFloor))
+
+        if  price < priceControls.min {
+            self.today = .init(price: priceControls.min)
+        } else if price > priceControls.max {
+            self.today = .init(price: priceControls.max)
+        } else {
+            self.today = .init(price: price)
+        }
     }
 
     public mutating func match(using random: inout PseudoRandom) -> (
