@@ -10,6 +10,7 @@ package-lock.json
 /Public/Fonts/*.otf
 /Public/Fonts/*.woff2
 /Public/rules.json
+/Public/start.json
 /IntegrationTests/.build/
 /IntegrationTests/.build.*
 
