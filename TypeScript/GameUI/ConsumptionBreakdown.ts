@@ -87,8 +87,8 @@ export class ConsumptionBreakdown {
         );
         this.needs.update(
             state.needs,
-            (need: ResourceNeed) => new ResourceNeedRow(need, type, id),
-            (need: ResourceNeed, row: ResourceNeedRow) => row.update(need),
+            (need: ResourceNeed) => new ResourceNeedRow(need, id, type),
+            (need: ResourceNeed, row: ResourceNeedRow) => row.update(need, id),
         );
 
         this.costs.update([id], state.costs ?? []);

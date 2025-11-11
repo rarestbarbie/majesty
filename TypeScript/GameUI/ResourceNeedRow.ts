@@ -21,82 +21,86 @@ export class ResourceNeedRow implements DiffableListElement<string> {
     private readonly stockpile: HTMLElement;
     private readonly price: Ticker;
 
-    public static get columns(): string[] {
-        return [
-            "Resource",
-            "Demand",
-            "Stockpile",
-            "Price",
-        ];
-    }
+    private owner: GameID;
 
     constructor(
-        need: ResourceNeed,
-        type: PersistentOverviewType,
+        state: ResourceNeed,
         owner: GameID,
+        type: PersistentOverviewType,
     ) {
-        this.id = need.id;
+        this.id = state.id;
         this.node = document.createElement('a');
 
         const label: HTMLDivElement = document.createElement('div');
-        label.textContent = `${need.icon} ${need.name}`;
+        label.textContent = `${state.icon} ${state.name}`;
 
         this.demand = new ProgressCell();
         this.demand.node.setAttribute('data-tooltip-type', type.tooltipResourceIO);
-        this.demand.node.setAttribute(
-            'data-tooltip-arguments',
-            JSON.stringify([owner, need.id]),
-        );
 
         this.stockpile = document.createElement('div');
         this.stockpile.setAttribute('data-tooltip-type', type.tooltipStockpile);
-        this.stockpile.setAttribute(
-            'data-tooltip-arguments',
-            JSON.stringify([owner, need.id]),
-        );
 
         this.price = new Ticker(Fortune.Malus);
         this.price.outer.setAttribute('data-tooltip-type', type.tooltipExplainPrice);
-        this.price.outer.setAttribute(
-            'data-tooltip-arguments',
-            JSON.stringify([owner, need.id]),
-        );
 
         this.node.appendChild(label);
         this.node.appendChild(this.demand.node);
         this.node.appendChild(this.stockpile);
         this.node.appendChild(this.price.outer);
-        this.node.dataset['tier'] = need.tier;
+        this.node.dataset['tier'] = state.tier;
+
+        this.owner = owner;
+        this.configure();
     }
 
-    public update(need: ResourceNeed): void {
-        UpdateBigInt(this.demand.summary, need.demand);
+    public update(state: ResourceNeed, owner: GameID): void {
+        if (this.owner !== owner) {
+            this.owner = owner;
+            this.configure();
+        }
+
+        UpdateBigInt(this.demand.summary, state.demand);
 
         let fraction: number;
-        if (need.demand === 0n) {
+        if (state.demand === 0n) {
             fraction = 0; // Avoid division by zero
-        } else if (need.filled > need.demand) {
+        } else if (state.filled > state.demand) {
             fraction = 1;
         } else {
-            fraction = Number(need.filled) / Number(need.demand);
+            fraction = Number(state.filled) / Number(state.demand);
         }
 
         this.demand.set(fraction * 100);
 
-        if (need.stockpile !== undefined) {
-            UpdateBigInt(this.stockpile, need.stockpile);
+        if (state.stockpile !== undefined) {
+            UpdateBigInt(this.stockpile, state.stockpile);
         } else {
             UpdateText(this.stockpile, '');
         }
 
-        if (need.filled < need.demand) {
+        if (state.filled < state.demand) {
             this.stockpile.classList.add(CellStyle.Bloody);
         } else {
             this.stockpile.classList.remove(CellStyle.Bloody);
         }
 
-        if (need.price !== undefined) {
-            this.price.updatePriceChange(need.price.o, need.price.c, 2);
+        if (state.price !== undefined) {
+            this.price.updatePriceChange(state.price.o, state.price.c, 2);
         }
+    }
+
+    private configure(): void {
+        this.demand.node.setAttribute(
+            'data-tooltip-arguments',
+            JSON.stringify([this.owner, this.id]),
+        );
+        this.stockpile.setAttribute(
+            'data-tooltip-arguments',
+            JSON.stringify([this.owner, this.id]),
+        );
+        this.price.outer.setAttribute(
+            'data-tooltip-arguments',
+            JSON.stringify([this.owner, this.id]),
+        );
     }
 }

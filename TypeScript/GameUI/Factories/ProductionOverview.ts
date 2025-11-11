@@ -199,12 +199,8 @@ export class ProductionOverview extends ScreenContent {
             this.consumption.update(id, state.factory.open, ProductionOverview);
             this.sales.update(
                 state.factory.open.sales,
-                (sale: ResourceSale) => new ResourceSaleBox(
-                    sale,
-                    id,
-                    ProductionOverview,
-                ),
-                (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
+                (sale: ResourceSale) => new ResourceSaleBox(sale, id, ProductionOverview),
+                (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale, id),
             );
 
             break;

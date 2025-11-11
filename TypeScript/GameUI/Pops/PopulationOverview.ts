@@ -213,12 +213,8 @@ export class PopulationOverview extends ScreenContent {
             this.consumption.update(id, state.pop.open, PopulationOverview);
             this.sales.update(
                 state.pop.open.sales,
-                (sale: ResourceSale) => new ResourceSaleBox(
-                    sale,
-                    id,
-                    PopulationOverview,
-                ),
-                (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale),
+                (sale: ResourceSale) => new ResourceSaleBox(sale, id, PopulationOverview),
+                (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale, id),
             );
             break;
 

@@ -3,6 +3,7 @@ import {
     Fortune,
     Ticker,
     UpdateBigInt,
+    UpdateText,
 } from '../DOM/exports.js';
 import { GameID } from '../GameEngine/exports.js';
 import { PersistentOverviewType, ResourceSale, TooltipType } from './exports.js';
@@ -14,70 +15,90 @@ export class ResourceSaleBox implements DiffableListElement<string> {
     private readonly units: HTMLElement;
     private readonly value: HTMLElement;
     private readonly price: Ticker;
+    private readonly proceeds: HTMLElement;
+    private readonly subtitle: HTMLElement;
+
+    private owner: GameID;
 
     constructor(
-        sale: ResourceSale,
+        state: ResourceSale,
         owner: GameID,
         type: PersistentOverviewType,
     ) {
-        this.id = sale.id;
+        this.id = state.id;
         this.node = document.createElement('a');
 
         const icon: HTMLDivElement = document.createElement('div');
         const resource: HTMLDivElement = document.createElement('div');
 
-        icon.textContent = sale.icon;
-        resource.textContent = sale.name;
+        icon.textContent = state.icon;
+        resource.textContent = state.name;
 
         this.units = document.createElement('div');
         this.units.setAttribute('data-tooltip-type', type.tooltipResourceIO);
         this.units.setAttribute(
             'data-tooltip-arguments',
-            JSON.stringify([owner, sale.id]),
+            JSON.stringify([owner, state.id]),
         );
 
-        const proceeds: HTMLDivElement = document.createElement('div');
 
         this.value = document.createElement('div');
         this.price = new Ticker(Fortune.Bonus);
 
-        proceeds.appendChild(this.value);
-        proceeds.appendChild(this.price.outer);
-        proceeds.classList.add('proceeds');
-        proceeds.setAttribute('data-tooltip-type', type.tooltipExplainPrice);
-        proceeds.setAttribute(
-            'data-tooltip-arguments',
-            JSON.stringify([owner, sale.id]),
-        );
+        this.proceeds = document.createElement('div');
+        this.proceeds.appendChild(this.value);
+        this.proceeds.appendChild(this.price.outer);
+        this.proceeds.classList.add('proceeds');
+        this.proceeds.setAttribute('data-tooltip-type', type.tooltipExplainPrice);
+
+        this.subtitle = document.createElement('div');
+        this.subtitle.classList.add('subtitle');
+        if (type.tooltipResourceOrigin !== undefined) {
+            this.subtitle.setAttribute('data-tooltip-type', type.tooltipResourceOrigin);
+        }
 
         this.node.appendChild(icon);
         this.node.appendChild(resource);
         this.node.appendChild(this.units);
-        this.node.appendChild(proceeds);
+        this.node.appendChild(this.proceeds);
+        this.node.appendChild(this.subtitle);
 
-        if (sale.source !== undefined) {
-            const subtitle: HTMLDivElement = document.createElement('div');
-            subtitle.classList.add('subtitle');
-            subtitle.textContent = sale.source;
+        this.owner = owner;
+        this.configure();
+    }
 
-            if (type.tooltipResourceOrigin !== undefined) {
-                subtitle.setAttribute('data-tooltip-type', type.tooltipResourceOrigin);
-                subtitle.setAttribute(
-                    'data-tooltip-arguments',
-                    JSON.stringify([owner, sale.id]),
-                );
-            }
+    public update(state: ResourceSale, owner: GameID): void {
+        if (this.owner !== owner) {
+            this.owner = owner;
+            this.configure();
+        }
 
-            this.node.appendChild(subtitle);
+        UpdateBigInt(this.units, state.unitsSold);
+        UpdateBigInt(this.value, state.valueSold);
+
+        if (state.source !== undefined) {
+            UpdateText(this.subtitle, state.source);
+        } else {
+            UpdateText(this.subtitle, '');
+        }
+
+        if (state.price !== undefined) {
+            this.price.updatePriceChange(state.price.o, state.price.c, 2);
         }
     }
 
-    public update(sale: ResourceSale): void {
-        UpdateBigInt(this.units, sale.unitsSold);
-        UpdateBigInt(this.value, sale.valueSold);
-
-        if (sale.price !== undefined) {
-            this.price.updatePriceChange(sale.price.o, sale.price.c, 2);
-        }
+    private configure(): void {
+        this.units.setAttribute(
+            'data-tooltip-arguments',
+            JSON.stringify([this.owner, this.id]),
+        );
+        this.proceeds.setAttribute(
+            'data-tooltip-arguments',
+            JSON.stringify([this.owner, this.id]),
+        );
+        this.subtitle.setAttribute(
+            'data-tooltip-arguments',
+            JSON.stringify([this.owner, this.id]),
+        );
     }
 }
