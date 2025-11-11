@@ -156,12 +156,18 @@ extension ResourceInputs {
                     if the situation persists
                     """
                 } else if
-                    let priceFloor: LocalMarket.PriceFloor = market.priceFloor,
-                        priceFloor.minimum >= today.price {
+                    let floor: LocalPriceLevel = market.limit.min,
+                        floor.price >= today.price {
                     $0[>] = """
                     There are not enough buyers in this region, but the price is not allowed \
-                    to decline due to their \(priceFloor.type) of \
-                    \(em: priceFloor.minimum.value[..])
+                    to decline due to their \(floor.label) of \(em: floor.price.value[..])
+                    """
+                } else if
+                    let cap: LocalPriceLevel = market.limit.max,
+                        cap.price <= today.price {
+                    $0[>] = """
+                    There is not enough supply in this region, but the price is not allowed \
+                    to increase due to their \(cap.label) of \(em: cap.price.value[..])
                     """
                 } else {
                     $0[>] = """

@@ -175,12 +175,18 @@ extension GameContext {
                 return
             }
 
+            let min: LocalPriceLevel?
+
             if let hours: Int64 = resource.hours {
-                let priceFloor: LocalPrice = .init(region.minwage %/ hours)
-                $0.turn(priceFloor: priceFloor, type: .minimumWage)
+                min = .init(
+                    price: LocalPrice.init(region.minwage %/ hours),
+                    label: .minimumWage
+                )
             } else {
-                $0.turn()
+                min = nil
             }
+
+            $0.turn(priceControls: (min: min, max: nil))
         }
 
         self.factories.turn { $0.turn(on: &turn) }

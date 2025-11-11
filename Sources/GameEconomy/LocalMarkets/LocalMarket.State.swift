@@ -1,20 +1,23 @@
 extension LocalMarket {
     @frozen public struct State {
         public let id: ID
-        public let priceFloor: PriceFloor?
         public let yesterday: Interval
         public let today: Interval
+        public let limit: (
+            min: LocalPriceLevel?,
+            max: LocalPriceLevel?
+        )
 
         @inlinable public init(
             id: ID,
-            priceFloor: PriceFloor?,
             yesterday: Interval,
-            today: Interval
+            today: Interval,
+            limit: (min: LocalPriceLevel?, max: LocalPriceLevel?),
         ) {
             self.id = id
-            self.priceFloor = priceFloor
             self.yesterday = yesterday
             self.today = today
+            self.limit = limit
         }
     }
 }

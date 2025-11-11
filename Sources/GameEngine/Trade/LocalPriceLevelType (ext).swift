@@ -3,11 +3,11 @@ import GameEconomy
 import JavaScriptKit
 import JavaScriptInterop
 
-extension LocalMarket.PriceFloorType: RawRepresentable {
+extension LocalPriceLevelType: RawRepresentable {
     @Bijection(label: "rawValue") @inlinable public var rawValue: Unicode.Scalar {
         switch self {
         case .minimumWage: "W"
         }
     }
 }
-extension LocalMarket.PriceFloorType: ConvertibleToJSValue, LoadableFromJSValue {}
+extension LocalPriceLevelType: ConvertibleToJSValue, LoadableFromJSValue {}

@@ -62,6 +62,12 @@ extension GameDate {
         return .init(rawValue: J - 1721425)
     }
 }
+extension GameDate: CustomStringConvertible {
+    @inlinable public var description: String {
+        let (y, m, d): (Int32, Int32, Int32) = self.gregorian
+        return "\(y)-\(m)-\(d)"
+    }
+}
 extension GameDate {
     @inlinable public subscript(format: GameDateFormat) -> String {
         switch format {

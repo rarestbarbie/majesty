@@ -43,11 +43,10 @@ extension IntegrationTestFile: JavaScriptDecodable {
             print("Integration test 'HashRules' failed: \(error)")
         }
 
-        for year: Int32 in [
-            // 2426,
-            2431
+        for target: GameDate in [
+            .gregorian(year: 2426, month: 1, day: 1),
+            .gregorian(year: 2450, month: 1, day: 1)
         ] {
-            let target: GameDate = .gregorian(year: year, month: 1, day: 1)
             let save: GameSave
             do {
                 save = try Self.HashGameState(target: target)
@@ -67,7 +66,7 @@ extension IntegrationTestFile: JavaScriptDecodable {
 
             outputs.append(
                 .init(
-                    name: "HashGameState_\(year)",
+                    name: "HashGameState_\(target)",
                     save: save
                 )
             )
