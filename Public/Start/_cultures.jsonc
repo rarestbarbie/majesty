@@ -1,0 +1,280 @@
+[
+    {
+        "id": "Andean",
+        "color": "#ff3794"
+    },
+    {
+        "id": "Alaskan",
+        "color": "#61271f"
+    },
+    {
+        "id": "Inuit",
+        "color": "#e8f4ff"
+    },
+    {
+        "id": "Atlantean",
+        "color": "#66BBFF"
+    },
+    {
+        "id": "Black American",
+        "color": "#131313"
+    },
+    {
+        "id": "Mexican",
+        "color": "#abff66"
+    },
+    {
+        "id": "South American",
+        "color": "#7aebff"
+    },
+    {
+        "id": "Brazilian",
+        "color": "#1c9249"
+    },
+    {
+        "id": "Italian",
+        "color": "#abff66"
+    },
+    {
+        "id": "Hispanic",
+        "color": "#fff066"
+    },
+    {
+        "id": "Hellenic",
+        "color": "#368cb4"
+    },
+    {
+        "id": "West Slavic",
+        "color": "#eb9fe4"
+    },
+    {
+        "id": "Russian",
+        "color": "#ff6b6b"
+    },
+    {
+        "id": "Central Asian",
+        "color": "#f34747"
+    },
+    {
+        "id": "East Asian",
+        "color": "#d62c2c"
+    },
+    {
+        "id": "Japanese",
+        "color": "#ffc2c2"
+    },
+    {
+        "id": "West Oceanian",
+        "color": "#fb84ff"
+    },
+    {
+        "id": "East Oceanian",
+        "color": "#9f84ff"
+    },
+    {
+        "id": "Filipino",
+        "color": "#8d1b1b"
+    },
+    {
+        "id": "Thai",
+        "color": "#ffe079"
+    },
+    {
+        "id": "South Asian",
+        "color": "#ff804d"
+    },
+    {
+        "id": "West Asian",
+        "color": "#eaffdc"
+    },
+    {
+        "id": "Iranian",
+        "color": "#cfffaf"
+    },
+    {
+        "id": "Arab",
+        "color": "#008f47"
+    },
+    {
+        "id": "Caspian",
+        "color": "#ceff7e"
+    },
+    {
+        "id": "Anatolian",
+        "color": "#610028"
+    },
+    {
+        "id": "West Mediterranean",
+        "color": "#941449"
+    },
+    {
+        "id": "Israeli",
+        "color": "#276cff"
+    },
+    {
+        "id": "Egyptian",
+        "color": "#24171d"
+    },
+    {
+        "id": "North African",
+        "color": "#1a1516"
+    },
+    {
+        "id": "Sahelian",
+        "color": "#321f83"
+    },
+    {
+        "id": "West African",
+        "color": "#360425"
+    },
+    {
+        "id": "East African",
+        "color": "#1f040f"
+    },
+    {
+        "id": "Ethiopian",
+        "color": "#9e009e"
+    },
+    {
+        "id": "Northeast African",
+        "color": "#00e1ff"
+    },
+    {
+        "id": "South African",
+        "color": "#252525"
+    },
+    {
+        "id": "Luso-African",
+        "color": "#6d1728"
+    },
+    {
+        "id": "Australian",
+        "color": "#7c1e0d"
+    },
+
+
+    {
+        "id": "Earther",
+        "color": "#ff00dd"
+    },
+    {
+        "id": "Penguin",
+        "color": "#3d3926"
+    },
+    {
+        "id": "Whale",
+        "color": "#202a31"
+    },
+    {
+        "id": "Dolphin",
+        "color": "#536877"
+    },
+    {
+        "id": "Cow",
+        "color": "#94737e"
+    },
+    {
+        "id": "Pig",
+        "color": "#ce9eae"
+    },
+    {
+        "id": "Cat",
+        "color": "#5c514a"
+    },
+    {
+        "id": "Dog",
+        "color": "#362e29"
+    },
+    {
+        "id": "Elephant",
+        "color": "#747474"
+    },
+    {
+        "id": "Crow",
+        "color": "#111111"
+    },
+    {
+        "id": "Octopus",
+        "color": "#7e1f1f"
+    },
+    {
+        "id": "Lunan",
+        "color": "#d3bbb9"
+    },
+    {
+        "id": "North Venusian",
+        "color": "#ffcc24"
+    },
+    {
+        "id": "South Venusian",
+        "color": "#ffae18"
+    },
+    {
+        "id": "Martian",
+        "color": "#ee5c37"
+    },
+    {
+        "id": "European",
+        "color": "#90CAF9"
+    },
+    {
+        "id": "Gallilean",
+        "color": "#4DB6AC"
+    },
+    {
+        "id": "Himalian",
+        "color": "#B39DDB"
+    },
+    {
+        "id": "Lysithean",
+        "color": "#B39DDB"
+    },
+    {
+        "id": "Elarese",
+        "color": "#B39DDB"
+    },
+    {
+        "id": "Pasiphaean",
+        "color": "#B39DDB"
+    },
+    {
+        "id": "Ledan",
+        "color": "#B39DDB"
+    },
+    {
+        "id": "Anakese",
+        "color": "#B39DDB"
+    },
+    {
+        "id": "Carmese",
+        "color": "#B39DDB"
+    },
+    {
+        "id": "Sinopean",
+        "color": "#B39DDB"
+    },
+    {
+        "id": "Jovian",
+        "color": "#d49968"
+    },
+    {
+        "id": "Titanian",
+        "color": "#FFAB91"
+    },
+    {
+        "id": "Vestan",
+        "color": "#FF8A65"
+    },
+    {
+        "id": "Cerean",
+        "color": "#FFB74D"
+    },
+    {
+        "id": "Erotian",
+        "color": "#f0bb6d"
+    },
+    {
+        "id": "Palladian",
+        "color": "#facc88"
+    }
+]

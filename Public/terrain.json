@@ -1326,499 +1326,637 @@
     ],
     "planet_surfaces": [
         {
+            "id": 10,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 199,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
             "id": 299,
             "size": 4,
             "grid": [
                 {
                     "id": "E3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-4,1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-4,1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-4,2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-4,2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-4,3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-4,3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "E4",
-                    "type": "Mountain Jungle"
+                    "type": "Mountain Jungle",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-3,-1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-3,-1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-3,0",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-3,0",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-3,1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-3,1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-3,2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-3,2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-3,3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-3,3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-3,4",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-3,4",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,-2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,-2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,-1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,-1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,0",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,0",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,2",
-                    "type": "Megaswamp"
+                    "type": "Megaswamp",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,3",
-                    "type": "Megaswamp"
+                    "type": "Megaswamp",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,4",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,4",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,-3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,-3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,-2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,-2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,-1",
+                    "name": "Guinevere Sea",
                     "type": "Megaswamp",
-                    "name": "Guinevere Sea"
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,-1",
-                    "type": "Megaswamp"
+                    "type": "Megaswamp",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,0",
+                    "name": "Western Ishtar",
                     "type": "Forest",
-                    "name": "Western Ishtar"
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,0",
+                    "name": "Lada Terra",
                     "type": "Forest",
-                    "name": "Lada Terra"
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,1",
+                    "name": "Central Ishtar",
                     "type": "Forest",
-                    "name": "Central Ishtar"
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,1",
+                    "name": "Lada Terra",
                     "type": "Forest",
-                    "name": "Lada Terra"
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,2",
+                    "name": "Southern Ishtar",
                     "type": "Forest",
-                    "name": "Southern Ishtar"
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,3",
-                    "type": "Megaswamp"
+                    "type": "Megaswamp",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,4",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,4",
+                    "name": "Navka Sea",
                     "type": "Megaswamp",
-                    "name": "Navka Sea"
+                    "geology": "_None"
                 },
                 {
                     "id": "E2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,-3",
+                    "name": "Beta Regio",
                     "type": "Mountain Jungle",
-                    "name": "Beta Regio"
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,-3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,-2",
+                    "name": "Guinevere Sea",
                     "type": "Megaswamp",
-                    "name": "Guinevere Sea"
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,-2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,-1",
+                    "name": "Atalantan Ocean",
                     "type": "Ocean",
-                    "name": "Atalantan Ocean"
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,-1",
+                    "name": "Lada Terra",
                     "type": "Forest",
-                    "name": "Lada Terra"
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,0",
+                    "name": "Atalantan Islands",
                     "type": "Archipelago",
-                    "name": "Atalantan Islands"
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,0",
+                    "name": "Lada Terra",
                     "type": "Forest",
-                    "name": "Lada Terra"
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,1",
+                    "name": "Maxwell Montes",
                     "type": "Taiga",
-                    "name": "Maxwell Montes"
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,1",
+                    "name": "Lavinia Sea",
                     "type": "Megaswamp",
-                    "name": "Lavinia Sea"
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,2",
+                    "name": "Eastern Ishtar",
                     "type": "Forest",
-                    "name": "Eastern Ishtar"
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,2",
+                    "name": "Alpha Regio",
                     "type": "Forest",
-                    "name": "Alpha Regio"
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,3",
-                    "type": "Megaswamp"
+                    "type": "Megaswamp",
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "E5",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,-4",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,-4",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,-3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,-3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,-2",
+                    "name": "Guinevere Sea",
                     "type": "Megaswamp",
-                    "name": "Guinevere Sea"
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,-2",
-                    "type": "Megaswamp"
+                    "type": "Megaswamp",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,-1",
+                    "name": "Guinevere Sea",
                     "type": "Megaswamp",
-                    "name": "Guinevere Sea"
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,-1",
-                    "type": "Megaswamp"
+                    "type": "Megaswamp",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,0",
+                    "name": "Guinevere Sea",
                     "type": "Megaswamp",
-                    "name": "Guinevere Sea"
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,0",
+                    "name": "Lada Terra",
                     "type": "Forest",
-                    "name": "Lada Terra"
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,1",
+                    "name": "Tethus Regio",
                     "type": "Forest",
-                    "name": "Tethus Regio"
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,-4",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,-4",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,-3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,-3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,-2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,-2",
-                    "type": "Megaswamp"
+                    "type": "Megaswamp",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,-1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,-1",
-                    "type": "Megaswamp"
+                    "type": "Megaswamp",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,0",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,0",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,2",
+                    "name": "Aphrodite",
                     "type": "Mountain Jungle",
-                    "name": "Aphrodite"
+                    "geology": "_None"
                 },
                 {
                     "id": "N3,-4",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S3,-4",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N3,-3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S3,-3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N3,-2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S3,-2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N3,-1",
-                    "type": "Megaswamp"
+                    "type": "Megaswamp",
+                    "geology": "_None"
                 },
                 {
                     "id": "S3,-1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N3,0",
-                    "type": "Megaswamp"
+                    "type": "Megaswamp",
+                    "geology": "_None"
                 },
                 {
                     "id": "S3,0",
-                    "type": "Megaswamp"
+                    "type": "Megaswamp",
+                    "geology": "_None"
                 },
                 {
                     "id": "N3,1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S3,1",
+                    "name": "Ovda Regio",
                     "type": "Mountain Jungle",
-                    "name": "Ovda Regio"
+                    "geology": "_None"
                 },
                 {
                     "id": "E1",
+                    "name": "Maat Mons",
                     "type": "Volcanic",
-                    "name": "Maat Mons"
+                    "geology": "_None"
                 },
                 {
                     "id": "N4,-3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S4,-3",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N4,-2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S4,-2",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "N4,-1",
-                    "type": "Rainforest"
+                    "type": "Rainforest",
+                    "geology": "_None"
                 },
                 {
                     "id": "S4,-1",
+                    "name": "Diana",
                     "type": "Mountain Jungle",
-                    "name": "Diana"
+                    "geology": "_None"
                 },
                 {
                     "id": "E0",
+                    "name": "Thetis Regio",
                     "type": "Mountain Jungle",
-                    "name": "Thetis Regio"
+                    "geology": "_None"
                 }
             ]
         },
@@ -1828,698 +1966,698 @@
             "grid": [
                 {
                     "id": "E3",
-                    "type": "Continental Shelf",
                     "name": "Fiji",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N-4,1",
-                    "type": "Abyssal Plain",
                     "name": "Midway",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "S-4,1",
-                    "type": "Continental Shelf",
                     "name": "Cook Islands",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N-4,2",
-                    "type": "Continental Shelf",
                     "name": "Hawaii",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S-4,2",
-                    "type": "Continental Shelf",
                     "name": "Pitcairn Islands",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N-4,3",
-                    "type": "Abyssal Plain",
                     "name": "Clarion Fracture Zone",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "S-4,3",
-                    "type": "Continental Shelf",
                     "name": "Easter Island",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "E4",
-                    "type": "Hydrothermal Vent Field",
                     "name": "East Pacific Rise",
+                    "type": "Hydrothermal Vent Field",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N-3,-1",
-                    "type": "Abyssal Plain",
                     "name": "Japan Trench",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "S-3,-1",
-                    "type": "Archipelago",
                     "name": "Oceania",
+                    "type": "Archipelago",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N-3,0",
-                    "type": "Abyssal Plain",
                     "name": "Emperor Seamounts",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "S-3,0",
-                    "type": "Continental Shelf",
                     "name": "Coral Sea",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N-3,1",
-                    "type": "Abyssal Plain",
                     "name": "North Pacific Ocean",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "S-3,1",
-                    "type": "Abyssal Plain",
                     "name": "Kermadec Trench",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N-3,2",
-                    "type": "Abyssal Plain",
                     "name": "North Pacific Gyre",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "S-3,2",
-                    "type": "Abyssal Plain",
                     "name": "South Pacific Gyre",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N-3,3",
-                    "type": "Abyssal Plain",
                     "name": "Baja California Seamounts",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "S-3,3",
-                    "type": "Abyssal Plain",
                     "name": "Easter Fracture Zone",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N-3,4",
-                    "type": "Abyssal Plain",
                     "name": "Cocos Plate",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "S-3,4",
-                    "type": "Abyssal Plain",
                     "name": "Peru-Chile Trench",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N-2,-2",
-                    "type": "Continental Shelf",
                     "name": "East China Sea",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S-2,-2",
-                    "type": "Archipelago",
                     "name": "New Guinea",
+                    "type": "Archipelago",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N-2,-1",
-                    "type": "Archipelago",
                     "name": "Japan",
+                    "type": "Archipelago",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S-2,-1",
+                    "name": "Australian East",
                     "type": "Desert",
-                    "name": "Eastern Australia",
                     "geology": "Earth_Sedimentary_Basin"
                 },
                 {
                     "id": "N-2,0",
-                    "type": "Archipelago",
                     "name": "Aleutian Islands",
+                    "type": "Archipelago",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S-2,0",
-                    "type": "Archipelago",
                     "name": "New Zealand",
+                    "type": "Archipelago",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N-2,1",
-                    "type": "Taiga",
                     "name": "Alaska",
+                    "type": "Taiga",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S-2,1",
-                    "type": "Abyssal Plain",
                     "name": "Amundsen Sea",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N-2,2",
+                    "name": "Pacific Northwest",
                     "type": "Forest",
-                    "name": "Western America",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S-2,2",
-                    "type": "Abyssal Plain",
                     "name": "Bellingshausen Sea",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N-2,3",
-                    "type": "Mountain",
                     "name": "California",
+                    "type": "Mountain",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S-2,3",
-                    "type": "Hydrothermal Vent Field",
                     "name": "Chile Rise",
+                    "type": "Hydrothermal Vent Field",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N-2,4",
-                    "type": "Desert",
                     "name": "Mexico",
+                    "type": "Desert",
                     "geology": "Earth_Sedimentary_Basin"
                 },
                 {
                     "id": "S-2,4",
-                    "type": "Hydrothermal Vent Field",
                     "name": "Galapagos Rise",
+                    "type": "Hydrothermal Vent Field",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N-1,-3",
-                    "type": "Archipelago",
                     "name": "Philippines",
+                    "type": "Archipelago",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S-1,-3",
-                    "type": "Archipelago",
                     "name": "Eastern Indonesia",
+                    "type": "Archipelago",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N-1,-2",
-                    "type": "Continental Shelf",
                     "name": "Taiwan",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S-1,-2",
+                    "name": "Australian West",
                     "type": "Desert",
-                    "name": "Western Australia",
                     "geology": "Earth_Sedimentary_Basin"
                 },
                 {
                     "id": "N-1,-1",
+                    "name": "Northern China",
                     "type": "Forest",
-                    "name": "Eastern Midlands",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S-1,-1",
-                    "type": "Continental Shelf",
                     "name": "Tasman Sea",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N-1,0",
-                    "type": "Arctic",
                     "name": "Bering Sea",
+                    "type": "Arctic",
                     "geology": "Earth_Polar"
                 },
                 {
                     "id": "S-1,0",
-                    "type": "Antarctic",
                     "name": "Antarctic Territories",
+                    "type": "Antarctic",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N-1,1",
-                    "type": "Arctic",
                     "name": "Hudson Bay",
+                    "type": "Arctic",
                     "geology": "Earth_Polar"
                 },
                 {
                     "id": "S-1,1",
-                    "type": "Arctic",
                     "name": "Ross Sea",
+                    "type": "Arctic",
                     "geology": "Earth_Polar"
                 },
                 {
                     "id": "N-1,2",
+                    "name": "American Midwest",
                     "type": "Steppe",
-                    "name": "Central America",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S-1,2",
-                    "type": "Hydrothermal Vent Field",
                     "name": "Chile Rise",
+                    "type": "Hydrothermal Vent Field",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N-1,3",
-                    "type": "Continental Shelf",
                     "name": "Gulf of America",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S-1,3",
-                    "type": "Abyssal Plain",
                     "name": "Nazca Ridge",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N-1,4",
+                    "name": "Central America",
                     "type": "Rainforest",
-                    "name": "Southern America",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S-1,4",
-                    "type": "Continental Shelf",
                     "name": "Galapagos",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "E2",
-                    "type": "Archipelago",
                     "name": "Western Indonesia",
+                    "type": "Archipelago",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N0,-3",
-                    "type": "Rainforest",
                     "name": "Thailand",
+                    "type": "Rainforest",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S0,-3",
-                    "type": "Continental Shelf",
                     "name": "Great Australian Bight",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N0,-2",
+                    "name": "Southern China",
                     "type": "Steppe",
-                    "name": "Western Midlands",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S0,-2",
-                    "type": "Abyssal Plain",
                     "name": "Cooperation Sea",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N0,-1",
+                    "name": "Siberia",
                     "type": "Taiga",
-                    "name": "Russia",
                     "geology": "Earth_Large_Igneous_Province"
                 },
                 {
                     "id": "S0,-1",
-                    "type": "Antarctic",
                     "name": "New Territories",
+                    "type": "Antarctic",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N0,0",
-                    "type": "Arctic",
                     "name": "Arctic Ocean",
+                    "type": "Arctic",
                     "geology": "Earth_Polar"
                 },
                 {
                     "id": "S0,0",
-                    "type": "Antarctic",
                     "name": "Central Antarctica",
+                    "type": "Antarctic",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N0,1",
+                    "name": "Canada",
                     "type": "Forest",
-                    "name": "Northern America",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S0,1",
-                    "type": "Taiga",
                     "name": "West Antarctica",
+                    "type": "Taiga",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N0,2",
+                    "name": "Eastern Seaboard",
                     "type": "Forest",
-                    "name": "West Atlantis",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S0,2",
-                    "type": "Steppe",
                     "name": "Patagonia",
+                    "type": "Steppe",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N0,3",
-                    "type": "Archipelago",
                     "name": "Caribbean Sea",
+                    "type": "Archipelago",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S0,3",
-                    "type": "Mountain",
                     "name": "Peru",
+                    "type": "Mountain",
                     "geology": "Earth_Large_Igneous_Province"
                 },
                 {
                     "id": "E5",
-                    "type": "Rainforest",
                     "name": "Panama",
+                    "type": "Rainforest",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N1,-4",
-                    "type": "Archipelago",
                     "name": "Malaysia",
+                    "type": "Archipelago",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S1,-4",
-                    "type": "Continental Shelf",
                     "name": "Cocos Islands",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N1,-3",
-                    "type": "Mountain",
                     "name": "Himalayan Mountains",
+                    "type": "Mountain",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S1,-3",
-                    "type": "Abyssal Plain",
                     "name": "Wharton Basin",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N1,-2",
-                    "type": "Steppe",
                     "name": "Central Asia",
+                    "type": "Steppe",
                     "geology": "Earth_Sedimentary_Basin"
                 },
                 {
                     "id": "S1,-2",
-                    "type": "Continental Shelf",
                     "name": "Kerguelen Plateau",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N1,-1",
+                    "name": "Russia",
                     "type": "Forest",
-                    "name": "Northern Europe",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S1,-1",
-                    "type": "Antarctic",
                     "name": "Queen Maud Land",
+                    "type": "Antarctic",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N1,0",
-                    "type": "Arctic",
                     "name": "North Sea",
+                    "type": "Arctic",
                     "geology": "Earth_Polar"
                 },
                 {
                     "id": "S1,0",
-                    "type": "Antarctic",
                     "name": "East Antarctica",
+                    "type": "Antarctic",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N1,1",
-                    "type": "Archipelago",
                     "name": "Greenland",
+                    "type": "Archipelago",
                     "geology": "Earth_Large_Igneous_Province"
                 },
                 {
                     "id": "S1,1",
-                    "type": "Continental Shelf",
                     "name": "Scotia Sea",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N1,2",
-                    "type": "Abyssal Plain",
                     "name": "North Atlantic Gyre",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "S1,2",
-                    "type": "Steppe",
                     "name": "Argentina",
+                    "type": "Steppe",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N1,3",
-                    "type": "Rainforest",
                     "name": "Colombia",
+                    "type": "Rainforest",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S1,3",
-                    "type": "Rainforest",
                     "name": "Amazon",
+                    "type": "Rainforest",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N2,-4",
-                    "type": "Rainforest",
                     "name": "India",
+                    "type": "Rainforest",
                     "geology": "Earth_Large_Igneous_Province"
                 },
                 {
                     "id": "S2,-4",
-                    "type": "Continental Shelf",
                     "name": "Bay of Bengal",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N2,-3",
-                    "type": "Mountain",
                     "name": "Persia",
+                    "type": "Mountain",
                     "geology": "Earth_Sedimentary_Basin"
                 },
                 {
                     "id": "S2,-3",
-                    "type": "Abyssal Plain",
                     "name": "Agulhas Plateau",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N2,-2",
+                    "name": "Caucasus",
                     "type": "Steppe",
-                    "name": "Eastern Europe",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S2,-2",
-                    "type": "Abyssal Plain",
                     "name": "Weddell Sea",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Polar"
                 },
                 {
                     "id": "N2,-1",
+                    "name": "Eastern Europe",
                     "type": "Forest",
-                    "name": "Central Europe",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S2,-1",
-                    "type": "Abyssal Plain",
                     "name": "Cosmonauts Sea",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N2,0",
+                    "name": "Northern Europe",
                     "type": "Forest",
-                    "name": "East Atlantis",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S2,0",
-                    "type": "Abyssal Plain",
                     "name": "South Sandwich Trench",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N2,1",
-                    "type": "Continental Shelf",
                     "name": "Azores",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S2,1",
-                    "type": "Abyssal Plain",
                     "name": "Brazil Basin",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N2,2",
-                    "type": "Abyssal Plain",
                     "name": "Tropical North Atlantic",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "S2,2",
-                    "type": "Forest",
                     "name": "Brazil",
+                    "type": "Forest",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N3,-4",
-                    "type": "Continental Shelf",
                     "name": "Arabian Sea",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S3,-4",
-                    "type": "Abyssal Plain",
                     "name": "Mascarene Basin",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N3,-3",
-                    "type": "Desert",
                     "name": "Holy Land",
+                    "type": "Desert",
                     "geology": "Earth_Sedimentary_Basin"
                 },
                 {
                     "id": "S3,-3",
-                    "type": "Archipelago",
                     "name": "Madagascar",
+                    "type": "Archipelago",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N3,-2",
-                    "type": "Archipelago",
                     "name": "Eastern Mediterranean",
+                    "type": "Archipelago",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S3,-2",
-                    "type": "Forest",
                     "name": "South Africa",
+                    "type": "Forest",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N3,-1",
-                    "type": "Forest",
                     "name": "Atlantropa",
+                    "type": "Forest",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S3,-1",
-                    "type": "Abyssal Plain",
                     "name": "Agulhas Basin",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N3,0",
+                    "name": "Southwestern Europe",
                     "type": "Forest",
-                    "name": "Iberia",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S3,0",
-                    "type": "Abyssal Plain",
                     "name": "Walvis Ridge",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "N3,1",
-                    "type": "Continental Shelf",
                     "name": "Canary Islands",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S3,1",
-                    "type": "Abyssal Plain",
                     "name": "Tropical South Atlantic",
+                    "type": "Abyssal Plain",
                     "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "E1",
-                    "type": "Continental Shelf",
                     "name": "Seychelles",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "N4,-3",
-                    "type": "Mountain",
                     "name": "Ethiopia",
+                    "type": "Mountain",
                     "geology": "Earth_Large_Igneous_Province"
                 },
                 {
                     "id": "S4,-3",
-                    "type": "Forest",
                     "name": "East Africa",
+                    "type": "Forest",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N4,-2",
-                    "type": "Desert",
                     "name": "North Africa",
+                    "type": "Desert",
                     "geology": "Earth_Sedimentary_Basin"
                 },
                 {
                     "id": "S4,-2",
-                    "type": "Rainforest",
                     "name": "Congo",
+                    "type": "Rainforest",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "N4,-1",
-                    "type": "Desert",
                     "name": "West Africa",
+                    "type": "Desert",
                     "geology": "Earth_Continental_Crust"
                 },
                 {
                     "id": "S4,-1",
-                    "type": "Continental Shelf",
                     "name": "St. Helena",
+                    "type": "Continental Shelf",
                     "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "E0",
-                    "type": "Hydrothermal Vent Field",
                     "name": "Mid-Atlantic Ridge",
+                    "type": "Hydrothermal Vent Field",
                     "geology": "Earth_Oceanic_Abyssal"
                 }
             ]
@@ -2530,275 +2668,387 @@
             "grid": [
                 {
                     "id": "E3",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-3,1",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-3,1",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-3,2",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-3,2",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "E4",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,-1",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,-1",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,0",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,0",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,1",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,1",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,2",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,2",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,3",
-                    "type": "Mountain Barren"
+                    "type": "Mountain Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,3",
-                    "type": "Mountain Barren"
+                    "type": "Mountain Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,-2",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,-2",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,-1",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,-1",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,0",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,0",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,1",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,1",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,2",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,2",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,3",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,3",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "E2",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,-2",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,-2",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,-1",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,-1",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,0",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,0",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,1",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,1",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,2",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,2",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "E5",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,-3",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,-3",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,-2",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,-2",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,-1",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,-1",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,0",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,0",
-                    "type": "Frozen Barren"
+                    "type": "Frozen Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,1",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,1",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,2",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,2",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,-3",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,-3",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,-2",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,-2",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,-1",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,-1",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,0",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,0",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,1",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,1",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "E1",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N3,-2",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S3,-2",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "N3,-1",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "S3,-1",
-                    "type": "Highland Barren"
+                    "type": "Highland Barren",
+                    "geology": "_None"
                 },
                 {
                     "id": "E0",
-                    "type": "Lowland Barren"
+                    "type": "Lowland Barren",
+                    "geology": "_None"
+                }
+            ]
+        },
+        {
+            "id": 599,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 699,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 799,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 899,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
                 }
             ]
         },
@@ -2808,294 +3058,362 @@
             "grid": [
                 {
                     "id": "E3",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-3,1",
-                    "type": "Mountain Vacuum"
+                    "type": "Mountain Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-3,1",
-                    "type": "Mountain Vacuum"
+                    "type": "Mountain Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-3,2",
-                    "type": "Mountain Vacuum"
+                    "type": "Mountain Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-3,2",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "E4",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,-1",
+                    "name": "Mare Moscoviense",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Moscoviense"
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,-1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,0",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,0",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,2",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,2",
+                    "name": "Mare Orientale",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Orientale"
+                    "geology": "_None"
                 },
                 {
                     "id": "N-2,3",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-2,3",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,-2",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,-2",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,-1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,-1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,0",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,0",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,2",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,2",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N-1,3",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S-1,3",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "E2",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,-2",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,-2",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,-1",
+                    "name": "Mare Humboldtianum",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Humboldtianum"
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,-1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,0",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,0",
-                    "type": "Mountain Vacuum"
+                    "type": "Mountain Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,1",
+                    "name": "Mare Frigoris",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Frigoris"
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N0,2",
+                    "name": "West Procellarum",
                     "type": "Lowland Vacuum",
-                    "name": "West Procellarum"
+                    "geology": "_None"
                 },
                 {
                     "id": "S0,2",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "E5",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,-3",
+                    "name": "Mare Marginis",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Marginis"
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,-3",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,-2",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,-2",
+                    "name": "Mare Australe",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Australe"
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,-1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,-1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,0",
+                    "name": "Mare Imbrium",
                     "type": "Highland Vacuum",
-                    "name": "Mare Imbrium"
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,0",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,1",
+                    "name": "Mare Imbrium",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Imbrium"
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N1,2",
+                    "name": "Mare Insularum",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Insularum"
+                    "geology": "_None"
                 },
                 {
                     "id": "S1,2",
+                    "name": "Mare Humorum",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Humorum"
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,-3",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,-3",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,-2",
+                    "name": "Mare Crisium",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Crisium"
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,-2",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,-1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,-1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,0",
+                    "name": "Mare Serenitatis",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Serenitatis"
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,0",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "N2,1",
+                    "name": "Copernicus",
                     "type": "Lowland Vacuum",
-                    "name": "Copernicus"
+                    "geology": "_None"
                 },
                 {
                     "id": "S2,1",
+                    "name": "Mare Nubium",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Nubium"
+                    "geology": "_None"
                 },
                 {
                     "id": "E1",
+                    "name": "Mare Smythii",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Smythii"
+                    "geology": "_None"
                 },
                 {
                     "id": "N3,-2",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "S3,-2",
+                    "name": "Mare Nectaris",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Nectaris"
+                    "geology": "_None"
                 },
                 {
                     "id": "N3,-1",
+                    "name": "Mare Tranquillitatis",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Tranquillitatis"
+                    "geology": "_None"
                 },
                 {
                     "id": "S3,-1",
-                    "type": "Highland Vacuum"
+                    "type": "Highland Vacuum",
+                    "geology": "_None"
                 },
                 {
                     "id": "E0",
+                    "name": "Mare Fecuditatis",
                     "type": "Lowland Vacuum",
-                    "name": "Mare Fecuditatis"
+                    "geology": "_None"
                 }
             ]
         },
@@ -3105,7 +3423,8 @@
             "grid": [
                 {
                     "id": "X",
-                    "type": "Space Vacuum"
+                    "type": "Space Vacuum",
+                    "geology": "_None"
                 }
             ]
         },
@@ -3115,7 +3434,602 @@
             "grid": [
                 {
                     "id": "X",
-                    "type": "Space Vacuum"
+                    "type": "Space Vacuum",
+                    "geology": "_None"
+                }
+            ]
+        },
+        {
+            "id": 501,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 502,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 503,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 504,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 505,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 506,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 507,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 508,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 509,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 510,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 511,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 512,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 513,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 514,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 515,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 516,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 601,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 602,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 603,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 604,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 605,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 606,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 607,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 608,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 609,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 610,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 611,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 612,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 613,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 614,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 615,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 616,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 617,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 618,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 619,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 705,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 701,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 702,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 703,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 704,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 803,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 804,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 805,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 806,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 807,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 808,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 801,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 802,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 999,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 901,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 902,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 903,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 904,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
+                }
+            ]
+        },
+        {
+            "id": 905,
+            "size": 0,
+            "grid": [
+                {
+                    "id": "X",
+                    "type": "Abyssal Plain",
+                    "geology": "Asteroid_C_Type"
                 }
             ]
         }

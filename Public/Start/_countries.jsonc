@@ -1,0 +1,45 @@
+[
+    {
+        "id": 1,
+        "article": "The",
+        "name": "United Nations",
+        "long": "United Nations",
+        "color": "#66a3ff",
+        "culture_preferred": "Atlantean",
+        "cultures_accepted": ["Italian"],
+        "currency": {
+            "id": 1,
+            "name": "UNB",
+            "long": "United Nations Bancor"
+        },
+        "controlled_worlds": [
+            399,
+            301
+        ],
+        "researched": [
+            1
+        ],
+        "minwage": 35
+    },
+    {
+        "id": 2,
+        "name": "Mars",
+        "long": "Commonwealth of Mars",
+        "color": "#FF7043",
+        "culture_preferred": "Martian",
+        "currency": {
+            "id": 2,
+            "name": "MAR",
+            "long": "Martian Rand"
+        },
+        "controlled_worlds": [
+            499,
+            401,
+            402
+        ],
+        "researched": [
+            1
+        ],
+        "minwage": 25
+    }
+]

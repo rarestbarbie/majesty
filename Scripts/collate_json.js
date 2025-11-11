@@ -17,25 +17,30 @@ const finalOutput = {};
 
 try {
     // Find all files matching the pattern '_*.json' in the specified directory
-    const files = glob.sync(path.join(inputDir, '_*.jsonc'));
+    const files = glob.sync(path.join(inputDir, '*.jsonc'));
 
     if (files.length === 0) {
-        console.warn(`⚠️ No files matching '_*.json' found in '${inputDir}'.`);
+        console.warn(`⚠️ No files matching '*.jsonc' found in '${inputDir}'.`);
     }
 
     // --- Process each file ---
     files.forEach(filePath => {
         // 1. Derive the key from the filename: '_foo_bar.json' -> 'foo_bar'
         const baseName = path.basename(filePath, '.jsonc'); // Gets '_foo_bar'
-        const key = baseName.slice(1); // Removes the leading '_' to get 'foo_bar'
 
         // 2. Read the JSON5 file content
         const fileContent = fs.readFileSync(filePath, 'utf8');
+        const parsedContent = JSON5.parse(fileContent);
 
-        // 3. Parse the content and add it to our main object
-        finalOutput[key] = JSON5.parse(fileContent);
-
-        console.log(`✅ Processed: ${filePath} -> key: '${key}'`);
+        // if first character is not an underscore, merge fields at top level
+        if (baseName.charAt(0) !== '_') {
+            Object.assign(finalOutput, parsedContent);
+            console.log(`Processed: ${filePath} -> (toplevel)`);
+        } else {
+            const key = baseName.slice(1); // Removes the leading '_' to get 'foo_bar'
+            finalOutput[key] = parsedContent;
+            console.log(`Processed: ${filePath} -> key: '${key}'`);
+        }
     });
 
     // --- Write the final combined object to the output file as standard JSON ---
