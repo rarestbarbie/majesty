@@ -6,6 +6,7 @@ set -e # Exit immediately if a command exits with a non-zero status.
 COMPONENT='engine'  # engine, integration, json, sprites
 PLATFORM='host'     # wasm, host
 CONFIG='debug'      # debug, release
+PROFILE=false
 NOASSERT=false
 
 SWIFT_WASM_SDK='6.1-RELEASE-wasm32-unknown-wasip1-threads'
@@ -24,6 +25,7 @@ usage() {
     echo "  -w              Build for wasm platform"
     echo "  -c <config>     Set build configuration: 'debug' or 'release' (default: debug)"
     echo "  -x              Shortcut for: -w -c release"
+    echo "  --profile       Build for profiling (wasm only, implies release config)"
     echo "  --noassert      Use release build without assertions (only affects wasm 'engine' component)"
     echo
     echo "  -? | --help     Show this help message"
@@ -71,6 +73,12 @@ while [[ $# -gt 0 ]]; do
         -x)
             PLATFORM="wasm"
             CONFIG="release"
+            shift
+            ;;
+        --profile)
+            PLATFORM="wasm"
+            CONFIG="release"
+            PROFILE=true
             shift
             ;;
         --noassert)
@@ -211,6 +219,7 @@ build_host() {
 build_wasm() {
     local product
     local scratch_path
+    local swift_js_arguments=()
 
     export SWIFT_WASM_SIMD128="1"
 
@@ -224,11 +233,15 @@ build_wasm() {
 
         if [ "$CONFIG" = "release" ] && [ "$NOASSERT" = true ]; then
             # "Build (release, noassert)"
-            echo "--- Building Engine for Wasm (release, noassert) ---"
+            echo "--- Building Engine for WebAssembly (release, noassert) ---"
             export SWIFT_NOASSERT="1"
         else
-            # "Build (release)" or "Build (debug)"
-            echo "--- Building Engine for Wasm ($CONFIG) ---"
+            if [ "$PROFILE" = true ]; then
+                echo "--- Building Engine for WebAssembly (with profiling symbols) ---"
+                swift_js_arguments+=(--debug-info-format name)
+            else
+                echo "--- Building Engine for WebAssembly ($CONFIG) ---"
+            fi
         fi
 
     elif [ "$COMPONENT" = "integration" ]; then
@@ -239,22 +252,31 @@ build_wasm() {
             echo "Warning: --noassert flag is ignored for integration-tests component."
         fi
 
-        # "Build Integration Tests (debug)" or "(release)"
-        echo "--- Building Integration Tests for Wasm ($CONFIG) ---"
+        if [ "$PROFILE" = true ]; then
+            echo "--- Building Integration Tests for WebAssembly (with profiling symbols) ---"
+            swift_js_arguments+=(--debug-info-format name)
+        else
+            echo "--- Building Integration Tests for WebAssembly ($CONFIG) ---"
+        fi
 
     else
-        echo "Error: Unknown component '$COMPONENT' for Wasm build." >&2
+        echo "Error: Unknown component '$COMPONENT' for WebAssembly build." >&2
         exit 1
     fi
 
     # Execute the common swift package command
+    set -x
+
     swift package \
         --explicit-target-dependency-import-check=error \
         --scratch-path "$scratch_path" \
         --swift-sdk "$SWIFT_WASM_SDK" \
-        js --product "$product" -c "$CONFIG"
+        js --product "$product" -c "$CONFIG" \
+        "${swift_js_arguments[@]}"
 
-    echo "Wasm build complete!"
+    set +x
+
+    echo "WebAssembly build complete!"
 }
 
 # --- Execute Build Task ---
