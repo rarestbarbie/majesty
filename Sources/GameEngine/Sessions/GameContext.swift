@@ -152,6 +152,150 @@ extension GameContext {
             rules: self.rules
         )
     }
+
+    private var factoryPass: FactoryContext.ComputationPass {
+        .init(
+            player: self.player,
+            rules: self.rules,
+            planets: self.planets,
+        )
+    }
+    private var minePass: MineContext.ComputationPass {
+        .init(
+            player: self.player,
+            rules: self.rules,
+            planets: self.planets,
+        )
+    }
+    private var popPass: PopContext.ComputationPass {
+        .init(
+            player: self.player,
+            rules: self.rules,
+            planets: self.planets,
+            factories: self.factories.state,
+            mines: self.mines.state,
+        )
+    }
+}
+extension GameContext {
+    private mutating func prune() {
+        let retain: PruningPass = self.pruningPass
+        for i: Int in self.factories.indices {
+            self.factories[i].state.prune(in: retain)
+        }
+        for i: Int in self.pops.indices {
+            self.pops[i].state.prune(in: retain)
+        }
+    }
+    private mutating func index() {
+        for country: CountryContext in self.countries {
+            for planet: PlanetID in country.state.controlledWorlds {
+                self.planets[planet]?.grid.assign(
+                    governedBy: country.properties,
+                    occupiedBy: country.properties
+                )
+            }
+            for address: Address in country.state.controlledTiles {
+                self.planets[address]?.properties.assign(
+                    governedBy: country.properties,
+                    occupiedBy: country.properties,
+                )
+            }
+        }
+
+        for i: Int in self.planets.indices {
+            {
+                for j: Int in $0.grid.tiles.values.indices {
+                    $0.grid.tiles.values[j].startIndexCount()
+                }
+            } (&self.planets[i])
+        }
+        for i: Int in self.factories.indices {
+            self.factories[i].startIndexCount()
+        }
+        for i: Int in self.mines.indices {
+            self.mines[i].startIndexCount()
+        }
+        for i: Int in self.pops.indices {
+            self.pops[i].startIndexCount()
+        }
+        for i: Int in self.pops.indices {
+            /// avoid copy-on-write
+            let pop: Pop = self.pops.state[i]
+            let counted: ()? = self.planets[pop.tile]?.addResidentCount(pop)
+
+            #assert(counted != nil, "Pop \(pop.id) has no home tile!!!")
+
+            for job: FactoryJob in pop.factories.values {
+                self.factories[modifying: job.id].addWorkforceCount(pop: pop, job: job)
+            }
+            for job: MiningJob in pop.mines.values {
+                self.mines[modifying: job.id].addWorkforceCount(pop: pop, job: job)
+            }
+            /// We compute this here, and not in `PopContext.compute`, so that its global
+            /// context can exclude the pop table itself, allowing us to mutate `PopContext`
+            /// in-place there without individually retaining and releasing every `PopContext`
+            /// in the array on every loop iteration, which would be O(n²)!
+            let equity: Equity<LEI>.Statistics = .compute(
+                equity: pop.equity,
+                assets: pop.inventory.account,
+                in: self.residentPass
+            )
+            self.pops[i].update(equityStatistics: equity)
+
+            for stake: EquityStake<LEI> in pop.equity.shares.values {
+                switch stake.id {
+                case .pop(let id):
+                    self.pops[modifying: id].addPosition(
+                        asset: pop.id.lei,
+                        value: stake.shares
+                    )
+
+                case .factory(let id):
+                    self.factories[modifying: id].addPosition(
+                        asset: pop.id.lei,
+                        value: stake.shares
+                    )
+                }
+            }
+        }
+        for i: Int in self.factories.indices {
+            let factory: Factory = self.factories.state[i]
+            let counted: ()? = self.planets[factory.tile]?.addResidentCount(factory)
+
+            #assert(counted != nil, "Factory \(factory.id) has no home tile!!!")
+
+            let equity: Equity<LEI>.Statistics = .compute(
+                equity: factory.equity,
+                assets: factory.inventory.account,
+                in: self.residentPass
+            )
+            self.factories[i].update(equityStatistics: equity)
+
+            for stake: EquityStake<LEI> in factory.equity.shares.values {
+                // TODO: this isn’t correctly taking into account pop/factory death
+                switch stake.id {
+                case .pop(let id):
+                    self.pops[modifying: id].addPosition(
+                        asset: factory.id.lei,
+                        value: stake.shares
+                    )
+
+                case .factory(let id):
+                    self.factories[modifying: id].addPosition(
+                        asset: factory.id.lei,
+                        value: stake.shares
+                    )
+                }
+            }
+        }
+        for i: Int in self.mines.indices {
+            let mine: Mine = self.mines.state[i]
+            let counted: ()? = self.planets[mine.tile]?.addResidentCount(mine)
+
+            #assert(counted != nil, "Mine \(mine.id) has no home tile!!!")
+        }
+    }
 }
 extension GameContext {
     mutating func advance(_ turn: inout Turn) throws {
@@ -298,14 +442,7 @@ extension GameContext {
     }
 
     mutating func compute(_ world: borrowing GameWorld) throws {
-        let retain: PruningPass = self.pruningPass
-        for i: Int in self.factories.indices {
-            self.factories[i].state.prune(in: retain)
-        }
-        for i: Int in self.pops.indices {
-            self.pops[i].state.prune(in: retain)
-        }
-
+        self.prune()
         self.index()
 
         for i: Int in self.planets.indices {
@@ -319,109 +456,17 @@ extension GameContext {
         }
 
         for i: Int in self.factories.indices {
-            try self.factories[i].compute(world: world, context: self.residentPass)
+            try self.factories[i].compute(world: world, context: self.factoryPass)
         }
         for i: Int in self.mines.indices {
-            try self.mines[i].compute(world: world, context: self.residentPass)
+            try self.mines[i].compute(world: world, context: self.minePass)
         }
         for i: Int in self.pops.indices {
-            try self.pops[i].compute(world: world, context: self.residentPass)
+            try self.pops[i].compute(world: world, context: self.popPass)
         }
     }
 }
-extension GameContext {
-    private mutating func index() {
-        for country: CountryContext in self.countries {
-            for planet: PlanetID in country.state.controlledWorlds {
-                self.planets[planet]?.grid.assign(
-                    governedBy: country.properties,
-                    occupiedBy: country.properties
-                )
-            }
-            for address: Address in country.state.controlledTiles {
-                self.planets[address]?.properties.assign(
-                    governedBy: country.properties,
-                    occupiedBy: country.properties,
-                )
-            }
-        }
 
-        for i: Int in self.planets.indices {
-            {
-                for j: Int in $0.grid.tiles.values.indices {
-                    $0.grid.tiles.values[j].startIndexCount()
-                }
-            } (&self.planets[i])
-        }
-        for i: Int in self.factories.indices {
-            self.factories[i].startIndexCount()
-        }
-        for i: Int in self.mines.indices {
-            self.mines[i].startIndexCount()
-        }
-        for i: Int in self.pops.indices {
-            self.pops[i].startIndexCount()
-        }
-        for i: Int in self.pops.indices {
-            /// avoid copy-on-write
-            let pop: Pop = self.pops.state[i]
-            let counted: ()? = self.planets[pop.tile]?.addResidentCount(pop)
-
-            #assert(counted != nil, "Pop \(pop.id) has no home tile!!!")
-
-            for job: FactoryJob in pop.factories.values {
-                self.factories[modifying: job.id].addWorkforceCount(pop: pop, job: job)
-            }
-            for job: MiningJob in pop.mines.values {
-                self.mines[modifying: job.id].addWorkforceCount(pop: pop, job: job)
-            }
-            for stake: EquityStake<LEI> in pop.equity.shares.values {
-                switch stake.id {
-                case .pop(let id):
-                    self.pops[modifying: id].addPosition(
-                        asset: pop.id.lei,
-                        value: stake.shares
-                    )
-
-                case .factory(let id):
-                    self.factories[modifying: id].addPosition(
-                        asset: pop.id.lei,
-                        value: stake.shares
-                    )
-                }
-            }
-        }
-        for i: Int in self.factories.indices {
-            let factory: Factory = self.factories.state[i]
-            let counted: ()? = self.planets[factory.tile]?.addResidentCount(factory)
-
-            #assert(counted != nil, "Factory \(factory.id) has no home tile!!!")
-
-            for stake: EquityStake<LEI> in factory.equity.shares.values {
-                // TODO: this isn’t correctly taking into account pop/factory death
-                switch stake.id {
-                case .pop(let id):
-                    self.pops[modifying: id].addPosition(
-                        asset: factory.id.lei,
-                        value: stake.shares
-                    )
-
-                case .factory(let id):
-                    self.factories[modifying: id].addPosition(
-                        asset: factory.id.lei,
-                        value: stake.shares
-                    )
-                }
-            }
-        }
-        for i: Int in self.mines.indices {
-            let mine: Mine = self.mines.state[i]
-            let counted: ()? = self.planets[mine.tile]?.addResidentCount(mine)
-
-            #assert(counted != nil, "Mine \(mine.id) has no home tile!!!")
-        }
-    }
-}
 extension GameContext {
     private mutating func postCashTransfers(_ turn: inout Turn) {
         turn.bank.turn {

@@ -54,12 +54,12 @@ extension PopContext {
 
         // TODO
     }
+    mutating func update(equityStatistics: Equity<LEI>.Statistics) {
+        self.equity = equityStatistics
+    }
 }
 extension PopContext {
-    mutating func compute(
-        world _: borrowing GameWorld,
-        context: GameContext.ResidentPass
-    ) throws {
+    mutating func compute(world _: borrowing GameWorld, context: ComputationPass) throws {
         guard
         let tile: PlanetGrid.Tile = context.planets[self.state.tile] else {
             return
@@ -98,12 +98,6 @@ extension PopContext {
         self.cashFlow.update(with: self.state.inventory.x)
 
         self.region = tile.properties
-
-        self.equity = .compute(
-            equity: self.state.equity,
-            assets: self.state.inventory.account,
-            in: context
-        )
     }
 }
 extension PopContext: TransactingContext {

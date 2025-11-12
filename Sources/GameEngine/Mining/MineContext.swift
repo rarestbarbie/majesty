@@ -26,7 +26,7 @@ extension MineContext {
     }
 }
 extension MineContext {
-    mutating func compute(world _: borrowing GameWorld, context: GameContext.ResidentPass) throws {
+    mutating func compute(world _: borrowing GameWorld, context: ComputationPass) throws {
         if  self.type.decay {
             self.miners.limit = self.state.today.size / 10_000
         } else {

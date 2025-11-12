@@ -19,6 +19,7 @@ const __dirname: string = path.dirname(__filename);
 const __root: string = path.resolve(__dirname, "../../");
 
 const start: string = path.resolve(__root, "Public/start.json");
+// const start: string = path.resolve(__root, "crash.msgpack");
 const rules: string = path.resolve(__root, "Public/rules.json");
 const terrain: string = path.resolve(__root, "Public/terrain.json");
 
@@ -34,6 +35,9 @@ declare global {
     var outputs: IntegrationTestFile[];
 }
 
+console.log('using start file:', start);
+
+// global.start = msgpack.decode(fs.readFileSync(start));
 global.start = JSON.parse(fs.readFileSync(start, 'utf8'));
 global.rules = JSON.parse(fs.readFileSync(rules, 'utf8'));
 global.terrain = JSON.parse(fs.readFileSync(terrain, 'utf8'));

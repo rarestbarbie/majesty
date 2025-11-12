@@ -91,7 +91,14 @@ extension IntegrationTests {
         var s1: GameSession = try .reload()
         var s2: GameSession = try .reload()
 
+        let started: SuspendingClock.Instant = .now
+
         try s1.run(until: target)
+
+        let elapsed: Duration = .now - started
+
+        print("GameSession took \(elapsed) to run until \(target)")
+
         try s2.run(until: target)
 
         if  s1._hash != s2._hash {

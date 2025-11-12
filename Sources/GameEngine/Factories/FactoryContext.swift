@@ -80,12 +80,12 @@ extension FactoryContext {
 
         // TODO
     }
+    mutating func update(equityStatistics: Equity<LEI>.Statistics) {
+        self.equity = equityStatistics
+    }
 }
 extension FactoryContext {
-    mutating func compute(
-        world _: borrowing GameWorld,
-        context: GameContext.ResidentPass
-    ) throws {
+    mutating func compute(world _: borrowing GameWorld, context: ComputationPass) throws {
         if  let area: Int64 = self.state.size.area {
             self.workers?.limit = area * self.type.workers.amount
             self.clerks?.limit = area * (self.type.clerks?.amount ?? 0)
@@ -105,12 +105,6 @@ extension FactoryContext {
         self.cashFlow.update(with: self.state.inventory.e)
         self.cashFlow[.workers] = -self.state.inventory.account.w
         self.cashFlow[.clerks] = -self.state.inventory.account.c
-
-        self.equity = .compute(
-            equity: self.state.equity,
-            assets: self.state.inventory.account,
-            in: context
-        )
     }
 }
 extension FactoryContext: TransactingContext {
