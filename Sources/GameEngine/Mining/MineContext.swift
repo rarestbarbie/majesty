@@ -48,15 +48,17 @@ extension MineContext {
             let bid: PopJobOfferBlock = .init(
                 job: .mine(self.state.id),
                 bid: 1,
-                size: Binomial[minersToHire, 0.05].sample(using: &turn.random.generator)
+                size: .random(
+                    in: 0 ... max(1, minersToHire / 20),
+                    using: &turn.random.generator
+                )
             )
 
             if  bid.size > 0 {
                 turn.jobs.hire.local[self.state.tile, self.type.miner].append(bid)
             }
         } else {
-            let layoff: PopJobLayoffBlock = .init(size: -minersToHire)
-            if  layoff.size > 0 {
+            if  let layoff: PopJobLayoffBlock = .init(size: -minersToHire) {
                 turn.jobs.fire[self.state.id, self.type.miner] = layoff
             }
         }

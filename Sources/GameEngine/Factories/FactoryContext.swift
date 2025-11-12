@@ -313,21 +313,18 @@ extension FactoryContext: TransactingContext {
 
                 operatingProfit = self.state.operatingProfit
 
-                switch changes {
-                case nil:
-                    break
-
-                case .fire(let type, let block)?:
-                    guard turn.random.roll(1, 7) else {
-                        break
+                if case .fire(let type, let block)? = changes {
+                    if  turn.random.roll(1, 7) {
+                        turn.jobs.fire[self.state.id, type] = block
                     }
-                    turn.jobs.fire[self.state.id, type] = block
-
-                case .hire(let type, let block)?:
-                    guard operatingProfit >= 0 || workers.count == 0 else {
-                        break
+                } else if workers.count > 0, operatingProfit < 0 {
+                    let firable: Int64 = workers.count / 4
+                    if  firable > 0, turn.random.roll(1, 7) {
+                        turn.jobs.fire[self.state.id, type.workers.unit] = .init(
+                            size: .random(in: 0 ... firable, using: &turn.random.generator)
+                        )
                     }
-
+                } else if case .hire(let type, let block)? = changes {
                     turn.jobs.hire.local[self.state.tile, type].append(block)
                 }
             } else {
@@ -577,18 +574,16 @@ extension FactoryContext {
             let retention: Fraction = wagesPaid %/ wagesOwed
             let retained: Int64 = clerks.count <> retention
 
-            let layoff: PopJobLayoffBlock = .init(
-                size: clerks.count - retained
-            )
-
-            if  layoff.size > 0 {
+            if  let layoff: PopJobLayoffBlock = .init(size: clerks.count - retained) {
                 headcount = .fire(clerkTeam.type, layoff)
             } else {
                 headcount = nil
             }
 
             wagesChange = -1
-
+        } else if let layoff: PopJobLayoffBlock = .init(size: clerks.count - clerksOptimal) {
+            headcount = .fire(clerkTeam.type, layoff)
+            wagesChange = 0
         } else {
             let clerksAffordable: Int64 = (budget - wagesPaid) / self.state.today.cn
             let clerksNeeded: Int64 = clerksOptimal - clerks.count
@@ -607,7 +602,10 @@ extension FactoryContext {
             let bid: PopJobOfferBlock = .init(
                 job: .factory(self.state.id),
                 bid: self.state.today.cn,
-                size: Binomial[clerksToHire, 0.05].sample(using: &turn.random.generator)
+                size: .random(
+                    in: 0 ... max(1, clerksToHire / 20),
+                    using: &turn.random.generator
+                )
             )
 
             if  bid.size > 0 {
@@ -660,11 +658,7 @@ extension FactoryContext {
 
         if  hours < workers.count {
             // Not enough money to pay all workers, or not enough work to do.
-            let layoff: PopJobLayoffBlock = .init(
-                size: workers.count - hours
-            )
-
-            if  layoff.size > 0 {
+            if  let layoff: PopJobLayoffBlock = .init(size: workers.count - hours) {
                 headcount = .fire(self.type.workers.unit, layoff)
             } else {
                 headcount = nil
@@ -691,7 +685,10 @@ extension FactoryContext {
                 let bid: PopJobOfferBlock = .init(
                     job: .factory(self.state.id),
                     bid: self.state.today.wn,
-                    size: Binomial[hire, 0.1].sample(using: &turn.random.generator)
+                    size: .random(
+                        in: 0 ... max(1, hire / 10),
+                        using: &turn.random.generator
+                    )
                 )
 
                 if  bid.size > 0 {
