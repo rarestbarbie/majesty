@@ -1,28 +1,23 @@
 final class RegionalProperties {
-    private(set) var governedBy: CountryProperties?
-    private(set) var occupiedBy: CountryProperties?
+    var governedBy: CountryProperties
+    var occupiedBy: CountryProperties
     private(set) var pops: PopulationStats
 
-    init() {
-        self.governedBy = nil
-        self.occupiedBy = nil
+    init(
+        governedBy: CountryProperties,
+        occupiedBy: CountryProperties
+    ) {
+        self.governedBy = governedBy
+        self.occupiedBy = occupiedBy
         self.pops = .init()
     }
 }
 extension RegionalProperties {
     var minwage: Int64 {
-        self.governedBy?.minwage ?? 1
+        self.governedBy.minwage
     }
 }
 extension RegionalProperties {
-    func assign(
-        governedBy: CountryProperties?,
-        occupiedBy: CountryProperties?
-    ) {
-        self.governedBy = governedBy
-        self.occupiedBy = occupiedBy
-    }
-
     func startIndexCount() {
         self.pops.startIndexCount()
     }

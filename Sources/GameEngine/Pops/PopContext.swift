@@ -60,10 +60,7 @@ extension PopContext {
 }
 extension PopContext {
     mutating func compute(world _: borrowing GameWorld, context: ComputationPass) throws {
-        guard
-        let tile: PlanetGrid.Tile = context.planets[self.state.tile] else {
-            return
-        }
+        self.region = context.planets[self.state.tile]?.properties
 
         if  self.state.inventory.out.inelastic.isEmpty {
             self.unemployment = Double.init(
@@ -96,8 +93,6 @@ extension PopContext {
         self.cashFlow.update(with: self.state.inventory.l)
         self.cashFlow.update(with: self.state.inventory.e)
         self.cashFlow.update(with: self.state.inventory.x)
-
-        self.region = tile.properties
     }
 }
 extension PopContext: TransactingContext {
@@ -116,7 +111,7 @@ extension PopContext: TransactingContext {
             }
         }
 
-        let currency: Fiat = self.region!.occupiedBy!.currency.id
+        let currency: Fiat = self.region!.occupiedBy.currency.id
         let balance: Int64 = self.state.inventory.account.balance
 
         self.state.inventory.out.sync(with: self.type.output, releasing: 1)

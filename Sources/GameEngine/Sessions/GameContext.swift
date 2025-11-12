@@ -210,7 +210,7 @@ extension GameContext {
                 )
             }
             for address: Address in country.state.controlledTiles {
-                self.planets[address]?.properties.assign(
+                self.planets[address]?.update(
                     governedBy: country.properties,
                     occupiedBy: country.properties,
                 )

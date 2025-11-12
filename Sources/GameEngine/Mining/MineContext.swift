@@ -33,12 +33,7 @@ extension MineContext {
             self.miners.limit = self.state.today.size
         }
 
-        guard
-        let tile: PlanetGrid.Tile = context.planets[self.state.tile] else {
-            return
-        }
-
-        self.region = tile.properties
+        self.region = context.planets[self.state.tile]?.properties
     }
 }
 extension MineContext {

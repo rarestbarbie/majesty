@@ -302,11 +302,10 @@ extension GameSnapshot {
     ) -> Tooltip? {
         guard
         let planet: PlanetContext = self.context.planets[id],
-        let tile: PlanetGrid.Tile = planet.grid.tiles[cell] else {
+        let tile: PlanetGrid.Tile = planet.grid.tiles[cell],
+        let pops: PopulationStats = tile.properties?.pops else {
             return nil
         }
-
-        let pops: PopulationStats = tile.properties.pops
 
         return .instructions(style: .borderless) {
             switch layer {
@@ -761,12 +760,12 @@ extension GameSnapshot {
         _ id: Address,
         _ culture: String,
     ) -> Tooltip? {
-        self.context.planets[id]?.properties.pops.tooltip(culture: culture)
+        self.context.planets[id]?.properties?.pops.tooltip(culture: culture)
     }
     func tooltipTilePopType(
         _ id: Address,
         _ popType: PopType,
     ) -> Tooltip? {
-        self.context.planets[id]?.properties.pops.tooltip(popType: popType)
+        self.context.planets[id]?.properties?.pops.tooltip(popType: popType)
     }
 }

@@ -91,13 +91,13 @@ extension FactoryContext {
             self.clerks?.limit = area * (self.type.clerks?.amount ?? 0)
         }
 
+        self.region = context.planets[self.state.tile]?.properties
+
         guard
-        let tile: PlanetGrid.Tile = context.planets[self.state.tile],
-        let occupiedBy: CountryProperties = tile.properties.occupiedBy else {
+        let occupiedBy: CountryProperties = self.region?.occupiedBy else {
             return
         }
 
-        self.region = tile.properties
         self.productivity = occupiedBy.factories.productivity[self.state.type]
 
         self.cashFlow.reset()
