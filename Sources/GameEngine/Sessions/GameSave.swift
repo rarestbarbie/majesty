@@ -17,10 +17,12 @@ public struct GameSave {
 
     let cultures: [Culture]
     var countries: [Country]
+
     let factories: [Factory]
     let mines: [Mine]
     var pops: [Pop]
 
+    let _factories: [FactorySeed]
 }
 extension GameSave {
     public enum ObjectKey: JSString, Sendable {
@@ -39,6 +41,8 @@ extension GameSave {
         case factories
         case mines
         case pops
+
+        case seed_factories
     }
 }
 extension GameSave: JavaScriptEncodable {
@@ -71,6 +75,7 @@ extension GameSave: JavaScriptDecodable {
             factories: try js[.factories].decode(),
             mines: try js[.mines]?.decode() ?? [],
             pops: try js[.pops].decode(),
+            _factories: try js[.seed_factories]?.decode() ?? []
         )
     }
 }

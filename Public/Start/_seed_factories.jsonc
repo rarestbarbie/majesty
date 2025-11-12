@@ -1,0 +1,237 @@
+[
+    // Alaska
+    {
+        "tile": "399N-2,1",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Pacific Northwest
+    {
+        "tile": "399N-2,2",
+        "size": {
+            "Hydroelectric Dam": 2
+        }
+    },
+
+    // California
+    {
+        "tile": "399N-2,3",
+        "size": {
+            "Hydroelectric Dam": 10
+        }
+    },
+
+    // American Midwest
+    {
+        "tile": "399N-1,2",
+        "size": {
+            "Hydroelectric Dam": 10
+        }
+    },
+
+    // American East Coast
+    {
+        "tile": "399N0,2",
+        "size": {
+            "Hydroelectric Dam": 5,
+            "Nuclear Power Plant": 1
+        }
+    },
+
+    // Canada
+    {
+        "tile": "399N0,1",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Greenland
+    {
+        "tile": "399N1,1"
+    },
+
+    // Mexico
+    {
+        "tile": "399N-2,4",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Central America
+    {
+        "tile": "399N-1,4",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Caribbean Sea
+    {
+        "tile": "399N0,3"
+    },
+
+    // Panama
+    {
+        "tile": "399E5",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Colombia
+    {
+        "tile": "399N1,3",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Peru
+    {
+        "tile": "399S0,3",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Amazon
+    {
+        "tile": "399S1,3",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Brazil
+    {
+        "tile": "399S2,2",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Argentina
+    {
+        "tile": "399S1,2",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Patagonia
+    {
+        "tile": "399S0,2",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // West Antarctica
+    {
+        "tile": "399S0,1",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // East Antarctica
+    {
+        "tile": "399S1,0"
+    },
+
+    // Queen Maud Land
+    {
+        "tile": "399S1,-1"
+    },
+
+    // Northern Europe
+    {
+        "tile": "399N2,0",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Southwestern Europe
+    {
+        "tile": "399N3,0",
+        "size": {
+            "Hydroelectric Dam": 1,
+            "Nuclear Power Plant": 2
+        }
+    },
+
+    // Atlantropa
+    {
+        "tile": "399N3,-1",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Eastern Mediterranean
+    {
+        "tile": "399N3,-2"
+    },
+
+    // Eastern Europe
+    {
+        "tile": "399N2,-1",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Holy Land
+    {
+        "tile": "399N3,-3",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Persia
+    {
+        "tile": "399N2,-3",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Southern China
+    {
+        "tile": "399N0,-2",
+        "size": {
+            "Hydroelectric Dam": 12,
+            "Nuclear Power Plant": 3
+        }
+    },
+    // Northern China
+    {
+        "tile": "399N-1,-1",
+        "size": {
+            "Hydroelectric Dam": 12,
+            "Nuclear Power Plant": 3
+        }
+    },
+
+    // Western Australia
+    {
+        "tile": "399S-1,-2",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    },
+
+    // Eastern Australia
+    {
+        "tile": "399S-2,-1",
+        "size": {
+            "Hydroelectric Dam": 1
+        }
+    }
+]

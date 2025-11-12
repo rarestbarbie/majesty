@@ -23,12 +23,25 @@ struct GameContext {
 extension GameContext {
     static func load(_ save: borrowing GameSave, rules: GameRules) throws -> Self {
         let _none: _NoMetadata = .init()
+        var factories: DynamicContextTable<FactoryContext> = try .init(states: save.factories) {
+            rules.factories[$0.type]
+        }
+        for seed: FactorySeed in save._factories {
+            for factory: Quantity<FactoryType> in try seed.unpack(symbols: save.symbols) {
+                let section: Factory.Section = .init(type: factory.unit, tile: seed.tile)
+                try factories[section] {
+                    rules.factories[$0.type]
+                } update: {
+                    _, _ in
+                }
+            }
+        }
         return .init(
             player: save.player,
             planets: [:],
             cultures: try .init(states: save.cultures) { _ in _none },
             countries: try .init(states: save.countries) { _ in _none },
-            factories: try .init(states: save.factories) { rules.factories[$0.type] },
+            factories: factories,
             mines: try .init(states: save.mines) { rules.mines[$0.type] },
             pops: try .init(states: save.pops) { rules.pops[$0.type] },
             symbols: save.symbols,
@@ -49,6 +62,7 @@ extension GameContext {
             factories: [_].init(self.factories.state),
             mines: [_].init(self.mines.state),
             pops: [_].init(self.pops.state),
+            _factories: [],
         )
     }
 }
