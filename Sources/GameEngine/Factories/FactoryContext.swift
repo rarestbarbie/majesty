@@ -1,9 +1,11 @@
 import Assert
+import D
 import Fraction
 import GameEconomy
 import GameIDs
 import GameRules
 import GameState
+import GameUI
 import OrderedCollections
 import Random
 
@@ -709,5 +711,17 @@ extension FactoryContext {
         )
 
         return (update, hours)
+    }
+}
+extension FactoryContext {
+    func explainProduction(_ ul: inout TooltipInstructionEncoder, base: Int64) {
+        let productivity: Double = Double.init(self.productivity)
+        let efficiency: Double = self.state.today.eo
+        ul["Production per worker"] = (productivity * efficiency * Double.init(base))[..3]
+        ul[>] {
+            $0["Base"] = base[/3]
+            $0["Productivity", +] = productivity[%2]
+            $0["Efficiency", +] = +?(efficiency - 1)[%2]
+        }
     }
 }

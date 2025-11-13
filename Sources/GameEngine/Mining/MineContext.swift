@@ -18,6 +18,11 @@ struct MineContext: RuntimeContext {
     }
 }
 extension MineContext {
+    static var efficiencyPoliticiansPerMilitancyPoint: Double { 0.01 }
+    static var efficiencyPoliticians: Decimal { 5% }
+    static var efficiencyMiners: Decimal { 1% }
+}
+extension MineContext {
     mutating func startIndexCount() {
         self.miners = .empty
     }
@@ -67,14 +72,16 @@ extension MineContext {
             self.state.today.size = max(0, self.state.today.size - self.miners.count)
         }
 
-        if case .Politician = self.type.miner,
-            let mil: Double = self.region?.pops.free.mil.average {
-            self.state.efficiency = 1 + 0.1 * mil
+        if case .Politician = self.type.miner {
+            let mil: Double = self.region?.pops.free.mil.average ?? 0
+            self.state.efficiency = Double.init(
+                Self.efficiencyPoliticians
+            ) + Self.efficiencyPoliticiansPerMilitancyPoint * mil
         } else {
             let bonus: Decimal = region.occupiedBy.modifiers.miningEfficiency[
                 self.state.type
             ]?.value ?? 0
-            self.state.efficiency = Double.init(1% + bonus)
+            self.state.efficiency = Double.init(Self.efficiencyMiners + bonus)
         }
     }
 }

@@ -26,7 +26,8 @@
         },
         "technologies": {
             "Mechanized Production": 1,
-            "Hydraulic Fracking": 2
+            "Hydraulic Fracking": 2,
+            "Bayer Process": 3
         }
     },
     "factories": [

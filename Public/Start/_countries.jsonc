@@ -19,7 +19,8 @@
         "minwage": 35,
         "researched": [
             1,
-            2
+            2,
+            3
         ]
     },
     {
@@ -41,7 +42,8 @@
         "minwage": 25,
         "researched": [
             1,
-            2
+            2,
+            3
         ]
     }
 ]
