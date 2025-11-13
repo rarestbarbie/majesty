@@ -232,6 +232,7 @@ let package: Package = .init(
             dependencies: [
                 .target(name: "Bijection"),
                 .target(name: "ColorText"),
+                .target(name: "GameIDs"),
                 .target(name: "JavaScriptInterop"),
                 .product(name: "D", package: "d"),
             ]
