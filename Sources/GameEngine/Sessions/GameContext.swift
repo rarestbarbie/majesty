@@ -32,7 +32,7 @@ extension GameContext {
                 try factories[section] {
                     rules.factories[$0.type]
                 } update: {
-                    _, _ in
+                    $1.size = .init(level: 0, growthProgress: Factory.Size.growthRequired - 1)
                 }
             }
         }
