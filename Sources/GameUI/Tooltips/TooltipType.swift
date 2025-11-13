@@ -1,6 +1,7 @@
 import JavaScriptInterop
+import JavaScriptKit
 
-@frozen public enum TooltipType: String, LoadableFromJSValue {
+@frozen public enum TooltipType: String, ConvertibleToJSValue, LoadableFromJSValue {
     case FactoryAccount
     case FactorySize
     case FactoryResourceIO

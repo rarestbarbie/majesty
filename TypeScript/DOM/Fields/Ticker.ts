@@ -1,5 +1,6 @@
 import {
     Fortune,
+    TickerInstruction,
     UpdateBigInt,
     UpdatePrice,
     UpdateText,
@@ -10,7 +11,7 @@ export class Ticker {
     readonly value: HTMLSpanElement;
     readonly delta: HTMLSpanElement;
 
-    constructor(fortune: Fortune) {
+    constructor(fortune?: Fortune) {
         this.outer = document.createElement('span');
         this.value = document.createElement('span');
         this.delta = document.createElement('span');
@@ -18,6 +19,13 @@ export class Ticker {
         this.outer.appendChild(this.value);
         this.outer.appendChild(this.delta);
         this.outer.dataset['ticker'] = fortune;
+    }
+
+    public update(instruction: TickerInstruction): void {
+        UpdateText(this.value, instruction.value);
+        UpdateText(this.delta, instruction.delta);
+        this.delta.dataset['sign'] = instruction.sign ?? 'zero';
+        this.outer.dataset['ticker'] = instruction.fortune;
     }
 
     public updatePriceChange(yesterday: number, today: number, places: number = 2): void {

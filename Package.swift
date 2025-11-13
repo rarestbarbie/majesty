@@ -230,6 +230,7 @@ let package: Package = .init(
         .target(
             name: "GameUI",
             dependencies: [
+                .target(name: "Bijection"),
                 .target(name: "ColorText"),
                 .target(name: "JavaScriptInterop"),
                 .product(name: "D", package: "d"),

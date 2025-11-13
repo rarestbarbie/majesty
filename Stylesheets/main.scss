@@ -15,6 +15,7 @@
 @use 'subscreen';
 @use 'tables';
 @use 'tabs';
+@use 'terms';
 @use 'tooltip';
 
 [data-count] > span:nth-child(2)::before {
@@ -30,8 +31,9 @@
 }
 
 
-[data-ticker] [data-sign]::before {
-    margin: 0 0.25em 0 0.25em;
+[data-ticker] [data-sign] {
+    position: relative;
+    display: inline-block;
 }
 
 [data-ticker] [data-sign='zero'],
@@ -49,6 +51,16 @@
     color: var(--color-neg-text);
 }
 
+[data-ticker] [data-sign='pos'],
+[data-ticker] [data-sign='neg'] {
+    padding-inline-start: 1.25em;
+    &::before {
+        position: absolute;
+        inset-inline-start: 0;
+        margin-inline-start: 0.25em;
+        bottom: 0;
+    }
+}
 [data-ticker] [data-sign='pos']::before {
     content: '\00a0▴';
 }

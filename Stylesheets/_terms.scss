@@ -1,0 +1,29 @@
+ul.terms {
+    margin: 0 0 0 1rem;
+    padding: 0;
+    list-style: none;
+
+    display: grid;
+    grid-template-columns: 2rem 1fr;
+    grid-auto-rows: 3rem;
+
+    align-items: center;
+
+    > li {
+        display: contents;
+
+        [data-term-id]::before {
+            content: var(--term-icon);
+        }
+
+        [data-term-id='eN'] {
+            --term-icon: '🍰';
+        }
+        [data-term-id='eP'] {
+            --term-icon: '🌐';
+        }
+        [data-term-id='eA'] {
+            --term-icon: '🧲';
+        }
+    }
+}

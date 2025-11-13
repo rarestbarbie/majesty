@@ -1,4 +1,6 @@
+import D
 import GameIDs
+import GameUI
 import JavaScriptKit
 import JavaScriptInterop
 import VectorCharts
@@ -8,13 +10,13 @@ struct OwnershipBreakdown<Tab> where Tab: OwnershipTab {
     private var country: PieChart<CountryID, PieChartLabel>?
     private var culture: PieChart<String, PieChartLabel>?
     private var equity: Equity<LEI>.Statistics?
-    private var state: Tab.State?
+    private var terms: [Term]
 
     init() {
         self.country = nil
         self.culture = nil
         self.equity = nil
-        self.state = nil
+        self.terms = []
     }
 }
 extension OwnershipBreakdown {
@@ -47,8 +49,16 @@ extension OwnershipBreakdown {
             values: culture.sorted { $0.key < $1.key }
         )
 
+        self.terms = Term.list {
+            let shares: TooltipInstruction.Ticker = equity.shareCount[/3]
+                ^^ asset.state.equity.issued
+
+            $0[.shares, (-), tooltip: Tab.tooltipShares] = shares
+            $0[.stockPrice, (+)] = asset.state.today.px[..3] <- asset.state.yesterday.px
+            $0[.stockAttraction, (+)] = asset.state.today.pa[%1] <- asset.state.yesterday.pa
+        }
+
         self.equity = equity
-        self.state = asset.state
     }
 }
 extension OwnershipBreakdown: JavaScriptEncodable {
@@ -56,24 +66,13 @@ extension OwnershipBreakdown: JavaScriptEncodable {
         case type
         case country
         case culture
-
-        case shares
-        case yesterday_px = "y_px"
-        case yesterday_pa = "y_pa"
-        case today_px = "t_px"
-        case today_pa = "t_pa"
-
+        case terms
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.type] = Tab.Ownership
         js[.country] = self.country
         js[.culture] = self.culture
-
-        js[.shares] = self.equity?.shareCount
-        js[.yesterday_px] = self.state?.yesterday.px
-        js[.yesterday_pa] = self.state?.yesterday.pa
-        js[.today_px] = self.state?.today.px
-        js[.today_pa] = self.state?.today.pa
+        js[.terms] = self.terms
     }
 }
