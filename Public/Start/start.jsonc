@@ -25,7 +25,8 @@
             "Nuclear Power Plant": 21
         },
         "technologies": {
-            "Mechanized Production": 1
+            "Mechanized Production": 1,
+            "Hydraulic Fracking": 2
         }
     },
     "factories": [

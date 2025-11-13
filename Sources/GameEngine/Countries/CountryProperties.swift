@@ -3,11 +3,11 @@ import GameIDs
 
 final class CountryProperties {
     var intrinsic: Country
-    private(set) var factories: FactoryModifiers
+    private(set) var modifiers: CountryModifiers
 
     init(intrinsic state: Country) {
         self.intrinsic = state
-        self.factories = .init()
+        self.modifiers = .init()
     }
 }
 extension CountryProperties: Identifiable {
@@ -19,10 +19,8 @@ extension CountryProperties {
     var culturePreferred: String { self.intrinsic.culturePreferred }
 }
 extension CountryProperties {
-    func technology(
-        yield: (inout FactoryModifiers) -> ()
-    ) {
-        self.factories = .init()
-        yield(&self.factories)
+    func update(rules: GameRules) {
+        self.modifiers = .init()
+        self.modifiers.update(from: self.intrinsic.researched, rules: rules)
     }
 }

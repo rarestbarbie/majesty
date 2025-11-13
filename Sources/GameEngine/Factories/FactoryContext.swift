@@ -98,7 +98,7 @@ extension FactoryContext {
             return
         }
 
-        self.productivity = occupiedBy.factories.productivity[self.state.type]
+        self.productivity = occupiedBy.modifiers.factoryProductivity[self.state.type]?.value ?? 1
 
         self.cashFlow.reset()
         self.cashFlow.update(with: self.state.inventory.l)

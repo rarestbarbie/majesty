@@ -1,3 +1,4 @@
+import D
 import GameRules
 import GameState
 import Random
@@ -38,6 +39,10 @@ extension MineContext {
 }
 extension MineContext {
     mutating func advance(turn: inout Turn) {
+        guard let region: RegionalProperties = self.region else {
+            return
+        }
+
         let minersToHire: Int64 = self.miners.limit - self.miners.count
         if  minersToHire > 0 {
             let bid: PopJobOfferBlock = .init(
@@ -66,7 +71,10 @@ extension MineContext {
             let mil: Double = self.region?.pops.free.mil.average {
             self.state.efficiency = 1 + 0.1 * mil
         } else {
-            self.state.efficiency = 0.01
+            let bonus: Decimal = region.occupiedBy.modifiers.miningEfficiency[
+                self.state.type
+            ]?.value ?? 0
+            self.state.efficiency = Double.init(1% + bonus)
         }
     }
 }
