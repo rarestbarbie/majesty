@@ -3,27 +3,42 @@ ul.terms {
     padding: 0;
     list-style: none;
 
-    display: grid;
-    grid-template-columns: 2rem 1fr;
-    grid-auto-rows: 2rem;
+    display: flex;
+    flex-direction: column;
 
-    align-items: center;
 
     > li {
-        display: contents;
+        min-height: 2rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
 
-        [data-term-id^='e']::before {
-            content: var(--term-icon);
+        > span.label {
+            flex: 0 0 2rem;
+        }
+        > span:last-child {
+            flex: 1 1 auto;
         }
 
-        [data-term-id='eN'] {
+        &[data-term-id^='p'] {
+            > span.label {
+                margin: 0.2em 0 0.5em 0;
+            }
+        }
+        &[data-term-id^='e'] {
+            > span.label::before {
+                content: var(--term-icon);
+            }
+        }
+        &[data-term-id='eN'] {
             --term-icon: '🍰';
         }
-        [data-term-id='eP'] {
+        &[data-term-id='eP'] {
             --term-icon: '🌐';
         }
-        [data-term-id='eA'] {
+        &[data-term-id='eA'] {
             --term-icon: '🧲';
         }
     }
+
 }

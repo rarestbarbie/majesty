@@ -21,8 +21,10 @@ export class Term implements DiffableListElement<string> {
         this.id = term.id;
 
         this.label = document.createElement('span');
-        this.label.setAttribute('data-term-id', term.id);
+        this.label.classList.add('label');
+
         this.node = document.createElement('li');
+        this.node.setAttribute('data-term-id', term.id);
         this.node.appendChild(this.label);
 
         switch (term.details.type) {
