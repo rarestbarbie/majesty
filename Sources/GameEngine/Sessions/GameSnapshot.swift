@@ -415,9 +415,7 @@ extension GameSnapshot {
                 self.context.mines[$0]?.type.name ?? "Unknown"
             }
         } else {
-            let employment: Int64 = pop.state.z.size > 0 ? .init(
-                (pop.unemployment * Double.init(pop.state.z.size)).rounded()
-            ) : 0
+            let employment: Int64 = pop.stats.employedBeforeEgress
             return .instructions {
                 $0["Total employment"] = employment[/3]
                 for output: ResourceOutput<Never> in pop.state.inventory.out.inelastic.values {

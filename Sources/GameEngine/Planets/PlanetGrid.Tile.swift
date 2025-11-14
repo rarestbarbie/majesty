@@ -85,8 +85,8 @@ extension PlanetGrid.Tile {
         self.properties?.startIndexCount()
     }
 
-    mutating func addResidentCount(_ pop: Pop) {
-        self.properties?.addResidentCount(pop)
+    mutating func addResidentCount(_ pop: Pop, _ stats: Pop.Stats) {
+        self.properties?.addResidentCount(pop, stats)
     }
     mutating func addResidentCount(_ factory: Factory) {
         self.factories.append(factory.id)
@@ -140,12 +140,14 @@ extension PlanetGrid.Tile {
         }
 
         guard
-        let miners: Int64 = self.properties?.pops.type[.Miner] else {
+        let miners: PopulationStats.Row = self.properties?.pops.type[.Miner] else {
             return nil
         }
 
+        let n: Int64 = miners.unemployed
+
         guard random.roll(
-            1 + max(miners / 100, 10) + max(miners / 10000, 20),
+            1 + max(n / 100, 10) + max(n / 10000, 20),
             90 * (1 + Int64(self.minesAlreadyPresent.count))
         ) else {
             return nil

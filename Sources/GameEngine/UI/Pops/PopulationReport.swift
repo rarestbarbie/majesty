@@ -102,7 +102,7 @@ extension PopulationReport: PersistentReport {
                 type: $0.state.type,
                 color: culture.color,
                 nat: $0.state.nat,
-                une: $0.unemployment,
+                une: 1 - $0.stats.employmentBeforeEgress,
                 yesterday: $0.state.y,
                 today: $0.state.z,
                 jobs: $0.state.factories.values.map {

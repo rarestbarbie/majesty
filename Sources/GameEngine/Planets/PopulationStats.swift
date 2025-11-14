@@ -3,13 +3,14 @@ import GameIDs
 import GameUI
 
 struct PopulationStats {
-    var type: [PopType: Int64]
+    var type: [PopType: Row]
     var free: PopulationStratum
     var enslaved: PopulationStratum
+    var employed: Int64
 }
 extension PopulationStats {
     init() {
-        self.init(type: [:], free: .init(), enslaved: .init())
+        self.init(type: [:], free: .init(), enslaved: .init(), employed: 0)
     }
 }
 extension PopulationStats {
@@ -20,14 +21,19 @@ extension PopulationStats {
         self.type.removeAll(keepingCapacity: true)
         self.free.startIndexCount()
         self.enslaved.startIndexCount()
+        self.employed = 0
     }
 
-    mutating func addResidentCount(_ pop: Pop) {
-        self.type[pop.type, default: 0] += pop.z.size
+    mutating func addResidentCount(_ pop: Pop, _ stats: Pop.Stats) {
+        {
+            $0.count += pop.z.size
+            $0.employed += stats.employedBeforeEgress
+        } (&self.type[pop.type, default: .zero])
 
         if pop.type.stratum <= .Ward {
             self.enslaved.addResidentCount(pop)
         } else {
+            self.employed += stats.employedBeforeEgress
             self.free.addResidentCount(pop)
         }
     }
@@ -53,7 +59,7 @@ extension PopulationStats {
         }
     }
     func tooltip(popType: PopType) -> Tooltip? {
-        let share: Int64 = self.type[popType] ?? 0
+        let share: Row = self.type[popType] ?? .zero
         let total: Int64 = self.free.total
 
         if  total == 0 {
@@ -61,7 +67,11 @@ extension PopulationStats {
         }
 
         return .instructions(style: .borderless) {
-            $0[popType.plural] = (Double.init(share) / Double.init(total))[%3]
+            let d: Double = Double.init(self.free.total)
+            $0[popType.plural] = (Double.init(share.count) / d)[%3]
+            $0[>] {
+                $0["Unemployment rate", (-)] = (Double.init(share.unemployed) / d)[%3]
+            }
         }
     }
 }

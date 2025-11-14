@@ -235,8 +235,8 @@ extension GameContext {
         }
         for i: Int in self.pops.indices {
             /// avoid copy-on-write
-            let pop: Pop = self.pops.state[i]
-            let counted: ()? = self.planets[pop.tile]?.addResidentCount(pop)
+            let (pop, stats): (Pop, Pop.Stats) = { ($0.state, $0.stats) } (self.pops[i])
+            let counted: ()? = self.planets[pop.tile]?.addResidentCount(pop, stats)
 
             #assert(counted != nil, "Pop \(pop.id) has no home tile!!!")
 
@@ -531,7 +531,7 @@ extension GameContext {
                 return
             }
 
-            let unemployed: Int64 = pop.unemployed
+            let unemployed: Int64 = pop.z.size - pop.employed()
             if  unemployed <= 0 {
                 return
             }

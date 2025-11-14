@@ -135,12 +135,9 @@ extension Pop {
     }
 }
 extension Pop {
-    /// It is better to compute this dynamically, as the pop count itself can change, and that
-    /// might invalidate cached values for unemployment!
-    var unemployed: Int64 {
-        self.z.size
-            - self.factories.values.reduce(0) { $0 + $1.count }
-            - self.mines.values.reduce(0) { $0 + $1.count }
+    func employed() -> Int64 {
+        self.factories.values.reduce(0) { $0 + $1.count } +
+        self.mines.values.reduce(0) { $0 + $1.count }
     }
 
     var decadence: Double {
