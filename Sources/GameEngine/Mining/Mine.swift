@@ -10,8 +10,8 @@ struct Mine {
     let tile: Address
     var efficiency: Double
 
-    var yesterday: Dimensions
-    var today: Dimensions
+    var y: Dimensions
+    var z: Dimensions
 }
 extension Mine: Sectionable {
     init(id: MineID, section: Section) {
@@ -20,8 +20,8 @@ extension Mine: Sectionable {
             type: section.type,
             tile: section.tile,
             efficiency: 0,
-            yesterday: .init(),
-            today: .init()
+            y: .init(),
+            z: .init()
         )
     }
 
@@ -34,7 +34,7 @@ extension Mine: Turnable {
     }
 }
 extension Mine: Deletable {
-    var dead: Bool { self.today.size <= 0 }
+    var dead: Bool { self.z.size <= 0 }
 }
 extension Mine {
     enum ObjectKey: JSString, Sendable {
@@ -43,9 +43,8 @@ extension Mine {
         case tile
         case efficiency
 
-        case y_size
-
-        case t_size
+        case y
+        case z
     }
 }
 extension Mine: JavaScriptEncodable {
@@ -55,25 +54,20 @@ extension Mine: JavaScriptEncodable {
         js[.type] = self.type
         js[.efficiency] = self.efficiency
 
-        js[.y_size] = self.yesterday.size
-
-        js[.t_size] = self.today.size
+        js[.y] = self.y
+        js[.z] = self.z
     }
 }
 extension Mine: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
-        let today: Dimensions = .init(
-            size: try js[.t_size].decode(),
-        )
+        let today: Dimensions = try js[.z]?.decode() ?? .init()
         self.init(
             id: try js[.id].decode(),
             type: try js[.type].decode(),
             tile: try js[.tile].decode(),
             efficiency: try js[.efficiency].decode(),
-            yesterday: .init(
-                size: try js[.y_size]?.decode() ?? today.size,
-            ),
-            today: today
+            y: try js[.y]?.decode() ?? today,
+            z: today
         )
     }
 }

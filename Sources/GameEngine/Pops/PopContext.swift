@@ -67,7 +67,7 @@ extension PopContext {
             self.unemployment = Double.init(
                 self.state.unemployed
             ) / Double.init(
-                self.state.today.size
+                self.state.z.size
             )
         } else {
             self.unemployment = self.state.inventory.out.inelastic.values.reduce(1) {
@@ -91,7 +91,7 @@ extension PopContext {
 
         self.income.removeAll(keepingCapacity: true)
         for id: FactoryID in self.state.factories.keys {
-            self.income[id] = context.factories[id]?.today.wn
+            self.income[id] = context.factories[id]?.z.wn
         }
 
         self.cashFlow.reset()
@@ -103,14 +103,14 @@ extension PopContext {
 extension PopContext: TransactingContext {
     mutating func allocate(turn: inout Turn) {
         if  self.state.type.stratum == .Ward {
-            if  self.state.today.pa < 0.5 {
-                let p: Double = 0.000_1 * (0.5 - self.state.today.pa)
-                self.state.today.size -= Binomial[self.state.today.size, p].sample(
+            if  self.state.z.pa < 0.5 {
+                let p: Double = 0.000_1 * (0.5 - self.state.z.pa)
+                self.state.z.size -= Binomial[self.state.z.size, p].sample(
                     using: &turn.random.generator
                 )
             } else {
-                let p: Double = 0.000_1 * (self.state.today.pa - 0.5)
-                self.state.today.size += Binomial[self.state.today.size, p].sample(
+                let p: Double = 0.000_1 * (self.state.z.pa - 0.5)
+                self.state.z.size += Binomial[self.state.z.size, p].sample(
                     using: &turn.random.generator
                 )
             }
@@ -135,15 +135,15 @@ extension PopContext: TransactingContext {
         let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
         self.state.inventory.l.sync(
             with: self.type.l,
-            scalingFactor: (self.state.today.size, z.l),
+            scalingFactor: (self.state.z.size, z.l),
         )
         self.state.inventory.e.sync(
             with: self.type.e,
-            scalingFactor: (self.state.today.size, z.e),
+            scalingFactor: (self.state.z.size, z.e),
         )
         self.state.inventory.x.sync(
             with: self.type.x,
-            scalingFactor: (self.state.today.size, z.x),
+            scalingFactor: (self.state.z.size, z.x),
         )
 
         let weights: ResourceInputWeights = .init(
@@ -167,10 +167,10 @@ extension PopContext: TransactingContext {
             budget.dividend = max(0, (balance - budget.min.l) / 3650)
             budget.buybacks = max(0, (balance - budget.min.l - budget.dividend) / 365)
             // Align share price
-            self.state.today.px = Double.init(self.equity.sharePrice)
+            self.state.z.px = Double.init(self.equity.sharePrice)
             turn.stockMarkets.issueShares(
                 currency: currency,
-                quantity: max(0, self.state.today.size - self.equity.shareCount),
+                quantity: max(0, self.state.z.size - self.equity.shareCount),
                 security: self.security,
             )
 
@@ -224,7 +224,7 @@ extension PopContext: TransactingContext {
         )
         self.state.inventory.out.deposit(
             from: self.type.output,
-            scalingFactor: (self.state.today.size, 1)
+            scalingFactor: (self.state.z.size, 1)
         )
 
         for j: Int in self.state.mines.values.indices {
@@ -254,10 +254,10 @@ extension PopContext: TransactingContext {
             )
         }
 
-        self.state.today.fl = self.state.inventory.l.fulfilled
+        self.state.z.fl = self.state.inventory.l.fulfilled
         self.state.inventory.l.consume(
             from: self.type.l,
-            scalingFactor: (self.state.today.size, z.l)
+            scalingFactor: (self.state.z.size, z.l)
         )
 
         if  budget.e.tradeable > 0 {
@@ -269,10 +269,10 @@ extension PopContext: TransactingContext {
             )
         }
 
-        self.state.today.fe = self.state.inventory.e.fulfilled
+        self.state.z.fe = self.state.inventory.e.fulfilled
         self.state.inventory.e.consume(
             from: self.type.e,
-            scalingFactor: (self.state.today.size, z.e)
+            scalingFactor: (self.state.z.size, z.e)
         )
 
         if  budget.x.tradeable > 0 {
@@ -284,25 +284,25 @@ extension PopContext: TransactingContext {
             )
         }
 
-        self.state.today.fx = self.state.inventory.x.fulfilled
+        self.state.z.fx = self.state.inventory.x.fulfilled
         self.state.inventory.x.consume(
             from: self.type.x,
-            scalingFactor: (self.state.today.size, z.x)
+            scalingFactor: (self.state.z.size, z.x)
         )
 
-        self.state.today.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
+        self.state.z.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
 
         liquidation:
         if case .Ward = self.state.type.stratum {
             // Pop is enslaved
-            self.state.today.fe = 1
-            self.state.today.fx = 0
+            self.state.z.fe = 1
+            self.state.z.fx = 0
 
             let operatingProfit: Int64 = self.state.operatingProfit
             if  operatingProfit > 0 {
-                self.state.today.pa = min(1, self.state.today.pa + 0.005)
+                self.state.z.pa = min(1, self.state.z.pa + 0.005)
             } else {
-                self.state.today.pa = max(0.01, self.state.today.pa - 0.005)
+                self.state.z.pa = max(0.01, self.state.z.pa - 0.005)
             }
 
             // Pay dividends to shareholders, if any.
@@ -319,7 +319,7 @@ extension PopContext: TransactingContext {
         }
 
         // Welfare
-        self.state.inventory.account.s += self.state.today.size * country.minwage / 10
+        self.state.inventory.account.s += self.state.z.size * country.minwage / 10
     }
 }
 extension PopContext {
@@ -329,22 +329,22 @@ extension PopContext {
             return
         }
 
-        self.state.today.mil += 0.020 * (1.0 - self.state.today.fl)
-        self.state.today.mil += 0.004 * (0.5 - self.state.today.fe)
-        self.state.today.mil += 0.004 * (0.0 - self.state.today.fx)
+        self.state.z.mil += 0.020 * (1.0 - self.state.z.fl)
+        self.state.z.mil += 0.004 * (0.5 - self.state.z.fe)
+        self.state.z.mil += 0.004 * (0.0 - self.state.z.fx)
 
-        self.state.today.con += 0.010 * (self.state.today.fl - 1.0)
-        self.state.today.con += 0.002 * (1.0 - self.state.today.fe)
-        self.state.today.con += 0.020 * (self.state.today.fx - 0.0)
+        self.state.z.con += 0.010 * (self.state.z.fl - 1.0)
+        self.state.z.con += 0.002 * (1.0 - self.state.z.fe)
+        self.state.z.con += 0.020 * (self.state.z.fx - 0.0)
 
-        self.state.today.mil = max(0, min(10, self.state.today.mil))
-        self.state.today.con = max(0, min(10, self.state.today.con))
+        self.state.z.mil = max(0, min(10, self.state.z.mil))
+        self.state.z.con = max(0, min(10, self.state.z.con))
 
         if  self.state.type.stratum > .Ward {
             self.convert(turn: &turn, country: country)
         } else {
             self.state.equity.split(
-                price: self.state.today.px,
+                price: self.state.z.px,
                 turn: &turn,
                 notifying: [country.id]
             )
@@ -464,7 +464,7 @@ extension PopContext {
                 $0[$1 >= 0.4] = +1‱
             } = { "\(+$0[%]): Unemployment is above \(em: $1[%0])" }
 
-            $0[self.state.yesterday.fl] {
+            $0[self.state.y.fl] {
                 $0[$1 < 1.00] = +1‰
                 $0[$1 < 0.75] = +5‰
                 $0[$1 < 0.50] = +2‰
@@ -472,15 +472,15 @@ extension PopContext {
             } = { "\(+$0[%]): Getting less than \(em: $1[%0]) of Life Needs" }
 
         } factors: {
-            $0[self.state.yesterday.fx] {
+            $0[self.state.y.fx] {
                 $0[$1 > 0.25] = -90%
             } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Luxury Needs" }
-            $0[self.state.yesterday.fe] {
+            $0[self.state.y.fe] {
                 $0[$1 > 0.75] = -50%
                 $0[$1 > 0.5] = -25%
             } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Everyday Needs" }
 
-            $0[self.state.yesterday.mil] {
+            $0[self.state.y.mil] {
                 $0[$1 >= 1.0] = -10%
                 $0[$1 >= 2.0] = -10%
                 $0[$1 >= 3.0] = -10%
@@ -514,7 +514,7 @@ extension PopContext {
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
-            $0[self.state.yesterday.mil] {
+            $0[self.state.y.mil] {
                 $0[$1 >= 3.0] = -2‱
                 $0[$1 >= 5.0] = -2‱
                 $0[$1 >= 7.0] = -3‱
@@ -523,7 +523,7 @@ extension PopContext {
 
             switch self.state.type.stratum {
             case .Owner:
-                $0[self.state.yesterday.fx] {
+                $0[self.state.y.fx] {
                     $0[$1 >= 0.25] = +3‰
                     $0[$1 >= 0.50] = +3‰
                     $0[$1 >= 0.75] = +3‰
@@ -533,7 +533,7 @@ extension PopContext {
                 break
             }
 
-            $0[self.state.yesterday.con] {
+            $0[self.state.y.con] {
                 $0[$1 >= 1.0] = +1‱
                 $0[$1 >= 2.0] = +1‱
                 $0[$1 >= 3.0] = +1‱
@@ -546,11 +546,11 @@ extension PopContext {
             } = { "\(+$0[%]): Consciousness is above \(em: $1[..1])" }
 
         } factors: {
-            $0[self.state.yesterday.fl] {
+            $0[self.state.y.fl] {
                 $0[$1 < 1.00] = -100%
             } = { "\(+$0[%]): Getting less than \(em: $1[%0]) of Life Needs" }
 
-            $0[self.state.yesterday.fe] {
+            $0[self.state.y.fe] {
                 $0[$1 >= 0.1] = -10%
                 $0[$1 >= 0.2] = -10%
                 $0[$1 >= 0.3] = -10%
@@ -562,7 +562,7 @@ extension PopContext {
                 $0[$1 >= 0.9] = -10%
             } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Everyday Needs" }
 
-            $0[self.state.yesterday.mil] {
+            $0[self.state.y.mil] {
                 $0[$1 >= 2.0] = -20%
                 $0[$1 >= 4.0] = -10%
                 $0[$1 >= 6.0] = -10%

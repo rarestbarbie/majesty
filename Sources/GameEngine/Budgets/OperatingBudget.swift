@@ -52,8 +52,8 @@ extension OperatingBudget {
         } ?? 0
 
         let laborCostPerDay: (w: Int64, c: Int64) = (
-            w: state.today.wn * workersTarget,
-            c: state.today.cn * clerksTarget,
+            w: state.z.wn * workersTarget,
+            c: state.z.cn * clerksTarget,
         )
 
         /// These are the minimum theoretical balances the factory would need to purchase 100%

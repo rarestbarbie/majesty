@@ -103,8 +103,8 @@ extension PopulationReport: PersistentReport {
                 color: culture.color,
                 nat: $0.state.nat,
                 une: $0.unemployment,
-                yesterday: $0.state.yesterday,
-                today: $0.state.today,
+                yesterday: $0.state.y,
+                today: $0.state.z,
                 jobs: $0.state.factories.values.map {
                     .init(
                         name: snapshot.factories[$0.id]?.type.name ?? "Unknown",

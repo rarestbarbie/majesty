@@ -23,7 +23,7 @@ extension PopulationStats {
     }
 
     mutating func addResidentCount(_ pop: Pop) {
-        self.type[pop.type, default: 0] += pop.today.size
+        self.type[pop.type, default: 0] += pop.z.size
 
         if pop.type.stratum <= .Ward {
             self.enslaved.addResidentCount(pop)

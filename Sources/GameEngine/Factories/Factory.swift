@@ -17,8 +17,8 @@ struct Factory: LegalEntityState, Identifiable {
     var liquidation: FactoryLiquidation?
 
     var inventory: Inventory
-    var yesterday: Dimensions
-    var today: Dimensions
+    var y: Dimensions
+    var z: Dimensions
 
     var equity: Equity<LEI>
 }
@@ -31,8 +31,8 @@ extension Factory: Sectionable {
             size: .init(level: 0),
             liquidation: nil,
             inventory: .init(),
-            yesterday: .init(),
-            today: .init(),
+            y: .init(),
+            z: .init(),
             equity: [:],
         )
     }
@@ -78,45 +78,8 @@ extension Factory {
         case inventory_e = "ne"
         case inventory_x = "nx"
 
-        case yesterday_vi = "y_vi"
-        case yesterday_vv = "y_vv"
-
-        case yesterday_wf = "y_wf"
-        case yesterday_wn = "y_wn"
-
-        case yesterday_cf = "y_cf"
-        case yesterday_cn = "y_cn"
-
-        case yesterday_ei = "y_ei"
-        case yesterday_eo = "y_eo"
-
-        case yesterday_fl = "y_fl"
-        case yesterday_fe = "y_fe"
-        case yesterday_fx = "y_fx"
-
-        case yesterday_px = "y_px"
-        case yesterday_pa = "y_pa"
-
-        case today_vi = "t_vi"
-        case today_vv = "t_vv"
-
-        case today_wa = "t_wa"
-        case today_wf = "t_wf"
-        case today_wn = "t_wn"
-
-        case today_ca = "t_ca"
-        case today_cf = "t_cf"
-        case today_cn = "t_cn"
-
-        case today_ei = "t_ei"
-        case today_eo = "t_eo"
-
-        case today_fl = "t_fl"
-        case today_fe = "t_fe"
-        case today_fx = "t_fx"
-
-        case today_px = "t_px"
-        case today_pa = "t_pa"
+        case y
+        case z
 
         case equity
     }
@@ -136,54 +99,15 @@ extension Factory: JavaScriptEncodable {
         js[.inventory_x] = self.inventory.x
         js[.inventory_out] = self.inventory.out
 
-        js[.yesterday_vi] = self.yesterday.vi
-        js[.yesterday_vv] = self.yesterday.vx
-        js[.yesterday_wf] = self.yesterday.wf
-        js[.yesterday_wn] = self.yesterday.wn
-        js[.yesterday_cf] = self.yesterday.cf
-        js[.yesterday_cn] = self.yesterday.cn
-        js[.yesterday_ei] = self.yesterday.ei
-        js[.yesterday_eo] = self.yesterday.eo
-        js[.yesterday_fl] = self.yesterday.fl
-        js[.yesterday_fe] = self.yesterday.fe
-        js[.yesterday_fx] = self.yesterday.fx
-        js[.yesterday_px] = self.yesterday.px
-        js[.yesterday_pa] = self.yesterday.pa
-
-        js[.today_vi] = self.today.vi
-        js[.today_vv] = self.today.vx
-        js[.today_wf] = self.today.wf
-        js[.today_wn] = self.today.wn
-        js[.today_cf] = self.today.cf
-        js[.today_cn] = self.today.cn
-        js[.today_ei] = self.today.ei
-        js[.today_eo] = self.today.eo
-        js[.today_fl] = self.today.fl
-        js[.today_fe] = self.today.fe
-        js[.today_fx] = self.today.fx
-        js[.today_px] = self.today.px
-        js[.today_pa] = self.today.pa
+        js[.y] = self.y
+        js[.z] = self.z
 
         js[.equity] = self.equity
     }
 }
 extension Factory: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
-        let today: Dimensions = .init(
-            vi: try js[.today_vi]?.decode() ?? 0,
-            vx: try js[.today_vv]?.decode() ?? 0,
-            wf: try js[.today_wf]?.decode(),
-            wn: try js[.today_wn]?.decode() ?? 1,
-            cf: try js[.today_cf]?.decode(),
-            cn: try js[.today_cn]?.decode() ?? 1,
-            ei: try js[.today_ei]?.decode() ?? 1,
-            eo: try js[.today_eo]?.decode() ?? 1,
-            fl: try js[.today_fl]?.decode() ?? 0,
-            fe: try js[.today_fe]?.decode() ?? 0,
-            fx: try js[.today_fx]?.decode() ?? 0,
-            px: try js[.today_px]?.decode() ?? 0,
-            pa: try js[.today_pa]?.decode() ?? 1,
-        )
+        let today: Dimensions = try js[.z]?.decode() ?? .init()
         self.init(
             id: try js[.id].decode(),
             tile: try js[.tile].decode(),
@@ -200,22 +124,8 @@ extension Factory: JavaScriptDecodable {
                 e: try js[.inventory_e]?.decode() ?? .init(),
                 x: try js[.inventory_x]?.decode() ?? .init()
             ),
-            yesterday: .init(
-                vi: try js[.yesterday_vi]?.decode() ?? today.vi,
-                vx: try js[.yesterday_vv]?.decode() ?? today.vx,
-                wf: try js[.yesterday_wf]?.decode(),
-                wn: try js[.yesterday_wn]?.decode() ?? today.wn,
-                cf: try js[.yesterday_cf]?.decode(),
-                cn: try js[.yesterday_cn]?.decode() ?? today.cn,
-                ei: try js[.yesterday_ei]?.decode() ?? today.ei,
-                eo: try js[.yesterday_eo]?.decode() ?? today.eo,
-                fl: try js[.yesterday_fl]?.decode() ?? today.fl,
-                fe: try js[.yesterday_fe]?.decode() ?? today.fe,
-                fx: try js[.yesterday_fx]?.decode() ?? today.fx,
-                px: try js[.yesterday_px]?.decode() ?? today.px,
-                pa: try js[.yesterday_pa]?.decode() ?? today.pa
-            ),
-            today: today,
+            y: try js[.y]?.decode() ?? today,
+            z: today,
             equity: try js[.equity]?.decode() ?? [:]
         )
     }

@@ -595,7 +595,7 @@ extension GameContext {
                         } else {
                             $0.cf = probability
                         }
-                    } (&self.factories[modifying: id].state.today)
+                    } (&self.factories[modifying: id].state.z)
 
                 case .mine:
                     break
@@ -677,8 +677,8 @@ extension GameContext {
             let inherited: (cash: Int64, mil: Double, con: Double) = {
                 (
                     $0.state.inventory.account.inherit(fraction: conversion.inherits),
-                    $0.state.today.mil,
-                    $0.state.today.con
+                    $0.state.z.mil,
+                    $0.state.z.con
                 )
             } (&self.pops[modifying: conversion.from])
 
@@ -688,13 +688,13 @@ extension GameContext {
                 self.rules.pops[$0.type]
             } update: {
                 let weight: Fraction.Interpolator<Double> = .init(
-                    conversion.size %/ (conversion.size + $1.today.size)
+                    conversion.size %/ (conversion.size + $1.z.size)
                 )
 
-                $1.today.size += conversion.size
+                $1.z.size += conversion.size
                 $1.inventory.account.d += inherited.cash
-                $1.today.mil = weight.mix(inherited.mil, $1.today.mil)
-                $1.today.con = weight.mix(inherited.con, $1.today.con)
+                $1.z.mil = weight.mix(inherited.mil, $1.z.mil)
+                $1.z.con = weight.mix(inherited.con, $1.z.con)
             }
         }
     }
@@ -734,9 +734,9 @@ extension GameContext {
                     } update: {
                         switch $0.miner {
                         case .Politician:
-                            $1.today.size = $0.initialSize
+                            $1.z.size = $0.initialSize
                         default:
-                            $1.today.size = $0.initialSize
+                            $1.z.size = $0.initialSize
                         }
                     }
                 }

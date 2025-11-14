@@ -117,15 +117,15 @@ extension FactoryContext: TransactingContext {
         }
 
         // Align wages with the national minimum wage.
-        self.state.today.wn = max(self.state.today.wn, country.minwage)
-        self.state.today.cn = max(self.state.today.cn, country.minwage)
+        self.state.z.wn = max(self.state.z.wn, country.minwage)
+        self.state.z.cn = max(self.state.z.cn, country.minwage)
 
         // Input efficiency, set to 1 for now.
-        self.state.today.ei = 1
+        self.state.z.ei = 1
 
         // Reset fill positions, since they are copied from yesterday’s positions by default.
-        self.state.today.wf = nil
-        self.state.today.cf = nil
+        self.state.z.wf = nil
+        self.state.z.cf = nil
 
         let throughput: Int64 = self.workers.map {
             self.productivity * min($0.limit, $0.count + 1)
@@ -134,24 +134,24 @@ extension FactoryContext: TransactingContext {
         self.state.inventory.out.sync(with: self.type.output, releasing: 1 %/ 4)
         self.state.inventory.l.sync(
             with: self.type.inputs,
-            scalingFactor: (throughput, self.state.today.ei),
+            scalingFactor: (throughput, self.state.z.ei),
         )
         self.state.inventory.e.sync(
             with: self.type.office,
-            scalingFactor: (throughput, self.state.today.ei),
+            scalingFactor: (throughput, self.state.z.ei),
         )
         self.state.inventory.x.sync(
             with: self.type.costs,
             scalingFactor: (
                 self.productivity * (self.state.size.level + 1),
-                self.state.today.ei
+                self.state.z.ei
             ),
         )
 
         if  self.equity.sharePrice.n > 0 {
-            self.state.today.px = Double.init(self.equity.sharePrice)
+            self.state.z.px = Double.init(self.equity.sharePrice)
         } else {
-            self.state.today.px = 0
+            self.state.z.px = 0
             self.state.equity = [:]
             self.equity = .init()
         }
@@ -204,7 +204,7 @@ extension FactoryContext: TransactingContext {
                 state: self.state,
                 weights: weights,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
-                d: (30, 60, 365, utilization * self.state.today.pa)
+                d: (30, 60, 365, utilization * self.state.z.pa)
             )
 
             let sharesTarget: Int64 = self.state.size.level * self.type.sharesPerLevel
@@ -251,7 +251,7 @@ extension FactoryContext: TransactingContext {
 
         switch budget {
         case .constructing(let budget):
-            self.state.today.pa = 1
+            self.state.z.pa = 1
             self.construct(
                 policy: country,
                 budget: budget.l,
@@ -262,7 +262,7 @@ extension FactoryContext: TransactingContext {
         case .liquidating(let budget):
             self.liquidate(policy: country, budget: budget, turn: &turn)
 
-            self.state.today.pa = 0
+            self.state.z.pa = 0
             self.state.inventory.account.e -= turn.bank.buyback(
                 random: &turn.random,
                 equity: &self.state.equity,
@@ -280,10 +280,10 @@ extension FactoryContext: TransactingContext {
                     budget: budget.clerks,
                     turn: &turn
                 ) {
-                self.state.today.eo = 1 + bonus
-                self.state.today.cn = max(
+                self.state.z.eo = 1 + bonus
+                self.state.z.cn = max(
                     country.minwage,
-                    self.state.today.cn + clerks.wagesChange
+                    self.state.z.cn + clerks.wagesChange
                 )
                 self.state.inventory.account.c -= clerks.wagesPaid
 
@@ -299,7 +299,7 @@ extension FactoryContext: TransactingContext {
                     turn.jobs.hire.remote[self.state.tile.planet, type].append(block)
                 }
             } else {
-                self.state.today.eo = 1
+                self.state.z.eo = 1
             }
 
             let operatingProfit: Int64
@@ -353,11 +353,11 @@ extension FactoryContext: TransactingContext {
             )
 
             if  self.state.size.level == 0 {
-                self.state.today.pa = 1
+                self.state.z.pa = 1
             } else if operatingProfit > 0 {
-                self.state.today.pa = min(1, self.state.today.pa + 0.01)
+                self.state.z.pa = min(1, self.state.z.pa + 0.01)
             } else {
-                self.state.today.pa = max(0, self.state.today.pa - 0.01)
+                self.state.z.pa = max(0, self.state.z.pa - 0.01)
             }
         }
     }
@@ -370,12 +370,12 @@ extension FactoryContext: TransactingContext {
 
         if  self.workers?.count ?? 0 == 0,
             self.clerks?.count ?? 0 == 0,
-            self.state.yesterday.pa <= 0,
-            self.state.today.pa <= 0 {
+            self.state.y.pa <= 0,
+            self.state.z.pa <= 0 {
             self.state.liquidation = .init(started: turn.date, burning: self.equity.shareCount)
         } else {
             self.state.equity.split(
-                price: self.state.today.px,
+                price: self.state.z.px,
                 turn: &turn,
                 notifying: [country.id]
             )
@@ -409,12 +409,12 @@ extension FactoryContext {
             self.state.size.grow()
             self.state.inventory.x.consume(
                 from: self.type.costs,
-                scalingFactor: (growthFactor, self.state.today.ei)
+                scalingFactor: (growthFactor, self.state.z.ei)
             )
         }
 
-        self.state.today.fx = self.state.inventory.x.fulfilled
-        self.state.today.vx = self.state.inventory.x.valueAcquired
+        self.state.z.fx = self.state.inventory.x.fulfilled
+        self.state.z.vx = self.state.inventory.x.valueAcquired
     }
 
     private mutating func liquidate(
@@ -450,8 +450,8 @@ extension FactoryContext {
         self.state.inventory.account.r += te.gain
         self.state.inventory.account.r += tx.gain
 
-        self.state.today.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
-        self.state.today.vx = self.state.inventory.x.valueAcquired
+        self.state.z.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
+        self.state.z.vx = self.state.inventory.x.valueAcquired
     }
 
     private mutating func operate(
@@ -489,7 +489,7 @@ extension FactoryContext {
             turn: &turn
         )
 
-        self.state.today.wn = max(policy.minwage, self.state.today.wn + update.wagesChange)
+        self.state.z.wn = max(policy.minwage, self.state.z.wn + update.wagesChange)
         self.state.inventory.account.w -= update.wagesPaid
 
         /// On some days, the factory purchases more inputs than others. To get a more accurate
@@ -499,11 +499,11 @@ extension FactoryContext {
         let throughput: Int64 = self.productivity * hours
         self.state.inventory.l.consume(
             from: self.type.inputs,
-            scalingFactor: (throughput, self.state.today.ei)
+            scalingFactor: (throughput, self.state.z.ei)
         )
         self.state.inventory.e.consume(
             from: self.type.office,
-            scalingFactor: (throughput, self.state.today.ei)
+            scalingFactor: (throughput, self.state.z.ei)
         )
 
         self.state.inventory.account.r += self.state.inventory.out.sell(
@@ -512,7 +512,7 @@ extension FactoryContext {
         )
         self.state.inventory.out.deposit(
             from: self.type.output,
-            scalingFactor: (throughput, self.state.today.eo)
+            scalingFactor: (throughput, self.state.z.eo)
         )
 
         #assert(
@@ -520,9 +520,9 @@ extension FactoryContext {
             "Factory has negative cash! (\(self.state.inventory.account))"
         )
 
-        self.state.today.fl = self.state.inventory.l.fulfilled
-        self.state.today.fe = self.state.inventory.e.fulfilled
-        self.state.today.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
+        self.state.z.fl = self.state.inventory.l.fulfilled
+        self.state.z.fe = self.state.inventory.e.fulfilled
+        self.state.z.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
 
         return update.headcount
     }
@@ -560,11 +560,11 @@ extension FactoryContext {
 
         let clerksOptimal: Int64 = self.workers.map { clerkTeam.optimal(for: $0.count) } ?? 0
 
-        let wagesOwed: Int64 = clerks.count * self.state.today.cn
+        let wagesOwed: Int64 = clerks.count * self.state.z.cn
         let wagesPaid: Int64 = turn.bank.pay(
             salariesBudget: budget,
             salaries: [
-                turn.payscale(shuffling: clerks.pops, rate: self.state.today.cn),
+                turn.payscale(shuffling: clerks.pops, rate: self.state.z.cn),
             ]
         )
 
@@ -587,12 +587,12 @@ extension FactoryContext {
             headcount = .fire(clerkTeam.type, layoff)
             wagesChange = 0
         } else {
-            let clerksAffordable: Int64 = (budget - wagesPaid) / self.state.today.cn
+            let clerksAffordable: Int64 = (budget - wagesPaid) / self.state.z.cn
             let clerksNeeded: Int64 = clerksOptimal - clerks.count
             let clerksToHire: Int64 = min(clerksNeeded, clerksAffordable)
 
             if  clerks.count < clerksNeeded,
-                let p: Int = self.state.yesterday.cf,
+                let p: Int = self.state.y.cf,
                 turn.random.roll(Int64.init(p), Int64.init(Self.pr)) {
                 // Was last in line to hire clerks yesterday, did not hire any clerks, and has
                 // fewer than half of the target number of clerks today.
@@ -603,7 +603,7 @@ extension FactoryContext {
 
             let bid: PopJobOfferBlock = .init(
                 job: .factory(self.state.id),
-                bid: self.state.today.cn,
+                bid: self.state.z.cn,
                 size: .random(
                     in: 0 ... max(1, clerksToHire / 20),
                     using: &turn.random.generator
@@ -648,11 +648,11 @@ extension FactoryContext {
 
         let hours: Int64 = min(
             min(workers.count, hoursWorkable),
-            budget / self.state.today.wn
+            budget / self.state.z.wn
         )
         let wagesPaid: Int64 = hours <= 0 ? 0 : turn.bank.pay(
-            wagesBudget: hours * self.state.today.wn,
-            wages: turn.payscale(shuffling: workers.pops, rate: self.state.today.wn)
+            wagesBudget: hours * self.state.z.wn,
+            wages: turn.payscale(shuffling: workers.pops, rate: self.state.z.wn)
         )
 
         let headcount: WorkforceChanges?
@@ -671,11 +671,11 @@ extension FactoryContext {
         } else {
             let unspent: Int64 = budget - wagesPaid
             let open: Int64 = workers.limit - workers.count
-            let hire: Int64 = min(open, unspent / self.state.today.wn)
+            let hire: Int64 = min(open, unspent / self.state.z.wn)
 
             if  hire > 0 {
                 if  workers.count < hire,
-                    let p: Int = self.state.yesterday.wf,
+                    let p: Int = self.state.y.wf,
                     turn.random.roll(Int64.init(p), Int64.init(Self.pr)) {
                     // Was last in line to hire workers yesterday, did not hire any workers, and has
                     // far more inputs stockpiled than workers to process them.
@@ -686,7 +686,7 @@ extension FactoryContext {
 
                 let bid: PopJobOfferBlock = .init(
                     job: .factory(self.state.id),
-                    bid: self.state.today.wn,
+                    bid: self.state.z.wn,
                     size: .random(
                         in: 0 ... max(1, hire / 10),
                         using: &turn.random.generator
@@ -716,7 +716,7 @@ extension FactoryContext {
 extension FactoryContext {
     func explainProduction(_ ul: inout TooltipInstructionEncoder, base: Int64) {
         let productivity: Double = Double.init(self.productivity)
-        let efficiency: Double = self.state.today.eo
+        let efficiency: Double = self.state.z.eo
         ul["Production per worker"] = (productivity * efficiency * Double.init(base))[..3]
         ul[>] {
             $0["Base"] = base[/3]
