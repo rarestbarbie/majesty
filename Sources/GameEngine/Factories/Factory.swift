@@ -124,7 +124,7 @@ extension Factory: JavaScriptDecodable {
                 e: try js[.inventory_e]?.decode() ?? .init(),
                 x: try js[.inventory_x]?.decode() ?? .init()
             ),
-            y: try js[.y]?.decode() ?? .init(),
+            y: try js[.y]?.decode() ?? today,
             z: today,
             equity: try js[.equity]?.decode() ?? [:]
         )
