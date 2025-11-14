@@ -1,11 +1,36 @@
-@dynamicMemberLookup
-@frozen public struct TurnDelta<Dimensions> {
-    @usableFromInline let yesterday: Dimensions
-    @usableFromInline let today: Dimensions
+import GameUI
+import D
+
+@dynamicMemberLookup struct TurnDelta<Dimensions> {
+    private let y: Dimensions
+    private let z: Dimensions
+
+    init(y: Dimensions, z: Dimensions) {
+        self.y = y
+        self.z = z
+    }
+}
+extension TurnDelta where Dimensions: AdditiveArithmetic {
+    var value: Dimensions { self.z - self.y }
+}
+extension TurnDelta where Dimensions: AdditiveArithmetic & DecimalFormattable {
+    subscript<Format>(format: Format) -> TooltipInstruction.Ticker
+        where Format: DecimalFormat {
+        self.z[format] <- self.y
+    }
+    subscript<Format>(
+        format: (Decimal.NaturalPrecision<Format>) -> ()
+    ) -> TooltipInstruction.Ticker where Format: DecimalFormat {
+        self.z[format] <- self.y
+    }
+}
+extension TurnDelta where Dimensions: BinaryInteger {
+    subscript(format: BigIntFormat) -> TooltipInstruction.Ticker {
+        self.z[format] <- self.y
+    }
 }
 extension TurnDelta {
-    @inlinable public subscript<T>(dynamicMember keyPath: KeyPath<Dimensions, T>) -> T
-        where T: AdditiveArithmetic {
-        self.today[keyPath: keyPath] - self.yesterday[keyPath: keyPath]
+    subscript<T>(dynamicMember keyPath: KeyPath<Dimensions, T>) -> TurnDelta<T> {
+        .init(y: self.y[keyPath: keyPath], z: self.z[keyPath: keyPath])
     }
 }

@@ -1,4 +1,6 @@
 import GameEconomy
+import JavaScriptKit
+import JavaScriptInterop
 
 extension Factory {
     struct Dimensions: LegalEntityMetrics {
@@ -48,6 +50,59 @@ extension Factory.Dimensions {
             fx: 0,
             px: 1,
             pa: 1
+        )
+    }
+}
+extension Factory.Dimensions {
+    enum ObjectKey: JSString, Sendable {
+        case vi = "vi"
+        case vx = "vx"
+        case wf = "wf"
+        case wn = "wn"
+        case cf = "cf"
+        case cn = "cn"
+        case ei = "ei"
+        case eo = "eo"
+        case fl = "fl"
+        case fe = "fe"
+        case fx = "fx"
+        case px = "px"
+        case pa = "pa"
+    }
+}
+extension Factory.Dimensions: JavaScriptEncodable {
+    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+        js[.vi] = self.vi
+        js[.vx] = self.vx
+        js[.wf] = self.wf
+        js[.wn] = self.wn
+        js[.cf] = self.cf
+        js[.cn] = self.cn
+        js[.ei] = self.ei
+        js[.eo] = self.eo
+        js[.fl] = self.fl
+        js[.fe] = self.fe
+        js[.fx] = self.fx
+        js[.px] = self.px
+        js[.pa] = self.pa
+    }
+}
+extension Factory.Dimensions: JavaScriptDecodable {
+    init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+        self.init(
+            vi: try js[.vi]?.decode() ?? 0,
+            vx: try js[.vx]?.decode() ?? 0,
+            wf: try js[.wf]?.decode(),
+            wn: try js[.wn]?.decode() ?? 1,
+            cf: try js[.cf]?.decode(),
+            cn: try js[.cn]?.decode() ?? 1,
+            ei: try js[.ei]?.decode() ?? 1,
+            eo: try js[.eo]?.decode() ?? 1,
+            fl: try js[.fl]?.decode() ?? 0,
+            fe: try js[.fe]?.decode() ?? 0,
+            fx: try js[.fx]?.decode() ?? 0,
+            px: try js[.px]?.decode() ?? 0,
+            pa: try js[.pa]?.decode() ?? 1,
         )
     }
 }

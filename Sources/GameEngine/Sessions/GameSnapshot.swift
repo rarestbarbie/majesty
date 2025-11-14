@@ -36,8 +36,8 @@ extension GameSnapshot {
         }
 
         let account: Bank.Account = factory.inventory.account
-        let y: Factory.Dimensions = factory.yesterday
-        let t: Factory.Dimensions = factory.today
+        let y: Factory.Dimensions = factory.y
+        let t: Factory.Dimensions = factory.z
 
         let liquid: (y: Int64, t: Int64) = (account.liq, account.balance)
         let assets: (y: Int64, t: Int64) = (y.vi + y.vx, t.vi + t.vx)
@@ -61,14 +61,14 @@ extension GameSnapshot {
 
             $0["Illiquid assets", +] = assets.t[/3] <- assets.y
             $0[>] {
-                $0["Stockpiled inputs", +] = t.vi[/3] <- y.vi
-                $0["Stockpiled equipment", +] = t.vx[/3] <- y.vx
+                $0["Stockpiled inputs", +] = factory.Δ.vi[/3]
+                $0["Stockpiled equipment", +] = factory.Δ.vx[/3]
             }
 
             $0["Liquid assets", +] = liquid.t[/3] <- liquid.y
             $0[>] {
                 $0["Market spending", +] = +account.b[/3]
-                $0["Market spending (amortized)", +] = +?(account.b + factory.Δ.vi)[/3]
+                $0["Market spending (amortized)", +] = +?(account.b + factory.Δ.vi.value)[/3]
                 $0["Market earnings", +] = +?account.r[/3]
                 $0["Subsidies", +] = +?account.s[/3]
                 $0["Salaries", +] = +?account.c[/3]
@@ -357,7 +357,7 @@ extension GameSnapshot {
 
         let account: Bank.Account = pop.inventory.account
         let liquid: (y: Int64, t: Int64) = (account.liq, account.balance)
-        let assets: (y: Int64, t: Int64) = (pop.yesterday.vi, pop.today.vi)
+        let assets: (y: Int64, t: Int64) = (pop.y.vi, pop.z.vi)
         let value: (y: Int64, t: Int64) = (liquid.y + assets.y, liquid.t + assets.t)
 
         return .instructions {
@@ -415,8 +415,8 @@ extension GameSnapshot {
                 self.context.mines[$0]?.type.name ?? "Unknown"
             }
         } else {
-            let employment: Int64 = pop.state.today.size > 0 ? .init(
-                (pop.unemployment * Double.init(pop.state.today.size)).rounded()
+            let employment: Int64 = pop.state.z.size > 0 ? .init(
+                (pop.unemployment * Double.init(pop.state.z.size)).rounded()
             ) : 0
             return .instructions {
                 $0["Total employment"] = employment[/3]
@@ -476,11 +476,11 @@ extension GameSnapshot {
         return .instructions {
             switch tier {
             case .l:
-                $0["Life needs fulfilled"] = pop.today.fl[%3]
+                $0["Life needs fulfilled"] = pop.z.fl[%3]
             case .e:
-                $0["Everyday needs fulfilled"] = pop.today.fe[%3]
+                $0["Everyday needs fulfilled"] = pop.z.fe[%3]
             case .x:
-                $0["Luxury needs fulfilled"] = pop.today.fx[%3]
+                $0["Luxury needs fulfilled"] = pop.z.fx[%3]
             }
         }
     }
@@ -568,7 +568,7 @@ extension GameSnapshot {
                     $0["Quit", -] = +?mine.miners.quit[/3]
                 }
                 if mine.type.decay {
-                    $0["Estimated deposits"] = mine.state.today.size[/3] <- mine.state.yesterday.size
+                    $0["Estimated deposits"] = mine.state.Δ.size[/3]
                 }
 
                 $0[>] = "\(mine.type.name)"
@@ -641,10 +641,10 @@ extension GameSnapshot {
         let demotion: ConditionBreakdown = pop.buildDemotionMatrix(country: country)
 
         let promotions: Int64 = promotion.output > 0
-            ? .init(Double.init(pop.state.today.size) * promotion.output * 30)
+            ? .init(Double.init(pop.state.z.size) * promotion.output * 30)
             : 0
         let demotions: Int64 = demotion.output > 0
-            ? .init(Double.init(pop.state.today.size) * demotion.output * 30)
+            ? .init(Double.init(pop.state.z.size) * demotion.output * 30)
             : 0
 
         return .conditions(

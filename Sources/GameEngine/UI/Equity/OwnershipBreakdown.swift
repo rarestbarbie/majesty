@@ -54,8 +54,8 @@ extension OwnershipBreakdown {
                 ^^ asset.state.equity.issued
 
             $0[.shares, (-), tooltip: Tab.tooltipShares] = shares
-            $0[.stockPrice, (+)] = asset.state.today.px[..3] <- asset.state.yesterday.px
-            $0[.stockAttraction, (+)] = asset.state.today.pa[%1] <- asset.state.yesterday.pa
+            $0[.stockPrice, (+)] = asset.state.Δ.px[..3]
+            $0[.stockAttraction, (+)] = asset.state.Δ.pa[%1]
         }
 
         self.equity = equity

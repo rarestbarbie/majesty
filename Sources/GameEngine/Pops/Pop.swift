@@ -17,8 +17,8 @@ struct Pop: LegalEntityState, IdentityReplaceable {
     let nat: String
 
     var inventory: Inventory
-    var yesterday: Dimensions
-    var today: Dimensions
+    var y: Dimensions
+    var z: Dimensions
 
     var equity: Equity<LEI>
 
@@ -33,8 +33,8 @@ extension Pop: Sectionable {
             type: section.type,
             nat: section.culture,
             inventory: .init(),
-            yesterday: .init(),
-            today: .init(),
+            y: .init(),
+            z: .init(),
             equity: [:],
             factories: [:],
             mines: [:]
@@ -47,7 +47,7 @@ extension Pop: Sectionable {
 }
 extension Pop: Deletable {
     var dead: Bool {
-        if  self.today.size == 0,
+        if  self.z.size == 0,
             self.inventory.account.balance == 0,
             self.equity.shares.values.allSatisfy({ $0.shares <= 0 }) {
             true
@@ -90,7 +90,7 @@ extension Pop {
             return
         }
 
-        let count: Int64 = Binomial[self.today.size, rate].sample(
+        let count: Int64 = Binomial[self.z.size, rate].sample(
             using: &turn.random.generator
         )
 
@@ -114,8 +114,8 @@ extension Pop {
             )
 
             let inherits: Fraction
-            if  size < self.today.size {
-                let fraction: Fraction = size %/ self.today.size
+            if  size < self.z.size {
+                let fraction: Fraction = size %/ self.z.size
                 inherits = inherit.map { $0 * fraction } ?? fraction
             } else {
                 inherits = 1
@@ -125,12 +125,12 @@ extension Pop {
                 .init(from: self.id, size: size, to: section, inherits: inherits)
             )
             // we must deduct this now, because we might have multiple calls to `egress`
-            self.today.size -= size
+            self.z.size -= size
         }
 
         #assert(
-            self.today.size >= 0,
-            "Pop (id = \(self.id)) has negative size (\(self.today.size))!"
+            self.z.size >= 0,
+            "Pop (id = \(self.id)) has negative size (\(self.z.size))!"
         )
     }
 }
@@ -138,13 +138,13 @@ extension Pop {
     /// It is better to compute this dynamically, as the pop count itself can change, and that
     /// might invalidate cached values for unemployment!
     var unemployed: Int64 {
-        self.today.size
+        self.z.size
             - self.factories.values.reduce(0) { $0 + $1.count }
             - self.mines.values.reduce(0) { $0 + $1.count }
     }
 
     var decadence: Double {
-        0.1 * self.yesterday.con
+        0.1 * self.y.con
     }
 
     var needsPerCapita: (l: Double, e: Double, x: Double) {
@@ -169,25 +169,8 @@ extension Pop {
         case inventory_e = "ne"
         case inventory_x = "nx"
 
-        case yesterday_size = "y_size"
-        case yesterday_mil = "y_mil"
-        case yesterday_con = "y_con"
-        case yesterday_fl = "y_fl"
-        case yesterday_fe = "y_fe"
-        case yesterday_fx = "y_fx"
-        case yesterday_px = "y_px"
-        case yesterday_pa = "y_pa"
-        case yesterday_vi = "y_vi"
-
-        case today_size = "t_size"
-        case today_mil = "t_mil"
-        case today_con = "t_con"
-        case today_fl = "t_fl"
-        case today_fe = "t_fe"
-        case today_fx = "t_fx"
-        case today_px = "t_px"
-        case today_pa = "t_pa"
-        case today_vi = "t_vi"
+        case y
+        case z
 
         case equity
         case factories
@@ -206,25 +189,8 @@ extension Pop: JavaScriptEncodable {
         js[.inventory_x] = self.inventory.x
         js[.inventory_out] = self.inventory.out
 
-        js[.yesterday_size] = self.yesterday.size
-        js[.yesterday_mil] = self.yesterday.mil
-        js[.yesterday_con] = self.yesterday.con
-        js[.yesterday_fl] = self.yesterday.fl
-        js[.yesterday_fe] = self.yesterday.fe
-        js[.yesterday_fx] = self.yesterday.fx
-        js[.yesterday_px] = self.yesterday.px
-        js[.yesterday_pa] = self.yesterday.pa
-        js[.yesterday_vi] = self.yesterday.vi
-
-        js[.today_size] = self.today.size
-        js[.today_mil] = self.today.mil
-        js[.today_con] = self.today.con
-        js[.today_fl] = self.today.fl
-        js[.today_fe] = self.today.fe
-        js[.today_fx] = self.today.fx
-        js[.today_px] = self.today.px
-        js[.today_pa] = self.today.pa
-        js[.today_vi] = self.today.vi
+        js[.y] = self.y
+        js[.z] = self.z
 
         js[.equity] = self.equity
         js[.factories] = self.factories.isEmpty ? nil : self.factories
@@ -233,17 +199,7 @@ extension Pop: JavaScriptEncodable {
 }
 extension Pop: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
-        let today: Dimensions = .init(
-            size: try js[.today_size].decode(),
-            mil: try js[.today_mil]?.decode() ?? 0,
-            con: try js[.today_con]?.decode() ?? 0,
-            fl: try js[.today_fl]?.decode() ?? 0,
-            fe: try js[.today_fe]?.decode() ?? 0,
-            fx: try js[.today_fx]?.decode() ?? 0,
-            px: try js[.today_px]?.decode() ?? 1,
-            pa: try js[.today_pa]?.decode() ?? 0.5,
-            vi: try js[.today_vi]?.decode() ?? 0
-        )
+        let today: Dimensions = try js[.z]?.decode() ?? .init()
         self.init(
             id: try js[.id]?.decode() ?? 0,
             tile: try js[.tile].decode(),
@@ -256,18 +212,8 @@ extension Pop: JavaScriptDecodable {
                 e: try js[.inventory_e]?.decode() ?? .init(),
                 x: try js[.inventory_x]?.decode() ?? .init()
             ),
-            yesterday: .init(
-                size: try js[.yesterday_size]?.decode() ?? today.size,
-                mil: try js[.yesterday_mil]?.decode() ?? today.mil,
-                con: try js[.yesterday_con]?.decode() ?? today.con,
-                fl: try js[.yesterday_fl]?.decode() ?? today.fl,
-                fe: try js[.yesterday_fe]?.decode() ?? today.fe,
-                fx: try js[.yesterday_fx]?.decode() ?? today.fx,
-                px: try js[.yesterday_px]?.decode() ?? today.px,
-                pa: try js[.yesterday_pa]?.decode() ?? today.pa,
-                vi: try js[.yesterday_vi]?.decode() ?? today.vi,
-            ),
-            today: today,
+            y: try js[.y]?.decode() ?? today,
+            z: today,
             equity: try js[.equity]?.decode() ?? [:],
             factories: try js[.factories]?.decode() ?? [:],
             mines: try js[.mines]?.decode() ?? [:]

@@ -72,8 +72,8 @@ extension ProductionReport: PersistentReport {
                 type: $0.type.name,
                 size: $0.state.size,
                 liquidationProgress: liquidationProgress,
-                yesterday: $0.state.yesterday,
-                today: $0.state.today,
+                yesterday: $0.state.y,
+                today: $0.state.z,
                 workers: $0.workers.map(FactoryWorkers.init(aggregate:)),
                 clerks: $0.clerks.map(FactoryWorkers.init(aggregate:))
             )

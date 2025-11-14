@@ -8,7 +8,7 @@ protocol LegalEntityState<Dimensions>: Turnable, Identifiable
 }
 extension LegalEntityState {
     var grossProfit: Int64 {
-        self.Δ.vi + // Change in stockpiled inputs
+        self.Δ.vi.value + // Change in stockpiled inputs
         self.inventory.account.b + // Spending on inputs
         self.inventory.account.w + // Spending on wages
         self.inventory.account.r // Revenue

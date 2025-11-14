@@ -43,9 +43,9 @@ extension InventoryBreakdown {
         }
 
         self.tiers = [
-            .init(id: .l, label: "Subsistence", value: pop.state.today.fl),
-            .init(id: .e, label: "Everyday", value: pop.state.today.fe),
-            .init(id: .x, label: "Luxury", value: pop.state.today.fx),
+            .init(id: .l, label: "Subsistence", value: pop.state.z.fl),
+            .init(id: .e, label: "Everyday", value: pop.state.z.fe),
+            .init(id: .x, label: "Luxury", value: pop.state.z.fx),
         ]
 
         let inputs: ResourceInputs
@@ -100,9 +100,9 @@ extension InventoryBreakdown {
         }
 
         self.tiers = [
-            .init(id: .l, label: "Materials", value: factory.state.today.fl),
-            .init(id: .e, label: "Corporate", value: factory.state.today.fe),
-            .init(id: .x, label: "Expansion", value: factory.state.today.fx),
+            .init(id: .l, label: "Materials", value: factory.state.z.fl),
+            .init(id: .e, label: "Corporate", value: factory.state.z.fe),
+            .init(id: .x, label: "Expansion", value: factory.state.z.fx),
         ]
 
         let inputs: ResourceInputs

@@ -34,9 +34,9 @@ extension MineContext {
 extension MineContext {
     mutating func compute(world _: borrowing GameWorld, context: ComputationPass) throws {
         if  self.type.decay {
-            self.miners.limit = self.state.today.size / 10_000
+            self.miners.limit = self.state.z.size / 10_000
         } else {
-            self.miners.limit = self.state.today.size
+            self.miners.limit = self.state.z.size
         }
 
         self.region = context.planets[self.state.tile]?.properties
@@ -69,7 +69,7 @@ extension MineContext {
         }
 
         if  self.type.decay {
-            self.state.today.size = max(0, self.state.today.size - self.miners.count)
+            self.state.z.size = max(0, self.state.z.size - self.miners.count)
         }
 
         if case .Politician = self.type.miner {
