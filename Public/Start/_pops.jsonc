@@ -4,13 +4,17 @@
         "on": "399N-2,1",
         "nat": "Alaskan",
         "type": "D",
-        "t_size": 1100000
+        "z": {
+            "size": 1100000
+        }
     },
     {
         "on": "399N-2,1",
         "nat": "Alaskan",
         "type": "O",
-        "t_size": 510,
+        "z": {
+            "size": 510
+        },
         "cash": {
             "liq": 200000000
         }
@@ -19,7 +23,9 @@
         "on": "399N-2,1",
         "nat": "Atlantean",
         "type": "O",
-        "t_size": 52,
+        "z": {
+            "size": 52
+        },
         "cash": {
             "liq": 50000000
         }
@@ -28,13 +34,17 @@
         "on": "399N-2,1",
         "nat": "Atlantean",
         "type": "D",
-        "t_size": 650000
+        "z": {
+            "size": 650000
+        }
     },
     {
         "on": "399N-2,1",
         "type": "D",
         "nat": "Black American",
-        "t_size": 1500
+        "z": {
+            "size": 1500
+        }
     },
 
     // Pacific Northwest
@@ -42,7 +52,9 @@
         "on": "399N-2,2",
         "type": "O",
         "nat": "Atlantean",
-        "t_size": 9200,
+        "z": {
+            "size": 9200
+        },
         "cash": {
             "liq": 10000000000
         }
@@ -51,19 +63,25 @@
         "on": "399N-2,2",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 14000000
+        "z": {
+            "size": 14000000
+        }
     },
     {
         "on": "399N-2,2",
         "type": "D",
         "nat": "Mexican",
-        "t_size": 310000
+        "z": {
+            "size": 310000
+        }
     },
     {
         "on": "399N-2,2",
         "type": "D",
         "nat": "Black American",
-        "t_size": 2300
+        "z": {
+            "size": 2300
+        }
     },
 
     // California
@@ -71,7 +89,9 @@
         "on": "399N-2,3",
         "type": "O",
         "nat": "Atlantean",
-        "t_size": 1100,
+        "z": {
+            "size": 1100
+        },
         "cash": {
             "liq": 40000000000
         }
@@ -80,19 +100,25 @@
         "on": "399N-2,3",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 21000000
+        "z": {
+            "size": 21000000
+        }
     },
     {
         "on": "399N-2,3",
         "type": "D",
         "nat": "Mexican",
-        "t_size": 8100000
+        "z": {
+            "size": 8100000
+        }
     },
     {
         "on": "399N-2,3",
         "type": "D",
         "nat": "Black American",
-        "t_size": 2500000
+        "z": {
+            "size": 2500000
+        }
     },
 
     // American Midwest
@@ -100,7 +126,9 @@
         "on": "399N-1,2",
         "type": "O",
         "nat": "Atlantean",
-        "t_size": 5400,
+        "z": {
+            "size": 5400
+        },
         "cash": {
             "liq": 5000000000
         }
@@ -109,25 +137,33 @@
         "on": "399N-1,2",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 12000000
+        "z": {
+            "size": 12000000
+        }
     },
     {
         "on": "399N-1,2",
         "type": "D",
         "nat": "Mexican",
-        "t_size": 2100000
+        "z": {
+            "size": 2100000
+        }
     },
     {
         "on": "399N-1,2",
         "type": "D",
         "nat": "Black American",
-        "t_size": 2400000
+        "z": {
+            "size": 2400000
+        }
     },
     {
         "on": "399N-1,2",
         "type": "A",
         "nat": "Cow",
-        "t_size": 3600000
+        "z": {
+            "size": 3600000
+        }
     },
 
     // American East Coast
@@ -135,7 +171,9 @@
         "on": "399N0,2",
         "type": "O",
         "nat": "Atlantean",
-        "t_size": 6100,
+        "z": {
+            "size": 6100
+        },
         "cash": {
             "liq": 6000000000
         }
@@ -144,7 +182,9 @@
         "on": "399N0,2",
         "type": "O",
         "nat": "Black American",
-        "t_size": 24,
+        "z": {
+            "size": 24
+        },
         "cash": {
             "liq": 10000000
         }
@@ -153,19 +193,25 @@
         "on": "399N0,2",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 16100000
+        "z": {
+            "size": 16100000
+        }
     },
     {
         "on": "399N0,2",
         "type": "D",
         "nat": "Mexican",
-        "t_size": 200000
+        "z": {
+            "size": 200000
+        }
     },
     {
         "on": "399N0,2",
         "type": "D",
         "nat": "Black American",
-        "t_size": 5500000
+        "z": {
+            "size": 5500000
+        }
     },
 
     // Canada
@@ -173,7 +219,9 @@
         "on": "399N0,1",
         "type": "O",
         "nat": "Atlantean",
-        "t_size": 6500,
+        "z": {
+            "size": 6500
+        },
         "cash": {
             "liq": 6000000000
         }
@@ -182,13 +230,17 @@
         "on": "399N0,1",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 4300000
+        "z": {
+            "size": 4300000
+        }
     },
     {
         "on": "399N0,1",
         "type": "O",
         "nat": "Black American",
-        "t_size": 17,
+        "z": {
+            "size": 17
+        },
         "cash": {
             "liq": 10000000
         }
@@ -197,13 +249,17 @@
         "on": "399N0,1",
         "type": "D",
         "nat": "Black American",
-        "t_size": 160000
+        "z": {
+            "size": 160000
+        }
     },
     {
         "on": "399N0,1",
         "type": "D",
         "nat": "Inuit",
-        "t_size": 330000
+        "z": {
+            "size": 330000
+        }
     },
 
     // Greenland
@@ -211,13 +267,17 @@
         "on": "399N1,1",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 6500
+        "z": {
+            "size": 6500
+        }
     },
     {
         "on": "399N1,1",
         "type": "D",
         "nat": "Inuit",
-        "t_size": 91000
+        "z": {
+            "size": 91000
+        }
     },
 
     // Mexico
@@ -225,7 +285,9 @@
         "on": "399N-2,4",
         "type": "O",
         "nat": "Mexican",
-        "t_size": 110,
+        "z": {
+            "size": 110
+        },
         "cash": {
             "liq": 4000000000
         }
@@ -234,19 +296,25 @@
         "on": "399N-2,4",
         "type": "D",
         "nat": "Mexican",
-        "t_size": 3100000
+        "z": {
+            "size": 3100000
+        }
     },
     {
         "on": "399N-2,4",
         "type": "D",
         "nat": "Hispanic",
-        "t_size": 910000
+        "z": {
+            "size": 910000
+        }
     },
     {
         "on": "399N-2,4",
         "type": "A",
         "nat": "Cow",
-        "t_size": 5500000
+        "z": {
+            "size": 5500000
+        }
     },
 
     // Central America
@@ -254,7 +322,9 @@
         "on": "399N-1,4",
         "type": "D",
         "nat": "Hispanic",
-        "t_size": 1020000
+        "z": {
+            "size": 1020000
+        }
     },
 
     // Caribbean Sea
@@ -262,19 +332,25 @@
         "on": "399N0,3",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 1010000
+        "z": {
+            "size": 1010000
+        }
     },
     {
         "on": "399N0,3",
         "type": "D",
         "nat": "Black American",
-        "t_size": 940000
+        "z": {
+            "size": 940000
+        }
     },
     {
         "on": "399N0,3",
         "type": "D",
         "nat": "Hispanic",
-        "t_size": 960000
+        "z": {
+            "size": 960000
+        }
     },
 
     // Panama
@@ -282,7 +358,9 @@
         "on": "399E5",
         "type": "D",
         "nat": "Hispanic",
-        "t_size": 180000
+        "z": {
+            "size": 180000
+        }
     },
 
     // Colombia
@@ -290,7 +368,9 @@
         "on": "399N1,3",
         "type": "D",
         "nat": "Hispanic",
-        "t_size": 2100000
+        "z": {
+            "size": 2100000
+        }
     },
 
     // Peru
@@ -298,13 +378,17 @@
         "on": "399S0,3",
         "type": "D",
         "nat": "Hispanic",
-        "t_size": 1500000
+        "z": {
+            "size": 1500000
+        }
     },
     {
         "on": "399S0,3",
         "type": "D",
         "nat": "Andean",
-        "t_size": 1090000
+        "z": {
+            "size": 1090000
+        }
     },
 
     // Amazon
@@ -312,13 +396,17 @@
         "on": "399S1,3",
         "type": "D",
         "nat": "Brazilian",
-        "t_size": 82000
+        "z": {
+            "size": 82000
+        }
     },
      {
         "on": "399S1,3",
         "type": "D",
         "nat": "Black American",
-        "t_size": 1700
+        "z": {
+            "size": 1700
+        }
     },
 
     // Brazil
@@ -326,7 +414,9 @@
         "on": "399S2,2",
         "type": "O",
         "nat": "Brazilian",
-        "t_size": 105,
+        "z": {
+            "size": 105
+        },
         "cash": {
             "liq": 4000000000
         }
@@ -335,19 +425,25 @@
         "on": "399S2,2",
         "type": "D",
         "nat": "Brazilian",
-        "t_size": 1100000
+        "z": {
+            "size": 1100000
+        }
     },
     {
         "on": "399S2,2",
         "type": "D",
         "nat": "Black American",
-        "t_size": 640000
+        "z": {
+            "size": 640000
+        }
     },
     {
         "on": "399S2,2",
         "type": "A",
         "nat": "Cow",
-        "t_size": 2900000
+        "z": {
+            "size": 2900000
+        }
     },
 
     // Argentina
@@ -355,7 +451,9 @@
         "on": "399S1,2",
         "type": "O",
         "nat": "South American",
-        "t_size": 100,
+        "z": {
+            "size": 100
+        },
         "cash": {
             "liq": 4000000000
         }
@@ -364,13 +462,17 @@
         "on": "399S1,2",
         "type": "D",
         "nat": "South American",
-        "t_size": 1400000
+        "z": {
+            "size": 1400000
+        }
     },
     {
         "on": "399S1,2",
         "type": "A",
         "nat": "Cow",
-        "t_size": 9900000
+        "z": {
+            "size": 9900000
+        }
     },
 
     // Patagonia
@@ -378,19 +480,25 @@
         "on": "399S0,2",
         "type": "D",
         "nat": "South American",
-        "t_size": 640000
+        "z": {
+            "size": 640000
+        }
     },
     {
         "on": "399S0,2",
         "type": "D",
         "nat": "Hispanic",
-        "t_size": 220000
+        "z": {
+            "size": 220000
+        }
     },
     {
         "on": "399S0,2",
         "type": "D",
         "nat": "Andean",
-        "t_size": 760000
+        "z": {
+            "size": 760000
+        }
     },
 
     // West Antarctica
@@ -398,13 +506,17 @@
         "on": "399S0,1",
         "type": "D",
         "nat": "South American",
-        "t_size": 59000
+        "z": {
+            "size": 59000
+        }
     },
     {
         "on": "399S0,1",
         "type": "D",
         "nat": "Hispanic",
-        "t_size": 1990
+        "z": {
+            "size": 1990
+        }
     },
 
     // East Antarctica
@@ -412,13 +524,17 @@
         "on": "399S1,0",
         "type": "D",
         "nat": "South American",
-        "t_size": 4000
+        "z": {
+            "size": 4000
+        }
     },
     {
         "on": "399S1,0",
         "type": "G",
         "nat": "South American",
-        "t_size": 11000
+        "z": {
+            "size": 11000
+        }
     },
 
     // Queen Maud Land
@@ -426,13 +542,17 @@
         "on": "399S1,-1",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 4800
+        "z": {
+            "size": 4800
+        }
     },
     {
         "on": "399S1,-1",
         "type": "G",
         "nat": "Atlantean",
-        "t_size": 13000
+        "z": {
+            "size": 13000
+        }
     },
 
     // Northern Europe
@@ -440,7 +560,9 @@
         "on": "399N2,0",
         "type": "O",
         "nat": "Atlantean",
-        "t_size": 3200,
+        "z": {
+            "size": 3200
+        },
         "cash": {
             "liq": 100000000
         }
@@ -449,43 +571,57 @@
         "on": "399N2,0",
         "type": "G",
         "nat": "Atlantean",
-        "t_size": 7600000
+        "z": {
+            "size": 7600000
+        }
     },
     {
         "on": "399N2,0",
         "type": "D",
         "nat": "Anatolian",
-        "t_size": 1400000
+        "z": {
+            "size": 1400000
+        }
     },
     {
         "on": "399N2,0",
         "type": "D",
         "nat": "West Slavic",
-        "t_size": 1000000
+        "z": {
+            "size": 1000000
+        }
     },
     {
         "on": "399N2,0",
         "type": "D",
         "nat": "Arab",
-        "t_size": 310000
+        "z": {
+            "size": 310000
+        }
     },
     {
         "on": "399N2,0",
         "type": "D",
         "nat": "North African",
-        "t_size": 310000
+        "z": {
+            "size": 310000
+        }
     },
     {
         "on": "399N2,0",
         "type": "D",
         "nat": "West Mediterranean",
-        "t_size": 280000
+        "z": {
+            "size": 280000
+        }
     },
     {
         "on": "399N2,0",
         "type": "D",
         "nat": "West Asian",
-        "t_size": 270000
+        "z": {
+            "size": 270000
+        }
     },
 
     // Southwestern Europe
@@ -493,7 +629,9 @@
         "on": "399N3,0",
         "type": "O",
         "nat": "Atlantean",
-        "t_size": 3000,
+        "z": {
+            "size": 3000
+        },
         "cash": {
             "liq": 70000000
         }
@@ -502,7 +640,9 @@
         "on": "399N3,0",
         "type": "O",
         "nat": "Hispanic",
-        "t_size": 1000,
+        "z": {
+            "size": 1000
+        },
         "cash": {
             "liq": 40000000
         }
@@ -511,43 +651,57 @@
         "on": "399N3,0",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 4900000
+        "z": {
+            "size": 4900000
+        }
     },
     {
         "on": "399N3,0",
         "type": "D",
         "nat": "Hispanic",
-        "t_size": 4700000
+        "z": {
+            "size": 4700000
+        }
     },
     {
         "on": "399N3,0",
         "type": "D",
         "nat": "Anatolian",
-        "t_size": 1200000
+        "z": {
+            "size": 1200000
+        }
     },
     {
         "on": "399N3,0",
         "type": "D",
         "nat": "West Slavic",
-        "t_size": 900000
+        "z": {
+            "size": 900000
+        }
     },
     {
         "on": "399N3,0",
         "type": "D",
         "nat": "Arab",
-        "t_size": 330000
+        "z": {
+            "size": 330000
+        }
     },
     {
         "on": "399N3,0",
         "type": "D",
         "nat": "North African",
-        "t_size": 1650000
+        "z": {
+            "size": 1650000
+        }
     },
     {
         "on": "399N3,0",
         "type": "D",
         "nat": "West Asian",
-        "t_size": 50000
+        "z": {
+            "size": 50000
+        }
     },
 
     // Atlantropa
@@ -555,7 +709,9 @@
         "on": "399N3,-1",
         "type": "O",
         "nat": "Italian",
-        "t_size": 3000,
+        "z": {
+            "size": 3000
+        },
         "cash": {
             "liq": 70000000
         }
@@ -564,7 +720,9 @@
         "on": "399N3,-1",
         "type": "O",
         "nat": "Atlantean",
-        "t_size": 100,
+        "z": {
+            "size": 100
+        },
         "cash": {
             "liq": 4000000
         }
@@ -573,49 +731,65 @@
         "on": "399N3,-1",
         "type": "D",
         "nat": "Italian",
-        "t_size": 4100000
+        "z": {
+            "size": 4100000
+        }
     },
     {
         "on": "399N3,-1",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 490000
+        "z": {
+            "size": 490000
+        }
     },
     {
         "on": "399N3,-1",
         "type": "D",
         "nat": "Hellenic",
-        "t_size": 990000
+        "z": {
+            "size": 990000
+        }
     },
     {
         "on": "399N3,-1",
         "type": "D",
         "nat": "Anatolian",
-        "t_size": 700000
+        "z": {
+            "size": 700000
+        }
     },
     {
         "on": "399N3,-1",
         "type": "D",
         "nat": "West Slavic",
-        "t_size": 800000
+        "z": {
+            "size": 800000
+        }
     },
     {
         "on": "399N3,-1",
         "type": "D",
         "nat": "Arab",
-        "t_size": 310000
+        "z": {
+            "size": 310000
+        }
     },
     {
         "on": "399N3,-1",
         "type": "D",
         "nat": "North African",
-        "t_size": 2050000
+        "z": {
+            "size": 2050000
+        }
     },
     {
         "on": "399N3,-1",
         "type": "D",
         "nat": "West Asian",
-        "t_size": 68000
+        "z": {
+            "size": 68000
+        }
     },
 
     // Eastern Mediterranean
@@ -623,7 +797,9 @@
         "on": "399N3,-2",
         "type": "O",
         "nat": "Hellenic",
-        "t_size": 300,
+        "z": {
+            "size": 300
+        },
         "cash": {
             "liq": 20000000
         }
@@ -632,7 +808,9 @@
         "on": "399N3,-2",
         "type": "O",
         "nat": "Atlantean",
-        "t_size": 100,
+        "z": {
+            "size": 100
+        },
         "cash": {
             "liq": 4000000
         }
@@ -641,49 +819,65 @@
         "on": "399N3,-2",
         "type": "D",
         "nat": "Italian",
-        "t_size": 2100000
+        "z": {
+            "size": 2100000
+        }
     },
     {
         "on": "399N3,-2",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 490000
+        "z": {
+            "size": 490000
+        }
     },
     {
         "on": "399N3,-2",
         "type": "D",
         "nat": "Hellenic",
-        "t_size": 2890000
+        "z": {
+            "size": 2890000
+        }
     },
     {
         "on": "399N3,-2",
         "type": "D",
         "nat": "Anatolian",
-        "t_size": 2700000
+        "z": {
+            "size": 2700000
+        }
     },
     {
         "on": "399N3,-2",
         "type": "D",
         "nat": "West Slavic",
-        "t_size": 1100000
+        "z": {
+            "size": 1100000
+        }
     },
     {
         "on": "399N3,-2",
         "type": "D",
         "nat": "Arab",
-        "t_size": 390000
+        "z": {
+            "size": 390000
+        }
     },
     {
         "on": "399N3,-2",
         "type": "D",
         "nat": "North African",
-        "t_size": 1600000
+        "z": {
+            "size": 1600000
+        }
     },
     {
         "on": "399N3,-2",
         "type": "D",
         "nat": "West Asian",
-        "t_size": 1000
+        "z": {
+            "size": 1000
+        }
     },
 
     // Eastern Europe
@@ -691,7 +885,9 @@
         "on": "399N2,-1",
         "type": "O",
         "nat": "West Slavic",
-        "t_size": 350,
+        "z": {
+            "size": 350
+        },
         "cash": {
             "liq": 20000000
         }
@@ -700,7 +896,9 @@
         "on": "399N2,-1",
         "type": "O",
         "nat": "Atlantean",
-        "t_size": 120,
+        "z": {
+            "size": 120
+        },
         "cash": {
             "liq": 7000000
         }
@@ -709,31 +907,41 @@
         "on": "399N2,-1",
         "type": "D",
         "nat": "West Slavic",
-        "t_size": 2490000
+        "z": {
+            "size": 2490000
+        }
     },
     {
         "on": "399N2,-1",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 1890000
+        "z": {
+            "size": 1890000
+        }
     },
     {
         "on": "399N2,-1",
         "type": "D",
         "nat": "Anatolian",
-        "t_size": 300000
+        "z": {
+            "size": 300000
+        }
     },
     {
         "on": "399N2,-1",
         "type": "D",
         "nat": "Russian",
-        "t_size": 440000
+        "z": {
+            "size": 440000
+        }
     },
     {
         "on": "399N2,-1",
         "type": "D",
         "nat": "Caspian",
-        "t_size": 100000
+        "z": {
+            "size": 100000
+        }
     },
 
     // Holy Land
@@ -741,7 +949,9 @@
         "on": "399N3,-3",
         "type": "O",
         "nat": "Israeli",
-        "t_size": 410,
+        "z": {
+            "size": 410
+        },
         "cash": {
             "liq": 1600000000
         }
@@ -750,7 +960,9 @@
         "on": "399N3,-3",
         "type": "O",
         "nat": "Arab",
-        "t_size": 120,
+        "z": {
+            "size": 120
+        },
         "cash": {
             "liq": 100000000
         }
@@ -759,25 +971,33 @@
         "on": "399N3,-3",
         "type": "G",
         "nat": "Israeli",
-        "t_size": 1750000
+        "z": {
+            "size": 1750000
+        }
     },
     {
         "on": "399N3,-3",
         "type": "D",
         "nat": "Arab",
-        "t_size": 1350000
+        "z": {
+            "size": 1350000
+        }
     },
     {
         "on": "399N3,-3",
         "type": "D",
         "nat": "Anatolian",
-        "t_size": 970000
+        "z": {
+            "size": 970000
+        }
     },
     {
         "on": "399N3,-3",
         "type": "D",
         "nat": "West Mediterranean",
-        "t_size": 1150000
+        "z": {
+            "size": 1150000
+        }
     },
 
     // Persia
@@ -785,19 +1005,25 @@
         "on": "399N2,-3",
         "type": "D",
         "nat": "Iranian",
-        "t_size": 14500000
+        "z": {
+            "size": 14500000
+        }
     },
     {
         "on": "399N2,-3",
         "type": "D",
         "nat": "Caspian",
-        "t_size": 3500000
+        "z": {
+            "size": 3500000
+        }
     },
     {
         "on": "399N2,-3",
         "type": "D",
         "nat": "West Asian",
-        "t_size": 2200000
+        "z": {
+            "size": 2200000
+        }
     },
 
     // Southern China
@@ -805,38 +1031,50 @@
         "on": "399N0,-2",
         "type": "D",
         "nat": "East Asian",
-        "t_size": 52500000
+        "z": {
+            "size": 52500000
+        }
     },
     {
         "on": "399N0,-2",
         "type": "D",
         "nat": "Central Asian",
-        "t_size": 6600000
+        "z": {
+            "size": 6600000
+        }
     },
     {
         "on": "399N0,-2",
         "type": "D",
         "nat": "West Asian",
-        "t_size": 1700000
+        "z": {
+            "size": 1700000
+        }
     },
     // Northern China
     {
         "on": "399N-1,-1",
         "type": "D",
         "nat": "East Asian",
-        "t_size": 44800000
+        "z": {
+            "size": 44800000
+        }
     },
     {
         "on": "399N-1,-1",
         "type": "D",
         "nat": "Central Asian",
-        "t_size": 9800000
+        "z": {
+            "size": 9800000
+        }
     },
     {
         "on": "399N-1,-1",
         "type": "D",
         "nat": "West Asian",
-        "t_size": 1000000
+        "z": {
+            "size": 1000000
+        }
     },
 
     // Western Australia
@@ -844,31 +1082,41 @@
         "on": "399S-1,-2",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 5800000
+        "z": {
+            "size": 5800000
+        }
     },
     {
         "on": "399S-1,-2",
         "type": "D",
         "nat": "East Asian",
-        "t_size": 1500000
+        "z": {
+            "size": 1500000
+        }
     },
     {
         "on": "399S-1,-2",
         "type": "D",
         "nat": "West Oceanian",
-        "t_size": 800000
+        "z": {
+            "size": 800000
+        }
     },
     {
         "on": "399S-1,-2",
         "type": "D",
         "nat": "East Oceanian",
-        "t_size": 250000
+        "z": {
+            "size": 250000
+        }
     },
     {
         "on": "399S-1,-2",
         "type": "D",
         "nat": "Australian",
-        "t_size": 320000
+        "z": {
+            "size": 320000
+        }
     },
 
     // Eastern Australia
@@ -876,237 +1124,40 @@
         "on": "399S-2,-1",
         "type": "D",
         "nat": "Atlantean",
-        "t_size": 7200000
+        "z": {
+            "size": 7200000
+        }
     },
     {
         "on": "399S-2,-1",
         "type": "D",
         "nat": "East Asian",
-        "t_size": 2400000
+        "z": {
+            "size": 2400000
+        }
     },
     {
         "on": "399S-2,-1",
         "type": "D",
         "nat": "West Oceanian",
-        "t_size": 950000
+        "z": {
+            "size": 950000
+        }
     },
     {
         "on": "399S-2,-1",
         "type": "D",
         "nat": "East Oceanian",
-        "t_size": 280000
+        "z": {
+            "size": 280000
+        }
     },
     {
         "on": "399S-2,-1",
         "type": "D",
         "nat": "Australian",
-        "t_size": 152000
+        "z": {
+            "size": 152000
+        }
     }
-
-    // {
-    //     "on": "399N0,2",
-    //     "type": "O",
-    //     "nat": "Lunan",
-    //     "t_size": 765,
-    //     "t_mil": 0.1,
-    //     "t_con": 4.0,
-    //     "cash": {
-    //         "liq": 20000000
-    //     }
-    // },
-    // {
-    //     "on": "399N0,2",
-    //     "type": "O",
-    //     "nat": "Gallilean",
-    //     "t_size": 325,
-    //     "t_mil": 0.1,
-    //     "t_con": 4.0,
-    //     "cash": {
-    //         "liq": 10000000
-    //     }
-    // },
-    // {
-    //     "on": "399N0,2",
-    //     "t_size": 34020508,
-    //     "type": "D",
-    //     "nat": "Earther",
-    //     "t_mil": 0.1,
-    //     "t_con": 0.1
-    // },
-    // {
-    //     "on": "399N-2,2",
-    //     "t_size": 55001209,
-    //     "type": "D",
-    //     "nat": "Earther",
-    //     "t_mil": 0.1,
-    //     "t_con": 0.1
-    // },
-    // {
-    //     "on": "399N-1,2",
-    //     "t_size": 41954008,
-    //     "type": "G",
-    //     "nat": "Earther",
-    //     "t_mil": 0.1,
-    //     "t_con": 0.1
-    // },
-    // {
-    //     "on": "399N-1,-1",
-    //     "t_size": 340050102,
-    //     "type": "D",
-    //     "nat": "Earther",
-    //     "t_mil": 0.1,
-    //     "t_con": 0.1
-    // },
-    // {
-    //     "on": "399N0,-2",
-    //     "t_size": 123850948,
-    //     "type": "D",
-    //     "nat": "Earther",
-    //     "t_mil": 0.1,
-    //     "t_con": 0.1
-    // },
-    // {
-    //     "on": "399S-1,-2",
-    //     "t_size": 4000000,
-    //     "type": "D",
-    //     "nat": "Earther",
-    //     "t_mil": 0.1,
-    //     "t_con": 0.1
-    // },
-    // {
-    //     "on": "399S-2,-1",
-    //     "t_size": 4000000,
-    //     "type": "D",
-    //     "nat": "Earther",
-    //     "t_mil": 0.1,
-    //     "t_con": 0.1
-    // },
-    // {
-    //     "on": "399N-1,2",
-    //     "t_size": 82856364,
-    //     "type": "D",
-    //     "nat": "Lunan",
-    //     "t_mil": 3.3,
-    //     "t_con": 8.0
-    // },
-    // {
-    //     "on": "399N-1,2",
-    //     "t_size": 301017008,
-    //     "type": "A",
-    //     "nat": "Pig",
-    //     "t_mil": 0.0,
-    //     "t_con": 0.0
-    // },
-    // {
-    //     "on": "399N1,0",
-    //     "t_size": 200000000,
-    //     "type": "A",
-    //     "nat": "Pig",
-    //     "t_mil": 0.0,
-    //     "t_con": 0.0
-    // },
-    // {
-    //     "on": "399N1,0",
-    //     "t_size": 100000,
-    //     "type": "M",
-    //     "nat": "Earther",
-    //     "t_mil": 0.0,
-    //     "t_con": 0.0
-    // },
-    // {
-    //     "on": "301N-1,0",
-    //     "type": "D",
-    //     "nat": "Earther",
-    //     "t_size": 16329119,
-    //     "t_mil": 2.1,
-    //     "t_con": 0.1
-    // },
-    // {
-    //     "on": "301N-1,0",
-    //     "type": "D",
-    //     "nat": "Lunan",
-    //     "t_size": 450636889,
-    //     "t_mil": 6.5,
-    //     "t_con": 4.1
-    // },
-
-    // {
-    //     "on": "499E2",
-    //     "type": "D",
-    //     "nat": "Martian",
-    //     "t_size": 857838047,
-    //     "t_mil": 0.4,
-    //     "t_con": 1.0
-    // },
-    // {
-    //     "on": "499E2",
-    //     "type": "G",
-    //     "nat": "Martian",
-    //     "t_size": 62833,
-    //     "t_mil": 0.4,
-    //     "t_con": 3.0
-    // },
-    // {
-    //     "on": "499E2",
-    //     "type": "D",
-    //     "nat": "Earther",
-    //     "t_size": 21002,
-    //     "t_mil": 0.0,
-    //     "t_con": 6.8
-    // },
-    // {
-    //     "on": "499E2",
-    //     "type": "D",
-    //     "nat": "Lunan",
-    //     "t_size": 101938,
-    //     "t_mil": 0.0,
-    //     "t_con": 0.0
-    // },
-    // {
-    //     "id": 1,
-    //     "on": "499E2",
-    //     "type": "A",
-    //     "nat": "Pig",
-    //     "t_size": 107823490,
-    //     "t_mil": 10.0,
-    //     "t_con": 0.0
-    // },
-
-    // {
-    //     "on": "401X",
-    //     "t_size": 62,
-    //     "type": "D",
-    //     "nat": "Martian"
-    // },
-    // {
-    //     "on": "401X",
-    //     "t_size": 3,
-    //     "type": "D",
-    //     "nat": "Earther"
-    // },
-    // {
-    //     "on": "401X",
-    //     "t_size": 40,
-    //     "type": "D",
-    //     "nat": "Lunan"
-    // },
-
-    // {
-    //     "on": "402X",
-    //     "t_size": 16,
-    //     "type": "D",
-    //     "nat": "Martian"
-    // },
-    // {
-    //     "on": "402X",
-    //     "t_size": 2,
-    //     "type": "D",
-    //     "nat": "Earther"
-    // },
-    // {
-    //     "on": "402X",
-    //     "t_size": 26,
-    //     "type": "D",
-    //     "nat": "Lunan"
-    // }
 ]
