@@ -22,23 +22,7 @@ extension CountryContext {
         world _: borrowing GameWorld,
         context: GameContext.TerritoryPass
     ) throws {
-        self.properties.technology { (
-                factories: inout FactoryModifiers
-            ) in
-
-            for id: Technology in self.state.researched {
-                guard
-                let technology: TechnologyMetadata = context.rules.technologies[id] else {
-                    continue
-                }
-                for effect: Effect in technology.effects {
-                    switch effect {
-                    case .factoryProductivity(let effects):
-                        factories.productivity.base.stack(with: effects)
-                    }
-                }
-            }
-        }
+        self.properties.update(rules: context.rules)
     }
 }
 extension CountryContext {

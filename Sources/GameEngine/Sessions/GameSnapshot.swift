@@ -122,9 +122,7 @@ extension GameSnapshot {
             return factory.state.inventory.out.tooltipSupply(
                 resource,
                 tier: factory.type.output,
-                unit: "worker",
-                factor: factory.state.today.eo,
-                productivity: factory.productivity
+                details: factory.explainProduction(_:base:)
             )
 
         case .m:
@@ -302,11 +300,10 @@ extension GameSnapshot {
     ) -> Tooltip? {
         guard
         let planet: PlanetContext = self.context.planets[id],
-        let tile: PlanetGrid.Tile = planet.grid.tiles[cell] else {
+        let tile: PlanetGrid.Tile = planet.grid.tiles[cell],
+        let pops: PopulationStats = tile.properties?.pops else {
             return nil
         }
-
-        let pops: PopulationStats = tile.properties.pops
 
         return .instructions(style: .borderless) {
             switch layer {
@@ -528,29 +525,19 @@ extension GameSnapshot {
             return pop.state.inventory.out.tooltipSupply(
                 resource,
                 tier: pop.type.output,
-                unit: "worker",
-                factor: 1,
-                productivity: 1,
+                details: pop.explainProduction(_:base:)
             )
         case .m(let id):
-            guard let (output, factor): (ResourceTier, Double) = pop.mines[id.mine] else {
+            guard
+            let miningConditions: MiningJobConditions = pop.mines[id.mine] else {
                 return nil
-            }
-            let factorLabel: String
-            switch pop.state.type {
-            case .Politician:
-                factorLabel = "Militancy of Free Population"
-            default:
-                factorLabel = "Efficiency"
             }
             return pop.state.mines[id.mine]?.out.tooltipSupply(
                 id.resource,
-                tier: output,
-                unit: "miner",
-                factor: factor,
-                factorLabel: factorLabel,
-                productivity: 1,
-            )
+                tier: miningConditions.output,
+            ) {
+                pop.explainProduction(&$0, base: $1, mine: miningConditions)
+            }
         }
     }
 
@@ -761,12 +748,12 @@ extension GameSnapshot {
         _ id: Address,
         _ culture: String,
     ) -> Tooltip? {
-        self.context.planets[id]?.properties.pops.tooltip(culture: culture)
+        self.context.planets[id]?.properties?.pops.tooltip(culture: culture)
     }
     func tooltipTilePopType(
         _ id: Address,
         _ popType: PopType,
     ) -> Tooltip? {
-        self.context.planets[id]?.properties.pops.tooltip(popType: popType)
+        self.context.planets[id]?.properties?.pops.tooltip(popType: popType)
     }
 }

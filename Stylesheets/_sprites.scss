@@ -42,39 +42,55 @@
     --pop-stratum-color: 106, 65, 255;
 }
 
+[data-term-id='pA'] > span.label::before,
 [data-pop-type='A'] > span {
     @include sprite(handmaid);
 }
+[data-term-id='pS'] > span.label::before,
 [data-pop-type='S'] > span {
     @include sprite(maid);
 }
+[data-term-id='pG'] > span.label::before,
 [data-pop-type='G'] > span {
     @include sprite(doctor);
 }
+[data-term-id='pD'] > span.label::before,
 [data-pop-type='D'] > span {
     @include sprite(driver);
 }
+[data-term-id='pC'] > span.label::before,
 [data-pop-type='C'] > span {
     @include sprite(contractor);
 }
+[data-term-id='pE'] > span.label::before,
 [data-pop-type='E'] > span {
     @include sprite(editor);
 }
+[data-term-id='pF'] > span.label::before,
 [data-pop-type='F'] > span {
     @include sprite(farmer);
 }
+[data-term-id='pI'] > span.label::before,
 [data-pop-type='I'] > span {
     @include sprite(influencer);
 }
+[data-term-id='pM'] > span.label::before,
 [data-pop-type='M'] > span {
     @include sprite(astronaut);
 }
+[data-term-id='pO'] > span.label::before,
 [data-pop-type='O'] > span {
     @include sprite(businesswoman);
 }
+[data-term-id='pP'] > span.label::before,
 [data-pop-type='P'] > span {
     @include sprite(spokeswoman);
 }
+
+[data-term-id^='p'] > span.label::before {
+    content: '';
+}
+[data-term-id^='p'] > span.label::before,
 [data-pop-type] > span {
     display: block;
     height: 30px;
@@ -83,6 +99,8 @@
     background-image: url(sprite-url.$spritesheet-url);
     --sprite-offset-x: -13px;
 }
+
+[data-term-id^='p'] > span.label,
 [data-pop-type] {
     display: block;
     width: 30px;

@@ -20,20 +20,10 @@
             }
         }
 
-        > dl {
-            margin: 0;
+        > ul.terms {
+            margin: 1rem 0 0 0;
             padding-left: 1rem;
-
-            display: grid;
-            grid-template-columns: auto 1fr;
-
-            > * {
-                margin: 0.5rem;
-            }
-
-            > dd {
-                font-weight: bold;
-            }
+            flex-grow: 1;
         }
     }
 }

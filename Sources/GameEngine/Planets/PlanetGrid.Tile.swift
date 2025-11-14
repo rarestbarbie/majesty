@@ -9,7 +9,7 @@ import Random
 extension PlanetGrid {
     struct Tile: Identifiable {
         let id: HexCoordinate
-        let properties: RegionalProperties
+        var properties: RegionalProperties?
 
         var name: String?
         var terrain: TerrainMetadata
@@ -30,7 +30,7 @@ extension PlanetGrid {
             geology: GeologicalMetadata,
         ) {
             self.id = id
-            self.properties = .init()
+            self.properties = nil
 
             self.name = name
             self.terrain = terrain
@@ -46,10 +46,10 @@ extension PlanetGrid {
     }
 }
 extension PlanetGrid.Tile {
-    var governedBy: CountryProperties? { self.properties.governedBy }
-    var occupiedBy: CountryProperties? { self.properties.occupiedBy }
+    var governedBy: CountryProperties? { self.properties?.governedBy }
+    var occupiedBy: CountryProperties? { self.properties?.occupiedBy }
 
-    var pops: PopulationStats { self.properties.pops }
+    var pops: PopulationStats { self.properties?.pops ?? .init() }
 }
 extension PlanetGrid.Tile {
     mutating func copy(from source: Self) {
@@ -59,6 +59,21 @@ extension PlanetGrid.Tile {
     }
 }
 extension PlanetGrid.Tile {
+    mutating func update(
+        governedBy: CountryProperties,
+        occupiedBy: CountryProperties,
+    ) {
+        if  let properties: RegionalProperties = self.properties {
+            properties.governedBy = governedBy
+            properties.occupiedBy = occupiedBy
+        } else {
+            self.properties = .init(
+                governedBy: governedBy,
+                occupiedBy: occupiedBy
+            )
+        }
+    }
+
     mutating func startIndexCount() {
         self.factoriesUnderConstruction = 0
         self.factoriesAlreadyPresent.removeAll(keepingCapacity: true)
@@ -67,11 +82,11 @@ extension PlanetGrid.Tile {
         self.minesAlreadyPresent.removeAll(keepingCapacity: true)
         self.mines.removeAll(keepingCapacity: true)
 
-        self.properties.startIndexCount()
+        self.properties?.startIndexCount()
     }
 
     mutating func addResidentCount(_ pop: Pop) {
-        self.properties.addResidentCount(pop)
+        self.properties?.addResidentCount(pop)
     }
     mutating func addResidentCount(_ factory: Factory) {
         self.factories.append(factory.id)
@@ -91,8 +106,10 @@ extension PlanetGrid.Tile {
         among factories: OrderedDictionary<FactoryType, FactoryMetadata>,
         using random: inout PseudoRandom,
     ) -> FactoryType? {
-        guard random.roll(
-            self.properties.pops.free.total / (1 + self.factoriesUnderConstruction),
+        guard
+        let pops: PopulationStats = self.properties?.pops,
+        random.roll(
+            pops.free.total / (1 + self.factoriesUnderConstruction),
             1_000_000_000
         ) else {
             return nil
@@ -123,7 +140,7 @@ extension PlanetGrid.Tile {
         }
 
         guard
-        let miners: Int64 = self.properties.pops.type[.Miner] else {
+        let miners: Int64 = self.properties?.pops.type[.Miner] else {
             return nil
         }
 

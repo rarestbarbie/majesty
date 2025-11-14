@@ -7,13 +7,10 @@ import JavaScriptKit
 import JavaScriptInterop
 
 extension ResourceOutputs {
-    public func tooltipSupply(
+    func tooltipSupply(
         _ id: Resource,
         tier: ResourceTier,
-        unit: String,
-        factor: Double,
-        factorLabel: String? = nil,
-        productivity: Int64
+        details: (inout TooltipInstructionEncoder, Int64) -> () = { _, _ in }
     ) -> Tooltip? {
         guard let amount: Int64 = tier.tradeable[id] ?? tier.inelastic[id] else {
             return nil
@@ -36,8 +33,6 @@ extension ResourceOutputs {
             return nil
         }
 
-        let productivity: Double = .init(productivity)
-
         return .instructions {
             $0["Units sold today", +] = unitsSold[/3] / units.removed
             $0[>] {
@@ -47,12 +42,9 @@ extension ResourceOutputs {
             $0[>] {
                 $0["Produced today", +] = units.added[/3]
             }
-            $0["Production per \(unit)"] = (productivity * factor * Double.init(amount))[..3]
-            $0[>] {
-                $0["Base"] = amount[/3]
-                $0["Productivity", +] = productivity[%2]
-                $0[factorLabel ?? "Efficiency", +] = +?(factor - 1)[%2]
-            }
+
+            details(&$0, amount)
+
             if unitsSold < units.removed {
                 $0[>] = """
                 \(neg: (units.removed - unitsSold)[/3]) didn’t get sold today

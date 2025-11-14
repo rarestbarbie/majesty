@@ -57,7 +57,7 @@ extension Equity<LEI>.Statistics {
                 }
 
                 guard
-                let country: CountryID = context.planets[location]?.governedBy?.id else {
+                let region: RegionalProperties = context.planets[location]?.properties else {
                     return
                 }
 
@@ -67,7 +67,7 @@ extension Equity<LEI>.Statistics {
                         shares: $1.shares,
                         bought: $1.bought,
                         sold: $1.sold,
-                        country: country,
+                        country: region.governedBy.id,
                         culture: culture
                     )
                 )

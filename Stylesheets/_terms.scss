@@ -1,0 +1,44 @@
+ul.terms {
+    margin: 1rem 0 0 1rem;
+    padding: 0;
+    list-style: none;
+
+    display: flex;
+    flex-direction: column;
+
+
+    > li {
+        min-height: 2rem;
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+
+        > span.label {
+            flex: 0 0 2rem;
+        }
+        > span:last-child {
+            flex: 1 1 auto;
+        }
+
+        &[data-term-id^='p'] {
+            > span.label {
+                margin: 0.2em 0 0.5em 0;
+            }
+        }
+        &[data-term-id^='e'] {
+            > span.label::before {
+                content: var(--term-icon);
+            }
+        }
+        &[data-term-id='eN'] {
+            --term-icon: '🍰';
+        }
+        &[data-term-id='eP'] {
+            --term-icon: '🌐';
+        }
+        &[data-term-id='eA'] {
+            --term-icon: '🧲';
+        }
+    }
+
+}

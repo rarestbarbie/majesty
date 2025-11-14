@@ -19,11 +19,11 @@ struct PlanetGrid {
 }
 extension PlanetGrid {
     mutating func assign(
-        governedBy: CountryProperties?,
-        occupiedBy: CountryProperties?,
+        governedBy: CountryProperties,
+        occupiedBy: CountryProperties,
     ) {
         for tile: Int in self.tiles.values.indices {
-            self.tiles.values[tile].properties.assign(
+            self.tiles.values[tile].update(
                 governedBy: governedBy,
                 occupiedBy: occupiedBy
             )

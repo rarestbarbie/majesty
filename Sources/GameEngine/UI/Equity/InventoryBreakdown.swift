@@ -1,5 +1,7 @@
+import D
 import GameEconomy
 import GameIDs
+import GameUI
 import JavaScriptInterop
 import JavaScriptKit
 import VectorCharts
@@ -10,6 +12,7 @@ struct InventoryBreakdown<Tab> where Tab: InventoryTab {
     private var tiers: [ResourceNeedMeter]
     private var needs: [ResourceNeed]
     private var sales: [ResourceSale]
+    private var terms: [Term]
     private var costs: PieChart<CashFlowItem, PieChartLabel>?
     private var budget: PieChart<CashAllocationItem, PieChartLabel>?
 
@@ -18,6 +21,7 @@ struct InventoryBreakdown<Tab> where Tab: InventoryTab {
         self.tiers = []
         self.needs = []
         self.sales = []
+        self.terms = []
         self.costs = nil
         self.budget = nil
     }
@@ -34,7 +38,7 @@ extension InventoryBreakdown {
 
     mutating func update(from pop: PopContext, in snapshot: borrowing GameSnapshot) {
         guard
-        let currency: Fiat = pop.region?.governedBy?.currency.id else {
+        let currency: Fiat = pop.region?.occupiedBy.currency.id else {
             return
         }
 
@@ -91,7 +95,7 @@ extension InventoryBreakdown {
 
     mutating func update(from factory: FactoryContext, in snapshot: borrowing GameSnapshot) {
         guard
-        let currency: Fiat = factory.region?.occupiedBy?.currency.id else {
+        let currency: Fiat = factory.region?.occupiedBy.currency.id else {
             return
         }
 
@@ -125,6 +129,19 @@ extension InventoryBreakdown {
             location: factory.state.tile,
             snapshot: snapshot
         )
+
+        self.terms = Term.list {
+            let workersType: PopType = factory.type.workers.unit
+            guard
+            let workers: Workforce = factory.workers,
+            let clerksType: PopType = factory.type.clerks?.unit,
+            let clerks: Workforce = factory.clerks else {
+                return
+            }
+
+            $0[.pop(clerksType), (+)] = clerks.count[/3] ^^ clerks.change
+            $0[.pop(workersType), (+)] = workers.count[/3] ^^ workers.change
+        }
 
         self.costs = factory.cashFlow.chart(rules: snapshot.rules)
 
@@ -224,6 +241,7 @@ extension InventoryBreakdown: JavaScriptEncodable {
         case tiers
         case needs
         case sales
+        case terms
         case costs
         case budget
     }
@@ -234,6 +252,7 @@ extension InventoryBreakdown: JavaScriptEncodable {
         js[.tiers] = self.tiers
         js[.needs] = self.needs
         js[.sales] = self.sales
+        js[.terms] = self.terms
         js[.costs] = self.costs
         js[.budget] = self.budget
     }

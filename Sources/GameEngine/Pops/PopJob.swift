@@ -11,6 +11,7 @@ extension PopJob {
     mutating func fire(_ layoff: inout PopJobLayoffBlock?) {
         guard
         let size: Int64 = layoff?.size, size > 0 else {
+            layoff = nil
             return
         }
 

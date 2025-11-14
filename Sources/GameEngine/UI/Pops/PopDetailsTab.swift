@@ -1,3 +1,4 @@
+import GameUI
 import JavaScriptInterop
 import JavaScriptKit
 
@@ -8,4 +9,5 @@ import JavaScriptKit
 extension PopDetailsTab: InventoryTab {}
 extension PopDetailsTab: OwnershipTab {
     typealias State = Pop
+    static var tooltipShares: TooltipType { .PopOwnershipSecurities }
 }

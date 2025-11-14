@@ -208,7 +208,7 @@ extension GameSession {
 
         return .items {
             $0["Switch to Player"] {
-                if  let country: CountryProperties = tile.properties.governedBy {
+                if  let country: CountryProperties = tile.properties?.governedBy {
                     $0[.SwitchToPlayer] = country.id
                 }
             }

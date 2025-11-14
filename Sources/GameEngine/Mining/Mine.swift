@@ -19,7 +19,7 @@ extension Mine: Sectionable {
             id: id,
             type: section.type,
             tile: section.tile,
-            efficiency: 1,
+            efficiency: 0,
             yesterday: .init(),
             today: .init()
         )

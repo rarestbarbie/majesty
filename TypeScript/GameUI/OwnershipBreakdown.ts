@@ -1,24 +1,25 @@
-import { Fortune, Ticker } from '../DOM/exports.js';
+import { Term, TermState, Fortune, Ticker } from '../DOM/exports.js';
 import { GameID } from '../GameEngine/exports.js';
 import {
     OwnershipBreakdownState,
     PieChart,
     TooltipType,
 } from './exports.js';
+import {
+    StaticList
+} from '../DOM/exports.js';
 
 export class OwnershipBreakdown {
     public readonly node: HTMLDivElement;
 
     private readonly byCountry: PieChart<GameID>;
     private readonly byCulture: PieChart<string>;
-    private readonly shares: Ticker;
-    private readonly px: Ticker;
-    private readonly pa: Ticker;
+
+    private readonly terms: StaticList<Term, string>;
 
     constructor(
         tooltipCountry: TooltipType,
         tooltipCulture: TooltipType,
-        tooltipSecurities: TooltipType
     ) {
         this.byCountry = new PieChart<GameID>(tooltipCountry);
         this.byCulture = new PieChart<string>(tooltipCulture);
@@ -39,49 +40,25 @@ export class OwnershipBreakdown {
             left.appendChild(container);
         }
 
-        this.shares = new Ticker(Fortune.Bonus);
-        this.shares.outer.setAttribute('data-tooltip-type', tooltipSecurities);
-
-        this.px = new Ticker(Fortune.Bonus);
-        this.pa = new Ticker(Fortune.Bonus);
-
-        const right: HTMLDListElement = document.createElement('dl');
-        const rows: [HTMLElement, string][] = [
-            [this.shares.outer, '🍰'],
-            [this.px.outer, '🌐'],
-            [this.pa.outer, '🧲'],
-        ];
-        for (const [value, label] of rows) {
-            const dt: HTMLElement = document.createElement('dt');
-            dt.textContent = label;
-            const dd: HTMLElement = document.createElement('dd');
-            dd.appendChild(value);
-
-            right.appendChild(dt);
-            right.appendChild(dd);
-        }
+        this.terms = new StaticList<Term, string>(document.createElement('ul'));
+        this.terms.node.classList.add('terms');
 
         left.classList.add('pie-charts');
 
         this.node = document.createElement('div');
         this.node.appendChild(left);
-        this.node.appendChild(right);
+        this.node.appendChild(this.terms.node);
         this.node.classList.add('hstack');
     }
 
     public update(id: GameID, state: OwnershipBreakdownState<any>): void {
-        this.shares.outer.setAttribute('data-tooltip-arguments', JSON.stringify([id]));
-
         this.byCountry.update([id], state.country ?? []);
         this.byCulture.update([id], state.culture ?? []);
 
-        this.shares.updateBigInts(state.shares ?? 0n, 0n);
-
-        if (state.y_px !== undefined && state.t_px !== undefined) {
-            this.px.updatePriceChange(state.y_px, state.t_px);
-        }
-        if (state.y_pa !== undefined && state.t_pa !== undefined) {
-            this.pa.updatePriceChange(state.y_pa * 100, state.t_pa * 100, 1);
-        }
+        this.terms.update(
+            state.terms ?? [],
+            (term: TermState) => new Term(term),
+            (term: TermState, item: Term) => item.update(term, [id]),
+        );
     }
 }

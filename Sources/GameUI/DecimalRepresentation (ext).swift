@@ -5,7 +5,7 @@ extension DecimalRepresentation where Value: DecimalFormattable & AdditiveArithm
         let (sign, magnitude): (Bool?, Value) = before.delta(to: self.value)
         return .init(
             value: "\(self)",
-            delta: "\(self.with(value: magnitude))",
+            delta: self.with(value: magnitude).bare,
             sign: sign.map { $0 ? .pos : .neg }
         )
     }

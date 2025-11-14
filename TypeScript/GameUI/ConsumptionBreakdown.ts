@@ -1,5 +1,7 @@
 import {
-    StaticList
+    StaticList,
+    Term,
+    TermState
  } from '../DOM/exports.js';
 import { GameID } from '../GameEngine/exports.js';
 import {
@@ -19,6 +21,7 @@ export class ConsumptionBreakdown {
 
     private readonly tiers: StaticList<ResourceNeedMeter, string>;
     private readonly needs: StaticList<ResourceNeedRow, string>;
+    private readonly terms: StaticList<Term, string>;
     private readonly costs: PieChart<string>;
     private readonly budget: PieChart<string>;
 
@@ -48,24 +51,14 @@ export class ConsumptionBreakdown {
             left.appendChild(container);
         }
 
-        const right: HTMLDListElement = document.createElement('dl');
-        const rows: [HTMLElement, string][] = [
-        ];
-        for (const [value, label] of rows) {
-            const dt: HTMLElement = document.createElement('dt');
-            dt.textContent = label;
-            const dd: HTMLElement = document.createElement('dd');
-            dd.appendChild(value);
-
-            right.appendChild(dt);
-            right.appendChild(dd);
-        }
+        this.terms = new StaticList<Term, string>(document.createElement('ul'));
+        this.terms.node.classList.add('terms');
 
         left.classList.add('pie-charts');
 
         this.charts = document.createElement('div');
         this.charts.appendChild(left);
-        this.charts.appendChild(right);
+        this.charts.appendChild(this.terms.node);
         this.charts.classList.add('hstack');
 
         this.node = document.createElement('div');
@@ -89,6 +82,11 @@ export class ConsumptionBreakdown {
             state.needs,
             (need: ResourceNeed) => new ResourceNeedRow(need, id, type),
             (need: ResourceNeed, row: ResourceNeedRow) => row.update(need, id),
+        );
+        this.terms.update(
+            state.terms,
+            (term: TermState) => new Term(term),
+            (term: TermState, item: Term) => item.update(term, [id]),
         );
 
         this.costs.update([id], state.costs ?? []);

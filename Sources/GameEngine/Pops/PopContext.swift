@@ -6,6 +6,7 @@ import GameEconomy
 import GameIDs
 import GameRules
 import GameState
+import GameUI
 import Random
 
 struct PopContext: RuntimeContext, LegalEntityContext {
@@ -22,7 +23,7 @@ struct PopContext: RuntimeContext, LegalEntityContext {
 
     private(set) var budget: PopBudget?
 
-    private(set) var mines: [MineID: (output: ResourceTier, factor: Double)]
+    private(set) var mines: [MineID: MiningJobConditions]
 
     public init(type: PopMetadata, state: Pop) {
         self.type = type
@@ -60,10 +61,7 @@ extension PopContext {
 }
 extension PopContext {
     mutating func compute(world _: borrowing GameWorld, context: ComputationPass) throws {
-        guard
-        let tile: PlanetGrid.Tile = context.planets[self.state.tile] else {
-            return
-        }
+        self.region = context.planets[self.state.tile]?.properties
 
         if  self.state.inventory.out.inelastic.isEmpty {
             self.unemployment = Double.init(
@@ -84,7 +82,11 @@ extension PopContext {
         self.mines.removeAll(keepingCapacity: true)
         for job: MiningJob in self.state.mines.values {
             let (state, type): (Mine, MineMetadata) = try context.mines[job.id]
-            self.mines[job.id] = (type.base, state.efficiency)
+            self.mines[job.id] = .init(
+                type: state.type,
+                output: type.base,
+                factor: state.efficiency
+            )
         }
 
         self.income.removeAll(keepingCapacity: true)
@@ -96,8 +98,6 @@ extension PopContext {
         self.cashFlow.update(with: self.state.inventory.l)
         self.cashFlow.update(with: self.state.inventory.e)
         self.cashFlow.update(with: self.state.inventory.x)
-
-        self.region = tile.properties
     }
 }
 extension PopContext: TransactingContext {
@@ -116,14 +116,14 @@ extension PopContext: TransactingContext {
             }
         }
 
-        let currency: Fiat = self.region!.occupiedBy!.currency.id
+        let currency: Fiat = self.region!.occupiedBy.currency.id
         let balance: Int64 = self.state.inventory.account.balance
 
         self.state.inventory.out.sync(with: self.type.output, releasing: 1)
         for j: Int in self.state.mines.values.indices {
             {
                 guard
-                let (output, _): (ResourceTier, Double) = self.mines[$0.id] else {
+                let output: ResourceTier = self.mines[$0.id]?.output else {
                     fatalError("missing stored info for mine '\($0.id)'!!!")
                 }
 
@@ -230,11 +230,11 @@ extension PopContext: TransactingContext {
         for j: Int in self.state.mines.values.indices {
             self.state.inventory.account.r += {
                 guard
-                let (output, factor): (ResourceTier, Double) = self.mines[$0.id] else {
+                let conditions: MiningJobConditions = self.mines[$0.id] else {
                     fatalError("missing stored info for mine '\($0.id)'!!!")
                 }
 
-                $0.out.deposit(from: output, scalingFactor: ($0.count, factor))
+                $0.out.deposit(from: conditions.output, scalingFactor: ($0.count, conditions.factor))
                 return $0.out.sell(in: country.currency.id, on: &turn.worldMarkets)
             } (&self.state.mines.values[j])
         }
@@ -585,6 +585,66 @@ extension PopContext {
             $0[self.state.nat] {
                 $0[$1 == country.culturePreferred] = +5%
             } = { "\(+$0[%]): Culture is \(em: $1)" }
+        }
+    }
+}
+extension PopContext {
+    func explainProduction(_ ul: inout TooltipInstructionEncoder, base: Int64) {
+        ul["Production per worker"] = Double.init(base)[..3]
+        ul[>] {
+            $0["Base"] = base[/3]
+            $0["Productivity", +] = (1 as Double)[%2]
+        }
+    }
+    func explainProduction(
+        _ ul: inout TooltipInstructionEncoder,
+        base: Int64,
+        mine: MiningJobConditions
+    ) {
+        ul["Production per miner"] = (mine.factor * Double.init(base))[..3]
+        ul[>] {
+            $0["Base"] = base[/3]
+        }
+
+        ul["Mining efficiency"] = mine.factor[%1]
+        ul[>] {
+            switch self.state.type {
+            case .Politician: self.explainProductionPolitician(&$0, base: base, mine: mine)
+            case .Miner: self.explainProductionMiner(&$0, base: base, mine: mine)
+            default: break
+            }
+        }
+    }
+    private func explainProductionPolitician(
+        _ ul: inout TooltipInstructionEncoder,
+        base: Int64,
+        mine: MiningJobConditions
+    ) {
+        guard
+        let mil: Double = self.region?.pops.free.mil.average else {
+            return
+        }
+
+        ul[>] = "Base: \(em: MineContext.efficiencyPoliticians[%])"
+        ul["Militancy of Free Population", +] = +(
+            MineContext.efficiencyPoliticiansPerMilitancyPoint * mil
+        )[%1]
+    }
+    private func explainProductionMiner(
+        _ ul: inout TooltipInstructionEncoder,
+        base: Int64,
+        mine: MiningJobConditions
+    ) {
+        guard
+        let modifiers: CountryModifiers = self.region?.occupiedBy.modifiers,
+        let modifiers: CountryModifiers.Stack<Decimal> = modifiers.miningEfficiency[mine.type]
+        else {
+            return
+        }
+
+        ul[>] = "Base: \(em: MineContext.efficiencyMiners[%])"
+        for (effect, provenance): (Decimal, EffectProvenance) in modifiers.blame {
+            ul[provenance.name, +] = +effect[%]
         }
     }
 }

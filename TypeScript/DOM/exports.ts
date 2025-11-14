@@ -16,7 +16,6 @@ export * from './Menus/ContextMenuState.js';
 export * from './Tooltips/CountInstruction.js';
 export * from './Tooltips/ConditionLine.js';
 export * from './Tooltips/ConditionListItem.js';
-export * from './Tooltips/ConditionListInstruction.js';
 export * from './Tooltips/FactorInstruction.js';
 export * from './Tooltips/HeaderInstruction.js';
 export * from './Tooltips/TickerInstruction.js';
@@ -27,11 +26,15 @@ export * from './Tooltips/TooltipInstructions.js';
 export * from './Tooltips/TooltipInstructionType.js';
 export * from './Tooltips/TooltipRenderer.js';
 
+export * from './Fields/Factor.js';
 export * from './Fields/FieldList.js';
 export * from './Fields/FieldListItem.js';
 export * from './Fields/Fortune.js';
 export * from './Fields/Count.js';
 export * from './Fields/Ticker.js';
+
+export * from './Terms/Term.js';
+export * from './Terms/TermState.js';
 
 export function UpdateText(field: HTMLElement, value: string): void {
     if (field.textContent !== value) {

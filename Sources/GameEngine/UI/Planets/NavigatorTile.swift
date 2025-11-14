@@ -36,7 +36,7 @@ extension NavigatorTile {
         self.name = "\(tile.name ?? tile.terrain.name) (\(planet.state.name))"
         self.terrain = tile.terrain.name
 
-        let pops: PopulationStats = tile.properties.pops
+        let pops: PopulationStats = tile.properties?.pops ?? .init()
 
         let culture: [
             (key: String, (share: Int64, PieChartLabel))

@@ -1,3 +1,4 @@
+import D
 import GameRules
 import GameState
 import Random
@@ -17,6 +18,11 @@ struct MineContext: RuntimeContext {
     }
 }
 extension MineContext {
+    static var efficiencyPoliticiansPerMilitancyPoint: Double { 0.01 }
+    static var efficiencyPoliticians: Decimal { 5% }
+    static var efficiencyMiners: Decimal { 1% }
+}
+extension MineContext {
     mutating func startIndexCount() {
         self.miners = .empty
     }
@@ -33,30 +39,31 @@ extension MineContext {
             self.miners.limit = self.state.today.size
         }
 
-        guard
-        let tile: PlanetGrid.Tile = context.planets[self.state.tile] else {
-            return
-        }
-
-        self.region = tile.properties
+        self.region = context.planets[self.state.tile]?.properties
     }
 }
 extension MineContext {
     mutating func advance(turn: inout Turn) {
+        guard let region: RegionalProperties = self.region else {
+            return
+        }
+
         let minersToHire: Int64 = self.miners.limit - self.miners.count
         if  minersToHire > 0 {
             let bid: PopJobOfferBlock = .init(
                 job: .mine(self.state.id),
                 bid: 1,
-                size: Binomial[minersToHire, 0.05].sample(using: &turn.random.generator)
+                size: .random(
+                    in: 0 ... max(1, minersToHire / 20),
+                    using: &turn.random.generator
+                )
             )
 
             if  bid.size > 0 {
                 turn.jobs.hire.local[self.state.tile, self.type.miner].append(bid)
             }
         } else {
-            let layoff: PopJobLayoffBlock = .init(size: -minersToHire)
-            if  layoff.size > 0 {
+            if  let layoff: PopJobLayoffBlock = .init(size: -minersToHire) {
                 turn.jobs.fire[self.state.id, self.type.miner] = layoff
             }
         }
@@ -65,11 +72,16 @@ extension MineContext {
             self.state.today.size = max(0, self.state.today.size - self.miners.count)
         }
 
-        if case .Politician = self.type.miner,
-            let mil: Double = self.region?.pops.free.mil.average {
-            self.state.efficiency = 1 + 0.1 * mil
+        if case .Politician = self.type.miner {
+            let mil: Double = self.region?.pops.free.mil.average ?? 0
+            self.state.efficiency = Double.init(
+                Self.efficiencyPoliticians
+            ) + Self.efficiencyPoliticiansPerMilitancyPoint * mil
         } else {
-            self.state.efficiency = 0.01
+            let bonus: Decimal = region.occupiedBy.modifiers.miningEfficiency[
+                self.state.type
+            ]?.value ?? 0
+            self.state.efficiency = Double.init(Self.efficiencyMiners + bonus)
         }
     }
 }
