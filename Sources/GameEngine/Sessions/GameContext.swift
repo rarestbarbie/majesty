@@ -701,26 +701,28 @@ extension GameContext {
     private mutating func executeConstructions(_ turn: inout Turn) throws {
         for i: Int in self.planets.indices {
             for j: Int in self.planets[i].grid.tiles.values.indices {
-                let (factory, mine): (Factory.Section?, Mine.Section?) = {
+                let (factory, mines, tile): (
+                    FactoryType?,
+                    [(type: MineType, size: Int64)],
+                    Address
+                ) = {
                     let id: PlanetID = $0.state.id
                     return {
                         let factory: FactoryType? = $0.pickFactory(
                             among: self.rules.factories,
                             using: &turn.random
                         )
-                        let mine: MineType? = $0.pickMine(
+                        let mines: [(type: MineType, size: Int64)] = $0.pickMine(
                             among: self.rules.mines,
                             using: &turn.random
                         )
                         let tile: Address = .init(planet: id, tile: $0.id)
-                        return (
-                            factory: factory.map { .init(type: $0, tile: tile) },
-                            mine: mine.map { .init(type: $0, tile: tile) }
-                        )
+                        return (factory: factory, mines: mines, tile: tile)
                     } (&$0[j])
                 } (&self.planets[i])
 
-                if  let factory: Factory.Section {
+                if  let factory: FactoryType {
+                    let factory: Factory.Section = .init(type: factory, tile: tile)
                     try self.factories[factory] {
                         self.rules.factories[$0.type]
                     } update: {
@@ -728,16 +730,13 @@ extension GameContext {
                     }
                 }
 
-                if  let mine: Mine.Section {
+                for (mine, size): (MineType, Int64) in mines {
+                    let mine: Mine.Section = .init(type: mine, tile: tile)
                     try self.mines[mine] {
                         self.rules.mines[$0.type]
                     } update: {
-                        switch $0.miner {
-                        case .Politician:
-                            $1.z.size = $0.initialSize
-                        default:
-                            $1.z.size = $0.initialSize
-                        }
+                        $1.z.size += size
+                        $1.last = Mine.Expansion.init(size: size, date: turn.date)
                     }
                 }
             }

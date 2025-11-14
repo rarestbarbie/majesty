@@ -6,23 +6,27 @@ public final class MineMetadata: Identifiable, Sendable {
     public let base: ResourceTier
     public let miner: PopType
     public let decay: Bool
-    public let geology: [GeologicalType: Int64]
-    public let initialSize: Int64
+    public let scale: Int64
+    public let spawn: [GeologicalType: SpawnWeight]
 
     init(
         name: String,
         base: ResourceTier,
         miner: PopType,
         decay: Bool,
-        geology: [GeologicalType: Int64],
-        initialSize: Int64
+        scale: Int64,
+        spawn: [GeologicalType: SpawnWeight],
     ) {
+        guard scale > 0 else {
+            fatalError("Mine scale must be positive!!!")
+        }
+
         self.name = name
         self.base = base
         self.miner = miner
         self.decay = decay
-        self.geology = geology
-        self.initialSize = initialSize
+        self.scale = scale
+        self.spawn = spawn
     }
 }
 extension MineMetadata {
@@ -33,8 +37,12 @@ extension MineMetadata {
         self.base.hash(into: &hasher)
         self.miner.hash(into: &hasher)
         self.decay.hash(into: &hasher)
-        self.geology.hash(into: &hasher)
-        self.initialSize.hash(into: &hasher)
+        self.scale.hash(into: &hasher)
+
+        for (key, value): (GeologicalType, SpawnWeight) in self.spawn.sorted(by: { $0.key < $1.key }) {
+            key.hash(into: &hasher)
+            value.hash(into: &hasher)
+        }
 
         return hasher.finalize()
     }

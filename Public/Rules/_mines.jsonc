@@ -2,58 +2,92 @@
     "Regional Government": {
         "miner": "Politician",
         "decay": false,
+        "scale": 400,
         "base": {
             "Influence": 100
-        },
-        "initial_size": 400
+        }
     },
 
     "Ice Mine": {
         "miner": "Miner",
         "decay": true,
+        "scale": 1000000000,
+        "spawn": {
+            "Earth_Polar": {
+                "rate": "0.05",
+                "size": 4
+            }
+        },
         "base": {
             "Water Ice": 800
-        },
-        "geology": {
-            "Earth_Polar": 5
-        },
-        "initial_size": 1000000000
+        }
     },
 
     "Alumina Mine": {
         "miner": "Miner",
         "decay": true,
+        "scale": 1000000000,
+        "spawn": {
+            "Earth_Continental_Crust": {
+                "rate": "0.05",
+                "size": 1
+            }
+        },
         "base": {
             "Alumina": 800
-        },
-        "geology": {
-            "Earth_Continental_Crust": 5
-        },
-        "initial_size": 1000000000
+        }
     },
 
     "Lithium Mine": {
         "miner": "Miner",
         "decay": true,
+        "scale": 1000000000,
+        "spawn": {
+            "Earth_Continental_Crust": {
+                "rate": "0.02",
+                "size": 1
+            },
+            "Earth_Sedimentary_Basin": {
+                "rate": "0.02",
+                "size": 1
+            }
+        },
         "base": {
             "Lithium": 800
-        },
-        "geology": {
-            "Earth_Continental_Crust": 2,
-            "Earth_Sedimentary_Basin": 2
-        },
-        "initial_size": 1000000000
+        }
     },
 
     "Natural Gas Field": {
         "miner": "Miner",
         "decay": true,
+        "scale": 1000000000,
+        "spawn": {
+            "Earth_Sedimentary_Basin": {
+                "rate": "0.05",
+                "size": 1
+            }
+        },
         "base": {
             "Hydrocarbons": 800
+        }
+    },
+
+    "Oil Field": {
+        "miner": "Miner",
+        "decay": true,
+        "scale": 1000000000,
+        "spawn": {
+            "Earth_Sedimentary_Basin": {
+                "rate": "0.05",
+                "size": 1
+            },
+            "Earth_Oceanic_Shelf": {
+                "rate": "0.05",
+                "size": 2
+            }
         },
-        "geology": {
-            "Earth_Sedimentary_Basin": 5
-        },
-        "initial_size": 1000000000
+        "base": {
+            "Hydrocarbons": 800
+        }
     }
 }

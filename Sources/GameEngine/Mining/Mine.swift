@@ -8,6 +8,7 @@ struct Mine {
     let id: MineID
     let type: MineType
     let tile: Address
+    var last: Expansion?
     var efficiency: Double
 
     var y: Dimensions
@@ -19,6 +20,7 @@ extension Mine: Sectionable {
             id: id,
             type: section.type,
             tile: section.tile,
+            last: nil,
             efficiency: 0,
             y: .init(),
             z: .init()
@@ -41,6 +43,8 @@ extension Mine {
         case id
         case type
         case tile
+        case last_date
+        case last_size
         case efficiency
 
         case y
@@ -52,6 +56,8 @@ extension Mine: JavaScriptEncodable {
         js[.id] = self.id
         js[.tile] = self.tile
         js[.type] = self.type
+        js[.last_date] = self.last?.date
+        js[.last_size] = self.last?.size
         js[.efficiency] = self.efficiency
 
         js[.y] = self.y
@@ -61,10 +67,18 @@ extension Mine: JavaScriptEncodable {
 extension Mine: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         let today: Dimensions = try js[.z]?.decode() ?? .init()
+
+        let last: Expansion?
+        if  let size: Int64 = try js[.last_size]?.decode() {
+            last = .init(size: size, date: try js[.last_date].decode())
+        } else {
+            last = nil
+        }
         self.init(
             id: try js[.id].decode(),
             type: try js[.type].decode(),
             tile: try js[.tile].decode(),
+            last: last,
             efficiency: try js[.efficiency].decode(),
             y: try js[.y]?.decode() ?? today,
             z: today

@@ -1,3 +1,4 @@
+import Fraction
 import GameEconomy
 import GameRules
 import GameIDs
@@ -20,7 +21,7 @@ extension PlanetGrid {
         private(set) var factoriesAlreadyPresent: Set<FactoryType>
         private(set) var factories: [FactoryID]
 
-        private(set) var minesAlreadyPresent: Set<MineType>
+        private(set) var minesAlreadyPresent: [MineType: Int64]
         private(set) var mines: [MineID]
 
         init(
@@ -40,7 +41,7 @@ extension PlanetGrid {
             self.factoriesAlreadyPresent = []
             self.factories = []
 
-            self.minesAlreadyPresent = []
+            self.minesAlreadyPresent = [:]
             self.mines = []
         }
     }
@@ -98,7 +99,7 @@ extension PlanetGrid.Tile {
     }
     mutating func addResidentCount(_ mine: Mine) {
         self.mines.append(mine.id)
-        self.minesAlreadyPresent.insert(mine.type)
+        self.minesAlreadyPresent[mine.type] = mine.z.size
     }
 }
 extension PlanetGrid.Tile {
@@ -131,42 +132,40 @@ extension PlanetGrid.Tile {
     func pickMine(
         among mines: OrderedDictionary<MineType, MineMetadata>,
         using random: inout PseudoRandom,
-    ) -> MineType? {
+    ) -> [(type: MineType, size: Int64)] {
         // mandatory mines
         for (missing, mine): (MineType, MineMetadata) in mines {
-            if !self.minesAlreadyPresent.contains(missing), mine.geology.isEmpty {
-                return missing
+            if !self.minesAlreadyPresent.keys.contains(missing), mine.spawn.isEmpty {
+                return [(type: missing, size: mine.scale)]
             }
         }
 
         guard
-        let miners: PopulationStats.Row = self.properties?.pops.type[.Miner] else {
-            return nil
+        let miners: PopulationStats.Row = self.properties?.pops.type[.Miner],
+            miners.count > 0 else {
+            return []
         }
 
         let n: Int64 = miners.unemployed
 
-        guard random.roll(
-            1 + max(n / 100, 10) + max(n / 10000, 20),
-            90 * (1 + Int64(self.minesAlreadyPresent.count))
-        ) else {
-            return nil
+        guard random.roll(n, miners.count * 30) else {
+            return []
         }
 
-        let choices: [(type: MineType, chance: Int64)] = mines.reduce(into: []) {
-            if self.minesAlreadyPresent.contains($1.key) {
+        return mines.reduce(into: []) {
+            guard
+            let (chance, spawn): (Fraction, SpawnWeight) = $1.value.chance(
+                size: self.minesAlreadyPresent[$1.key] ?? 0,
+                tile: self.geology.id
+            ) else {
                 return
             }
-            if  let chance: Int64 = $1.value.geology[self.geology.id] {
-                $0.append(($1.key, chance))
+
+            if  random.roll(chance.n, chance.d) {
+                let scale: Int64 = $1.value.scale * spawn.size
+                let size: Int64 = .random(in: 1 ... scale, using: &random.generator)
+                $0.append(($1.key, size: size))
             }
         }
-        let sampler: RandomWeightedSampler<[(MineType, chance: Int64)], Double>? = .init(
-            choices: choices
-        ) {
-            Double.init($0.chance)
-        }
-        return sampler.map { choices[$0.next(using: &random.generator)].type }
-
     }
 }
