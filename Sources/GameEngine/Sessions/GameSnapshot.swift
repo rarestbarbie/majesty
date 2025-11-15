@@ -571,10 +571,10 @@ extension GameSnapshot {
                 if  let (chance, spawn): (Fraction, SpawnWeight) = mine.type.chance(size: mine.state.z.size, tile: tile.geology.id) {
                     $0["Estimated deposits"] = mine.state.Δ.size[/3]
                     if  let miners: PopulationStats.Row = tile.properties?.pops.type[.Miner],
-                            miners.count > 0 {
+                        let fromWorkers: Fraction = miners.mineExpansionFactor {
                         let roll: Double = .init(chance.n %/ chance.d)
                         let fromDeposit: Double = .init(mine.type.scale %/ (mine.type.scale + mine.state.z.size))
-                        let fromWorkers: Double = .init(miners.unemployed %/ (30 * miners.count))
+                        let fromWorkers: Double = .init(fromWorkers)
                         let chance: Double = roll * fromWorkers
                         $0["Chance to expand mine", (+)] = chance[%2]
                         $0[>] {

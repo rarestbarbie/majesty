@@ -142,13 +142,11 @@ extension PlanetGrid.Tile {
 
         guard
         let miners: PopulationStats.Row = self.properties?.pops.type[.Miner],
-            miners.count > 0 else {
+        let factor: Fraction = miners.mineExpansionFactor else {
             return []
         }
 
-        let n: Int64 = miners.unemployed
-
-        guard random.roll(n, miners.count * 30) else {
+        guard random.roll(factor.n, factor.d) else {
             return []
         }
 
