@@ -70,7 +70,12 @@ extension PopulationStats {
         }
     }
     func tooltip(popType: PopType) -> Tooltip? {
-        let share: Row = self.type[popType] ?? .zero
+        guard
+        let share: Row = self.type[popType],
+            share.count > 0 else {
+            return nil
+        }
+
         let total: Int64 = self.free.total
 
         if  total == 0 {
