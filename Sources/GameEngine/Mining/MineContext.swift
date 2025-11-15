@@ -65,17 +65,17 @@ extension MineContext: AllocatingContext {
             self.state.z.efficiency = Double.init(Self.efficiencyMiners + bonus)
         }
 
-        var yield: Double = 0
+        var yieldBeforeScaling: Double = 0
         for (id, amount): (Resource, Int64) in self.type.base.inelastic {
             let price: Double = .init(turn.localMarkets[id / self.state.tile].today.price.value)
-            yield += self.state.z.efficiency * price * Double.init(amount)
+            yieldBeforeScaling += price * Double.init(amount)
         }
         for (id, amount): (Resource, Int64) in self.type.base.tradeable {
             let price: Double = turn.worldMarkets.price(of: id, in: authority.currency.id)
-            yield += self.state.z.efficiency * price * Double.init(amount)
+            yieldBeforeScaling += price * Double.init(amount)
         }
 
-        self.state.z.yield = yield
+        self.state.z.yield = yieldBeforeScaling * self.state.z.efficiency
     }
 }
 extension MineContext {
