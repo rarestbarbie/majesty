@@ -43,8 +43,19 @@ extension PopulationStats {
         let free: Int64? = self.free.cultures[culture]
         let enslaved: Int64? = self.enslaved.cultures[culture]
 
-        let share: Int64 = (free ?? 0) + (enslaved ?? 0)
-        let total: Int64 = self.total
+        let share: Int64
+        let total: Int64
+
+        if  let free: Int64 {
+            share = free
+            total = self.free.total
+        } else if
+            let enslaved: Int64 {
+            share = enslaved
+            total = self.enslaved.total
+        } else {
+            return nil
+        }
 
         if  total == 0 {
             return nil
