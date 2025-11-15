@@ -448,7 +448,15 @@ extension GameContext {
         self.pops.turn { $0.advance(turn: &turn) }
 
         self.postCashTransfers(&turn)
-        self.postPopEmployment(&turn, order: shuffled)
+
+        let unfilled: (
+            [(PopType, [PopJobOfferBlock])],
+            [(PopType, [PopJobOfferBlock])]
+        ) = self.postPopHirings(&turn, order: shuffled)
+        self.postPopFirings(&turn)
+
+        self.awardRanksToFactories([unfilled.0, unfilled.1].joined())
+        self.awardRanksToMines()
 
         try self.executeMovements(&turn)
 
@@ -493,11 +501,6 @@ extension GameContext {
         }
     }
 
-    private mutating func postPopEmployment(_ turn: inout Turn, order: ResidentOrder) {
-        self.postPopHirings(&turn, order: order)
-        self.postPopFirings(&turn)
-    }
-
     private mutating func postPopFirings(_ turn: inout Turn) {
         var layoffs: [Turn.Jobs.Fire.Key: PopJobLayoffBlock] = turn.jobs.fire.turn()
 
@@ -515,7 +518,10 @@ extension GameContext {
             }
         }
     }
-    private mutating func postPopHirings(_ turn: inout Turn, order: ResidentOrder) {
+    private mutating func postPopHirings(_ turn: inout Turn, order: ResidentOrder) -> (
+            [(PopType, [PopJobOfferBlock])],
+            [(PopType, [PopJobOfferBlock])]
+        ) {
         let offers: (
             remote: [Turn.Jobs.Hire<PlanetID>.Key: [(Int, Int64)]],
             local: [Turn.Jobs.Hire<Address>.Key: [(Int, Int64)]]
@@ -553,55 +559,18 @@ extension GameContext {
             }
         }
 
-        let workersUnavailable: [
-            (PopType, [PopJobOfferBlock])
-        ] = turn.jobs.hire.local.turn {
+        let workersUnavailable: [(PopType, [PopJobOfferBlock])] = turn.jobs.hire.local.turn {
             if var pops: [(index: Int, unemployed: Int64)] = offers.local[$0] {
                 self.postPopHirings(matching: &pops, with: &$1)
             }
         }
-        let clerksUnavailable: [
-            (PopType, [PopJobOfferBlock])
-        ] = turn.jobs.hire.remote.turn {
+        let clerksUnavailable: [(PopType, [PopJobOfferBlock])] = turn.jobs.hire.remote.turn {
             if var pops: [(index: Int, unemployed: Int64)] = offers.remote[$0] {
                 self.postPopHirings(matching: &pops, with: &$1)
             }
         }
 
-        for (type, unfilled): (PopType, [PopJobOfferBlock])
-            in [clerksUnavailable, workersUnavailable].joined() {
-            /// The last `q` factories will always raise wages. The next factory after the first
-            /// `q` will raise wages with probability `r / 8`.
-            let (q, r): (Int, remainder: Int) = unfilled.count.quotientAndRemainder(
-                dividingBy: FactoryContext.pr
-            )
-            for (position, block): (Int, PopJobOfferBlock) in unfilled.enumerated() {
-                let probability: Int
-
-                switch position {
-                case 0 ..< q:
-                    probability = FactoryContext.pr
-                case q:
-                    probability = r
-                case _:
-                    probability = 0
-                }
-
-                switch block.job {
-                case .factory(let id):
-                    {
-                        if type.stratum <= .Worker {
-                            $0.wf = probability
-                        } else {
-                            $0.cf = probability
-                        }
-                    } (&self.factories[modifying: id].state.z)
-
-                case .mine:
-                    break
-                }
-            }
-        }
+        return (workersUnavailable, clerksUnavailable)
     }
 
     private mutating func postPopHirings(
@@ -639,6 +608,64 @@ extension GameContext {
                 self.pops[pop].state.factories[id, default: .init(id: id)].hire(count)
             case .mine(let id):
                 self.pops[pop].state.mines[id, default: .init(id: id)].hire(count)
+            }
+        }
+    }
+}
+extension GameContext {
+    private mutating func awardRanksToFactories(_ types: some Sequence<(PopType, [PopJobOfferBlock])>) {
+        for (type, unfilled): (PopType, [PopJobOfferBlock]) in types {
+            /// The last `q` factories will always raise wages. The next factory after the first
+            /// `q` will raise wages with probability `r / 8`.
+            let (q, r): (Int, remainder: Int) = unfilled.count.quotientAndRemainder(
+                dividingBy: FactoryContext.pr
+            )
+            for (position, block): (Int, PopJobOfferBlock) in unfilled.enumerated() {
+                let probability: Int
+
+                switch position {
+                case 0 ..< q:
+                    probability = FactoryContext.pr
+                case q:
+                    probability = r
+                case _:
+                    probability = 0
+                }
+
+                switch block.job {
+                case .factory(let id):
+                    {
+                        if type.stratum <= .Worker {
+                            $0.wf = probability
+                        } else {
+                            $0.cf = probability
+                        }
+                    } (&self.factories[modifying: id].state.z)
+
+                case .mine:
+                    break
+                }
+            }
+        }
+    }
+    private mutating func awardRanksToMines() {
+        for i: Int in self.planets.indices {
+            for tile: PlanetGrid.Tile in self.planets[i].grid.tiles.values {
+                var ranks: [PopType: [(id: MineID, yield: Double)]] = [:]
+                for mine: MineID in tile.mines {
+                    guard
+                    let mine: MineContext = self.mines[mine] else {
+                        continue
+                    }
+
+                    ranks[mine.type.miner, default: []].append((id: mine.state.id, yield: mine.state.z.yield))
+                }
+                for var mines: [(id: MineID, yield: Double)] in ranks.values {
+                    mines.sort { $0.yield < $1.yield }
+                    for (yieldRank, (id, _)): (Int, (MineID, _)) in mines.enumerated() {
+                        self.mines[modifying: id].state.z.yieldRank = yieldRank
+                    }
+                }
             }
         }
     }

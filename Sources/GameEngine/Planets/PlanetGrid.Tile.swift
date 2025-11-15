@@ -21,7 +21,7 @@ extension PlanetGrid {
         private(set) var factoriesAlreadyPresent: Set<FactoryType>
         private(set) var factories: [FactoryID]
 
-        private(set) var minesAlreadyPresent: [MineType: Int64]
+        private(set) var minesAlreadyPresent: [MineType: (size: Int64, yieldRank: Int?)]
         private(set) var mines: [MineID]
 
         init(
@@ -99,7 +99,7 @@ extension PlanetGrid.Tile {
     }
     mutating func addResidentCount(_ mine: Mine) {
         self.mines.append(mine.id)
-        self.minesAlreadyPresent[mine.type] = mine.z.size
+        self.minesAlreadyPresent[mine.type] = (mine.z.size, mine.z.yieldRank)
     }
 }
 extension PlanetGrid.Tile {
@@ -151,15 +151,28 @@ extension PlanetGrid.Tile {
         }
 
         return mines.reduce(into: []) {
+            let current: (size: Int64, yieldRank: Int)
+            switch self.minesAlreadyPresent[$1.key] {
+            case (size: let size, let yieldRank?)?:
+                current = (size, yieldRank)
+
+            case (size: _, nil)?:
+                return
+
+            case nil:
+                current = (0, 0)
+            }
+
             guard
             let (chance, spawn): (Fraction, SpawnWeight) = $1.value.chance(
-                size: self.minesAlreadyPresent[$1.key] ?? 0,
-                tile: self.geology.id
+                size: current.size,
+                tile: self.geology.id,
+                yieldRank: current.yieldRank
             ) else {
                 return
             }
 
-            if  random.roll(chance.n, chance.d) {
+            if  random.roll(chance.n , chance.d) {
                 let scale: Int64 = $1.value.scale * spawn.size
                 let size: Int64 = .random(in: 1 ... scale, using: &random.generator)
                 $0.append(($1.key, size: size))

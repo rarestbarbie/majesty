@@ -6,7 +6,7 @@ enum EffectProvenance {
 extension EffectProvenance {
     var name: String {
         switch self {
-        case .technology(let self): self.name
+        case .technology(let self): self.title
         }
     }
 }

@@ -105,8 +105,7 @@
             "Machine Parts": 1
         },
         "output": {
-            "Clothing": 12,
-            "Lingerie": 4
+            "Clothing": 15
         },
         "workers": {
             "Driver": 5000,
@@ -223,6 +222,22 @@
         "workers": {
             "Driver": 5000,
             "Engineer": 5000
+        }
+    },
+    "Fashion House": {
+        "emoji": "💝",
+        "color": "#ff4171",
+        "inputs": {
+            "Advertising": 8,
+            "Clothing": 4
+        },
+        "output": {
+            "Clothing": 4,
+            "Lingerie": 4
+        },
+        "workers": {
+            "Editor": 5000,
+            "Farmer": 5000
         }
     },
     "Liquor Distillery": {
