@@ -18,6 +18,7 @@ extension Pop.Stats {
     mutating func update(from state: Pop) {
         self.employedBeforeEgress = state.employed()
 
+        // we know pop size must be positive, as it would have been pruned during pruning
         if  state.inventory.out.inelastic.isEmpty {
             self.employmentBeforeEgress = Double.init(
                 self.employedBeforeEgress

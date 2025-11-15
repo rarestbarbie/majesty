@@ -47,13 +47,16 @@ extension Pop: Sectionable {
 }
 extension Pop: Deletable {
     var dead: Bool {
-        if  self.z.size == 0,
-            self.inventory.account.balance == 0,
-            self.equity.shares.values.allSatisfy({ $0.shares <= 0 }) {
-            true
-        } else {
-            false
+        guard self.z.size <= 0 else {
+            return false
         }
+
+        #assert(
+            self.inventory.account.balance == 0,
+            "Pop (id = \(self.id)) is dead but still has assets!!!"
+        )
+
+        return true
     }
 }
 extension Pop {
