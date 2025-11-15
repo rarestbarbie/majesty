@@ -69,7 +69,7 @@ extension SymbolTable where Value: RawRepresentable<Int16> & Sendable {
     /// Extends this symbol table to cover all of the symbols in the provided table.
     mutating func extend<Metadata>(
         over table: SymbolTable<Metadata>
-    ) throws -> OrderedDictionary<Value, (Symbol, Metadata)> {
+    ) throws -> OrderedDictionary<SymbolAssignment<Value>, Metadata> {
         /// This is required, or the assigned identifiers will not be deterministic.
         let order: [(Symbol, Metadata)] = table.index.sorted { $0.key < $1.key }
         var last: Int16 = self.index.values.reduce(into: 1) { $0 = max($0, $1.rawValue) }
@@ -94,15 +94,17 @@ extension SymbolTable where Value: RawRepresentable<Int16> & Sendable {
 
             } (&self.index[symbol])
 
+            let identity: SymbolAssignment<Value> = .init(code: id, symbol: symbol)
+
             /// We guarantee that identifiers we generate are unique, so this can only throw if
             /// a user-defined symbol has a collision with another user-defined symbol.
             try {
-                if  let existing: Symbol = $0?.0 {
-                    throw AddressSpaceError<Value>.collision(id, existing.name, symbol.name)
+                if case _? = $0 {
+                    throw AddressSpaceError<Value>.collision(id, symbol.name)
                 } else {
-                    $0 = (symbol, metadata)
+                    $0 = metadata
                 }
-            } (&$0[id])
+            } (&$0[identity])
         }
     }
 }

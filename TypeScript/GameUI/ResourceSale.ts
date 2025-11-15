@@ -6,9 +6,7 @@ export interface ResourceSale {
     readonly icon: string;
     readonly source?: string;
 
-    readonly unitsProduced: bigint;
     readonly unitsSold: bigint;
-    readonly valueSold: bigint;
 
     readonly price?: Candle<number>;
 }

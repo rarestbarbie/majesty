@@ -77,7 +77,7 @@ extension InventoryBreakdown {
             self.update(
                 from: mine.out,
                 mine: mine.id,
-                name: snapshot.mines[mine.id]?.type.name,
+                name: snapshot.mines[mine.id]?.type.title,
                 currency: currency,
                 location: pop.state.tile,
                 snapshot: snapshot
@@ -209,9 +209,7 @@ extension InventoryBreakdown {
                     label: snapshot.rules[output.id],
                     mine: mine,
                     name: name,
-                    unitsProduced: output.units.added,
                     unitsSold: output.unitsSold,
-                    valueSold: output.valueSold,
                     priceAtMarket: market?.history.last?.prices,
                     price: nil
                 )
@@ -224,9 +222,7 @@ extension InventoryBreakdown {
                     label: snapshot.rules[output.id],
                     mine: mine,
                     name: name,
-                    unitsProduced: output.units.added,
                     unitsSold: output.unitsSold,
-                    valueSold: output.valueSold,
                     priceAtMarket: nil,
                     price: market?.price,
                 )

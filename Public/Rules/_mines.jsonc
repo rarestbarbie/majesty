@@ -57,6 +57,25 @@
         }
     },
 
+    "Mica Mine": {
+        "miner": "Miner",
+        "decay": true,
+        "scale": 1000000000,
+        "spawn": {
+            "Earth_Large_Igneous_Province": {
+                "rate": "0.05",
+                "size": 2
+            },
+            "Earth_Sedimentary_Basin": {
+                "rate": "0.01",
+                "size": 1
+            }
+        },
+        "base": {
+            "Mica": 800
+        }
+    },
+
     "Natural Gas Field": {
         "miner": "Miner",
         "decay": true,
@@ -72,15 +91,11 @@
         }
     },
 
-    "Oil Field": {
+    "Offshore Oil Field": {
         "miner": "Miner",
         "decay": true,
         "scale": 1000000000,
         "spawn": {
-            "Earth_Sedimentary_Basin": {
-                "rate": "0.05",
-                "size": 1
-            },
             "Earth_Oceanic_Shelf": {
                 "rate": "0.05",
                 "size": 2

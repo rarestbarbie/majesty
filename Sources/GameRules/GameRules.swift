@@ -37,12 +37,12 @@ import OrderedCollections
 }
 extension GameRules {
     private typealias Tables = (
-        resources: OrderedDictionary<Resource, (Symbol, ResourceDescription)>,
-        factories: OrderedDictionary<FactoryType, (Symbol, FactoryDescription)>,
-        mines: OrderedDictionary<MineType, (Symbol, MineDescription)>,
-        technologies: OrderedDictionary<Technology, (Symbol, TechnologyDescription)>,
-        geology: OrderedDictionary<GeologicalType, (Symbol, GeologicalDescription)>,
-        terrains: OrderedDictionary<TerrainType, (Symbol, TerrainDescription)>
+        resources: OrderedDictionary<SymbolAssignment<Resource>, ResourceDescription>,
+        factories: OrderedDictionary<SymbolAssignment<FactoryType>, FactoryDescription>,
+        mines: OrderedDictionary<SymbolAssignment<MineType>, MineDescription>,
+        technologies: OrderedDictionary<SymbolAssignment<Technology>, TechnologyDescription>,
+        geology: OrderedDictionary<SymbolAssignment<GeologicalType>, GeologicalDescription>,
+        terrains: OrderedDictionary<SymbolAssignment<TerrainType>, TerrainDescription>
     )
 }
 extension GameRules {
@@ -79,12 +79,9 @@ extension GameRules {
             keys: symbols.pops,
             wildcard: "*"
         )
-        let resources: OrderedDictionary<
-            Resource,
-            ResourceMetadata
-        > = table.resources.mapValues {
+        let resources: OrderedDictionary<Resource, ResourceMetadata> = table.resources.map {
             .init(
-                name: $0.name,
+                identity: $0,
                 color: $1.color,
                 emoji: $1.emoji,
                 local: $1.local,
@@ -99,83 +96,73 @@ extension GameRules {
 
         self.init(
             resources: resources,
-            factories: try table.factories.reduce(
-                into: [:]
-            ) {
-                let (type, (symbol, factory)): (FactoryType, (Symbol, FactoryDescription)) = $1
-                $0[type] = try .init(
-                    name: symbol.name,
+            factories: try table.factories.map {
+                return try .init(
+                    identity: $0,
                     inputs: .init(
                         metadata: resources,
-                        quantity: try factory.inputs.quantities(keys: symbols.resources)
+                        quantity: try $1.inputs.quantities(keys: symbols.resources)
                     ),
                     office: .init(
                         metadata: resources,
-                        quantity: try factory.office.quantities(keys: symbols.resources)
+                        quantity: try $1.office.quantities(keys: symbols.resources)
                     ),
                     costs: .init(
                         metadata: resources,
-                        quantity: try (try factoryCosts[type] ?? factoryCosts[*]).quantities(keys: symbols.resources)
+                        quantity: try (try factoryCosts[$0.code] ?? factoryCosts[*]).quantities(keys: symbols.resources)
                     ),
                     output: .init(
                         metadata: resources,
-                        quantity: try factory.output.quantities(keys: symbols.resources)
+                        quantity: try $1.output.quantities(keys: symbols.resources)
                     ),
-                    workers: try factory.workers.quantities(keys: symbols.pops),
+                    workers: try $1.workers.quantities(keys: symbols.pops),
                     sharesInitial: rules.factoryCosts.sharesInitial,
                     sharesPerLevel: rules.factoryCosts.sharesPerLevel,
                     terrainAllowed: .init(
-                        try factory.terrain.lazy.map { try symbols.terrains[$0] }
+                        try $1.terrain.lazy.map { try symbols.terrains[$0] }
                     )
                 )
             },
-            mines: try table.mines.reduce(into: [:]) {
-                let (type, (symbol, mine)): (MineType, (Symbol, MineDescription)) = $1
-
-                $0[type] = MineMetadata.init(
-                    name: symbol.name,
+            mines: try table.mines.map {
+                .init(
+                    identity: $0,
                     base: .init(
                         metadata: resources,
-                        quantity: try mine.base.quantities(keys: symbols.resources)
+                        quantity: try $1.base.quantities(keys: symbols.resources)
                     ),
-                    miner: try symbols.pops[mine.miner],
-                    decay: mine.decay,
-                    scale: mine.scale,
-                    spawn: try mine.spawn.map(keys: symbols.geology),
+                    miner: try symbols.pops[$1.miner],
+                    decay: $1.decay,
+                    scale: $1.scale,
+                    spawn: try $1.spawn.map(keys: symbols.geology),
                 )
             },
-            technologies: try table.technologies.mapValues {
+            technologies: try table.technologies.map {
                 try .init(
-                    name: $0.name,
+                    identity: $0 as SymbolAssignment<Technology>,
                     starter: $1.starter,
                     effects: try $1.effects.resolved(with: symbols),
                     summary: $1.summary
                 )
             },
-            geology: try table.geology.reduce(into: [:]) {
-                let (type, (symbol, province)): (
-                    GeologicalType, (Symbol, GeologicalDescription)
-                ) = $1
-
-                $0[type] = .init(
-                    id: type,
-                    symbol: symbol,
-                    name: province.name,
-                    base: try province.base.map(keys: symbols.resources),
-                    bonus: try province.bonus.map(keys: symbols.resources) {
+            geology: try table.geology.map {
+                .init(
+                    identity: $0,
+                    title: $1.title,
+                    base: try $1.base.map(keys: symbols.resources),
+                    bonus: try $1.bonus.map(keys: symbols.resources) {
                         .init(
                             weightNone: $0.weightNone,
                             weights: try $0.weights.map(keys: symbols.resources)
                         )
                     },
-                    color: province.color
+                    color: $1.color
                 )
             },
-            terrains: table.terrains.reduce(into: [:]) {
-                $0[$1.key] = .init(id: $1.key, symbol: $1.value.0, color: $1.value.1.color)
+            terrains: table.terrains.map {
+                .init(identity: $0, color: $1.color)
             },
-            pops: try PopType.allCases.reduce(into: [:]) {
-                $0[$1] = try .init(type: $1, pops: pops, symbols: symbols, resources: resources)
+            pops: try PopType.allCases.map(to: [PopType: PopMetadata].self) {
+                try .init(id: $0, effects: pops, symbols: symbols, resources: resources)
             },
             settings: settings
         )
@@ -188,12 +175,10 @@ extension GameRules {
 
         // TODO: hash settings
 
-        for (key, value): (Resource, ResourceMetadata) in self.resources {
-            key.hash(into: &hasher)
+        for value: ResourceMetadata in self.resources.values {
             value.hash.hash(into: &hasher)
         }
-        for (key, value): (FactoryType, FactoryMetadata) in self.factories {
-            key.hash(into: &hasher)
+        for value: FactoryMetadata in self.factories.values {
             value.hash.hash(into: &hasher)
         }
         for (key, value): (MineType, MineMetadata) in self.mines {

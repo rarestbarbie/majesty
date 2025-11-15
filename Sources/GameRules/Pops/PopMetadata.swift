@@ -4,8 +4,7 @@ import GameEconomy
 import OrderedCollections
 
 public final class PopMetadata: Identifiable, Sendable {
-    public let singular: String
-    public let plural: String
+    public let id: PopType
     public let color: Color
     public let l: ResourceTier
     public let e: ResourceTier
@@ -13,16 +12,14 @@ public final class PopMetadata: Identifiable, Sendable {
     public let output: ResourceTier
 
     private init(
-        singular: String,
-        plural: String,
+        id: PopType,
         color: Color,
         l: ResourceTier,
         e: ResourceTier,
         x: ResourceTier,
         output: ResourceTier,
     ) {
-        self.singular = singular
-        self.plural = plural
+        self.id = id
         self.color = color
         self.l = l
         self.e = e
@@ -32,20 +29,19 @@ public final class PopMetadata: Identifiable, Sendable {
 }
 extension PopMetadata {
     convenience init(
-        type: PopType,
-        pops: EffectsTable<PopType, PopDescription>,
+        id: PopType,
+        effects: EffectsTable<PopType, PopDescription>,
         symbols: GameSaveSymbols,
         resources: OrderedDictionary<Resource, ResourceMetadata>
     ) throws {
-        let pop: PopDescription? = pops[type]
-        let l: SymbolTable<Int64> = try pop?.l ?? pops[*].l ?? [:]
-        let e: SymbolTable<Int64> = try pop?.e ?? pops[*].e ?? [:]
-        let x: SymbolTable<Int64> = try pop?.x ?? pops[*].x ?? [:]
-        let output: SymbolTable<Int64> = try pop?.output ?? pops[*].output ?? [:]
+        let pop: PopDescription? = effects[id]
+        let l: SymbolTable<Int64> = try pop?.l ?? effects[*].l ?? [:]
+        let e: SymbolTable<Int64> = try pop?.e ?? effects[*].e ?? [:]
+        let x: SymbolTable<Int64> = try pop?.x ?? effects[*].x ?? [:]
+        let output: SymbolTable<Int64> = try pop?.output ?? effects[*].output ?? [:]
         self.init(
-            singular: type.singular,
-            plural: type.plural,
-            color: try pop?.color ?? pops[*].color ?? 0xFFFFFF,
+            id: id,
+            color: try pop?.color ?? effects[*].color ?? 0xFFFFFF,
             l: .init(metadata: resources, quantity: try l.quantities(keys: symbols.resources)),
             e: .init(metadata: resources, quantity: try e.quantities(keys: symbols.resources)),
             x: .init(metadata: resources, quantity: try x.quantities(keys: symbols.resources)),
@@ -55,6 +51,10 @@ extension PopMetadata {
             )
         )
     }
+}
+extension PopMetadata {
+    @inlinable public var singular: String { self.id.singular }
+    @inlinable public var plural: String { self.id.plural }
 }
 extension PopMetadata {
     var hash: Int {

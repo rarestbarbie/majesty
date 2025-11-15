@@ -1,8 +1,9 @@
 import GameEconomy
 import GameIDs
 
-public final class FactoryMetadata: Identifiable, Sendable {
-    public let name: String
+public final class FactoryMetadata: GameMetadata {
+    public typealias ID = FactoryType
+    public let identity: SymbolAssignment<FactoryType>
     public let inputs: ResourceTier
     public let office: ResourceTier
     public let costs: ResourceTier
@@ -16,7 +17,7 @@ public final class FactoryMetadata: Identifiable, Sendable {
     public let terrainAllowed: Set<TerrainType>
 
     init(
-        name: String,
+        identity: SymbolAssignment<FactoryType>,
         inputs: ResourceTier,
         office: ResourceTier,
         costs: ResourceTier,
@@ -26,7 +27,7 @@ public final class FactoryMetadata: Identifiable, Sendable {
         sharesPerLevel: Int64,
         terrainAllowed: Set<TerrainType>
     ) throws {
-        self.name = name
+        self.identity = identity
 
         self.inputs = inputs
         self.office = office
@@ -56,7 +57,7 @@ extension FactoryMetadata {
     var hash: Int {
         var hasher: Hasher = .init()
 
-        self.name.hash(into: &hasher)
+        self.identity.hash(into: &hasher)
         self.inputs.hash(into: &hasher)
         self.office.hash(into: &hasher)
         self.costs.hash(into: &hasher)

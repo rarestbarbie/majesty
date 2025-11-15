@@ -33,8 +33,8 @@ extension NavigatorTile {
             return
         }
 
-        self.name = "\(tile.name ?? tile.terrain.name) (\(planet.state.name))"
-        self.terrain = tile.terrain.name
+        self.name = "\(tile.name ?? tile.terrain.title) (\(planet.state.name))"
+        self.terrain = tile.terrain.title
 
         let pops: PopulationStats = tile.properties?.pops ?? .init()
 

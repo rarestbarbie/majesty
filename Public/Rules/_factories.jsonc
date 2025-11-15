@@ -1,4 +1,176 @@
 {
+    "Aluminum Mill": {
+        "inputs": {
+            "Machine Parts": 1,
+            "Alumina": 20,
+            "Electricity": 20
+        },
+        "output": {
+            "Aluminum": 16
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+    "Appliance Factory": {
+        "emoji": "🖥️",
+        "color": "#505253",
+        "inputs": {
+            "Aluminum": 4,
+            "Electronics": 2,
+            "Machine Parts": 6
+        },
+        "output": {
+            "Appliances": 12
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+    "Automotive Assembly Plant": {
+        "emoji": "🛻",
+        "color": "#91091b",
+        "inputs": {
+            "Polymers": 2,
+            "Batteries": 4,
+            "Aluminum": 2,
+            "Machine Parts": 4,
+            "Appliances": 4,
+            "Instruments": 1
+        },
+        "output": {
+            "Vehicles": 12
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+    "Battery Plant": {
+        "inputs": {
+            "Lithium": 4,
+            "Polymers": 1
+            // "Graphite": 3
+        },
+        "output": {
+            "Batteries": 8
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+    "Cereal Farm": {
+        "inputs": {
+            "Water": 20,
+            "Fertilizer": 5
+        },
+        "output": {
+            "Wheat": 60,
+            "Fertilizer": 5
+        },
+        "workers": {
+            "Driver": 20000,
+            "Farmer": 5000
+        },
+        "terrain": ["Desert", "Forest", "Rainforest", "Steppe"]
+    },
+    "Cosmetics Factory": {
+        "emoji": "💄",
+        "color": "#ffffff",
+        "inputs": {
+            "Polymers": 4,
+            "Produce": 4,
+            "Mica": 2,
+            "Water": 2
+        },
+        "output": {
+            "Makeup": 10,
+            "Medical Equipment": 2
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+    "Clothing Workshop": {
+        "emoji": "👗",
+        "color": "#4cffd2",
+        "inputs": {
+            "Produce": 5,
+            "Polymers": 5,
+            "Appliances": 1,
+            "Machine Parts": 1
+        },
+        "output": {
+            "Clothing": 12,
+            "Lingerie": 4
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+    "Data Center": {
+        "inputs": {
+            "Electricity": 12,
+            "Electronics": 4
+        },
+        "output": {
+            "Storage": 128
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+    "Electronics Factory": {
+        "emoji": "🎮",
+        "color": "#62a060",
+        "inputs": {
+            "Polymers": 4,
+            "Semiconductor Devices": 4,
+            "Aluminum": 1,
+            "Appliances": 1,
+            "Mica": 2,
+            "Machine Parts": 2
+        },
+        "output": {
+            "Electronics": 12
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+    "Fertilizer Plant": {
+        "inputs": {
+            "Electricity": 20
+        },
+        "output": {
+            "Fertilizer": 40
+        },
+        "workers": {
+            "Driver": 10000,
+            "Engineer": 3000
+        }
+    },
+    "Fossil Power Plant": {
+        "inputs": {
+            "Construction": 1,
+            "Hydrocarbons": 5,
+            "Water": 5
+        },
+        "output": {
+            "Electricity": 200
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 2500
+        }
+    },
     "Hydroelectric Dam": {
         "inputs": {
             "Construction": 1
@@ -23,64 +195,6 @@
             "Taiga"
         ]
     },
-    "Fossil Power Plant": {
-        "inputs": {
-            "Construction": 1,
-            "Hydrocarbons": 5,
-            "Water": 5
-        },
-        "output": {
-            "Electricity": 200
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 2500
-        }
-    },
-    "Nuclear Power Plant": {
-        "inputs": {
-            "Water": 1,
-            "Uranium": 1
-        },
-        "output": {
-            "Electricity": 1200
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
-    "Cereal Farm": {
-        "inputs": {
-            "Water": 20,
-            "Fertilizer": 5
-        },
-        "output": {
-            "Wheat": 60,
-            "Fertilizer": 5
-        },
-        "workers": {
-            "Driver": 20000,
-            "Farmer": 5000
-        },
-        "terrain": ["Desert", "Forest", "Rainforest", "Steppe"]
-    },
-    "Plantation": {
-        "inputs": {
-            "Water": 40,
-            "Fertilizer": 10
-        },
-        "output": {
-            "Wheat": 40,
-            "Produce": 40,
-            "Fertilizer": 5
-        },
-        "workers": {
-            "Driver": 20000,
-            "Farmer": 5000
-        },
-        "terrain": ["Desert", "Steppe", "Forest", "Rainforest"]
-    },
     "Hydroponic Farm": {
         "inputs": {
             "Water": 5,
@@ -95,44 +209,30 @@
             "Engineer": 3000
         }
     },
-    "Fertilizer Plant": {
+    "Instrument Factory": {
+        "emoji": "🎸",
+        "color": "#a02535",
         "inputs": {
-            "Electricity": 20
+            "Polymers": 2,
+            "Electronics": 4,
+            "Semiconductor Devices": 2
         },
         "output": {
-            "Fertilizer": 40
+            "Instruments": 10
         },
         "workers": {
-            "Driver": 10000,
-            "Engineer": 3000
+            "Driver": 5000,
+            "Engineer": 5000
         }
     },
-
-    "Slaughterhouse": {
+    "Liquor Distillery": {
         "inputs": {
-            "Machine Parts": 1,
-            "Livestock": 160,
-            "Water": 20
+            "Produce": 4,
+            "Wheat": 4,
+            "Water": 4
         },
         "output": {
-            "Poultry": 240,
-            "Beef": 80
-        },
-        "workers": {
-            "Driver": 10000,
-            "Engineer": 3000
-        }
-    },
-
-
-    "Aluminum Mill": {
-        "inputs": {
-            "Machine Parts": 1,
-            "Alumina": 20,
-            "Electricity": 20
-        },
-        "output": {
-            "Aluminum": 16
+            "Liquor": 12
         },
         "workers": {
             "Driver": 5000,
@@ -153,81 +253,6 @@
             "Engineer": 5000
         }
     },
-
-    "Appliance Factory": {
-        "emoji": "🖥️",
-        "color": "#505253",
-        "inputs": {
-            "Aluminum": 4,
-            "Electronics": 2,
-            "Machine Parts": 6
-        },
-        "output": {
-            "Appliances": 12
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
-
-    "Automotive Assembly Plant": {
-        "emoji": "🛻",
-        "color": "#91091b",
-        "inputs": {
-            "Polymers": 2,
-            "Batteries": 4,
-            "Aluminum": 2,
-            "Machine Parts": 4,
-            "Appliances": 4,
-            "Instruments": 1
-        },
-        "output": {
-            "Vehicles": 12
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
-
-    "Clothing Workshop": {
-        "emoji": "👗",
-        "color": "#4cffd2",
-        "inputs": {
-            "Produce": 5,
-            "Polymers": 5,
-            "Appliances": 1,
-            "Machine Parts": 1
-        },
-        "output": {
-            "Clothing": 12
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
-
-    "Electronics Factory": {
-        "emoji": "🎮",
-        "color": "#62a060",
-        "inputs": {
-            "Polymers": 4,
-            "Semiconductor Devices": 4,
-            "Aluminum": 1,
-            "Appliances": 1,
-            "Machine Parts": 2
-        },
-        "output": {
-            "Electronics": 12
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
-
     "Medical Equipment Factory": {
         "emoji": "💉",
         "color": "#9de9f7",
@@ -245,24 +270,48 @@
             "Engineer": 5000
         }
     },
-
-    "Instrument Factory": {
-        "emoji": "🎸",
-        "color": "#a02535",
+    "Nuclear Power Plant": {
         "inputs": {
-            "Polymers": 2,
-            "Electronics": 4,
-            "Semiconductor Devices": 2
+            "Water": 1,
+            "Uranium": 1
         },
         "output": {
-            "Instruments": 10
+            "Electricity": 1200
         },
         "workers": {
             "Driver": 5000,
             "Engineer": 5000
         }
     },
-
+    "Plantation": {
+        "inputs": {
+            "Water": 40,
+            "Fertilizer": 10
+        },
+        "output": {
+            "Wheat": 40,
+            "Produce": 40,
+            "Fertilizer": 5
+        },
+        "workers": {
+            "Driver": 20000,
+            "Farmer": 5000
+        },
+        "terrain": ["Desert", "Steppe", "Forest", "Rainforest"]
+    },
+    "Polypropylene Plant": {
+        "inputs": {
+            "Hydrocarbons": 8,
+            "Water": 8
+        },
+        "output": {
+            "Polymers": 8
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
     "Semiconductor Foundry": {
         "emoji": "📀",
         "color": "#e4b55f",
@@ -282,116 +331,19 @@
             "Engineer": 8000
         }
     },
-
-    "Ammonia Plant": {
+    "Slaughterhouse": {
         "inputs": {
-            "Hydrocarbons": 12
+            "Machine Parts": 1,
+            "Livestock": 160,
+            "Water": 20
         },
         "output": {
-            "Ammonia": 12
+            "Poultry": 240,
+            "Beef": 80
         },
         "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
-    "Battery Plant": {
-        "inputs": {
-            "Lithium": 4,
-            "Polymers": 1
-            // "Graphite": 3
-        },
-        "output": {
-            "Batteries": 8
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
-    "Chemical Synthesis Plant": {
-        "inputs": {
-            "Hydrocarbons": 2,
-            "Graphite": 1,
-            "Ammonia": 1,
-            "Water": 2
-        },
-        "output": {
-            "Hormones": 8
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
-    "Compute Cluster": {
-        "inputs": {
-            "Electricity": 24,
-            "Electronics": 4,
-            "Storage": 24
-        },
-        "output": {
-            "Autocomplete": 16
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
-    "Data Center": {
-        "inputs": {
-            "Electricity": 12,
-            "Electronics": 4
-        },
-        "output": {
-            "Storage": 128
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
-    "Fermentation Plant": {
-        "inputs": {
-            "Hydrocarbons": 2,
-            "Hormones": 1,
-            "Fertilizer": 3,
-            "Water": 2
-        },
-        "output": {
-            "Antibiotics": 8
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
-
-    "Polypropylene Plant": {
-        "inputs": {
-            "Hydrocarbons": 8,
-            "Water": 8
-        },
-        "output": {
-            "Polymers": 8
-        },
-        "workers": {
-            "Driver": 5000,
-            "Engineer": 5000
-        }
-    },
-
-    "Water Treatment Plant": {
-        "inputs": {
-            "Water Ice": 10,
-            "Electricity": 10
-        },
-        "output": {
-            "Water": 100
-        },
-        "workers": {
-            "Driver": 2000,
-            "Engineer": 4000
+            "Driver": 10000,
+            "Engineer": 3000
         }
     },
     "Uranium Enrichment Facility": {
@@ -405,6 +357,92 @@
         "workers": {
             "Driver": 5000,
             "Engineer": 2000
+        }
+    },
+    "Vape Factory": {
+        "inputs": {
+            "Polymers": 1,
+            "Electronics": 1,
+            "Liquor": 4
+        },
+        "output": {
+            "Vapes": 12
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+
+
+    // "Ammonia Plant": {
+    //     "inputs": {
+    //         "Hydrocarbons": 12
+    //     },
+    //     "output": {
+    //         "Ammonia": 12
+    //     },
+    //     "workers": {
+    //         "Driver": 5000,
+    //         "Engineer": 5000
+    //     }
+    // },
+
+    // "Chemical Synthesis Plant": {
+    //     "inputs": {
+    //         "Hydrocarbons": 2,
+    //         "Graphite": 1,
+    //         "Ammonia": 1,
+    //         "Water": 2
+    //     },
+    //     "output": {
+    //         "Hormones": 8
+    //     },
+    //     "workers": {
+    //         "Driver": 5000,
+    //         "Engineer": 5000
+    //     }
+    // },
+    // "Compute Cluster": {
+    //     "inputs": {
+    //         "Electricity": 24,
+    //         "Electronics": 4,
+    //         "Storage": 24
+    //     },
+    //     "output": {
+    //         "Autocomplete": 16
+    //     },
+    //     "workers": {
+    //         "Driver": 5000,
+    //         "Engineer": 5000
+    //     }
+    // },
+    // "Fermentation Plant": {
+    //     "inputs": {
+    //         "Hydrocarbons": 2,
+    //         "Hormones": 1,
+    //         "Fertilizer": 3,
+    //         "Water": 2
+    //     },
+    //     "output": {
+    //         "Antibiotics": 8
+    //     },
+    //     "workers": {
+    //         "Driver": 5000,
+    //         "Engineer": 5000
+    //     }
+    // },
+    "Water Treatment Plant": {
+        "inputs": {
+            "Water Ice": 10,
+            "Electricity": 10
+        },
+        "output": {
+            "Water": 100
+        },
+        "workers": {
+            "Driver": 2000,
+            "Engineer": 4000
         }
     }
 }

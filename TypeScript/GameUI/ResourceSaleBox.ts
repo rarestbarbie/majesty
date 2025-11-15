@@ -13,9 +13,7 @@ export class ResourceSaleBox implements DiffableListElement<string> {
     public readonly node: HTMLAnchorElement;
 
     private readonly units: HTMLElement;
-    private readonly value: HTMLElement;
     private readonly price: Ticker;
-    private readonly proceeds: HTMLElement;
     private readonly subtitle: HTMLElement;
 
     private owner: GameID;
@@ -35,21 +33,17 @@ export class ResourceSaleBox implements DiffableListElement<string> {
         resource.textContent = state.name;
 
         this.units = document.createElement('div');
+        this.units.classList.add('units-sold');
         this.units.setAttribute('data-tooltip-type', type.tooltipResourceIO);
         this.units.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([owner, state.id]),
         );
 
-
-        this.value = document.createElement('div');
+        // this.value = document.createElement('div');
         this.price = new Ticker(Fortune.Bonus);
-
-        this.proceeds = document.createElement('div');
-        this.proceeds.appendChild(this.value);
-        this.proceeds.appendChild(this.price.outer);
-        this.proceeds.classList.add('proceeds');
-        this.proceeds.setAttribute('data-tooltip-type', type.tooltipExplainPrice);
+        this.price.outer.classList.add('price');
+        this.price.outer.setAttribute('data-tooltip-type', type.tooltipExplainPrice);
 
         this.subtitle = document.createElement('div');
         this.subtitle.classList.add('subtitle');
@@ -59,8 +53,8 @@ export class ResourceSaleBox implements DiffableListElement<string> {
 
         this.node.appendChild(icon);
         this.node.appendChild(resource);
+        this.node.appendChild(this.price.outer);
         this.node.appendChild(this.units);
-        this.node.appendChild(this.proceeds);
         this.node.appendChild(this.subtitle);
 
         this.owner = owner;
@@ -74,7 +68,6 @@ export class ResourceSaleBox implements DiffableListElement<string> {
         }
 
         UpdateBigInt(this.units, state.unitsSold);
-        UpdateBigInt(this.value, state.valueSold);
 
         if (state.source !== undefined) {
             UpdateText(this.subtitle, state.source);
@@ -92,7 +85,7 @@ export class ResourceSaleBox implements DiffableListElement<string> {
             'data-tooltip-arguments',
             JSON.stringify([this.owner, this.id]),
         );
-        this.proceeds.setAttribute(
+        this.price.outer.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([this.owner, this.id]),
         );

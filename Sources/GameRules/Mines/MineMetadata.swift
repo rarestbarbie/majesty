@@ -1,8 +1,9 @@
 import GameEconomy
 import GameIDs
 
-public final class MineMetadata: Identifiable, Sendable {
-    public let name: String
+public final class MineMetadata: GameMetadata {
+    public typealias ID = MineType
+    public let identity: SymbolAssignment<MineType>
     public let base: ResourceTier
     public let miner: PopType
     public let decay: Bool
@@ -10,7 +11,7 @@ public final class MineMetadata: Identifiable, Sendable {
     public let spawn: [GeologicalType: SpawnWeight]
 
     init(
-        name: String,
+        identity: SymbolAssignment<MineType>,
         base: ResourceTier,
         miner: PopType,
         decay: Bool,
@@ -21,7 +22,7 @@ public final class MineMetadata: Identifiable, Sendable {
             fatalError("Mine scale must be positive!!!")
         }
 
-        self.name = name
+        self.identity = identity
         self.base = base
         self.miner = miner
         self.decay = decay
@@ -33,7 +34,7 @@ extension MineMetadata {
     var hash: Int {
         var hasher: Hasher = .init()
 
-        self.name.hash(into: &hasher)
+        self.identity.hash(into: &hasher)
         self.base.hash(into: &hasher)
         self.miner.hash(into: &hasher)
         self.decay.hash(into: &hasher)
