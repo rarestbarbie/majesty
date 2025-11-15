@@ -18,7 +18,7 @@ extension CountryContext: RuntimeContext {
     }
 }
 extension CountryContext {
-    mutating func compute(
+    mutating func afterIndexCount(
         world _: borrowing GameWorld,
         context: GameContext.TerritoryPass
     ) throws {

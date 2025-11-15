@@ -10,7 +10,7 @@ struct CultureContext: RuntimeContext {
     }
 }
 extension CultureContext {
-    mutating func compute(
+    mutating func afterIndexCount(
         world _: borrowing GameWorld,
         context: GameContext.TerritoryPass
     ) throws {

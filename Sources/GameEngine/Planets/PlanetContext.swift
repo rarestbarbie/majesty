@@ -33,7 +33,7 @@ extension PlanetContext {
     }
 }
 extension PlanetContext {
-    mutating func compute(
+    mutating func afterIndexCount(
         world: borrowing GameWorld,
         context: GameContext.TerritoryPass
     ) throws {

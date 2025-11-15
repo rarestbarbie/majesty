@@ -460,23 +460,23 @@ extension GameContext {
         self.index()
 
         for i: Int in self.planets.indices {
-            try self.planets[i].compute(world: world, context: self.territoryPass)
+            try self.planets[i].afterIndexCount(world: world, context: self.territoryPass)
         }
         for i: Int in self.cultures.indices {
-            try self.cultures[i].compute(world: world, context: self.territoryPass)
+            try self.cultures[i].afterIndexCount(world: world, context: self.territoryPass)
         }
         for i: Int in self.countries.indices {
-            try self.countries[i].compute(world: world, context: self.territoryPass)
+            try self.countries[i].afterIndexCount(world: world, context: self.territoryPass)
         }
 
         for i: Int in self.factories.indices {
-            try self.factories[i].compute(world: world, context: self.factoryPass)
+            try self.factories[i].afterIndexCount(world: world, context: self.factoryPass)
         }
         for i: Int in self.mines.indices {
-            try self.mines[i].compute(world: world, context: self.minePass)
+            try self.mines[i].afterIndexCount(world: world, context: self.minePass)
         }
         for i: Int in self.pops.indices {
-            try self.pops[i].compute(world: world, context: self.popPass)
+            try self.pops[i].afterIndexCount(world: world, context: self.popPass)
         }
     }
 }
