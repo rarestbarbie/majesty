@@ -79,7 +79,7 @@ extension PopulationStats {
 
         return .instructions(style: .borderless) {
             let n: Double = Double.init(share.count)
-            let d: Double = Double.init(self.free.total)
+            let d: Double = Double.init(total)
             $0[popType.plural] = (n / d)[%3]
             $0[>] {
                 $0["Unemployment rate", (-)] = (Double.init(share.unemployed) / n)[%3]
