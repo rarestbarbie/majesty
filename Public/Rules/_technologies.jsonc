@@ -15,6 +15,15 @@
         },
         "summary": "Hydraulic Fracking involved the use of vast quantities of water under high pressure to fracture subterranean rock formations, thereby releasing the natural gas inside. The technique was so effective that it led to a boom in hydrocarbon production in the early 21st century, as well as a religious revival among certain groups who came to believe its use would bring about the end of the world."
     },
+    "Deepwater Drilling": {
+        "starter": true,
+        "effects": {
+            "mining_efficiency": {
+                "Offshore Oil Field": "0.05"
+            }
+        },
+        "summary": "Deepwater Drilling technology enabled the extraction of oil from beneath the ocean floor, opening up vast new reserves of hydrocarbons that were previously inaccessible. This led to a significant increase in global oil production, fueling economic growth and geopolitical shifts in the late 20th century."
+    },
     "Bayer Process": {
         "starter": true,
         "effects": {

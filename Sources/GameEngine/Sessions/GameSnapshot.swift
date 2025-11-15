@@ -309,7 +309,7 @@ extension GameSnapshot {
         return .instructions(style: .borderless) {
             switch layer {
             case .Terrain:
-                $0[>] = "\(tile.terrain.name) (\(tile.geology.name))"
+                $0[>] = "\(tile.terrain.title) (\(tile.geology.title))"
 
             case .Population:
                 $0["Population"] = pops.free.total[/3]
@@ -408,19 +408,19 @@ extension GameSnapshot {
 
         if !pop.state.factories.isEmpty {
             return self.tooltipPopJobs(list: pop.state.factories.values.elements) {
-                self.context.factories[$0]?.type.name ?? "Unknown"
+                self.context.factories[$0]?.type.title ?? "Unknown"
             }
         }
         if !pop.state.mines.isEmpty {
             return self.tooltipPopJobs(list: pop.state.mines.values.elements) {
-                self.context.mines[$0]?.type.name ?? "Unknown"
+                self.context.mines[$0]?.type.title ?? "Unknown"
             }
         } else {
             let employment: Int64 = pop.stats.employedBeforeEgress
             return .instructions {
                 $0["Total employment"] = employment[/3]
                 for output: ResourceOutput<Never> in pop.state.inventory.out.inelastic.values {
-                    let name: String? = self.context.rules.resources[output.id]?.name
+                    let name: String? = self.context.rules.resources[output.id]?.title
                     $0[>] = """
                     Today these \(pop.state.type.plural) sold \(
                         output.unitsSold[/3],
@@ -591,7 +591,7 @@ extension GameSnapshot {
                     }
                 }
 
-                $0[>] = "\(mine.type.name)"
+                $0[>] = "\(mine.type.title)"
             }
         }
     }

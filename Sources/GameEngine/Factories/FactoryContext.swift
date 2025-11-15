@@ -70,7 +70,7 @@ extension FactoryContext {
             fatalError(
                 """
                 Pop (id = \(pop.id)) of type '\(pop.type)' cannot work in factory of type \
-                '\(self.type.name)'!
+                '\(self.type.symbol)'!
                 """
             )
         }
@@ -478,7 +478,7 @@ extension FactoryContext {
         #assert(
             self.state.inventory.account.balance >= 0,
             """
-            Factory (id = \(self.id), type = '\(self.type.name)') has negative cash! \
+            Factory (id = \(self.id), type = '\(self.type.symbol)') has negative cash! \
             (\(self.state.inventory.account))
             """
         )

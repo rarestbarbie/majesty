@@ -41,7 +41,7 @@ extension CashFlowStatement {
 
         let label: String
         switch item {
-        case .resource(let id): label = rules.resources[id]?.name ?? "???"
+        case .resource(let id): label = rules.resources[id]?.title ?? "???"
         case .workers: label = "Workers"
         case .clerks: label = "Clerks"
         }

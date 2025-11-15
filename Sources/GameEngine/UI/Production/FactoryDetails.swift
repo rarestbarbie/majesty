@@ -34,7 +34,7 @@ extension FactoryDetails {
         case .Ownership: self.ownership.update(from: factory, in: snapshot.context)
         }
 
-        self.name = factory.type.name
+        self.name = factory.type.title
     }
 }
 extension FactoryDetails: JavaScriptEncodable {
