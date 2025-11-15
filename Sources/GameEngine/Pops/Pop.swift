@@ -47,13 +47,16 @@ extension Pop: Sectionable {
 }
 extension Pop: Deletable {
     var dead: Bool {
-        if  self.z.size == 0,
-            self.inventory.account.balance == 0,
-            self.equity.shares.values.allSatisfy({ $0.shares <= 0 }) {
-            true
-        } else {
-            false
+        guard self.z.size <= 0 else {
+            return false
         }
+
+        #assert(
+            self.inventory.account.balance == 0,
+            "Pop (id = \(self.id)) is dead but still has assets!!!"
+        )
+
+        return true
     }
 }
 extension Pop {
@@ -135,12 +138,9 @@ extension Pop {
     }
 }
 extension Pop {
-    /// It is better to compute this dynamically, as the pop count itself can change, and that
-    /// might invalidate cached values for unemployment!
-    var unemployed: Int64 {
-        self.z.size
-            - self.factories.values.reduce(0) { $0 + $1.count }
-            - self.mines.values.reduce(0) { $0 + $1.count }
+    func employed() -> Int64 {
+        self.factories.values.reduce(0) { $0 + $1.count } +
+        self.mines.values.reduce(0) { $0 + $1.count }
     }
 
     var decadence: Double {

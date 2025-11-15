@@ -12,14 +12,14 @@ import Random
 struct PopContext: RuntimeContext, LegalEntityContext {
     let type: PopMetadata
     var state: Pop
+    private(set) var stats: Pop.Stats
 
     private(set) var region: RegionalProperties?
 
-    private(set) var unemployment: Double
     private(set) var income: [FactoryID: Int64]
     private(set) var equity: Equity<LEI>.Statistics
 
-    private(set) var cashFlow: CashFlowStatement
+    var cashFlow: CashFlowStatement { self.stats.cashFlow }
 
     private(set) var budget: PopBudget?
 
@@ -28,13 +28,11 @@ struct PopContext: RuntimeContext, LegalEntityContext {
     public init(type: PopMetadata, state: Pop) {
         self.type = type
         self.state = state
+        self.stats = .init()
         self.region = nil
 
-        self.unemployment = 0
         self.income = [:]
         self.equity = .init()
-        self.cashFlow = .init()
-
         self.budget = nil
         self.mines = [:]
     }
@@ -46,6 +44,8 @@ extension PopContext {
     private static var stockpileDays: ClosedRange<Int64> { 3 ... 7 }
 
     mutating func startIndexCount() {
+        // computed during indexing, because the index pass uses it
+        self.stats.update(from: self.state)
     }
 
     mutating func addPosition(asset: LEI, value: Int64) {
@@ -63,22 +63,6 @@ extension PopContext {
     mutating func compute(world _: borrowing GameWorld, context: ComputationPass) throws {
         self.region = context.planets[self.state.tile]?.properties
 
-        if  self.state.inventory.out.inelastic.isEmpty {
-            self.unemployment = Double.init(
-                self.state.unemployed
-            ) / Double.init(
-                self.state.z.size
-            )
-        } else {
-            self.unemployment = self.state.inventory.out.inelastic.values.reduce(1) {
-                let sold: Double = $1.units.added > 0
-                    ? Double.init($1.unitsSold) / Double.init($1.units.added)
-                    : 1
-
-                return min($0, 1 - sold)
-            }
-        }
-
         self.mines.removeAll(keepingCapacity: true)
         for job: MiningJob in self.state.mines.values {
             let (state, type): (Mine, MineMetadata) = try context.mines[job.id]
@@ -93,11 +77,6 @@ extension PopContext {
         for id: FactoryID in self.state.factories.keys {
             self.income[id] = context.factories[id]?.z.wn
         }
-
-        self.cashFlow.reset()
-        self.cashFlow.update(with: self.state.inventory.l)
-        self.cashFlow.update(with: self.state.inventory.e)
-        self.cashFlow.update(with: self.state.inventory.x)
     }
 }
 extension PopContext: TransactingContext {
@@ -375,7 +354,7 @@ extension PopContext {
             } (&self.state.mines.values[i])
         }
 
-        let unemployed: Int64 = self.state.unemployed
+        let unemployed: Int64 = self.state.z.size - self.state.employed()
         if  unemployed < 0 {
             /// We have negative unemployment! This happens when the popuation shrinks, either
             /// through pop death or conversion.
@@ -457,7 +436,7 @@ extension PopContext {
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
-            $0[self.unemployment] {
+            $0[1 - self.stats.employmentBeforeEgress] {
                 $0[$1 >= 0.1] = +2‱
                 $0[$1 >= 0.2] = +1‱
                 $0[$1 >= 0.3] = +1‱

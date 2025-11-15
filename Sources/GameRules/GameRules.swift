@@ -140,8 +140,8 @@ extension GameRules {
                     ),
                     miner: try symbols.pops[mine.miner],
                     decay: mine.decay,
-                    geology: try mine.geology.map(keys: symbols.geology),
-                    initialSize: mine.initialSize
+                    scale: mine.scale,
+                    spawn: try mine.spawn.map(keys: symbols.geology),
                 )
             },
             technologies: try table.technologies.mapValues {

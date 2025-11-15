@@ -3,6 +3,7 @@ import Fraction
 import GameConditions
 import GameEconomy
 import GameIDs
+import GameRules
 import GameUI
 import HexGrids
 import OrderedCollections
@@ -415,9 +416,7 @@ extension GameSnapshot {
                 self.context.mines[$0]?.type.name ?? "Unknown"
             }
         } else {
-            let employment: Int64 = pop.state.z.size > 0 ? .init(
-                (pop.unemployment * Double.init(pop.state.z.size)).rounded()
-            ) : 0
+            let employment: Int64 = pop.stats.employedBeforeEgress
             return .instructions {
                 $0["Total employment"] = employment[/3]
                 for output: ResourceOutput<Never> in pop.state.inventory.out.inelastic.values {
@@ -556,19 +555,40 @@ extension GameSnapshot {
             return nil
         case .m(let id):
             guard
-            let mine: MineContext = self.context.mines[id.mine] else {
+            let mine: MineContext = self.context.mines[id.mine],
+            let tile: PlanetGrid.Tile = self.context.planets[mine.state.tile] else {
                 return nil
             }
             return .instructions {
                 $0[mine.type.miner.plural, +] = mine.miners.count[/3] / mine.miners.limit
                 $0["Today’s change", +] = mine.miners.count[/3] <- mine.miners.before
                 $0[>] {
-                    $0["Hired", +] = +?mine.miners.hired[/3]
+                    // only elide fired, it’s annoying when the lines below jump around
+                    $0["Hired", +] = +mine.miners.hired[/3]
                     $0["Fired", -] = +?mine.miners.fired[/3]
-                    $0["Quit", -] = +?mine.miners.quit[/3]
+                    $0["Quit", -] = +mine.miners.quit[/3]
                 }
-                if mine.type.decay {
+                if  let (chance, spawn): (Fraction, SpawnWeight) = mine.type.chance(size: mine.state.z.size, tile: tile.geology.id) {
                     $0["Estimated deposits"] = mine.state.Δ.size[/3]
+                    if  let miners: PopulationStats.Row = tile.properties?.pops.type[.Miner],
+                        let fromWorkers: Fraction = miners.mineExpansionFactor {
+                        let roll: Double = .init(chance.n %/ chance.d)
+                        let fromDeposit: Double = .init(mine.type.scale %/ (mine.type.scale + mine.state.z.size))
+                        let fromWorkers: Double = .init(fromWorkers)
+                        let chance: Double = roll * fromWorkers
+                        $0["Chance to expand mine", (+)] = chance[%2]
+                        $0[>] {
+                            $0["Base"] = spawn.rate.value[%]
+                            $0["From size of deposit", (+)] = (fromDeposit - 1)[%2]
+                            $0["From unemployed miners", (+)] = fromWorkers[%2]
+                        }
+                    }
+                    if  let expanded: Mine.Expansion = mine.state.last {
+                        $0[>] = """
+                        We recently discovered a deposit of size \(em: expanded.size[/3]) on \
+                        \(em: expanded.date[.phrasal_US])
+                        """
+                    }
                 }
 
                 $0[>] = "\(mine.type.name)"

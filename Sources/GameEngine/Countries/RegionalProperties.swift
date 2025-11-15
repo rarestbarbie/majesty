@@ -22,7 +22,7 @@ extension RegionalProperties {
         self.pops.startIndexCount()
     }
 
-    func addResidentCount(_ pop: Pop) {
-        self.pops.addResidentCount(pop)
+    func addResidentCount(_ pop: Pop, _ stats: Pop.Stats) {
+        self.pops.addResidentCount(pop, stats)
     }
 }

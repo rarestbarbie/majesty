@@ -56,7 +56,7 @@ extension NavigatorTile {
             }
 
             let label: PieChartLabel = .init(color: type.color, name: $0.singular)
-            return ($0, ($1, label))
+            return ($0, ($1.count, label))
         }
 
         self._neighbors = self.id.tile.neighbors(size: planet.grid.size)
