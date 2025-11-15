@@ -107,7 +107,7 @@ extension PopulationReport: PersistentReport {
                 today: $0.state.z,
                 jobs: $0.state.factories.values.map {
                     .init(
-                        name: snapshot.factories[$0.id]?.type.name ?? "Unknown",
+                        name: snapshot.factories[$0.id]?.type.title ?? "Unknown",
                         size: $0.count,
                         hire: $0.hired,
                         fire: $0.fired,

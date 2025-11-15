@@ -58,7 +58,7 @@ extension BlocMarkets {
     }
 
     @inlinable public func price(of resource: Resource, in currency: Fiat) -> Double {
-        self.table[resource / currency]?.current.c ?? 1
+        self.table[resource / currency]?.price ?? 1
     }
 
     public mutating func turn() {

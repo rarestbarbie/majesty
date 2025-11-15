@@ -348,7 +348,7 @@ extension GameContext {
         }
 
         self.factories.turn { $0.turn(on: &turn) }
-        self.mines.turn { $0.state.turnToNextDay() }
+        self.mines.turn { $0.turn(on: &turn) }
         self.pops.turn { $0.turn(on: &turn) }
 
         turn.localMarkets.turn {

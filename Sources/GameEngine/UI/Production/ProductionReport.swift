@@ -69,7 +69,7 @@ extension ProductionReport: PersistentReport {
             return .init(
                 id: $0.state.id,
                 location: tile.name ?? planet.state.name,
-                type: $0.type.name,
+                type: $0.type.title,
                 size: $0.state.size,
                 liquidationProgress: liquidationProgress,
                 yesterday: $0.state.y,
