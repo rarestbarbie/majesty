@@ -568,20 +568,27 @@ extension GameSnapshot {
                     $0["Fired", -] = +?mine.miners.fired[/3]
                     $0["Quit", -] = +mine.miners.quit[/3]
                 }
-                if  let (chance, spawn): (Fraction, SpawnWeight) = mine.type.chance(size: mine.state.z.size, tile: tile.geology.id) {
+                if  mine.type.decay {
                     $0["Estimated deposits"] = mine.state.Δ.size[/3]
                     $0[>] {
-                        $0["Estimated yield"] = mine.state.Δ.yield[..2]
+                        $0["Estimated yield", (+)] = mine.state.Δ.yield[..2]
                     }
-                    if  let miners: PopulationStats.Row = tile.properties?.pops.type[.Miner],
+                    if  let yieldRank: Int = mine.state.z.yieldRank,
+                        let (chance, spawn): (Fraction, SpawnWeight) = mine.type.chance(
+                            size: mine.state.z.size,
+                            tile: tile.geology.id,
+                            yieldRank: yieldRank
+                        ),
+                        let miners: PopulationStats.Row = tile.properties?.pops.type[.Miner],
                         let fromWorkers: Fraction = miners.mineExpansionFactor {
-                        let roll: Double = .init(chance.n %/ chance.d)
                         let fromDeposit: Double = .init(mine.type.scale %/ (mine.type.scale + mine.state.z.size))
                         let fromWorkers: Double = .init(fromWorkers)
-                        let chance: Double = roll * fromWorkers
+                        let fromRank: Double = MineMetadata.yieldRankExpansionFactor(yieldRank).map(Double.init(_:)) ?? 0.0
+                        let chance: Double = Double.init(chance) * fromWorkers
                         $0["Chance to expand mine", (+)] = chance[%2]
                         $0[>] {
                             $0["Base"] = spawn.rate.value[%]
+                            $0["From yield rank", (+)] = (fromRank - 1)[%0]
                             $0["From size of deposit", (+)] = (fromDeposit - 1)[%2]
                             $0["From unemployed miners", (+)] = fromWorkers[%2]
                         }
