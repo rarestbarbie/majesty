@@ -60,7 +60,7 @@ extension PopContext {
     }
 }
 extension PopContext {
-    mutating func compute(world _: borrowing GameWorld, context: ComputationPass) throws {
+    mutating func afterIndexCount(world _: borrowing GameWorld, context: ComputationPass) throws {
         self.region = context.planets[self.state.tile]?.properties
 
         self.mines.removeAll(keepingCapacity: true)

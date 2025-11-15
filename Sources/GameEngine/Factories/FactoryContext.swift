@@ -87,7 +87,7 @@ extension FactoryContext {
     }
 }
 extension FactoryContext {
-    mutating func compute(world _: borrowing GameWorld, context: ComputationPass) throws {
+    mutating func afterIndexCount(world _: borrowing GameWorld, context: ComputationPass) throws {
         if  let area: Int64 = self.state.size.area {
             self.workers?.limit = area * self.type.workers.amount
             self.clerks?.limit = area * (self.type.clerks?.amount ?? 0)
