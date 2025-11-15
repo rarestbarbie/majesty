@@ -69,7 +69,7 @@ extension PopContext {
             self.mines[job.id] = .init(
                 type: state.type,
                 output: type.base,
-                factor: state.efficiency
+                factor: state.y.efficiency
             )
         }
 
@@ -79,7 +79,7 @@ extension PopContext {
         }
     }
 }
-extension PopContext: TransactingContext {
+extension PopContext: AllocatingContext {
     mutating func allocate(turn: inout Turn) {
         if  self.state.type.stratum == .Ward {
             if  self.state.z.pa < 0.5 {
@@ -189,7 +189,8 @@ extension PopContext: TransactingContext {
 
         self.budget = budget
     }
-
+}
+extension PopContext: TransactingContext {
     mutating func transact(turn: inout Turn) {
         guard
         let country: CountryProperties = self.region?.occupiedBy,

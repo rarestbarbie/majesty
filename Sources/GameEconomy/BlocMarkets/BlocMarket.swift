@@ -1,5 +1,6 @@
 import DequeModule
 import Fraction
+import GameIDs
 import LiquidityPool
 import RealModule
 
@@ -71,6 +72,9 @@ extension BlocMarket {
             self.current.update(self.pool.price)
         }
     }
+}
+extension BlocMarket {
+    @inlinable public var price: Double { self.current.c }
 }
 extension BlocMarket {
     @inlinable public mutating func turn(history: Int) {
