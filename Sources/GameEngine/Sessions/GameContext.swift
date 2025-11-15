@@ -661,7 +661,7 @@ extension GameContext {
                     ranks[mine.type.miner, default: []].append((id: mine.state.id, yield: mine.state.z.yield))
                 }
                 for var mines: [(id: MineID, yield: Double)] in ranks.values {
-                    mines.sort { $0.yield < $1.yield }
+                    mines.sort { $0.yield > $1.yield }
                     for (yieldRank, (id, _)): (Int, (MineID, _)) in mines.enumerated() {
                         self.mines[modifying: id].state.z.yieldRank = yieldRank
                     }
