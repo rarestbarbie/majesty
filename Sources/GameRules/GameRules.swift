@@ -109,7 +109,9 @@ extension GameRules {
                     ),
                     costs: .init(
                         metadata: resources,
-                        quantity: try (try factoryCosts[$0.code] ?? factoryCosts[*]).quantities(keys: symbols.resources)
+                        quantity: try (try factoryCosts[$0.code] ?? factoryCosts[*]).quantities(
+                            keys: symbols.resources
+                        )
                     ),
                     output: .init(
                         metadata: resources,

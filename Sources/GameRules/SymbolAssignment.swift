@@ -1,4 +1,6 @@
-@frozen public struct SymbolAssignment<ID>: Equatable, Hashable, Sendable where ID: Hashable & Sendable {
+@frozen public struct SymbolAssignment<ID>: Equatable,
+    Hashable,
+    Sendable where ID: Hashable & Sendable {
     @usableFromInline let code: ID
     @usableFromInline let symbol: Symbol
 

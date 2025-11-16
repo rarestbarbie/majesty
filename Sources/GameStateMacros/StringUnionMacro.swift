@@ -69,16 +69,16 @@ extension StringUnionMacro: MemberMacro {
         @inlinable \(decl.modifiers)var description: String {
             switch self {\(
             raw: cases.map {
-            if case _? = $0.type {
-                return """
-                case .\($0.name)(let self): "\($0.discriminant)\\(self)"
-                """
-            } else {
-                return """
-                case .\($0.name): "\($0.discriminant)"
-                """
-            }
-        }.joined(separator: "\n")
+                if case _? = $0.type {
+                    return """
+                    case .\($0.name)(let self): "\($0.discriminant)\\(self)"
+                    """
+                } else {
+                    return """
+                    case .\($0.name): "\($0.discriminant)"
+                    """
+                }
+            }.joined(separator: "\n")
         )
             }
         }
@@ -112,7 +112,10 @@ extension StringUnionMacro: PeerMacro {
     }
 }
 extension StringUnionMacro {
-    private static func cases(of decl: EnumDeclSyntax, in context: some MacroExpansionContext) -> [Case] {
+    private static func cases(
+        of decl: EnumDeclSyntax,
+        in context: some MacroExpansionContext
+    ) -> [Case] {
         decl.memberBlock.members.reduce(into: []) {
             guard let group: EnumCaseDeclSyntax = $1.decl.as(EnumCaseDeclSyntax.self) else {
                 return

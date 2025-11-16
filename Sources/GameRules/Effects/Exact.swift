@@ -25,7 +25,8 @@ extension Exact: CustomStringConvertible {
 }
 extension Exact: LosslessStringConvertible {
     @inlinable public init?(
-        _ string: consuming some StringProtocol & RangeReplaceableCollection) {
+        _ string: consuming some StringProtocol & RangeReplaceableCollection
+    ) {
         guard let value: Decimal = .init(string) else {
             return nil
         }

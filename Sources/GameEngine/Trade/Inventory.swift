@@ -29,9 +29,9 @@ extension Inventory {
         let value: Int64 = units <> price.value
         self.account.r += value
         if case ()? = self.out.inelastic[resource]?.report(
-            unitsSold: units,
-            valueSold: value,
-        ) {
+                unitsSold: units,
+                valueSold: value,
+            ) {
             return (value, true)
         } else {
             return (value, false)

@@ -18,7 +18,9 @@ extension EffectsDescription {
             effects.append(.factoryProductivity(value, nil))
         }
         if  let productivity: SymbolTable<Int64> = self.factoryProductivity {
-            for effect: Quantity<FactoryType> in try productivity.quantities(keys: symbols.factories) {
+            for effect: Quantity<FactoryType> in try productivity.quantities(
+                    keys: symbols.factories
+                ) {
                 effects.append(.factoryProductivity(effect.amount, effect.unit))
             }
         }
@@ -27,7 +29,9 @@ extension EffectsDescription {
             effects.append(.miningEfficiency(value, nil))
         }
         if  let efficiency: SymbolTable<Exact> = self.miningEfficiency {
-            for (predicate, amount): (MineType, Exact) in try efficiency.quantities(keys: symbols.mines) {
+            for (predicate, amount): (MineType, Exact) in try efficiency.quantities(
+                    keys: symbols.mines
+                ) {
                 effects.append(.miningEfficiency(amount, predicate))
             }
         }

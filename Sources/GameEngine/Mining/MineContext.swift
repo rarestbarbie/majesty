@@ -35,7 +35,10 @@ extension MineContext {
     }
 }
 extension MineContext {
-    mutating func afterIndexCount(world _: borrowing GameWorld, context: ComputationPass) throws {
+    mutating func afterIndexCount(
+        world _: borrowing GameWorld,
+        context: ComputationPass
+    ) throws {
         if  self.type.decay {
             self.miners.limit = self.state.z.size / 10_000
         } else {

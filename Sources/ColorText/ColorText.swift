@@ -37,8 +37,7 @@ extension ColorText: StringInterpolationProtocol {
         ColorText interpolation of 'Double' may produce a very long sequence of digits – \
         did you mean to use '[..places]' instead?
         """
-    )
-    @inlinable public mutating func appendInterpolation(_ value: Double) {
+    ) @inlinable public mutating func appendInterpolation(_ value: Double) {
         self.buffer.append("\(value)")
     }
     @available(
@@ -47,8 +46,7 @@ extension ColorText: StringInterpolationProtocol {
         ColorText interpolation of 'Decimal' produces an ASCII string, not a UI string – \
         did you mean to use '[..]' instead?
         """
-    )
-    @inlinable public mutating func appendInterpolation(_ value: Decimal) {
+    ) @inlinable public mutating func appendInterpolation(_ value: Decimal) {
         self.buffer.append("\(value)")
     }
 

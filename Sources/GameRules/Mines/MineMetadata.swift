@@ -40,7 +40,9 @@ extension MineMetadata {
         self.decay.hash(into: &hasher)
         self.scale.hash(into: &hasher)
 
-        for (key, value): (GeologicalType, SpawnWeight) in self.spawn.sorted(by: { $0.key < $1.key }) {
+        for (key, value): (GeologicalType, SpawnWeight) in self.spawn.sorted(
+                by: { $0.key < $1.key }
+            ) {
             key.hash(into: &hasher)
             value.hash(into: &hasher)
         }

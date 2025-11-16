@@ -30,17 +30,29 @@ extension CountryModifiers {
             switch effect {
             case .factoryProductivity(let value, nil):
                 for type: FactoryType in rules.factories.keys {
-                    self.factoryProductivity[type, default: .zero].stack(with: value, from: technology)
+                    self.factoryProductivity[type, default: .zero].stack(
+                        with: value,
+                        from: technology
+                    )
                 }
             case .factoryProductivity(let value, let type?):
-                self.factoryProductivity[type, default: .zero].stack(with: value, from: technology)
+                self.factoryProductivity[type, default: .zero].stack(
+                    with: value,
+                    from: technology
+                )
 
             case .miningEfficiency(let exact, nil):
                 for type: MineType in rules.mines.keys {
-                    self.miningEfficiency[type, default: .zero].stack(with: exact.value, from: technology)
+                    self.miningEfficiency[type, default: .zero].stack(
+                        with: exact.value,
+                        from: technology
+                    )
                 }
             case .miningEfficiency(let exact, let type?):
-                self.miningEfficiency[type, default: .zero].stack(with: exact.value, from: technology)
+                self.miningEfficiency[type, default: .zero].stack(
+                    with: exact.value,
+                    from: technology
+                )
             }
         }
     }
@@ -61,7 +73,10 @@ extension CountryModifiers {
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 1%) {
-            for (value, effect): (Decimal, EffectProvenance) in self.miningEfficiency[mine]?.blame ?? [] {
+            for (value, effect): (
+                    Decimal,
+                    EffectProvenance
+                ) in self.miningEfficiency[mine]?.blame ?? [] {
                 $0[true] { $0 = value } = { "\(+$0[%]): \(effect.name)" }
             }
         } factors: {

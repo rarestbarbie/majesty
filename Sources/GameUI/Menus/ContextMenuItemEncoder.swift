@@ -6,7 +6,10 @@ public struct ContextMenuItemEncoder: ~Copyable {
     }
 }
 extension ContextMenuItemEncoder {
-    @inlinable public subscript(label: String, action: (inout ContextMenuActionEncoder) -> ()) -> () {
+    @inlinable public subscript(
+        label: String,
+        action: (inout ContextMenuActionEncoder) -> ()
+    ) -> () {
         mutating get {
             var encoder: ContextMenuActionEncoder = .init()
             action(&encoder)

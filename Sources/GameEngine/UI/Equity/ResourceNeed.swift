@@ -21,7 +21,7 @@ extension ResourceNeed: Identifiable {
         case .e: .e(self.label.id)
         case .x: .x(self.label.id)
         }
-     }
+    }
 }
 extension ResourceNeed: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {

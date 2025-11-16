@@ -16,7 +16,10 @@ extension TermListEncoder {
     }
 }
 extension TermListEncoder {
-    @inlinable public subscript<T>(indent: (IndentNone) -> (), _ yield: (inout Self) -> T) -> T {
+    @inlinable public subscript<T>(
+        indent: (IndentNone) -> (),
+        _ yield: (inout Self) -> T
+    ) -> T {
         mutating get {
             self[>0, yield]
         }
@@ -31,17 +34,29 @@ extension TermListEncoder {
 }
 extension TermListEncoder {
     /// Writes the assigned string with no indentation.
-    @inlinable public subscript(indent: (IndentNone) -> (), label: TermType, tooltip tooltip: TooltipType? = nil) -> ColorText? {
+    @inlinable public subscript(
+        indent: (IndentNone) -> (),
+        label: TermType,
+        tooltip tooltip: TooltipType? = nil
+    ) -> ColorText? {
         get { nil }
         set (lines) { self[>0, label, tooltip: tooltip] = lines }
     }
     /// Writes the assigned string with the specified indentation level.
-    @inlinable public subscript(indent: Indent, label: TermType, tooltip tooltip: TooltipType? = nil) -> ColorText? {
+    @inlinable public subscript(
+        indent: Indent,
+        label: TermType,
+        tooltip tooltip: TooltipType? = nil
+    ) -> ColorText? {
         get { nil }
         set (lines) {
             if let lines: ColorText {
                 self.buffer.append(
-                    .init(id: label, details: .header(self.indent + indent.level, lines), tooltip: tooltip)
+                    .init(
+                        id: label,
+                        details: .header(self.indent + indent.level, lines),
+                        tooltip: tooltip
+                    )
                 )
             }
         }
@@ -58,7 +73,14 @@ extension TermListEncoder {
                 return
             }
             self.buffer.append(
-                .init(id: label, details: .factor(.init(fortune: fortune, indent: self.indent, text: ""), value), tooltip: tooltip)
+                .init(
+                    id: label,
+                    details: .factor(
+                        .init(fortune: fortune, indent: self.indent, text: ""),
+                        value
+                    ),
+                    tooltip: tooltip
+                )
             )
         }
     }
@@ -91,7 +113,14 @@ extension TermListEncoder {
                 return
             }
             self.buffer.append(
-                .init(id: label, details: .ticker(.init(fortune: Style.fortune, indent: self.indent, text: ""), value), tooltip: tooltip)
+                .init(
+                    id: label,
+                    details: .ticker(
+                        .init(fortune: Style.fortune, indent: self.indent, text: ""),
+                        value
+                    ),
+                    tooltip: tooltip
+                )
             )
         }
     }
@@ -107,7 +136,14 @@ extension TermListEncoder {
                 return
             }
             self.buffer.append(
-                .init(id: label, details: .count(.init(fortune: Style.fortune, indent: self.indent, text: ""), value), tooltip: tooltip)
+                .init(
+                    id: label,
+                    details: .count(
+                        .init(fortune: Style.fortune, indent: self.indent, text: ""),
+                        value
+                    ),
+                    tooltip: tooltip
+                )
             )
         }
     }

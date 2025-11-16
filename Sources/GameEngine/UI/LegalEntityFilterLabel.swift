@@ -1,7 +1,10 @@
 import JavaScriptKit
 import JavaScriptInterop
 
-protocol LegalEntityFilterLabel: JavaScriptEncodable<LegalEntityFilterLabelObjectKey>, Identifiable, Equatable, Comparable where ID: ConvertibleToJSValue {
+protocol LegalEntityFilterLabel: JavaScriptEncodable<LegalEntityFilterLabelObjectKey>,
+    Identifiable,
+    Equatable,
+    Comparable where ID: ConvertibleToJSValue {
     var name: String { get }
 }
 extension LegalEntityFilterLabel {

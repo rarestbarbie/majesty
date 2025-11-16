@@ -60,7 +60,10 @@ extension PopContext {
     }
 }
 extension PopContext {
-    mutating func afterIndexCount(world _: borrowing GameWorld, context: ComputationPass) throws {
+    mutating func afterIndexCount(
+        world _: borrowing GameWorld,
+        context: ComputationPass
+    ) throws {
         self.region = context.planets[self.state.tile]?.properties
 
         self.mines.removeAll(keepingCapacity: true)
@@ -214,7 +217,10 @@ extension PopContext: TransactingContext {
                     fatalError("missing stored info for mine '\($0.id)'!!!")
                 }
 
-                $0.out.deposit(from: conditions.output, scalingFactor: ($0.count, conditions.factor))
+                $0.out.deposit(
+                    from: conditions.output,
+                    scalingFactor: ($0.count, conditions.factor)
+                )
                 return $0.out.sell(in: country.currency.id, on: &turn.worldMarkets)
             } (&self.state.mines.values[j])
         }
@@ -617,8 +623,9 @@ extension PopContext {
     ) {
         guard
         let modifiers: CountryModifiers = self.region?.occupiedBy.modifiers,
-        let modifiers: CountryModifiers.Stack<Decimal> = modifiers.miningEfficiency[mine.type]
-        else {
+        let modifiers: CountryModifiers.Stack<
+            Decimal
+        > = modifiers.miningEfficiency[mine.type] else {
             return
         }
 

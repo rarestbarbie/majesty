@@ -16,7 +16,10 @@ extension TooltipInstructionEncoder {
     }
 }
 extension TooltipInstructionEncoder {
-    @inlinable public subscript<T>(indent: (IndentNone) -> (), _ yield: (inout Self) -> T) -> T {
+    @inlinable public subscript<T>(
+        indent: (IndentNone) -> (),
+        _ yield: (inout Self) -> T
+    ) -> T {
         mutating get {
             self[>0, yield]
         }

@@ -1,4 +1,9 @@
-public protocol StaticID: RawRepresentable<Int16>, LosslessStringConvertible, Comparable, Equatable, Hashable, Sendable {
+public protocol StaticID: RawRepresentable<Int16>,
+    LosslessStringConvertible,
+    Comparable,
+    Equatable,
+    Hashable,
+    Sendable {
     var rawValue: Int16 { get }
     init(rawValue: Int16)
 }

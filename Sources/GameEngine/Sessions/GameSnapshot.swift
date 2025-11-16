@@ -581,9 +581,15 @@ extension GameSnapshot {
                         ),
                         let miners: PopulationStats.Row = tile.properties?.pops.type[.Miner],
                         let fromWorkers: Fraction = miners.mineExpansionFactor {
-                        let fromDeposit: Double = .init(mine.type.scale %/ (mine.type.scale + mine.state.z.size))
+                        let fromDeposit: Double = .init(
+                            mine.type.scale %/ (mine.type.scale + mine.state.z.size)
+                        )
                         let fromWorkers: Double = .init(fromWorkers)
-                        let fromRank: Double = MineMetadata.yieldRankExpansionFactor(yieldRank).map(Double.init(_:)) ?? 0.0
+                        let fromRank: Double = MineMetadata.yieldRankExpansionFactor(
+                            yieldRank
+                        ).map(
+                            Double.init(_:)
+                        ) ?? 0.0
                         let chance: Double = Double.init(chance) * fromWorkers
                         $0["Chance to expand mine", (+)] = chance[%2]
                         $0[>] {

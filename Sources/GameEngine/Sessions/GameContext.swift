@@ -363,7 +363,10 @@ extension GameContext {
             for order: LocalMarket.Order in asks {
                 switch order.by {
                 case .factory(let id):
-                    let (credited, _): (Int64, reported: Bool) = self.factories[modifying: id].state.inventory.credit(
+                    let (credited, _): (
+                        Int64,
+                        reported: Bool
+                    ) = self.factories[modifying: id].state.inventory.credit(
                         inelastic: $0.id.resource,
                         units: order.filled,
                         price: price
@@ -371,7 +374,10 @@ extension GameContext {
                     spread -= credited
 
                 case .pop(let id):
-                    let (credited, _): (Int64, reported: Bool) = self.pops[modifying: id].state.inventory.credit(
+                    let (credited, _): (
+                        Int64,
+                        reported: Bool
+                    ) = self.pops[modifying: id].state.inventory.credit(
                         inelastic: $0.id.resource,
                         units: order.filled,
                         price: price
@@ -381,7 +387,9 @@ extension GameContext {
 
                     if let memo: MineID = order.memo {
                         // Log unreported mining output
-                        self.pops[modifying: id].state.mines[memo]?.out.inelastic[$0.id.resource]?.report(
+                        self.pops[
+                            modifying: id
+                        ].state.mines[memo]?.out.inelastic[$0.id.resource]?.report(
                             unitsSold: order.filled,
                             valueSold: credited,
                         )
@@ -519,9 +527,9 @@ extension GameContext {
         }
     }
     private mutating func postPopHirings(_ turn: inout Turn, order: ResidentOrder) -> (
-            [(PopType, [PopJobOfferBlock])],
-            [(PopType, [PopJobOfferBlock])]
-        ) {
+        [(PopType, [PopJobOfferBlock])],
+        [(PopType, [PopJobOfferBlock])]
+    ) {
         let offers: (
             remote: [Turn.Jobs.Hire<PlanetID>.Key: [(Int, Int64)]],
             local: [Turn.Jobs.Hire<Address>.Key: [(Int, Int64)]]
@@ -613,7 +621,9 @@ extension GameContext {
     }
 }
 extension GameContext {
-    private mutating func awardRanksToFactories(_ types: some Sequence<(PopType, [PopJobOfferBlock])>) {
+    private mutating func awardRanksToFactories(
+        _ types: some Sequence<(PopType, [PopJobOfferBlock])>
+    ) {
         for (type, unfilled): (PopType, [PopJobOfferBlock]) in types {
             /// The last `q` factories will always raise wages. The next factory after the first
             /// `q` will raise wages with probability `r / 8`.
@@ -658,7 +668,9 @@ extension GameContext {
                         continue
                     }
 
-                    ranks[mine.type.miner, default: []].append((id: mine.state.id, yield: mine.state.z.yield))
+                    ranks[mine.type.miner, default: []].append(
+                        (id: mine.state.id, yield: mine.state.z.yield)
+                    )
                 }
                 for var mines: [(id: MineID, yield: Double)] in ranks.values {
                     mines.sort { $0.yield > $1.yield }

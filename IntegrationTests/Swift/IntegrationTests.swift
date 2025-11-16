@@ -44,9 +44,9 @@ extension IntegrationTestFile: JavaScriptDecodable {
         }
 
         for target: GameDate in [
-            .gregorian(year: 2426, month: 1, day: 1),
-            .gregorian(year: 2438, month: 1, day: 1)
-        ] {
+                .gregorian(year: 2426, month: 1, day: 1),
+                .gregorian(year: 2438, month: 1, day: 1)
+            ] {
             let save: GameSave
             do {
                 save = try Self.HashGameState(target: target)

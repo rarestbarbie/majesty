@@ -31,4 +31,3 @@ extension TermType: RawRepresentable {
     }
 }
 extension TermType: ConvertibleToJSValue, LoadableFromJSValue {}
-

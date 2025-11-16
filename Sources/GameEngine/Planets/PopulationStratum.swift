@@ -1,7 +1,6 @@
 import GameIDs
 
-@dynamicMemberLookup
-struct PopulationStratum {
+@dynamicMemberLookup struct PopulationStratum {
     var all: [PopID]
     var total: Int64
     var cultures: [String: Int64]
@@ -13,7 +12,10 @@ extension PopulationStratum {
     }
 }
 extension PopulationStratum {
-    subscript<Float>(dynamicMember keyPath: KeyPath<Fields, Float>) -> (average: Float, of: Float) where Float: BinaryFloatingPoint {
+    subscript<Float>(dynamicMember keyPath: KeyPath<Fields, Float>) -> (
+        average: Float,
+        of: Float
+    ) where Float: BinaryFloatingPoint {
         let population: Float = .init(self.total)
         if  population < 0 {
             return (0, 0)

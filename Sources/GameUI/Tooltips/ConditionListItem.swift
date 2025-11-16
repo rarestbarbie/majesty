@@ -8,7 +8,12 @@ import JavaScriptKit
     @usableFromInline let description: ColorText
     @usableFromInline let indent: Int
 
-    @inlinable public init(fulfilled: Bool?, highlight: Bool, description: ColorText, indent: Int = 0) {
+    @inlinable public init(
+        fulfilled: Bool?,
+        highlight: Bool,
+        description: ColorText,
+        indent: Int = 0
+    ) {
         self.fulfilled = fulfilled
         self.highlight = highlight
         self.description = description

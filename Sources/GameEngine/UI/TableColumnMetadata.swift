@@ -20,7 +20,12 @@ struct TableColumnMetadata<Stop>: Identifiable where Stop: ConvertibleToJSValue 
     }
 }
 extension TableColumnMetadata {
-    mutating func updateStops<Entry, Key>(columnSelected: Int32?, from rows: [Entry], on stop: (Entry) -> Key, as union: (Key) -> Stop) where Key: Comparable {
+    mutating func updateStops<Entry, Key>(
+        columnSelected: Int32?,
+        from rows: [Entry],
+        on stop: (Entry) -> Key,
+        as union: (Key) -> Stop
+    ) where Key: Comparable {
         update:
         if case self.id? = columnSelected {
             guard

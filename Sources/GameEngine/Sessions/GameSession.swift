@@ -136,12 +136,16 @@ extension GameSession {
         return try self.ui.report.planet.open(request: request, snapshot: self.snapshot)
     }
 
-    public mutating func openProduction(_ request: ProductionReportRequest) throws -> ProductionReport {
+    public mutating func openProduction(
+        _ request: ProductionReportRequest
+    ) throws -> ProductionReport {
         self.ui.screen = .Production
         return try self.ui.report.production.open(request: request, snapshot: self.snapshot)
     }
 
-    public mutating func openPopulation(_ request: PopulationReportRequest) throws -> PopulationReport {
+    public mutating func openPopulation(
+        _ request: PopulationReportRequest
+    ) throws -> PopulationReport {
         self.ui.screen = .Population
         return try self.ui.report.population.open(request: request, snapshot: self.snapshot)
     }

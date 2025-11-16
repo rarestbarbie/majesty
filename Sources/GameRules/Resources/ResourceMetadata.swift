@@ -9,7 +9,13 @@ public final class ResourceMetadata: GameMetadata {
     public let local: Bool
     public let hours: Int64?
 
-    init(identity: SymbolAssignment<Resource>, color: Color, emoji: Character, local: Bool, hours: Int64?) {
+    init(
+        identity: SymbolAssignment<Resource>,
+        color: Color,
+        emoji: Character,
+        local: Bool,
+        hours: Int64?
+    ) {
         self.identity = identity
         self.color = color
         self.emoji = emoji

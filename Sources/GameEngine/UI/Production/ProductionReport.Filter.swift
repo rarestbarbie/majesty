@@ -3,8 +3,7 @@ import JavaScriptInterop
 import JavaScriptKit
 
 extension ProductionReport {
-    @StringUnion
-    @frozen public enum Filter: Equatable, Hashable {
+    @StringUnion @frozen public enum Filter: Equatable, Hashable {
         @tag("A") case all
         @tag("T") case location(Address)
     }

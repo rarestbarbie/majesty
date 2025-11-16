@@ -87,7 +87,10 @@ extension FactoryContext {
     }
 }
 extension FactoryContext {
-    mutating func afterIndexCount(world _: borrowing GameWorld, context: ComputationPass) throws {
+    mutating func afterIndexCount(
+        world _: borrowing GameWorld,
+        context: ComputationPass
+    ) throws {
         if  let area: Int64 = self.state.size.area {
             self.workers?.limit = area * self.type.workers.amount
             self.clerks?.limit = area * (self.type.clerks?.amount ?? 0)
@@ -100,7 +103,9 @@ extension FactoryContext {
             return
         }
 
-        self.productivity = occupiedBy.modifiers.factoryProductivity[self.state.type]?.value ?? 1
+        self.productivity = occupiedBy.modifiers.factoryProductivity[
+            self.state.type
+        ]?.value ?? 1
 
         self.cashFlow.reset()
         self.cashFlow.update(with: self.state.inventory.l)
@@ -186,7 +191,7 @@ extension FactoryContext: TransactingContext {
         } else {
             let utilization: Double
             if  let workers: Workforce = self.workers,
-                workers.limit > 0 {
+                    workers.limit > 0 {
                 utilization = min(1, Double.init(workers.count) / Double.init(workers.limit))
             } else {
                 utilization = 0.5

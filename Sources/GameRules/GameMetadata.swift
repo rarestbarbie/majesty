@@ -11,4 +11,3 @@ extension GameMetadata {
     @inlinable public var title: String { self.identity.symbol.name }
     @inlinable public var symbol: Symbol { self.identity.symbol }
 }
-
