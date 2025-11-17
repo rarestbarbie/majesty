@@ -5,33 +5,42 @@ import Random
 
 @frozen public struct LocalMarket: Identifiable {
     public let id: ID
+    public var stabilizationFund: Reservoir
+    public var stockpile: Reservoir
     public var yesterday: Interval
     public var today: Interval
     public var limit: (
         min: LocalPriceLevel?,
         max: LocalPriceLevel?
     )
+    public var storage: Bool
 
-    @usableFromInline var asks: [Order]
-    @usableFromInline var bids: [Order]
+    @usableFromInline var supply: [Order]
+    @usableFromInline var demand: [Order]
 
     @inlinable init(
         id: ID,
+        stabilizationFund: Reservoir,
+        stockpile: Reservoir,
         yesterday: Interval,
         today: Interval,
         limit: (
             min: LocalPriceLevel?,
             max: LocalPriceLevel?
         ),
-        asks: [Order],
-        bids: [Order]
+        storage: Bool,
+        supply: [Order],
+        demand: [Order]
     ) {
         self.id = id
+        self.stabilizationFund = stabilizationFund
+        self.stockpile = stockpile
         self.yesterday = yesterday
         self.today = today
         self.limit = limit
-        self.asks = asks
-        self.bids = bids
+        self.storage = storage
+        self.supply = supply
+        self.demand = demand
     }
 }
 extension LocalMarket {
@@ -39,30 +48,39 @@ extension LocalMarket {
         let interval: Interval = .init(price: .init(), supply: 0, demand: 0)
         self.init(
             id: id,
+            stabilizationFund: .zero,
+            stockpile: .zero,
             yesterday: interval,
             today: interval,
-            limit: (min: nil, max: nil),
-            asks: [],
-            bids: []
+            limit: (nil, nil),
+            storage: false,
+            supply: [],
+            demand: []
         )
     }
 
     @inlinable public init(state: State) {
         self.init(
             id: state.id,
+            stabilizationFund: state.stabilizationFund,
+            stockpile: state.stockpile,
             yesterday: state.yesterday,
             today: state.today,
             limit: state.limit,
-            asks: [],
-            bids: []
+            storage: state.storage,
+            supply: [],
+            demand: []
         )
     }
     @inlinable public var state: State {
         .init(
             id: self.id,
+            stabilizationFund: self.stabilizationFund,
+            stockpile: self.stockpile,
             yesterday: self.yesterday,
             today: self.today,
             limit: self.limit,
+            storage: self.storage
         )
     }
 }
@@ -81,113 +99,170 @@ extension LocalMarket {
     }
 }
 extension LocalMarket {
-    public mutating func ask(amount: Int64, by entity: LEI, memo: MineID?) {
-        self.asks.append(.init(by: entity, tier: nil, memo: memo, amount: amount))
+    public mutating func sell(amount: Int64, entity: LEI, memo: Order.Memo?) {
+        // taker order goes on the bid side
+        self.supply.append(.init(by: entity, type: .taker, memo: memo, size: amount))
         self.today.supply += amount
     }
 
-    public mutating func bid(
+    public mutating func buy(
         budget: Int64,
-        by entity: LEI,
-        in tier: UInt8,
+        entity: LEI,
         limit: Int64,
+        memo: Order.Memo?,
     ) {
-        let quotient: Int64
-
-        switch self.today.price.value.fraction {
-        case (let n, denominator: let d?):
-            quotient = budget <> (d %/ n)
-        case (let n, denominator: nil):
-            quotient = budget / n
+        guard let amount: Int64 = Self.quantity(
+            budget: budget,
+            limit: limit,
+            price: self.today.price
+        ) else {
+            return
         }
 
-        let amount: Int64 = min(quotient, limit)
-        self.bids.append(.init(by: entity, tier: tier, memo: nil, amount: amount))
+        // taker order goes on the ask side
+        self.demand.append(.init(by: entity, type: .taker, memo: memo, size: amount))
         self.today.demand += amount
     }
 }
 extension LocalMarket {
     private static var minDefault: LocalPrice { .init(1 %/ 10_000) }
     private static var maxDefault: LocalPrice { .init(100_000_000 %/ 1) }
+
+    private static func quantity(budget: Int64, limit: Int64, price: LocalPrice) -> Int64? {
+        let quotient: Int64
+
+        switch price.value.fraction {
+        case (let n, denominator: let d?):
+            quotient = budget <> (d %/ n)
+        case (let n, denominator: nil):
+            quotient = budget / n
+        }
+
+        if  quotient <= 0 {
+            return nil
+        }
+
+        return min(quotient, limit)
+    }
 }
 extension LocalMarket {
-    public mutating func turn(
-        priceControls: (min: LocalPriceLevel?, max: LocalPriceLevel?)
-    ) {
-        self.turn(
-            priceControls: (
-                priceControls.min?.price ?? Self.minDefault,
-                priceControls.max?.price ?? Self.maxDefault
-            )
-        )
-        self.limit = priceControls
-    }
-    private mutating func turn(priceControls: (min: LocalPrice, max: LocalPrice)) {
-        let price: LocalPrice = self.today.priceUpdate
-
+    public mutating func turn(template: Template) {
         self.yesterday = self.today
+        self.limit = template.limit
+        self.storage = template.storage
 
-        if  price < priceControls.min {
-            self.today = .init(price: priceControls.min)
-        } else if price > priceControls.max {
-            self.today = .init(price: priceControls.max)
+        let min: LocalPrice = template.limit.min?.price ?? Self.minDefault
+        let max: LocalPrice = template.limit.max?.price ?? Self.maxDefault
+
+        let price: LocalPrice = self.today.priceUpdate
+        if  price < min {
+            self.today = .init(price: min)
+        } else if price > max {
+            self.today = .init(price: max)
         } else {
             self.today = .init(price: price)
         }
+
+        self.stabilizationFund.turn()
+        self.stockpile.turn()
     }
 
     public mutating func match(using random: inout PseudoRandom) -> (
-        asks: [Order],
-        bids: [Order]
+        supply: [Order],
+        demand: [Order]
     ) {
-        if self.today.supply > self.today.demand {
-            self.asks.shuffle(using: &random.generator)
+        var demandAvailable: Int64 = self.today.demand
+        var supplyAvailable: Int64 = self.today.supply
 
-            guard let matched: [Int64] = self.asks.distribute(
-                self.today.demand,
-                share: \.amount
+        if  self.storage {
+            if  self.today.supply < self.today.demand {
+                let size: Int64 = min(
+                    self.today.demand - self.today.supply,
+                    self.stockpile.total
+                )
+                if  size > 0 {
+                    // when selling, maker order goes on the ask side
+                    let maker: Order = .init(
+                        by: nil,
+                        type: .maker,
+                        memo: nil,
+                        size: size
+                    )
+                    supplyAvailable += size
+                    self.supply.append(maker)
+                }
+            } else {
+                let limit: Int64 = (self.today.supply - self.today.demand) / 2
+                if  limit > 0,
+                    self.stabilizationFund.total > 0,
+                    let size: Int64 = Self.quantity(
+                        budget: self.stabilizationFund.total,
+                        limit: limit,
+                        price: self.today.price
+                    ) {
+                    // when buying, maker order goes on the bid side
+                    let maker: Order = .init(
+                        by: nil,
+                        type: .maker,
+                        memo: nil,
+                        size: size
+                    )
+                    demandAvailable += size
+                    self.demand.append(maker)
+                }
+            }
+        }
+
+        if  supplyAvailable > demandAvailable {
+            self.supply.shuffle(using: &random.generator)
+
+            guard let matched: [Int64] = self.supply.distribute(
+                demandAvailable,
+                share: \.size
             ) else {
                 // nonzero supply, but no asks?
                 fatalError("unreachable")
             }
 
-            for i: Int in self.asks.indices {
-                self.asks[i].filled = matched[i]
+            for i: Int in self.supply.indices {
+                self.supply[i].fill(.sell, price: self.today.price, units: matched[i])
             }
-            for i: Int in self.bids.indices {
-                self.bids[i].fillAll()
+            for i: Int in self.demand.indices {
+                self.demand[i].fill(.buy, price: self.today.price)
             }
-        } else if self.today.supply < self.today.demand {
-            self.bids.shuffle(using: &random.generator)
+        } else if supplyAvailable < demandAvailable {
+            self.demand.shuffle(using: &random.generator)
 
-            guard let matched: [Int64] = self.bids.distribute(
-                self.today.supply,
-                share: \.amount
+            guard let matched: [Int64] = self.demand.distribute(
+                supplyAvailable,
+                share: \.size
             ) else {
                 // nonzero demand, but no bids?
                 fatalError("unreachable")
             }
 
-            for i: Int in self.bids.indices {
-                self.bids[i].filled = matched[i]
+            for i: Int in self.supply.indices {
+                self.supply[i].fill(.sell, price: self.today.price)
             }
-            for i: Int in self.asks.indices {
-                self.asks[i].fillAll()
+            for i: Int in self.demand.indices {
+                self.demand[i].fill(.buy, price: self.today.price, units: matched[i])
             }
         } else {
-            for i: Int in self.asks.indices {
-                self.asks[i].fillAll()
+            // supply and demand are evenly matched
+            for i: Int in self.supply.indices {
+                self.supply[i].fill(.sell, price: self.today.price)
             }
-            for i: Int in self.bids.indices {
-                self.bids[i].fillAll()
+            for i: Int in self.demand.indices {
+                self.demand[i].fill(.buy, price: self.today.price)
             }
         }
 
-        defer {
-            self.asks = []
-            self.bids = []
-        }
+        // Reset for the next turn
+        let supply: [Order] = self.supply
+        let demand: [Order] = self.demand
 
-        return (asks: self.asks, bids: self.bids)
+        self.supply = []
+        self.demand = []
+        return (supply: supply, demand: demand)
     }
 }

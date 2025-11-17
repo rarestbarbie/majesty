@@ -1,12 +1,7 @@
 import Fraction
 import GameIDs
 
-@available(*, deprecated)
-public typealias InelasticInput = ResourceInput<Never>
-@available(*, deprecated)
-public typealias TradeableInput = ResourceInput<Double>
-
-@frozen public struct ResourceInput<Price>: Identifiable where Price: Equatable & Hashable {
+@frozen public struct ResourceInput: Identifiable {
     public let id: Resource
 
     public var unitsDemanded: Int64
@@ -20,7 +15,8 @@ public typealias TradeableInput = ResourceInput<Double>
     public var value: Reservoir
     // public var valueAtMarket: Valuation
 
-    public var price: Price?
+    /// Most recent available price, can be different from average cost.
+    public var price: Double?
 
     @inlinable public init(
         id: Resource,
@@ -29,7 +25,7 @@ public typealias TradeableInput = ResourceInput<Double>
         units: Reservoir,
         valueReturned: Int64,
         value: Reservoir,
-        price: Price?
+        price: Double?
     ) {
         self.id = id
         self.unitsDemanded = unitsDemanded
@@ -75,16 +71,17 @@ extension ResourceInput {
         // self.valueAtMarket.turn()
     }
 }
-extension ResourceInput<Never> {
+extension ResourceInput {
     @inlinable public mutating func report(
         unitsPurchased: Int64,
         valuePurchased: Int64,
     ) {
         self.units += unitsPurchased
         self.value += valuePurchased
+        self.price = unitsPurchased != 0 ? Double.init(valuePurchased %/ unitsPurchased) : nil
     }
 }
-extension ResourceInput<Double> {
+extension ResourceInput {
     /// Returns the amount of funds actually spent.
     mutating func trade(
         stockpileDays: ClosedRange<Int64>,

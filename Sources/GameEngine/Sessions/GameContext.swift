@@ -325,26 +325,14 @@ extension GameContext {
             try self.countries[i].advance(turn: &turn, context: self)
         }
 
+        // need to call this first, to update prices before trading
         turn.localMarkets.turn {
-            /// Apply local minimum wages
             guard
-            let region: RegionalProperties = self.planets[$0.id.location]?.properties,
-            let resource: ResourceMetadata = self.rules.resources[$0.id.resource] else {
-                return
+            let region: RegionalProperties = self.planets[$0.id.location]?.properties else {
+                fatalError("LocalMarket \($0.id) exists in a tile with no authority!!!")
             }
 
-            let min: LocalPriceLevel?
-
-            if let hours: Int64 = resource.hours {
-                min = .init(
-                    price: LocalPrice.init(region.minwage %/ hours),
-                    label: .minimumWage
-                )
-            } else {
-                min = nil
-            }
-
-            $0.turn(priceControls: (min: min, max: nil))
+            $0.turn(template: region.occupiedBy.localMarkets[$0.id.resource])
         }
 
         self.factories.turn { $0.turn(on: &turn) }
@@ -352,72 +340,93 @@ extension GameContext {
         self.pops.turn { $0.turn(on: &turn) }
 
         turn.localMarkets.turn {
-            let price: LocalPrice = $0.today.price
-            let (asks, bids): (
-                asks: [LocalMarket.Order],
-                bids: [LocalMarket.Order]
+            let matched: (
+                supply: [LocalMarket.Order],
+                demand: [LocalMarket.Order]
             ) = $0.match(using: &turn.random)
 
-            var spread: Int64 = 0
+            var stabilizationFundChange: Int64 = 0
+            var feesCollected: Int64 = 0
 
-            for order: LocalMarket.Order in asks {
-                switch order.by {
+            for order: LocalMarket.Order in matched.supply {
+                guard let entity: LEI = order.by else {
+                    stabilizationFundChange += order.value
+                    $0.stockpile -= order.filled
+                    continue
+                }
+
+                feesCollected -= order.value
+
+                switch entity {
                 case .factory(let id):
-                    let (credited, _): (
-                        Int64,
-                        reported: Bool
-                    ) = self.factories[modifying: id].state.inventory.credit(
+                    let _: Bool = self.factories[modifying: id].state.inventory.credit(
                         inelastic: $0.id.resource,
                         units: order.filled,
-                        price: price
+                        value: order.value
                     )
-                    spread -= credited
 
                 case .pop(let id):
-                    let (credited, _): (
-                        Int64,
-                        reported: Bool
-                    ) = self.pops[modifying: id].state.inventory.credit(
-                        inelastic: $0.id.resource,
-                        units: order.filled,
-                        price: price
-                    )
-
-                    spread -= credited
-
-                    if let memo: MineID = order.memo {
-                        // Log unreported mining output
+                    if case .mine(let mine)? = order.memo {
                         self.pops[
                             modifying: id
-                        ].state.mines[memo]?.out.inelastic[$0.id.resource]?.report(
+                        ].state.mines[mine]?.out.inelastic[$0.id.resource]?.report(
                             unitsSold: order.filled,
-                            valueSold: credited,
+                            valueSold: order.value,
+                        )
+                    } else {
+                        let _: Bool = self.pops[modifying: id].state.inventory.credit(
+                            inelastic: $0.id.resource,
+                            units: order.filled,
+                            value: order.value
                         )
                     }
                 }
             }
-            for order: LocalMarket.Order in bids {
-                #assert(order.filled <= order.amount, "Order overfilled! (\(order))")
+            for order: LocalMarket.Order in matched.demand {
+                #assert(order.filled <= order.size, "Order overfilled! (\(order))")
+                guard let entity: LEI = order.by else {
+                    stabilizationFundChange -= order.value
+                    $0.stockpile += order.filled
+                    continue
+                }
 
-                switch order.by {
+                guard case .tier(let tier)? = order.memo else {
+                    fatalError("filled buy order with no tier memo!!!")
+                }
+
+                feesCollected += order.value
+
+                switch entity {
                 case .factory(let id):
-                    spread += self.factories[modifying: id].state.inventory.debit(
+                    self.factories[modifying: id].state.inventory.debit(
                         inelastic: $0.id.resource,
                         units: order.filled,
-                        price: price,
-                        tier: order.tier
+                        value: order.value,
+                        tier: tier
                     )
                 case .pop(let id):
-                    spread += self.pops[modifying: id].state.inventory.debit(
+                    self.pops[modifying: id].state.inventory.debit(
                         inelastic: $0.id.resource,
                         units: order.filled,
-                        price: price,
-                        tier: order.tier
+                        value: order.value,
+                        tier: tier
                     )
                 }
             }
 
-            // TODO: do something with spread
+            #assert(
+                feesCollected >= 0,
+                "LocalMarket \($0.id) has negative fees collected!!!"
+            )
+
+            $0.stabilizationFund += stabilizationFundChange
+
+            #assert(
+                $0.stabilizationFund.total >= 0,
+                "LocalMarket \($0.id) has negative stabilization fund!!!"
+            )
+
+            $0.stabilizationFund += feesCollected
         }
         turn.stockMarkets.turn(random: &turn.random) {
             switch $2.asset {

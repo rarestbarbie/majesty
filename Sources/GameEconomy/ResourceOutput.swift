@@ -1,19 +1,19 @@
 import Fraction
 import GameIDs
 
-@frozen public struct ResourceOutput<Price>: Identifiable where Price: Equatable & Hashable {
+@frozen public struct ResourceOutput: Identifiable {
     public let id: Resource
     public var units: Reservoir
     public var unitsSold: Int64
     public var valueSold: Int64
-    public var price: Price?
+    public var price: Double?
 
     @inlinable public init(
         id: Resource,
         units: Reservoir,
         unitsSold: Int64,
         valueSold: Int64,
-        price: Price?
+        price: Double?
     ) {
         self.id = id
         self.units = units
@@ -44,16 +44,17 @@ extension ResourceOutput {
         self.units += .init(Double.init(amount) * efficiency)
     }
 }
-extension ResourceOutput<Never> {
+extension ResourceOutput {
     @inlinable public mutating func report(
         unitsSold: Int64,
         valueSold: Int64,
     ) {
         self.unitsSold += unitsSold
         self.valueSold += valueSold
+        self.price = unitsSold != 0 ? Double.init(valueSold %/ unitsSold) : nil
     }
 }
-extension ResourceOutput<Double> {
+extension ResourceOutput {
     public mutating func sell(in currency: Fiat, on exchange: inout BlocMarkets) -> Int64 {
         {
             let units: Int64 = self.units.removed - self.unitsSold

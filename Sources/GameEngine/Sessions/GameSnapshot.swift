@@ -419,7 +419,7 @@ extension GameSnapshot {
             let employment: Int64 = pop.stats.employedBeforeEgress
             return .instructions {
                 $0["Total employment"] = employment[/3]
-                for output: ResourceOutput<Never> in pop.state.inventory.out.inelastic.values {
+                for output: ResourceOutput in pop.state.inventory.out.inelastic.values {
                     let name: String? = self.context.rules.resources[output.id]?.title
                     $0[>] = """
                     Today these \(pop.state.type.plural) sold \(

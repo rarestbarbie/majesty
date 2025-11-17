@@ -5,7 +5,8 @@ import JavaScriptKit
 struct ResourceDescription {
     let color: Color
     let emoji: Character
-    let local: Bool
+    let local: Bool?
+    let storable: Bool?
     let hours: Int64?
 }
 extension ResourceDescription: JavaScriptDecodable {
@@ -13,6 +14,7 @@ extension ResourceDescription: JavaScriptDecodable {
         case color
         case emoji
         case local
+        case storable
         case hours
     }
 
@@ -20,7 +22,8 @@ extension ResourceDescription: JavaScriptDecodable {
         self.init(
             color: try js[.color].decode(),
             emoji: try js[.emoji].decode(),
-            local: try js[.local]?.decode() ?? false,
+            local: try js[.local]?.decode(),
+            storable: try js[.storable]?.decode(),
             hours: try js[.hours]?.decode()
         )
     }

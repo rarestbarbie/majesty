@@ -84,7 +84,8 @@ extension GameRules {
                 identity: $0,
                 color: $1.color,
                 emoji: $1.emoji,
-                local: $1.local,
+                local: $1.local ?? false,
+                storable: $1.storable ?? false,
                 hours: $1.hours
             )
         }

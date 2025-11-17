@@ -12,42 +12,39 @@ extension ResourceOutputs {
         tier: ResourceTier,
         details: (inout TooltipInstructionEncoder, Int64) -> () = { _, _ in }
     ) -> Tooltip? {
-        guard let amount: Int64 = tier.tradeable[id] ?? tier.inelastic[id] else {
-            return nil
-        }
+        let amount: Int64
+        let output: ResourceOutput?
 
-        let units: Reservoir
-        let unitsSold: Int64
-        let valueSold: Int64
-
-        if  let output: ResourceOutput<Double> = self.tradeable[id] {
-            units = output.units
-            unitsSold = output.unitsSold
-            valueSold = output.valueSold
+        if  let tradeable: Int64 = tier.tradeable[id] {
+            amount = tradeable
+            output = self.tradeable[id]
         } else if
-            let output: ResourceOutput<Never> = self.inelastic[id] {
-            units = output.units
-            unitsSold = output.unitsSold
-            valueSold = output.valueSold
+            let inelastic: Int64 = tier.inelastic[id] {
+            amount = inelastic
+            output = self.inelastic[id]
         } else {
             return nil
         }
 
+        guard let output: ResourceOutput = output else {
+            return nil
+        }
+
         return .instructions {
-            $0["Units sold today", +] = unitsSold[/3] / units.removed
+            $0["Units sold today", +] = output.unitsSold[/3] / output.units.removed
             $0[>] {
-                $0["Proceeds earned", +] = +?valueSold[/3]
+                $0["Proceeds earned", +] = +?output.valueSold[/3]
             }
-            $0["Stockpiled inventory", +] = units.total[/3] <- units.before
+            $0["Stockpiled inventory", +] = output.units.total[/3] <- output.units.before
             $0[>] {
-                $0["Produced today", +] = units.added[/3]
+                $0["Produced today", +] = output.units.added[/3]
             }
 
             details(&$0, amount)
 
-            if unitsSold < units.removed {
+            if output.unitsSold < output.units.removed {
                 $0[>] = """
-                \(neg: (units.removed - unitsSold)[/3]) didn’t get sold today
+                \(neg: (output.units.removed - output.unitsSold)[/3]) didn’t get sold today
                 """
             }
         }
@@ -60,12 +57,12 @@ extension ResourceOutputs {
             tradeable: BlocMarket.State?
         ),
     ) -> Tooltip? {
-        if  let output: ResourceOutput<Double> = self.tradeable[id],
+        if  let filled: ResourceOutput = self.tradeable[id],
             let price: Candle<Double> = market.tradeable?.history.last?.prices {
             return .instructions {
                 $0["Today’s closing price", +] = price.c[..2] <- price.o
 
-                guard let actual: Double = output.price else {
+                guard let actual: Double = filled.price else {
                     return
                 }
 
@@ -78,7 +75,7 @@ extension ResourceOutputs {
                 """
             }
         } else if
-            let _: ResourceOutput<Never> = self.inelastic[id],
+            let filled: ResourceOutput = self.inelastic[id],
             let market: LocalMarket.State = market.inelastic {
             let today: LocalMarket.Interval = market.today
             let yesterday: LocalMarket.Interval = market.yesterday
@@ -87,6 +84,18 @@ extension ResourceOutputs {
                 $0[>] {
                     $0["Supply in this tile", -] = today.supply[/3] <- yesterday.supply
                     $0["Demand in this tile", +] = today.demand[/3] <- yesterday.demand
+                }
+
+                $0["Local stockpile", -] = market.stockpile[/3]
+                $0[>] {
+                    $0["Stabilization fund value", +] = market.stabilizationFund[/3]
+                }
+
+                if let average: Double = filled.price {
+                    $0[>] = """
+                    Due to the local bid-ask spread, the average price they actually received \
+                    today was \(em: average[..2])
+                    """
                 }
 
                 if today.supply <= today.demand {

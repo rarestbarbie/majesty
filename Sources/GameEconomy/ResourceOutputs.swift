@@ -4,12 +4,12 @@ import GameIDs
 import OrderedCollections
 
 @frozen public struct ResourceOutputs {
-    public var tradeable: OrderedDictionary<Resource, ResourceOutput<Double>>
-    public var inelastic: OrderedDictionary<Resource, ResourceOutput<Never>>
+    public var tradeable: OrderedDictionary<Resource, ResourceOutput>
+    public var inelastic: OrderedDictionary<Resource, ResourceOutput>
 
     @inlinable public init(
-        tradeable: OrderedDictionary<Resource, ResourceOutput<Double>>,
-        inelastic: OrderedDictionary<Resource, ResourceOutput<Never>>
+        tradeable: OrderedDictionary<Resource, ResourceOutput>,
+        inelastic: OrderedDictionary<Resource, ResourceOutput>
     ) {
         self.tradeable = tradeable
         self.inelastic = inelastic

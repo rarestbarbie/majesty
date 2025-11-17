@@ -19,8 +19,7 @@ extension ResourceInput {
         case price = "p"
     }
 }
-extension ResourceInput: JavaScriptEncodable, ConvertibleToJSValue
-    where Price: ConvertibleToJSValue {
+extension ResourceInput: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
 
@@ -38,8 +37,7 @@ extension ResourceInput: JavaScriptEncodable, ConvertibleToJSValue
         js[.price] = self.price
     }
 }
-extension ResourceInput: JavaScriptDecodable, LoadableFromJSValue, ConstructibleFromJSValue
-    where Price: LoadableFromJSValue {
+extension ResourceInput: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             id: try js[.id].decode(),
