@@ -70,7 +70,7 @@ extension MineContext: AllocatingContext {
 
         var yieldBeforeScaling: Double = 0
         for (id, amount): (Resource, Int64) in self.type.base.inelastic {
-            let price: Double = .init(turn.localMarkets[id / self.state.tile].today.price.value)
+            let price: Double = .init(turn.localMarkets[id / self.state.tile].today.bid.value)
             yieldBeforeScaling += price * Double.init(amount)
         }
         for (id, amount): (Resource, Int64) in self.type.base.tradeable {

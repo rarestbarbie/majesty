@@ -173,8 +173,7 @@ extension InventoryBreakdown {
                     stockpile: input.units.total,
                     filled: input.unitsConsumed,
                     demand: input.unitsDemanded,
-                    priceAtMarket: market?.history.last?.prices,
-                    price: nil
+                    price: market?.history.last?.prices,
                 )
             )
         }
@@ -187,7 +186,6 @@ extension InventoryBreakdown {
                     stockpile: input.units.total,
                     filled: input.units.added,
                     demand: input.unitsDemanded,
-                    priceAtMarket: nil,
                     price: market?.price,
                 )
             )
@@ -210,8 +208,7 @@ extension InventoryBreakdown {
                     mine: mine,
                     name: name,
                     unitsSold: output.unitsSold,
-                    priceAtMarket: market?.history.last?.prices,
-                    price: nil
+                    price: market?.history.last?.prices
                 )
             )
         }
@@ -223,7 +220,6 @@ extension InventoryBreakdown {
                     mine: mine,
                     name: name,
                     unitsSold: output.unitsSold,
-                    priceAtMarket: nil,
                     price: market?.price,
                 )
             )

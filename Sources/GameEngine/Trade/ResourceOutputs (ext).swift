@@ -80,7 +80,7 @@ extension ResourceOutputs {
             let today: LocalMarket.Interval = market.today
             let yesterday: LocalMarket.Interval = market.yesterday
             return .instructions {
-                $0["Today’s local price", +] = today.price.value[..] <- yesterday.price.value
+                $0["Today’s local price", +] = today.bid.value[..] <- yesterday.bid.value
                 $0[>] {
                     $0["Supply in this tile", -] = today.supply[/3] <- yesterday.supply
                     $0["Demand in this tile", +] = today.demand[/3] <- yesterday.demand
@@ -91,9 +91,12 @@ extension ResourceOutputs {
                     $0["Stabilization fund value", +] = market.stabilizationFund[/3]
                 }
 
-                if let average: Double = filled.price {
+                if  let average: Double = filled.price {
+                    let spread: Double = today.spread
                     $0[>] = """
-                    Due to the local bid-ask spread, the average price they actually received \
+                    Due to the local bid-ask spread of \(
+                        spread[%2], style: spread > 0.005 ? .neg : .em
+                    ), the average price they actually received \
                     today was \(em: average[..2])
                     """
                 }
@@ -105,7 +108,7 @@ extension ResourceOutputs {
                     """
                 } else if
                     let floor: LocalPriceLevel = market.limit.min,
-                        floor.price >= today.price {
+                        floor.price >= today.bid {
                     $0[>] = """
                     There are not enough buyers in this region, but the price is not allowed \
                     to decline due to their \(floor.label) of \
@@ -113,7 +116,7 @@ extension ResourceOutputs {
                     """
                 } else if
                     let cap: LocalPriceLevel = market.limit.max,
-                        cap.price <= today.price {
+                        cap.price <= today.ask {
                     $0[>] = """
                     There are not enough producers in this region, but the price is not
                     allowed to increase due to their \(cap.label) of \(em: cap.price.value[..])

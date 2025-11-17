@@ -33,6 +33,13 @@ extension Fraction {
     @inlinable public static func / (a: Self, b: Self) -> Self {
         .init(a.n * b.d, a.d * b.n)
     }
+
+    @inlinable public static func * (a: Self, b: Int64) -> Self {
+        .init(a.n * b, a.d)
+    }
+    @inlinable public static func * (a: Int64, b: Self) -> Self {
+        .init(a * b.n, b.d)
+    }
 }
 extension Fraction {
     /// Multiply the operand by this fraction, rounding away from zero.
