@@ -345,12 +345,10 @@ extension GameContext {
                 demand: [LocalMarket.Order]
             ) = $0.match(using: &turn.random)
 
-            var stabilizationFundChange: Int64 = 0
             var feesCollected: Int64 = 0
 
             for order: LocalMarket.Order in matched.supply {
                 guard let entity: LEI = order.by else {
-                    stabilizationFundChange += order.value
                     $0.stockpile -= order.filled
                     continue
                 }
@@ -385,7 +383,6 @@ extension GameContext {
             for order: LocalMarket.Order in matched.demand {
                 #assert(order.filled <= order.size, "Order overfilled! (\(order))")
                 guard let entity: LEI = order.by else {
-                    stabilizationFundChange -= order.value
                     $0.stockpile += order.filled
                     continue
                 }
@@ -414,19 +411,12 @@ extension GameContext {
                 }
             }
 
-            #assert(
-                feesCollected >= 0,
-                "LocalMarket \($0.id) has negative fees collected!!!"
-            )
-
-            $0.stabilizationFund += stabilizationFundChange
-
+            $0.stabilizationFund += feesCollected
             #assert(
                 $0.stabilizationFund.total >= 0,
                 "LocalMarket \($0.id) has negative stabilization fund!!!"
             )
 
-            $0.stabilizationFund += feesCollected
         }
         turn.stockMarkets.turn(random: &turn.random) {
             switch $2.asset {
