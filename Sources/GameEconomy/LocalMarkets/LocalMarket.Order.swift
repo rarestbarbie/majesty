@@ -28,24 +28,17 @@ extension LocalMarket.Order {
     @inlinable public var value: Int64 { self.valueMatched }
 }
 extension LocalMarket.Order {
-    mutating func fill(
-        _ side: LocalMarket.Side,
-        price: (bid: LocalPrice, ask: LocalPrice),
-        units: Int64
-    ) {
+    mutating func fill(_ side: LocalMarket.Side, price: LocalPrice, units: Int64) {
         self.unitsMatched = units
 
         switch (side, self.type) {
         case (.buy, .taker), (.sell, .maker):
-            self.valueMatched = units >< price.ask.value
+            self.valueMatched = units >< price.value
         case (.buy, .maker), (.sell, .taker):
-            self.valueMatched = units <> price.bid.value
+            self.valueMatched = units <> price.value
         }
     }
-    mutating func fill(
-        _ side: LocalMarket.Side,
-        price: (bid: LocalPrice, ask: LocalPrice)
-    ) {
+    mutating func fill(_ side: LocalMarket.Side, price: LocalPrice) {
         self.fill(side, price: price, units: self.size)
     }
 }

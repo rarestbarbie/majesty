@@ -86,8 +86,8 @@ extension LocalMarket {
 }
 extension LocalMarket {
     @inlinable public var price: Candle<Double> {
-        let y: Double = .init(self.yesterday.mid)
-        let z: Double = .init(self.today.mid)
+        let y: Double = .init(self.yesterday.bid.value)
+        let z: Double = .init(self.today.bid.value)
         return .init(
             o: y,
             l: min(y, z),
@@ -116,7 +116,7 @@ extension LocalMarket {
         guard let amount: Int64 = Self.quantity(
             budget: budget,
             limit: limit,
-            price: self.today.ask
+            price: self.today.price
         ) else {
             return
         }
@@ -153,19 +153,17 @@ extension LocalMarket {
         self.limit = template.limit
         self.storage = template.storage
 
-        let volume: Double = Double.init(self.today.mid) * Double.init(
-            min(self.today.supply, self.today.demand)
-        )
-        let l: Double = Double.init(self.stabilizationFund.total) / (1 + 30 * volume)
-        let s: Double = (1 + 99 * max(1 - l, 0)) / 10_000
+        let min: LocalPrice = template.limit.min?.price ?? Self.minDefault
+        let max: LocalPrice = template.limit.max?.price ?? Self.maxDefault
 
-        self.today = self.today.priceUpdate(
-            spread: s,
-            limit: (
-                min: template.limit.min?.price ?? Self.minDefault,
-                max: template.limit.max?.price ?? Self.maxDefault,
-            )
-        )
+        let price: LocalPrice = self.today.priceUpdate
+        if  price < min {
+            self.today = .init(bid: min, ask: min)
+        } else if price > max {
+            self.today = .init(bid: max, ask: max)
+        } else {
+            self.today = .init(bid: price, ask: price)
+        }
 
         self.stabilizationFund.turn()
         self.stockpile.turn()
@@ -202,7 +200,7 @@ extension LocalMarket {
                     let size: Int64 = Self.quantity(
                         budget: self.stabilizationFund.total,
                         limit: limit,
-                        price: self.today.bid
+                        price: self.today.price
                     ) {
                     // when buying, maker order goes on the bid side
                     let maker: Order = .init(
@@ -229,10 +227,10 @@ extension LocalMarket {
             }
 
             for i: Int in self.supply.indices {
-                self.supply[i].fill(.sell, price: self.today.prices, units: matched[i])
+                self.supply[i].fill(.sell, price: self.today.price, units: matched[i])
             }
             for i: Int in self.demand.indices {
-                self.demand[i].fill(.buy, price: self.today.prices)
+                self.demand[i].fill(.buy, price: self.today.price)
             }
         } else if supplyAvailable < demandAvailable {
             self.demand.shuffle(using: &random.generator)
@@ -246,18 +244,18 @@ extension LocalMarket {
             }
 
             for i: Int in self.supply.indices {
-                self.supply[i].fill(.sell, price: self.today.prices)
+                self.supply[i].fill(.sell, price: self.today.price)
             }
             for i: Int in self.demand.indices {
-                self.demand[i].fill(.buy, price: self.today.prices, units: matched[i])
+                self.demand[i].fill(.buy, price: self.today.price, units: matched[i])
             }
         } else {
             // supply and demand are evenly matched
             for i: Int in self.supply.indices {
-                self.supply[i].fill(.sell, price: self.today.prices)
+                self.supply[i].fill(.sell, price: self.today.price)
             }
             for i: Int in self.demand.indices {
-                self.demand[i].fill(.buy, price: self.today.prices)
+                self.demand[i].fill(.buy, price: self.today.price)
             }
         }
 

@@ -92,7 +92,7 @@ extension ResourceOutputs {
                 }
 
                 if  let average: Double = filled.price {
-                    let spread: Double = today.spread
+                    let spread: Double = 0 //today.spread
                     $0[>] = """
                     Due to the local bid-ask spread of \(
                         spread[%2], style: spread > 0.005 ? .neg : .em
