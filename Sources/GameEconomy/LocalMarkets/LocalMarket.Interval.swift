@@ -1,3 +1,4 @@
+import D
 import Fraction
 
 extension LocalMarket {
@@ -16,30 +17,87 @@ extension LocalMarket {
     }
 }
 extension LocalMarket.Interval {
-    @available(*, unavailable)
-    public var price: LocalPrice { self.bid }
+    @inlinable var mid: Fraction {
+        let sum: Decimal = self.bid.value + self.ask.value
+        switch sum.fraction {
+        case (let n, denominator: let d?):
+            return n %/ (2 * d)
+        case (let n, denominator: nil):
+            return n %/ 2
+        }
+    }
+
+    @inlinable public var spread: Double {
+        let bid: Double = Double.init(self.bid.value)
+        let ask: Double = Double.init(self.ask.value)
+        if  ask > 0 {
+            return (ask - bid) / ask
+        } else {
+            return 0
+        }
+    }
 
     var prices: (bid: LocalPrice, ask: LocalPrice) { (self.bid, self.ask) }
 }
 extension LocalMarket.Interval {
-    /// To prevent the price from oscillating around a fractional value, we only allow it to
-    /// move if the relative deficit, or excess, is greater than the relative change in the
-    /// price itself.
-    var priceUpdate: LocalPrice {
+    mutating func update(
+        spread: Double,
+        limit: (min: LocalPrice, max: LocalPrice)
+    ) {
+        defer {
+            self.supply = 0
+            self.demand = 0
+        }
+
+        guard
+        let (bid, ask): (bid: LocalPrice, ask: LocalPrice) = self.updated(
+            spread: spread,
+            limit: limit
+        ) else {
+            return
+        }
+
+        self.bid = bid
+        self.ask = ask
+    }
+
+    private func updated(
+        spread: Double,
+        limit: (min: LocalPrice, max: LocalPrice)
+    ) -> (bid: LocalPrice, ask: LocalPrice)? {
+        if  self.bid < limit.min {
+            return (bid: limit.min, ask: max(limit.min, self.ask))
+        } else if
+            self.ask > limit.max {
+            return (bid: min(limit.max, self.bid), ask: limit.max)
+        }
+
         if  self.supply < self.demand {
             if self.supply == 0 {
-                return self.price.tickedUp()
+                return self.tickedUp(spread: spread, limit: limit.max)
             }
             if (self.demand %/ self.supply) > (LocalPrice.cent %/ (LocalPrice.cent - 1)) {
-                return self.price.tickedUp()
+                return self.tickedUp(spread: spread, limit: limit.max)
             }
-        } else if self.price.value.units > 0,
+        } else if self.bid.value.units > 0,
             self.supply > self.demand {
             if (self.demand %/ self.supply) < ((LocalPrice.cent - 1) %/ LocalPrice.cent) {
-                return self.price.tickedDown()
+                return self.tickedDown(spread: spread, limit: limit.min)
             }
         }
 
-        return self.price
+        return nil
+    }
+
+    private func tickedUp(spread: Double, limit: LocalPrice) ->  (bid: LocalPrice, ask: LocalPrice) {
+        let ask: LocalPrice = min(self.ask.tickedUp(), limit)
+        let bid: LocalPrice = ask.scaled(by: (1 - spread), rounding: .down)
+        return (bid: max(self.bid, bid), ask: ask)
+    }
+
+    private func tickedDown(spread: Double, limit: LocalPrice) -> (bid: LocalPrice, ask: LocalPrice) {
+        let bid: LocalPrice = max(self.bid.tickedDown(), limit)
+        let ask: LocalPrice = bid.scaled(by: (1 / (1 - spread)), rounding: .up)
+        return (bid: bid, ask: min(self.ask, ask))
     }
 }

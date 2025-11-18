@@ -80,7 +80,9 @@ extension ResourceOutputs {
             let today: LocalMarket.Interval = market.today
             let yesterday: LocalMarket.Interval = market.yesterday
             return .instructions {
-                $0["Today’s local price", +] = today.bid.value[..] <- yesterday.bid.value
+                // Show the ask price here, because the bid price is what they actually
+                // received, and that is shown several lines below
+                $0["Today’s local price", +] = today.ask.value[..] <- yesterday.ask.value
                 $0[>] {
                     $0["Supply in this tile", -] = today.supply[/3] <- yesterday.supply
                     $0["Demand in this tile", +] = today.demand[/3] <- yesterday.demand
@@ -92,7 +94,7 @@ extension ResourceOutputs {
                 }
 
                 if  let average: Double = filled.price {
-                    let spread: Double = 0 //today.spread
+                    let spread: Double = today.spread
                     $0[>] = """
                     Due to the local bid-ask spread of \(
                         spread[%2], style: spread > 0.005 ? .neg : .em

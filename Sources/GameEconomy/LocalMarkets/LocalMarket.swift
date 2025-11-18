@@ -86,8 +86,8 @@ extension LocalMarket {
 }
 extension LocalMarket {
     @inlinable public var price: Candle<Double> {
-        let y: Double = .init(self.yesterday.bid.value)
-        let z: Double = .init(self.today.bid.value)
+        let y: Double = .init(self.yesterday.mid)
+        let z: Double = .init(self.today.mid)
         return .init(
             o: y,
             l: min(y, z),
@@ -150,20 +150,22 @@ extension LocalMarket {
 extension LocalMarket {
     public mutating func turn(template: Template) {
         self.yesterday = self.today
+
+        let volume: Double = Double.init(self.today.mid) * Double.init(
+            min(self.today.supply, self.today.demand)
+        )
+        let l: Double = Double.init(self.stabilizationFund.total) / (1 + 30 * volume)
+
+        self.today.update(
+            spread: (1 + 99 * max(1 - l, 0)) / 10_000,
+            limit: (
+                min: template.limit.min?.price ?? Self.minDefault,
+                max: template.limit.max?.price ?? Self.maxDefault,
+            )
+        )
+
         self.limit = template.limit
         self.storage = template.storage
-
-        let min: LocalPrice = template.limit.min?.price ?? Self.minDefault
-        let max: LocalPrice = template.limit.max?.price ?? Self.maxDefault
-
-        let price: LocalPrice = self.today.priceUpdate
-        if  price < min {
-            self.today = .init(bid: min, ask: min)
-        } else if price > max {
-            self.today = .init(bid: max, ask: max)
-        } else {
-            self.today = .init(bid: price, ask: price)
-        }
 
         self.stabilizationFund.turn()
         self.stockpile.turn()
