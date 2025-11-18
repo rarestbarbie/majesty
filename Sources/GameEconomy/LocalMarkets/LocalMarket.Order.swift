@@ -2,12 +2,12 @@ import Fraction
 import GameIDs
 
 extension LocalMarket {
-    @frozen public struct Order {
+    @frozen @usableFromInline struct Order {
         /// Nil for private entities (such as the market itself)
-        public let by: LEI?
-        public let type: OrderType
-        public let memo: Memo?
-        public let size: Int64
+        @usableFromInline let by: LEI?
+        @usableFromInline let type: OrderType
+        @usableFromInline let memo: Memo?
+        @usableFromInline let size: Int64
 
         @usableFromInline var unitsMatched: Int64
         @usableFromInline var valueMatched: Int64
@@ -24,10 +24,6 @@ extension LocalMarket {
     }
 }
 extension LocalMarket.Order {
-    @inlinable public var filled: Int64 { self.unitsMatched }
-    @inlinable public var value: Int64 { self.valueMatched }
-}
-extension LocalMarket.Order {
     mutating func fill(_ side: LocalMarket.Side, price: (bid: LocalPrice, ask: LocalPrice), units: Int64) {
         self.unitsMatched = units
 
@@ -40,17 +36,5 @@ extension LocalMarket.Order {
     }
     mutating func fill(_ side: LocalMarket.Side, price: (bid: LocalPrice, ask: LocalPrice)) {
         self.fill(side, price: price, units: self.size)
-    }
-}
-extension LocalMarket {
-    @frozen public enum OrderType {
-        case maker
-        case taker
-    }
-}
-extension LocalMarket {
-    enum Side {
-        case buy
-        case sell
     }
 }

@@ -21,23 +21,39 @@ extension Inventory {
     }
 }
 extension Inventory {
-    mutating func credit(
-        inelastic resource: Resource,
-        units: Int64,
-        value: Int64
-    ) -> Bool {
-        self.account.r += value
-        if case ()? = self.out.inelastic[resource]?.report(
-                unitsSold: units,
-                valueSold: value,
-            ) {
-            return true
-        } else {
-            return false
+    mutating func report(resource: Resource, fill: LocalMarket.Fill, side: LocalMarket.Side) {
+        switch side {
+        case .sell:
+            self.credit(
+                inelastic: resource,
+                units: fill.filled,
+                value: fill.value
+            )
+
+        case .buy:
+            guard case .tier(let tier)? = fill.memo else {
+                fatalError("filled buy order with no tier memo!!!")
+            }
+
+            self.debit(
+                inelastic: resource,
+                units: fill.filled,
+                value: fill.value,
+                tier: tier
+            )
         }
     }
 
-    mutating func debit(
+    private mutating func credit(
+        inelastic resource: Resource,
+        units: Int64,
+        value: Int64
+    ) {
+        self.account.r += value
+        self.out.inelastic[resource]?.report(unitsSold: units, valueSold: value)
+    }
+
+    private mutating func debit(
         inelastic resource: Resource,
         units: Int64,
         value: Int64,

@@ -5,6 +5,7 @@ import JavaScriptInterop
 extension LocalMarket.State {
     @frozen public enum ObjectKey: JSString, Sendable {
         case id
+        case f
         case q
         case qi
         case qo
@@ -23,6 +24,7 @@ extension LocalMarket.State {
 extension LocalMarket.State: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
+        js[.f] = self.stabilizationFundFees
         js[.q] = self.stabilizationFund.total
         js[.qi] = self.stabilizationFund.added
         js[.qo] = self.stabilizationFund.removed
@@ -56,6 +58,7 @@ extension LocalMarket.State: JavaScriptDecodable {
 
         self.init(
             id: try js[.id].decode(),
+            stabilizationFundFees: try js[.f].decode(),
             stabilizationFund: .init(
                 total: try js[.q].decode(),
                 added: try js[.qi].decode(),

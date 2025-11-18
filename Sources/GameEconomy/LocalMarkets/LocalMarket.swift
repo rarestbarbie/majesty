@@ -1,3 +1,4 @@
+import Assert
 import D
 import Fraction
 import GameIDs
@@ -5,6 +6,8 @@ import Random
 
 @frozen public struct LocalMarket: Identifiable {
     public let id: ID
+    /// Change to stabilization fund this turn, excluding changes from stockpile trades.
+    public var stabilizationFundFees: Int64
     public var stabilizationFund: Reservoir
     public var stockpile: Reservoir
     public var yesterday: Interval
@@ -20,6 +23,7 @@ import Random
 
     @inlinable init(
         id: ID,
+        stabilizationFundFees: Int64,
         stabilizationFund: Reservoir,
         stockpile: Reservoir,
         yesterday: Interval,
@@ -33,6 +37,7 @@ import Random
         demand: [Order]
     ) {
         self.id = id
+        self.stabilizationFundFees = stabilizationFundFees
         self.stabilizationFund = stabilizationFund
         self.stockpile = stockpile
         self.yesterday = yesterday
@@ -48,6 +53,7 @@ extension LocalMarket {
         let interval: Interval = .init(bid: .init(), ask: .init(), supply: 0, demand: 0)
         self.init(
             id: id,
+            stabilizationFundFees: 0,
             stabilizationFund: .zero,
             stockpile: .zero,
             yesterday: interval,
@@ -62,6 +68,7 @@ extension LocalMarket {
     @inlinable public init(state: State) {
         self.init(
             id: state.id,
+            stabilizationFundFees: state.stabilizationFundFees,
             stabilizationFund: state.stabilizationFund,
             stockpile: state.stockpile,
             yesterday: state.yesterday,
@@ -75,6 +82,7 @@ extension LocalMarket {
     @inlinable public var state: State {
         .init(
             id: self.id,
+            stabilizationFundFees: self.stabilizationFundFees,
             stabilizationFund: self.stabilizationFund,
             stockpile: self.stockpile,
             yesterday: self.yesterday,
@@ -101,7 +109,7 @@ extension LocalMarket {
     }
 }
 extension LocalMarket {
-    public mutating func sell(amount: Int64, entity: LEI, memo: Order.Memo?) {
+    public mutating func sell(amount: Int64, entity: LEI, memo: Memo?) {
         // taker order goes on the bid side
         self.supply.append(.init(by: entity, type: .taker, memo: memo, size: amount))
         self.today.supply += amount
@@ -111,7 +119,7 @@ extension LocalMarket {
         budget: Int64,
         entity: LEI,
         limit: Int64,
-        memo: Order.Memo?,
+        memo: Memo?,
     ) {
         guard let amount: Int64 = Self.quantity(
             budget: budget,
@@ -157,7 +165,7 @@ extension LocalMarket {
                 min(self.today.supply, self.today.demand)
             )
             let l: Double = Double.init(self.stabilizationFund.total) / (1 + 30 * volume)
-            spread = (1 + 99 * max(1 - l, 0)) / 10_000
+            spread = (1 + 149 * max(1 - l, 0)) / 10_000
         } else {
             spread = nil
         }
@@ -177,7 +185,76 @@ extension LocalMarket {
         self.stockpile.turn()
     }
 
-    public mutating func match(using random: inout PseudoRandom) -> (
+    @inlinable public mutating func match(
+        random: inout PseudoRandom,
+        report: (Fill, Side) -> (),
+    ) {
+        let matched: (
+            supply: [LocalMarket.Order],
+            demand: [LocalMarket.Order]
+        ) = self.match(using: &random)
+
+        var proceeds: Int64 = 0
+        var cashFlow: Int64 = 0
+
+        for order: LocalMarket.Order in matched.supply {
+            #assert(order.unitsMatched <= order.size, "Order overfilled! (\(order))")
+
+            guard let entity: LEI = order.by else {
+                // when we sell from the stockpile,
+                // we receive proceeds for the stabilization fund
+                proceeds += order.valueMatched
+                self.stockpile -= order.unitsMatched
+                continue
+            }
+
+            cashFlow -= order.valueMatched
+
+            let fill: Fill = .init(
+                entity: entity,
+                filled: order.unitsMatched,
+                value: order.valueMatched,
+                memo: order.memo
+            )
+
+            report(fill, .sell)
+        }
+        for order: LocalMarket.Order in matched.demand {
+            #assert(order.unitsMatched <= order.size, "Order overfilled! (\(order))")
+
+            guard let entity: LEI = order.by else {
+                // when we buy for the stockpile,
+                // we spend proceeds from the stabilization fund
+                proceeds -= order.valueMatched
+                self.stockpile += order.unitsMatched
+                continue
+            }
+
+            cashFlow += order.valueMatched
+
+            let fill: Fill = .init(
+                entity: entity,
+                filled: order.unitsMatched,
+                value: order.valueMatched,
+                memo: order.memo
+            )
+
+            report(fill, .buy)
+        }
+
+        self.stabilizationFundFees = cashFlow - proceeds
+        #assert(
+            self.stabilizationFundFees >= 0,
+            "LocalMarket \(self.id) collected negative (\(self.stabilizationFundFees)) fees!!!"
+        )
+
+        self.stabilizationFund += cashFlow
+        #assert(
+            self.stabilizationFund.total >= 0,
+            "LocalMarket \(self.id) has negative stabilization fund!!!"
+        )
+    }
+    @usableFromInline mutating func match(using random: inout PseudoRandom) -> (
         supply: [Order],
         demand: [Order]
     ) {

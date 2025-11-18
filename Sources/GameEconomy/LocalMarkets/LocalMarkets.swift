@@ -55,7 +55,7 @@ extension LocalMarkets {
     public mutating func sell(
         supply: OrderedDictionary<Resource, ResourceOutput>,
         entity: LEI,
-        memo: LocalMarket.Order.Memo? = nil,
+        memo: LocalMarket.Memo? = nil,
         tile: Address,
     ) {
         for (id, output): (Resource, ResourceOutput) in supply {
@@ -69,7 +69,7 @@ extension LocalMarkets {
     public mutating func buy(
         budget budgetTotal: Int64,
         entity: LEI,
-        memo: LocalMarket.Order.Memo? = nil,
+        memo: LocalMarket.Memo? = nil,
         tile: Address,
         weights: [InelasticBudgetTier.Weight],
     ) {

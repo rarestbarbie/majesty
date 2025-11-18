@@ -340,83 +340,10 @@ extension GameContext {
         self.pops.turn { $0.turn(on: &turn) }
 
         turn.localMarkets.turn {
-            let matched: (
-                supply: [LocalMarket.Order],
-                demand: [LocalMarket.Order]
-            ) = $0.match(using: &turn.random)
-
-            var feesCollected: Int64 = 0
-
-            for order: LocalMarket.Order in matched.supply {
-                guard let entity: LEI = order.by else {
-                    $0.stockpile -= order.filled
-                    continue
-                }
-
-                feesCollected -= order.value
-
-                switch entity {
-                case .factory(let id):
-                    let _: Bool = self.factories[modifying: id].state.inventory.credit(
-                        inelastic: $0.id.resource,
-                        units: order.filled,
-                        value: order.value
-                    )
-
-                case .pop(let id):
-                    if case .mine(let mine)? = order.memo {
-                        self.pops[
-                            modifying: id
-                        ].state.mines[mine]?.out.inelastic[$0.id.resource]?.report(
-                            unitsSold: order.filled,
-                            valueSold: order.value,
-                        )
-                    } else {
-                        let _: Bool = self.pops[modifying: id].state.inventory.credit(
-                            inelastic: $0.id.resource,
-                            units: order.filled,
-                            value: order.value
-                        )
-                    }
-                }
+            let resource: Resource = $0.id.resource
+            $0.match(random: &turn.random) {
+                self.report(resource: resource, fill: $0, side: $1)
             }
-            for order: LocalMarket.Order in matched.demand {
-                #assert(order.filled <= order.size, "Order overfilled! (\(order))")
-                guard let entity: LEI = order.by else {
-                    $0.stockpile += order.filled
-                    continue
-                }
-
-                guard case .tier(let tier)? = order.memo else {
-                    fatalError("filled buy order with no tier memo!!!")
-                }
-
-                feesCollected += order.value
-
-                switch entity {
-                case .factory(let id):
-                    self.factories[modifying: id].state.inventory.debit(
-                        inelastic: $0.id.resource,
-                        units: order.filled,
-                        value: order.value,
-                        tier: tier
-                    )
-                case .pop(let id):
-                    self.pops[modifying: id].state.inventory.debit(
-                        inelastic: $0.id.resource,
-                        units: order.filled,
-                        value: order.value,
-                        tier: tier
-                    )
-                }
-            }
-
-            $0.stabilizationFund += feesCollected
-            #assert(
-                $0.stabilizationFund.total >= 0,
-                "LocalMarket \($0.id) has negative stabilization fund!!!"
-            )
-
         }
         turn.stockMarkets.turn(random: &turn.random) {
             switch $2.asset {
@@ -496,6 +423,33 @@ extension GameContext {
     }
 }
 
+extension GameContext {
+    private mutating func report(resource: Resource, fill: LocalMarket.Fill, side: LocalMarket.Side) {
+        switch fill.entity {
+        case .factory(let id):
+            self.factories[modifying: id].state.inventory.report(
+                resource: resource,
+                fill: fill,
+                side: side
+            )
+
+        case .pop(let id):
+            if  case .sell = side,
+                case .mine(let mine)? = fill.memo {
+                self.pops[modifying: id].state.mines[mine]?.out.inelastic[resource]?.report(
+                    unitsSold: fill.filled,
+                    valueSold: fill.value,
+                )
+            } else {
+                self.pops[modifying: id].state.inventory.report(
+                    resource: resource,
+                    fill: fill,
+                    side: side
+                )
+            }
+        }
+    }
+}
 extension GameContext {
     private mutating func postCashTransfers(_ turn: inout Turn) {
         turn.bank.turn {
