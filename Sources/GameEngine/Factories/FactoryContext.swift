@@ -230,15 +230,15 @@ extension FactoryContext: TransactingContext {
             security: self.security,
         )
 
-        turn.localMarkets.place(
-            bids: (
+        turn.localMarkets.trade(
+            selling: self.state.inventory.out.inelastic,
+            buying: (
                 (budget.l.inelastic, weights.l.inelastic.x),
                 (budget.e.inelastic, weights.e.inelastic.x),
                 (budget.x.inelastic, weights.x.inelastic.x),
             ),
-            asks: self.state.inventory.out.inelastic,
             as: self.lei,
-            in: self.state.tile,
+            in: self.state.tile
         )
     }
 

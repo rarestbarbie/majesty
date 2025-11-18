@@ -13,11 +13,6 @@ final class RegionalProperties {
     }
 }
 extension RegionalProperties {
-    var minwage: Int64 {
-        self.governedBy.minwage
-    }
-}
-extension RegionalProperties {
     func startIndexCount() {
         self.pops.startIndexCount()
     }

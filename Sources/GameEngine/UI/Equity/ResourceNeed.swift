@@ -10,9 +10,7 @@ struct ResourceNeed {
     let stockpile: Int64?
     let filled: Int64
     let demand: Int64
-
-    let priceAtMarket: Candle<Double>?
-    let price: Candle<LocalPrice>?
+    let price: Candle<Double>?
 }
 extension ResourceNeed: Identifiable {
     var id: InventoryLine {
@@ -43,6 +41,6 @@ extension ResourceNeed: JavaScriptEncodable {
         js[.stockpile] = self.stockpile
         js[.filled] = self.filled
         js[.demand] = self.demand
-        js[.price] = self.priceAtMarket ?? self.price?.map { Double.init($0.value) }
+        js[.price] = self.price
     }
 }

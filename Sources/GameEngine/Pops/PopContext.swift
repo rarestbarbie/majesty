@@ -98,7 +98,11 @@ extension PopContext: AllocatingContext {
             }
         }
 
-        let currency: Fiat = self.region!.occupiedBy.currency.id
+        guard let authority: CountryProperties = self.region?.occupiedBy else {
+            return
+        }
+
+        let currency: Fiat = authority.currency.id
         let balance: Int64 = self.state.inventory.account.balance
 
         self.state.inventory.out.sync(with: self.type.output, releasing: 1)
@@ -131,7 +135,7 @@ extension PopContext: AllocatingContext {
         let weights: ResourceInputWeights = .init(
             tiers: (self.state.inventory.l, self.state.inventory.e, self.state.inventory.x),
             location: self.state.tile,
-            currency: currency,
+            currency: authority.currency.id,
             turn: turn,
         )
 
@@ -171,22 +175,22 @@ extension PopContext: AllocatingContext {
             break
         }
 
-        turn.localMarkets.place(
-            bids: (
+        turn.localMarkets.trade(
+            selling: self.state.inventory.out.inelastic,
+            buying: (
                 (budget.l.inelastic, weights.l.inelastic.x),
                 (budget.e.inelastic, weights.e.inelastic.x),
                 (budget.x.inelastic, weights.x.inelastic.x),
             ),
-            asks: self.state.inventory.out.inelastic,
             as: self.lei,
             in: self.state.tile,
         )
         for job: MiningJob in self.state.mines.values {
-            turn.localMarkets.ask(
-                asks: job.out.inelastic,
-                memo: job.id,
-                as: self.lei,
-                in: self.state.tile,
+            turn.localMarkets.sell(
+                supply: job.out.inelastic,
+                entity: self.lei,
+                memo: .mine(job.id),
+                tile: self.state.tile,
             )
         }
 

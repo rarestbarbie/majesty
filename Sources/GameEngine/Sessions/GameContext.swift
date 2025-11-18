@@ -325,26 +325,14 @@ extension GameContext {
             try self.countries[i].advance(turn: &turn, context: self)
         }
 
+        // need to call this first, to update prices before trading
         turn.localMarkets.turn {
-            /// Apply local minimum wages
             guard
-            let region: RegionalProperties = self.planets[$0.id.location]?.properties,
-            let resource: ResourceMetadata = self.rules.resources[$0.id.resource] else {
-                return
+            let region: RegionalProperties = self.planets[$0.id.location]?.properties else {
+                fatalError("LocalMarket \($0.id) exists in a tile with no authority!!!")
             }
 
-            let min: LocalPriceLevel?
-
-            if let hours: Int64 = resource.hours {
-                min = .init(
-                    price: LocalPrice.init(region.minwage %/ hours),
-                    label: .minimumWage
-                )
-            } else {
-                min = nil
-            }
-
-            $0.turn(priceControls: (min: min, max: nil))
+            $0.turn(template: region.occupiedBy.localMarkets[$0.id.resource])
         }
 
         self.factories.turn { $0.turn(on: &turn) }
@@ -352,72 +340,10 @@ extension GameContext {
         self.pops.turn { $0.turn(on: &turn) }
 
         turn.localMarkets.turn {
-            let price: LocalPrice = $0.today.price
-            let (asks, bids): (
-                asks: [LocalMarket.Order],
-                bids: [LocalMarket.Order]
-            ) = $0.match(using: &turn.random)
-
-            var spread: Int64 = 0
-
-            for order: LocalMarket.Order in asks {
-                switch order.by {
-                case .factory(let id):
-                    let (credited, _): (
-                        Int64,
-                        reported: Bool
-                    ) = self.factories[modifying: id].state.inventory.credit(
-                        inelastic: $0.id.resource,
-                        units: order.filled,
-                        price: price
-                    )
-                    spread -= credited
-
-                case .pop(let id):
-                    let (credited, _): (
-                        Int64,
-                        reported: Bool
-                    ) = self.pops[modifying: id].state.inventory.credit(
-                        inelastic: $0.id.resource,
-                        units: order.filled,
-                        price: price
-                    )
-
-                    spread -= credited
-
-                    if let memo: MineID = order.memo {
-                        // Log unreported mining output
-                        self.pops[
-                            modifying: id
-                        ].state.mines[memo]?.out.inelastic[$0.id.resource]?.report(
-                            unitsSold: order.filled,
-                            valueSold: credited,
-                        )
-                    }
-                }
+            let resource: Resource = $0.id.resource
+            $0.match(random: &turn.random) {
+                self.report(resource: resource, fill: $0, side: $1)
             }
-            for order: LocalMarket.Order in bids {
-                #assert(order.filled <= order.amount, "Order overfilled! (\(order))")
-
-                switch order.by {
-                case .factory(let id):
-                    spread += self.factories[modifying: id].state.inventory.debit(
-                        inelastic: $0.id.resource,
-                        units: order.filled,
-                        price: price,
-                        tier: order.tier
-                    )
-                case .pop(let id):
-                    spread += self.pops[modifying: id].state.inventory.debit(
-                        inelastic: $0.id.resource,
-                        units: order.filled,
-                        price: price,
-                        tier: order.tier
-                    )
-                }
-            }
-
-            // TODO: do something with spread
         }
         turn.stockMarkets.turn(random: &turn.random) {
             switch $2.asset {
@@ -497,6 +423,33 @@ extension GameContext {
     }
 }
 
+extension GameContext {
+    private mutating func report(resource: Resource, fill: LocalMarket.Fill, side: LocalMarket.Side) {
+        switch fill.entity {
+        case .factory(let id):
+            self.factories[modifying: id].state.inventory.report(
+                resource: resource,
+                fill: fill,
+                side: side
+            )
+
+        case .pop(let id):
+            if  case .sell = side,
+                case .mine(let mine)? = fill.memo {
+                self.pops[modifying: id].state.mines[mine]?.out.inelastic[resource]?.report(
+                    unitsSold: fill.filled,
+                    valueSold: fill.value,
+                )
+            } else {
+                self.pops[modifying: id].state.inventory.report(
+                    resource: resource,
+                    fill: fill,
+                    side: side
+                )
+            }
+        }
+    }
+}
 extension GameContext {
     private mutating func postCashTransfers(_ turn: inout Turn) {
         turn.bank.turn {

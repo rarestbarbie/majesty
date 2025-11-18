@@ -7,7 +7,7 @@ import OrderedCollections
 }
 extension InelasticBudgetTier {
     public static func compute(
-        demands: OrderedDictionary<Resource, ResourceInput<Never>>,
+        demands: OrderedDictionary<Resource, ResourceInput>,
         markets: LocalMarkets,
         location: Address,
     ) -> Self {
@@ -17,7 +17,7 @@ extension InelasticBudgetTier {
                     id: $0,
                     unitsToPurchase: $1.needed($1.unitsDemanded),
                     units: $1.unitsDemanded,
-                    value: $1.unitsDemanded >< markets[$0 / location].yesterday.price.value
+                    value: $1.unitsDemanded >< markets[$0 / location].yesterday.ask.value
                 )
             }
         )

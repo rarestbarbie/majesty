@@ -4,14 +4,16 @@ import JavaScriptInterop
 
 extension LocalMarket.Interval {
     @frozen public enum ObjectKey: JSString, Sendable {
-        case p
+        case b
+        case a
         case s
         case d
     }
 }
 extension LocalMarket.Interval: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.p] = self.price
+        js[.b] = self.bid
+        js[.a] = self.ask
         js[.s] = self.supply
         js[.d] = self.demand
     }
@@ -19,7 +21,8 @@ extension LocalMarket.Interval: JavaScriptEncodable {
 extension LocalMarket.Interval: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
-            price: try js[.p].decode(),
+            bid: try js[.b].decode(),
+            ask: try js[.a].decode(),
             supply: try js[.s].decode(),
             demand: try js[.d].decode()
         )

@@ -10,8 +10,7 @@ struct ResourceSale {
 
     let unitsSold: Int64
 
-    let priceAtMarket: Candle<Double>?
-    let price: Candle<LocalPrice>?
+    let price: Candle<Double>?
 }
 extension ResourceSale: Identifiable {
     var id: InventoryLine {
@@ -39,6 +38,6 @@ extension ResourceSale: JavaScriptEncodable {
         js[.source] = self.name
         js[.icon] = self.label.icon
         js[.unitsSold] = self.unitsSold
-        js[.price] = self.priceAtMarket ?? self.price?.map { Double.init($0.value) }
+        js[.price] = self.price
     }
 }

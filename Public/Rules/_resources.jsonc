@@ -3,6 +3,7 @@
         "emoji": "💧",
         "color": "#5ea9ff",
         "local": true,
+        "storable": true,
         "floor": "none"
     },
     "Housing": {

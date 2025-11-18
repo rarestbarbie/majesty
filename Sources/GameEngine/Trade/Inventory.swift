@@ -21,31 +21,44 @@ extension Inventory {
     }
 }
 extension Inventory {
-    mutating func credit(
-        inelastic resource: Resource,
-        units: Int64,
-        price: LocalPrice
-    ) -> (Int64, reported: Bool) {
-        let value: Int64 = units <> price.value
-        self.account.r += value
-        if case ()? = self.out.inelastic[resource]?.report(
-                unitsSold: units,
-                valueSold: value,
-            ) {
-            return (value, true)
-        } else {
-            return (value, false)
+    mutating func report(resource: Resource, fill: LocalMarket.Fill, side: LocalMarket.Side) {
+        switch side {
+        case .sell:
+            self.credit(
+                inelastic: resource,
+                units: fill.filled,
+                value: fill.value
+            )
+
+        case .buy:
+            guard case .tier(let tier)? = fill.memo else {
+                fatalError("filled buy order with no tier memo!!!")
+            }
+
+            self.debit(
+                inelastic: resource,
+                units: fill.filled,
+                value: fill.value,
+                tier: tier
+            )
         }
     }
 
-    mutating func debit(
+    private mutating func credit(
         inelastic resource: Resource,
         units: Int64,
-        price: LocalPrice,
-        tier: UInt8?
-    ) -> Int64 {
-        let value: Int64 = units >< price.value
+        value: Int64
+    ) {
+        self.account.r += value
+        self.out.inelastic[resource]?.report(unitsSold: units, valueSold: value)
+    }
 
+    private mutating func debit(
+        inelastic resource: Resource,
+        units: Int64,
+        value: Int64,
+        tier: UInt8?
+    ) {
         switch tier {
         case 0?:
             self.l.inelastic[resource]?.report(
@@ -64,11 +77,10 @@ extension Inventory {
             )
 
         case _:
-            return 0
+            return
         }
 
         self.account.b -= value
-        return value
     }
 }
 

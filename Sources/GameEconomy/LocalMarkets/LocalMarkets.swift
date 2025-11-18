@@ -36,41 +36,41 @@ extension LocalMarkets {
     }
 }
 extension LocalMarkets {
-    public mutating func place(
-        bids tier: (
+    public mutating func trade(
+        selling: OrderedDictionary<Resource, ResourceOutput>,
+        buying tier: (
             (budget: Int64, weights: [InelasticBudgetTier.Weight]),
             (budget: Int64, weights: [InelasticBudgetTier.Weight]),
             (budget: Int64, weights: [InelasticBudgetTier.Weight])
         ),
-        asks: OrderedDictionary<Resource, ResourceOutput<Never>>,
         as lei: LEI,
         in tile: Address,
     ) {
-        self.bid(budget: tier.0.budget, as: lei, in: tile, tier: 0, weights: tier.0.weights)
-        self.bid(budget: tier.1.budget, as: lei, in: tile, tier: 1, weights: tier.1.weights)
-        self.bid(budget: tier.2.budget, as: lei, in: tile, tier: 2, weights: tier.2.weights)
-        self.ask(asks: asks, as: lei, in: tile)
+        self.buy(budget: tier.0.budget, entity: lei, memo: .tier(0), tile: tile, weights: tier.0.weights)
+        self.buy(budget: tier.1.budget, entity: lei, memo: .tier(1), tile: tile, weights: tier.1.weights)
+        self.buy(budget: tier.2.budget, entity: lei, memo: .tier(2), tile: tile, weights: tier.2.weights)
+        self.sell(supply: selling, entity: lei, tile: tile)
     }
 
-    public mutating func ask(
-        asks: OrderedDictionary<Resource, ResourceOutput<Never>>,
-        memo: MineID? = nil,
-        as lei: LEI,
-        in tile: Address,
+    public mutating func sell(
+        supply: OrderedDictionary<Resource, ResourceOutput>,
+        entity: LEI,
+        memo: LocalMarket.Memo? = nil,
+        tile: Address,
     ) {
-        for (id, output): (Resource, ResourceOutput<Never>) in asks {
-            let ask: Int64 = output.unitsReleased
-            if  ask > 0 {
-                self[id / tile].ask(amount: ask, by: lei, memo: memo)
+        for (id, output): (Resource, ResourceOutput) in supply {
+            let units: Int64 = output.unitsReleased
+            if  units > 0 {
+                self[id / tile].sell(amount: units, entity: entity, memo: memo)
             }
         }
     }
 
-    public mutating func bid(
+    public mutating func buy(
         budget budgetTotal: Int64,
-        as lei: LEI,
-        in tile: Address,
-        tier: UInt8,
+        entity: LEI,
+        memo: LocalMarket.Memo? = nil,
+        tile: Address,
         weights: [InelasticBudgetTier.Weight],
     ) {
         guard budgetTotal > 0,
@@ -80,13 +80,13 @@ extension LocalMarkets {
 
         for (budget, x): (Int64, InelasticBudgetTier.Weight) in zip(budgets, weights) {
             if budget > 0, x.unitsToPurchase > 0 {
-                self[x.id / tile].bid(
+                self[x.id / tile].buy(
                     budget: budget,
-                    by: lei,
-                    in: tier,
+                    entity: entity,
                     // not `x.unitsToPurchase`!
                     // this effectively makes the stockpile target 1–2d
-                    limit: x.units
+                    limit: x.units,
+                    memo: memo,
                 )
             }
         }
