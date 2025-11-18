@@ -153,11 +153,11 @@ extension ResourceInputs {
                     $0["Stabilization fund value", +] = market.stabilizationFund[/3]
                 }
 
-                if  let average: Double = filled.price {
+                if  let average: Double = filled.price, market.storage {
                     let spread: Double = today.spread
                     $0[>] = """
                     Due to the local bid-ask spread of \(
-                        spread[%2], style: spread > 0.005 ? .neg : .em
+                        spread[%2], style: .spread(spread)
                     ), the average price they actually paid \
                     today was \(em: average[..2])
                     """
