@@ -151,13 +151,19 @@ extension LocalMarket {
     public mutating func turn(template: Template) {
         self.yesterday = self.today
 
-        let volume: Double = Double.init(self.today.mid) * Double.init(
-            min(self.today.supply, self.today.demand)
-        )
-        let l: Double = Double.init(self.stabilizationFund.total) / (1 + 30 * volume)
+        let spread: Double?
+        if  template.storage {
+            let volume: Double = Double.init(self.today.mid) * Double.init(
+                min(self.today.supply, self.today.demand)
+            )
+            let l: Double = Double.init(self.stabilizationFund.total) / (1 + 30 * volume)
+            spread = (1 + 99 * max(1 - l, 0)) / 10_000
+        } else {
+            spread = nil
+        }
 
         self.today.update(
-            spread: (1 + 99 * max(1 - l, 0)) / 10_000,
+            spread: spread,
             limit: (
                 min: template.limit.min?.price ?? Self.minDefault,
                 max: template.limit.max?.price ?? Self.maxDefault,

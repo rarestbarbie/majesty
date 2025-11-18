@@ -41,7 +41,7 @@ extension LocalMarket.Interval {
 }
 extension LocalMarket.Interval {
     mutating func update(
-        spread: Double,
+        spread: Double?,
         limit: (min: LocalPrice, max: LocalPrice)
     ) {
         defer {
@@ -62,7 +62,7 @@ extension LocalMarket.Interval {
     }
 
     private func updated(
-        spread: Double,
+        spread: Double?,
         limit: (min: LocalPrice, max: LocalPrice)
     ) -> (bid: LocalPrice, ask: LocalPrice)? {
         if  self.bid < limit.min {
@@ -89,14 +89,24 @@ extension LocalMarket.Interval {
         return nil
     }
 
-    private func tickedUp(spread: Double, limit: LocalPrice) ->  (bid: LocalPrice, ask: LocalPrice) {
+    private func tickedUp(spread: Double?, limit: LocalPrice) ->  (bid: LocalPrice, ask: LocalPrice) {
         let ask: LocalPrice = min(self.ask.tickedUp(), limit)
+
+        guard let spread: Double = spread else {
+            return (ask, ask)
+        }
+
         let bid: LocalPrice = ask.scaled(by: (1 - spread), rounding: .down)
         return (bid: max(self.bid, bid), ask: ask)
     }
 
-    private func tickedDown(spread: Double, limit: LocalPrice) -> (bid: LocalPrice, ask: LocalPrice) {
+    private func tickedDown(spread: Double?, limit: LocalPrice) -> (bid: LocalPrice, ask: LocalPrice) {
         let bid: LocalPrice = max(self.bid.tickedDown(), limit)
+
+        guard let spread: Double = spread else {
+            return (bid, bid)
+        }
+
         let ask: LocalPrice = bid.scaled(by: (1 / (1 - spread)), rounding: .up)
         return (bid: bid, ask: min(self.ask, ask))
     }
