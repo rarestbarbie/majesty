@@ -2,20 +2,24 @@ import Fraction
 
 extension LocalMarket {
     @frozen public struct Interval {
-        public var price: LocalPrice
+        public var bid: LocalPrice
+        public var ask: LocalPrice
         public var supply: Int64
         public var demand: Int64
 
-        @inlinable public init(bid price: LocalPrice, ask _: LocalPrice, supply: Int64 = 0, demand: Int64 = 0) {
-            self.price = price
+        @inlinable public init(bid: LocalPrice, ask: LocalPrice, supply: Int64 = 0, demand: Int64 = 0) {
+            self.bid = bid
+            self.ask = ask
             self.supply = supply
             self.demand = demand
         }
     }
 }
 extension LocalMarket.Interval {
-    @inlinable public var bid: LocalPrice { self.price }
-    @inlinable public var ask: LocalPrice { self.price }
+    @available(*, unavailable)
+    public var price: LocalPrice { self.bid }
+
+    var prices: (bid: LocalPrice, ask: LocalPrice) { (self.bid, self.ask) }
 }
 extension LocalMarket.Interval {
     /// To prevent the price from oscillating around a fractional value, we only allow it to

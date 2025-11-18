@@ -116,7 +116,7 @@ extension LocalMarket {
         guard let amount: Int64 = Self.quantity(
             budget: budget,
             limit: limit,
-            price: self.today.price
+            price: self.today.ask
         ) else {
             return
         }
@@ -200,7 +200,7 @@ extension LocalMarket {
                     let size: Int64 = Self.quantity(
                         budget: self.stabilizationFund.total,
                         limit: limit,
-                        price: self.today.price
+                        price: self.today.bid
                     ) {
                     // when buying, maker order goes on the bid side
                     let maker: Order = .init(
@@ -227,10 +227,10 @@ extension LocalMarket {
             }
 
             for i: Int in self.supply.indices {
-                self.supply[i].fill(.sell, price: self.today.price, units: matched[i])
+                self.supply[i].fill(.sell, price: self.today.prices, units: matched[i])
             }
             for i: Int in self.demand.indices {
-                self.demand[i].fill(.buy, price: self.today.price)
+                self.demand[i].fill(.buy, price: self.today.prices)
             }
         } else if supplyAvailable < demandAvailable {
             self.demand.shuffle(using: &random.generator)
@@ -244,18 +244,18 @@ extension LocalMarket {
             }
 
             for i: Int in self.supply.indices {
-                self.supply[i].fill(.sell, price: self.today.price)
+                self.supply[i].fill(.sell, price: self.today.prices)
             }
             for i: Int in self.demand.indices {
-                self.demand[i].fill(.buy, price: self.today.price, units: matched[i])
+                self.demand[i].fill(.buy, price: self.today.prices, units: matched[i])
             }
         } else {
             // supply and demand are evenly matched
             for i: Int in self.supply.indices {
-                self.supply[i].fill(.sell, price: self.today.price)
+                self.supply[i].fill(.sell, price: self.today.prices)
             }
             for i: Int in self.demand.indices {
-                self.demand[i].fill(.buy, price: self.today.price)
+                self.demand[i].fill(.buy, price: self.today.prices)
             }
         }
 
