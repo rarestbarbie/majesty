@@ -247,6 +247,11 @@ extension GameSession {
             return self.snapshot.tooltipFactorySize(
                 try arguments[0].decode(),
             )
+        case .FactoryNeeds:
+            return self.snapshot.tooltipFactoryNeeds(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+            )
         case .FactoryResourceIO:
             return self.snapshot.tooltipFactoryResourceIO(
                 try arguments[0].decode(),

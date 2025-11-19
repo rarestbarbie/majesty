@@ -47,6 +47,7 @@ export class PopulationOverview extends ScreenContent {
     static readonly tooltipCashFlowItem: TooltipType = TooltipType.PopCashFlowItem;
     static readonly tooltipBudgetItem: TooltipType = TooltipType.PopBudgetItem;
     static readonly tooltipExplainPrice: TooltipType = TooltipType.PopExplainPrice;
+    static readonly tooltipNeeds: TooltipType = TooltipType.PopNeeds;
     static readonly tooltipResourceOrigin: TooltipType = TooltipType.PopResourceOrigin;
     static readonly tooltipResourceIO: TooltipType = TooltipType.PopResourceIO;
     static readonly tooltipStockpile: TooltipType = TooltipType.PopStockpile;

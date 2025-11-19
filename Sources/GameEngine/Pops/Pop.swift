@@ -144,7 +144,7 @@ extension Pop {
         0.1 * self.y.con
     }
 
-    var needsPerCapita: (l: Double, e: Double, x: Double) {
+    var needsScalePerCapita: (l: Double, e: Double, x: Double) {
         let decadence: Double = self.decadence
         return (
             l: 1 + decadence,

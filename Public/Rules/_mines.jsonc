@@ -30,11 +30,30 @@
         "spawn": {
             "Earth_Continental_Crust": {
                 "rate": "0.05",
-                "size": 1
+                "size": 2
             }
         },
         "base": {
             "Alumina": 800
+        }
+    },
+
+    "Iron Mine": {
+        "miner": "Miner",
+        "decay": true,
+        "scale": 1000000000,
+        "spawn": {
+            "Earth_Continental_Crust": {
+                "rate": "0.05",
+                "size": 1
+            },
+            "Earth_Large_Igneous_Province": {
+                "rate": "0.05",
+                "size": 2
+            }
+        },
+        "base": {
+            "Iron Ore": 800
         }
     },
 
@@ -44,10 +63,6 @@
         "scale": 1000000000,
         "spawn": {
             "Earth_Continental_Crust": {
-                "rate": "0.02",
-                "size": 1
-            },
-            "Earth_Sedimentary_Basin": {
                 "rate": "0.02",
                 "size": 1
             }

@@ -45,6 +45,7 @@ export class ProductionOverview extends ScreenContent {
     static readonly tooltipCashFlowItem: TooltipType = TooltipType.FactoryCashFlowItem;
     static readonly tooltipBudgetItem: TooltipType = TooltipType.FactoryBudgetItem;
     static readonly tooltipExplainPrice: TooltipType = TooltipType.FactoryExplainPrice;
+    static readonly tooltipNeeds: TooltipType = TooltipType.FactoryNeeds;
     static readonly tooltipResourceIO: TooltipType = TooltipType.FactoryResourceIO;
     static readonly tooltipStockpile: TooltipType = TooltipType.FactoryStockpile;
 

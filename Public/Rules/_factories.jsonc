@@ -1,6 +1,20 @@
 {
+    "Alloy Foundry": {
+        "materials": {
+            "Machine Parts": 1,
+            "Iron Ore": 20,
+            "Electricity": 20
+        },
+        "output": {
+            "Alloys": 16
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
     "Aluminum Mill": {
-        "inputs": {
+        "materials": {
             "Machine Parts": 1,
             "Alumina": 20,
             "Electricity": 20
@@ -16,8 +30,9 @@
     "Appliance Factory": {
         "emoji": "🖥️",
         "color": "#505253",
-        "inputs": {
-            "Aluminum": 4,
+        "materials": {
+            "Aluminum": 3,
+            "Alloys": 1,
             "Electronics": 2,
             "Machine Parts": 6
         },
@@ -32,10 +47,11 @@
     "Automotive Assembly Plant": {
         "emoji": "🛻",
         "color": "#91091b",
-        "inputs": {
+        "materials": {
             "Polymers": 2,
             "Batteries": 4,
-            "Aluminum": 2,
+            "Aluminum": 1,
+            "Alloys": 3,
             "Machine Parts": 4,
             "Appliances": 4,
             "Instruments": 1
@@ -49,7 +65,7 @@
         }
     },
     "Battery Plant": {
-        "inputs": {
+        "materials": {
             "Lithium": 4,
             "Polymers": 1
             // "Graphite": 3
@@ -63,7 +79,7 @@
         }
     },
     "Cereal Farm": {
-        "inputs": {
+        "materials": {
             "Water": 20,
             "Fertilizer": 5
         },
@@ -80,7 +96,7 @@
     "Cosmetics Factory": {
         "emoji": "💄",
         "color": "#ffffff",
-        "inputs": {
+        "materials": {
             "Polymers": 4,
             "Produce": 4,
             "Mica": 2,
@@ -98,7 +114,7 @@
     "Clothing Workshop": {
         "emoji": "👗",
         "color": "#4cffd2",
-        "inputs": {
+        "materials": {
             "Produce": 5,
             "Polymers": 5,
             "Appliances": 1,
@@ -113,7 +129,7 @@
         }
     },
     "Data Center": {
-        "inputs": {
+        "materials": {
             "Electricity": 12,
             "Electronics": 4
         },
@@ -128,7 +144,7 @@
     "Electronics Factory": {
         "emoji": "🎮",
         "color": "#62a060",
-        "inputs": {
+        "materials": {
             "Polymers": 4,
             "Semiconductor Devices": 4,
             "Aluminum": 1,
@@ -145,7 +161,7 @@
         }
     },
     "Fertilizer Plant": {
-        "inputs": {
+        "materials": {
             "Electricity": 20
         },
         "output": {
@@ -157,7 +173,7 @@
         }
     },
     "Fossil Power Plant": {
-        "inputs": {
+        "materials": {
             "Construction": 1,
             "Hydrocarbons": 5,
             "Water": 5
@@ -171,10 +187,8 @@
         }
     },
     "Hydroelectric Dam": {
-        "inputs": {
+        "materials": {
             "Construction": 1
-        },
-        "office": {
         },
         "output": {
             "Electricity": 12,
@@ -195,7 +209,7 @@
         ]
     },
     "Hydroponic Farm": {
-        "inputs": {
+        "materials": {
             "Water": 5,
             "Fertilizer": 10
         },
@@ -211,8 +225,9 @@
     "Instrument Factory": {
         "emoji": "🎸",
         "color": "#a02535",
-        "inputs": {
+        "materials": {
             "Polymers": 2,
+            "Alloys": 1,
             "Electronics": 4,
             "Semiconductor Devices": 2
         },
@@ -227,7 +242,7 @@
     "Fashion House": {
         "emoji": "💝",
         "color": "#ff4171",
-        "inputs": {
+        "materials": {
             "Advertising": 8,
             "Clothing": 4
         },
@@ -241,7 +256,7 @@
         }
     },
     "Liquor Distillery": {
-        "inputs": {
+        "materials": {
             "Produce": 4,
             "Wheat": 4,
             "Water": 4
@@ -255,8 +270,9 @@
         }
     },
     "Machine Parts Factory": {
-        "inputs": {
-            "Aluminum": 12,
+        "materials": {
+            "Aluminum": 6,
+            "Alloys": 6,
             // "Sulfur": 1,
             "Water": 1
         },
@@ -271,7 +287,7 @@
     "Medical Equipment Factory": {
         "emoji": "💉",
         "color": "#9de9f7",
-        "inputs": {
+        "materials": {
             "Polymers": 8,
             "Machine Parts": 2,
             "Appliances": 1,
@@ -286,7 +302,7 @@
         }
     },
     "Nuclear Power Plant": {
-        "inputs": {
+        "materials": {
             "Water": 1,
             "Uranium": 1
         },
@@ -299,7 +315,7 @@
         }
     },
     "Plantation": {
-        "inputs": {
+        "materials": {
             "Water": 40,
             "Fertilizer": 10
         },
@@ -315,7 +331,7 @@
         "terrain": ["Desert", "Steppe", "Forest", "Rainforest"]
     },
     "Polypropylene Plant": {
-        "inputs": {
+        "materials": {
             "Hydrocarbons": 8,
             "Water": 8
         },
@@ -330,7 +346,7 @@
     "Semiconductor Foundry": {
         "emoji": "📀",
         "color": "#e4b55f",
-        "inputs": {
+        "materials": {
             "Aluminum": 10,
             "Batteries": 1
             // "Graphite": 1,
@@ -347,7 +363,7 @@
         }
     },
     "Slaughterhouse": {
-        "inputs": {
+        "materials": {
             "Machine Parts": 1,
             "Livestock": 160,
             "Water": 20
@@ -362,7 +378,7 @@
         }
     },
     "Uranium Enrichment Facility": {
-        "inputs": {
+        "materials": {
             "Machine Parts": 2,
             "Electricity": 40
         },
@@ -375,7 +391,7 @@
         }
     },
     "Vape Factory": {
-        "inputs": {
+        "materials": {
             "Polymers": 1,
             "Electronics": 1,
             "Liquor": 4
@@ -391,7 +407,7 @@
 
 
     // "Ammonia Plant": {
-    //     "inputs": {
+    //     "materials": {
     //         "Hydrocarbons": 12
     //     },
     //     "output": {
@@ -404,7 +420,7 @@
     // },
 
     // "Chemical Synthesis Plant": {
-    //     "inputs": {
+    //     "materials": {
     //         "Hydrocarbons": 2,
     //         "Graphite": 1,
     //         "Ammonia": 1,
@@ -419,7 +435,7 @@
     //     }
     // },
     // "Compute Cluster": {
-    //     "inputs": {
+    //     "materials": {
     //         "Electricity": 24,
     //         "Electronics": 4,
     //         "Storage": 24
@@ -433,7 +449,7 @@
     //     }
     // },
     // "Fermentation Plant": {
-    //     "inputs": {
+    //     "materials": {
     //         "Hydrocarbons": 2,
     //         "Hormones": 1,
     //         "Fertilizer": 3,
@@ -448,7 +464,7 @@
     //     }
     // },
     "Water Treatment Plant": {
-        "inputs": {
+        "materials": {
             "Water Ice": 10,
             "Electricity": 10
         },
