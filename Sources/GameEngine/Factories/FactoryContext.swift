@@ -320,8 +320,7 @@ extension FactoryContext: TransactingContext {
                 self.state.z.eo = 1
             }
 
-            let operatingProfit: Int64
-
+            let profit: ProfitMargins
             if  let workers: Workforce = self.workers {
                 let changes: WorkforceChanges? = self.operate(
                     workers: workers,
@@ -332,14 +331,16 @@ extension FactoryContext: TransactingContext {
                 )
 
                 // can be expensive to compute, so only do it once
-                operatingProfit = self.state.profit.operating
+                profit = self.state.profit
 
                 if case .fire(let type, let block)? = changes {
                     if  turn.random.roll(1, 7) {
                         turn.jobs.fire[self.state.id, type] = block
                     }
-                } else if workers.count > 0, operatingProfit < 0 {
-                    let firable: Int64 = workers.count / 4
+                } else if workers.count > 0, profit.operating < 0 {
+                    /// if gross profit is negative, fire up to 25% of workers
+                    /// otherwise, fire up to 5% of workers
+                    let firable: Int64 = workers.count / (profit.gross < 0 ? 4 : 20)
                     if  firable > 0, turn.random.roll(1, 7) {
                         turn.jobs.fire[self.state.id, type.workers.unit] = .init(
                             size: .random(in: 0 ... firable, using: &turn.random.generator)
@@ -349,7 +350,7 @@ extension FactoryContext: TransactingContext {
                     turn.jobs.hire.local[self.state.tile, type].append(block)
                 }
             } else {
-                operatingProfit = self.state.profit.operating
+                profit = self.state.profit
             }
 
             self.construct(
@@ -376,7 +377,7 @@ extension FactoryContext: TransactingContext {
 
             if  self.state.size.level == 0 {
                 self.state.z.pa = 1
-            } else if operatingProfit > 0 {
+            } else if profit.operating > 0 {
                 self.state.z.pa = min(1, self.state.z.pa + 0.01)
             } else {
                 self.state.z.pa = max(0, self.state.z.pa - 0.01)
