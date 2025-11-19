@@ -130,7 +130,11 @@ extension FactoryContext: TransactingContext {
             "Factory input efficiency out of bounds! (\(self.state.y.fe))"
         )
         // Input efficiency, bonus from buying all corporate needs yesterday.
-        self.state.z.ei = 1 - 0.3 * self.state.y.fe
+        if  self.state.size.level == 0 {
+            self.state.z.ei = 1
+        } else {
+            self.state.z.ei = 1 - 0.3 * self.state.y.fe
+        }
 
         // Reset fill positions, since they are copied from yesterday’s positions by default.
         self.state.z.wf = nil
@@ -761,7 +765,7 @@ extension FactoryContext {
                     $0["Efficiency", -] = +?(self.state.z.ei - 1)[%2]
                 }
                 $0[>] = self.state.z.ei < 1 ? """
-                Today this factory saved \(pos: (1 - self.state.z.ei)[%2]) on all inputs
+                Today this factory saved \(pos: (1 - self.state.z.ei)[%1]) on all inputs
                 """ : """
                 Factories that purchase all of their corporate supplies are more efficient
                 """
