@@ -141,6 +141,24 @@
             "Engineer": 5000
         }
     },
+    "Desalination Plant": {
+        "materials": {
+            "Electricity": 10
+        },
+        "output": {
+            "Water": 100
+        },
+        "workers": {
+            "Driver": 2000,
+            "Engineer": 4000
+        },
+        "terrain": [
+            "Archipelago",
+            "Continental Shelf",
+            "Abyssal Plain",
+            "Hydrothermal Vent Field"
+        ]
+    },
     "Electronics Factory": {
         "emoji": "🎮",
         "color": "#62a060",
@@ -205,7 +223,8 @@
             "Mountain",
             "Mountain Jungle",
             "Steppe",
-            "Taiga"
+            "Taiga",
+            "Tundra"
         ]
     },
     "Hydroponic Farm": {
@@ -249,6 +268,37 @@
         "output": {
             "Clothing": 4,
             "Lingerie": 4
+        },
+        "workers": {
+            "Editor": 5000,
+            "Farmer": 5000
+        }
+    },
+    "Firearms Manufacturer": {
+        "emoji": "🔫",
+        "color": "#202149",
+        "materials": {
+            "Machine Parts": 8,
+            "Electronics": 1,
+            "Polymers": 1
+        },
+        "output": {
+            "Firearms": 10
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+    "Jewelry Workshop": {
+        "emoji": "💍",
+        "color": "#9df0ff",
+        "materials": {
+            "Advertising": 7,
+            "Alloys": 1
+        },
+        "output": {
+            "Jewelry": 4
         },
         "workers": {
             "Editor": 5000,
@@ -465,8 +515,7 @@
     // },
     "Water Treatment Plant": {
         "materials": {
-            "Water Ice": 10,
-            "Electricity": 10
+            "Electricity": 1
         },
         "output": {
             "Water": 100
@@ -474,6 +523,10 @@
         "workers": {
             "Driver": 2000,
             "Engineer": 4000
-        }
+        },
+        "terrain": [
+            "Arctic",
+            "Antarctic"
+        ]
     }
 }
