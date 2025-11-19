@@ -32,14 +32,7 @@ extension Equity: ExpressibleByDictionaryLiteral {
 }
 extension Equity<LEI> {
     mutating func prune(in context: GameContext.PruningPass) {
-        self.shares.update {
-            switch $0.id {
-            case .factory(let id):
-                return context.factories.contains(id)
-            case .pop(let id):
-                return context.pops.contains(id)
-            }
-        }
+        self.shares.prune(unless: context.contains(_:))
     }
     mutating func turn() {
         self.shares.update {
@@ -145,11 +138,9 @@ extension Equity {
 }
 extension Equity<LEI> {
     mutating func trade(random: inout PseudoRandom, bank: inout Bank, fill: StockMarket.Fill) {
-        let traded: StockPrice.Quote = self.liquidate(
-            random: &random,
-            bank: &bank,
-            quote: fill.market
-        )
+        let traded: StockPrice.Quote = self.liquidate(random: &random, quote: fill.market) {
+            bank[account: $0].j += $1
+        }
 
         self.traded += traded.quantity
         self.issued += fill.issued.quantity
@@ -161,15 +152,15 @@ extension Equity<LEI> {
             $0.bought += quantity
         } (&self[fill.buyer])
 
-        bank[fill.buyer].e -= fill.issued.value + traded.value
-        bank[fill.asset].e += fill.issued.value
+        bank[account: fill.buyer].e -= fill.issued.value + traded.value
+        bank[account: fill.asset].e += fill.issued.value
     }
 
     mutating func liquidate(
         random: inout PseudoRandom,
-        bank: inout Bank,
         quote: StockPrice.Quote,
-        burn: Bool = false
+        burn: Bool = false,
+        credit: (LEI, Int64) -> (),
     ) -> StockPrice.Quote {
         let recipients: [EquityStake<LEI>] = self.shares.values.shuffled(
             using: &random.generator
@@ -202,7 +193,7 @@ extension Equity<LEI> {
 
                 liquidated.quantity += shares
                 liquidated.value += compensation
-                bank[recipient.id].j += compensation
+                credit(recipient.id, compensation)
             }
         }
 

@@ -1,114 +1,103 @@
 import Assert
+import Fraction
 import GameEconomy
 import GameIDs
+import OrderedCollections
 import Random
 
-struct Bank: ~Copyable {
-    private var transfers: [LEI: Transfers]
+struct Bank {
+    private(set) var accounts: OrderedDictionary<LEI, Account>
 
-    init() {
-        self.transfers = [:]
+    init(accounts: OrderedDictionary<LEI, Account>) {
+        self.accounts = accounts
     }
 }
 extension Bank {
-    subscript(id: LEI) -> Transfers {
-        _read   { yield  self.transfers[id, default: .init()] }
-        _modify { yield &self.transfers[id, default: .init()] }
+    subscript(account id: LEI) -> Account {
+        _read   { yield  self.accounts[id, default: .zero] }
+        _modify { yield &self.accounts[id, default: .zero] }
     }
 }
 extension Bank {
-    mutating func turn(_ yield: (LEI, Transfers) -> ()) {
-        defer {
-            self.transfers.removeAll(keepingCapacity: true)
+    mutating func prune(in context: GameContext.PruningPass) {
+        self.accounts.prune(unless: context.contains(_:))
+    }
+    mutating func turn() {
+        self.accounts.update {
+            $0.settle()
+            return $0.balance != 0
         }
-        for (id, transfers): (LEI, Transfers) in self.transfers {
-            yield(id, transfers)
-        }
     }
 }
 extension Bank {
+    mutating func transfer(
+        budget: Int64,
+        source: LEI,
+        recipients: Turn.Payscale
+    ) -> Int64 {
+        guard let payments: [Int64] = recipients.split(limit: budget, share: \.owed) else {
+            return 0
+        }
+
+        var paid: Int64 = 0
+
+        for ((pop, _), payment): ((PopID, _), Int64) in zip(recipients, payments) {
+            self[account: .pop(pop)].r += payment
+            paid += payment
+        }
+
+        #assert(
+            0 ... budget ~= paid,
+            "Payments (\(paid)) exceed budget (\(budget))!"
+        )
+
+        self[account: source].b -= paid
+        return paid
+    }
+
+    mutating func transfer(
+        budget: Int64,
+        source: LEI,
+        recipients shareholders: [EquityStake<LEI>]
+    ) -> Int64 {
+        guard let payments: [Int64] = shareholders.distribute(budget, share: \.shares) else {
+            return 0
+        }
+
+        var paid: Int64 = 0
+
+        for (shareholder, payment): (EquityStake<LEI>, Int64) in zip(shareholders, payments) {
+            self[account: shareholder.id].i += payment
+            paid += payment
+        }
+
+        #assert(
+            budget == paid,
+            "Dividends paid (\(paid)) does not equal dividend allocated (\(budget))!"
+        )
+
+        self[account: source].b -= paid
+        return paid
+    }
+
     /// Returns the total compensation paid out to shareholders.
     mutating func buyback(
-        random: inout PseudoRandom,
-        equity: inout Equity<LEI>,
-        budget value: Int64,
         security: StockMarket.Security,
+        budget: Int64,
+        equity: inout Equity<LEI>,
+        random: inout PseudoRandom,
     ) -> Int64 {
-        guard let quote: StockPrice.Quote = security.stockPrice?.quote(value: value) else {
+        guard let quote: StockPrice.Quote = security.stockPrice?.quote(value: budget) else {
             return 0
         }
         let liquidated: StockPrice.Quote = equity.liquidate(
             random: &random,
-            bank: &self,
             quote: quote,
             burn: true
-        )
+        ) {
+            self[account: $0].j += $1
+        }
+        self[account: security.id].e -= liquidated.value
         return liquidated.value
-    }
-}
-extension Bank {
-    mutating func pay(salariesBudget: Int64, salaries recipients: [Turn.Payscale]) -> Int64 {
-        guard let payments: [Int64] = recipients.joined().split(
-            limit: salariesBudget,
-            share: \.owed
-        ) else {
-            return 0
-        }
-
-        var salariesPaid: Int64 = 0
-
-        for ((pop, _), payment) in zip(recipients.joined(), payments) {
-            self.transfers[.pop(pop), default: .init()].c += payment
-            salariesPaid += payment
-        }
-
-        return salariesPaid
-    }
-
-    mutating func pay(wagesBudget: Int64, wages recipients: Turn.Payscale) -> Int64 {
-        guard let payments: [Int64] = recipients.split(limit: wagesBudget, share: \.owed) else {
-            return 0
-        }
-
-        var wagesPaid: Int64 = 0
-
-        for ((pop, _), payment) in zip(recipients, payments) {
-            self.transfers[.pop(pop), default: .init()].w += payment
-            wagesPaid += payment
-        }
-
-        #assert(
-            0 ... wagesBudget ~= wagesPaid,
-            "Wages paid (\(wagesPaid)) exceeds budget (\(wagesBudget))!"
-        )
-
-        return wagesPaid
-    }
-
-    mutating func pay(
-        dividend: Int64,
-        to shareholders: [EquityStake<LEI>]
-    ) -> Int64 {
-        guard
-        let payments: [Int64] = shareholders.distribute(
-            dividend,
-            share: \.shares
-        ) else {
-            return 0
-        }
-
-        var dividendsPaid: Int64 = 0
-
-        for (shareholder, payment) in zip(shareholders, payments) {
-            self.transfers[shareholder.id, default: .init()].i += payment
-            dividendsPaid += payment
-        }
-
-        #assert(
-            dividend == dividendsPaid,
-            "Dividends paid (\(dividendsPaid)) does not equal dividend allocated (\(dividend))!"
-        )
-
-        return dividendsPaid
     }
 }

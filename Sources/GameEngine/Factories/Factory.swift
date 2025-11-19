@@ -17,6 +17,7 @@ struct Factory: LegalEntityState, Identifiable {
     var liquidation: FactoryLiquidation?
 
     var inventory: Inventory
+    var spending: Spending
     var y: Dimensions
     var z: Dimensions
 
@@ -31,6 +32,7 @@ extension Factory: Sectionable {
             size: .init(level: 0),
             liquidation: nil,
             inventory: .init(),
+            spending: .zero,
             y: .init(),
             z: .init(),
             equity: [:],
@@ -44,7 +46,6 @@ extension Factory: Sectionable {
 extension Factory: Deletable {
     var dead: Bool {
         if  case _? = self.liquidation,
-            self.inventory.account.balance == 0,
             self.equity.shares.values.allSatisfy({ $0.shares <= 0 }) {
             true
         } else {
@@ -59,8 +60,16 @@ extension Factory {
 }
 extension Factory: Turnable {
     mutating func turn() {
-        self.inventory.account.settle()
+        self.spending = .zero
         self.equity.turn()
+    }
+}
+extension Factory {
+    var profit: ProfitMargins {
+        self.inventory.profit(
+            variableCosts: self.spending.wages,
+            fixedCosts: self.spending.salaries
+        )
     }
 }
 extension Factory {
@@ -72,11 +81,15 @@ extension Factory {
         case size_p
         case liquidation
 
-        case inventory_account = "cash"
         case inventory_out = "out"
         case inventory_l = "nl"
         case inventory_e = "ne"
         case inventory_x = "nx"
+
+        case spending_buybacks = "sE"
+        case spending_dividend = "sI"
+        case spending_salaries = "sC"
+        case spending_wages = "sW"
 
         case y
         case z
@@ -93,11 +106,15 @@ extension Factory: JavaScriptEncodable {
         js[.size_p] = self.size.growthProgress
         js[.liquidation] = self.liquidation
 
-        js[.inventory_account] = self.inventory.account
         js[.inventory_l] = self.inventory.l
         js[.inventory_e] = self.inventory.e
         js[.inventory_x] = self.inventory.x
         js[.inventory_out] = self.inventory.out
+
+        js[.spending_buybacks] = self.spending.buybacks
+        js[.spending_dividend] = self.spending.dividend
+        js[.spending_salaries] = self.spending.salaries
+        js[.spending_wages] = self.spending.wages
 
         js[.y] = self.y
         js[.z] = self.z
@@ -118,11 +135,16 @@ extension Factory: JavaScriptDecodable {
             ),
             liquidation: try js[.liquidation]?.decode(),
             inventory: .init(
-                account: try js[.inventory_account]?.decode() ?? .init(),
                 out: try js[.inventory_out]?.decode() ?? .init(),
                 l: try js[.inventory_l]?.decode() ?? .init(),
                 e: try js[.inventory_e]?.decode() ?? .init(),
                 x: try js[.inventory_x]?.decode() ?? .init()
+            ),
+            spending: .init(
+                buybacks: try js[.spending_buybacks]?.decode() ?? 0,
+                dividend: try js[.spending_dividend]?.decode() ?? 0,
+                salaries: try js[.spending_salaries]?.decode() ?? 0,
+                wages: try js[.spending_wages]?.decode() ?? 0
             ),
             y: try js[.y]?.decode() ?? today,
             z: today,

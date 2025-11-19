@@ -5,12 +5,12 @@ import Random
 struct Turn: ~Copyable {
     var random: PseudoRandom
     var notifications: Notifications
+    var bank: Bank
     var worldMarkets: BlocMarkets
     var localMarkets: LocalMarkets
     var stockMarkets: StockMarkets
 
     var conversions: [Pop.Conversion]
-    var bank: Bank
     var jobs: (
         hire: (
             remote: Jobs.Hire<PlanetID>,
@@ -23,17 +23,18 @@ extension Turn {
     init(
         random: PseudoRandom,
         notifications: Notifications,
+        bank: consuming Bank,
         worldMarkets: consuming BlocMarkets,
         localMarkets: consuming LocalMarkets,
     ) {
         self.random = random
         self.notifications = notifications
+        self.bank = bank
         self.worldMarkets = worldMarkets
         self.localMarkets = localMarkets
         self.stockMarkets = .init()
         self.conversions = []
         self.jobs = ((.init(), .init()), .init())
-        self.bank = .init()
     }
 }
 

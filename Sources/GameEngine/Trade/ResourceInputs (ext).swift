@@ -13,6 +13,11 @@ extension ResourceInputs {
         )
     }
 
+    var valueConsumed: Int64 {
+        self.tradeable.values.reduce(0) { $0 + $1.valueConsumed } +
+        self.inelastic.values.reduce(0) { $0 + $1.valueConsumed }
+    }
+
     var valueAcquired: Int64 {
         self.tradeable.values.reduce(0) { $0 + $1.value.total } +
         self.inelastic.values.reduce(0) { $0 + $1.value.total }

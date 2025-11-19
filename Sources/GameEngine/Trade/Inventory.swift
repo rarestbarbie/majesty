@@ -3,7 +3,6 @@ import GameEconomy
 import GameIDs
 
 struct Inventory {
-    var account: Bank.Account
     var out: ResourceOutputs
     var l: ResourceInputs
     var e: ResourceInputs
@@ -12,7 +11,6 @@ struct Inventory {
 extension Inventory {
     init() {
         self.init(
-            account: .init(),
             out: .init(),
             l: .init(),
             e: .init(),
@@ -21,13 +19,22 @@ extension Inventory {
     }
 }
 extension Inventory {
+    func profit(variableCosts: Int64, fixedCosts: Int64) -> ProfitMargins {
+        .init(
+            variableCosts: variableCosts + self.l.valueConsumed,
+            fixedCosts: fixedCosts + self.e.valueConsumed,
+            revenue: self.out.valueSold
+        )
+    }
+}
+extension Inventory {
     mutating func report(resource: Resource, fill: LocalMarket.Fill, side: LocalMarket.Side) {
         switch side {
         case .sell:
-            self.credit(
-                inelastic: resource,
+            self.report(
+                resourceSold: resource,
                 units: fill.filled,
-                value: fill.value
+                value: fill.value,
             )
 
         case .buy:
@@ -35,8 +42,8 @@ extension Inventory {
                 fatalError("filled buy order with no tier memo!!!")
             }
 
-            self.debit(
-                inelastic: resource,
+            self.report(
+                resourcePurchased: resource,
                 units: fill.filled,
                 value: fill.value,
                 tier: tier
@@ -44,17 +51,16 @@ extension Inventory {
         }
     }
 
-    private mutating func credit(
-        inelastic resource: Resource,
+    private mutating func report(
+        resourceSold resource: Resource,
         units: Int64,
-        value: Int64
+        value: Int64,
     ) {
-        self.account.r += value
         self.out.inelastic[resource]?.report(unitsSold: units, valueSold: value)
     }
 
-    private mutating func debit(
-        inelastic resource: Resource,
+    private mutating func report(
+        resourcePurchased resource: Resource,
         units: Int64,
         value: Int64,
         tier: UInt8?
@@ -79,8 +85,6 @@ extension Inventory {
         case _:
             return
         }
-
-        self.account.b -= value
     }
 }
 

@@ -23,25 +23,12 @@ struct GameContext {
 extension GameContext {
     static func load(_ save: borrowing GameSave, rules: GameRules) throws -> Self {
         let _none: _NoMetadata = .init()
-        var factories: DynamicContextTable<FactoryContext> = try .init(states: save.factories) {
-            rules.factories[$0.type]
-        }
-        for seed: FactorySeed in save._factories {
-            for factory: Quantity<FactoryType> in try seed.unpack(symbols: save.symbols) {
-                let section: Factory.Section = .init(type: factory.unit, tile: seed.tile)
-                try factories[section] {
-                    rules.factories[$0.type]
-                } update: {
-                    $1.size = .init(level: 0, growthProgress: Factory.Size.growthRequired - 1)
-                }
-            }
-        }
         return .init(
             player: save.player,
             planets: [:],
             cultures: try .init(states: save.cultures) { _ in _none },
             countries: try .init(states: save.countries) { _ in _none },
-            factories: factories,
+            factories: try .init(states: save.factories) { rules.factories[$0.type] },
             mines: try .init(states: save.mines) { rules.mines[$0.type] },
             pops: try .init(states: save.pops) { rules.pops[$0.type] },
             symbols: save.symbols,
@@ -54,6 +41,7 @@ extension GameContext {
             symbols: self.symbols,
             random: world.random,
             player: self.player,
+            accounts: world.bank.accounts.items,
             tradeableMarkets: world.tradeableMarkets,
             inelasticMarkets: world.inelasticMarkets,
             date: world.date,
@@ -63,7 +51,40 @@ extension GameContext {
             mines: [_].init(self.mines.state),
             pops: [_].init(self.pops.state),
             _factories: [],
+            _pops: []
         )
+    }
+}
+extension GameContext {
+    mutating func seed(
+        factories: [FactorySeed],
+        pops: [PopSeed],
+        symbols: GameSaveSymbols,
+        world: inout GameWorld,
+    ) throws {
+        for seed: FactorySeed in factories {
+            for factory: Quantity<FactoryType> in try seed.unpack(symbols: symbols) {
+                let section: Factory.Section = .init(type: factory.unit, tile: seed.tile)
+                try self.factories[section] {
+                    rules.factories[$0.type]
+                } update: {
+                    $1.size = .init(level: 0, growthProgress: Factory.Size.growthRequired - 1)
+                }
+            }
+        }
+        // this is very slow, but we only do it once when initializing a new game
+        for seed: PopSeed in pops {
+            for pop: Pop in self.pops.state {
+                if  let nat: String = seed.nat, pop.nat != nat {
+                    continue
+                }
+                if  pop.type != seed.type {
+                    continue
+                }
+
+                world.bank[account: .pop(pop.id)].s += seed.cash
+            }
+        }
     }
 }
 extension GameContext {
@@ -192,8 +213,11 @@ extension GameContext {
     }
 }
 extension GameContext {
-    private mutating func prune() {
+    private mutating func prune(world: inout GameWorld) {
         let retain: PruningPass = self.pruningPass
+
+        world.bank.prune(in: retain)
+
         for i: Int in self.factories.indices {
             self.factories[i].state.prune(in: retain)
         }
@@ -201,7 +225,7 @@ extension GameContext {
             self.pops[i].state.prune(in: retain)
         }
     }
-    private mutating func index() {
+    private mutating func index(world: borrowing GameWorld) {
         for country: CountryContext in self.countries {
             for planet: PlanetID in country.state.controlledWorlds {
                 self.planets[planet]?.grid.assign(
@@ -252,7 +276,7 @@ extension GameContext {
             /// in the array on every loop iteration, which would be O(n²)!
             let equity: Equity<LEI>.Statistics = .compute(
                 equity: pop.equity,
-                assets: pop.inventory.account,
+                assets: world.bank[account: .pop(pop.id)],
                 in: self.residentPass
             )
             self.pops[i].update(equityStatistics: equity)
@@ -281,7 +305,7 @@ extension GameContext {
 
             let equity: Equity<LEI>.Statistics = .compute(
                 equity: factory.equity,
-                assets: factory.inventory.account,
+                assets: world.bank[account: .factory(factory.id)],
                 in: self.residentPass
             )
             self.factories[i].update(equityStatistics: equity)
@@ -314,6 +338,7 @@ extension GameContext {
 extension GameContext {
     mutating func advance(_ turn: inout Turn) throws {
         turn.notifications.turn()
+        turn.bank.turn()
 
         for i: Int in self.planets.indices {
             try self.planets[i].advance(turn: &turn, context: self)
@@ -342,6 +367,12 @@ extension GameContext {
         turn.localMarkets.turn {
             let resource: Resource = $0.id.resource
             $0.match(random: &turn.random) {
+                switch $1 {
+                case .sell:
+                    turn.bank[account: $0.entity].r += $0.value
+                case .buy:
+                    turn.bank[account: $0.entity].b -= $0.value
+                }
                 self.report(resource: resource, fill: $0, side: $1)
             }
         }
@@ -381,8 +412,6 @@ extension GameContext {
         self.mines.turn { $0.advance(turn: &turn) }
         self.pops.turn { $0.advance(turn: &turn) }
 
-        self.postCashTransfers(&turn)
-
         let unfilled: (
             [(PopType, [PopJobOfferBlock])],
             [(PopType, [PopJobOfferBlock])]
@@ -397,9 +426,9 @@ extension GameContext {
         self.destroyObjects()
     }
 
-    mutating func compute(_ world: borrowing GameWorld) throws {
-        self.prune()
-        self.index()
+    mutating func compute(_ world: inout GameWorld) throws {
+        self.prune(world: &world)
+        self.index(world: world)
 
         for i: Int in self.planets.indices {
             try self.planets[i].afterIndexCount(world: world, context: self.territoryPass)
@@ -451,17 +480,6 @@ extension GameContext {
     }
 }
 extension GameContext {
-    private mutating func postCashTransfers(_ turn: inout Turn) {
-        turn.bank.turn {
-            switch $0 {
-            case .factory(let id):
-                self.factories[modifying: id].state.inventory.account += $1
-            case .pop(let id):
-                self.pops[modifying: id].state.inventory.account += $1
-            }
-        }
-    }
-
     private mutating func postPopFirings(_ turn: inout Turn) {
         var layoffs: [Turn.Jobs.Fire.Key: PopJobLayoffBlock] = turn.jobs.fire.turn()
 
@@ -666,9 +684,11 @@ extension GameContext {
         // )
 
         for conversion: Pop.Conversion in turn.conversions {
-            let inherited: (cash: Int64, mil: Double, con: Double) = {
+            let inheritedCash: Int64 = turn.bank[account: .pop(conversion.from)].inherit(
+                fraction: conversion.inherits
+            )
+            let inherited: (mil: Double, con: Double) = {
                 (
-                    $0.state.inventory.account.inherit(fraction: conversion.inherits),
                     $0.state.z.mil,
                     $0.state.z.con
                 )
@@ -676,7 +696,7 @@ extension GameContext {
 
             // TODO: pops should also inherit stock portfolios and slaves
 
-            try self.pops[conversion.to] {
+            let target: PopID = try self.pops[conversion.to] {
                 self.rules.pops[$0.type]
             } update: {
                 let weight: Fraction.Interpolator<Double> = .init(
@@ -684,10 +704,12 @@ extension GameContext {
                 )
 
                 $1.z.size += conversion.size
-                $1.inventory.account.d += inherited.cash
                 $1.z.mil = weight.mix(inherited.mil, $1.z.mil)
                 $1.z.con = weight.mix(inherited.con, $1.z.con)
+                return $1.id
             }
+
+            turn.bank[account: .pop(target)].d += inheritedCash
         }
     }
     private mutating func executeConstructions(_ turn: inout Turn) throws {

@@ -5,24 +5,21 @@ import JavaScriptInterop
 import JavaScriptKit
 
 extension Bank {
-    struct Account {
-        var liq: Int64
+    struct Account: Equatable {
+        var settled: Int64
 
-        /// Credit balance, negative if debt is owed.
+        /// Spending, excluding equity purchases. Negative if funds are spent.
         var b: Int64
-        var v: Int64
 
-        /// Revenue.
+        /// Income.
         var r: Int64
         /// Subsidies.
         var s: Int64
-        /// Salaries, negative if salaries are owed.
-        var c: Int64
-        /// Wages, negative if wages are owed.
-        var w: Int64
 
         /// Interest and dividends, negative if owed.
         var i: Int64
+        /// Proceeds from stock sales. Not to be confused with ``e``.
+        var j: Int64
         /// Equity value, negative for purchasers of equity, positive for issuers.
         var e: Int64
 
@@ -31,65 +28,55 @@ extension Bank {
     }
 }
 extension Bank.Account {
-    init(liq: Int64) {
-        self.init(liq: liq, b: 0, v: 0, r: 0, s: 0, c: 0, w: 0, i: 0, e: 0, d: 0)
+    init(settled: Int64) {
+        self.init(settled: settled, b: 0, r: 0, s: 0, i: 0, j: 0, e: 0, d: 0)
     }
-    init() {
-        self.init(liq: 0, b: 0, v: 0, r: 0, s: 0, c: 0, w: 0, i: 0, e: 0, d: 0)
+    static var zero: Self {
+        .init(settled: 0, b: 0, r: 0, s: 0, i: 0, j: 0, e: 0, d: 0)
     }
 }
 extension Bank.Account {
-    static func += (self: inout Self, other: Bank.Transfers) {
-        self.s += other.s
-        self.c += other.c
-        self.w += other.w
-        self.i += other.i
-        self.e += other.e
-        self.v += other.j
-    }
     static func += (self: inout Self, trade: TradeProceeds) {
         self.b += trade.loss
         self.r += trade.gain
     }
-    static func += (self: inout Self, other: Self) {
-        self = .init(
-            liq: self.liq + other.liq,
-            b: self.b + other.b,
-            v: self.v + other.v,
-            r: self.r + other.r,
-            s: self.s + other.s,
-            c: self.c + other.c,
-            w: self.w + other.w,
-            i: self.i + other.i,
-            e: self.e + other.e,
-            d: self.d + other.d
-        )
-    }
+    // static func += (self: inout Self, other: Self) {
+    //     self = .init(
+    //         settled: self.settled + other.settled,
+    //         b: self.b + other.b,
+    //         r: self.r + other.r,
+    //         s: self.s + other.s,
+    //         i: self.i + other.i,
+    //         j: self.j + other.j,
+    //         e: self.e + other.e,
+    //         d: self.d + other.d
+    //     )
+    // }
 }
 extension Bank.Account {
+    var Δ: TurnDelta<Int64> {
+        .init(y: self.settled, z: self.balance)
+    }
+
     var balance: Int64 {
-        self.liq +
+        self.settled +
         self.b +
-        self.v +
         self.r +
         self.s +
-        self.c +
-        self.w +
         self.i +
+        self.j +
         self.e +
         self.d
     }
 
     mutating func settle() {
-        self.liq += self.b; self.b = 0
-        self.liq += self.v; self.v = 0
-        self.liq += self.r; self.r = 0
-        self.liq += self.s; self.s = 0
-        self.liq += self.c; self.c = 0
-        self.liq += self.w; self.w = 0
-        self.liq += self.i; self.i = 0
-        self.liq += self.e; self.e = 0
-        self.liq += self.d; self.d = 0
+        self.settled += self.b; self.b = 0
+        self.settled += self.r; self.r = 0
+        self.settled += self.s; self.s = 0
+        self.settled += self.i; self.i = 0
+        self.settled += self.j; self.j = 0
+        self.settled += self.e; self.e = 0
+        self.settled += self.d; self.d = 0
     }
 
     mutating func inherit(fraction: Fraction) -> Int64 {
@@ -111,28 +98,24 @@ extension Bank.Account {
 }
 extension Bank.Account {
     enum ObjectKey: JSString, Sendable {
-        case liq
+        case settled = "X"
         case b
-        case v
         case r
         case s
-        case c
-        case w
         case i
+        case j
         case e
         case d
     }
 }
 extension Bank.Account: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.liq] = self.liq
+        js[.settled] = self.settled
         js[.b] = self.b
-        js[.v] = self.v
         js[.r] = self.r
         js[.s] = self.s
-        js[.c] = self.c
-        js[.w] = self.w
         js[.i] = self.i
+        js[.j] = self.j
         js[.e] = self.e
         js[.d] = self.d
     }
@@ -140,14 +123,12 @@ extension Bank.Account: JavaScriptEncodable {
 extension Bank.Account: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
-            liq: try js[.liq].decode(),
+            settled: try js[.settled].decode(),
             b: try js[.b]?.decode() ?? 0,
-            v: try js[.v]?.decode() ?? 0,
             r: try js[.r]?.decode() ?? 0,
             s: try js[.s]?.decode() ?? 0,
-            c: try js[.c]?.decode() ?? 0,
-            w: try js[.w]?.decode() ?? 0,
             i: try js[.i]?.decode() ?? 0,
+            j: try js[.j]?.decode() ?? 0,
             e: try js[.e]?.decode() ?? 0,
             d: try js[.d]?.decode() ?? 0
         )
@@ -155,5 +136,5 @@ extension Bank.Account: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension Bank.Account: Equatable, Hashable {}
+extension Bank.Account: Hashable {}
 #endif

@@ -17,9 +17,10 @@ struct OperatingBudget {
 }
 extension OperatingBudget {
     init(
+        account: Bank.Account,
         workers: Workforce?,
         clerks: (Workforce, FactoryMetadata.ClerkBonus)?,
-        state: Factory,
+        state: Factory.Dimensions,
         weights: __shared ResourceInputWeights,
         stockpileMaxDays: Int64,
         d: (l: Int64, e: Int64, x: Int64, v: Double?)
@@ -44,7 +45,7 @@ extension OperatingBudget {
             x: tradeableCostPerDay.x + inelasticCostPerDay.x,
         )
 
-        let balance: Int64 = state.inventory.account.balance
+        let balance: Int64 = account.settled
 
         let workersTarget: Int64 = workers.map { Swift.min($0.limit, $0.count + 1) } ?? 0
         let clerksTarget: Int64 = clerks.map {
@@ -52,8 +53,8 @@ extension OperatingBudget {
         } ?? 0
 
         let laborCostPerDay: (w: Int64, c: Int64) = (
-            w: state.z.wn * workersTarget,
-            c: state.z.cn * clerksTarget,
+            w: state.wn * workersTarget,
+            c: state.cn * clerksTarget,
         )
 
         /// These are the minimum theoretical balances the factory would need to purchase 100%

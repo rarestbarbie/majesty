@@ -110,8 +110,8 @@ extension FactoryContext {
         self.cashFlow.reset()
         self.cashFlow.update(with: self.state.inventory.l)
         self.cashFlow.update(with: self.state.inventory.e)
-        self.cashFlow[.workers] = -self.state.inventory.account.w
-        self.cashFlow[.clerks] = -self.state.inventory.account.c
+        self.cashFlow[.workers] = self.state.spending.wages
+        self.cashFlow[.clerks] = self.state.spending.salaries
     }
 }
 extension FactoryContext: TransactingContext {
@@ -162,7 +162,10 @@ extension FactoryContext: TransactingContext {
         }
 
         if case _? = self.state.liquidation {
-            self.budget = .liquidating(state: self.state, sharePrice: self.equity.sharePrice)
+            self.budget = .liquidating(
+                account: turn.bank[account: self.lei],
+                sharePrice: self.equity.sharePrice
+            )
             return
         }
 
@@ -178,9 +181,10 @@ extension FactoryContext: TransactingContext {
                 turn: turn,
             )
             budget = .init(
+                account: turn.bank[account: self.lei],
                 workers: nil,
                 clerks: nil,
-                state: self.state,
+                state: self.state.z,
                 weights: weights,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
                 d: (7, 30, 90, nil),
@@ -204,9 +208,10 @@ extension FactoryContext: TransactingContext {
                 turn: turn,
             )
             budget = .init(
+                account: turn.bank[account: self.lei],
                 workers: self.workers,
                 clerks: self.clerks.map { ($0, self.type.clerkBonus!) },
-                state: self.state,
+                state: self.state.z,
                 weights: weights,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
                 d: (30, 60, 365, utilization * self.state.z.pa)
@@ -268,11 +273,11 @@ extension FactoryContext: TransactingContext {
             self.liquidate(policy: country, budget: budget, turn: &turn)
 
             self.state.z.pa = 0
-            self.state.inventory.account.e -= turn.bank.buyback(
-                random: &turn.random,
-                equity: &self.state.equity,
-                budget: budget.buybacks,
+            self.state.spending.buybacks += turn.bank.buyback(
                 security: self.security,
+                budget: budget.buybacks,
+                equity: &self.state.equity,
+                random: &turn.random,
             )
 
         case .active(let budget):
@@ -285,12 +290,12 @@ extension FactoryContext: TransactingContext {
                     budget: budget.clerks,
                     turn: &turn
                 ) {
+                self.state.spending.salaries += clerks.wagesPaid
                 self.state.z.eo = 1 + bonus
                 self.state.z.cn = max(
                     country.minwage,
                     self.state.z.cn + clerks.wagesChange
                 )
-                self.state.inventory.account.c -= clerks.wagesPaid
 
                 switch clerks.headcount {
                 case nil:
@@ -318,7 +323,8 @@ extension FactoryContext: TransactingContext {
                     turn: &turn
                 )
 
-                operatingProfit = self.state.operatingProfit
+                // can be expensive to compute, so only do it once
+                operatingProfit = self.state.profit.operating
 
                 if case .fire(let type, let block)? = changes {
                     if  turn.random.roll(1, 7) {
@@ -335,7 +341,7 @@ extension FactoryContext: TransactingContext {
                     turn.jobs.hire.local[self.state.tile, type].append(block)
                 }
             } else {
-                operatingProfit = self.state.operatingProfit
+                operatingProfit = self.state.profit.operating
             }
 
             self.construct(
@@ -345,16 +351,19 @@ extension FactoryContext: TransactingContext {
                 turn: &turn
             )
 
-            self.state.inventory.account.e -= turn.bank.buyback(
-                random: &turn.random,
-                equity: &self.state.equity,
-                budget: budget.buybacks,
+            self.state.spending.buybacks += turn.bank.buyback(
                 security: self.security,
+                budget: budget.buybacks,
+                equity: &self.state.equity,
+                random: &turn.random,
             )
             // Pay dividends to shareholders, if any.
-            self.state.inventory.account.i -= turn.bank.pay(
-                dividend: budget.dividend,
-                to: self.state.equity.shares.values.shuffled(using: &turn.random.generator)
+            self.state.spending.dividend += turn.bank.transfer(
+                budget: budget.dividend,
+                source: self.lei,
+                recipients: self.state.equity.shares.values.shuffled(
+                    using: &turn.random.generator
+                )
             )
 
             if  self.state.size.level == 0 {
@@ -368,6 +377,10 @@ extension FactoryContext: TransactingContext {
     }
 
     mutating func advance(turn: inout Turn) {
+        self.state.z.vl = self.state.inventory.l.valueAcquired
+        self.state.z.ve = self.state.inventory.e.valueAcquired
+        self.state.z.vx = self.state.inventory.x.valueAcquired
+
         guard case nil = self.state.liquidation,
         let country: CountryProperties = self.region?.occupiedBy else {
             return
@@ -395,15 +408,14 @@ extension FactoryContext {
         turn: inout Turn
     ) {
         if  budget.tradeable > 0 {
-            let trade: TradeProceeds = self.state.inventory.x.trade(
-                stockpileDays: stockpileTarget,
-                spendingLimit: budget.tradeable,
-                in: policy.currency.id,
-                on: &turn.worldMarkets,
-            )
-
-            self.state.inventory.account.v += trade.loss
-            self.state.inventory.account.r += trade.gain
+            {
+                $0 += self.state.inventory.x.trade(
+                    stockpileDays: stockpileTarget,
+                    spendingLimit: budget.tradeable,
+                    in: policy.currency.id,
+                    on: &turn.worldMarkets,
+                )
+            } (&turn.bank[account: self.lei])
         }
 
         let growthFactor: Int64 = self.productivity * (self.state.size.level + 1)
@@ -419,7 +431,6 @@ extension FactoryContext {
         }
 
         self.state.z.fx = self.state.inventory.x.fulfilled
-        self.state.z.vx = self.state.inventory.x.valueAcquired
     }
 
     private mutating func liquidate(
@@ -427,36 +438,35 @@ extension FactoryContext {
         budget: FactoryBudget.Liquidating,
         turn: inout Turn
     ) {
-        let stockpileNone: ResourceStockpileTarget = .init(lower: 0, today: 0, upper: 0)
-        let tl: TradeProceeds = self.state.inventory.l.trade(
-            stockpileDays: stockpileNone,
-            spendingLimit: 0,
-            in: policy.currency.id,
-            on: &turn.worldMarkets,
-        )
-        let te: TradeProceeds = self.state.inventory.e.trade(
-            stockpileDays: stockpileNone,
-            spendingLimit: 0,
-            in: policy.currency.id,
-            on: &turn.worldMarkets,
-        )
-        let tx: TradeProceeds = self.state.inventory.x.trade(
-            stockpileDays: stockpileNone,
-            spendingLimit: 0,
-            in: policy.currency.id,
-            on: &turn.worldMarkets,
-        )
+        {
+            let stockpileNone: ResourceStockpileTarget = .init(lower: 0, today: 0, upper: 0)
+            let tl: TradeProceeds = self.state.inventory.l.trade(
+                stockpileDays: stockpileNone,
+                spendingLimit: 0,
+                in: policy.currency.id,
+                on: &turn.worldMarkets,
+            )
+            let te: TradeProceeds = self.state.inventory.e.trade(
+                stockpileDays: stockpileNone,
+                spendingLimit: 0,
+                in: policy.currency.id,
+                on: &turn.worldMarkets,
+            )
+            let tx: TradeProceeds = self.state.inventory.x.trade(
+                stockpileDays: stockpileNone,
+                spendingLimit: 0,
+                in: policy.currency.id,
+                on: &turn.worldMarkets,
+            )
 
-        #assert(tl.loss == 0, "nl loss during liquidation is non-zero! (\(tl.loss))")
-        #assert(te.loss == 0, "ne loss during liquidation is non-zero! (\(te.loss))")
-        #assert(tx.loss == 0, "nx loss during liquidation is non-zero! (\(tx.loss))")
+            #assert(tl.loss == 0, "nl loss during liquidation is non-zero! (\(tl.loss))")
+            #assert(te.loss == 0, "ne loss during liquidation is non-zero! (\(te.loss))")
+            #assert(tx.loss == 0, "nx loss during liquidation is non-zero! (\(tx.loss))")
 
-        self.state.inventory.account.r += tl.gain
-        self.state.inventory.account.r += te.gain
-        self.state.inventory.account.r += tx.gain
-
-        self.state.z.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
-        self.state.z.vx = self.state.inventory.x.valueAcquired
+            $0.r += tl.gain
+            $0.r += te.gain
+            $0.r += tx.gain
+        } (&turn.bank[account: self.lei])
     }
 
     private mutating func operate(
@@ -466,27 +476,33 @@ extension FactoryContext {
         stockpileTarget: ResourceStockpileTarget,
         turn: inout Turn
     ) -> WorkforceChanges? {
-        self.state.inventory.account += self.state.inventory.l.trade(
-            stockpileDays: stockpileTarget,
-            spendingLimit: budget.l.tradeable,
-            in: policy.currency.id,
-            on: &turn.worldMarkets,
-        )
+        {
+            $0 += self.state.inventory.l.trade(
+                stockpileDays: stockpileTarget,
+                spendingLimit: budget.l.tradeable,
+                in: policy.currency.id,
+                on: &turn.worldMarkets,
+            )
+            $0 += self.state.inventory.e.trade(
+                stockpileDays: stockpileTarget,
+                spendingLimit: budget.e.tradeable,
+                in: policy.currency.id,
+                on: &turn.worldMarkets,
+            )
 
-        self.state.inventory.account += self.state.inventory.e.trade(
-            stockpileDays: stockpileTarget,
-            spendingLimit: budget.e.tradeable,
-            in: policy.currency.id,
-            on: &turn.worldMarkets,
-        )
+            #assert(
+                $0.balance >= 0,
+                """
+                Factory (id = \(self.id), type = '\(self.type.symbol)') has negative cash! \
+                (\($0))
+                """
+            )
 
-        #assert(
-            self.state.inventory.account.balance >= 0,
-            """
-            Factory (id = \(self.id), type = '\(self.type.symbol)') has negative cash! \
-            (\(self.state.inventory.account))
-            """
-        )
+            $0.r += self.state.inventory.out.sell(
+                in: policy.currency.id,
+                on: &turn.worldMarkets
+            )
+        } (&turn.bank[account: self.lei])
 
         let (update, hours): (Update, Int64) = self.workerEffects(
             workers: workers,
@@ -495,7 +511,7 @@ extension FactoryContext {
         )
 
         self.state.z.wn = max(policy.minwage, self.state.z.wn + update.wagesChange)
-        self.state.inventory.account.w -= update.wagesPaid
+        self.state.spending.wages += update.wagesPaid
 
         /// On some days, the factory purchases more inputs than others. To get a more accurate
         /// estimate of the factory’s profitability, we need to credit the day’s balance with
@@ -511,45 +527,15 @@ extension FactoryContext {
             scalingFactor: (throughput, self.state.z.ei)
         )
 
-        self.state.inventory.account.r += self.state.inventory.out.sell(
-            in: policy.currency.id,
-            on: &turn.worldMarkets
-        )
         self.state.inventory.out.deposit(
             from: self.type.output,
             scalingFactor: (throughput, self.state.z.eo)
         )
 
-        #assert(
-            self.state.inventory.account.balance >= 0,
-            "Factory has negative cash! (\(self.state.inventory.account))"
-        )
-
         self.state.z.fl = self.state.inventory.l.fulfilled
         self.state.z.fe = self.state.inventory.e.fulfilled
-        self.state.z.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
 
         return update.headcount
-    }
-}
-extension FactoryMetadata {
-    var clerkBonus: ClerkBonus? {
-        guard
-        let clerks: Quantity<PopType> = self.clerks else {
-            return nil
-        }
-        return .init(ratio: clerks.amount %/ self.workers.amount, type: clerks.unit)
-    }
-}
-extension FactoryMetadata {
-    struct ClerkBonus {
-        let ratio: Fraction
-        let type: PopType
-    }
-}
-extension FactoryMetadata.ClerkBonus {
-    func optimal(for workers: Int64) -> Int64 {
-        workers >< self.ratio
     }
 }
 extension FactoryContext {
@@ -566,11 +552,10 @@ extension FactoryContext {
         let clerksOptimal: Int64 = self.workers.map { clerkTeam.optimal(for: $0.count) } ?? 0
 
         let wagesOwed: Int64 = clerks.count * self.state.z.cn
-        let wagesPaid: Int64 = turn.bank.pay(
-            salariesBudget: budget,
-            salaries: [
-                turn.payscale(shuffling: clerks.pops, rate: self.state.z.cn),
-            ]
+        let wagesPaid: Int64 = turn.bank.transfer(
+            budget: budget,
+            source: self.lei,
+            recipients: turn.payscale(shuffling: clerks.pops, rate: self.state.z.cn),
         )
 
         let headcount: WorkforceChanges?
@@ -655,9 +640,10 @@ extension FactoryContext {
             min(workers.count, hoursWorkable),
             budget / self.state.z.wn
         )
-        let wagesPaid: Int64 = hours <= 0 ? 0 : turn.bank.pay(
-            wagesBudget: hours * self.state.z.wn,
-            wages: turn.payscale(shuffling: workers.pops, rate: self.state.z.wn)
+        let wagesPaid: Int64 = hours <= 0 ? 0 : turn.bank.transfer(
+            budget: hours * self.state.z.wn,
+            source: self.lei,
+            recipients: turn.payscale(shuffling: workers.pops, rate: self.state.z.wn)
         )
 
         let headcount: WorkforceChanges?

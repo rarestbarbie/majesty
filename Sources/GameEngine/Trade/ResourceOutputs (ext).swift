@@ -7,6 +7,12 @@ import JavaScriptKit
 import JavaScriptInterop
 
 extension ResourceOutputs {
+    var valueSold: Int64 {
+        self.tradeable.values.reduce(0) { $0 + $1.valueSold } +
+        self.inelastic.values.reduce(0) { $0 + $1.valueSold }
+    }
+}
+extension ResourceOutputs {
     func tooltipSupply(
         _ id: Resource,
         tier: ResourceTier,

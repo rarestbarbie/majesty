@@ -1,0 +1,16 @@
+[
+    {
+        "type": "O",
+        "cash": 10000000
+    },
+    {
+        "type": "O",
+        "cash": 10000000,
+        "nat": "Atlantean"
+    },
+    {
+        "type": "O",
+        "cash": 90000000,
+        "nat": "Israeli"
+    }
+]
