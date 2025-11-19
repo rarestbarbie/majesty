@@ -419,11 +419,11 @@ extension PopContext {
 
         targetDemotions.shuffle(using: &turn.random.generator)
 
-        // when demoting, inherit 1/4
+        // when demoting, inherit 1 percent
         self.state.egress(
             evaluator: self.buildDemotionMatrix(country: country),
             targets: targetDemotions,
-            inherit: 1 %/ 4,
+            inherit: 1 %/ 100,
             on: &turn,
         )
 

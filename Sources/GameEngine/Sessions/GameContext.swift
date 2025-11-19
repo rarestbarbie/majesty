@@ -82,7 +82,7 @@ extension GameContext {
                     continue
                 }
 
-                world.bank[account: .pop(pop.id)].s += seed.cash
+                world.bank[account: .pop(pop.id)].s += seed.cash * pop.z.size
             }
         }
     }
