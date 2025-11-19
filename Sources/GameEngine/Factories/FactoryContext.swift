@@ -636,7 +636,8 @@ extension FactoryContext {
         /// will never be larger than the number of workers that can fit in the factory.
         let hoursWorkable: Int64 = self.state.inventory.l.width(
             limit: workers.limit,
-            tier: self.type.materials
+            tier: self.type.materials,
+            efficiency: self.state.z.ei
         )
 
         #assert(hoursWorkable >= 0, "Hours workable (\(hoursWorkable)) is negative?!?!")

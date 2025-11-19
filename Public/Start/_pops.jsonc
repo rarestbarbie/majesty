@@ -1269,15 +1269,15 @@
         "type": "O",
         "nat": "East Asian",
         "z": {
-            "size": 3080000
+            "size": 6200
         }
     },
     {
         "on": "399N-1,-2",
-        "type": "O",
+        "type": "D",
         "nat": "East Asian",
         "z": {
-            "size": 6200
+            "size": 3080000
         }
     },
     {

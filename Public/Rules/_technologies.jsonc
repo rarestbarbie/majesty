@@ -32,5 +32,14 @@
             }
         },
         "summary": "The Bayer Process enabled the efficient local extraction of alumina from bauxite ore, which could then be shipped long distances for further processing into aluminum metal. This dramatically lowered the cost of aluminum production in the Late Classical Period, leading to its widespread use in everything from aircraft to beverage cans."
+    },
+    "Taconite Concentration": {
+        "starter": true,
+        "effects": {
+            "mining_efficiency": {
+                "Iron Mine": "0.04"
+            }
+        },
+        "summary": "Taconite Concentration technology allowed for the economical extraction of iron from low-grade taconite ore, which was previously considered waste. This innovation revitalized the iron mining industry in the Midwestern United States during the 20th century, leading to increased steel production and economic growth in the region."
     }
 }

@@ -28,7 +28,8 @@
             "Mechanized Production": 1,
             "Hydraulic Fracking": 2,
             "Deepwater Drilling": 3,
-            "Bayer Process": 4
+            "Bayer Process": 4,
+            "Taconite Concentration": 5
         }
     },
     "factories": [

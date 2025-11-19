@@ -4,6 +4,7 @@ import GameIDs
 import GameUI
 import JavaScriptKit
 import JavaScriptInterop
+import OrderedCollections
 
 extension ResourceInputs {
     var fulfilled: Double {
@@ -33,15 +34,17 @@ extension ResourceInputs {
         return true
     }
 
-    func width(limit: Int64, tier: ResourceTier) -> Int64 {
-        let limit: Int64 = zip(self.inelastic.values, tier.inelastic).reduce(limit) {
-            let (resource, (_, amount)): (ResourceInput, (Resource, Int64)) = $1
-            return min($0, resource.units.total / amount)
-        }
-        return zip(self.tradeable.values, tier.tradeable).reduce(limit) {
-            let (resource, (_, amount)): (ResourceInput, (Resource, Int64)) = $1
-            return min($0, resource.units.total / amount)
-        }
+    func width(limit: Int64, tier: ResourceTier, efficiency: Double) -> Int64 {
+        min(
+            zip(self.inelastic.values, tier.inelastic).reduce(limit) {
+                let (resource, (_, amount)): (ResourceInput, (Resource, Int64)) = $1
+                return min($0, resource.width(base: amount, efficiency: efficiency))
+            },
+            zip(self.tradeable.values, tier.tradeable).reduce(limit) {
+                let (resource, (_, amount)): (ResourceInput, (Resource, Int64)) = $1
+                return min($0, resource.width(base: amount, efficiency: efficiency))
+            }
+        )
     }
 }
 extension ResourceInputs {
