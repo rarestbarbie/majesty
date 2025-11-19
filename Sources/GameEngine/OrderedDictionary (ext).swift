@@ -3,6 +3,10 @@ import JavaScriptKit
 import JavaScriptInterop
 import OrderedCollections
 
+extension OrderedDictionary where Key: ConvertibleToJSValue & LoadableFromJSValue & Sendable,
+    Value: ConvertibleToJSValue & LoadableFromJSValue {
+    var items: Items { .init(dictionary: self) }
+}
 extension OrderedDictionary: LoadableFromJSArray, LoadableFromJSValue,
     @retroactive ConstructibleFromJSValue
     where Value: LoadableFromJSValue, Value: Identifiable, Key == Value.ID {

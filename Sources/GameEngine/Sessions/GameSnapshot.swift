@@ -14,6 +14,7 @@ import OrderedCollections
         tradeable: OrderedDictionary<BlocMarket.ID, BlocMarket>,
         inelastic: OrderedDictionary<LocalMarket.ID, LocalMarket>
     )
+    let bank: Bank
     let date: GameDate
 }
 extension GameSnapshot {
@@ -36,51 +37,39 @@ extension GameSnapshot {
             return nil
         }
 
-        let account: Bank.Account = factory.inventory.account
-        let y: Factory.Dimensions = factory.y
-        let t: Factory.Dimensions = factory.z
-
-        let liquid: (y: Int64, t: Int64) = (account.liq, account.balance)
-        let assets: (y: Int64, t: Int64) = (y.vi + y.vx, t.vi + t.vx)
-        let value: (y: Int64, t: Int64) = (liquid.y + assets.y, liquid.t + assets.t)
-
-        let operatingProfit: Int64 = factory.operatingProfit
-        let operatingMargin: Fraction? = factory.operatingMargin
-        let grossMargin: Fraction? = factory.grossMargin
+        let account: Bank.Account = self.bank[account: .factory(id)]
+        let profit: ProfitMargins = factory.profit
+        let liquid: TurnDelta<Int64> = account.Δ
+        let assets: TurnDelta<Int64> = factory.Δ.vl + factory.Δ.ve + factory.Δ.vx
+        let valuation: TurnDelta<Int64> = liquid + assets
 
         return .instructions {
-            $0["Total valuation", +] = value.t[/3] <- value.y
+            $0["Total valuation", +] = valuation[/3]
             $0[>] {
-                $0["Today’s profit", +] = +operatingProfit[/3]
-                $0["Gross margin", +] = grossMargin.map {
+                $0["Today’s profit", +] = +profit.operating[/3]
+                $0["Gross margin", +] = profit.grossMargin.map {
                     (Double.init($0))[%2]
                 }
-                $0["Operating margin", +] = operatingMargin.map {
+                $0["Operating margin", +] = profit.operatingMargin.map {
                     (Double.init($0))[%2]
                 }
             }
 
-            $0["Illiquid assets", +] = assets.t[/3] <- assets.y
-            $0[>] {
-                $0["Stockpiled inputs", +] = factory.Δ.vi[/3]
-                $0["Stockpiled equipment", +] = factory.Δ.vx[/3]
-            }
-
-            $0["Liquid assets", +] = liquid.t[/3] <- liquid.y
+            $0["Illiquid assets", +] = assets[/3]
+            $0["Liquid assets", +] = liquid[/3]
             $0[>] {
                 $0["Market spending", +] = +account.b[/3]
-                $0["Market spending (amortized)", +] = +?(account.b + factory.Δ.vi.value)[/3]
+                // $0["Market spending (amortized)", +] = +?(account.b + factory.Δ.vi.value)[/3]
                 $0["Market earnings", +] = +?account.r[/3]
                 $0["Subsidies", +] = +?account.s[/3]
-                $0["Salaries", +] = +?account.c[/3]
-                $0["Wages", +] = +?account.w[/3]
-                $0["Interest and dividends", +] = +?account.i[/3]
-                if account.e < 0 {
-                    $0["Stock buybacks", +] = account.e[/3]
-                } else {
-                    $0["Market capitalization", +] = +?account.e[/3]
+                $0["Salaries", +] = +?factory.spending.salaries[/3]
+                $0["Wages", +] = +?factory.spending.wages[/3]
+                $0["Interest and dividends", +] = +?factory.spending.dividend[/3]
+                $0["Stock buybacks", +] = factory.spending.buybacks[/3]
+                if account.e > 0 {
+                    $0["Market capitalization", +] = +account.e[/3]
                 }
-                $0["Capital expenditures", +] = +?account.v[/3]
+                // $0["Capital expenditures", +] = +?account.v[/3]
             }
         }
     }
@@ -356,40 +345,35 @@ extension GameSnapshot {
             return nil
         }
 
-        let account: Bank.Account = pop.inventory.account
-        let liquid: (y: Int64, t: Int64) = (account.liq, account.balance)
-        let assets: (y: Int64, t: Int64) = (pop.y.vi, pop.z.vi)
-        let value: (y: Int64, t: Int64) = (liquid.y + assets.y, liquid.t + assets.t)
+        let account: Bank.Account = self.bank[account: .pop(id)]
+        let liquid: TurnDelta<Int64> = account.Δ
+        let assets: TurnDelta<Int64> = pop.Δ.vl + pop.Δ.ve + pop.Δ.vx
+        let valuation: TurnDelta<Int64> = liquid + assets
 
         return .instructions {
             if case .Ward = pop.type.stratum {
-                let operatingProfit: Int64 = pop.operatingProfit
-                let operatingMargin: Fraction? = pop.operatingMargin
-                let grossMargin: Fraction? = pop.grossMargin
-                $0["Total valuation", +] = value.t[/3] <- value.y
+                let profit: ProfitMargins = pop.profit
+                $0["Total valuation", +] = valuation[/3]
                 $0[>] {
-                    $0["Today’s profit", +] = +operatingProfit[/3]
-                    $0["Gross margin", +] = grossMargin.map {
+                    $0["Today’s profit", +] = +profit.operating[/3]
+                    $0["Gross margin", +] = profit.grossMargin.map {
                         (Double.init($0))[%2]
                     }
-                    $0["Operating margin", +] = operatingMargin.map {
+                    $0["Operating margin", +] = profit.operatingMargin.map {
                         (Double.init($0))[%2]
                     }
                 }
             }
 
-            $0["Illiquid assets", +] = assets.t[/3] <- assets.y
-
-            $0["Liquid assets", +] = account.balance[/3] <- account.liq
+            $0["Illiquid assets", +] = assets[/3]
+            $0["Liquid assets", +] = liquid[/3]
             $0[>] {
-                $0["Market earnings", +] = +?account.r[/3]
                 $0["Welfare", +] = +?account.s[/3]
-                $0["Salaries", +] = +?account.c[/3]
-                $0["Wages", +] = +?account.w[/3]
+                $0[pop.type.earnings, +] = +?account.r[/3]
                 $0["Interest and dividends", +] = +?account.i[/3]
 
                 $0["Market spending", +] = +?account.b[/3]
-                $0["Stock sales", +] = +?account.v[/3]
+                $0["Stock sales", +] = +?account.j[/3]
                 if case .Ward = pop.type.stratum {
                     $0["Loans taken", +] = +?account.e[/3]
                 } else {

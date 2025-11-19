@@ -11,6 +11,7 @@ public struct GameSave {
     let random: PseudoRandom
     let player: CountryID
 
+    let accounts: OrderedDictionary<LEI, Bank.Account>.Items
     let tradeableMarkets: OrderedDictionary<BlocMarket.ID, BlocMarket>
     let inelasticMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
     let date: GameDate
@@ -23,6 +24,7 @@ public struct GameSave {
     var pops: [Pop]
 
     let _factories: [FactorySeed]
+    let _pops: [PopSeed]
 }
 extension GameSave {
     public enum ObjectKey: JSString, Sendable {
@@ -30,6 +32,7 @@ extension GameSave {
         case random
         case player
 
+        case accounts
         case markets_tradeable
         case markets_inelastic
         case date
@@ -43,6 +46,7 @@ extension GameSave {
         case pops
 
         case seed_factories
+        case seed_pops
     }
 }
 extension GameSave: JavaScriptEncodable {
@@ -50,6 +54,7 @@ extension GameSave: JavaScriptEncodable {
         js[.symbols] = self.symbols
         js[.random] = self.random
         js[.player] = self.player
+        js[.accounts] = self.accounts
         js[.markets_tradeable] = self.tradeableMarkets
         js[.markets_inelastic] = self.inelasticMarkets
         js[.date] = self.date
@@ -67,6 +72,7 @@ extension GameSave: JavaScriptDecodable {
             symbols: try js[.symbols].decode(),
             random: try js[.random]?.decode() ?? .init(seed: 12345),
             player: try js[.player].decode(),
+            accounts: try js[.accounts]?.decode() ?? .init(dictionary: [:]),
             tradeableMarkets: try js[.markets_tradeable]?.decode() ?? [:],
             inelasticMarkets: try js[.markets_inelastic]?.decode() ?? [:],
             date: try js[.date].decode(),
@@ -75,7 +81,8 @@ extension GameSave: JavaScriptDecodable {
             factories: try js[.factories].decode(),
             mines: try js[.mines]?.decode() ?? [],
             pops: try js[.pops].decode(),
-            _factories: try js[.seed_factories]?.decode() ?? []
+            _factories: try js[.seed_factories]?.decode() ?? [],
+            _pops: try js[.seed_pops]?.decode() ?? []
         )
     }
 }

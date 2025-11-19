@@ -27,19 +27,19 @@ extension GameSession {
         Self.address(&save.pops)
 
         let rules: GameRules = try .init(resolving: rules, with: &save.symbols)
+        var world: GameWorld = .init(
+            notifications: .init(date: save.date),
+            bank: .init(accounts: save.accounts.dictionary),
+            tradeableMarkets: save.tradeableMarkets,
+            inelasticMarkets: save.inelasticMarkets,
+            random: save.random,
+        )
 
         var context: GameContext = try .load(save, rules: rules)
         try context.loadTerrain(map)
+        try context.seed(factories: save._factories, pops: save._pops, symbols: save.symbols, world: &world)
 
-        return .init(
-            context: context,
-            world: .init(
-                notifications: .init(date: save.date),
-                tradeableMarkets: save.tradeableMarkets,
-                inelasticMarkets: save.inelasticMarkets,
-                random: save.random,
-            )
-        )
+        return .init(context: context, world: world)
     }
 
     public var save: GameSave {
@@ -93,6 +93,7 @@ extension GameSession {
         .init(
             context: self.context,
             markets: (self.world.tradeableMarkets, self.world.inelasticMarkets),
+            bank: self.world.bank,
             date: self.world.date
         )
     }
@@ -112,7 +113,7 @@ extension GameSession {
     }
 
     public mutating func start() throws -> GameUI {
-        try self.context.compute(self.world)
+        try self.context.compute(&self.world)
         try self.ui.sync(with: self.snapshot)
         return self.ui
     }
@@ -120,7 +121,7 @@ extension GameSession {
     public mutating func tick() throws -> GameUI {
         if  self.ui.clock.tick() {
             try self.context.advance(&self.world[self.rules.settings])
-            try self.context.compute(self.world)
+            try self.context.compute(&self.world)
         }
 
         try self.ui.sync(with: self.snapshot)
@@ -378,10 +379,10 @@ extension GameSession {
 #if TESTABLE
 extension GameSession {
     public mutating func run(until date: GameDate) throws {
-        try self.context.compute(self.world)
+        try self.context.compute(&self.world)
         while self.world.date < date {
             try self.context.advance(&self.world[self.rules.settings])
-            try self.context.compute(self.world)
+            try self.context.compute(&self.world)
 
             if case (year: let year, month: 1, day: 1) = self.world.date.gregorian {
                 print("Year \(year) has started.")

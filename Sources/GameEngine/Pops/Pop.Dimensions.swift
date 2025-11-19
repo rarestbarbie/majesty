@@ -9,15 +9,17 @@ extension Pop {
         var fl: Double
         var fe: Double
         var fx: Double
+        var vl: Int64
+        var ve: Int64
+        var vx: Int64
         var px: Double
         /// Investor confidence, a number between 0 and 1.
         var pa: Double
-        var vi: Int64
     }
 }
 extension Pop.Dimensions {
     init() {
-        self.init(size: 0, mil: 0, con: 0, fl: 0, fe: 0, fx: 0, px: 1, pa: 0.5, vi: 0)
+        self.init(size: 0, mil: 0, con: 0, fl: 0, fe: 0, fx: 0, vl: 0, ve: 0, vx: 0, px: 1, pa: 0.5)
     }
 }
 extension Pop.Dimensions {
@@ -28,9 +30,11 @@ extension Pop.Dimensions {
         case fl = "fl"
         case fe = "fe"
         case fx = "fx"
+        case vl = "vl"
+        case ve = "ve"
+        case vx = "vx"
         case px = "px"
         case pa = "pa"
-        case vi = "vi"
     }
 }
 extension Pop.Dimensions: JavaScriptEncodable {
@@ -41,9 +45,11 @@ extension Pop.Dimensions: JavaScriptEncodable {
         js[.fl] = self.fl
         js[.fe] = self.fe
         js[.fx] = self.fx
+        js[.vl] = self.vl
+        js[.ve] = self.ve
+        js[.vx] = self.vx
         js[.px] = self.px
         js[.pa] = self.pa
-        js[.vi] = self.vi
     }
 }
 extension Pop.Dimensions: JavaScriptDecodable {
@@ -55,9 +61,11 @@ extension Pop.Dimensions: JavaScriptDecodable {
             fl: try js[.fl]?.decode() ?? 0,
             fe: try js[.fe]?.decode() ?? 0,
             fx: try js[.fx]?.decode() ?? 0,
+            vl: try js[.vl]?.decode() ?? 0,
+            ve: try js[.ve]?.decode() ?? 0,
+            vx: try js[.vx]?.decode() ?? 0,
             px: try js[.px]?.decode() ?? 1,
             pa: try js[.pa]?.decode() ?? 0.5,
-            vi: try js[.vi]?.decode() ?? 0
         )
     }
 }

@@ -1,6 +1,22 @@
 import GameIDs
 
 extension PopType {
+    var earnings: String {
+        switch self {
+        case .Livestock: "Market earnings"
+        case .Driver: "Wages"
+        case .Editor: "Wages"
+        case .Miner: "Market earnings"
+        case .Server: "Wages"
+        case .Contractor:"Wages"
+        case .Engineer: "Salaries"
+        case .Farmer: "Salaries"
+        case .Influencer: "Market earnings"
+        case .Aristocrat: "Fundraising"
+        case .Politician: "Fundraising"
+        }
+    }
+
     var jobMode: PopJobMode? {
         switch self {
         case .Livestock: nil

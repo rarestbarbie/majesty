@@ -103,7 +103,7 @@ extension PopContext: AllocatingContext {
         }
 
         let currency: Fiat = authority.currency.id
-        let balance: Int64 = self.state.inventory.account.balance
+        let balance: Int64 = turn.bank[account: self.lei].settled
 
         self.state.inventory.out.sync(with: self.type.output, releasing: 1)
         for j: Int in self.state.mines.values.indices {
@@ -205,82 +205,87 @@ extension PopContext: TransactingContext {
             return
         }
 
-        self.state.inventory.account.r += self.state.inventory.out.sell(
-            in: country.currency.id,
-            on: &turn.worldMarkets
-        )
-        self.state.inventory.out.deposit(
-            from: self.type.output,
-            scalingFactor: (self.state.z.size, 1)
-        )
+        {
+            (account: inout Bank.Account) in
 
-        for j: Int in self.state.mines.values.indices {
-            self.state.inventory.account.r += {
-                guard
-                let conditions: MiningJobConditions = self.mines[$0.id] else {
-                    fatalError("missing stored info for mine '\($0.id)'!!!")
-                }
+            account.r += self.state.inventory.out.sell(
+                in: country.currency.id,
+                on: &turn.worldMarkets
+            )
+            self.state.inventory.out.deposit(
+                from: self.type.output,
+                scalingFactor: (self.state.z.size, 1)
+            )
 
-                $0.out.deposit(
-                    from: conditions.output,
-                    scalingFactor: ($0.count, conditions.factor)
+            for j: Int in self.state.mines.values.indices {
+                account.r += {
+                    guard
+                    let conditions: MiningJobConditions = self.mines[$0.id] else {
+                        fatalError("missing stored info for mine '\($0.id)'!!!")
+                    }
+
+                    $0.out.deposit(
+                        from: conditions.output,
+                        scalingFactor: ($0.count, conditions.factor)
+                    )
+                    return $0.out.sell(in: country.currency.id, on: &turn.worldMarkets)
+                } (&self.state.mines.values[j])
+            }
+
+            let target: ResourceStockpileTarget = .random(
+                in: Self.stockpileDays,
+                using: &turn.random
+            )
+            let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
+
+            if  budget.l.tradeable > 0 {
+                account += self.state.inventory.l.trade(
+                    stockpileDays: target,
+                    spendingLimit: budget.l.tradeable,
+                    in: country.currency.id,
+                    on: &turn.worldMarkets,
                 )
-                return $0.out.sell(in: country.currency.id, on: &turn.worldMarkets)
-            } (&self.state.mines.values[j])
-        }
+            }
 
-        let target: ResourceStockpileTarget = .random(
-            in: Self.stockpileDays,
-            using: &turn.random
-        )
-        let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
-
-        if  budget.l.tradeable > 0 {
-            self.state.inventory.account += self.state.inventory.l.trade(
-                stockpileDays: target,
-                spendingLimit: budget.l.tradeable,
-                in: country.currency.id,
-                on: &turn.worldMarkets,
+            self.state.z.fl = self.state.inventory.l.fulfilled
+            self.state.inventory.l.consume(
+                from: self.type.l,
+                scalingFactor: (self.state.z.size, z.l)
             )
-        }
 
-        self.state.z.fl = self.state.inventory.l.fulfilled
-        self.state.inventory.l.consume(
-            from: self.type.l,
-            scalingFactor: (self.state.z.size, z.l)
-        )
+            if  budget.e.tradeable > 0 {
+                account += self.state.inventory.e.trade(
+                    stockpileDays: target,
+                    spendingLimit: budget.e.tradeable,
+                    in: country.currency.id,
+                    on: &turn.worldMarkets,
+                )
+            }
 
-        if  budget.e.tradeable > 0 {
-            self.state.inventory.account += self.state.inventory.e.trade(
-                stockpileDays: target,
-                spendingLimit: budget.e.tradeable,
-                in: country.currency.id,
-                on: &turn.worldMarkets,
+            self.state.z.fe = self.state.inventory.e.fulfilled
+            self.state.inventory.e.consume(
+                from: self.type.e,
+                scalingFactor: (self.state.z.size, z.e)
             )
-        }
 
-        self.state.z.fe = self.state.inventory.e.fulfilled
-        self.state.inventory.e.consume(
-            from: self.type.e,
-            scalingFactor: (self.state.z.size, z.e)
-        )
+            if  budget.x.tradeable > 0 {
+                account += self.state.inventory.x.trade(
+                    stockpileDays: target,
+                    spendingLimit: budget.x.tradeable,
+                    in: country.currency.id,
+                    on: &turn.worldMarkets,
+                )
+            }
 
-        if  budget.x.tradeable > 0 {
-            self.state.inventory.account += self.state.inventory.x.trade(
-                stockpileDays: target,
-                spendingLimit: budget.x.tradeable,
-                in: country.currency.id,
-                on: &turn.worldMarkets,
+            self.state.z.fx = self.state.inventory.x.fulfilled
+            self.state.inventory.x.consume(
+                from: self.type.x,
+                scalingFactor: (self.state.z.size, z.x)
             )
-        }
 
-        self.state.z.fx = self.state.inventory.x.fulfilled
-        self.state.inventory.x.consume(
-            from: self.type.x,
-            scalingFactor: (self.state.z.size, z.x)
-        )
-
-        self.state.z.vi = self.state.inventory.l.valueAcquired + self.state.inventory.e.valueAcquired
+            // Welfare
+            account.s += self.state.z.size * country.minwage / 10
+        } (&turn.bank[account: self.lei])
 
         liquidation:
         if case .Ward = self.state.type.stratum {
@@ -288,32 +293,35 @@ extension PopContext: TransactingContext {
             self.state.z.fe = 1
             self.state.z.fx = 0
 
-            let operatingProfit: Int64 = self.state.operatingProfit
-            if  operatingProfit > 0 {
+            if  self.state.profit.operating > 0 {
                 self.state.z.pa = min(1, self.state.z.pa + 0.005)
             } else {
                 self.state.z.pa = max(0.01, self.state.z.pa - 0.005)
             }
 
             // Pay dividends to shareholders, if any.
-            self.state.inventory.account.i -= turn.bank.pay(
-                dividend: budget.dividend,
-                to: self.state.equity.shares.values.shuffled(using: &turn.random.generator)
+            self.state.spending.dividend += turn.bank.transfer(
+                budget: budget.dividend,
+                source: self.lei,
+                recipients: self.state.equity.shares.values.shuffled(
+                    using: &turn.random.generator
+                )
             )
-            self.state.inventory.account.e -= turn.bank.buyback(
-                random: &turn.random,
-                equity: &self.state.equity,
-                budget: budget.buybacks,
+            self.state.spending.buybacks += turn.bank.buyback(
                 security: self.security,
+                budget: budget.buybacks,
+                equity: &self.state.equity,
+                random: &turn.random,
             )
         }
-
-        // Welfare
-        self.state.inventory.account.s += self.state.z.size * country.minwage / 10
     }
 }
 extension PopContext {
     mutating func advance(turn: inout Turn) {
+        self.state.z.vl = self.state.inventory.l.valueAcquired
+        self.state.z.ve = self.state.inventory.e.valueAcquired
+        self.state.z.vx = self.state.inventory.x.valueAcquired
+
         guard
         let country: CountryProperties = self.region?.occupiedBy else {
             return

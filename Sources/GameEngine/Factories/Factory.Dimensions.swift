@@ -4,7 +4,8 @@ import JavaScriptInterop
 
 extension Factory {
     struct Dimensions: LegalEntityMetrics {
-        var vi: Int64
+        var vl: Int64
+        var ve: Int64
         var vx: Int64
 
         /// Worker raise probability, set if the factory couldn’t hire any workers.
@@ -37,7 +38,8 @@ extension Factory {
 extension Factory.Dimensions {
     init() {
         self.init(
-            vi: 0,
+            vl: 0,
+            ve: 0,
             vx: 0,
             wf: nil,
             wn: 1,
@@ -55,7 +57,8 @@ extension Factory.Dimensions {
 }
 extension Factory.Dimensions {
     enum ObjectKey: JSString, Sendable {
-        case vi = "vi"
+        case vl = "vl"
+        case ve = "ve"
         case vx = "vx"
         case wf = "wf"
         case wn = "wn"
@@ -72,7 +75,8 @@ extension Factory.Dimensions {
 }
 extension Factory.Dimensions: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.vi] = self.vi
+        js[.vl] = self.vl
+        js[.ve] = self.ve
         js[.vx] = self.vx
         js[.wf] = self.wf
         js[.wn] = self.wn
@@ -90,7 +94,8 @@ extension Factory.Dimensions: JavaScriptEncodable {
 extension Factory.Dimensions: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
-            vi: try js[.vi]?.decode() ?? 0,
+            vl: try js[.vl]?.decode() ?? 0,
+            ve: try js[.ve]?.decode() ?? 0,
             vx: try js[.vx]?.decode() ?? 0,
             wf: try js[.wf]?.decode(),
             wn: try js[.wn]?.decode() ?? 1,
