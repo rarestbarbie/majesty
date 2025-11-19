@@ -71,7 +71,7 @@ export class ConsumptionBreakdown {
     public update(id: GameID, state: InventoryBreakdownState<any>, type: PersistentOverviewType): void {
         this.tiers.update(
             state.tiers,
-            (tier: ResourceNeedMeterState) => new ResourceNeedMeter(tier.id),
+            (tier: ResourceNeedMeterState) => new ResourceNeedMeter(tier.id, id, type),
             (
                 tier: ResourceNeedMeterState,
                 meter: ResourceNeedMeter

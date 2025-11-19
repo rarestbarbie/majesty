@@ -90,27 +90,37 @@ extension GameRules {
             )
         }
 
-        let factoryCosts: EffectsTable<
+        let corporateCosts: EffectsTable<
             FactoryType,
             SymbolTable<Int64>
-        > = try rules.factoryCosts.construction.effects(keys: symbols.factories, wildcard: "*")
+        > = try rules.factoryCosts.corporate.effects(keys: symbols.factories, wildcard: "*")
+        let expansionCosts: EffectsTable<
+            FactoryType,
+            SymbolTable<Int64>
+        > = try rules.factoryCosts.expansion.effects(keys: symbols.factories, wildcard: "*")
 
         self.init(
             resources: resources,
             factories: try table.factories.map {
                 return try .init(
                     identity: $0,
-                    inputs: .init(
+                    materials: .init(
                         metadata: resources,
-                        quantity: try $1.inputs.quantities(keys: symbols.resources)
+                        quantity: try $1.materials.quantities(keys: symbols.resources)
                     ),
-                    office: .init(
+                    corporate: .init(
                         metadata: resources,
-                        quantity: try $1.office.quantities(keys: symbols.resources)
+                        quantity: try (
+                            try $1.corporate ?? corporateCosts[$0.code] ?? corporateCosts[*]
+                        ).quantities(
+                            keys: symbols.resources
+                        )
                     ),
-                    costs: .init(
+                    expansion: .init(
                         metadata: resources,
-                        quantity: try (try factoryCosts[$0.code] ?? factoryCosts[*]).quantities(
+                        quantity: try (
+                            try $1.expansion ?? expansionCosts[$0.code] ?? expansionCosts[*]
+                        ).quantities(
                             keys: symbols.resources
                         )
                     ),

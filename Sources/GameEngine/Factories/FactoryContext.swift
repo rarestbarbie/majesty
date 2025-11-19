@@ -125,8 +125,12 @@ extension FactoryContext: TransactingContext {
         self.state.z.wn = max(self.state.z.wn, country.minwage)
         self.state.z.cn = max(self.state.z.cn, country.minwage)
 
-        // Input efficiency, set to 1 for now.
-        self.state.z.ei = 1
+        #assert(
+            0 ... 1 ~= self.state.y.fe,
+            "Factory input efficiency out of bounds! (\(self.state.y.fe))"
+        )
+        // Input efficiency, bonus from buying all corporate needs yesterday.
+        self.state.z.ei = 1 - 0.3 * self.state.y.fe
 
         // Reset fill positions, since they are copied from yesterday’s positions by default.
         self.state.z.wf = nil
@@ -138,15 +142,15 @@ extension FactoryContext: TransactingContext {
 
         self.state.inventory.out.sync(with: self.type.output, releasing: 1 %/ 4)
         self.state.inventory.l.sync(
-            with: self.type.inputs,
+            with: self.type.materials,
             scalingFactor: (throughput, self.state.z.ei),
         )
         self.state.inventory.e.sync(
-            with: self.type.office,
+            with: self.type.corporate,
             scalingFactor: (throughput, self.state.z.ei),
         )
         self.state.inventory.x.sync(
-            with: self.type.costs,
+            with: self.type.expansion,
             scalingFactor: (
                 self.productivity * (self.state.size.level + 1),
                 self.state.z.ei
@@ -421,11 +425,11 @@ extension FactoryContext {
         let growthFactor: Int64 = self.productivity * (self.state.size.level + 1)
         if  growthFactor == self.state.inventory.x.width(
                 limit: growthFactor,
-                tier: self.type.costs
+                tier: self.type.expansion
             ) {
             self.state.size.grow()
             self.state.inventory.x.consume(
-                from: self.type.costs,
+                from: self.type.expansion,
                 scalingFactor: (growthFactor, self.state.z.ei)
             )
         }
@@ -519,11 +523,11 @@ extension FactoryContext {
         /// approximate value of the inputs consumed today.
         let throughput: Int64 = self.productivity * hours
         self.state.inventory.l.consume(
-            from: self.type.inputs,
+            from: self.type.materials,
             scalingFactor: (throughput, self.state.z.ei)
         )
         self.state.inventory.e.consume(
-            from: self.type.office,
+            from: self.type.corporate,
             scalingFactor: (throughput, self.state.z.ei)
         )
 
@@ -631,7 +635,7 @@ extension FactoryContext {
         /// will never be larger than the number of workers that can fit in the factory.
         let hoursWorkable: Int64 = self.state.inventory.l.width(
             limit: workers.limit,
-            tier: self.type.inputs
+            tier: self.type.materials
         )
 
         #assert(hoursWorkable >= 0, "Hours workable (\(hoursWorkable)) is negative?!?!")
@@ -713,6 +717,62 @@ extension FactoryContext {
             $0["Base"] = base[/3]
             $0["Productivity", +] = productivity[%2]
             $0["Efficiency", +] = +?(efficiency - 1)[%2]
+        }
+    }
+
+    func explainNeeds(_ ul: inout TooltipInstructionEncoder, x: Int64) {
+        self.explainNeeds(&ul, base: x, unit: "level")
+    }
+    func explainNeeds(_ ul: inout TooltipInstructionEncoder, base: Int64) {
+        self.explainNeeds(&ul, base: base, unit: "worker")
+    }
+    private func explainNeeds(_ ul: inout TooltipInstructionEncoder, base: Int64, unit: String) {
+        let productivity: Double = Double.init(self.productivity)
+        let efficiency: Double = self.state.z.ei
+        ul["Demand per \(unit)"] = (productivity * efficiency * Double.init(base))[..3]
+        ul[>] {
+            $0["Base"] = base[/3]
+            $0["Productivity", +] = productivity[%2]
+            $0["Efficiency", -] = +?(efficiency - 1)[%2]
+        }
+    }
+}
+extension FactoryContext {
+    func tooltipNeeds(
+        _ tier: ResourceTierIdentifier
+    ) -> Tooltip? {
+        .instructions {
+            switch tier {
+            case .l:
+                let inputs: ResourceInputs = self.state.inventory.l
+                $0["Materials fulfilled"] = self.state.z.fl[%3]
+                $0[>] {
+                    $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
+                    $0["Efficiency", -] = +?(self.state.z.ei - 1)[%2]
+                }
+                $0[>] = """
+                Factories that lack materials will not produce anything
+                """
+            case .e:
+                let inputs: ResourceInputs = self.state.inventory.e
+                $0["Corporate supplies"] = self.state.z.fe[%3]
+                $0[>] {
+                    $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
+                    $0["Efficiency", -] = +?(self.state.z.ei - 1)[%2]
+                }
+                $0[>] = self.state.z.ei < 1 ? """
+                Today this factory saved \(pos: (1 - self.state.z.ei)[%2]) on all inputs
+                """ : """
+                Factories that purchase all of their corporate supplies are more efficient
+                """
+            case .x:
+                let inputs: ResourceInputs = self.state.inventory.x
+                $0["Capital expenditures"] = self.state.z.fx[%3]
+                $0[>] {
+                    $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
+                    $0["Efficiency", -] = +?(self.state.z.ei - 1)[%2]
+                }
+            }
         }
     }
 }

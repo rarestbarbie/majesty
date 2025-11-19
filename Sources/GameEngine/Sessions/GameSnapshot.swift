@@ -74,6 +74,13 @@ extension GameSnapshot {
         }
     }
 
+    func tooltipFactoryNeeds(
+        _ id: FactoryID,
+        _ tier: ResourceTierIdentifier
+    ) -> Tooltip? {
+        self.context.factories[id]?.tooltipNeeds(tier)
+    }
+
     func tooltipFactoryResourceIO(
         _ id: FactoryID,
         _ line: InventoryLine,
@@ -86,26 +93,20 @@ extension GameSnapshot {
         case .l(let resource):
             return factory.state.inventory.l.tooltipDemand(
                 resource,
-                tier: factory.type.inputs,
-                unit: "worker",
-                factor: 1,
-                productivity: Double.init(factory.productivity)
+                tier: factory.type.materials,
+                details: factory.explainNeeds(_:base:)
             )
         case .e(let resource):
             return factory.state.inventory.e.tooltipDemand(
                 resource,
-                tier: factory.type.office,
-                unit: "worker",
-                factor: 1,
-                productivity: Double.init(factory.productivity)
+                tier: factory.type.corporate,
+                details: factory.explainNeeds(_:base:)
             )
         case .x(let resource):
             return factory.state.inventory.x.tooltipDemand(
                 resource,
-                tier: factory.type.costs,
-                unit: "level",
-                factor: 1,
-                productivity: Double.init(factory.productivity)
+                tier: factory.type.expansion,
+                details: factory.explainNeeds(_:x:)
             )
 
         case .o(let resource):
@@ -453,19 +454,7 @@ extension GameSnapshot {
         _ id: PopID,
         _ tier: ResourceTierIdentifier
     ) -> Tooltip? {
-        guard let pop: Pop = self.context.pops.state[id] else {
-            return nil
-        }
-        return .instructions {
-            switch tier {
-            case .l:
-                $0["Life needs fulfilled"] = pop.z.fl[%3]
-            case .e:
-                $0["Everyday needs fulfilled"] = pop.z.fe[%3]
-            case .x:
-                $0["Luxury needs fulfilled"] = pop.z.fx[%3]
-            }
-        }
+        self.context.pops[id]?.tooltipNeeds(tier)
     }
 
     func tooltipPopResourceIO(
@@ -481,28 +470,19 @@ extension GameSnapshot {
             return pop.state.inventory.l.tooltipDemand(
                 resource,
                 tier: pop.type.l,
-                unit: "capita",
-                factor: 1,
-                productivity: pop.state.needsPerCapita.l,
-                productivityLabel: "Consciousness"
+                details: pop.explainNeeds(_:l:)
             )
         case .e(let resource):
             return pop.state.inventory.e.tooltipDemand(
                 resource,
                 tier: pop.type.e,
-                unit: "capita",
-                factor: 1,
-                productivity: pop.state.needsPerCapita.e,
-                productivityLabel: "Consciousness"
+                details: pop.explainNeeds(_:e:)
             )
         case .x(let resource):
             return pop.state.inventory.x.tooltipDemand(
                 resource,
                 tier: pop.type.x,
-                unit: "capita",
-                factor: 1,
-                productivity: pop.state.needsPerCapita.x,
-                productivityLabel: "Consciousness"
+                details: pop.explainNeeds(_:x:)
             )
         case .o(let resource):
             return pop.state.inventory.out.tooltipSupply(

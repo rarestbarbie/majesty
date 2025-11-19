@@ -118,7 +118,7 @@ extension PopContext: AllocatingContext {
         }
 
         /// Compute vertical weights.
-        let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
+        let z: (l: Double, e: Double, x: Double) = self.state.needsScalePerCapita
         self.state.inventory.l.sync(
             with: self.type.l,
             scalingFactor: (self.state.z.size, z.l),
@@ -236,7 +236,7 @@ extension PopContext: TransactingContext {
                 in: Self.stockpileDays,
                 using: &turn.random
             )
-            let z: (l: Double, e: Double, x: Double) = self.state.needsPerCapita
+            let z: (l: Double, e: Double, x: Double) = self.state.needsScalePerCapita
 
             if  budget.l.tradeable > 0 {
                 account += self.state.inventory.l.trade(
@@ -644,6 +644,41 @@ extension PopContext {
         ul[>] = "Base: \(em: MineContext.efficiencyMiners[%])"
         for (effect, provenance): (Decimal, EffectProvenance) in modifiers.blame {
             ul[provenance.name, +] = +effect[%]
+        }
+    }
+
+    func explainNeeds(_ ul: inout TooltipInstructionEncoder, l: Int64) {
+        self.explainNeeds(&ul, base: l, needsScalePerCapita: self.state.needsScalePerCapita.l)
+    }
+    func explainNeeds(_ ul: inout TooltipInstructionEncoder, e: Int64) {
+        self.explainNeeds(&ul, base: e, needsScalePerCapita: self.state.needsScalePerCapita.e)
+    }
+    func explainNeeds(_ ul: inout TooltipInstructionEncoder, x: Int64) {
+        self.explainNeeds(&ul, base: x, needsScalePerCapita: self.state.needsScalePerCapita.x)
+    }
+    private func explainNeeds(
+        _ ul: inout TooltipInstructionEncoder,
+        base: Int64,
+        needsScalePerCapita: Double
+    ) {
+        ul["Demand per capita"] = (needsScalePerCapita * Double.init(base))[..3]
+        ul[>] {
+            $0["Base"] = base[/3]
+            $0["Consciousness", -] = +?(needsScalePerCapita - 1)[%2]
+        }
+    }
+}
+extension PopContext {
+    func tooltipNeeds(_ tier: ResourceTierIdentifier) -> Tooltip? {
+        .instructions {
+            switch tier {
+            case .l:
+                $0["Life needs fulfilled"] = self.state.z.fl[%3]
+            case .e:
+                $0["Everyday needs fulfilled"] = self.state.z.fe[%3]
+            case .x:
+                $0["Luxury needs fulfilled"] = self.state.z.fx[%3]
+            }
         }
     }
 }

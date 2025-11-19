@@ -38,10 +38,7 @@ extension ResourceInputs {
     public func tooltipDemand(
         _ id: Resource,
         tier: ResourceTier,
-        unit: String,
-        factor: Double,
-        productivity: Double,
-        productivityLabel: String = "Productivity"
+        details: (inout TooltipInstructionEncoder, Int64) -> () = { _, _ in }
     ) -> Tooltip? {
         let amount: Int64
         let input: ResourceInput?
@@ -64,12 +61,7 @@ extension ResourceInputs {
         return .instructions {
             $0["Consumed today", +] = input.unitsConsumed[/3] / input.unitsDemanded
             $0[>] {
-                $0["Demand per \(unit)"] = (productivity * factor * Double.init(amount))[..3]
-                $0[>] {
-                    $0["Base"] = amount[/3]
-                    $0[productivityLabel, +] = productivity[%2]
-                    $0["Efficiency", -] = +?(1 - factor)[%2]
-                }
+                details(&$0, amount)
                 $0["Average cost"] = input.averageCost?[..2]
             }
         }

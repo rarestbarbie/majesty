@@ -7,6 +7,7 @@ import JavaScriptKit
     case FactoryResourceIO
     case FactoryStockpile
     case FactoryExplainPrice
+    case FactoryNeeds
     case FactoryOwnershipCountry
     case FactoryOwnershipCulture
     case FactoryOwnershipSecurities

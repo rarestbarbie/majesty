@@ -23,6 +23,7 @@ export enum TooltipType {
     FactoryStockpile = 'FactoryStockpile',
     FactoryExplainPrice = 'FactoryExplainPrice',
     FactoryWorkers = 'FactoryWorkers',
+    FactoryNeeds = 'FactoryNeeds',
     FactoryOwnershipCountry = 'FactoryOwnershipCountry',
     FactoryOwnershipCulture = 'FactoryOwnershipCulture',
     FactoryOwnershipSecurities = 'FactoryOwnershipSecurities',

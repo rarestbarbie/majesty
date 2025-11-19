@@ -1,7 +1,12 @@
 {
     "shares_initial": 10000000,
     "shares_per_level": 5000000,
-    "construction": {
+    "corporate": {
+        "*": {
+            "Services": 1
+        }
+    },
+    "expansion": {
         "*": {
             "Construction": 100000
         },
