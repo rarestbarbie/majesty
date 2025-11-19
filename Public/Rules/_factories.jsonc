@@ -1,4 +1,18 @@
 {
+    "Alloy Foundry": {
+        "materials": {
+            "Machine Parts": 1,
+            "Iron Ore": 20,
+            "Electricity": 20
+        },
+        "output": {
+            "Alloys": 16
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
     "Aluminum Mill": {
         "materials": {
             "Machine Parts": 1,
@@ -17,7 +31,8 @@
         "emoji": "🖥️",
         "color": "#505253",
         "materials": {
-            "Aluminum": 4,
+            "Aluminum": 3,
+            "Alloys": 1,
             "Electronics": 2,
             "Machine Parts": 6
         },
@@ -35,7 +50,8 @@
         "materials": {
             "Polymers": 2,
             "Batteries": 4,
-            "Aluminum": 2,
+            "Aluminum": 1,
+            "Alloys": 3,
             "Machine Parts": 4,
             "Appliances": 4,
             "Instruments": 1
@@ -174,8 +190,6 @@
         "materials": {
             "Construction": 1
         },
-        "office": {
-        },
         "output": {
             "Electricity": 12,
             "Water": 128
@@ -213,6 +227,7 @@
         "color": "#a02535",
         "materials": {
             "Polymers": 2,
+            "Alloys": 1,
             "Electronics": 4,
             "Semiconductor Devices": 2
         },
@@ -256,7 +271,8 @@
     },
     "Machine Parts Factory": {
         "materials": {
-            "Aluminum": 12,
+            "Aluminum": 6,
+            "Alloys": 6,
             // "Sulfur": 1,
             "Water": 1
         },

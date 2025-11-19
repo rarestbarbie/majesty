@@ -11,7 +11,8 @@
     {
         "tile": "399N-2,2",
         "size": {
-            "Hydroelectric Dam": 2
+            "Hydroelectric Dam": 2,
+            "Data Center": 2
         }
     },
 
@@ -19,7 +20,8 @@
     {
         "tile": "399N-2,3",
         "size": {
-            "Hydroelectric Dam": 10
+            "Hydroelectric Dam": 10,
+            "Plantation": 1
         }
     },
 
@@ -27,7 +29,8 @@
     {
         "tile": "399N-1,2",
         "size": {
-            "Hydroelectric Dam": 10
+            "Hydroelectric Dam": 10,
+            "Cereal Farm": 10
         }
     },
 
@@ -36,7 +39,8 @@
         "tile": "399N0,2",
         "size": {
             "Hydroelectric Dam": 5,
-            "Nuclear Power Plant": 1
+            "Nuclear Power Plant": 1,
+            "Cereal Farm": 1
         }
     },
 
@@ -152,7 +156,8 @@
     {
         "tile": "399N2,0",
         "size": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Instrument Factory": 1
         }
     },
 
@@ -161,7 +166,8 @@
         "tile": "399N3,0",
         "size": {
             "Hydroelectric Dam": 1,
-            "Nuclear Power Plant": 2
+            "Nuclear Power Plant": 2,
+            "Fashion House": 1
         }
     },
 
@@ -207,7 +213,14 @@
         "tile": "399N0,-2",
         "size": {
             "Hydroelectric Dam": 12,
-            "Nuclear Power Plant": 3
+            "Nuclear Power Plant": 3,
+            "Aluminum Mill": 1,
+            "Appliance Factory": 1,
+            "Automotive Assembly Plant": 1,
+            "Battery Plant": 1,
+            "Medical Equipment Factory": 1,
+            "Polypropylene Plant": 1,
+            "Semiconductor Foundry": 1
         }
     },
     // Northern China
@@ -215,7 +228,11 @@
         "tile": "399N-1,-1",
         "size": {
             "Hydroelectric Dam": 12,
-            "Nuclear Power Plant": 3
+            "Nuclear Power Plant": 3,
+            "Aluminum Mill": 1,
+            "Alloy Foundry": 1,
+            "Clothing Workshop": 4,
+            "Machine Parts Factory": 3
         }
     },
 

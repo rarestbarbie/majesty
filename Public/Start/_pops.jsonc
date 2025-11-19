@@ -1,4 +1,46 @@
 [
+    // Aleutian Islands
+    {
+        "on": "399N-2,0",
+        "nat": "Alaskan",
+        "type": "D",
+        "z": {
+            "size": 1400
+        }
+    },
+    {
+        "on": "399N-2,0",
+        "nat": "Alaskan",
+        "type": "O",
+        "z": {
+            "size": 60
+        }
+    },
+    {
+        "on": "399N-2,0",
+        "nat": "Atlantean",
+        "type": "O",
+        "z": {
+            "size": 52
+        }
+    },
+    {
+        "on": "399N-2,0",
+        "nat": "Atlantean",
+        "type": "D",
+        "z": {
+            "size": 3500
+        }
+    },
+    {
+        "on": "399N-2,0",
+        "type": "D",
+        "nat": "Black American",
+        "z": {
+            "size": 67
+        }
+    },
+
     // Alaska
     {
         "on": "399N-2,1",
@@ -74,6 +116,14 @@
             "size": 2300
         }
     },
+    {
+        "on": "399N-2,3",
+        "type": "D",
+        "nat": "West Indian",
+        "z": {
+            "size": 260000
+        }
+    },
 
     // California
     {
@@ -106,6 +156,14 @@
         "nat": "Black American",
         "z": {
             "size": 2500000
+        }
+    },
+    {
+        "on": "399N-2,3",
+        "type": "D",
+        "nat": "West Indian",
+        "z": {
+            "size": 80000
         }
     },
 
@@ -181,7 +239,7 @@
         "type": "D",
         "nat": "Mexican",
         "z": {
-            "size": 200000
+            "size": 660000
         }
     },
     {
@@ -190,6 +248,22 @@
         "nat": "Black American",
         "z": {
             "size": 5500000
+        }
+    },
+    {
+        "on": "399N0,2",
+        "type": "O",
+        "nat": "Jewish",
+        "z": {
+            "size": 6050
+        }
+    },
+    {
+        "on": "399N0,2",
+        "type": "D",
+        "nat": "Jewish",
+        "z": {
+            "size": 205000
         }
     },
 
@@ -885,9 +959,9 @@
     {
         "on": "399N3,-3",
         "type": "O",
-        "nat": "Israeli",
+        "nat": "Jewish",
         "z": {
-            "size": 410
+            "size": 4100
         }
     },
     {
@@ -901,7 +975,7 @@
     {
         "on": "399N3,-3",
         "type": "G",
-        "nat": "Israeli",
+        "nat": "Jewish",
         "z": {
             "size": 1750000
         }
@@ -928,6 +1002,14 @@
         "nat": "West Mediterranean",
         "z": {
             "size": 1150000
+        }
+    },
+    {
+        "on": "399N3,-3",
+        "type": "D",
+        "nat": "Caspian",
+        "z": {
+            "size": 201000
         }
     },
 
@@ -1089,6 +1171,137 @@
         "nat": "Australian",
         "z": {
             "size": 152000
+        }
+    },
+
+    // New Zealand
+    {
+        "on": "399S-2,0",
+        "type": "D",
+        "nat": "Atlantean",
+        "z": {
+            "size": 1300000
+        }
+    },
+    {
+        "on": "399S-2,0",
+        "type": "D",
+        "nat": "East Asian",
+        "z": {
+            "size": 2400000
+        }
+    },
+    {
+        "on": "399S-2,0",
+        "type": "D",
+        "nat": "West Oceanian",
+        "z": {
+            "size": 40000
+        }
+    },
+    {
+        "on": "399S-2,0",
+        "type": "D",
+        "nat": "East Oceanian",
+        "z": {
+            "size": 310000
+        }
+    },
+    {
+        "on": "399S-2,0",
+        "type": "D",
+        "nat": "Maori",
+        "z": {
+            "size": 1070000
+        }
+    },
+
+
+    // Antarctic Territories
+    {
+        "on": "399S-1,0",
+        "type": "G",
+        "nat": "Atlantean",
+        "z": {
+            "size": 80000
+        }
+    },
+
+    // New Territories
+    {
+        "on": "399S0,-1",
+        "type": "G",
+        "nat": "Atlantean",
+        "z": {
+            "size": 125000
+        }
+    },
+
+    // Japan
+    {
+        "on": "399N-2,-1",
+        "type": "O",
+        "nat": "Japanese",
+        "z": {
+            "size": 3500
+        }
+    },
+    {
+        "on": "399N-2,-1",
+        "type": "O",
+        "nat": "Atlantean",
+        "z": {
+            "size": 3100
+        }
+    },
+    {
+        "on": "399N-2,-1",
+        "type": "D",
+        "nat": "Japanese",
+        "z": {
+            "size": 6020000
+        }
+    },
+
+    // Taiwan
+    {
+        "on": "399N-1,-2",
+        "type": "O",
+        "nat": "East Asian",
+        "z": {
+            "size": 3080000
+        }
+    },
+    {
+        "on": "399N-1,-2",
+        "type": "O",
+        "nat": "East Asian",
+        "z": {
+            "size": 6200
+        }
+    },
+    {
+        "on": "399N-1,-2",
+        "type": "G",
+        "nat": "Japanese",
+        "z": {
+            "size": 90000
+        }
+    },
+    {
+        "on": "399N-1,-2",
+        "type": "G",
+        "nat": "East Asian",
+        "z": {
+            "size": 120000
+        }
+    },
+    {
+        "on": "399N-1,-2",
+        "type": "G",
+        "nat": "Atlantean",
+        "z": {
+            "size": 80000
         }
     }
 ]

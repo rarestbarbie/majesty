@@ -23,6 +23,16 @@ extension ResourceInputs {
         self.inelastic.values.reduce(0) { $0 + $1.value.total }
     }
 
+    var full: Bool {
+        for input: ResourceInput in self.inelastic.values where input.units.total < input.unitsDemanded {
+            return false
+        }
+        for input: ResourceInput in self.tradeable.values where input.units.total < input.unitsDemanded {
+            return false
+        }
+        return true
+    }
+
     func width(limit: Int64, tier: ResourceTier) -> Int64 {
         let limit: Int64 = zip(self.inelastic.values, tier.inelastic).reduce(limit) {
             let (resource, (_, amount)): (ResourceInput, (Resource, Int64)) = $1

@@ -12,7 +12,7 @@
         "name": "Continental Crust",
         "text": "The crust of a geologically active, Earth-like planet with a history of liquid water and tectonic activity is a balanced, resource-diverse environment. It is rich in bulk materials formed by sedimentary and weathering processes, such as Iron (from Banded Iron Formations), Aluminum (from bauxite), Limestone, Phosphate, and Potash, but it lacks the extreme concentrations of specialized materials found elsewhere.",
         "base_resources": {
-            "Iron": 80,
+            "Iron Ore": 80,
             "Aluminum": 80,
             "Copper": 40,
             "Limestone": 100,
@@ -62,7 +62,7 @@
                     "amount": "0.0001"
                 }
             },
-            "Iron": {
+            "Iron Ore": {
                 "_": {
                     "chance": 98
                 },
@@ -127,7 +127,7 @@
         "color": "#534c46",
         "name": "Large Igneous Province",
         "base_resources": {
-            "Iron": 100,
+            "Iron Ore": 100,
             "Nickel": 50,
             "Copper": 60,
             "Platinum": 2,
@@ -270,7 +270,7 @@
         "name": "Anorthositic Highlands",
         "base_resources": {
             "Anorthosite": 280,
-            "Iron": 20,
+            "Iron Ore": 20,
             "Nickel": 10,
             "Platinum": 1
         },
@@ -281,7 +281,7 @@
         "name": "Basaltic Mare",
         "base_resources": {
             "Titanium": 150,
-            "Iron": 100,
+            "Iron Ore": 100,
             "Helium-3": 1,
             "Olivine": 25,
             "Pyroxene": 25
@@ -344,7 +344,7 @@
         "color": "#5f4945",
         "name": "Martian Crust",
         "base_resources": {
-            "Iron": 250,
+            "Iron Ore": 250,
             "Aluminum": 60,
             "Titanium": 20,
             "Sulfur": 80,
@@ -353,7 +353,7 @@
             "Pyroxene": 50
         },
         "bonus_resources": {
-            "Iron": {
+            "Iron Ore": {
                 "_": {
                     "chance": 95
                 },
@@ -373,7 +373,7 @@
         "name": "Martian Canyon",
         "base_resources": {
             "Gypsum": 100,
-            "Iron": 150,
+            "Iron Ore": 150,
             "Jarosite": 50,
             "Olivine": 40,
             "Pyroxene": 40
@@ -384,7 +384,7 @@
         "color": "#5c2c25",
         "name": "Martian Volcanic",
         "base_resources": {
-            "Iron": 200,
+            "Iron Ore": 200,
             "Titanium": 50,
             "Olivine": 100,
             "Pyroxene": 100
@@ -407,7 +407,7 @@
             "Water Ice": 150,
             "Carbonaceous Materials": 120,
             "Graphite": 100,
-            "Iron": 20,
+            "Iron Ore": 20,
             "Olivine": 15,
             "Pyroxene": 15
         },
@@ -417,7 +417,7 @@
         "color": "#7a7571",
         "name": "Silicaceous Body",
         "base_resources": {
-            "Iron": 60,
+            "Iron Ore": 60,
             "Nickel": 30,
             "Olivine": 130,
             "Pyroxene": 130
@@ -438,7 +438,7 @@
         "color": "#2b2b30",
         "name": "Metallic Body",
         "base_resources": {
-            "Iron": 120,
+            "Iron Ore": 120,
             "Nickel": 150,
             "Platinum": 8,
             "Tungsten": 10,

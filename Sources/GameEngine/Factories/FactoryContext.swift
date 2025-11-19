@@ -427,10 +427,7 @@ extension FactoryContext {
         }
 
         let growthFactor: Int64 = self.productivity * (self.state.size.level + 1)
-        if  growthFactor == self.state.inventory.x.width(
-                limit: growthFactor,
-                tier: self.type.expansion
-            ) {
+        if  self.state.inventory.x.full {
             self.state.size.grow()
             self.state.inventory.x.consume(
                 from: self.type.expansion,
