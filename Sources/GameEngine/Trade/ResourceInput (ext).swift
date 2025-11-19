@@ -3,6 +3,13 @@ import JavaScriptKit
 import JavaScriptInterop
 
 extension ResourceInput {
+    func width(base: Int64, efficiency: Double) -> Int64 {
+        Int64.init(
+            Double.init(self.units.total) / (Double.init(base) * efficiency)
+        )
+    }
+}
+extension ResourceInput {
     @frozen public enum ObjectKey: JSString, Sendable {
         case id
         case unitsDemanded = "d"
