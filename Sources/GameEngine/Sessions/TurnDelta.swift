@@ -12,6 +12,13 @@ import D
 }
 extension TurnDelta where Dimensions: AdditiveArithmetic {
     var value: Dimensions { self.z - self.y }
+
+    static func + (a: Self, b: Self) -> Self {
+        .init(y: a.y + b.y, z: a.z + b.z)
+    }
+    static func - (a: Self, b: Self) -> Self {
+        .init(y: a.y - b.y, z: a.z - b.z)
+    }
 }
 extension TurnDelta where Dimensions: AdditiveArithmetic & DecimalFormattable {
     subscript<Format>(format: Format) -> TooltipInstruction.Ticker
