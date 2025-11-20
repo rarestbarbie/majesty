@@ -168,7 +168,7 @@ extension InventoryBreakdown {
             let market: BlocMarket.State? = snapshot.markets.tradeable[id / currency]?.state
             self.needs.append(
                 ResourceNeed.init(
-                    label: snapshot.rules[id],
+                    label: snapshot.rules.resources[id].label,
                     tier: tier,
                     stockpile: input.units.total,
                     filled: input.unitsConsumed,
@@ -181,7 +181,7 @@ extension InventoryBreakdown {
             let market: LocalMarket? = snapshot.markets.inelastic[id / location]
             self.needs.append(
                 ResourceNeed.init(
-                    label: snapshot.rules[id],
+                    label: snapshot.rules.resources[id].label,
                     tier: tier,
                     stockpile: input.units.total,
                     filled: input.units.added,
@@ -204,7 +204,7 @@ extension InventoryBreakdown {
             let market: BlocMarket.State? = snapshot.markets.tradeable[id / currency]?.state
             self.sales.append(
                 ResourceSale.init(
-                    label: snapshot.rules[output.id],
+                    label: snapshot.rules.resources[output.id].label,
                     mine: mine,
                     name: name,
                     unitsSold: output.unitsSold,
@@ -216,7 +216,7 @@ extension InventoryBreakdown {
             let market: LocalMarket? = snapshot.markets.inelastic[id / location]
             self.sales.append(
                 ResourceSale.init(
-                    label: snapshot.rules[output.id],
+                    label: snapshot.rules.resources[output.id].label,
                     mine: mine,
                     name: name,
                     unitsSold: output.unitsSold,

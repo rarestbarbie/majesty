@@ -32,7 +32,7 @@ extension TradeReport: PersistentReport {
             currency: [Fiat: CurrencyLabel]
         ) = snapshot.markets.tradeable.values.reduce(into: ([:], [:])) {
             if  case .good(let id) = $1.id.x {
-                $0.resource[id] = snapshot.rules[id]
+                $0.resource[id] = snapshot.rules.resources[id].label
             }
             if  case .fiat(let id) = $1.id.y,
                 let currency: Country.Currency = currencies[id] {
@@ -54,7 +54,7 @@ extension TradeReport: PersistentReport {
                 return nil
             }
 
-            let resource: ResourceLabel = snapshot.rules[good]
+            let resource: ResourceLabel = snapshot.rules.resources[good].label
 
             return .init(
                 id: $0.id,

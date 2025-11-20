@@ -41,7 +41,7 @@ extension CashFlowStatement {
 
         let label: String
         switch item {
-        case .resource(let id): label = rules.resources[id]?.title ?? "???"
+        case .resource(let id): label = rules.resources[id].title
         case .workers: label = "Workers"
         case .clerks: label = "Clerks"
         }
@@ -60,7 +60,7 @@ extension CashFlowStatement {
             let label: PieChartLabel?
 
             switch $0 {
-            case .resource(let id): label = rules.resources[id]?.label
+            case .resource(let id): label = rules.resources[id].label.pieChart
             case .workers: label = .init(color: 0x71bac7, name: "Workers")
             case .clerks: label = .init(color: 0xdbd5d3, name: "Clerks")
             }

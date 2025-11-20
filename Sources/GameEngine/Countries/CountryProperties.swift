@@ -27,7 +27,7 @@ extension CountryProperties {
         self.modifiers = .init()
         self.modifiers.update(from: self.intrinsic.researched, rules: rules)
 
-        for resource: ResourceMetadata in rules.resources.values where resource.local {
+        for resource: ResourceMetadata in rules.resources.local {
             let min: LocalPriceLevel?
 
             if let hours: Int64 = resource.hours {

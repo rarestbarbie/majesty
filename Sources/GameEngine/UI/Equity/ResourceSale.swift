@@ -34,7 +34,7 @@ extension ResourceSale: JavaScriptEncodable {
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
-        js[.name] = self.label.name
+        js[.name] = self.label.title
         js[.source] = self.name
         js[.icon] = self.label.icon
         js[.unitsSold] = self.unitsSold

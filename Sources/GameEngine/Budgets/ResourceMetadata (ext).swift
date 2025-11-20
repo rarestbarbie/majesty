@@ -1,7 +1,7 @@
 import GameRules
 
 extension ResourceMetadata {
-    var label: PieChartLabel {
-        .init(color: self.color, name: self.title)
+    var label: ResourceLabel {
+        .init(id: self.id, icon: self.emoji, title: self.title, color: self.color)
     }
 }

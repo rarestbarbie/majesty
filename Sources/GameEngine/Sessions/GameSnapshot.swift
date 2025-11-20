@@ -405,13 +405,13 @@ extension GameSnapshot {
             return .instructions {
                 $0["Total employment"] = employment[/3]
                 for output: ResourceOutput in pop.state.inventory.out.inelastic.values {
-                    let name: String? = self.context.rules.resources[output.id]?.title
+                    let name: String = self.context.rules.resources[output.id].title
                     $0[>] = """
                     Today these \(pop.state.type.plural) sold \(
                         output.unitsSold[/3],
                         style: output.unitsSold < output.units.added ? .neg : .pos
                     ) of \
-                    \(em: output.units.added[/3]) \(name ?? "?") produced
+                    \(em: output.units.added[/3]) \(name) produced
                     """
                 }
             }

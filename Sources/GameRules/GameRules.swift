@@ -4,7 +4,7 @@ import GameIDs
 import OrderedCollections
 
 @frozen public struct GameRules {
-    public let resources: OrderedDictionary<Resource, ResourceMetadata>
+    public let resources: Resources
     public let factories: OrderedDictionary<FactoryType, FactoryMetadata>
     public let mines: OrderedDictionary<MineType, MineMetadata>
     public let technologies: OrderedDictionary<Technology, TechnologyMetadata>
@@ -14,26 +14,6 @@ import OrderedCollections
     public let pops: [PopType: PopMetadata]
 
     public let settings: Settings
-
-    @inlinable public init(
-        resources: OrderedDictionary<Resource, ResourceMetadata>,
-        factories: OrderedDictionary<FactoryType, FactoryMetadata>,
-        mines: OrderedDictionary<MineType, MineMetadata>,
-        technologies: OrderedDictionary<Technology, TechnologyMetadata>,
-        geology: OrderedDictionary<GeologicalType, GeologicalMetadata>,
-        terrains: OrderedDictionary<TerrainType, TerrainMetadata>,
-        pops: [PopType: PopMetadata],
-        settings: Settings
-    ) {
-        self.resources = resources
-        self.factories = factories
-        self.mines = mines
-        self.technologies = technologies
-        self.geology = geology
-        self.terrains = terrains
-        self.pops = pops
-        self.settings = settings
-    }
 }
 extension GameRules {
     private typealias Tables = (
@@ -180,6 +160,39 @@ extension GameRules {
             settings: settings
         )
     }
+
+    private init(
+        resources: OrderedDictionary<Resource, ResourceMetadata>,
+        factories: OrderedDictionary<FactoryType, FactoryMetadata>,
+        mines: OrderedDictionary<MineType, MineMetadata>,
+        technologies: OrderedDictionary<Technology, TechnologyMetadata>,
+        geology: OrderedDictionary<GeologicalType, GeologicalMetadata>,
+        terrains: OrderedDictionary<TerrainType, TerrainMetadata>,
+        pops: [PopType: PopMetadata],
+        settings: Settings
+    ) {
+        self.init(
+            resources: .init(
+                fallback: .init(
+                    identity: .init(code: .init(rawValue: -1), symbol: "_Unknown"),
+                    color: 0xFFFFFF,
+                    emoji: "?",
+                    local: false,
+                    storable: false,
+                    hours: nil
+                ),
+                local: resources.values.filter(\.local),
+                table: resources
+            ),
+            factories: factories,
+            mines: mines,
+            technologies: technologies,
+            geology: geology,
+            terrains: terrains,
+            pops: pops,
+            settings: settings,
+        )
+    }
 }
 extension GameRules {
     /// Compute a slow hash of the game rules, used for checking mod compatibility.
@@ -188,7 +201,7 @@ extension GameRules {
 
         // TODO: hash settings
 
-        for value: ResourceMetadata in self.resources.values {
+        for value: ResourceMetadata in self.resources.all {
             value.hash.hash(into: &hasher)
         }
         for value: FactoryMetadata in self.factories.values {
