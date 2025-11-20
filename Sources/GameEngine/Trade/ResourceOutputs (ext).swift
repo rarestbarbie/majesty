@@ -107,6 +107,23 @@ extension ResourceOutputs {
                     ), the average price they actually received \
                     today was \(em: average[..2])
                     """
+
+                    switch today.priceIncrement(stockpile: market.stockpile) {
+                    case .increased:
+                        $0[>] = """
+                        We are \(em: "liquidating") the local stockpile, which is \
+                        \(em: "accelerating") the price increase
+                        """
+                        return
+                    case .reduced:
+                        $0[>] = """
+                        We are \(em: "dispensing") from the stabilization fund, which is \
+                        \(em: "retarding") the price decrease
+                        """
+                        return
+                    case .nominal:
+                        break
+                    }
                 }
 
                 if today.supply <= today.demand {

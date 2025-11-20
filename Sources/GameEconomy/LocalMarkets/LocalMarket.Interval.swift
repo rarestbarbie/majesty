@@ -37,12 +37,28 @@ extension LocalMarket.Interval {
         }
     }
 
+    @inlinable public func priceIncrement(stockpile: Reservoir) -> LocalPrice.TickRate {
+        if  self.supply < self.demand {
+            if  stockpile.removed >= (self.demand - self.supply) / 2 {
+                return .increased
+            }
+        } else if
+            self.supply > self.demand {
+            if  stockpile.added >= (self.supply - self.demand) / 2 {
+                return .reduced
+            }
+        }
+
+        return .nominal
+    }
+
     var prices: (bid: LocalPrice, ask: LocalPrice) { (self.bid, self.ask) }
 }
 extension LocalMarket.Interval {
     mutating func update(
+        rate: LocalPrice.TickRate,
+        limit: (min: LocalPrice, max: LocalPrice),
         spread: Double?,
-        limit: (min: LocalPrice, max: LocalPrice)
     ) {
         defer {
             self.supply = 0
@@ -51,8 +67,9 @@ extension LocalMarket.Interval {
 
         guard
         let (bid, ask): (bid: LocalPrice, ask: LocalPrice) = self.updated(
+            rate: rate,
+            limit: limit,
             spread: spread,
-            limit: limit
         ) else {
             return
         }
@@ -62,8 +79,9 @@ extension LocalMarket.Interval {
     }
 
     private func updated(
+        rate: LocalPrice.TickRate,
+        limit: (min: LocalPrice, max: LocalPrice),
         spread: Double?,
-        limit: (min: LocalPrice, max: LocalPrice)
     ) -> (bid: LocalPrice, ask: LocalPrice)? {
         if  self.bid < limit.min {
             return (bid: limit.min, ask: max(limit.min, self.ask))
@@ -74,23 +92,23 @@ extension LocalMarket.Interval {
 
         if  self.supply < self.demand {
             if self.supply == 0 {
-                return self.tickedUp(spread: spread, limit: limit.max)
+                return self.tickedUp(rate: rate, limit: limit.max, spread: spread)
             }
             if (self.demand %/ self.supply) > (LocalPrice.cent %/ (LocalPrice.cent - 1)) {
-                return self.tickedUp(spread: spread, limit: limit.max)
+                return self.tickedUp(rate: rate, limit: limit.max, spread: spread)
             }
         } else if self.bid.value.units > 0,
             self.supply > self.demand {
             if (self.demand %/ self.supply) < ((LocalPrice.cent - 1) %/ LocalPrice.cent) {
-                return self.tickedDown(spread: spread, limit: limit.min)
+                return self.tickedDown(rate: rate, limit: limit.min, spread: spread)
             }
         }
 
         return nil
     }
 
-    private func tickedUp(spread: Double?, limit: LocalPrice) ->  (bid: LocalPrice, ask: LocalPrice) {
-        let ask: LocalPrice = min(self.ask.tickedUp(), limit)
+    private func tickedUp(rate: LocalPrice.TickRate, limit: LocalPrice, spread: Double?) ->  (bid: LocalPrice, ask: LocalPrice) {
+        let ask: LocalPrice = min(self.ask.tickedUp(rate: rate), limit)
 
         guard let spread: Double = spread else {
             return (ask, ask)
@@ -100,8 +118,8 @@ extension LocalMarket.Interval {
         return (bid: max(self.bid, bid), ask: ask)
     }
 
-    private func tickedDown(spread: Double?, limit: LocalPrice) -> (bid: LocalPrice, ask: LocalPrice) {
-        let bid: LocalPrice = max(self.bid.tickedDown(), limit)
+    private func tickedDown(rate: LocalPrice.TickRate, limit: LocalPrice, spread: Double?) -> (bid: LocalPrice, ask: LocalPrice) {
+        let bid: LocalPrice = max(self.bid.tickedDown(rate: rate), limit)
 
         guard let spread: Double = spread else {
             return (bid, bid)

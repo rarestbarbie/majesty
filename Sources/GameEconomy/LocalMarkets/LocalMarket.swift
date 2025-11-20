@@ -157,32 +157,36 @@ extension LocalMarket {
 
         return min(quotient, limit)
     }
+
+    private var spreadTarget: Double? {
+        guard self.storage else {
+            return nil
+        }
+
+        let volume: Double = Double.init(self.today.mid) * Double.init(
+            min(self.today.supply, self.today.demand)
+        )
+        let l: Double = Double.init(self.stabilizationFund.total) / (1 + 30 * volume)
+        return (1 + 149 * max(1 - l, 0)) / 10_000
+    }
 }
 extension LocalMarket {
     public mutating func turn(template: Template) {
         self.yesterday = self.today
 
-        let spread: Double?
-        if  template.storage {
-            let volume: Double = Double.init(self.today.mid) * Double.init(
-                min(self.today.supply, self.today.demand)
-            )
-            let l: Double = Double.init(self.stabilizationFund.total) / (1 + 30 * volume)
-            spread = (1 + 149 * max(1 - l, 0)) / 10_000
-        } else {
-            spread = nil
-        }
+        self.storage = template.storage
+        self.limit = template.limit
 
         self.today.update(
-            spread: spread,
+            rate: self.storage
+                ? self.today.priceIncrement(stockpile: self.stockpile)
+                : .nominal,
             limit: (
-                min: template.limit.min?.price ?? Self.minDefault,
-                max: template.limit.max?.price ?? Self.maxDefault,
-            )
+                min: self.limit.min?.price ?? Self.minDefault,
+                max: self.limit.max?.price ?? Self.maxDefault,
+            ),
+            spread: self.spreadTarget,
         )
-
-        self.limit = template.limit
-        self.storage = template.storage
 
         self.stabilizationFund.turn()
         self.stockpile.turn()
