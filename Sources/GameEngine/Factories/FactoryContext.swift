@@ -342,7 +342,7 @@ extension FactoryContext: TransactingContext {
                     /// If gross profit is also negative, this happens more quickly.
                     let l: Double = 0.2 * profit.operatingLossParameter
                     let firable: Int64 = .init(l * Double.init(workers.count))
-                    if  firable > 0, turn.random.roll(1, profit.gross < 0 ? 3 : 7) {
+                    if  firable > 0, profit.gross < 0 || turn.random.roll(1, 3) {
                         turn.jobs.fire[self.state.id, type.workers.unit] = .init(
                             size: .random(in: 0 ... firable, using: &turn.random.generator)
                         )
