@@ -171,8 +171,15 @@ extension ResourceInputs {
                     ), the average price they actually paid \
                     today was \(em: average[..2])
                     """
-                }
 
+                    if case .reduced = today.priceIncrement(stockpile: market.stockpile) {
+                        $0[>] = """
+                        We are \(em: "dispensing") from the stabilization fund, which is \
+                        \(em: "retarding") the price decrease
+                        """
+                        return
+                    }
+                }
                 if today.supply <= today.demand {
                     $0[>] = """
                     There are not enough producers in this region, and the price will increase \

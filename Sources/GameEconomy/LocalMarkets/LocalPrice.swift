@@ -53,17 +53,17 @@ extension LocalPrice {
         return self
     }
 
-    consuming func tickedUp() -> Self {
-        self.tickUp()
+    consuming func tickedUp(rate: TickRate) -> Self {
+        self.tickUp(rate: rate)
         return self
     }
-    consuming func tickedDown() -> Self {
-        self.tickDown()
+    consuming func tickedDown(rate: TickRate) -> Self {
+        self.tickDown(rate: rate)
         return self
     }
 
-    mutating func tickUp() {
-        let step: Int64 = self.value.units / Self.cent
+    mutating func tickUp(rate: TickRate) {
+        let step: Int64 = self.value.units / rate.divisor
 
         self.value.units += step
         if  self.value.units > Self.high {
@@ -71,8 +71,8 @@ extension LocalPrice {
             self.value.power += 1
         }
     }
-    mutating func tickDown() {
-        let step: Int64 = self.value.units / Self.cent
+    mutating func tickDown(rate: TickRate) {
+        let step: Int64 = self.value.units / rate.divisor
 
         self.value.units -= step
         if  self.value.units < Self.low {
