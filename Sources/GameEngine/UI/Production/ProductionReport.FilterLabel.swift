@@ -7,7 +7,7 @@ extension ProductionReport {
     }
 }
 extension ProductionReport.FilterLabel: Identifiable {
-    var id: PopulationReport.Filter {
+    var id: ProductionReport.Filter {
         switch self {
         case .all: .all
         case .location(_, let address): .location(address)

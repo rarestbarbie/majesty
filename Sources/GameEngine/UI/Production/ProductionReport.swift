@@ -32,23 +32,30 @@ extension ProductionReport: PersistentReport {
     mutating func update(from snapshot: borrowing GameSnapshot) {
         let country: CountryProperties = snapshot.player
 
-        let filterlists: (
-            location: [Address: FilterLabel],
+        let filterable: (
+            locations: [Address: FilterLabel],
             Never?
         ) = snapshot.factories.reduce(into: ([:], nil)) {
             let tile: Address = $1.state.tile
             if case country.id? = $1.region?.governedBy.id {
                 {
                     $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
-                } (&$0.location[tile])
+                } (&$0.locations[tile])
             }
         }
+        let filters: (
+            location: [FilterLabel],
+            Never?
+        ) = (
+            location: filterable.locations.values.sorted(),
+            nil
+        )
 
         self.selection.rebuild(
             filtering: snapshot.factories,
             entries: &self.factories,
             details: &self.factory,
-            default: .all
+            default: filters.location.first?.id ?? .all
         ) {
             guard case country.id? = $0.region?.governedBy.id else {
                 return nil
@@ -81,7 +88,7 @@ extension ProductionReport: PersistentReport {
             $0.update(to: $2, from: snapshot) ;
         }
 
-        self.filters.0 = [.all] + filterlists.location.values.sorted()
+        self.filters.0 = [.all] + filters.location
     }
 }
 extension ProductionReport {
