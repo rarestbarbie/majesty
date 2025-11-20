@@ -27,9 +27,11 @@ extension ProfitMargins {
     /// revenue.
     var operatingLossParameter: Double {
         guard
-        let operatingMargin: Fraction,
-            operatingMargin.n < 0 else {
+        let operatingMargin: Fraction else {
             return 1
+        }
+        if  operatingMargin.n > 0 {
+            return 0
         }
         let operatingLoss: Int64 = -operatingMargin.n
         if  operatingLoss >= operatingMargin.d {

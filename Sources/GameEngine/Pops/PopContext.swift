@@ -377,7 +377,7 @@ extension PopContext {
         for i: Int in miningJobs {
             {
                 $0.quit(
-                    rate: q + q * (self.miningJobRank[$0.id].map(Double.init(_:)) ?? 0),
+                    rate: q + q * (self.miningJobRank[$0.id].map(Double.init(_:)) ?? 2),
                     using: &turn.random.generator
                 )
             } (&self.state.mines.values[i])
