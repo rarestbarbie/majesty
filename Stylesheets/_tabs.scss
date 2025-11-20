@@ -38,6 +38,9 @@ div.tabs > * > input[type=radio]:checked + label + *.tabcontent {
     left: 0;
 
     margin-top: 1rem;
+
+    overflow-y: scroll;
+    height: calc(100% - var(--tab-height) - 1.5rem);
     width: 100%;
 }
 div.tabs > * > input[type=radio]:checked + label {
