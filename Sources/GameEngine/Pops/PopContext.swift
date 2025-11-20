@@ -327,7 +327,7 @@ extension PopContext {
             return
         }
 
-        self.state.z.mil += 0.020 * (1.0 - self.state.z.fl)
+        self.state.z.mil += 0.010 * (1.0 - self.state.z.fl)
         self.state.z.mil += 0.004 * (0.5 - self.state.z.fe)
         self.state.z.mil += 0.004 * (0.0 - self.state.z.fx)
 
