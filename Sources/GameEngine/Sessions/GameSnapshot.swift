@@ -558,7 +558,7 @@ extension GameSnapshot {
                         $0["Chance to expand mine", (+)] = chance[%2]
                         $0[>] {
                             $0["Base"] = spawn.rate.value[%]
-                            $0["From yield rank", (+)] = (fromRank - 1)[%0]
+                            $0["From yield rank", (+)] = +?(fromRank - 1)[%0]
                             $0["From size of deposit", (+)] = (fromDeposit - 1)[%2]
                             $0["From unemployed miners", (+)] = fromWorkers[%2]
                         }

@@ -11,7 +11,7 @@
     "Ice Mine": {
         "miner": "Miner",
         "decay": true,
-        "scale": 1000000000,
+        "scale": 200000000,
         "spawn": {
             "Earth_Polar": {
                 "rate": "0.05",
@@ -26,7 +26,7 @@
     "Alumina Mine": {
         "miner": "Miner",
         "decay": true,
-        "scale": 1000000000,
+        "scale": 200000000,
         "spawn": {
             "Earth_Continental_Crust": {
                 "rate": "0.05",
@@ -41,7 +41,7 @@
     "Iron Mine": {
         "miner": "Miner",
         "decay": true,
-        "scale": 1000000000,
+        "scale": 200000000,
         "spawn": {
             "Earth_Continental_Crust": {
                 "rate": "0.05",
@@ -60,7 +60,7 @@
     "Lithium Mine": {
         "miner": "Miner",
         "decay": true,
-        "scale": 1000000000,
+        "scale": 200000000,
         "spawn": {
             "Earth_Continental_Crust": {
                 "rate": "0.02",
@@ -75,7 +75,7 @@
     "Mica Mine": {
         "miner": "Miner",
         "decay": true,
-        "scale": 1000000000,
+        "scale": 200000000,
         "spawn": {
             "Earth_Large_Igneous_Province": {
                 "rate": "0.05",
@@ -94,7 +94,7 @@
     "Natural Gas Field": {
         "miner": "Miner",
         "decay": true,
-        "scale": 1000000000,
+        "scale": 200000000,
         "spawn": {
             "Earth_Sedimentary_Basin": {
                 "rate": "0.05",
@@ -109,7 +109,7 @@
     "Offshore Oil Field": {
         "miner": "Miner",
         "decay": true,
-        "scale": 1000000000,
+        "scale": 200000000,
         "spawn": {
             "Earth_Oceanic_Shelf": {
                 "rate": "0.05",

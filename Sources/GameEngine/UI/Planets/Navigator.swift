@@ -27,9 +27,9 @@ extension Navigator {
 
         if let cell: HexCoordinate {
             self.cursor[planet] = cell
-            self.tile = .init(id: .init(planet: planet, tile: cell))
+            self.tile = .init(id: planet / cell)
         } else if let saved: HexCoordinate = self.cursor[planet] {
-            self.tile = .init(id: .init(planet: planet, tile: saved))
+            self.tile = .init(id: planet / saved)
         }
     }
 

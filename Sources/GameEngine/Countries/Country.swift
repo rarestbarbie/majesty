@@ -26,8 +26,6 @@ struct Country: IdentityReplaceable {
     var culturesAccepted: [String]
 
     /// The tiles this country controls.
-    var controlledWorlds: [PlanetID]
-    /// The tiles this country controls.
     var controlledTiles: [Address]
 
     var researched: [Technology]
@@ -43,7 +41,6 @@ extension Country {
         case color
         case culture_preferred
         case cultures_accepted
-        case controlled_worlds
         case controlled_tiles
         case researched
         case minwage
@@ -59,7 +56,6 @@ extension Country: JavaScriptEncodable {
         js[.color] = self.color
         js[.culture_preferred] = self.culturePreferred
         js[.cultures_accepted] = self.culturesAccepted
-        js[.controlled_worlds] = self.controlledWorlds
         js[.controlled_tiles] = self.controlledTiles
         js[.researched] = self.researched
         js[.minwage] = self.minwage
@@ -76,7 +72,6 @@ extension Country: JavaScriptDecodable {
             color: try js[.color].decode(),
             culturePreferred: try js[.culture_preferred].decode(),
             culturesAccepted: try js[.cultures_accepted]?.decode() ?? [],
-            controlledWorlds: try js[.controlled_worlds]?.decode() ?? [],
             controlledTiles: try js[.controlled_tiles]?.decode() ?? [],
             researched: try js[.researched]?.decode() ?? [],
             minwage: try js[.minwage].decode(),

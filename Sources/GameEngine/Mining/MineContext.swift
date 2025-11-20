@@ -21,11 +21,6 @@ struct MineContext: RuntimeContext {
     }
 }
 extension MineContext {
-    static var efficiencyPoliticiansPerMilitancyPoint: Double { 0.01 }
-    static var efficiencyPoliticians: Decimal { 5% }
-    static var efficiencyMiners: Decimal { 1% }
-}
-extension MineContext {
     mutating func startIndexCount() {
         self.miners = .empty
     }
@@ -39,13 +34,14 @@ extension MineContext {
         world _: borrowing GameWorld,
         context: ComputationPass
     ) throws {
-        if  self.type.decay {
-            self.miners.limit = self.state.z.size / 10_000
-        } else {
-            self.miners.limit = self.state.z.size
+        self.region = context.planets[self.state.tile]?.properties
+
+        guard
+        let region: RegionalProperties = self.region else {
+            return
         }
 
-        self.region = context.planets[self.state.tile]?.properties
+        self.miners.limit = self.type.width(tile: region, size: self.state.z.size)
     }
 }
 extension MineContext: AllocatingContext {
@@ -54,31 +50,9 @@ extension MineContext: AllocatingContext {
             return
         }
 
-        let authority: CountryProperties = region.occupiedBy
-
-        if case .Politician = self.type.miner {
-            let mil: Double = self.region?.pops.free.mil.average ?? 0
-            self.state.z.efficiency = Double.init(
-                Self.efficiencyPoliticians
-            ) + Self.efficiencyPoliticiansPerMilitancyPoint * mil
-        } else {
-            let bonus: Decimal = region.occupiedBy.modifiers.miningEfficiency[
-                self.state.type
-            ]?.value ?? 0
-            self.state.z.efficiency = Double.init(Self.efficiencyMiners + bonus)
-        }
-
-        var yieldBeforeScaling: Double = 0
-        for (id, amount): (Resource, Int64) in self.type.base.inelastic {
-            let price: Double = .init(turn.localMarkets[id / self.state.tile].today.bid.value)
-            yieldBeforeScaling += price * Double.init(amount)
-        }
-        for (id, amount): (Resource, Int64) in self.type.base.tradeable {
-            let price: Double = turn.worldMarkets.price(of: id, in: authority.currency.id)
-            yieldBeforeScaling += price * Double.init(amount)
-        }
-
-        self.state.z.yield = yieldBeforeScaling * self.state.z.efficiency
+        let yield: (efficiency: Double, value: Double) = self.type.yield(tile: region, turn: turn)
+        self.state.z.efficiency = yield.efficiency
+        self.state.z.yield = yield.value
     }
 }
 extension MineContext {

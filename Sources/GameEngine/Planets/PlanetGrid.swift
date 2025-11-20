@@ -1,4 +1,5 @@
 import Color
+import GameIDs
 import GameRules
 import GameTerrain
 import HexGrids
@@ -18,21 +19,8 @@ struct PlanetGrid {
     }
 }
 extension PlanetGrid {
-    mutating func assign(
-        governedBy: CountryProperties,
-        occupiedBy: CountryProperties,
-    ) {
-        for tile: Int in self.tiles.values.indices {
-            self.tiles.values[tile].update(
-                governedBy: governedBy,
-                occupiedBy: occupiedBy
-            )
-        }
-    }
-}
-extension PlanetGrid {
     mutating func replace(
-        surface: PlanetSurface?,
+        surface: PlanetSurface,
         symbols: GameSaveSymbols,
         rules: GameRules,
         terrainDefault: TerrainMetadata,
@@ -44,13 +32,15 @@ extension PlanetGrid {
             rules: rules,
         )
         self.reshape(
-            size: surface?.size ?? 0,
+            planet: surface.id,
+            size: surface.size,
             terrainDefault: terrainDefault,
             geologyDefault: geologyDefault
         )
     }
 
     mutating func resurface(
+        planet: PlanetID,
         rotate: HexRotation?,
         size: Int8,
         terrainDefault: TerrainMetadata,
@@ -58,6 +48,7 @@ extension PlanetGrid {
     ) {
         if  self.size != size {
             self.reshape(
+                planet: planet,
                 size: size,
                 terrainDefault: terrainDefault,
                 geologyDefault: geologyDefault
@@ -70,7 +61,7 @@ extension PlanetGrid {
                 let id: HexCoordinate
                 switch rotate {
                 case .ccw:
-                    switch source.id {
+                    switch source.id.tile {
                     case .x:                id = .x
                     case .n(let q, let r):  id = .n(r + q, -q)
                     case .e(let φ):         id = .e(φ == 5 ? 0 : φ + 1)
@@ -78,7 +69,7 @@ extension PlanetGrid {
                     }
 
                 case .cw:
-                    switch source.id {
+                    switch source.id.tile {
                     case .x:                id = .x
                     case .n(let q, let r):  id = .n(-r, r + q)
                     case .e(let φ):         id = .e(φ == 0 ? 5 : φ - 1)
@@ -93,6 +84,7 @@ extension PlanetGrid {
 }
 extension PlanetGrid {
     private mutating func reshape(
+        planet: PlanetID,
         size: Int8,
         terrainDefault: TerrainMetadata,
         geologyDefault: GeologicalMetadata
@@ -102,7 +94,7 @@ extension PlanetGrid {
         self.size = size
         self.tiles = template.reduce(into: [:]) {
             $0[$1] = self.tiles[$1] ?? Tile.init(
-                id: $1,
+                id: planet / $1,
                 name: nil,
                 terrain: terrainDefault,
                 geology: geologyDefault
@@ -138,7 +130,7 @@ extension PlanetGrid {
             }
 
             tiles[tile.id] = Tile.init(
-                id: tile.id,
+                id: surface.id / tile.id,
                 name: tile.name,
                 terrain: terrain,
                 geology: geology

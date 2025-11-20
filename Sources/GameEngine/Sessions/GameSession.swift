@@ -61,7 +61,6 @@ extension GameSession {
 
         return .init(
             id: tile.id,
-            on: planet.state.id,
             rotate: nil,
             size: planet.grid.size,
             name: tile.name,
