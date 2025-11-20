@@ -33,15 +33,10 @@
     "Livestock": {
         "color": "#8b1e27",
         "l": {
-            "Wheat": 6
         },
         "e": {
         },
         "x": {
-        },
-        "output": {
-            "Livestock": 3,
-            "Poultry": 1
         }
     },
     "Miner": {

@@ -469,25 +469,25 @@ extension GameSnapshot {
         case .l(let resource):
             return pop.state.inventory.l.tooltipDemand(
                 resource,
-                tier: pop.type.l,
+                tier: pop.l,
                 details: pop.explainNeeds(_:l:)
             )
         case .e(let resource):
             return pop.state.inventory.e.tooltipDemand(
                 resource,
-                tier: pop.type.e,
+                tier: pop.e,
                 details: pop.explainNeeds(_:e:)
             )
         case .x(let resource):
             return pop.state.inventory.x.tooltipDemand(
                 resource,
-                tier: pop.type.x,
+                tier: pop.x,
                 details: pop.explainNeeds(_:x:)
             )
         case .o(let resource):
             return pop.state.inventory.out.tooltipSupply(
                 resource,
-                tier: pop.type.output,
+                tier: pop.output,
                 details: pop.explainProduction(_:base:)
             )
         case .m(let id):

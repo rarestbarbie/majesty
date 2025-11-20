@@ -8,6 +8,7 @@ public struct GameRulesDescription {
     let mines: SymbolTable<MineDescription>
     let pops: SymbolTable<PopDescription>
     let technologies: SymbolTable<TechnologyDescription>
+    let biology: SymbolTable<CultureDescription>
     let geology: SymbolTable<GeologicalDescription>
     let terrains: SymbolTable<TerrainDescription>
     let exchange: BlocMarkets.Settings
@@ -21,6 +22,7 @@ extension GameRulesDescription: JavaScriptDecodable {
             mines: try js[.mines].decode(),
             pops: try js[.pops].decode(),
             technologies: try js[.technologies].decode(),
+            biology: try js[.biology].decode(),
             geology: try js[.geology].decode(),
             terrains: try js[.terrains].decode(),
             exchange: try js[.exchange].decode(),

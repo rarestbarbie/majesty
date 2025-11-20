@@ -1,0 +1,24 @@
+{
+    "_Pet": {
+    },
+    "Poultry": {
+        "meat": {
+            "Livestock": 3,
+            "Poultry": 3
+        },
+        "diet": {
+            "Water": 1,
+            "Wheat": 6
+        }
+    },
+    "Cattle": {
+        "meat": {
+            "Livestock": 3,
+            "Beef": 3
+        },
+        "diet": {
+            "Water": 3,
+            "Wheat": 3
+        }
+    }
+}

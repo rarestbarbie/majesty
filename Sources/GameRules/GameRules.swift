@@ -8,6 +8,7 @@ import OrderedCollections
     public let factories: OrderedDictionary<FactoryType, FactoryMetadata>
     public let mines: OrderedDictionary<MineType, MineMetadata>
     public let technologies: OrderedDictionary<Technology, TechnologyMetadata>
+    public let biology: OrderedDictionary<CultureType, CultureMetadata>
     public let geology: OrderedDictionary<GeologicalType, GeologicalMetadata>
     public let terrains: OrderedDictionary<TerrainType, TerrainMetadata>
 
@@ -21,6 +22,7 @@ extension GameRules {
         factories: OrderedDictionary<SymbolAssignment<FactoryType>, FactoryDescription>,
         mines: OrderedDictionary<SymbolAssignment<MineType>, MineDescription>,
         technologies: OrderedDictionary<SymbolAssignment<Technology>, TechnologyDescription>,
+        biology: OrderedDictionary<SymbolAssignment<CultureType>, CultureDescription>,
         geology: OrderedDictionary<SymbolAssignment<GeologicalType>, GeologicalDescription>,
         terrains: OrderedDictionary<SymbolAssignment<TerrainType>, TerrainDescription>
     )
@@ -37,6 +39,7 @@ extension GameRules {
                 try symbols.factories.extend(over: rules.factories),
                 try symbols.mines.extend(over: rules.mines),
                 try symbols.technologies.extend(over: rules.technologies),
+                try symbols.biology.extend(over: rules.biology),
                 try symbols.geology.extend(over: rules.geology),
                 try symbols.terrains.extend(over: rules.terrains),
             ),
@@ -117,7 +120,7 @@ extension GameRules {
                 )
             },
             mines: try table.mines.map {
-                .init(
+                MineMetadata.init(
                     identity: $0,
                     base: .init(
                         metadata: resources,
@@ -130,15 +133,28 @@ extension GameRules {
                 )
             },
             technologies: try table.technologies.map {
-                try .init(
+                TechnologyMetadata.init(
                     identity: $0 as SymbolAssignment<Technology>,
                     starter: $1.starter,
                     effects: try $1.effects.resolved(with: symbols),
                     summary: $1.summary
                 )
             },
+            biology: try table.biology.map {
+                CultureMetadata.init(
+                    identity: $0,
+                    diet: .init(
+                        metadata: resources,
+                        quantity: try $1.diet.quantities(keys: symbols.resources)
+                    ),
+                    meat: .init(
+                        metadata: resources,
+                        quantity: try $1.meat.quantities(keys: symbols.resources)
+                    )
+                )
+            },
             geology: try table.geology.map {
-                .init(
+                GeologicalMetadata.init(
                     identity: $0,
                     title: $1.title,
                     base: try $1.base.map(keys: symbols.resources),
@@ -152,10 +168,10 @@ extension GameRules {
                 )
             },
             terrains: table.terrains.map {
-                .init(identity: $0, color: $1.color)
+                TerrainMetadata.init(identity: $0, color: $1.color)
             },
             pops: try PopType.allCases.map(to: [PopType: PopMetadata].self) {
-                try .init(id: $0, effects: pops, symbols: symbols, resources: resources)
+                try PopMetadata.init(id: $0, effects: pops, symbols: symbols, resources: resources)
             },
             settings: settings
         )
@@ -166,6 +182,7 @@ extension GameRules {
         factories: OrderedDictionary<FactoryType, FactoryMetadata>,
         mines: OrderedDictionary<MineType, MineMetadata>,
         technologies: OrderedDictionary<Technology, TechnologyMetadata>,
+        biology: OrderedDictionary<CultureType, CultureMetadata>,
         geology: OrderedDictionary<GeologicalType, GeologicalMetadata>,
         terrains: OrderedDictionary<TerrainType, TerrainMetadata>,
         pops: [PopType: PopMetadata],
@@ -187,6 +204,7 @@ extension GameRules {
             factories: factories,
             mines: mines,
             technologies: technologies,
+            biology: biology,
             geology: geology,
             terrains: terrains,
             pops: pops,

@@ -1,10 +1,11 @@
+import GameRules
 import GameState
 
 struct CultureContext: RuntimeContext {
-    let type: _NoMetadata
+    let type: CultureMetadata
     var state: Culture
 
-    init(type: _NoMetadata, state: Culture) {
+    init(type: CultureMetadata, state: Culture) {
         self.type = type
         self.state = state
     }

@@ -26,7 +26,13 @@ extension GameContext {
         return .init(
             player: save.player,
             planets: [:],
-            cultures: try .init(states: save.cultures) { _ in _none },
+            cultures: try .init(states: save.cultures) {
+                guard
+                let type: CultureType = try? save.symbols[biology: $0.type ?? "_Pet"] else {
+                    return nil
+                }
+                return rules.biology[type]
+            },
             countries: try .init(states: save.countries) { _ in _none },
             factories: try .init(states: save.factories) { rules.factories[$0.type] },
             mines: try .init(states: save.mines) { rules.mines[$0.type] },
@@ -208,6 +214,7 @@ extension GameContext {
             player: self.player,
             rules: self.rules,
             planets: self.planets,
+            cultures: self.cultures,
             factories: self.factories.state,
             mines: self.mines.state,
         )
