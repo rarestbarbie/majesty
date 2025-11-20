@@ -107,7 +107,7 @@ extension LocalMarket.Interval {
             return (bid, bid)
         }
 
-        let ask: LocalPrice = bid.scaled(by: (1 / (1 - spread)), rounding: .up)
+        let ask: LocalPrice = bid.scaled(by: 1 / (1 - spread), rounding: .up)
         return (bid: bid, ask: min(self.ask, ask))
     }
 }
