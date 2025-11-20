@@ -111,3 +111,4 @@ extension LocalMarket.Interval {
         return (bid: bid, ask: min(self.ask, ask))
     }
 }
+
