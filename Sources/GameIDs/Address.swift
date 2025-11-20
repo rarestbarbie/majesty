@@ -1,10 +1,11 @@
 import HexGrids
 
+/// Construct an ``Address`` using the `/` operator.
 @frozen public struct Address: Equatable, Hashable, Sendable {
     public let planet: PlanetID
     public let tile: HexCoordinate
 
-    @inlinable public init(planet: PlanetID, tile: HexCoordinate) {
+    @inlinable init(planet: PlanetID, tile: HexCoordinate) {
         self.planet = planet
         self.tile = tile
     }

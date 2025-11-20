@@ -1,12 +1,17 @@
-final class RegionalProperties {
+import GameIDs
+
+final class RegionalProperties: Identifiable {
+    let id: Address
     var governedBy: CountryProperties
     var occupiedBy: CountryProperties
     private(set) var pops: PopulationStats
 
     init(
+        id: Address,
         governedBy: CountryProperties,
         occupiedBy: CountryProperties
     ) {
+        self.id = id
         self.governedBy = governedBy
         self.occupiedBy = occupiedBy
         self.pops = .init()

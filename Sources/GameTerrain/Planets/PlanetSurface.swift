@@ -18,6 +18,11 @@ import JavaScriptKit
     }
 }
 extension PlanetSurface {
+    @inlinable public init(id: PlanetID) {
+        self.init(id: id, size: 0, grid: [])
+    }
+}
+extension PlanetSurface {
     @frozen public enum ObjectKey: JSString {
         case id
         case size

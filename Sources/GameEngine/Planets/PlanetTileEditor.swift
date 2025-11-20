@@ -6,8 +6,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 public struct PlanetTileEditor {
-    let id: HexCoordinate
-    let on: PlanetID
+    let id: Address
 
     let rotate: HexRotation?
     let size: Int8
@@ -21,6 +20,8 @@ public struct PlanetTileEditor {
 }
 extension PlanetTileEditor {
     @frozen public enum ObjectKey: JSString, Sendable {
+        // encoded separately, to make it easier for the frontend to tell if we are editing a
+        // polar tile (otherwise it would have to parse the ID)
         case id
         case on
         case rotate
@@ -34,8 +35,8 @@ extension PlanetTileEditor {
 }
 extension PlanetTileEditor: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.id] = self.id
-        js[.on] = self.on
+        js[.id] = self.id.tile
+        js[.on] = self.id.planet
         js[.rotate] = self.rotate
         js[.size] = self.size
         js[.name] = self.name
@@ -48,8 +49,7 @@ extension PlanetTileEditor: JavaScriptEncodable {
 extension PlanetTileEditor: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
-            id: try js[.id].decode(),
-            on: try js[.on].decode(),
+            id: try js[.on].decode() / js[.id].decode(),
             rotate: try js[.rotate]?.decode(),
             size: try js[.size].decode(),
             name: try js[.name]?.decode(),

@@ -6,15 +6,87 @@
         "long": "United Nations",
         "color": "#66a3ff",
         "culture_preferred": "Atlantean",
-        "cultures_accepted": ["Italian"],
+        "cultures_accepted": ["Italian", "Jewish"],
         "currency": {
             "id": 1,
             "name": "UNB",
             "long": "United Nations Bancor"
         },
-        "controlled_worlds": [
-            399,
-            301
+        "controlled_tiles": [
+            // Aleutian Islands
+            "399N-2,0",
+            // Alaska
+            "399N-2,1",
+            // Pacific Northwest
+            "399N-2,2",
+            // California
+            "399N-2,3",
+            // American Midwest
+            "399N-1,2",
+            // American East Coast
+            "399N0,2",
+            // Canada
+            "399N0,1",
+            // Greenland
+            "399N1,1",
+            // Mexico
+            "399N-2,4",
+            // Central America
+            "399N-1,4",
+            // Caribbean Sea
+            "399N0,3",
+            // Panama
+            "399E5",
+            // Colombia
+            "399N1,3",
+            // Peru
+            "399S0,3",
+            // Amazon
+            "399S1,3",
+            // Brazil
+            "399S2,2",
+            // Argentina
+            "399S1,2",
+            // Patagonia
+            "399S0,2",
+            // West Antarctica
+            "399S0,1",
+            // East Antarctica
+            "399S1,0",
+            // Queen Maud Land
+            "399S1,-1",
+            // Northern Europe
+            "399N2,0",
+            // Southwestern Europe
+            "399N3,0",
+            // Atlantropa
+            "399N3,-1",
+            // Eastern Mediterranean
+            "399N3,-2",
+            // Eastern Europe
+            "399N2,-1",
+            // Holy Land
+            "399N3,-3",
+            // Persia
+            "399N2,-3",
+            // Southern China
+            "399N0,-2",
+            // Northern China
+            "399N-1,-1",
+            // Western Australia
+            "399S-1,-2",
+            // Eastern Australia
+            "399S-2,-1",
+            // New Zealand
+            "399S-2,0",
+            // Antarctic Territories
+            "399S-1,0",
+            // New Territories
+            "399S0,-1",
+            // Japan
+            "399N-2,-1",
+            // Taiwan
+            "399N-1,-2"
         ],
         "minwage": 35,
         "researched": [
@@ -27,27 +99,98 @@
     },
     {
         "id": 2,
-        "name": "Mars",
-        "long": "Commonwealth of Mars",
-        "color": "#FF7043",
-        "culture_preferred": "Martian",
+        "article": "The",
+        "name": "Russia",
+        "long": "Russian Federation",
+        "color": "#caa12f",
+        "culture_preferred": "Russian",
+        "cultures_accepted": ["Caspian", "Central Asian"],
         "currency": {
             "id": 2,
-            "name": "MAR",
-            "long": "Martian Rand"
+            "name": "RUB",
+            "long": "Ruble"
         },
-        "controlled_worlds": [
-            499,
-            401,
-            402
-        ],
-        "minwage": 25,
-        "researched": [
-            1,
-            2,
-            3,
-            4,
-            5
+        "controlled_tiles": [
+            // Russia
+            "399N1,-1",
+            // Siberia
+            "399N0,-1",
+            // Bering Sea
+            "399N-1,0",
+            // Caucasus
+            "399N2,-2"
+        ]
+    },
+    {
+        "id": 3,
+        "name": "India",
+        "long": "Republic of India",
+        "color": "#ff7a3d",
+        "culture_preferred": "South Asian",
+        "cultures_accepted": [],
+        "currency": {
+            "id": 3,
+            "name": "INR",
+            "long": "Rupee"
+        },
+        "controlled_tiles": [
+            // India
+            "399N2,-4",
+            // Bay of Bengal
+            "399S2,-4"
+        ]
+    },
+    {
+        "id": 4,
+        "name": "Thailand",
+        "long": "Kingdom of Thailand",
+        "color": "#cc004e",
+        "culture_preferred": "Thai",
+        "cultures_accepted": [],
+        "currency": {
+            "id": 4,
+            "name": "THB",
+            "long": "Baht"
+        },
+        "controlled_tiles": [
+            // Thailand
+            "399N0,-3"
+        ]
+    },
+    {
+        "id": 5,
+        "name": "Sahelia",
+        "long": "Republic of Sahelia",
+        "color": "#00ccaa",
+        "culture_preferred": "Sahelian",
+        "cultures_accepted": ["West African"],
+        "currency": {
+            "id": 5,
+            "name": "SAF",
+            "long": "Franc"
+        },
+        "controlled_tiles": [
+            // West Africa
+            "399N4,-1",
+            // Congo
+            "399S4,-2"
+        ]
+    },
+    {
+        "id": 6,
+        "name": "Ethiopia",
+        "long": "Republic of Ethiopia",
+        "color": "#5f004f",
+        "culture_preferred": "Ethiopian",
+        "cultures_accepted": [],
+        "currency": {
+            "id": 6,
+            "name": "ETB",
+            "long": "Birr"
+        },
+        "controlled_tiles": [
+            // Ethiopia
+            "399N4,-3"
         ]
     }
 ]

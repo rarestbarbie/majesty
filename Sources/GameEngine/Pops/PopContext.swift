@@ -623,9 +623,9 @@ extension PopContext {
             return
         }
 
-        ul[>] = "Base: \(em: MineContext.efficiencyPoliticians[%])"
+        ul[>] = "Base: \(em: MineMetadata.efficiencyPoliticians[%])"
         ul["Militancy of Free Population", +] = +(
-            MineContext.efficiencyPoliticiansPerMilitancyPoint * mil
+            MineMetadata.efficiencyPoliticiansPerMilitancyPoint * mil
         )[%1]
     }
     private func explainProductionMiner(
@@ -641,7 +641,7 @@ extension PopContext {
             return
         }
 
-        ul[>] = "Base: \(em: MineContext.efficiencyMiners[%])"
+        ul[>] = "Base: \(em: MineMetadata.efficiencyMiners[%])"
         for (effect, provenance): (Decimal, EffectProvenance) in modifiers.blame {
             ul[provenance.name, +] = +effect[%]
         }

@@ -97,13 +97,14 @@ extension GameContext {
             return
         }
 
-        self.planets[editor.on]?.grid.tiles[editor.id]?.self = .init(
+        self.planets[editor.id] = .init(
             id: editor.id,
             name: editor.name,
             terrain: terrain,
             geology: geology
         )
-        self.planets[editor.on]?.grid.resurface(
+        self.planets[editor.id.planet]?.grid.resurface(
+            planet: editor.id.planet,
             rotate: editor.rotate,
             size: editor.size,
             terrainDefault: terrain,
@@ -130,7 +131,7 @@ extension GameContext {
         for i: Int in self.planets.indices {
             try {
                 try $0.grid.replace(
-                    surface: defined[$0.state.id],
+                    surface: defined[$0.state.id] ?? .init(id: $0.state.id),
                     symbols: self.symbols,
                     rules: self.rules,
                     terrainDefault: terrainDefault,
@@ -227,12 +228,6 @@ extension GameContext {
     }
     private mutating func index(world: borrowing GameWorld) {
         for country: CountryContext in self.countries {
-            for planet: PlanetID in country.state.controlledWorlds {
-                self.planets[planet]?.grid.assign(
-                    governedBy: country.properties,
-                    occupiedBy: country.properties
-                )
-            }
             for address: Address in country.state.controlledTiles {
                 self.planets[address]?.update(
                     governedBy: country.properties,
@@ -720,20 +715,16 @@ extension GameContext {
                     [(type: MineType, size: Int64)],
                     Address
                 ) = {
-                    let id: PlanetID = $0.state.id
-                    return {
-                        let factory: FactoryType? = $0.pickFactory(
-                            among: self.rules.factories,
-                            using: &turn.random
-                        )
-                        let mines: [(type: MineType, size: Int64)] = $0.pickMine(
-                            among: self.rules.mines,
-                            using: &turn.random
-                        )
-                        let tile: Address = .init(planet: id, tile: $0.id)
-                        return (factory: factory, mines: mines, tile: tile)
-                    } (&$0[j])
-                } (&self.planets[i])
+                    let factory: FactoryType? = $0.pickFactory(
+                        among: self.rules.factories,
+                        using: &turn.random
+                    )
+                    let mines: [(type: MineType, size: Int64)] = $0.pickMine(
+                        among: self.rules.mines,
+                        using: &turn.random
+                    )
+                    return (factory: factory, mines: mines, tile: $0.id)
+                } (&self.planets[i][j])
 
                 if  let factory: FactoryType {
                     let factory: Factory.Section = .init(type: factory, tile: tile)

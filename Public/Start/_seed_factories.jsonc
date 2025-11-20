@@ -21,7 +21,9 @@
         "tile": "399N-2,3",
         "size": {
             "Hydroelectric Dam": 10,
-            "Plantation": 1
+            "Plantation": 1,
+            "Machine Parts Factory": 1,
+            "Polypropylene Plant": 1
         }
     },
 
@@ -30,7 +32,10 @@
         "tile": "399N-1,2",
         "size": {
             "Hydroelectric Dam": 10,
-            "Cereal Farm": 10
+            "Cereal Farm": 10,
+            "Machine Parts Factory": 1,
+            "Automotive Assembly Plant": 1,
+            "Appliance Factory": 1
         }
     },
 
@@ -40,7 +45,8 @@
         "size": {
             "Hydroelectric Dam": 5,
             "Nuclear Power Plant": 1,
-            "Cereal Farm": 1
+            "Cereal Farm": 1,
+            "Machine Parts Factory": 1
         }
     },
 
@@ -48,7 +54,8 @@
     {
         "tile": "399N0,1",
         "size": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Appliance Factory": 1
         }
     },
 
@@ -61,7 +68,8 @@
     {
         "tile": "399N-2,4",
         "size": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Clothing Workshop": 1
         }
     },
 
@@ -69,7 +77,8 @@
     {
         "tile": "399N-1,4",
         "size": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Clothing Workshop": 1
         }
     },
 
@@ -90,7 +99,8 @@
     {
         "tile": "399N1,3",
         "size": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Clothing Workshop": 1
         }
     },
 
@@ -157,7 +167,9 @@
         "tile": "399N2,0",
         "size": {
             "Hydroelectric Dam": 1,
-            "Instrument Factory": 1
+            "Instrument Factory": 1,
+            "Machine Parts Factory": 1,
+            "Polypropylene Plant": 1
         }
     },
 
@@ -167,7 +179,8 @@
         "size": {
             "Hydroelectric Dam": 1,
             "Nuclear Power Plant": 2,
-            "Fashion House": 1
+            "Fashion House": 1,
+            "Appliance Factory": 1
         }
     },
 
@@ -249,6 +262,23 @@
         "tile": "399S-2,-1",
         "size": {
             "Hydroelectric Dam": 1
+        }
+    },
+
+    // Japan
+    {
+        "tile": "399N-2,-1",
+        "size": {
+            "Desalination Plant": 1
+        }
+    },
+
+    // Taiwan
+    {
+        "tile": "399N-1,-2",
+        "size": {
+            "Desalination Plant": 1,
+            "Semiconductor Foundry": 1
         }
     }
 ]

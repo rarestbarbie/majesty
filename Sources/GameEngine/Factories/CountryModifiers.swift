@@ -8,10 +8,12 @@ import GameUI
 struct CountryModifiers {
     private(set) var factoryProductivity: [FactoryType: Stack<Int64>]
     private(set) var miningEfficiency: [MineType: Stack<Decimal>]
+    private(set) var miningWidth: [MineType: Stack<Decimal>]
 
     init() {
         self.factoryProductivity = [:]
         self.miningEfficiency = [:]
+        self.miningWidth = [:]
     }
 }
 extension CountryModifiers {
@@ -54,33 +56,6 @@ extension CountryModifiers {
                     from: technology
                 )
             }
-        }
-    }
-}
-extension CountryModifiers {
-    func tooltipEfficiency(mine: MineType) -> Tooltip {
-        let evaluator: ConditionBreakdown = self.computeEfficiency(mine: mine)
-        return .conditions(
-            .list(
-                "Mining efficiency: \(em: evaluator.output[%2])",
-                breakdown: evaluator
-            ),
-        )
-    }
-
-    private func computeEfficiency<Matrix>(
-        mine: MineType,
-        type: Matrix.Type = Matrix.self,
-    ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
-        .init(base: 1%) {
-            for (value, effect): (
-                    Decimal,
-                    EffectProvenance
-                ) in self.miningEfficiency[mine]?.blame ?? [] {
-                $0[true] { $0 = value } = { "\(+$0[%]): \(effect.name)" }
-            }
-        } factors: {
-            _ in
         }
     }
 }

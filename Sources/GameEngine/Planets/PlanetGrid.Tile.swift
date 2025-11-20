@@ -9,7 +9,7 @@ import Random
 
 extension PlanetGrid {
     struct Tile: Identifiable {
-        let id: HexCoordinate
+        let id: Address
         var properties: RegionalProperties?
 
         var name: String?
@@ -25,7 +25,7 @@ extension PlanetGrid {
         private(set) var mines: [MineID]
 
         init(
-            id: HexCoordinate,
+            id: Address,
             name: String?,
             terrain: TerrainMetadata,
             geology: GeologicalMetadata,
@@ -69,6 +69,7 @@ extension PlanetGrid.Tile {
             properties.occupiedBy = occupiedBy
         } else {
             self.properties = .init(
+                id: self.id,
                 governedBy: governedBy,
                 occupiedBy: occupiedBy
             )
