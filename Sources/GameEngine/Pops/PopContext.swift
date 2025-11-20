@@ -13,28 +13,24 @@ struct PopContext: RuntimeContext, LegalEntityContext {
     let type: PopMetadata
     var state: Pop
     private(set) var stats: Pop.Stats
-
     private(set) var region: RegionalProperties?
-
-    private(set) var income: [FactoryID: Int64]
     private(set) var equity: Equity<LEI>.Statistics
-
-    var cashFlow: CashFlowStatement { self.stats.cashFlow }
-
     private(set) var budget: PopBudget?
-
     private(set) var mines: [MineID: MiningJobConditions]
+
+    private var miningJobRank: [MineID: Int]
+    private var factoryJobPay: [FactoryID: Int64]
 
     public init(type: PopMetadata, state: Pop) {
         self.type = type
         self.state = state
         self.stats = .init()
         self.region = nil
-
-        self.income = [:]
         self.equity = .init()
         self.budget = nil
         self.mines = [:]
+        self.miningJobRank = [:]
+        self.factoryJobPay = [:]
     }
 }
 extension PopContext: Identifiable {
@@ -76,9 +72,22 @@ extension PopContext {
             )
         }
 
-        self.income.removeAll(keepingCapacity: true)
-        for id: FactoryID in self.state.factories.keys {
-            self.income[id] = context.factories[id]?.z.wn
+        self.factoryJobPay = [:]
+        self.miningJobRank = [:]
+
+        if  case .Miner = self.state.type {
+            // mining yield does not affect Politicians
+            for job: MineID in self.state.mines.keys {
+                self.miningJobRank[job] = context.mines[job]?.z.yieldRank
+            }
+        } else if case .Clerk = self.state.type.stratum {
+            for job: FactoryID in self.state.factories.keys {
+                self.factoryJobPay[job] = context.factories[job]?.z.cn
+            }
+        } else {
+            for job: FactoryID in self.state.factories.keys {
+                self.factoryJobPay[job] = context.factories[job]?.z.wn
+            }
         }
     }
 }
@@ -327,7 +336,7 @@ extension PopContext {
             return
         }
 
-        self.state.z.mil += 0.020 * (1.0 - self.state.z.fl)
+        self.state.z.mil += 0.010 * (1.0 - self.state.z.fl)
         self.state.z.mil += 0.004 * (0.5 - self.state.z.fe)
         self.state.z.mil += 0.004 * (0.0 - self.state.z.fx)
 
@@ -354,12 +363,13 @@ extension PopContext {
         let miningJobs: Range<Int> = self.state.mines.values.indices
 
         let w0: Double = .init(country.minwage)
+        let q: Double = 0.002
         for i: Int in factoryJobs {
             {
                 /// At this rate, if the factory pays minimum wage or less, about half of
                 /// non-union workers, and one third of union workers, will quit every year.
                 $0.quit(
-                    rate: 0.002 * w0 / max(w0, self.income[$0.id].map(Double.init(_:)) ?? 1),
+                    rate: q * w0 / max(w0, self.factoryJobPay[$0.id].map(Double.init(_:)) ?? 1),
                     using: &turn.random.generator
                 )
             } (&self.state.factories.values[i])
@@ -367,7 +377,7 @@ extension PopContext {
         for i: Int in miningJobs {
             {
                 $0.quit(
-                    rate: 0.001,
+                    rate: q + q * (self.miningJobRank[$0.id].map(Double.init(_:)) ?? 2),
                     using: &turn.random.generator
                 )
             } (&self.state.mines.values[i])

@@ -35,7 +35,7 @@ extension ResourceNeed: JavaScriptEncodable {
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
-        js[.name] = self.label.name
+        js[.name] = self.label.title
         js[.icon] = self.label.icon
         js[.tier] = self.tier
         js[.stockpile] = self.stockpile

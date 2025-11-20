@@ -344,6 +344,10 @@
         "emoji": "🚀",
         "color": "#9c0000"
     },
+    "Nuclear Fuel": {
+        "emoji": "⚫",
+        "color": "#26302a"
+    },
     "Organs": {
         "emoji": "🫁",
         "color": "#ff95be"

@@ -13,9 +13,25 @@ extension MineMetadata {
         }
     }
 
-    func chance(
-        size: Int64,
+    func chanceNew(
         tile: GeologicalType,
+    ) -> (chance: Fraction, spawn: SpawnWeight)? {
+        guard let spawn: SpawnWeight = self.spawn[tile] else {
+            return nil
+        }
+
+        let (r, d): (Int64, Int64?) = spawn.rate.value.fraction
+
+        guard r > 0 else {
+            return nil
+        }
+
+        return ((r * self.scale) %/ ((d ?? 1) * self.scale), spawn)
+    }
+
+    func chance(
+        tile: GeologicalType,
+        size: Int64,
         yieldRank: Int
     ) -> (chance: Fraction, spawn: SpawnWeight)? {
         guard let y: Fraction = Self.yieldRankExpansionFactor(yieldRank) else {
@@ -32,7 +48,7 @@ extension MineMetadata {
             return nil
         }
 
-        return ((y.n * r * self.scale) %/ (y.d * ((d ?? 1) * size + self.scale)), spawn)
+        return ((y.n * r * self.scale) %/ (y.d * ((d ?? 1) * (size + self.scale))), spawn)
     }
 }
 extension MineMetadata {
@@ -88,3 +104,4 @@ extension MineMetadata {
         return (efficiency: efficiency, value: yieldBeforeScaling * efficiency)
     }
 }
+

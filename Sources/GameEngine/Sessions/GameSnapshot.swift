@@ -405,13 +405,13 @@ extension GameSnapshot {
             return .instructions {
                 $0["Total employment"] = employment[/3]
                 for output: ResourceOutput in pop.state.inventory.out.inelastic.values {
-                    let name: String? = self.context.rules.resources[output.id]?.title
+                    let name: String = self.context.rules.resources[output.id].title
                     $0[>] = """
                     Today these \(pop.state.type.plural) sold \(
                         output.unitsSold[/3],
                         style: output.unitsSold < output.units.added ? .neg : .pos
                     ) of \
-                    \(em: output.units.added[/3]) \(name ?? "?") produced
+                    \(em: output.units.added[/3]) \(name) produced
                     """
                 }
             }
@@ -539,8 +539,8 @@ extension GameSnapshot {
                     }
                     if  let yieldRank: Int = mine.state.z.yieldRank,
                         let (chance, spawn): (Fraction, SpawnWeight) = mine.type.chance(
-                            size: mine.state.z.size,
                             tile: tile.geology.id,
+                            size: mine.state.z.size,
                             yieldRank: yieldRank
                         ),
                         let miners: PopulationStats.Row = tile.properties?.pops.type[.Miner],
@@ -689,7 +689,7 @@ extension GameSnapshot {
         _ id: PopID,
         _ item: CashFlowItem,
     ) -> Tooltip? {
-        self.context.pops[id]?.cashFlow.tooltip(rules: self.context.rules, item: item)
+        self.context.pops[id]?.stats.cashFlow.tooltip(rules: self.context.rules, item: item)
     }
 
     func tooltipPopBudgetItem(

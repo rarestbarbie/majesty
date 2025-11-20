@@ -22,4 +22,22 @@ extension ProfitMargins {
 
         return self.operating %/ self.revenue
     }
+
+    /// Ranges between 0 and 1, where 0 means break-even and 1 means losing more than total
+    /// revenue.
+    var operatingLossParameter: Double {
+        guard
+        let operatingMargin: Fraction else {
+            return 1
+        }
+        if  operatingMargin.n > 0 {
+            return 0
+        }
+        let operatingLoss: Int64 = -operatingMargin.n
+        if  operatingLoss >= operatingMargin.d {
+            return 1
+        } else {
+            return Double.init(operatingLoss %/ operatingMargin.d)
+        }
+    }
 }

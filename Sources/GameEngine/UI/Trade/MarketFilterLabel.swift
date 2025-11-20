@@ -18,7 +18,7 @@ extension MarketFilterLabel {
     var name: String {
         switch self {
         case .currency(let label): label.name
-        case .resource(let label): label.name
+        case .resource(let label): label.title
         }
     }
 }
@@ -41,7 +41,7 @@ extension MarketFilterLabel: JavaScriptEncodable {
 
         case .resource(let self):
             js[.icon] = self.icon
-            js[.name] = self.name
+            js[.name] = self.title
         }
     }
 }
