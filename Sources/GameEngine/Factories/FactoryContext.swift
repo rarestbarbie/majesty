@@ -338,10 +338,11 @@ extension FactoryContext: TransactingContext {
                         turn.jobs.fire[self.state.id, type] = block
                     }
                 } else if workers.count > 0, profit.operating < 0 {
-                    /// if gross profit is negative, fire up to 25% of workers
-                    /// otherwise, fire up to 5% of workers
-                    let firable: Int64 = workers.count / (profit.gross < 0 ? 4 : 20)
-                    if  firable > 0, turn.random.roll(1, 7) {
+                    /// Fire up to 20% of workers based on operating loss.
+                    /// If gross profit is also negative, this happens more quickly.
+                    let l: Double = 0.2 * profit.operatingLossParameter
+                    let firable: Int64 = .init(l * Double.init(workers.count))
+                    if  firable > 0, turn.random.roll(1, profit.gross < 0 ? 3 : 7) {
                         turn.jobs.fire[self.state.id, type.workers.unit] = .init(
                             size: .random(in: 0 ... firable, using: &turn.random.generator)
                         )
