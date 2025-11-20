@@ -250,7 +250,11 @@ extension PopContext: TransactingContext {
             )
             self.state.inventory.out.deposit(
                 from: self.output,
-                scalingFactor: (self.state.z.size, 1)
+                scalingFactor: (
+                    self.state.z.size,
+                    // yesterday’s fulfillment, not today’s, as we do not yet know it
+                    self.state.type.stratum == .Ward ? self.state.y.fl : 1
+                )
             )
 
             for j: Int in self.state.mines.values.indices {
