@@ -539,8 +539,8 @@ extension GameSnapshot {
                     }
                     if  let yieldRank: Int = mine.state.z.yieldRank,
                         let (chance, spawn): (Fraction, SpawnWeight) = mine.type.chance(
-                            size: mine.state.z.size,
                             tile: tile.geology.id,
+                            size: mine.state.z.size,
                             yieldRank: yieldRank
                         ),
                         let miners: PopulationStats.Row = tile.properties?.pops.type[.Miner],

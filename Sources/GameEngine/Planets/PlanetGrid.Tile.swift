@@ -107,7 +107,7 @@ extension PlanetGrid.Tile {
     func pickFactory(
         among factories: OrderedDictionary<FactoryType, FactoryMetadata>,
         using random: inout PseudoRandom,
-    ) -> FactoryType? {
+    ) -> FactoryMetadata? {
         guard
         let pops: PopulationStats = self.properties?.pops,
         random.roll(
@@ -117,67 +117,106 @@ extension PlanetGrid.Tile {
             return nil
         }
 
-        let choices: [FactoryType] = factories.reduce(into: []) {
-            if self.factoriesAlreadyPresent.contains($1.key) {
-                return
+        let choices: [FactoryMetadata] = factories.values.filter {
+            if self.factoriesAlreadyPresent.contains($0.id) {
+                return false
             }
-            if  $1.value.terrainAllowed.isEmpty {
-                $0.append($1.key)
+            if  $0.terrainAllowed.isEmpty {
+                return true
             } else if
-                $1.value.terrainAllowed.contains(self.terrain.id) {
-                $0.append($1.key)
+                $0.terrainAllowed.contains(self.terrain.id) {
+                return true
+            } else {
+                return false
             }
         }
         return choices.randomElement(using: &random.generator)
     }
+
     func pickMine(
         among mines: OrderedDictionary<MineType, MineMetadata>,
-        using random: inout PseudoRandom,
-    ) -> [(type: MineType, size: Int64)] {
+        turn: inout Turn,
+    ) -> (type: MineMetadata, size: Int64)? {
         // mandatory mines
-        for (missing, mine): (MineType, MineMetadata) in mines {
-            if !self.minesAlreadyPresent.keys.contains(missing), mine.spawn.isEmpty {
-                return [(type: missing, size: mine.scale)]
+        for mine: MineMetadata in mines.values {
+            if !self.minesAlreadyPresent.keys.contains(mine.id), mine.spawn.isEmpty {
+                return (mine, size: mine.scale)
             }
         }
 
         guard
-        let miners: PopulationStats.Row = self.properties?.pops.type[.Miner],
-        let factor: Fraction = miners.mineExpansionFactor else {
-            return []
+        let region: RegionalProperties = self.properties,
+        let factor: Fraction = region.pops.type[.Miner]?.mineExpansionFactor else {
+            return nil
         }
 
-        guard random.roll(factor.n, factor.d) else {
-            return []
+        guard turn.random.roll(factor.n, factor.d) else {
+            return nil
         }
 
-        return mines.reduce(into: []) {
-            let current: (size: Int64, yieldRank: Int)
-            switch self.minesAlreadyPresent[$1.key] {
-            case (size: let size, let yieldRank?)?:
-                current = (size, yieldRank)
-
-            case (size: _, nil)?:
-                return
-
-            case nil:
-                current = (0, 0)
-            }
-
+        var existing: [(MineMetadata, size: Int64, yieldRank: Int)] = mines.values.reduce(
+            into: []
+        ) {
             guard
-            let (chance, spawn): (Fraction, SpawnWeight) = $1.value.chance(
-                size: current.size,
-                tile: self.geology.id,
-                yieldRank: current.yieldRank
-            ) else {
+            case (size: let size, let yieldRank?)? = self.minesAlreadyPresent[$1.id] else {
                 return
             }
 
-            if  random.roll(chance.n , chance.d) {
-                let scale: Int64 = $1.value.scale * spawn.size
-                let size: Int64 = .random(in: 1 ... scale, using: &random.generator)
-                $0.append(($1.key, size: size))
+            $0.append(($1, size: size, yieldRank: yieldRank))
+        }
+
+        // To reduce arbitrary ordering bias, give preference to higher-yield mines
+        // (this means the probabilities shown in the UI are very slightly inaccurate)
+        existing.sort { $0.yieldRank < $1.yieldRank }
+
+        for (type, size, yieldRank): (MineMetadata, Int64, Int) in existing {
+            guard
+            let (chance, spawn): (Fraction, SpawnWeight) = type.chance(
+                tile: self.geology.id,
+                size: size,
+                yieldRank: yieldRank
+            ) else {
+                continue
+            }
+
+            if  turn.random.roll(chance.n , chance.d) {
+                let scale: Int64 = type.scale * spawn.size
+                return (type, size: .random(in: 1 ... scale, using: &turn.random.generator))
             }
         }
+
+        guard existing.count < 3 else {
+            return nil
+        }
+
+        // we didn’t expand an existing mine, and we have room for a new one
+        // we always try the one with the highest theoretical yield, even if the chance of
+        // spawning it is lower than others
+        var yieldMax: Double = 0
+        var best: (chance: Fraction, spawn: SpawnWeight, mine: MineMetadata)?
+        for mine: MineMetadata in mines.values
+            where !self.minesAlreadyPresent.keys.contains(mine.id) {
+            //  computing theoretical yield is expensive, so only do it for mines that can spawn
+            //  on this tile’s geology
+            guard
+            let (chance, spawn): (Fraction, SpawnWeight) = mine.chanceNew(
+                tile: self.geology.id
+            ) else {
+                continue
+            }
+            let (_, yield): (_, value: Double) = mine.yield(tile: region, turn: turn)
+            if  yield > yieldMax {
+                yieldMax = yield
+                best = (chance, spawn, mine)
+            }
+        }
+
+        if  let (chance, spawn, mine): (Fraction, SpawnWeight, MineMetadata) = best,
+            turn.random.roll(chance.n , chance.d) {
+            let scale: Int64 = mine.scale * spawn.size
+            return (mine, size: .random(in: 1 ... scale, using: &turn.random.generator))
+        }
+
+        return nil
     }
 }
