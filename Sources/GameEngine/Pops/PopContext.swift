@@ -93,22 +93,24 @@ extension PopContext {
 }
 extension PopContext: AllocatingContext {
     mutating func allocate(turn: inout Turn) {
+        guard let authority: CountryProperties = self.region?.occupiedBy else {
+            return
+        }
+
         if  self.state.type.stratum == .Ward {
             if  self.state.z.pa < 0.5 {
-                let p: Double = 0.000_1 * (0.5 - self.state.z.pa)
+                let r: Decimal = 1‰ + authority.modifiers.livestockCullingEfficiency.value
+                let p: Double = Double.init(r) * (0.5 - self.state.z.pa)
                 self.state.z.size -= Binomial[self.state.z.size, p].sample(
                     using: &turn.random.generator
                 )
             } else {
-                let p: Double = 0.000_1 * (self.state.z.pa - 0.5)
+                let r: Decimal = 1‰ + authority.modifiers.livestockBreedingEfficiency.value
+                let p: Double = Double.init(r) * (self.state.z.pa - 0.5)
                 self.state.z.size += Binomial[self.state.z.size, p].sample(
                     using: &turn.random.generator
                 )
             }
-        }
-
-        guard let authority: CountryProperties = self.region?.occupiedBy else {
-            return
         }
 
         let currency: Fiat = authority.currency.id

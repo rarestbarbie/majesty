@@ -10,10 +10,16 @@ struct CountryModifiers {
     private(set) var miningEfficiency: [MineType: Stack<Decimal>]
     private(set) var miningWidth: [MineType: Stack<Decimal>]
 
+    private(set) var livestockBreedingEfficiency: Stack<Decimal>
+    private(set) var livestockCullingEfficiency: Stack<Decimal>
+
     init() {
         self.factoryProductivity = [:]
         self.miningEfficiency = [:]
         self.miningWidth = [:]
+
+        self.livestockBreedingEfficiency = .zero
+        self.livestockCullingEfficiency = .zero
     }
 }
 extension CountryModifiers {
@@ -52,6 +58,17 @@ extension CountryModifiers {
                 }
             case .miningEfficiency(let exact, let type?):
                 self.miningEfficiency[type, default: .zero].stack(
+                    with: exact.value,
+                    from: technology
+                )
+
+            case .livestockBreedingEfficiency(let exact):
+                self.livestockBreedingEfficiency.stack(
+                    with: exact.value,
+                    from: technology
+                )
+            case .livestockCullingEfficiency(let exact):
+                self.livestockCullingEfficiency.stack(
                     with: exact.value,
                     from: technology
                 )
