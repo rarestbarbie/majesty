@@ -263,10 +263,8 @@ extension LocalMarket {
 
         if  self.storage {
             if  self.today.supply < self.today.demand {
-                let size: Int64 = min(
-                    self.today.demand - self.today.supply,
-                    self.stockpile.total
-                )
+                let deficit: Int64 = self.today.demand - self.today.supply
+                let size: Int64 = min(deficit, self.stockpile.total)
                 if  size > 0 {
                     // when selling, maker order goes on the ask side
                     let maker: Order = .init(
@@ -278,15 +276,23 @@ extension LocalMarket {
                     supplyAvailable += size
                     self.supply.append(maker)
                 }
-            } else {
-                let limit: Int64 = (self.today.supply - self.today.demand) / 2
-                if  limit > 0,
-                    self.stabilizationFund.total > 0,
-                    let size: Int64 = Self.quantity(
-                        budget: self.stabilizationFund.total,
-                        limit: limit,
+            } else if self.stabilizationFund.total > 0 {
+                /// if it can afford to, the stabilization fund will buy all excess supply,
+                /// and it will attempt to absorb at least half of the surplus regardless
+                let surplus: Int64 = self.today.supply - self.today.demand
+                let size: Int64 = max(
+                    Self.quantity(
+                        budget: self.stabilizationFund.total / 16,
+                        limit: surplus,
                         price: self.today.bid
-                    ) {
+                    ) ?? 0,
+                    Self.quantity(
+                        budget: self.stabilizationFund.total,
+                        limit: surplus / 2,
+                        price: self.today.bid
+                    ) ?? 0
+                )
+                if  size > 0 {
                     // when buying, maker order goes on the bid side
                     let maker: Order = .init(
                         by: nil,
