@@ -689,7 +689,7 @@ extension GameSnapshot {
         _ id: PopID,
         _ item: CashFlowItem,
     ) -> Tooltip? {
-        self.context.pops[id]?.cashFlow.tooltip(rules: self.context.rules, item: item)
+        self.context.pops[id]?.stats.cashFlow.tooltip(rules: self.context.rules, item: item)
     }
 
     func tooltipPopBudgetItem(

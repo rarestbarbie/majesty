@@ -67,7 +67,7 @@ extension MineContext {
                 job: .mine(self.state.id),
                 bid: 1,
                 size: .random(
-                    in: 0 ... max(1, minersToHire / 20),
+                    in: 0 ... max(1, minersToHire / 50),
                     using: &turn.random.generator
                 )
             )
