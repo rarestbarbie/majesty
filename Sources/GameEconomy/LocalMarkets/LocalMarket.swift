@@ -12,6 +12,9 @@ import Random
     public var stockpile: Reservoir
     public var yesterday: Interval
     public var today: Interval
+    // These actually are stateful, even though they are almost always correlated with other
+    // state. The reason is because local markets can be instantiated mid-turn, and such markets
+    // won’t be synchronized with tile authorities until the next turn.
     public var limit: (
         min: LocalPriceLevel?,
         max: LocalPriceLevel?
