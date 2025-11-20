@@ -268,6 +268,7 @@ extension LocalMarket {
         var demandAvailable: Int64 = self.today.demand
         var supplyAvailable: Int64 = self.today.supply
 
+        stabilization:
         if  self.storage {
             if  self.today.supply < self.today.demand {
                 let deficit: Int64 = self.today.demand - self.today.supply
@@ -284,18 +285,24 @@ extension LocalMarket {
                     self.supply.append(maker)
                 }
             } else if self.stabilizationFund.total > 0 {
+                let capacity: Int64 = self.today.supply * 30
+                let surplus: Int64 = self.today.supply - self.today.demand
+                let absorb: Int64 = min(surplus, max(0, capacity - self.stockpile.total))
+                if  absorb <= 0 {
+                    break stabilization
+                }
+
                 /// if it can afford to, the stabilization fund will buy all excess supply,
                 /// and it will attempt to absorb at least half of the surplus regardless
-                let surplus: Int64 = self.today.supply - self.today.demand
                 let size: Int64 = max(
                     Self.quantity(
                         budget: self.stabilizationFund.total / 16,
-                        limit: surplus,
+                        limit: absorb,
                         price: self.today.bid
                     ) ?? 0,
                     Self.quantity(
                         budget: self.stabilizationFund.total,
-                        limit: surplus / 2,
+                        limit: absorb / 2,
                         price: self.today.bid
                     ) ?? 0
                 )
