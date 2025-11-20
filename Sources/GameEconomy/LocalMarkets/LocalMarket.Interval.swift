@@ -38,18 +38,11 @@ extension LocalMarket.Interval {
     }
 
     @inlinable public func priceIncrement(stockpile: Reservoir) -> LocalPrice.TickRate {
-        if  self.supply < self.demand {
-            if  stockpile.removed >= (self.demand - self.supply) / 2 {
-                return .increased
-            }
-        } else if
-            self.supply > self.demand {
-            if  stockpile.added >= (self.supply - self.demand) / 2 {
-                return .reduced
-            }
+        if  self.supply > self.demand, stockpile.added >= (self.supply - self.demand) / 2 {
+            return .reduced
+        } else {
+            return .nominal
         }
-
-        return .nominal
     }
 
     var prices: (bid: LocalPrice, ask: LocalPrice) { (self.bid, self.ask) }

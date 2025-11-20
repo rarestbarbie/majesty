@@ -172,21 +172,12 @@ extension ResourceInputs {
                     today was \(em: average[..2])
                     """
 
-                    switch today.priceIncrement(stockpile: market.stockpile) {
-                    case .increased:
-                        $0[>] = """
-                        We are \(em: "drawing down") the local stockpile, which is \
-                        \(em: "accelerating") the price increase
-                        """
-                        return
-                    case .reduced:
+                    if case .reduced = today.priceIncrement(stockpile: market.stockpile) {
                         $0[>] = """
                         We are \(em: "dispensing") from the stabilization fund, which is \
                         \(em: "retarding") the price decrease
                         """
                         return
-                    case .nominal:
-                        break
                     }
                 }
                 if today.supply <= today.demand {

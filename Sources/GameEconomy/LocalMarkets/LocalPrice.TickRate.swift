@@ -4,7 +4,6 @@ extension LocalPrice {
     @frozen public enum TickRate {
         case reduced
         case nominal
-        case increased
     }
 }
 extension LocalPrice.TickRate {
@@ -12,7 +11,6 @@ extension LocalPrice.TickRate {
         switch self {
         case .reduced: LocalPrice.cent * 2
         case .nominal: LocalPrice.cent
-        case .increased: LocalPrice.cent / 2
         }
     }
 }
