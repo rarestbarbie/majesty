@@ -119,6 +119,14 @@
             "399N-1,0",
             // Caucasus
             "399N2,-2"
+        ],
+        "minwage": 35,
+        "researched": [
+            1,
+            2,
+            3,
+            4,
+            5
         ]
     },
     {
@@ -138,6 +146,14 @@
             "399N2,-4",
             // Bay of Bengal
             "399S2,-4"
+        ],
+        "minwage": 35,
+        "researched": [
+            1,
+            2,
+            3,
+            4,
+            5
         ]
     },
     {
@@ -155,6 +171,14 @@
         "controlled_tiles": [
             // Thailand
             "399N0,-3"
+        ],
+        "minwage": 35,
+        "researched": [
+            1,
+            2,
+            3,
+            4,
+            5
         ]
     },
     {
@@ -174,6 +198,14 @@
             "399N4,-1",
             // Congo
             "399S4,-2"
+        ],
+        "minwage": 35,
+        "researched": [
+            1,
+            2,
+            3,
+            4,
+            5
         ]
     },
     {
@@ -191,6 +223,14 @@
         "controlled_tiles": [
             // Ethiopia
             "399N4,-3"
+        ],
+        "minwage": 35,
+        "researched": [
+            1,
+            2,
+            3,
+            4,
+            5
         ]
     }
 ]

@@ -354,7 +354,7 @@
     "Nuclear Power Plant": {
         "materials": {
             "Water": 1,
-            "Uranium": 1
+            "Nuclear Fuel": 1
         },
         "output": {
             "Electricity": 1200
@@ -430,14 +430,15 @@
     "Uranium Enrichment Facility": {
         "materials": {
             "Machine Parts": 2,
-            "Electricity": 40
+            "Electricity": 10,
+            "Uranium": 40
         },
         "output": {
-            "Uranium": 20
+            "Nuclear Fuel": 20
         },
         "workers": {
-            "Driver": 5000,
-            "Engineer": 2000
+            "Driver": 2000,
+            "Engineer": 5000
         }
     },
     "Vape Factory": {

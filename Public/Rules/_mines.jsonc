@@ -91,6 +91,25 @@
         }
     },
 
+    "Uranium Mine": {
+        "miner": "Miner",
+        "decay": true,
+        "scale": 200000000,
+        "spawn": {
+            "Earth_Continental_Crust": {
+                "rate": "0.01",
+                "size": 1
+            },
+            "Earth_Sedimentary_Basin": {
+                "rate": "0.05",
+                "size": 1
+            }
+        },
+        "base": {
+            "Uranium": 800
+        }
+    },
+
     "Natural Gas Field": {
         "miner": "Miner",
         "decay": true,
