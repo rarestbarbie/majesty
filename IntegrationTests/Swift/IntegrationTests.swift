@@ -1,9 +1,5 @@
-import Glibc
-
 import GameEngine
 import GameIDs
-import JavaScriptKit
-
 import JavaScriptInterop
 import JavaScriptKit
 
@@ -42,8 +38,8 @@ extension IntegrationTestFile: JavaScriptDecodable {
         do {
             try Self.HashRules()
         } catch {
-            print("Integration test 'HashRules' failed: \(error)")
-            exit(1)
+            // 'fatalError' is used instead of 'exit(1)' because Glibc is not available in Wasm.
+            fatalError("Integration test 'HashRules' failed: \(error)")
         }
 
         for target: GameDate in [
@@ -59,12 +55,11 @@ extension IntegrationTestFile: JavaScriptDecodable {
                     """
                 )
             } catch {
-                print(
+                fatalError(
                     """
                     Integration test 'HashGameState' failed for target \(target): \(error)
                     """
                 )
-                exit(1)
             }
 
             outputs.append(
