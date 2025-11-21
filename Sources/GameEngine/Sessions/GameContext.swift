@@ -374,20 +374,23 @@ extension GameContext {
                 self.report(resource: resource, fill: $0, side: $1)
             }
         }
-        turn.stockMarkets.turn(random: &turn.random) {
-            switch $2.asset {
-            case .factory(let id):
-                self.factories[modifying: id].state.equity.trade(
-                    random: &$0,
-                    bank: &turn.bank,
-                    fill: $2
-                )
-            case .pop(let id):
-                self.pops[modifying: id].state.equity.trade(
-                    random: &$0,
-                    bank: &turn.bank,
-                    fill: $2
-                )
+        turn.stockMarkets.turn {
+            let shape: StockMarket.Shape = .init(r: 0.02)
+            $0.match(shape: shape, random: &turn.random) {
+                switch $2.asset {
+                case .factory(let id):
+                    self.factories[modifying: id].state.equity.trade(
+                        random: &$0,
+                        bank: &turn.bank,
+                        fill: $2
+                    )
+                case .pop(let id):
+                    self.pops[modifying: id].state.equity.trade(
+                        random: &$0,
+                        bank: &turn.bank,
+                        fill: $2
+                    )
+                }
             }
         }
 

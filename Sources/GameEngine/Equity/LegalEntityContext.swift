@@ -14,7 +14,7 @@ extension LegalEntityContext {
         .init(
             id: self.lei,
             stockPrice: .init(exact: self.equity.sharePrice),
-            attraction: self.state.z.pa,
+            profitability: self.state.z.profitability,
         )
     }
 }

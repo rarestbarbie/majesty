@@ -222,7 +222,7 @@ extension FactoryContext: TransactingContext {
                 state: self.state.z,
                 weights: weights,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
-                d: (30, 60, 365, utilization * self.state.z.pa)
+                d: (30, 60, 365, utilization * max(0, self.state.z.profitability))
             )
 
             let sharesTarget: Int64 = self.state.size.level * self.type.sharesPerLevel
@@ -269,7 +269,7 @@ extension FactoryContext: TransactingContext {
 
         switch budget {
         case .constructing(let budget):
-            self.state.z.pa = 1
+            self.state.z.profitability = 1
             self.construct(
                 policy: country,
                 budget: budget.l,
@@ -280,7 +280,7 @@ extension FactoryContext: TransactingContext {
         case .liquidating(let budget):
             self.liquidate(policy: country, budget: budget, turn: &turn)
 
-            self.state.z.pa = 0
+            self.state.z.profitability = -1
             self.state.spending.buybacks += turn.bank.buyback(
                 security: self.security,
                 budget: budget.buybacks,
@@ -338,9 +338,9 @@ extension FactoryContext: TransactingContext {
                         turn.jobs.fire[self.state.id, type] = block
                     }
                 } else if workers.count > 0, profit.operating < 0 {
-                    /// Fire up to 20% of workers based on operating loss.
+                    /// Fire up to 40% of workers based on operating loss.
                     /// If gross profit is also negative, this happens more quickly.
-                    let l: Double = 0.2 * profit.operatingLossParameter
+                    let l: Double = max(0, -0.4 * profit.operatingProfitability)
                     let firable: Int64 = .init(l * Double.init(workers.count))
                     if  firable > 0, profit.gross < 0 || turn.random.roll(1, 3) {
                         turn.jobs.fire[self.state.id, type.workers.unit] = .init(
@@ -376,13 +376,7 @@ extension FactoryContext: TransactingContext {
                 )
             )
 
-            if  self.state.size.level == 0 {
-                self.state.z.pa = 1
-            } else if profit.operating > 0 {
-                self.state.z.pa = min(1, self.state.z.pa + 0.01)
-            } else {
-                self.state.z.pa = max(0, self.state.z.pa - 0.01)
-            }
+            self.state.z.mix(profitability: self.state.profit.operatingProfitability)
         }
     }
 
@@ -398,8 +392,8 @@ extension FactoryContext: TransactingContext {
 
         if  self.workers?.count ?? 0 == 0,
             self.clerks?.count ?? 0 == 0,
-            self.state.y.pa <= 0,
-            self.state.z.pa <= 0 {
+            self.state.y.profitability <= 0,
+            self.state.z.profitability <= 0 {
             self.state.liquidation = .init(started: turn.date, burning: self.equity.shareCount)
         } else {
             self.state.equity.split(
