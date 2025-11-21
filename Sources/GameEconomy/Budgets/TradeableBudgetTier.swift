@@ -10,7 +10,7 @@ extension TradeableBudgetTier {
     public static func compute(
         demands: OrderedDictionary<Resource, ResourceInput>,
         markets: borrowing BlocMarkets,
-        currency: Fiat
+        currency: CurrencyID
     ) -> Self {
         .init(
             total: demands.reduce(0) {

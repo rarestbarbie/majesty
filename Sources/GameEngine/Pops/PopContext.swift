@@ -138,7 +138,7 @@ extension PopContext: AllocatingContext {
             }
         }
 
-        let currency: Fiat = authority.currency.id
+        let currency: CurrencyID = authority.currency.id
         let balance: Int64 = turn.bank[account: self.lei].settled
 
         self.state.inventory.out.sync(with: self.output, releasing: 1)

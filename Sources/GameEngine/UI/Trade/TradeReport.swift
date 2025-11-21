@@ -23,13 +23,13 @@ extension TradeReport: PersistentReport {
     }
 
     mutating func update(from snapshot: borrowing GameSnapshot) {
-        let currencies: [Fiat: Currency] = snapshot.countries.state.reduce(into: [:]) {
+        let currencies: [CurrencyID: Currency] = snapshot.countries.state.reduce(into: [:]) {
             $0[$1.currency.id] = $1.currency
         }
 
         let filterlists: (
             resource: [Resource: ResourceLabel],
-            currency: [Fiat: CurrencyLabel]
+            currency: [CurrencyID: CurrencyLabel]
         ) = snapshot.markets.tradeable.values.reduce(into: ([:], [:])) {
             if  case .good(let id) = $1.id.x {
                 $0.resource[id] = snapshot.rules.resources[id].label

@@ -5,8 +5,8 @@ import Testing
 @Suite struct ConjugationTests {
     @Test static func Symmetry() throws {
         var exchange: BlocMarkets = .init()
-        let UNB: Fiat = 0
-        let MAR: Fiat = 1
+        let UNB: CurrencyID = 0
+        let MAR: CurrencyID = 1
 
         exchange[MAR / UNB].assets = .init(base: 1, quote: 4)
 

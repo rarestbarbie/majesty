@@ -1,6 +1,3 @@
-// todo: rename
-public typealias Fiat = CurrencyID
-
 @frozen public struct CurrencyID: RawRepresentable, Equatable, Hashable, Sendable {
     public let rawValue: Int16
 

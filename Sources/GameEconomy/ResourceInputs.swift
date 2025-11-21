@@ -50,7 +50,7 @@ extension ResourceInputs {
     public mutating func trade(
         stockpileDays target: ResourceStockpileTarget,
         spendingLimit budget: Int64,
-        in currency: Fiat,
+        in currency: CurrencyID,
         on exchange: inout BlocMarkets,
     ) -> TradeProceeds {
         let weights: [Double] = self.tradeable.values.map {
@@ -72,7 +72,7 @@ extension ResourceInputs {
     private mutating func trade(
         stockpileDays: ClosedRange<Int64>,
         spendingLimit: Int64,
-        in currency: Fiat,
+        in currency: CurrencyID,
         on exchange: inout BlocMarkets,
         weights: ArraySlice<Double>,
     ) -> TradeProceeds {

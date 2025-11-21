@@ -10,7 +10,7 @@ extension ResourceInputWeights {
     init(
         tiers: __shared (ResourceInputs, ResourceInputs, ResourceInputs),
         location: Address,
-        currency: Fiat,
+        currency: CurrencyID,
         turn: borrowing Turn,
     ) {
         let (l, e, x): (ResourceInputs, ResourceInputs, ResourceInputs) = tiers

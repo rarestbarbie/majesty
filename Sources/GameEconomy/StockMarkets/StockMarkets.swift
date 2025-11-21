@@ -4,7 +4,7 @@ import OrderedCollections
 
 @frozen public struct StockMarkets {
     // iteration order currently does not matter, but it might in the future
-    @usableFromInline var regions: OrderedDictionary<Fiat, StockMarket>
+    @usableFromInline var regions: OrderedDictionary<CurrencyID, StockMarket>
 
     @inlinable public init() {
         self.regions = [:]
@@ -18,7 +18,7 @@ extension StockMarkets {
     }
 }
 extension StockMarkets {
-    public mutating func queueRandomPurchase(buyer: LEI, value: Int64, currency: Fiat) {
+    public mutating func queueRandomPurchase(buyer: LEI, value: Int64, currency: CurrencyID) {
         guard value > 0 else {
             return
         }
@@ -28,7 +28,7 @@ extension StockMarkets {
     }
 
     public mutating func issueShares(
-        currency: Fiat,
+        currency: CurrencyID,
         quantity: Int64,
         security: StockMarket.Security
     ) {

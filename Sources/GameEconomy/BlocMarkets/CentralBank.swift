@@ -1,7 +1,7 @@
 import GameIDs
 
 struct CentralBank {
-    let id: Fiat
+    let id: CurrencyID
     /// The balance of the central bank in its own currency.
     ///
     /// This is always a negative number, because the central bank is the issuer of the
@@ -54,9 +54,9 @@ struct CentralBank {
     /// A Liquidity Swap signifies deep diplomatic trust, as it functionally offers the
     /// other player a blank check to withdraw an infinite amount of the player’s own
     /// currency.
-    var reserve: [Fiat: Int]
+    var reserve: [CurrencyID: Int]
 
-    init(id: Fiat) {
+    init(id: CurrencyID) {
         self.id = id
         self.balance = 0
         self.reserve = [:]

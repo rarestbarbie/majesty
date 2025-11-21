@@ -38,7 +38,7 @@ extension InventoryBreakdown {
 
     mutating func update(from pop: PopContext, in snapshot: borrowing GameSnapshot) {
         guard
-        let currency: Fiat = pop.region?.occupiedBy.currency.id else {
+        let currency: CurrencyID = pop.region?.occupiedBy.currency.id else {
             return
         }
 
@@ -95,7 +95,7 @@ extension InventoryBreakdown {
 
     mutating func update(from factory: FactoryContext, in snapshot: borrowing GameSnapshot) {
         guard
-        let currency: Fiat = factory.region?.occupiedBy.currency.id else {
+        let currency: CurrencyID = factory.region?.occupiedBy.currency.id else {
             return
         }
 
@@ -160,7 +160,7 @@ extension InventoryBreakdown {
     private mutating func update(
         from inputs: ResourceInputs,
         tier: ResourceTierIdentifier,
-        currency: Fiat,
+        currency: CurrencyID,
         location: Address,
         snapshot: borrowing GameSnapshot,
     ) {
@@ -196,7 +196,7 @@ extension InventoryBreakdown {
         from outputs: ResourceOutputs,
         mine: MineID? = nil,
         name: String? = nil,
-        currency: Fiat,
+        currency: CurrencyID,
         location: Address,
         snapshot: borrowing GameSnapshot,
     ) {
