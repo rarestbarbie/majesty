@@ -420,7 +420,11 @@ extension GameContext {
 }
 
 extension GameContext {
-    private mutating func report(resource: Resource, fill: LocalMarket.Fill, side: LocalMarket.Side) {
+    private mutating func report(
+        resource: Resource,
+        fill: LocalMarket.Fill,
+        side: LocalMarket.Side
+    ) {
         switch fill.entity {
         case .factory(let id):
             self.factories[modifying: id].state.inventory.report(
@@ -701,7 +705,8 @@ extension GameContext {
                 if  let type: FactoryMetadata = factory {
                     let factory: Factory.Section = .init(type: type.id, tile: tile)
                     try self.factories[factory] {
-                        _ in type
+                        _ in
+                        type
                     } update: {
                         $1.size = .init(level: 0)
                     }
@@ -710,7 +715,8 @@ extension GameContext {
                 if  let (type, size): (MineMetadata, Int64) = mine {
                     let mine: Mine.Section = .init(type: type.id, tile: tile)
                     try self.mines[mine] {
-                        _ in type
+                        _ in
+                        type
                     } update: {
                         $1.z.size += size
                         $1.last = Mine.Expansion.init(size: size, date: turn.date)

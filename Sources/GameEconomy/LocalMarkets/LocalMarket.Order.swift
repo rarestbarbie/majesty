@@ -13,7 +13,14 @@ extension LocalMarket {
         @usableFromInline var valueMatched: Int64
 
 
-        init(by: LEI?, type: OrderType, memo: Memo?, size: Int64, unitsMatched: Int64 = 0, valueMatched: Int64 = 0) {
+        init(
+            by: LEI?,
+            type: OrderType,
+            memo: Memo?,
+            size: Int64,
+            unitsMatched: Int64 = 0,
+            valueMatched: Int64 = 0
+        ) {
             self.by = by
             self.type = type
             self.memo = memo
@@ -24,7 +31,11 @@ extension LocalMarket {
     }
 }
 extension LocalMarket.Order {
-    mutating func fill(_ side: LocalMarket.Side, price: (bid: LocalPrice, ask: LocalPrice), units: Int64) {
+    mutating func fill(
+        _ side: LocalMarket.Side,
+        price: (bid: LocalPrice, ask: LocalPrice),
+        units: Int64
+    ) {
         self.unitsMatched = units
 
         switch (side, self.type) {

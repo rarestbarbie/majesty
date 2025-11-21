@@ -8,7 +8,12 @@ extension LocalMarket {
         public var supply: Int64
         public var demand: Int64
 
-        @inlinable public init(bid: LocalPrice, ask: LocalPrice, supply: Int64 = 0, demand: Int64 = 0) {
+        @inlinable public init(
+            bid: LocalPrice,
+            ask: LocalPrice,
+            supply: Int64 = 0,
+            demand: Int64 = 0
+        ) {
             self.bid = bid
             self.ask = ask
             self.supply = supply
@@ -100,7 +105,10 @@ extension LocalMarket.Interval {
         return nil
     }
 
-    private func tickedUp(rate: LocalPrice.TickRate, limit: LocalPrice, spread: Double?) ->  (bid: LocalPrice, ask: LocalPrice) {
+    private func tickedUp(rate: LocalPrice.TickRate, limit: LocalPrice, spread: Double?) ->  (
+        bid: LocalPrice,
+        ask: LocalPrice
+    ) {
         let ask: LocalPrice = min(self.ask.tickedUp(rate: rate), limit)
 
         guard let spread: Double = spread else {
@@ -111,7 +119,10 @@ extension LocalMarket.Interval {
         return (bid: max(self.bid, bid), ask: ask)
     }
 
-    private func tickedDown(rate: LocalPrice.TickRate, limit: LocalPrice, spread: Double?) -> (bid: LocalPrice, ask: LocalPrice) {
+    private func tickedDown(rate: LocalPrice.TickRate, limit: LocalPrice, spread: Double?) -> (
+        bid: LocalPrice,
+        ask: LocalPrice
+    ) {
         let bid: LocalPrice = max(self.bid.tickedDown(rate: rate), limit)
 
         guard let spread: Double = spread else {

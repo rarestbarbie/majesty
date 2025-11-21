@@ -75,7 +75,10 @@ extension MineMetadata {
         return min(size, 1 + size <> factor)
     }
 
-    func yield(tile: RegionalProperties, turn: borrowing Turn) -> (efficiency: Double, value: Double) {
+    func yield(tile: RegionalProperties, turn: borrowing Turn) -> (
+        efficiency: Double,
+        value: Double
+    ) {
         let authority: CountryProperties = tile.occupiedBy
 
         let efficiency: Double
@@ -104,4 +107,3 @@ extension MineMetadata {
         return (efficiency: efficiency, value: yieldBeforeScaling * efficiency)
     }
 }
-

@@ -46,9 +46,27 @@ extension LocalMarkets {
         as lei: LEI,
         in tile: Address,
     ) {
-        self.buy(budget: tier.0.budget, entity: lei, memo: .tier(0), tile: tile, weights: tier.0.weights)
-        self.buy(budget: tier.1.budget, entity: lei, memo: .tier(1), tile: tile, weights: tier.1.weights)
-        self.buy(budget: tier.2.budget, entity: lei, memo: .tier(2), tile: tile, weights: tier.2.weights)
+        self.buy(
+            budget: tier.0.budget,
+            entity: lei,
+            memo: .tier(0),
+            tile: tile,
+            weights: tier.0.weights
+        )
+        self.buy(
+            budget: tier.1.budget,
+            entity: lei,
+            memo: .tier(1),
+            tile: tile,
+            weights: tier.1.weights
+        )
+        self.buy(
+            budget: tier.2.budget,
+            entity: lei,
+            memo: .tier(2),
+            tile: tile,
+            weights: tier.2.weights
+        )
         self.sell(supply: selling, entity: lei, tile: tile)
     }
 

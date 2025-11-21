@@ -67,7 +67,10 @@ extension GameStart {
         var factory: FactoryID = 0
         for group: FactorySeedGroup in self.factories {
             for seed: Symbol in group.factories {
-                let section: Factory.Section = .init(type: try symbols.static.factories[seed], tile: group.tile)
+                let section: Factory.Section = .init(
+                    type: try symbols.static.factories[seed],
+                    tile: group.tile
+                )
                 var factory: Factory = .init(id: factory.increment(), section: section)
 
                 factory.size = .init(level: 0, growthProgress: Factory.Size.growthRequired - 1)
@@ -79,7 +82,11 @@ extension GameStart {
         var pop: PopID = Self.highest(in: self.pops.lazy.map(\.pops).joined())
         for group: PopSeedGroup in self.pops {
             for seed: PopSeed in group.pops {
-                let section: Pop.Section = .init(culture: seed.race.name, type: seed.type, tile: group.tile)
+                let section: Pop.Section = .init(
+                    culture: seed.race.name,
+                    type: seed.type,
+                    tile: group.tile
+                )
                 var pop: Pop = .init(id: seed.id ?? pop.increment(), section: section)
 
                 pop.y.size = seed.size

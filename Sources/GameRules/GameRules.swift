@@ -172,7 +172,12 @@ extension GameRules {
                 TerrainMetadata.init(identity: $0, color: $1.color)
             },
             pops: try PopType.allCases.map(to: [PopType: PopMetadata].self) {
-                try PopMetadata.init(id: $0, effects: pops, symbols: symbols, resources: resources)
+                try PopMetadata.init(
+                    id: $0,
+                    effects: pops,
+                    symbols: symbols,
+                    resources: resources
+                )
             },
             settings: settings
         )

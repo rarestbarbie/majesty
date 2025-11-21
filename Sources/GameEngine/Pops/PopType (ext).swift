@@ -8,7 +8,7 @@ extension PopType {
         case .Editor: "Wages"
         case .Miner: "Market earnings"
         case .Server: "Wages"
-        case .Contractor:"Wages"
+        case .Contractor: "Wages"
         case .Engineer: "Salaries"
         case .Farmer: "Salaries"
         case .Influencer: "Market earnings"
