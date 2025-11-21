@@ -7,6 +7,7 @@ public final class ResourceMetadata: GameMetadata {
     public let color: Color
     public let emoji: Character
     public let local: Bool
+    public let critical: Bool
     public let storable: Bool
     public let hours: Int64?
 
@@ -15,6 +16,7 @@ public final class ResourceMetadata: GameMetadata {
         color: Color,
         emoji: Character,
         local: Bool,
+        critical: Bool,
         storable: Bool,
         hours: Int64?
     ) {
@@ -22,8 +24,21 @@ public final class ResourceMetadata: GameMetadata {
         self.color = color
         self.emoji = emoji
         self.local = local
+        self.critical = critical
         self.storable = storable
         self.hours = hours
+
+        if !self.local {
+            if self.critical {
+                fatalError("Resource '\(self.title)' has flag 'critical' but not local!")
+            }
+            if self.storable {
+                fatalError("Resource '\(self.title)' has flag 'storable' but not local!")
+            }
+            if self.hours != nil {
+                fatalError("Resource '\(self.title)' has field 'hours' but is not local!")
+            }
+        }
     }
 }
 extension ResourceMetadata {
@@ -34,6 +49,7 @@ extension ResourceMetadata {
         self.color.hash(into: &hasher)
         self.emoji.hash(into: &hasher)
         self.local.hash(into: &hasher)
+        self.critical.hash(into: &hasher)
         self.storable.hash(into: &hasher)
         self.hours.hash(into: &hasher)
 

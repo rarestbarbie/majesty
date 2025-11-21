@@ -6,6 +6,7 @@ struct ResourceDescription {
     let color: Color
     let emoji: Character
     let local: Bool?
+    let critical: Bool?
     let storable: Bool?
     let hours: Int64?
 }
@@ -14,6 +15,7 @@ extension ResourceDescription: JavaScriptDecodable {
         case color
         case emoji
         case local
+        case critical
         case storable
         case hours
     }
@@ -23,6 +25,7 @@ extension ResourceDescription: JavaScriptDecodable {
             color: try js[.color].decode(),
             emoji: try js[.emoji].decode(),
             local: try js[.local]?.decode(),
+            critical: try js[.critical]?.decode(),
             storable: try js[.storable]?.decode(),
             hours: try js[.hours]?.decode()
         )

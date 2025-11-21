@@ -3,14 +3,13 @@
         "emoji": "💧",
         "color": "#5ea9ff",
         "local": true,
-        "storable": true,
-        "floor": "none"
+        "critical": true,
+        "storable": true
     },
     "Housing": {
         "emoji": "🏠",
         "color": "#575a7e",
-        "local": true,
-        "floor": "none"
+        "local": true
     },
     "Construction": {
         "emoji": "🦺",

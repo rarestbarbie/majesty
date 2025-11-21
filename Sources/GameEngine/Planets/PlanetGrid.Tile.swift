@@ -23,6 +23,7 @@ extension PlanetGrid {
 
         private(set) var minesAlreadyPresent: [MineType: (size: Int64, yieldRank: Int?)]
         private(set) var mines: [MineID]
+        private var criticalShortages: [Resource]
 
         init(
             id: Address,
@@ -43,6 +44,8 @@ extension PlanetGrid {
 
             self.minesAlreadyPresent = [:]
             self.mines = []
+
+            self.criticalShortages = []
         }
     }
 }
@@ -104,35 +107,91 @@ extension PlanetGrid.Tile {
     }
 
     mutating func afterIndexCount(world: borrowing GameWorld) {
-    }
-}
-extension PlanetGrid.Tile {
-    func pickFactory(
-        among factories: OrderedDictionary<FactoryType, FactoryMetadata>,
-        using random: inout PseudoRandom,
-    ) -> FactoryMetadata? {
-        guard
-        let pops: PopulationStats = self.properties?.pops,
-        random.roll(
-            pops.free.total / (1 + self.factoriesUnderConstruction),
-            1_000_000_000
-        ) else {
-            return nil
+        guard let region: RegionalProperties = self.properties else {
+            return
         }
 
-        let choices: [FactoryMetadata] = factories.values.filter {
-            if self.factoriesAlreadyPresent.contains($0.id) {
-                return false
-            }
-            if  $0.terrainAllowed.isEmpty {
-                return true
-            } else if
-                $0.terrainAllowed.contains(self.terrain.id) {
+        self.criticalShortages = region.occupiedBy.criticalResources.filter {
+            if  let localMarket: LocalMarket = world.inelasticMarkets[$0 / self.id],
+                    localMarket.today.supply == 0,
+                    localMarket.today.demand > 0 {
                 return true
             } else {
                 return false
             }
         }
+    }
+}
+extension PlanetGrid.Tile {
+    private func filter(
+        factories: OrderedDictionary<FactoryType, FactoryMetadata>,
+        where predicate: (FactoryMetadata) -> Bool
+    ) -> [FactoryMetadata] {
+        factories.values.filter {
+            if self.factoriesAlreadyPresent.contains($0.id) {
+                return false
+            }
+            if  $0.terrainAllowed.isEmpty {
+                return predicate($0)
+            } else if
+                $0.terrainAllowed.contains(self.terrain.id) {
+                return predicate($0)
+            } else {
+                return false
+            }
+        }
+    }
+
+    func pickFactory(
+        among factories: OrderedDictionary<FactoryType, FactoryMetadata>,
+        using random: inout PseudoRandom,
+    ) -> FactoryMetadata? {
+        guard let pops: PopulationStats = self.properties?.pops else {
+            return nil
+        }
+
+        let chance: Int64
+        switch pops.free.total {
+        case ...0:
+            return nil
+        case 1 ..< 1000:
+            chance = 1
+        case 1000 ..< 50_000:
+            chance = 2
+        case 50_000 ..< 1_000_000:
+            chance = 3
+        case 1_000_000 ..< 10_000_000:
+            chance = 3 + (pops.free.total / 1_000_000)
+        default:
+            chance = 13 + (pops.free.total / 10_000_000)
+        }
+
+        guard random.roll(chance, 100 * (1 + self.factoriesUnderConstruction)) else {
+            return nil
+        }
+
+        let priority: Resource?
+
+        if  self.criticalShortages.isEmpty {
+            priority = nil
+        } else if
+            let first: Resource = self.criticalShortages.first,
+            self.criticalShortages.count == 1 {
+            priority = first
+        } else {
+            priority = self.criticalShortages.randomElement(using: &random.generator)
+        }
+
+        let choices: [FactoryMetadata]
+
+        if  let priority: Resource {
+            choices = self.filter(factories: factories) {
+                $0.output.inelastic.keys.contains(priority)
+            }
+        } else {
+            choices = self.filter(factories: factories) { _ in true }
+        }
+
         return choices.randomElement(using: &random.generator)
     }
 

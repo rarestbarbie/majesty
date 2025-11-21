@@ -68,6 +68,7 @@ extension GameRules {
                 color: $1.color,
                 emoji: $1.emoji,
                 local: $1.local ?? false,
+                critical: $1.critical ?? false,
                 storable: $1.storable ?? false,
                 hours: $1.hours
             )
@@ -195,6 +196,7 @@ extension GameRules {
                     color: 0xFFFFFF,
                     emoji: "?",
                     local: false,
+                    critical: false,
                     storable: false,
                     hours: nil
                 ),
