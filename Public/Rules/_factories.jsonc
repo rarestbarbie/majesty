@@ -431,11 +431,11 @@
         "materials": {
             "Appliances": 1,
             "Vehicles": 1,
-            "Poultry": 80,
-            "Wheat": 80
+            "Poultry": 100,
+            "Wheat": 100
         },
         "output": {
-            "Groceries": 80
+            "Groceries": 100
         },
         "workers": {
             "Driver": 20000,

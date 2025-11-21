@@ -3,7 +3,8 @@
     {
         "tile": "399N-2,1",
         "size": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Supermarket": 1
         }
     },
 
@@ -12,6 +13,7 @@
         "tile": "399N-2,2",
         "size": {
             "Hydroelectric Dam": 2,
+            "Supermarket": 1,
             "Data Center": 2
         }
     },
@@ -21,6 +23,7 @@
         "tile": "399N-2,3",
         "size": {
             "Hydroelectric Dam": 10,
+            "Supermarket": 1,
             "Plantation": 1,
             "Machine Parts Factory": 1,
             "Polypropylene Plant": 1
@@ -32,6 +35,7 @@
         "tile": "399N-1,2",
         "size": {
             "Hydroelectric Dam": 10,
+            "Supermarket": 1,
             "Cereal Farm": 10,
             "Machine Parts Factory": 1,
             "Automotive Assembly Plant": 1,
@@ -44,6 +48,7 @@
         "tile": "399N0,2",
         "size": {
             "Hydroelectric Dam": 5,
+            "Supermarket": 1,
             "Nuclear Power Plant": 1,
             "Cereal Farm": 1,
             "Machine Parts Factory": 1
@@ -55,6 +60,7 @@
         "tile": "399N0,1",
         "size": {
             "Hydroelectric Dam": 1,
+            "Supermarket": 1,
             "Appliance Factory": 1
         }
     },
@@ -167,6 +173,7 @@
         "tile": "399N2,0",
         "size": {
             "Hydroelectric Dam": 1,
+            "Supermarket": 1,
             "Instrument Factory": 1,
             "Machine Parts Factory": 1,
             "Polypropylene Plant": 1
@@ -178,6 +185,7 @@
         "tile": "399N3,0",
         "size": {
             "Hydroelectric Dam": 1,
+            "Supermarket": 1,
             "Nuclear Power Plant": 2,
             "Fashion House": 1,
             "Appliance Factory": 1
@@ -188,20 +196,25 @@
     {
         "tile": "399N3,-1",
         "size": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Supermarket": 1
         }
     },
 
     // Eastern Mediterranean
     {
-        "tile": "399N3,-2"
+        "tile": "399N3,-2",
+        "size": {
+            "Supermarket": 1
+        }
     },
 
     // Eastern Europe
     {
         "tile": "399N2,-1",
         "size": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Supermarket": 1
         }
     },
 
@@ -209,7 +222,8 @@
     {
         "tile": "399N3,-3",
         "size": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Supermarket": 1
         }
     },
 
@@ -226,6 +240,7 @@
         "tile": "399N0,-2",
         "size": {
             "Hydroelectric Dam": 12,
+            "Supermarket": 1,
             "Nuclear Power Plant": 3,
             "Aluminum Mill": 1,
             "Appliance Factory": 1,
@@ -241,6 +256,7 @@
         "tile": "399N-1,-1",
         "size": {
             "Hydroelectric Dam": 12,
+            "Supermarket": 1,
             "Nuclear Power Plant": 3,
             "Aluminum Mill": 1,
             "Alloy Foundry": 1,
@@ -253,7 +269,8 @@
     {
         "tile": "399S-1,-2",
         "size": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Supermarket": 1
         }
     },
 
@@ -261,7 +278,8 @@
     {
         "tile": "399S-2,-1",
         "size": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Supermarket": 1
         }
     },
 
@@ -269,7 +287,8 @@
     {
         "tile": "399N-2,-1",
         "size": {
-            "Desalination Plant": 1
+            "Desalination Plant": 1,
+            "Supermarket": 1
         }
     },
 
@@ -278,6 +297,7 @@
         "tile": "399N-1,-2",
         "size": {
             "Desalination Plant": 1,
+            "Supermarket": 1,
             "Semiconductor Foundry": 1
         }
     }
