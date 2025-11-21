@@ -101,7 +101,7 @@
                 "size": 1
             },
             "Earth_Sedimentary_Basin": {
-                "rate": "0.05",
+                "rate": "0.01",
                 "size": 1
             }
         },
