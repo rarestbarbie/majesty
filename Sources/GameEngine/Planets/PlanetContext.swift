@@ -33,6 +33,11 @@ extension PlanetContext {
     }
 }
 extension PlanetContext {
+    mutating func startIndexCount() {
+        for j: Int in self.grid.tiles.values.indices {
+            self.grid.tiles.values[j].startIndexCount()
+        }
+    }
     mutating func afterIndexCount(
         world: borrowing GameWorld,
         context: GameContext.TerritoryPass
@@ -66,6 +71,10 @@ extension PlanetContext {
             self.motion.local = motion
         } else {
             self.motion.local = nil
+        }
+
+        for j: Int in self.grid.tiles.values.indices {
+            self.grid.tiles.values[j].afterIndexCount(world: world)
         }
     }
 

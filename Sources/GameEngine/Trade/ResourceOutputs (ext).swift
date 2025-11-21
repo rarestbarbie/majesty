@@ -59,7 +59,7 @@ extension ResourceOutputs {
     func tooltipExplainPrice(
         _ id: Resource,
         _ market: (
-            inelastic: LocalMarket.State?,
+            inelastic: LocalMarketSnapshot?,
             tradeable: BlocMarket.State?
         ),
     ) -> Tooltip? {
@@ -82,25 +82,24 @@ extension ResourceOutputs {
             }
         } else if
             let filled: ResourceOutput = self.inelastic[id],
-            let market: LocalMarket.State = market.inelastic {
-            let today: LocalMarket.Interval = market.today
-            let yesterday: LocalMarket.Interval = market.yesterday
+            let market: LocalMarketSnapshot = market.inelastic {
             return .instructions {
                 // Show the ask price here, because the bid price is what they actually
                 // received, and that is shown several lines below
-                $0["Today’s local price", +] = today.ask.value[..] <- yesterday.ask.value
+                $0["Today’s local price", +] = market.state.Δ.ask.value[..]
                 $0[>] {
-                    $0["Supply in this tile", -] = today.supply[/3] <- yesterday.supply
-                    $0["Demand in this tile", +] = today.demand[/3] <- yesterday.demand
+                    $0["Supply in this tile", -] = market.state.Δ.supply[/3]
+                    $0["Demand in this tile", +] = market.state.Δ.demand[/3]
                 }
 
-                $0["Local stockpile", -] = market.stockpile[/3]
+                $0["Local stockpile", -] = market.state.stockpile[/3]
                 $0[>] {
-                    $0["Stabilization fund value", +] = market.stabilizationFund[/3]
+                    $0["Stabilization fund value", +] = market.state.stabilizationFund[/3]
                 }
 
-                if  let average: Double = filled.price, market.storage {
-                    let spread: Double = today.spread
+                if  let average: Double = filled.price,
+                    let _: Int64 = market.shape.storage {
+                    let spread: Double = market.state.today.spread
                     $0[>] = """
                     Due to the local bid-ask spread of \(
                         spread[%2], style: .spread(spread)
@@ -108,7 +107,9 @@ extension ResourceOutputs {
                     today was \(em: average[..2])
                     """
 
-                    if case .reduced = today.priceIncrement(stockpile: market.stockpile) {
+                    if case .reduced = market.state.today.priceIncrement(
+                            stockpile: market.state.stockpile
+                        ) {
                         $0[>] = """
                         We are \(em: "dispensing") from the stabilization fund, which is \
                         \(em: "retarding") the price decrease
@@ -117,22 +118,22 @@ extension ResourceOutputs {
                     }
                 }
 
-                if today.supply <= today.demand {
+                if market.state.today.supply <= market.state.today.demand {
                     $0[>] = """
                     There are not enough producers in this region, and the price will increase \
                     if the situation persists
                     """
                 } else if
-                    let floor: LocalPriceLevel = market.limit.min,
-                        floor.price >= today.bid {
+                    let floor: LocalPriceLevel = market.shape.limit.min,
+                        floor.price >= market.state.today.bid {
                     $0[>] = """
                     There are not enough buyers in this region, but the price is not allowed \
                     to decline due to their \(floor.label) of \
                     \(em: floor.price.value[..])
                     """
                 } else if
-                    let cap: LocalPriceLevel = market.limit.max,
-                        cap.price <= today.ask {
+                    let cap: LocalPriceLevel = market.shape.limit.max,
+                        cap.price <= market.state.today.ask {
                     $0[>] = """
                     There are not enough producers in this region, but the price is not
                     allowed to increase due to their \(cap.label) of \(em: cap.price.value[..])

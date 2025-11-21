@@ -12,15 +12,8 @@ import Random
     public var stockpile: Reservoir
     public var yesterday: Interval
     public var today: Interval
-    // These actually are stateful, even though they are almost always correlated with other
-    // state. The reason is because local markets can be instantiated mid-turn, and such markets
-    // won’t be synchronized with tile authorities until the next turn.
-    public var limit: (
-        min: LocalPriceLevel?,
-        max: LocalPriceLevel?
-    )
-    public var storage: Bool
 
+    @usableFromInline var shape: Shape?
     @usableFromInline var supply: [Order]
     @usableFromInline var demand: [Order]
 
@@ -30,14 +23,7 @@ import Random
         stabilizationFund: Reservoir,
         stockpile: Reservoir,
         yesterday: Interval,
-        today: Interval,
-        limit: (
-            min: LocalPriceLevel?,
-            max: LocalPriceLevel?
-        ),
-        storage: Bool,
-        supply: [Order],
-        demand: [Order]
+        today: Interval
     ) {
         self.id = id
         self.stabilizationFundFees = stabilizationFundFees
@@ -45,10 +31,9 @@ import Random
         self.stockpile = stockpile
         self.yesterday = yesterday
         self.today = today
-        self.limit = limit
-        self.storage = storage
-        self.supply = supply
-        self.demand = demand
+        self.shape = nil
+        self.supply = []
+        self.demand = []
     }
 }
 extension LocalMarket {
@@ -60,11 +45,7 @@ extension LocalMarket {
             stabilizationFund: .zero,
             stockpile: .zero,
             yesterday: interval,
-            today: interval,
-            limit: (nil, nil),
-            storage: false,
-            supply: [],
-            demand: []
+            today: interval
         )
     }
 
@@ -75,11 +56,7 @@ extension LocalMarket {
             stabilizationFund: state.stabilizationFund,
             stockpile: state.stockpile,
             yesterday: state.yesterday,
-            today: state.today,
-            limit: state.limit,
-            storage: state.storage,
-            supply: [],
-            demand: []
+            today: state.today
         )
     }
     @inlinable public var state: State {
@@ -90,8 +67,6 @@ extension LocalMarket {
             stockpile: self.stockpile,
             yesterday: self.yesterday,
             today: self.today,
-            limit: self.limit,
-            storage: self.storage
         )
     }
 }
@@ -159,31 +134,33 @@ extension LocalMarket {
     }
 
     private var spreadTarget: Double? {
-        guard self.storage else {
+        guard let storageDays: Int64 = self.shape?.storage else {
             return nil
         }
 
         let volume: Double = Double.init(self.today.mid) * Double.init(
             min(self.today.supply, self.today.demand)
         )
-        let l: Double = Double.init(self.stabilizationFund.total) / (1 + 30 * volume)
+        let l: Double = Double.init(self.stabilizationFund.total) / (
+            1 + Double.init(2 * storageDays) * volume
+        )
         return (1 + 149 * max(1 - l, 0)) / 10_000
     }
 }
 extension LocalMarket {
-    public mutating func turn(template: Template) {
-        self.yesterday = self.today
+    public mutating func turn(shape: Shape) {
+        #assert(self.shape == nil, "LocalMarket \(self.id) shape is already set for this turn!")
 
-        self.storage = template.storage
-        self.limit = template.limit
+        self.yesterday = self.today
+        self.shape = shape
 
         self.today.update(
-            rate: self.storage
+            rate: shape.storage != nil
                 ? self.today.priceIncrement(stockpile: self.stockpile)
                 : .nominal,
             limit: (
-                min: self.limit.min?.price ?? Self.minDefault,
-                max: self.limit.max?.price ?? Self.maxDefault,
+                min: shape.limit.min?.price ?? Self.minDefault,
+                max: shape.limit.max?.price ?? Self.maxDefault,
             ),
             spread: self.spreadTarget,
         )
@@ -269,7 +246,7 @@ extension LocalMarket {
         var supplyAvailable: Int64 = self.today.supply
 
         stabilization:
-        if  self.storage {
+        if  let storageDays: Int64 = self.shape?.storage {
             if  self.today.supply < self.today.demand {
                 let deficit: Int64 = self.today.demand - self.today.supply
                 let size: Int64 = min(deficit, self.stockpile.total)
@@ -285,7 +262,7 @@ extension LocalMarket {
                     self.supply.append(maker)
                 }
             } else if self.stabilizationFund.total > 0 {
-                let capacity: Int64 = self.today.supply * 30
+                let capacity: Int64 = self.today.supply * storageDays * 2
                 let surplus: Int64 = self.today.supply - self.today.demand
                 let absorb: Int64 = min(surplus, max(0, capacity - self.stockpile.total))
                 if  absorb <= 0 {
@@ -296,7 +273,7 @@ extension LocalMarket {
                 /// and it will attempt to absorb at least half of the surplus regardless
                 let size: Int64 = max(
                     Self.quantity(
-                        budget: self.stabilizationFund.total / 16,
+                        budget: self.stabilizationFund.total / storageDays,
                         limit: absorb,
                         price: self.today.bid
                     ) ?? 0,
@@ -370,6 +347,8 @@ extension LocalMarket {
 
         self.supply = []
         self.demand = []
+        self.shape = nil
+
         return (supply: supply, demand: demand)
     }
 }
