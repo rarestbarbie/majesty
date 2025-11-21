@@ -6,5 +6,299 @@
             "Hydroelectric Dam",
             "Supermarket"
         ]
+    },
+
+    // Pacific Northwest
+    {
+        "tile": "399N-2,2",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket",
+            "Data Center"
+        ]
+    },
+
+    // California
+    {
+        "tile": "399N-2,3",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket",
+            "Plantation",
+            "Machine Parts Factory",
+            "Polypropylene Plant"
+        ]
+    },
+
+    // American Midwest
+    {
+        "tile": "399N-1,2",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket",
+            "Cereal Farm",
+            "Machine Parts Factory",
+            "Automotive Assembly Plant",
+            "Appliance Factory"
+        ]
+    },
+
+    // American East Coast
+    {
+        "tile": "399N0,2",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket",
+            "Nuclear Power Plant",
+            "Cereal Farm",
+            "Machine Parts Factory"
+        ]
+    },
+
+    // Canada
+    {
+        "tile": "399N0,1",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket",
+            "Appliance Factory"
+        ]
+    },
+
+    // Greenland
+    {
+        "tile": "399N1,1"
+    },
+
+    // Mexico
+    {
+        "tile": "399N-2,4",
+        "factories": [
+            "Hydroelectric Dam",
+            "Clothing Workshop"
+        ]
+    },
+
+    // Central America
+    {
+        "tile": "399N-1,4",
+        "factories": [
+            "Hydroelectric Dam",
+            "Clothing Workshop"
+        ]
+    },
+
+    // Caribbean Sea
+    {
+        "tile": "399N0,3"
+    },
+
+    // Panama
+    {
+        "tile": "399E5",
+        "factories": [
+            "Hydroelectric Dam"
+        ]
+    },
+
+    // Colombia
+    {
+        "tile": "399N1,3",
+        "factories": [
+            "Hydroelectric Dam",
+            "Clothing Workshop"
+        ]
+    },
+
+    // Peru
+    {
+        "tile": "399S0,3",
+        "factories": [
+            "Hydroelectric Dam"
+        ]
+    },
+
+    // Amazon
+    {
+        "tile": "399S1,3",
+        "factories": [
+            "Hydroelectric Dam"
+        ]
+    },
+
+    // Brazil
+    {
+        "tile": "399S2,2",
+        "factories": [
+            "Hydroelectric Dam"
+        ]
+    },
+
+    // Argentina
+    {
+        "tile": "399S1,2",
+        "factories": [
+            "Hydroelectric Dam"
+        ]
+    },
+
+    // Patagonia
+    {
+        "tile": "399S0,2",
+        "factories": [
+            "Hydroelectric Dam"
+        ]
+    },
+
+    // West Antarctica
+    {
+        "tile": "399S0,1",
+        "factories": [
+            "Hydroelectric Dam"
+        ]
+    },
+
+    // East Antarctica
+    {
+        "tile": "399S1,0"
+    },
+
+    // Queen Maud Land
+    {
+        "tile": "399S1,-1"
+    },
+
+    // Northern Europe
+    {
+        "tile": "399N2,0",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket",
+            "Instrument Factory",
+            "Machine Parts Factory",
+            "Polypropylene Plant"
+        ]
+    },
+
+    // Southwestern Europe
+    {
+        "tile": "399N3,0",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket",
+            "Nuclear Power Plant",
+            "Fashion House",
+            "Appliance Factory"
+        ]
+    },
+
+    // Atlantropa
+    {
+        "tile": "399N3,-1",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket"
+        ]
+    },
+
+    // Eastern Mediterranean
+    {
+        "tile": "399N3,-2",
+        "factories": [
+            "Supermarket"
+        ]
+    },
+
+    // Eastern Europe
+    {
+        "tile": "399N2,-1",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket"
+        ]
+    },
+
+    // Holy Land
+    {
+        "tile": "399N3,-3",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket"
+        ]
+    },
+
+    // Persia
+    {
+        "tile": "399N2,-3",
+        "factories": [
+            "Hydroelectric Dam"
+        ]
+    },
+
+    // Southern China
+    {
+        "tile": "399N0,-2",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket",
+            "Nuclear Power Plant",
+            "Aluminum Mill",
+            "Appliance Factory",
+            "Automotive Assembly Plant",
+            "Battery Plant",
+            "Medical Equipment Factory",
+            "Polypropylene Plant",
+            "Semiconductor Foundry"
+        ]
+    },
+    // Northern China
+    {
+        "tile": "399N-1,-1",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket",
+            "Nuclear Power Plant",
+            "Aluminum Mill",
+            "Alloy Foundry",
+            "Clothing Workshop",
+            "Machine Parts Factory"
+        ]
+    },
+
+    // Western Australia
+    {
+        "tile": "399S-1,-2",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket"
+        ]
+    },
+
+    // Eastern Australia
+    {
+        "tile": "399S-2,-1",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket"
+        ]
+    },
+
+    // Japan
+    {
+        "tile": "399N-2,-1",
+        "factories": [
+            "Desalination Plant",
+            "Supermarket"
+        ]
+    },
+
+    // Taiwan
+    {
+        "tile": "399N-1,-2",
+        "factories": [
+            "Desalination Plant",
+            "Supermarket",
+            "Semiconductor Foundry"
+        ]
     }
 ]
