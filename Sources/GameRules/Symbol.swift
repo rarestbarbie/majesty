@@ -2,7 +2,7 @@ import JavaScriptInterop
 import JavaScriptKit
 
 @frozen public struct Symbol: Hashable {
-    @usableFromInline let name: String
+    public let name: String
 
     @inlinable init(name: String) {
         self.name = name

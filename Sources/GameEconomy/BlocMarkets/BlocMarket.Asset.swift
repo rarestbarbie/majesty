@@ -6,7 +6,7 @@ import GameIDs
 extension BlocMarket {
     @frozen public enum Asset: Equatable, Hashable, Comparable, Sendable {
         case good(Resource)
-        case fiat(Fiat)
+        case fiat(CurrencyID)
     }
 }
 extension BlocMarket.Asset: CustomStringConvertible {
@@ -20,7 +20,7 @@ extension BlocMarket.Asset: CustomStringConvertible {
 extension BlocMarket.Asset: LosslessStringConvertible {
     @inlinable public init?(_ code: borrowing some StringProtocol) {
         if case "F"? = code.first,
-            let fiat: Fiat = .init(code[code.index(after: code.startIndex)...]) {
+            let fiat: CurrencyID = .init(code[code.index(after: code.startIndex)...]) {
             self = .fiat(fiat)
         } else if
             let good: Resource = .init(code) {

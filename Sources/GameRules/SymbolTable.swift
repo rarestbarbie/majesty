@@ -3,20 +3,20 @@ import JavaScriptInterop
 import JavaScriptKit
 import OrderedCollections
 
-@frozen @usableFromInline struct SymbolTable<Value> {
+@frozen public struct SymbolTable<Value> {
     @usableFromInline var index: [Symbol: Value]
 
-    @inlinable init(index: [Symbol: Value]) {
+    @inlinable public init(index: [Symbol: Value]) {
         self.index = index
     }
 }
 extension SymbolTable: ExpressibleByDictionaryLiteral {
-    @inlinable init(dictionaryLiteral: (Never, Never)...) {
+    @inlinable public init(dictionaryLiteral: (Never, Never)...) {
         self.init(index: [:])
     }
 }
 extension SymbolTable {
-    @inlinable subscript(_ symbol: Symbol) -> Value {
+    @inlinable public subscript(_ symbol: Symbol) -> Value {
         get throws {
             guard let value: Value = self.index[symbol] else {
                 throw SymbolResolutionError<Value>.undefined(symbol.name)
@@ -110,7 +110,7 @@ extension SymbolTable where Value: RawRepresentable<Int16> & Sendable {
 }
 extension SymbolTable: JavaScriptEncodable, ConvertibleToJSValue
     where Value: ConvertibleToJSValue & Comparable {
-    @inlinable func encode(to js: inout JavaScriptEncoder<Symbol>) {
+    @inlinable public func encode(to js: inout JavaScriptEncoder<Symbol>) {
         for (symbol, id): (Symbol, Value) in (self.index.sorted { $0.value < $1.value }) {
             js[symbol] = id
         }
@@ -118,7 +118,7 @@ extension SymbolTable: JavaScriptEncodable, ConvertibleToJSValue
 }
 extension SymbolTable: JavaScriptDecodable, LoadableFromJSValue, ConstructibleFromJSValue
     where Value: LoadableFromJSValue {
-    @inlinable init(from js: borrowing JavaScriptDecoder<Symbol>) throws {
+    @inlinable public init(from js: borrowing JavaScriptDecoder<Symbol>) throws {
         self.init(index: try js.values(as: Value.self))
     }
 }

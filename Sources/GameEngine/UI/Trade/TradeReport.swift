@@ -23,7 +23,7 @@ extension TradeReport: PersistentReport {
     }
 
     mutating func update(from snapshot: borrowing GameSnapshot) {
-        let currencies: [Fiat: Country.Currency] = snapshot.countries.state.reduce(into: [:]) {
+        let currencies: [Fiat: Currency] = snapshot.countries.state.reduce(into: [:]) {
             $0[$1.currency.id] = $1.currency
         }
 
@@ -35,7 +35,7 @@ extension TradeReport: PersistentReport {
                 $0.resource[id] = snapshot.rules.resources[id].label
             }
             if  case .fiat(let id) = $1.id.y,
-                let currency: Country.Currency = currencies[id] {
+                let currency: Currency = currencies[id] {
                 $0.currency[id] = currency.label
             }
         }
@@ -50,7 +50,7 @@ extension TradeReport: PersistentReport {
             let today: BlocMarket.Interval = $0.state.history.last,
             case .good(let good) = $0.id.x,
             case .fiat(let fiat) = $0.id.y,
-            let currency: Country.Currency = currencies[fiat] else {
+            let currency: Currency = currencies[fiat] else {
                 return nil
             }
 

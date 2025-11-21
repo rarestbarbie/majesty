@@ -1,6 +1,6 @@
 import GameEconomy
-import GameRules
 import GameIDs
+import GameRules
 import JavaScriptKit
 import JavaScriptInterop
 import Random
@@ -22,9 +22,6 @@ public struct GameSave {
     let factories: [Factory]
     let mines: [Mine]
     var pops: [Pop]
-
-    let _factories: [FactorySeed]
-    let _pops: [PopSeed]
 }
 extension GameSave {
     public enum ObjectKey: JSString, Sendable {
@@ -70,7 +67,7 @@ extension GameSave: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             symbols: try js[.symbols].decode(),
-            random: try js[.random]?.decode() ?? .init(seed: 12345),
+            random: try js[.random].decode(),
             player: try js[.player].decode(),
             accounts: try js[.accounts]?.decode() ?? .init(dictionary: [:]),
             tradeableMarkets: try js[.markets_tradeable]?.decode() ?? [:],
@@ -81,8 +78,6 @@ extension GameSave: JavaScriptDecodable {
             factories: try js[.factories].decode(),
             mines: try js[.mines]?.decode() ?? [],
             pops: try js[.pops].decode(),
-            _factories: try js[.seed_factories]?.decode() ?? [],
-            _pops: try js[.seed_pops]?.decode() ?? []
         )
     }
 }

@@ -3,12 +3,12 @@ import JavaScriptInterop
 
 @frozen public struct GameSaveSymbols {
     /// Pop types are not moddable.
-    let pops: SymbolTable<PopType>
+    public let pops: SymbolTable<PopType>
 
-    var mines: SymbolTable<MineType>
-    var factories: SymbolTable<FactoryType>
-    var resources: SymbolTable<Resource>
-    var technologies: SymbolTable<Technology>
+    public internal(set) var mines: SymbolTable<MineType>
+    public internal(set) var factories: SymbolTable<FactoryType>
+    public internal(set) var resources: SymbolTable<Resource>
+    public internal(set) var technologies: SymbolTable<Technology>
 
     @usableFromInline var biology: SymbolTable<CultureType>
     @usableFromInline var geology: SymbolTable<GeologicalType>

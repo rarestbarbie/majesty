@@ -1,0 +1,10 @@
+[
+    // Alaska
+    {
+        "tile": "399N-2,1",
+        "factories": [
+            "Hydroelectric Dam",
+            "Supermarket"
+        ]
+    }
+]

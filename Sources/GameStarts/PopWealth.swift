@@ -3,12 +3,12 @@ import GameEconomy
 import JavaScriptInterop
 import JavaScriptKit
 
-@frozen public struct PopSeed {
+@frozen public struct PopWealth {
     public let type: PopType
     public let cash: Int64
     public let nat: String?
 }
-extension PopSeed: JavaScriptDecodable {
+extension PopWealth: JavaScriptDecodable {
     @frozen public enum ObjectKey: JSString {
         case type
         case cash

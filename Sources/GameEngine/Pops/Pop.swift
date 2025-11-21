@@ -10,8 +10,8 @@ import JavaScriptInterop
 import Random
 import OrderedCollections
 
-struct Pop: LegalEntityState, IdentityReplaceable {
-    var id: PopID
+struct Pop: LegalEntityState, Identifiable {
+    let id: PopID
     let tile: Address
     let type: PopType
     let nat: String

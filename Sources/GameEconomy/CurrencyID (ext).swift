@@ -1,6 +1,6 @@
 import GameIDs
 
-extension Fiat {
+extension CurrencyID {
     @inlinable public static func / (a: Self, b: Self) -> BlocMarket.ID {
         .init(.fiat(a), .fiat(b))
     }

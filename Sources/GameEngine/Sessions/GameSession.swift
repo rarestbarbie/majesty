@@ -23,11 +23,25 @@ extension GameSession {
         rules: borrowing GameRulesDescription,
         map: borrowing TerrainMap,
     ) throws -> Self {
-        Self.address(&save.countries)
-        Self.address(&save.pops)
-
         let rules: GameRules = try .init(resolving: rules, with: &save.symbols)
-        var world: GameWorld = .init(
+        return try .load(save, rules: rules, map: map)
+    }
+    public static func load(
+        start: consuming GameStart,
+        rules: borrowing GameRulesDescription,
+        map: borrowing TerrainMap,
+    ) throws -> Self {
+        let rules: GameRules = try .init(resolving: rules, with: &start.symbols)
+        let save: GameSave = try start.unpack()
+        return try .load(save, rules: rules, map: map)
+    }
+
+    private static func load(
+        _ save: borrowing GameSave,
+        rules: consuming GameRules,
+        map: borrowing TerrainMap,
+    ) throws -> Self {
+        let world: GameWorld = .init(
             notifications: .init(date: save.date),
             bank: .init(accounts: save.accounts.dictionary),
             tradeableMarkets: save.tradeableMarkets,
@@ -37,7 +51,6 @@ extension GameSession {
 
         var context: GameContext = try .load(save, rules: rules)
         try context.loadTerrain(map)
-        try context.seed(factories: save._factories, pops: save._pops, symbols: save.symbols, world: &world)
 
         return .init(context: context, world: world)
     }
@@ -72,20 +85,6 @@ extension GameSession {
     }
 
     public func saveTerrain() -> TerrainMap { self.context.saveTerrain() }
-}
-extension GameSession {
-    private static func address<ID>(
-        _ objects: inout [some IdentityReplaceable<ID>]
-    ) where ID: GameID {
-        var highest: ID = objects.reduce(0) { max($0, $1.id) }
-        for i: Int in objects.indices {
-            {
-                if  $0 == 0 {
-                    $0 = highest.increment()
-                }
-            } (&objects[i].id)
-        }
-    }
 }
 extension GameSession {
     private var snapshot: GameSnapshot {

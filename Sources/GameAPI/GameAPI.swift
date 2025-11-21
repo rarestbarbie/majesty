@@ -41,7 +41,7 @@ extension GameAPI {
         self[.save] = { Self.game?.save }
         self[.load] = {
             do {
-                Self.game = try .load($0, rules: $1, map: $2)
+                Self.game = try .load(start: $0, rules: $1, map: $2)
             } catch let error {
                 print("Error loading game: \(error)")
             }

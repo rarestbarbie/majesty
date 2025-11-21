@@ -33,9 +33,5 @@
             "Bayer Process": 6,
             "Taconite Concentration": 7
         }
-    },
-    "factories": [
-    ],
-    "markets": [
-    ]
+    }
 }

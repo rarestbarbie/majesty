@@ -56,41 +56,7 @@ extension GameContext {
             factories: [_].init(self.factories.state),
             mines: [_].init(self.mines.state),
             pops: [_].init(self.pops.state),
-            _factories: [],
-            _pops: []
         )
-    }
-}
-extension GameContext {
-    mutating func seed(
-        factories: [FactorySeed],
-        pops: [PopSeed],
-        symbols: GameSaveSymbols,
-        world: inout GameWorld,
-    ) throws {
-        for seed: FactorySeed in factories {
-            for factory: Quantity<FactoryType> in try seed.unpack(symbols: symbols) {
-                let section: Factory.Section = .init(type: factory.unit, tile: seed.tile)
-                try self.factories[section] {
-                    rules.factories[$0.type]
-                } update: {
-                    $1.size = .init(level: 0, growthProgress: Factory.Size.growthRequired - 1)
-                }
-            }
-        }
-        // this is very slow, but we only do it once when initializing a new game
-        for seed: PopSeed in pops {
-            for pop: Pop in self.pops.state {
-                if  let nat: String = seed.nat, pop.nat != nat {
-                    continue
-                }
-                if  pop.type != seed.type {
-                    continue
-                }
-
-                world.bank[account: .pop(pop.id)].s += seed.cash * pop.z.size
-            }
-        }
     }
 }
 extension GameContext {
@@ -235,7 +201,7 @@ extension GameContext {
     }
     private mutating func index(world: borrowing GameWorld) {
         for country: CountryContext in self.countries {
-            for address: Address in country.state.controlledTiles {
+            for address: Address in country.state.tilesControlled {
                 self.planets[address]?.update(
                     governedBy: country.properties,
                     occupiedBy: country.properties,

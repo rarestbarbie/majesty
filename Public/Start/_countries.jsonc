@@ -1,10 +1,11 @@
 [
     {
-        "id": 1,
-        "article": "The",
-        "name": "United Nations",
-        "long": "United Nations",
-        "color": "#66a3ff",
+        "name": {
+            "article": "The",
+            "short": "United Nations",
+            "long": "United Nations",
+            "color": "#66a3ff"
+        },
         "culture_preferred": "Atlantean",
         "cultures_accepted": ["Italian", "Jewish"],
         "currency": {
@@ -12,7 +13,7 @@
             "name": "UNB",
             "long": "United Nations Bancor"
         },
-        "controlled_tiles": [
+        "tiles": [
             // Aleutian Islands
             "399N-2,0",
             // Alaska
@@ -90,21 +91,22 @@
         ],
         "minwage": 35,
         "researched": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
+            "Forced Insemination",
+            "Industrial Gas Chambers",
+            "Mechanized Production",
+            "Hydraulic Fracking",
+            "Deepwater Drilling",
+            "Bayer Process",
+            "Taconite Concentration"
         ]
     },
     {
-        "id": 2,
-        "article": "The",
-        "name": "Russia",
-        "long": "Russian Federation",
-        "color": "#caa12f",
+        "name": {
+            "article": "The",
+            "short": "Russia",
+            "long": "Russian Federation",
+            "color": "#caa12f"
+        },
         "culture_preferred": "Russian",
         "cultures_accepted": ["Caspian", "Central Asian"],
         "currency": {
@@ -112,7 +114,7 @@
             "name": "RUB",
             "long": "Ruble"
         },
-        "controlled_tiles": [
+        "tiles": [
             // Russia
             "399N1,-1",
             // Siberia
@@ -124,20 +126,22 @@
         ],
         "minwage": 35,
         "researched": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
+            "Forced Insemination",
+            "Industrial Gas Chambers",
+            "Mechanized Production",
+            "Hydraulic Fracking",
+            "Deepwater Drilling",
+            "Bayer Process",
+            "Taconite Concentration"
         ]
     },
     {
-        "id": 3,
-        "name": "India",
-        "long": "Republic of India",
-        "color": "#ff7a3d",
+        "name": {
+            "article": "The",
+            "short": "India",
+            "long": "Republic of India",
+            "color": "#ff7a3d"
+        },
         "culture_preferred": "South Asian",
         "cultures_accepted": [],
         "currency": {
@@ -145,7 +149,7 @@
             "name": "INR",
             "long": "Rupee"
         },
-        "controlled_tiles": [
+        "tiles": [
             // India
             "399N2,-4",
             // Bay of Bengal
@@ -153,20 +157,22 @@
         ],
         "minwage": 35,
         "researched": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
+            "Forced Insemination",
+            "Industrial Gas Chambers",
+            "Mechanized Production",
+            "Hydraulic Fracking",
+            "Deepwater Drilling",
+            "Bayer Process",
+            "Taconite Concentration"
         ]
     },
     {
-        "id": 4,
-        "name": "Thailand",
-        "long": "Kingdom of Thailand",
-        "color": "#cc004e",
+        "name": {
+            "article": "The",
+            "short": "Thailand",
+            "long": "Kingdom of Thailand",
+            "color": "#cc004e"
+        },
         "culture_preferred": "Thai",
         "cultures_accepted": [],
         "currency": {
@@ -174,26 +180,28 @@
             "name": "THB",
             "long": "Baht"
         },
-        "controlled_tiles": [
+        "tiles": [
             // Thailand
             "399N0,-3"
         ],
         "minwage": 35,
         "researched": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
+            "Forced Insemination",
+            "Industrial Gas Chambers",
+            "Mechanized Production",
+            "Hydraulic Fracking",
+            "Deepwater Drilling",
+            "Bayer Process",
+            "Taconite Concentration"
         ]
     },
     {
-        "id": 5,
-        "name": "Sahelia",
-        "long": "Republic of Sahelia",
-        "color": "#00ccaa",
+        "name": {
+            "article": "The",
+            "short": "Sahelia",
+            "long": "Republic of Sahelia",
+            "color": "#00ccaa"
+        },
         "culture_preferred": "Sahelian",
         "cultures_accepted": ["West African"],
         "currency": {
@@ -201,7 +209,7 @@
             "name": "SAF",
             "long": "Franc"
         },
-        "controlled_tiles": [
+        "tiles": [
             // West Africa
             "399N4,-1",
             // Congo
@@ -209,20 +217,22 @@
         ],
         "minwage": 35,
         "researched": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
+            "Forced Insemination",
+            "Industrial Gas Chambers",
+            "Mechanized Production",
+            "Hydraulic Fracking",
+            "Deepwater Drilling",
+            "Bayer Process",
+            "Taconite Concentration"
         ]
     },
     {
-        "id": 6,
-        "name": "Ethiopia",
-        "long": "Republic of Ethiopia",
-        "color": "#5f004f",
+        "name": {
+            "article": "The",
+            "short": "Ethiopia",
+            "long": "Republic of Ethiopia",
+            "color": "#5f004f"
+        },
         "culture_preferred": "Ethiopian",
         "cultures_accepted": [],
         "currency": {
@@ -230,19 +240,19 @@
             "name": "ETB",
             "long": "Birr"
         },
-        "controlled_tiles": [
+        "tiles": [
             // Ethiopia
             "399N4,-3"
         ],
         "minwage": 35,
         "researched": [
-            1,
-            2,
-            3,
-            4,
-            5,
-            6,
-            7
+            "Forced Insemination",
+            "Industrial Gas Chambers",
+            "Mechanized Production",
+            "Hydraulic Fracking",
+            "Deepwater Drilling",
+            "Bayer Process",
+            "Taconite Concentration"
         ]
     }
 ]

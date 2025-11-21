@@ -145,6 +145,7 @@ let package: Package = .init(
                 .target(name: "GameConditions"),
                 .target(name: "GameEconomy"),
                 .target(name: "GameRules"),
+                .target(name: "GameStarts"),
                 .target(name: "GameState"),
                 .target(name: "GameTerrain"),
                 .target(name: "GameUI"),
@@ -193,6 +194,14 @@ let package: Package = .init(
                 .target(name: "JavaScriptInterop"),
                 .product(name: "D", package: "d"),
             ]
+        ),
+
+        .target(
+            name: "GameStarts",
+            dependencies: [
+                .target(name: "GameIDs"),
+                .target(name: "GameRules"),
+            ],
         ),
 
         .target(

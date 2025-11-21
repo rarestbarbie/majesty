@@ -57,8 +57,8 @@ export class Clock {
         this.node.classList.toggle('paused', state.speed.paused);
         this.node.dataset.ticks = `${state.speed.ticks}`;
         // Convert Int32 color to CSS hex string
-        this.flag.style.backgroundColor = hex(state.player?.color ?? 0x000000 as Color);
-        this.flag.title = state.player?.long ?? 'Observer';
+        this.flag.style.backgroundColor = hex(state.player?.name.color ?? 0x000000 as Color);
+        this.flag.title = state.player?.name.long ?? 'Observer';
         UpdateText(this.date, `${month} ${date.d}, ${date.y}`);
     }
 }

@@ -60,8 +60,8 @@ extension LegalEntityContext {
         }
 
         return .instructions(style: .borderless) {
-            $0[country.name] = (Double.init(share) / Double.init(total))[%3]
-            $0[>] = "The residents of \(em: country.name) own \(em: share[/3]) shares"
+            $0[country.name.short] = (Double.init(share) / Double.init(total))[%3]
+            $0[>] = "The residents of \(em: country.name.short) own \(em: share[/3]) shares"
         }
     }
 

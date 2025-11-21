@@ -20,7 +20,7 @@ extension CountryProperties: Identifiable {
     var id: CountryID { self.intrinsic.id }
 }
 extension CountryProperties {
-    var currency: Country.Currency { self.intrinsic.currency }
+    var currency: Currency { self.intrinsic.currency }
     var minwage: Int64 { self.intrinsic.minwage }
     var culturePreferred: String { self.intrinsic.culturePreferred }
 }

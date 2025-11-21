@@ -4,8 +4,8 @@ import JavaScriptInterop
 import JavaScriptKit
 
 /// In Majesty, everything is a planet, even stars and moons.
-@frozen public struct Planet: IdentityReplaceable {
-    public var id: PlanetID
+@frozen public struct Planet: Identifiable {
+    public let id: PlanetID
     public let name: String
     public let type: PlanetType
     public let color: Color
