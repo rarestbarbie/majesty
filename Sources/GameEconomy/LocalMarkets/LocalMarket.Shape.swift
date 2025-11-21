@@ -1,13 +1,14 @@
 extension LocalMarket {
-    @frozen public struct Template {
-        public let storage: Bool
+    @frozen public struct Shape {
+        /// Units of days, must be greater than 2!
+        public let storage: Int64?
         public let limit: (
             min: LocalPriceLevel?,
             max: LocalPriceLevel?
         )
 
         @inlinable public init(
-            storage: Bool,
+            storage: Int64?,
             limit: (
                 min: LocalPriceLevel?,
                 max: LocalPriceLevel?
@@ -18,8 +19,8 @@ extension LocalMarket {
         }
     }
 }
-extension LocalMarket.Template {
+extension LocalMarket.Shape {
     @inlinable public static var `default`: Self {
-        .init(storage: false, limit: (nil, nil))
+        .init(storage: nil, limit: (nil, nil))
     }
 }

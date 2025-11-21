@@ -40,7 +40,7 @@ extension CountryProperties {
             }
 
             self.localMarkets.templates[resource.id] = .init(
-                storage: resource.storable,
+                storage: resource.storable ? 16 : nil,
                 limit: (min: min, max: nil)
             )
         }

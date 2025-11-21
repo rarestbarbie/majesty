@@ -7,11 +7,6 @@ extension LocalMarket {
         public let stockpile: Reservoir
         public let yesterday: Interval
         public let today: Interval
-        public let limit: (
-            min: LocalPriceLevel?,
-            max: LocalPriceLevel?
-        )
-        public let storage: Bool
 
         @inlinable public init(
             id: ID,
@@ -19,12 +14,7 @@ extension LocalMarket {
             stabilizationFund: Reservoir,
             stockpile: Reservoir,
             yesterday: Interval,
-            today: Interval,
-            limit: (
-                min: LocalPriceLevel?,
-                max: LocalPriceLevel?
-            ),
-            storage: Bool
+            today: Interval
         ) {
             self.id = id
             self.stabilizationFundFees = stabilizationFundFees
@@ -32,8 +22,6 @@ extension LocalMarket {
             self.stockpile = stockpile
             self.yesterday = yesterday
             self.today = today
-            self.limit = limit
-            self.storage = storage
         }
     }
 }

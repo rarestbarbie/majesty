@@ -102,6 +102,9 @@ extension PlanetGrid.Tile {
         self.mines.append(mine.id)
         self.minesAlreadyPresent[mine.type] = (mine.z.size, mine.z.yieldRank)
     }
+
+    mutating func afterIndexCount(world: borrowing GameWorld) {
+    }
 }
 extension PlanetGrid.Tile {
     func pickFactory(

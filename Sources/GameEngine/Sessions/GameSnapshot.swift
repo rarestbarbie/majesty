@@ -151,10 +151,10 @@ extension GameSnapshot {
         }
 
         let market: (
-            inelastic: LocalMarket.State?,
+            inelastic: LocalMarketSnapshot?,
             tradeable: BlocMarket.State?
         ) = (
-            self.markets.inelastic[line.resource / factory.state.tile]?.state,
+            self.markets.inelastic[line.resource / factory.state.tile]?.snapshot(country),
             self.markets.tradeable[line.resource / country.currency.id]?.state
         )
 
@@ -607,10 +607,10 @@ extension GameSnapshot {
 
         let resource: Resource = line.resource
         let market: (
-            inelastic: LocalMarket.State?,
+            inelastic: LocalMarketSnapshot?,
             tradeable: BlocMarket.State?
         ) = (
-            self.markets.inelastic[resource / pop.state.tile]?.state,
+            self.markets.inelastic[resource / pop.state.tile]?.snapshot(country),
             self.markets.tradeable[resource / country.currency.id]?.state
         )
 

@@ -244,11 +244,7 @@ extension GameContext {
         }
 
         for i: Int in self.planets.indices {
-            {
-                for j: Int in $0.grid.tiles.values.indices {
-                    $0.grid.tiles.values[j].startIndexCount()
-                }
-            } (&self.planets[i])
+            self.planets[i].startIndexCount()
         }
         for i: Int in self.factories.indices {
             self.factories[i].startIndexCount()
@@ -359,7 +355,7 @@ extension GameContext {
                 fatalError("LocalMarket \($0.id) exists in a tile with no authority!!!")
             }
 
-            $0.turn(template: region.occupiedBy.localMarkets[$0.id.resource])
+            $0.turn(shape: region.occupiedBy.localMarkets[$0.id.resource])
         }
 
         self.factories.turn { $0.turn(on: &turn) }
