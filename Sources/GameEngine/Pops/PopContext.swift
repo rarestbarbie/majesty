@@ -117,9 +117,9 @@ extension PopContext: AllocatingContext {
         }
 
         if  case _? = self.livestock {
-            if  self.state.z.pa < 0.5 {
+            if  self.state.z.profitability < 0 {
                 let r: Decimal = 1‰ + authority.modifiers.livestockCullingEfficiency.value
-                let p: Double = Double.init(r) * (0.5 - self.state.z.pa)
+                let p: Double = -Double.init(r) * self.state.z.profitability
                 let cullable: Int64 = self.state.z.size - 1
                 if  cullable > 0 {
                     self.state.z.size -= Binomial[cullable, p].sample(
@@ -128,11 +128,11 @@ extension PopContext: AllocatingContext {
                 }
             } else {
                 let r: Decimal = 1‰ + authority.modifiers.livestockBreedingEfficiency.value
-                let p: Double = Double.init(r) * (self.state.z.pa - 0.5)
+                let p: Double = Double.init(r) * self.state.z.profitability
                 self.state.z.size += Binomial[self.state.z.size, p].sample(
                     using: &turn.random.generator
                 ) + Int64.random(
-                    in: 0 ... Int64.init((4 * self.state.z.pa).rounded()),
+                    in: 0 ... Int64.init((4 * self.state.z.profitability).rounded()),
                     using: &turn.random.generator
                 )
             }
@@ -335,11 +335,7 @@ extension PopContext: TransactingContext {
             self.state.z.fe = 1
             self.state.z.fx = 0
 
-            if  self.state.profit.operating > 0 {
-                self.state.z.pa = min(1, self.state.z.pa + 0.005)
-            } else {
-                self.state.z.pa = max(0.01, self.state.z.pa - 0.005)
-            }
+            self.state.z.mix(profitability: self.state.profit.operatingProfitability)
 
             // Pay dividends to shareholders, if any.
             self.state.spending.dividend += turn.bank.transfer(

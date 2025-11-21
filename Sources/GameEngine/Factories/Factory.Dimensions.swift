@@ -31,8 +31,8 @@ extension Factory {
 
         /// Share price.
         var px: Double
-        /// Investor confidence, a number between 0 and 1.
-        var pa: Double
+        /// A number between -1 and 1.
+        var profitability: Double
     }
 }
 extension Factory.Dimensions {
@@ -51,7 +51,7 @@ extension Factory.Dimensions {
             fe: 0,
             fx: 0,
             px: 1,
-            pa: 1
+            profitability: 1
         )
     }
 }
@@ -70,7 +70,7 @@ extension Factory.Dimensions {
         case fe = "fe"
         case fx = "fx"
         case px = "px"
-        case pa = "pa"
+        case profitability = "pa"
     }
 }
 extension Factory.Dimensions: JavaScriptEncodable {
@@ -88,7 +88,7 @@ extension Factory.Dimensions: JavaScriptEncodable {
         js[.fe] = self.fe
         js[.fx] = self.fx
         js[.px] = self.px
-        js[.pa] = self.pa
+        js[.profitability] = self.profitability
     }
 }
 extension Factory.Dimensions: JavaScriptDecodable {
@@ -107,7 +107,7 @@ extension Factory.Dimensions: JavaScriptDecodable {
             fe: try js[.fe]?.decode() ?? 0,
             fx: try js[.fx]?.decode() ?? 0,
             px: try js[.px]?.decode() ?? 0,
-            pa: try js[.pa]?.decode() ?? 1,
+            profitability: try js[.profitability]?.decode() ?? 1,
         )
     }
 }

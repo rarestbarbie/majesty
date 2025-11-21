@@ -13,13 +13,13 @@ extension Pop {
         var ve: Int64
         var vx: Int64
         var px: Double
-        /// Investor confidence, a number between 0 and 1.
-        var pa: Double
+        /// A number between -1 and 1.
+        var profitability: Double
     }
 }
 extension Pop.Dimensions {
     init() {
-        self.init(size: 0, mil: 0, con: 0, fl: 0, fe: 0, fx: 0, vl: 0, ve: 0, vx: 0, px: 1, pa: 0.5)
+        self.init(size: 0, mil: 0, con: 0, fl: 0, fe: 0, fx: 0, vl: 0, ve: 0, vx: 0, px: 1, profitability: 0)
     }
 }
 extension Pop.Dimensions {
@@ -34,7 +34,7 @@ extension Pop.Dimensions {
         case ve = "ve"
         case vx = "vx"
         case px = "px"
-        case pa = "pa"
+        case profitability = "pa"
     }
 }
 extension Pop.Dimensions: JavaScriptEncodable {
@@ -49,7 +49,7 @@ extension Pop.Dimensions: JavaScriptEncodable {
         js[.ve] = self.ve
         js[.vx] = self.vx
         js[.px] = self.px
-        js[.pa] = self.pa
+        js[.profitability] = self.profitability
     }
 }
 extension Pop.Dimensions: JavaScriptDecodable {
@@ -65,7 +65,7 @@ extension Pop.Dimensions: JavaScriptDecodable {
             ve: try js[.ve]?.decode() ?? 0,
             vx: try js[.vx]?.decode() ?? 0,
             px: try js[.px]?.decode() ?? 1,
-            pa: try js[.pa]?.decode() ?? 0.5,
+            profitability: try js[.profitability]?.decode() ?? 0,
         )
     }
 }

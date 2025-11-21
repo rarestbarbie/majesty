@@ -55,7 +55,7 @@ extension OwnershipBreakdown {
 
             $0[.shares, (-), tooltip: Tab.tooltipShares] = shares
             $0[.stockPrice, (+)] = asset.state.Δ.px[..3]
-            $0[.stockAttraction, (+)] = asset.state.Δ.pa[%1]
+            $0[.stockAttraction, (+)] = asset.state.Δ.profitability[%1]
         }
 
         self.equity = equity

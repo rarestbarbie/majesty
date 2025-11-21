@@ -11,19 +11,9 @@ import OrderedCollections
     }
 }
 extension StockMarkets {
-    private mutating func turn(by turn: (Fiat, inout StockMarket) -> ()) {
+    @inlinable public mutating func turn(by turn: (inout StockMarket) -> ()) {
         for i: Int in self.regions.elements.indices {
-            let id: Fiat = self.regions.keys[i]
-            turn(id, &self.regions.values[i])
-        }
-    }
-
-    public mutating func turn(
-        random: inout PseudoRandom,
-        execute: (inout PseudoRandom, Fiat, StockMarket.Fill) -> ()
-    ) {
-        self.turn { (currency: Fiat, market: inout StockMarket) in
-            market.match(random: &random) { execute(&$0, currency, $1) }
+            turn(&self.regions.values[i])
         }
     }
 }
@@ -32,7 +22,7 @@ extension StockMarkets {
         guard value > 0 else {
             return
         }
-        self.regions[currency, default: .init()].buyers.append(
+        self.regions[currency, default: .init(id: currency)].buyers.append(
             .init(buyer: buyer, value: value)
         )
     }
@@ -42,7 +32,7 @@ extension StockMarkets {
         quantity: Int64,
         security: StockMarket.Security
     ) {
-        self.regions[currency, default: .init()].assets.append(
+        self.regions[currency, default: .init(id: currency)].assets.append(
             .init(security: security, issuable: quantity)
         )
     }

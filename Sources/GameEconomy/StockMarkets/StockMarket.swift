@@ -1,18 +1,23 @@
+import Assert
+import GameIDs
 import Random
 
 @frozen public struct StockMarket {
+    public let id: Fiat
     @usableFromInline var buyers: [RandomPurchase]
     @usableFromInline var assets: [TradeableAsset]
 
-    @inlinable init() {
+    @inlinable init(id: Fiat) {
+        self.id = id
         self.buyers = []
         self.assets = []
     }
 }
 extension StockMarket {
-    mutating func match(
+    public mutating func match(
+        shape: Shape,
         random: inout PseudoRandom,
-        execute: (inout PseudoRandom, StockMarket.Fill) -> ()
+        execute: (inout PseudoRandom, Fiat, StockMarket.Fill) -> ()
     ) {
         defer {
             self.buyers.removeAll(keepingCapacity: true)
@@ -22,7 +27,7 @@ extension StockMarket {
         guard
         let sampler: RandomWeightedSampler<[TradeableAsset], Double> = .init(
             choices: self.assets,
-            sampleWeight: \.security.attraction
+            sampleWeight: { $0.security.attraction(r: shape.r) }
         ) else {
             return
         }
@@ -58,7 +63,7 @@ extension StockMarket {
                 )
             } (&self.assets[sampler.next(using: &random.generator)])
 
-            execute(&random, fill)
+            execute(&random, self.id, fill)
         }
     }
 }
