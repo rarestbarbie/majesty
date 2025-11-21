@@ -427,6 +427,21 @@
             "Engineer": 3000
         }
     },
+    "Supermarket": {
+        "materials": {
+            "Appliances": 1,
+            "Vehicles": 1,
+            "Poultry": 100,
+            "Wheat": 100
+        },
+        "output": {
+            "Groceries": 100
+        },
+        "workers": {
+            "Driver": 20000,
+            "Farmer": 3000
+        }
+    },
     "Uranium Enrichment Facility": {
         "materials": {
             "Machine Parts": 2,

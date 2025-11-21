@@ -6,6 +6,13 @@
         "critical": true,
         "storable": true
     },
+    "Groceries": {
+        "emoji": "🥖",
+        "color": "#d6b37d",
+        "local": true,
+        "critical": true,
+        "storable": true
+    },
     "Housing": {
         "emoji": "🏠",
         "color": "#575a7e",

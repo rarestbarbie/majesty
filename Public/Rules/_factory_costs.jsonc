@@ -3,7 +3,8 @@
     "shares_per_level": 5000000,
     "corporate": {
         "*": {
-            "Services": 1
+            "Services": 1,
+            "Storage": 1
         }
     },
     "expansion": {

@@ -154,19 +154,17 @@ extension PlanetGrid.Tile {
         switch pops.free.total {
         case ...0:
             return nil
-        case 1 ..< 1000:
+        case 1 ..< 50_000:
             chance = 1
-        case 1000 ..< 50_000:
-            chance = 2
         case 50_000 ..< 1_000_000:
-            chance = 3
+            chance = 2
         case 1_000_000 ..< 10_000_000:
-            chance = 3 + (pops.free.total / 1_000_000)
+            chance = 2 + (pops.free.total / 1_000_000)
         default:
-            chance = 13 + (pops.free.total / 10_000_000)
+            chance = 12 + (pops.free.total / 10_000_000)
         }
 
-        guard random.roll(chance, 100 * (1 + self.factoriesUnderConstruction)) else {
+        guard random.roll(chance, 200 * (1 + self.factoriesUnderConstruction)) else {
             return nil
         }
 

@@ -6,12 +6,13 @@ extension Collection<Int64> {
     ///     An array where each element represents the amount of funds allocated to the
     ///     corresponding shareholder.
     @inlinable public func distribute(_ funds: Int64) -> [Int64]? {
-        self.distribute(funds, share: \.self)
+        // can’t use `\.self`, the compiler forgets to optimize it
+        self.distribute(funds) { $0 }
     }
 }
 extension Collection where Element: BinaryFloatingPoint {
     @inlinable public func distribute(_ funds: Int64) -> [Int64]? {
-        self.distribute(funds, share: \.self)
+        self.distribute(funds) { $0 }
     }
 }
 extension Collection {
