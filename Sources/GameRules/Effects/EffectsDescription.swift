@@ -9,6 +9,9 @@ struct EffectsDescription {
 
     let miningEfficiencyAll: Exact?
     let miningEfficiency: SymbolTable<Exact>?
+
+    let livestockBreedingEfficiency: Exact?
+    let livestockCullingEfficiency: Exact?
 }
 extension EffectsDescription {
     func resolved(with symbols: GameSaveSymbols) throws -> [Effect] {
@@ -36,6 +39,13 @@ extension EffectsDescription {
             }
         }
 
+        if let value: Exact = self.livestockBreedingEfficiency {
+            effects.append(.livestockBreedingEfficiency(value))
+        }
+        if let value: Exact = self.livestockCullingEfficiency {
+            effects.append(.livestockCullingEfficiency(value))
+        }
+
         return effects
     }
 }
@@ -45,6 +55,8 @@ extension EffectsDescription: JavaScriptDecodable {
         case factory_productivity
         case mining_efficiency_all
         case mining_efficiency
+        case livestock_breeding_efficiency
+        case livestock_culling_efficiency
     }
 
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
@@ -52,7 +64,9 @@ extension EffectsDescription: JavaScriptDecodable {
             factoryProductivityAll: try js[.factory_productivity_all]?.decode(),
             factoryProductivity: try js[.factory_productivity]?.decode(),
             miningEfficiencyAll: try js[.mining_efficiency_all]?.decode(),
-            miningEfficiency: try js[.mining_efficiency]?.decode()
+            miningEfficiency: try js[.mining_efficiency]?.decode(),
+            livestockBreedingEfficiency: try js[.livestock_breeding_efficiency]?.decode(),
+            livestockCullingEfficiency: try js[.livestock_culling_efficiency]?.decode(),
         )
     }
 }

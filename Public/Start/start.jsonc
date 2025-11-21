@@ -25,11 +25,13 @@
             "Nuclear Power Plant": 21
         },
         "technologies": {
-            "Mechanized Production": 1,
-            "Hydraulic Fracking": 2,
-            "Deepwater Drilling": 3,
-            "Bayer Process": 4,
-            "Taconite Concentration": 5
+            "Forced Insemination": 1,
+            "Industrial Gas Chambers": 2,
+            "Mechanized Production": 3,
+            "Hydraulic Fracking": 4,
+            "Deepwater Drilling": 5,
+            "Bayer Process": 6,
+            "Taconite Concentration": 7
         }
     },
     "factories": [

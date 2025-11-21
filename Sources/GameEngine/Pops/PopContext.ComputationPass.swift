@@ -8,6 +8,7 @@ extension PopContext {
         let rules: GameRules
 
         let planets: RuntimeContextTable<PlanetContext>
+        let cultures: RuntimeContextTable<CultureContext>
         let factories: RuntimeStateTable<FactoryContext>
         let mines: RuntimeStateTable<MineContext>
     }

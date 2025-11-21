@@ -12,7 +12,7 @@ public final class TechnologyMetadata: GameMetadata {
         starter: Bool,
         effects: [Effect],
         summary: String
-    ) throws {
+    ) {
         self.identity = identity
         self.starter = starter
         self.effects = effects

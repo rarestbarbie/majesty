@@ -178,7 +178,13 @@
         "color": "#536877"
     },
     {
+        "id": "Chicken",
+        "type": "Poultry",
+        "color": "#e4403a"
+    },
+    {
         "id": "Cow",
+        "type": "Cattle",
         "color": "#94737e"
     },
     {

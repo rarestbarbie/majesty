@@ -13,6 +13,7 @@ struct PopContext: RuntimeContext, LegalEntityContext {
     let type: PopMetadata
     var state: Pop
     private(set) var stats: Pop.Stats
+    private(set) var livestock: CultureMetadata?
     private(set) var region: RegionalProperties?
     private(set) var equity: Equity<LEI>.Statistics
     private(set) var budget: PopBudget?
@@ -25,6 +26,7 @@ struct PopContext: RuntimeContext, LegalEntityContext {
         self.type = type
         self.state = state
         self.stats = .init()
+        self.livestock = nil
         self.region = nil
         self.equity = .init()
         self.budget = nil
@@ -75,7 +77,10 @@ extension PopContext {
         self.factoryJobPay = [:]
         self.miningJobRank = [:]
 
-        if  case .Miner = self.state.type {
+        if  case .Livestock = self.state.type {
+            self.livestock = context.cultures[self.state.nat]?.type
+        } else if
+            case .Miner = self.state.type {
             // mining yield does not affect Politicians
             for job: MineID in self.state.mines.keys {
                 self.miningJobRank[job] = context.mines[job]?.z.yieldRank
@@ -91,30 +96,52 @@ extension PopContext {
         }
     }
 }
+extension PopContext {
+    var l: ResourceTier {
+        self.livestock?.diet ?? self.type.l
+    }
+    var e: ResourceTier {
+        self.type.e
+    }
+    var x: ResourceTier {
+        self.type.x
+    }
+    var output: ResourceTier {
+        self.livestock?.meat ?? self.type.output
+    }
+}
 extension PopContext: AllocatingContext {
     mutating func allocate(turn: inout Turn) {
-        if  self.state.type.stratum == .Ward {
+        guard let authority: CountryProperties = self.region?.occupiedBy else {
+            return
+        }
+
+        if  case _? = self.livestock {
             if  self.state.z.pa < 0.5 {
-                let p: Double = 0.000_1 * (0.5 - self.state.z.pa)
-                self.state.z.size -= Binomial[self.state.z.size, p].sample(
-                    using: &turn.random.generator
-                )
+                let r: Decimal = 1‰ + authority.modifiers.livestockCullingEfficiency.value
+                let p: Double = Double.init(r) * (0.5 - self.state.z.pa)
+                let cullable: Int64 = self.state.z.size - 1
+                if  cullable > 0 {
+                    self.state.z.size -= Binomial[cullable, p].sample(
+                        using: &turn.random.generator
+                    )
+                }
             } else {
-                let p: Double = 0.000_1 * (self.state.z.pa - 0.5)
+                let r: Decimal = 1‰ + authority.modifiers.livestockBreedingEfficiency.value
+                let p: Double = Double.init(r) * (self.state.z.pa - 0.5)
                 self.state.z.size += Binomial[self.state.z.size, p].sample(
+                    using: &turn.random.generator
+                ) + Int64.random(
+                    in: 0 ... Int64.init((4 * self.state.z.pa).rounded()),
                     using: &turn.random.generator
                 )
             }
         }
 
-        guard let authority: CountryProperties = self.region?.occupiedBy else {
-            return
-        }
-
         let currency: Fiat = authority.currency.id
         let balance: Int64 = turn.bank[account: self.lei].settled
 
-        self.state.inventory.out.sync(with: self.type.output, releasing: 1)
+        self.state.inventory.out.sync(with: self.output, releasing: 1)
         for j: Int in self.state.mines.values.indices {
             {
                 guard
@@ -129,15 +156,15 @@ extension PopContext: AllocatingContext {
         /// Compute vertical weights.
         let z: (l: Double, e: Double, x: Double) = self.state.needsScalePerCapita
         self.state.inventory.l.sync(
-            with: self.type.l,
+            with: self.l,
             scalingFactor: (self.state.z.size, z.l),
         )
         self.state.inventory.e.sync(
-            with: self.type.e,
+            with: self.e,
             scalingFactor: (self.state.z.size, z.e),
         )
         self.state.inventory.x.sync(
-            with: self.type.x,
+            with: self.x,
             scalingFactor: (self.state.z.size, z.x),
         )
 
@@ -222,8 +249,12 @@ extension PopContext: TransactingContext {
                 on: &turn.worldMarkets
             )
             self.state.inventory.out.deposit(
-                from: self.type.output,
-                scalingFactor: (self.state.z.size, 1)
+                from: self.output,
+                scalingFactor: (
+                    self.state.z.size,
+                    // yesterday’s fulfillment, not today’s, as we do not yet know it
+                    self.state.type.stratum == .Ward ? self.state.y.fl : 1
+                )
             )
 
             for j: Int in self.state.mines.values.indices {
@@ -258,7 +289,7 @@ extension PopContext: TransactingContext {
 
             self.state.z.fl = self.state.inventory.l.fulfilled
             self.state.inventory.l.consume(
-                from: self.type.l,
+                from: self.l,
                 scalingFactor: (self.state.z.size, z.l)
             )
 
@@ -273,7 +304,7 @@ extension PopContext: TransactingContext {
 
             self.state.z.fe = self.state.inventory.e.fulfilled
             self.state.inventory.e.consume(
-                from: self.type.e,
+                from: self.e,
                 scalingFactor: (self.state.z.size, z.e)
             )
 
@@ -288,12 +319,14 @@ extension PopContext: TransactingContext {
 
             self.state.z.fx = self.state.inventory.x.fulfilled
             self.state.inventory.x.consume(
-                from: self.type.x,
+                from: self.x,
                 scalingFactor: (self.state.z.size, z.x)
             )
 
             // Welfare
-            account.s += self.state.z.size * country.minwage / 10
+            if  self.state.type.stratum != .Ward {
+                account.s += self.state.z.size * country.minwage / 10
+            }
         } (&turn.bank[account: self.lei])
 
         liquidation:

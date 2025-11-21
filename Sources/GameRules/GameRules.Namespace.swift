@@ -9,6 +9,7 @@ extension GameRules {
         case pops
         case technologies
 
+        case biology
         case geology
         case terrains
 
