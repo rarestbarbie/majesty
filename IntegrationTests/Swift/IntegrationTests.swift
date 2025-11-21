@@ -1,3 +1,5 @@
+import Glibc
+
 import GameEngine
 import GameIDs
 import JavaScriptKit
@@ -41,6 +43,7 @@ extension IntegrationTestFile: JavaScriptDecodable {
             try Self.HashRules()
         } catch {
             print("Integration test 'HashRules' failed: \(error)")
+            exit(1)
         }
 
         for target: GameDate in [
@@ -61,7 +64,7 @@ extension IntegrationTestFile: JavaScriptDecodable {
                     Integration test 'HashGameState' failed for target \(target): \(error)
                     """
                 )
-                continue
+                exit(1)
             }
 
             outputs.append(
