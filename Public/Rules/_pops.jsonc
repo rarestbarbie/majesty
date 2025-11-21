@@ -5,8 +5,7 @@
             "Electricity": 1,
             "Clothing": 2,
             "Medical Equipment": 1,
-            "Poultry": 2,
-            "Wheat": 2,
+            "Groceries": 2,
             "Vehicles": 1,
             "Water": 1
         },
@@ -79,8 +78,7 @@
             "Electricity": 1,
             "Clothing": 6,
             "Medical Equipment": 2,
-            "Poultry": 2,
-            "Wheat": 2,
+            "Groceries": 2,
             "Vehicles": 4,
             "Water": 1
         },
@@ -113,8 +111,7 @@
             "Electricity": 1,
             "Clothing": 6,
             "Medical Equipment": 2,
-            "Poultry": 2,
-            "Wheat": 2,
+            "Groceries": 2,
             "Vehicles": 4,
             "Water": 1
         },
