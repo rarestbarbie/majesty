@@ -78,6 +78,20 @@
             "Engineer": 5000
         }
     },
+    "Cattle Ranch": {
+        "materials": {
+            "Machine Parts": 1,
+            "Heifers": 20
+        },
+        "output": {
+            "Beef": 20
+        },
+        "workers": {
+            "Driver": 5000,
+            "Farmer": 3000
+        },
+        "terrain": ["Archipelago", "Desert", "Forest", "Rainforest", "Steppe"]
+    },
     "Cereal Farm": {
         "materials": {
             "Water": 20,
@@ -91,24 +105,35 @@
             "Driver": 20000,
             "Farmer": 5000
         },
-        "terrain": ["Desert", "Forest", "Rainforest", "Steppe"]
+        "terrain": ["Archipelago", "Desert", "Forest", "Rainforest", "Steppe"]
     },
-    "Cosmetics Factory": {
-        "emoji": "💄",
-        "color": "#ffffff",
+    "Chicken Farm": {
         "materials": {
-            "Polymers": 4,
-            "Produce": 4,
-            "Mica": 2,
-            "Water": 2
+            "Machine Parts": 1,
+            "Chicks": 100
         },
         "output": {
-            "Makeup": 10,
-            "Medical Equipment": 2
+            "Poultry": 100
         },
         "workers": {
             "Driver": 5000,
-            "Engineer": 5000
+            "Farmer": 3000
+        },
+        "terrain": ["Archipelago", "Desert", "Forest", "Rainforest", "Steppe"]
+    },
+    "Chicken Plant": {
+        "materials": {
+            "Machine Parts": 1,
+            "Appliances": 1,
+            "Poultry": 100,
+            "Water": 20
+        },
+        "output": {
+            "Meat": 320
+        },
+        "workers": {
+            "Driver": 10000,
+            "Engineer": 3000
         }
     },
     "Clothing Workshop": {
@@ -122,6 +147,43 @@
         },
         "output": {
             "Clothing": 15
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
+        }
+    },
+    "Creator Studio": {
+        "emoji": "🎥",
+        "color": "#21b9ff",
+        "materials": {
+            "Storage": 4,
+            "Services": 4,
+            "Makeup": 1,
+            "Lingerie": 1,
+            "Instruments": 1
+        },
+        "output": {
+            "Media": 9,
+            "Advertising": 1
+        },
+        "workers": {
+            "Editor": 5000,
+            "Farmer": 5000
+        }
+    },
+    "Cosmetics Factory": {
+        "emoji": "💄",
+        "color": "#ffffff",
+        "materials": {
+            "Polymers": 4,
+            "Produce": 4,
+            "Mica": 2,
+            "Water": 2
+        },
+        "output": {
+            "Makeup": 10,
+            "Medical Equipment": 2
         },
         "workers": {
             "Driver": 5000,
@@ -262,7 +324,7 @@
         "emoji": "💝",
         "color": "#ff4171",
         "materials": {
-            "Advertising": 8,
+            "Advertising": 4,
             "Clothing": 4
         },
         "output": {
@@ -294,7 +356,7 @@
         "emoji": "💍",
         "color": "#9df0ff",
         "materials": {
-            "Advertising": 7,
+            "Advertising": 4,
             "Alloys": 1
         },
         "output": {
@@ -378,7 +440,7 @@
             "Driver": 20000,
             "Farmer": 5000
         },
-        "terrain": ["Desert", "Steppe", "Forest", "Rainforest"]
+        "terrain": ["Archipelago", "Desert", "Steppe", "Forest", "Rainforest"]
     },
     "Polypropylene Plant": {
         "materials": {
@@ -415,12 +477,11 @@
     "Slaughterhouse": {
         "materials": {
             "Machine Parts": 1,
-            "Livestock": 160,
+            "Beef": 20,
             "Water": 20
         },
         "output": {
-            "Poultry": 240,
-            "Beef": 80
+            "Meat": 320
         },
         "workers": {
             "Driver": 10000,
@@ -431,7 +492,7 @@
         "materials": {
             "Appliances": 1,
             "Vehicles": 1,
-            "Poultry": 100,
+            "Meat": 60,
             "Wheat": 100
         },
         "output": {
@@ -440,6 +501,18 @@
         "workers": {
             "Driver": 20000,
             "Farmer": 3000
+        }
+    },
+    "Synthetic Mica Plant": {
+        "materials": {
+            "Electricity": 100
+        },
+        "output": {
+            "Mica": 10
+        },
+        "workers": {
+            "Driver": 5000,
+            "Engineer": 5000
         }
     },
     "Uranium Enrichment Facility": {

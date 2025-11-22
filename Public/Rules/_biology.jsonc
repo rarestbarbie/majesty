@@ -1,10 +1,9 @@
 {
     "_Pet": {
     },
-    "Poultry": {
+    "Chickens": {
         "meat": {
-            "Livestock": 3,
-            "Poultry": 3
+            "Chicks": 6
         },
         "diet": {
             "Water": 1,
@@ -13,12 +12,11 @@
     },
     "Cattle": {
         "meat": {
-            "Livestock": 3,
-            "Beef": 3
+            "Heifers": 6
         },
         "diet": {
-            "Water": 3,
-            "Wheat": 3
+            "Water": 5,
+            "Wheat": 5
         }
     }
 }

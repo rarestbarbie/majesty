@@ -48,6 +48,10 @@
         "emoji": "🍗",
         "color": "#da9669"
     },
+    "Meat": {
+        "emoji": "🍖",
+        "color": "#c5533e"
+    },
     "Produce": {
         "emoji": "🥬",
         "color": "#7ed157"
@@ -342,6 +346,10 @@
         "emoji": "💄",
         "color": "#ff2643"
     },
+    "Media": {
+        "emoji": "🎞️",
+        "color": "#554a42"
+    },
     "Medical Equipment": {
         "emoji": "💉",
         "color": "#9de9f7"
@@ -383,12 +391,18 @@
         "color": "#91091b"
     },
 
-
-    "Livestock": {
+    "Heifers": {
         "emoji": "🐄",
-        "color": "#7c566c"
+        "color": "#7c566c",
+        "local": true,
+        "storable": true
     },
-
+    "Chicks": {
+        "emoji": "🐥",
+        "color": "#fffc4a",
+        "local": true,
+        "storable": true
+    },
 
     "Adderall": {
         "emoji": "💊",

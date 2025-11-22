@@ -55,5 +55,14 @@
             }
         },
         "summary": "Taconite Concentration technology allowed for the economical extraction of iron from low-grade taconite ore, which was previously considered waste. This innovation revitalized the iron mining industry in the Midwestern United States during the 20th century, leading to increased steel production and economic growth in the region."
+    },
+    "Direct Lithium Extraction": {
+        "starter": true,
+        "effects": {
+            "mining_efficiency": {
+                "Lithium Mine": "0.03"
+            }
+        },
+        "summary": "Direct Lithium Extraction technology revolutionized the lithium mining industry by enabling the efficient extraction of lithium from brine sources. This was considered more environmentally friendly than traditional evaporation methods."
     }
 }

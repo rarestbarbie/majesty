@@ -13,20 +13,19 @@
             "Electronics": 1,
             "Makeup": 1,
             "Produce": 2,
-            "Beef": 2,
             "Storage": 1,
-            "Services": 4,
+            "Services": 2,
             "Liquor": 1,
             "Vapes": 1
         },
         "x": {
             "Electronics": 2,
-            "Services": 8,
+            "Services": 2,
             "Firearms": 1,
-            "Advertising": 4,
+            "Media": 2,
             "Instruments": 1,
             "Jewelry": 1,
-            "Lingerie": 4
+            "Lingerie": 2
         }
     },
     "Livestock": {
@@ -87,7 +86,6 @@
             "Makeup": 2,
             "Clothing": 6,
             "Produce": 2,
-            "Beef": 2,
             "Storage": 2,
             "Services": 12,
             "Lingerie": 4,
@@ -96,7 +94,7 @@
         "x": {
             "Electronics": 2,
             "Firearms": 2,
-            "Advertising": 4,
+            "Media": 2,
             "Instruments": 4,
             "Jewelry": 2,
             "Lingerie": 10,
@@ -120,7 +118,6 @@
             "Makeup": 2,
             "Clothing": 6,
             "Produce": 2,
-            "Beef": 2,
             "Storage": 2,
             "Services": 12,
             "Lingerie": 4,
