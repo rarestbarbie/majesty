@@ -1,6 +1,6 @@
 import GameIDs
 
-extension InelasticBudgetTier {
+extension SegmentedBudgetTier {
     @frozen public struct Weight {
         let id: Resource
         let unitsToPurchase: Int64

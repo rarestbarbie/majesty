@@ -2,10 +2,10 @@ import Fraction
 import GameIDs
 import OrderedCollections
 
-@frozen public struct InelasticBudgetTier {
+@frozen public struct SegmentedBudgetTier {
     public let x: [Weight]
 }
-extension InelasticBudgetTier {
+extension SegmentedBudgetTier {
     public static func compute(
         demands: OrderedDictionary<Resource, ResourceInput>,
         markets: LocalMarkets,

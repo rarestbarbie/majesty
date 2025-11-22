@@ -39,9 +39,9 @@ extension LocalMarkets {
     public mutating func trade(
         selling: OrderedDictionary<Resource, ResourceOutput>,
         buying tier: (
-            (budget: Int64, weights: [InelasticBudgetTier.Weight]),
-            (budget: Int64, weights: [InelasticBudgetTier.Weight]),
-            (budget: Int64, weights: [InelasticBudgetTier.Weight])
+            (budget: Int64, weights: [SegmentedBudgetTier.Weight]),
+            (budget: Int64, weights: [SegmentedBudgetTier.Weight]),
+            (budget: Int64, weights: [SegmentedBudgetTier.Weight])
         ),
         as lei: LEI,
         in tile: Address,
@@ -89,20 +89,29 @@ extension LocalMarkets {
         entity: LEI,
         memo: LocalMarket.Memo? = nil,
         tile: Address,
-        weights: [InelasticBudgetTier.Weight],
+        weights: [SegmentedBudgetTier.Weight],
     ) {
         guard budgetTotal > 0,
         let budgets: [Int64] = weights.distribute(budgetTotal, share: \.value) else {
             return
         }
 
-        for (budget, x): (Int64, InelasticBudgetTier.Weight) in zip(budgets, weights) {
+        for (budget, x): (Int64, SegmentedBudgetTier.Weight) in zip(budgets, weights) {
             if budget > 0, x.unitsToPurchase > 0 {
                 self[x.id / tile].buy(
                     budget: budget,
                     entity: entity,
                     // not `x.unitsToPurchase`!
-                    // this effectively makes the stockpile target 1–2d
+                    //
+                    // why do we do it this way? some resource tiers (like the expansion tier)
+                    // are “progress like”, that is, it takes multiple days to fill them up to
+                    // 100 percent. if we set the limit to `x.unitsToPurchase`, then they would
+                    // have “hiccups” every time the meter passes the 100 percent mark and turns
+                    // over to zero again.
+                    //
+                    // this effectively makes the stockpile target 1–2d. it won’t cause us to
+                    // accumulate absurd amounts of resources, because we still condition
+                    // purchases on `x.unitsToPurchase > 0` above.
                     limit: x.units,
                     memo: memo,
                 )

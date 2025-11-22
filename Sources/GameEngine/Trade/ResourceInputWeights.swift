@@ -2,9 +2,9 @@ import GameEconomy
 import GameIDs
 
 struct ResourceInputWeights {
-    let l: (tradeable: TradeableBudgetTier, segmented: InelasticBudgetTier)
-    let e: (tradeable: TradeableBudgetTier, segmented: InelasticBudgetTier)
-    let x: (tradeable: TradeableBudgetTier, segmented: InelasticBudgetTier)
+    let l: (tradeable: AggregateBudgetTier, segmented: SegmentedBudgetTier)
+    let e: (tradeable: AggregateBudgetTier, segmented: SegmentedBudgetTier)
+    let x: (tradeable: AggregateBudgetTier, segmented: SegmentedBudgetTier)
 }
 extension ResourceInputWeights {
     init(

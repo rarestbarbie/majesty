@@ -56,7 +56,7 @@ extension ResourceInputs {
         let weights: [Double] = self.tradeable.values.map {
             Double.init(
                 $0.needed($0.unitsDemanded * target.lower)
-            ) * exchange.price(of: $0.id, in: currency)
+            ) * exchange.price(of: $0.id, in: currency)//.squareRoot()
         }
 
         return self.trade(

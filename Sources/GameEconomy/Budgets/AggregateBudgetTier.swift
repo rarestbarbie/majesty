@@ -1,12 +1,12 @@
 import GameIDs
 import OrderedCollections
 
-/// Unlike ``InelasticBudgetTier``, the weights of `TradeableBudgetTier` are only an estimate.
+/// Unlike ``PrecomputedBudgetTier``, the weights of `AggregateBudgetTier` are only an estimate.
 /// Therefore, we only track the total weight of all resources across the tier.
-@frozen public struct TradeableBudgetTier {
+@frozen public struct AggregateBudgetTier {
     public let total: Double
 }
-extension TradeableBudgetTier {
+extension AggregateBudgetTier {
     public static func compute(
         demands: OrderedDictionary<Resource, ResourceInput>,
         markets: borrowing BlocMarkets,
