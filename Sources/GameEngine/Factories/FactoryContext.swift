@@ -724,7 +724,11 @@ extension FactoryContext {
     func explainNeeds(_ ul: inout TooltipInstructionEncoder, base: Int64) {
         self.explainNeeds(&ul, base: base, unit: "worker")
     }
-    private func explainNeeds(_ ul: inout TooltipInstructionEncoder, base: Int64, unit: String) {
+    private func explainNeeds(
+        _ ul: inout TooltipInstructionEncoder,
+        base: Int64,
+        unit: String
+    ) {
         let productivity: Double = Double.init(self.productivity)
         let efficiency: Double = self.state.z.ei
         ul["Demand per \(unit)"] = (productivity * efficiency * Double.init(base))[..3]

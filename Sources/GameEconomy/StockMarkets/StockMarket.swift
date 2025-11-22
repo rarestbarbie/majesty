@@ -3,11 +3,11 @@ import GameIDs
 import Random
 
 @frozen public struct StockMarket {
-    public let id: Fiat
+    public let id: CurrencyID
     @usableFromInline var buyers: [RandomPurchase]
     @usableFromInline var assets: [TradeableAsset]
 
-    @inlinable init(id: Fiat) {
+    @inlinable init(id: CurrencyID) {
         self.id = id
         self.buyers = []
         self.assets = []
@@ -17,7 +17,7 @@ extension StockMarket {
     public mutating func match(
         shape: Shape,
         random: inout PseudoRandom,
-        execute: (inout PseudoRandom, Fiat, StockMarket.Fill) -> ()
+        execute: (inout PseudoRandom, CurrencyID, StockMarket.Fill) -> ()
     ) {
         defer {
             self.buyers.removeAll(keepingCapacity: true)

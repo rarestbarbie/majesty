@@ -1,6 +1,6 @@
 import GameIDs
 
 struct CurrencyLabel: Equatable, Identifiable {
-    let id: Fiat
+    let id: CurrencyID
     let name: String
 }

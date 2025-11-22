@@ -86,7 +86,7 @@ extension ResourceInput {
     mutating func trade(
         stockpileDays: ClosedRange<Int64>,
         budget: Int64,
-        in currency: Fiat,
+        in currency: CurrencyID,
         on exchange: inout BlocMarkets
     ) -> Int64 {
         {

@@ -50,7 +50,10 @@ extension MineContext: AllocatingContext {
             return
         }
 
-        let yield: (efficiency: Double, value: Double) = self.type.yield(tile: region, turn: turn)
+        let yield: (efficiency: Double, value: Double) = self.type.yield(
+            tile: region,
+            turn: turn
+        )
         self.state.z.efficiency = yield.efficiency
         self.state.z.yield = yield.value
     }

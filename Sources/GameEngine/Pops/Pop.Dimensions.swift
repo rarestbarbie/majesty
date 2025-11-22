@@ -19,7 +19,19 @@ extension Pop {
 }
 extension Pop.Dimensions {
     init() {
-        self.init(size: 0, mil: 0, con: 0, fl: 0, fe: 0, fx: 0, vl: 0, ve: 0, vx: 0, px: 1, profitability: 0)
+        self.init(
+            size: 0,
+            mil: 0,
+            con: 0,
+            fl: 0,
+            fe: 0,
+            fx: 0,
+            vl: 0,
+            ve: 0,
+            vx: 0,
+            px: 1,
+            profitability: 0
+        )
     }
 }
 extension Pop.Dimensions {

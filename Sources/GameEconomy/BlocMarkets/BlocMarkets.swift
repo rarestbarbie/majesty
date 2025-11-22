@@ -57,7 +57,7 @@ extension BlocMarkets {
         }
     }
 
-    @inlinable public func price(of resource: Resource, in currency: Fiat) -> Double {
+    @inlinable public func price(of resource: Resource, in currency: CurrencyID) -> Double {
         self.table[resource / currency]?.price ?? 1
     }
 
@@ -75,8 +75,8 @@ extension BlocMarkets {
 extension BlocMarkets {
     /// This has O(n²) complexity, where n is the number of trading partners.
     public mutating func arbitrate(
-        currency: Fiat,
-        partners: [Fiat],
+        currency: CurrencyID,
+        partners: [CurrencyID],
         capital: inout Int64
     ) -> [ResourceArbitrage] {
         partners.reduce(into: []) {
@@ -104,8 +104,8 @@ extension BlocMarkets {
     ///     This has units of `currency`.
     public mutating func arbitrate(
         resource: Resource,
-        currency: Fiat,
-        partners: [Fiat],
+        currency: CurrencyID,
+        partners: [CurrencyID],
         capital: inout Int64
     ) -> ResourceArbitrage? {
         self.arbitrate(
@@ -118,8 +118,8 @@ extension BlocMarkets {
 
     @_spi(testable) public mutating func arbitrate(
         resource: BlocMarket.Asset,
-        currency: Fiat,
-        partners: [Fiat],
+        currency: CurrencyID,
+        partners: [CurrencyID],
         capital: inout Int64
     ) -> ResourceArbitrage? {
         /// This is the maximum amount of `resource` that we can export from the local market,
@@ -129,7 +129,7 @@ extension BlocMarkets {
         )
         var best: ResourceArbitrage.Opportunity? = nil
 
-        for foreign: Fiat in partners {
+        for foreign: CurrencyID in partners {
             if case .fiat(let fiat) = resource, fiat == foreign {
                 // Skip the same currency.
                 continue

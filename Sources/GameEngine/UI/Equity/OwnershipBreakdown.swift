@@ -32,7 +32,10 @@ extension OwnershipBreakdown {
             into: ([:], [:])
         ) {
             if  let country: Country = context.countries.state[$1.country] {
-                let label: PieChartLabel = .init(color: country.name.color, name: country.name.short)
+                let label: PieChartLabel = .init(
+                    color: country.name.color,
+                    name: country.name.short
+                )
                 $0.country[country.id, default: (0, label)].share += $1.shares
             }
             if  let culture: String = $1.culture,

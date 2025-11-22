@@ -8,9 +8,9 @@ import Testing
 
         let XAU: Resource = .init(rawValue: 1)
         /// United Nations Bancor
-        let UNB: Fiat = 0
+        let UNB: CurrencyID = 0
         /// Martian Rand
-        let MAR: Fiat = 1
+        let MAR: CurrencyID = 1
 
         /// Sell 1,000 XAU into the local Martian market. By default, markets start out with
         /// 2 units of liquidity on both sides, and there is no external demand for XAU yet,
@@ -99,13 +99,13 @@ import Testing
         var exchange: BlocMarkets = .init()
 
         /// United Nations Bancor
-        let UNB: Fiat = 0
+        let UNB: CurrencyID = 0
         /// Martian Rand
-        let MAR: Fiat = 1
+        let MAR: CurrencyID = 1
         /// Lunar Bancor
-        let LUB: Fiat = 2
+        let LUB: CurrencyID = 2
         /// Ceres Reserve Note
-        let CRN: Fiat = 3
+        let CRN: CurrencyID = 3
 
         /// In this scenario, the Martian Rand and the United Nations Bancor have a “natural”
         /// exchange rate that values the Bancor much more than the Rand. However, there are two
