@@ -212,18 +212,18 @@ extension PopContext: AllocatingContext {
         }
 
         turn.localMarkets.trade(
-            selling: self.state.inventory.out.inelastic,
+            selling: self.state.inventory.out.segmented,
             buying: (
-                (budget.l.inelastic, weights.l.inelastic.x),
-                (budget.e.inelastic, weights.e.inelastic.x),
-                (budget.x.inelastic, weights.x.inelastic.x),
+                (budget.l.segmented, weights.l.segmented.x),
+                (budget.e.segmented, weights.e.segmented.x),
+                (budget.x.segmented, weights.x.segmented.x),
             ),
             as: self.lei,
             in: self.state.tile,
         )
         for job: MiningJob in self.state.mines.values {
             turn.localMarkets.sell(
-                supply: job.out.inelastic,
+                supply: job.out.segmented,
                 entity: self.lei,
                 memo: .mine(job.id),
                 tile: self.state.tile,

@@ -29,10 +29,10 @@ extension OperatingBudget {
         self.e = .init()
         self.x = .init()
 
-        let inelasticCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: weights.l.inelastic.total,
-            e: weights.e.inelastic.total,
-            x: weights.x.inelastic.total,
+        let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = (
+            l: weights.l.segmented.total,
+            e: weights.e.segmented.total,
+            x: weights.x.segmented.total,
         )
         let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = (
             l: Int64.init(weights.l.tradeable.total.rounded(.up)),
@@ -40,9 +40,9 @@ extension OperatingBudget {
             x: Int64.init(weights.x.tradeable.total.rounded(.up)),
         )
         let totalCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: tradeableCostPerDay.l + inelasticCostPerDay.l,
-            e: tradeableCostPerDay.e + inelasticCostPerDay.e,
-            x: tradeableCostPerDay.x + inelasticCostPerDay.x,
+            l: tradeableCostPerDay.l + segmentedCostPerDay.l,
+            e: tradeableCostPerDay.e + segmentedCostPerDay.e,
+            x: tradeableCostPerDay.x + segmentedCostPerDay.x,
         )
 
         let balance: Int64 = account.settled
@@ -69,7 +69,7 @@ extension OperatingBudget {
 
         (w: self.workers, c: self.clerks) = self.l.distribute(
             funds: balance / d.l,
-            inelastic: inelasticCostPerDay.l * stockpileMaxDays,
+            segmented: segmentedCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
             w: laborCostPerDay.w * stockpileMaxDays,
             c: laborCostPerDay.c * stockpileMaxDays,
@@ -77,7 +77,7 @@ extension OperatingBudget {
 
         self.e.distribute(
             funds: (balance - self.min.l) / d.e,
-            inelastic: inelasticCostPerDay.e * stockpileMaxDays,
+            segmented: segmentedCostPerDay.e * stockpileMaxDays,
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
         )
 
@@ -92,7 +92,7 @@ extension OperatingBudget {
 
         self.x.distribute(
             funds: investment,
-            inelastic: inelasticCostPerDay.x * stockpileMaxDays,
+            segmented: segmentedCostPerDay.x * stockpileMaxDays,
             tradeable: tradeableCostPerDay.x * stockpileMaxDays,
         )
     }

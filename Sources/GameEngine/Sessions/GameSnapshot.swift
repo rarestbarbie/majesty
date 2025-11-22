@@ -12,7 +12,7 @@ import OrderedCollections
     let context: GameContext
     let markets: (
         tradeable: OrderedDictionary<BlocMarket.ID, BlocMarket>,
-        inelastic: OrderedDictionary<LocalMarket.ID, LocalMarket>
+        segmented: OrderedDictionary<LocalMarket.ID, LocalMarket>
     )
     let bank: Bank
     let date: GameDate
@@ -151,10 +151,10 @@ extension GameSnapshot {
         }
 
         let market: (
-            inelastic: LocalMarketSnapshot?,
+            segmented: LocalMarketSnapshot?,
             tradeable: BlocMarket.State?
         ) = (
-            self.markets.inelastic[line.resource / factory.state.tile]?.snapshot(country),
+            self.markets.segmented[line.resource / factory.state.tile]?.snapshot(country),
             self.markets.tradeable[line.resource / country.currency.id]?.state
         )
 
@@ -404,7 +404,7 @@ extension GameSnapshot {
             let employment: Int64 = pop.stats.employedBeforeEgress
             return .instructions {
                 $0["Total employment"] = employment[/3]
-                for output: ResourceOutput in pop.state.inventory.out.inelastic.values {
+                for output: ResourceOutput in pop.state.inventory.out.segmented.values {
                     let name: String = self.context.rules.resources[output.id].title
                     $0[>] = """
                     Today these \(pop.state.type.plural) sold \(
@@ -607,10 +607,10 @@ extension GameSnapshot {
 
         let resource: Resource = line.resource
         let market: (
-            inelastic: LocalMarketSnapshot?,
+            segmented: LocalMarketSnapshot?,
             tradeable: BlocMarket.State?
         ) = (
-            self.markets.inelastic[resource / pop.state.tile]?.snapshot(country),
+            self.markets.segmented[resource / pop.state.tile]?.snapshot(country),
             self.markets.tradeable[resource / country.currency.id]?.state
         )
 

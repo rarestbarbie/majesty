@@ -3,33 +3,33 @@ import GameIDs
 import OrderedCollections
 
 @frozen public struct ResourceInputs {
+    public var segmented: OrderedDictionary<Resource, ResourceInput>
     public var tradeable: OrderedDictionary<Resource, ResourceInput>
-    public var inelastic: OrderedDictionary<Resource, ResourceInput>
 
     @inlinable public init(
+        segmented: OrderedDictionary<Resource, ResourceInput>,
         tradeable: OrderedDictionary<Resource, ResourceInput>,
-        inelastic: OrderedDictionary<Resource, ResourceInput>
     ) {
+        self.segmented = segmented
         self.tradeable = tradeable
-        self.inelastic = inelastic
     }
     @inlinable public init() {
+        self.segmented = [:]
         self.tradeable = [:]
-        self.inelastic = [:]
     }
 }
 extension ResourceInputs {
-    @inlinable public var count: Int { self.tradeable.count + self.inelastic.count }
+    @inlinable public var count: Int { self.segmented.count + self.tradeable.count }
 }
 extension ResourceInputs {
     public mutating func sync(
         with resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
-        self.tradeable.sync(with: resourceTier.tradeable) {
+        self.segmented.sync(with: resourceTier.segmented) {
             $1.turn(unitsDemanded: $0 * scalingFactor.x, efficiency: scalingFactor.z)
         }
-        self.inelastic.sync(with: resourceTier.inelastic) {
+        self.tradeable.sync(with: resourceTier.tradeable) {
             $1.turn(unitsDemanded: $0 * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }
@@ -37,11 +37,11 @@ extension ResourceInputs {
         from resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
+        for (id, amount): (Resource, Int64) in resourceTier.segmented {
+            self.segmented[id].consume(amount * scalingFactor.x, efficiency: scalingFactor.z)
+        }
         for (id, amount): (Resource, Int64) in resourceTier.tradeable {
             self.tradeable[id].consume(amount * scalingFactor.x, efficiency: scalingFactor.z)
-        }
-        for (id, amount): (Resource, Int64) in resourceTier.inelastic {
-            self.inelastic[id].consume(amount * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }
 }

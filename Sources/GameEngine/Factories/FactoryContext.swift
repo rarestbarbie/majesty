@@ -244,11 +244,11 @@ extension FactoryContext: TransactingContext {
         )
 
         turn.localMarkets.trade(
-            selling: self.state.inventory.out.inelastic,
+            selling: self.state.inventory.out.segmented,
             buying: (
-                (budget.l.inelastic, weights.l.inelastic.x),
-                (budget.e.inelastic, weights.e.inelastic.x),
-                (budget.x.inelastic, weights.x.inelastic.x),
+                (budget.l.segmented, weights.l.segmented.x),
+                (budget.e.segmented, weights.e.segmented.x),
+                (budget.x.segmented, weights.x.segmented.x),
             ),
             as: self.lei,
             in: self.state.tile

@@ -24,10 +24,10 @@ extension PopBudget {
         self.dividend = 0
         self.buybacks = 0
 
-        let inelasticCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: weights.l.inelastic.total,
-            e: weights.e.inelastic.total,
-            x: weights.x.inelastic.total,
+        let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = (
+            l: weights.l.segmented.total,
+            e: weights.e.segmented.total,
+            x: weights.x.segmented.total,
         )
         let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = (
             l: Int64.init(weights.l.tradeable.total.rounded(.up)),
@@ -35,8 +35,8 @@ extension PopBudget {
             x: Int64.init(weights.x.tradeable.total.rounded(.up)),
         )
         let totalCostPerDay: (l: Int64, e: Int64) = (
-            l: tradeableCostPerDay.l + inelasticCostPerDay.l,
-            e: tradeableCostPerDay.e + inelasticCostPerDay.e,
+            l: tradeableCostPerDay.l + segmentedCostPerDay.l,
+            e: tradeableCostPerDay.e + segmentedCostPerDay.e,
         )
 
         /// These are the minimum theoretical balances the pop would need to purchase 100% of
@@ -48,19 +48,19 @@ extension PopBudget {
 
         self.l.distribute(
             funds: balance / d.l,
-            inelastic: inelasticCostPerDay.l * stockpileMaxDays,
+            segmented: segmentedCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
         )
 
         self.e.distribute(
             funds: (balance - min.l) / d.e,
-            inelastic: inelasticCostPerDay.e * stockpileMaxDays,
+            segmented: segmentedCostPerDay.e * stockpileMaxDays,
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
         )
 
         self.x.distribute(
             funds: (balance - min.l - min.e) / d.x,
-            inelastic: inelasticCostPerDay.x * stockpileMaxDays,
+            segmented: segmentedCostPerDay.x * stockpileMaxDays,
             tradeable: tradeableCostPerDay.x * stockpileMaxDays,
         )
     }

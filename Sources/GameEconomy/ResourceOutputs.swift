@@ -4,30 +4,30 @@ import GameIDs
 import OrderedCollections
 
 @frozen public struct ResourceOutputs {
+    public var segmented: OrderedDictionary<Resource, ResourceOutput>
     public var tradeable: OrderedDictionary<Resource, ResourceOutput>
-    public var inelastic: OrderedDictionary<Resource, ResourceOutput>
 
     @inlinable public init(
+        segmented: OrderedDictionary<Resource, ResourceOutput>,
         tradeable: OrderedDictionary<Resource, ResourceOutput>,
-        inelastic: OrderedDictionary<Resource, ResourceOutput>
     ) {
+        self.segmented = segmented
         self.tradeable = tradeable
-        self.inelastic = inelastic
     }
     @inlinable public init() {
+        self.segmented = [:]
         self.tradeable = [:]
-        self.inelastic = [:]
     }
 }
 extension ResourceOutputs {
-    @inlinable public var count: Int { self.tradeable.count + self.inelastic.count }
+    @inlinable public var count: Int { self.segmented.count + self.tradeable.count }
 }
 extension ResourceOutputs {
     public mutating func sync(
         with resourceTier: ResourceTier,
         releasing fraction: Fraction
     ) {
-        self.inelastic.sync(with: resourceTier.inelastic) {
+        self.segmented.sync(with: resourceTier.segmented) {
             $1.turn(releasing: fraction)
         }
         self.tradeable.sync(with: resourceTier.tradeable) {
@@ -38,8 +38,8 @@ extension ResourceOutputs {
         from resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
-        for (id, amount): (Resource, Int64) in resourceTier.inelastic {
-            self.inelastic[id].deposit(amount * scalingFactor.x, efficiency: scalingFactor.z)
+        for (id, amount): (Resource, Int64) in resourceTier.segmented {
+            self.segmented[id].deposit(amount * scalingFactor.x, efficiency: scalingFactor.z)
         }
         for (id, amount): (Resource, Int64) in resourceTier.tradeable {
             self.tradeable[id].deposit(amount * scalingFactor.x, efficiency: scalingFactor.z)

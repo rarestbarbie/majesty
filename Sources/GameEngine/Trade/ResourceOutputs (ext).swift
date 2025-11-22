@@ -8,8 +8,8 @@ import JavaScriptInterop
 
 extension ResourceOutputs {
     var valueSold: Int64 {
-        self.tradeable.values.reduce(0) { $0 + $1.valueSold } +
-        self.inelastic.values.reduce(0) { $0 + $1.valueSold }
+        self.segmented.values.reduce(0) { $0 + $1.valueSold } +
+        self.tradeable.values.reduce(0) { $0 + $1.valueSold }
     }
 }
 extension ResourceOutputs {
@@ -25,9 +25,9 @@ extension ResourceOutputs {
             amount = tradeable
             output = self.tradeable[id]
         } else if
-            let inelastic: Int64 = tier.inelastic[id] {
-            amount = inelastic
-            output = self.inelastic[id]
+            let segmented: Int64 = tier.segmented[id] {
+            amount = segmented
+            output = self.segmented[id]
         } else {
             return nil
         }
@@ -59,7 +59,7 @@ extension ResourceOutputs {
     func tooltipExplainPrice(
         _ id: Resource,
         _ market: (
-            inelastic: LocalMarketSnapshot?,
+            segmented: LocalMarketSnapshot?,
             tradeable: BlocMarket.State?
         ),
     ) -> Tooltip? {
@@ -81,8 +81,8 @@ extension ResourceOutputs {
                 """
             }
         } else if
-            let filled: ResourceOutput = self.inelastic[id],
-            let market: LocalMarketSnapshot = market.inelastic {
+            let filled: ResourceOutput = self.segmented[id],
+            let market: LocalMarketSnapshot = market.segmented {
             return .instructions {
                 // Show the ask price here, because the bid price is what they actually
                 // received, and that is shown several lines below
@@ -152,21 +152,21 @@ extension ResourceOutputs {
 }
 extension ResourceOutputs {
     @frozen public enum ObjectKey: JSString, Sendable {
+        case segmented = "s"
         case tradeable = "t"
-        case inelastic = "i"
     }
 }
 extension ResourceOutputs: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+        js[.segmented] = self.segmented
         js[.tradeable] = self.tradeable
-        js[.inelastic] = self.inelastic
     }
 }
 extension ResourceOutputs: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
+            segmented: try js[.segmented].decode(),
             tradeable: try js[.tradeable].decode(),
-            inelastic: try js[.inelastic].decode()
         )
     }
 }
