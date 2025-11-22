@@ -511,8 +511,8 @@
             "Mica": 10
         },
         "workers": {
-            "Driver": 20000,
-            "Farmer": 3000
+            "Driver": 5000,
+            "Engineer": 5000
         }
     },
     "Uranium Enrichment Facility": {
