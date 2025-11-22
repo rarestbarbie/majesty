@@ -78,11 +78,11 @@
         "scale": 200000000,
         "spawn": {
             "Earth_Large_Igneous_Province": {
-                "rate": "0.05",
-                "size": 2
+                "rate": "0.1",
+                "size": 4
             },
             "Earth_Sedimentary_Basin": {
-                "rate": "0.01",
+                "rate": "0.02",
                 "size": 1
             }
         },

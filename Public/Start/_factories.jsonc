@@ -25,6 +25,7 @@
             "Hydroelectric Dam",
             "Supermarket",
             "Plantation",
+            "Creator Studio",
             "Machine Parts Factory",
             "Polypropylene Plant"
         ]
@@ -37,6 +38,8 @@
             "Hydroelectric Dam",
             "Supermarket",
             "Cereal Farm",
+            "Cattle Ranch",
+            "Chicken Farm",
             "Machine Parts Factory",
             "Automotive Assembly Plant",
             "Appliance Factory"
@@ -130,7 +133,8 @@
     {
         "tile": "399S2,2",
         "factories": [
-            "Hydroelectric Dam"
+            "Hydroelectric Dam",
+            "Cattle Ranch"
         ]
     },
 
@@ -138,7 +142,8 @@
     {
         "tile": "399S1,2",
         "factories": [
-            "Hydroelectric Dam"
+            "Hydroelectric Dam",
+            "Cattle Ranch"
         ]
     },
 
@@ -270,7 +275,8 @@
         "tile": "399S-1,-2",
         "factories": [
             "Hydroelectric Dam",
-            "Supermarket"
+            "Supermarket",
+            "Cattle Ranch"
         ]
     },
 
@@ -279,7 +285,8 @@
         "tile": "399S-2,-1",
         "factories": [
             "Hydroelectric Dam",
-            "Supermarket"
+            "Supermarket",
+            "Cattle Ranch"
         ]
     },
 

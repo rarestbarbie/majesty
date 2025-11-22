@@ -5,6 +5,12 @@
         "*": {
             "Services": 1,
             "Storage": 1
+        },
+        "Cattle Ranch": {
+            "Heifers": 5
+        },
+        "Chicken Farm": {
+            "Chicks": 25
         }
     },
     "expansion": {
@@ -14,6 +20,14 @@
         "Nuclear Power Plant": {
             "Construction": 100000,
             "Influence": 10000
+        },
+        "Cattle Ranch": {
+            "Construction": 100000,
+            "Heifers": 50000
+        },
+        "Chicken Farm": {
+            "Construction": 100000,
+            "Chicks": 250000
         }
     }
 }
