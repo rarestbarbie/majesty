@@ -11,10 +11,10 @@ struct Inventory {
 extension Inventory {
     init() {
         self.init(
-            out: .init(),
-            l: .init(),
-            e: .init(),
-            x: .init()
+            out: .empty,
+            l: .empty,
+            e: .empty,
+            x: .empty
         )
     }
 }
@@ -56,7 +56,7 @@ extension Inventory {
         units: Int64,
         value: Int64,
     ) {
-        self.out.inelastic[resource]?.report(unitsSold: units, valueSold: value)
+        self.out.segmented[resource]?.report(unitsSold: units, valueSold: value)
     }
 
     private mutating func report(
@@ -67,17 +67,17 @@ extension Inventory {
     ) {
         switch tier {
         case 0?:
-            self.l.inelastic[resource]?.report(
+            self.l.segmented[resource]?.report(
                 unitsPurchased: units,
                 valuePurchased: value,
             )
         case 1?:
-            self.e.inelastic[resource]?.report(
+            self.e.segmented[resource]?.report(
                 unitsPurchased: units,
                 valuePurchased: value,
             )
         case 2?:
-            self.x.inelastic[resource]?.report(
+            self.x.segmented[resource]?.report(
                 unitsPurchased: units,
                 valuePurchased: value,
             )

@@ -36,38 +36,37 @@ extension LocalMarkets {
     }
 }
 extension LocalMarkets {
-    public mutating func trade(
-        selling: OrderedDictionary<Resource, ResourceOutput>,
-        buying tier: (
-            (budget: Int64, weights: [InelasticBudgetTier.Weight]),
-            (budget: Int64, weights: [InelasticBudgetTier.Weight]),
-            (budget: Int64, weights: [InelasticBudgetTier.Weight])
-        ),
+    public mutating func tradeAsConsumer(
+        selling supply: OrderedDictionary<Resource, ResourceOutput>,
+        buying demands: SegmentedWeights<ElasticDemand>,
+        budget: (l: Int64, e: Int64, x: Int64),
         as lei: LEI,
-        in tile: Address,
+        in tile: Address
     ) {
-        self.buy(
-            budget: tier.0.budget,
-            entity: lei,
-            memo: .tier(0),
-            tile: tile,
-            weights: tier.0.weights
+        self.trade(
+            selling: supply,
+            weights: demands,
+            budget: budget,
+            as: lei,
+            in: tile,
+            progressive: (false, false, x: false)
         )
-        self.buy(
-            budget: tier.1.budget,
-            entity: lei,
-            memo: .tier(1),
-            tile: tile,
-            weights: tier.1.weights
+    }
+    public mutating func tradeAsBusiness(
+        selling supply: OrderedDictionary<Resource, ResourceOutput>,
+        buying demands: SegmentedWeights<InelasticDemand>,
+        budget: (l: Int64, e: Int64, x: Int64),
+        as lei: LEI,
+        in tile: Address
+    ) {
+        self.trade(
+            selling: supply,
+            weights: demands,
+            budget: budget,
+            as: lei,
+            in: tile,
+            progressive: (false, false, x: true)
         )
-        self.buy(
-            budget: tier.2.budget,
-            entity: lei,
-            memo: .tier(2),
-            tile: tile,
-            weights: tier.2.weights
-        )
-        self.sell(supply: selling, entity: lei, tile: tile)
     }
 
     public mutating func sell(
@@ -83,27 +82,73 @@ extension LocalMarkets {
             }
         }
     }
+}
+extension LocalMarkets {
+    private mutating func trade<Demand>(
+        selling: OrderedDictionary<Resource, ResourceOutput>,
+        weights: SegmentedWeights<Demand>,
+        budget: (l: Int64, e: Int64, x: Int64),
+        as lei: LEI,
+        in tile: Address,
+        progressive: (l: Bool, e: Bool, x: Bool)
+    ) {
+        self.buy(
+            budget: budget.0,
+            entity: lei,
+            memo: .tier(0),
+            tile: tile,
+            weights: weights.l,
+            progressive: progressive.0
+        )
+        self.buy(
+            budget: budget.1,
+            entity: lei,
+            memo: .tier(1),
+            tile: tile,
+            weights: weights.e,
+            progressive: progressive.1
+        )
+        self.buy(
+            budget: budget.2,
+            entity: lei,
+            memo: .tier(2),
+            tile: tile,
+            weights: weights.x,
+            progressive: progressive.2
+        )
+        self.sell(supply: selling, entity: lei, tile: tile)
+    }
 
-    public mutating func buy(
+    private mutating func buy<Demand>(
         budget budgetTotal: Int64,
         entity: LEI,
         memo: LocalMarket.Memo? = nil,
         tile: Address,
-        weights: [InelasticBudgetTier.Weight],
+        weights: SegmentedWeights<Demand>.Tier,
+        progressive: Bool,
     ) {
         guard budgetTotal > 0,
-        let budgets: [Int64] = weights.distribute(budgetTotal, share: \.value) else {
+        let budgets: [Int64] = weights.demands.distribute(budgetTotal, share: \.value) else {
             return
         }
 
-        for (budget, x): (Int64, InelasticBudgetTier.Weight) in zip(budgets, weights) {
-            if budget > 0, x.unitsToPurchase > 0 {
-                self[x.id / tile].buy(
+        for (budget, demand): (Int64, Demand) in zip(budgets, weights.demands) {
+            if budget > 0, demand.unitsToPurchase > 0 {
+                self[demand.id / tile].buy(
                     budget: budget,
                     entity: entity,
-                    // not `x.unitsToPurchase`!
-                    // this effectively makes the stockpile target 1–2d
-                    limit: x.units,
+                    // not `demand.unitsToPurchase`!
+                    //
+                    // why do we do it this way? some resource tiers (like the expansion tier)
+                    // are “progress like”, that is, it takes multiple days to fill them up to
+                    // 100 percent. if we set the limit to `unitsToPurchase`, then they would
+                    // have “hiccups” every time the meter passes the 100 percent mark and turns
+                    // over to zero again.
+                    //
+                    // this effectively makes the stockpile target 1–2d. it won’t cause us to
+                    // accumulate absurd amounts of resources, because we still condition
+                    // purchases on `x.unitsToPurchase > 0` above.
+                    limit: progressive ? demand.units : demand.unitsToPurchase,
                     memo: memo,
                 )
             }

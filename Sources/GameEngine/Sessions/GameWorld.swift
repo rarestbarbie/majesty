@@ -9,22 +9,22 @@ struct GameWorld: ~Copyable {
 
     var notifications: Notifications
     var bank: Bank
+    var segmentedMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
     var tradeableMarkets: OrderedDictionary<BlocMarket.ID, BlocMarket>
-    var inelasticMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
 }
 extension GameWorld {
     init(
         notifications: Notifications,
         bank: Bank,
+        segmentedMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>,
         tradeableMarkets: OrderedDictionary<BlocMarket.ID, BlocMarket>,
-        inelasticMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>,
         random: PseudoRandom,
     ) {
         self.random = random
         self.notifications = notifications
         self.bank = bank
         self.tradeableMarkets = tradeableMarkets
-        self.inelasticMarkets = inelasticMarkets
+        self.segmentedMarkets = segmentedMarkets
     }
 }
 extension GameWorld {
@@ -42,7 +42,7 @@ extension GameWorld {
                     table: self.tradeableMarkets
                 ),
                 localMarkets: .init(
-                    table: self.inelasticMarkets
+                    table: self.segmentedMarkets
                 ),
             )
         }
@@ -52,8 +52,8 @@ extension GameWorld {
                 self = .init(
                     notifications: .init(date: .min),
                     bank: .init(accounts: [:]),
+                    segmentedMarkets: [:],
                     tradeableMarkets: [:],
-                    inelasticMarkets: [:],
                     random: .init(seed: 0),
                 )
             }
@@ -61,8 +61,8 @@ extension GameWorld {
                 self = .init(
                     notifications: turn.notifications,
                     bank: turn.bank,
+                    segmentedMarkets: turn.localMarkets.markets,
                     tradeableMarkets: turn.worldMarkets.markets,
-                    inelasticMarkets: turn.localMarkets.markets,
                     random: turn.random,
                 )
             }

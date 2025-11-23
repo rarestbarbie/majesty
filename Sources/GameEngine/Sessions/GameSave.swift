@@ -12,8 +12,8 @@ public struct GameSave {
     let player: CountryID
 
     let accounts: OrderedDictionary<LEI, Bank.Account>.Items
+    let segmentedMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
     let tradeableMarkets: OrderedDictionary<BlocMarket.ID, BlocMarket>
-    let inelasticMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
     let date: GameDate
 
     let cultures: [Culture]
@@ -30,8 +30,8 @@ extension GameSave {
         case player
 
         case accounts
+        case markets_segmented
         case markets_tradeable
-        case markets_inelastic
         case date
 
         // case terrain
@@ -52,8 +52,8 @@ extension GameSave: JavaScriptEncodable {
         js[.random] = self.random
         js[.player] = self.player
         js[.accounts] = self.accounts
+        js[.markets_segmented] = self.segmentedMarkets
         js[.markets_tradeable] = self.tradeableMarkets
-        js[.markets_inelastic] = self.inelasticMarkets
         js[.date] = self.date
 
         js[.cultures] = self.cultures
@@ -70,8 +70,8 @@ extension GameSave: JavaScriptDecodable {
             random: try js[.random].decode(),
             player: try js[.player].decode(),
             accounts: try js[.accounts]?.decode() ?? .init(dictionary: [:]),
+            segmentedMarkets: try js[.markets_segmented]?.decode() ?? [:],
             tradeableMarkets: try js[.markets_tradeable]?.decode() ?? [:],
-            inelasticMarkets: try js[.markets_inelastic]?.decode() ?? [:],
             date: try js[.date].decode(),
             cultures: try js[.cultures].decode(),
             countries: try js[.countries].decode(),

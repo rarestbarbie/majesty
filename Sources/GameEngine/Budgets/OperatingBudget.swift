@@ -21,7 +21,10 @@ extension OperatingBudget {
         workers: Workforce?,
         clerks: (Workforce, FactoryMetadata.ClerkBonus)?,
         state: Factory.Dimensions,
-        weights: __shared ResourceInputWeights,
+        weights: __shared (
+            segmented: SegmentedWeights<InelasticDemand>,
+            tradeable: AggregateWeights
+        ),
         stockpileMaxDays: Int64,
         d: (l: Int64, e: Int64, x: Int64, v: Double?)
     ) {
@@ -29,20 +32,20 @@ extension OperatingBudget {
         self.e = .init()
         self.x = .init()
 
-        let inelasticCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: weights.l.inelastic.total,
-            e: weights.e.inelastic.total,
-            x: weights.x.inelastic.total,
+        let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = (
+            l: weights.segmented.l.total,
+            e: weights.segmented.e.total,
+            x: weights.segmented.x.total,
         )
         let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: Int64.init(weights.l.tradeable.total.rounded(.up)),
-            e: Int64.init(weights.e.tradeable.total.rounded(.up)),
-            x: Int64.init(weights.x.tradeable.total.rounded(.up)),
+            l: Int64.init(weights.tradeable.l.total.rounded(.up)),
+            e: Int64.init(weights.tradeable.e.total.rounded(.up)),
+            x: Int64.init(weights.tradeable.x.total.rounded(.up)),
         )
         let totalCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: tradeableCostPerDay.l + inelasticCostPerDay.l,
-            e: tradeableCostPerDay.e + inelasticCostPerDay.e,
-            x: tradeableCostPerDay.x + inelasticCostPerDay.x,
+            l: tradeableCostPerDay.l + segmentedCostPerDay.l,
+            e: tradeableCostPerDay.e + segmentedCostPerDay.e,
+            x: tradeableCostPerDay.x + segmentedCostPerDay.x,
         )
 
         let balance: Int64 = account.settled
@@ -67,17 +70,18 @@ extension OperatingBudget {
         self.dividend = max(0, (balance - self.min.l - self.min.e) / 3650)
         self.buybacks = max(0, (balance - self.min.l - self.min.e - self.dividend) / 365)
 
-        (w: self.workers, c: self.clerks) = self.l.distribute(
+        (w: self.workers, c: self.clerks) = self.l.distributeAsBusiness(
             funds: balance / d.l,
-            inelastic: inelasticCostPerDay.l * stockpileMaxDays,
+            segmented: segmentedCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
             w: laborCostPerDay.w * stockpileMaxDays,
             c: laborCostPerDay.c * stockpileMaxDays,
         ) ?? (0, 0)
 
-        self.e.distribute(
+        // corporate inputs are elastic
+        self.e.distributeAsConsumer(
             funds: (balance - self.min.l) / d.e,
-            inelastic: inelasticCostPerDay.e * stockpileMaxDays,
+            segmented: segmentedCostPerDay.e * stockpileMaxDays,
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
         )
 
@@ -90,9 +94,10 @@ extension OperatingBudget {
             investment = investmentBase
         }
 
-        self.x.distribute(
+        // construction costs are inelastic
+        self.x.distributeAsBusiness(
             funds: investment,
-            inelastic: inelasticCostPerDay.x * stockpileMaxDays,
+            segmented: segmentedCostPerDay.x * stockpileMaxDays,
             tradeable: tradeableCostPerDay.x * stockpileMaxDays,
         )
     }

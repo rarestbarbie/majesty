@@ -17,7 +17,7 @@ extension CashFlowStatement {
     }
     mutating func update(with inputs: ResourceInputs) {
         self.update(with: inputs.tradeable.values.elements)
-        self.update(with: inputs.inelastic.values.elements)
+        self.update(with: inputs.segmented.values.elements)
     }
     private mutating func update(with inputs: [ResourceInput]) {
         for input: ResourceInput in inputs where input.valueConsumed > 0 {

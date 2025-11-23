@@ -95,7 +95,7 @@ extension MineMetadata {
         }
 
         var yieldBeforeScaling: Double = 0
-        for (id, amount): (Resource, Int64) in self.base.inelastic {
+        for (id, amount): (Resource, Int64) in self.base.segmented {
             let price: Double = .init(turn.localMarkets[id / tile.id].today.bid.value)
             yieldBeforeScaling += price * Double.init(amount)
         }

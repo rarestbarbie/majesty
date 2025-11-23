@@ -9,23 +9,23 @@ import OrderedCollections
 extension ResourceInputs {
     var fulfilled: Double {
         min(
-            self.inelastic.values.reduce(1) { min($0, $1.fulfilled) },
+            self.segmented.values.reduce(1) { min($0, $1.fulfilled) },
             self.tradeable.values.reduce(1) { min($0, $1.fulfilled) },
         )
     }
 
     var valueConsumed: Int64 {
-        self.tradeable.values.reduce(0) { $0 + $1.valueConsumed } +
-        self.inelastic.values.reduce(0) { $0 + $1.valueConsumed }
+        self.segmented.values.reduce(0) { $0 + $1.valueConsumed } +
+        self.tradeable.values.reduce(0) { $0 + $1.valueConsumed }
     }
 
     var valueAcquired: Int64 {
-        self.tradeable.values.reduce(0) { $0 + $1.value.total } +
-        self.inelastic.values.reduce(0) { $0 + $1.value.total }
+        self.segmented.values.reduce(0) { $0 + $1.value.total } +
+        self.tradeable.values.reduce(0) { $0 + $1.value.total }
     }
 
     var full: Bool {
-        for input: ResourceInput in self.inelastic.values where input.units.total < input.unitsDemanded {
+        for input: ResourceInput in self.segmented.values where input.units.total < input.unitsDemanded {
             return false
         }
         for input: ResourceInput in self.tradeable.values where input.units.total < input.unitsDemanded {
@@ -36,7 +36,7 @@ extension ResourceInputs {
 
     func width(limit: Int64, tier: ResourceTier, efficiency: Double) -> Int64 {
         min(
-            zip(self.inelastic.values, tier.inelastic).reduce(limit) {
+            zip(self.segmented.values, tier.segmented).reduce(limit) {
                 let (resource, (_, amount)): (ResourceInput, (Resource, Int64)) = $1
                 return min($0, resource.width(base: amount, efficiency: efficiency))
             },
@@ -60,9 +60,9 @@ extension ResourceInputs {
             amount = tradeable
             input = self.tradeable[id]
         } else if
-            let inelastic: Int64 = tier.inelastic[id] {
-            amount = inelastic
-            input = self.inelastic[id]
+            let segmented: Int64 = tier.segmented[id] {
+            amount = segmented
+            input = self.segmented[id]
         } else {
             return nil
         }
@@ -96,7 +96,7 @@ extension ResourceInputs {
                 Double.init(input.units.total) / Double.init(input.unitsDemanded)
             )
         } else if
-            let input: ResourceInput = self.inelastic[id] {
+            let input: ResourceInput = self.segmented[id] {
             units = input.units
             value = input.value
             unitsReturned = input.unitsReturned
@@ -124,7 +124,7 @@ extension ResourceInputs {
     func tooltipExplainPrice(
         _ id: Resource,
         _ market: (
-            inelastic: LocalMarketSnapshot?,
+            segmented: LocalMarketSnapshot?,
             tradeable: BlocMarket.State?
         ),
     ) -> Tooltip? {
@@ -146,8 +146,8 @@ extension ResourceInputs {
                 """
             }
         } else if
-            let filled: ResourceInput = self.inelastic[id],
-            let market: LocalMarketSnapshot = market.inelastic {
+            let filled: ResourceInput = self.segmented[id],
+            let market: LocalMarketSnapshot = market.segmented {
             return .instructions {
                 // Show the bid price here, because the ask price is what they actually paid,
                 // and that is shown several lines below
@@ -214,21 +214,21 @@ extension ResourceInputs {
 }
 extension ResourceInputs {
     @frozen public enum ObjectKey: JSString, Sendable {
+        case segmented = "s"
         case tradeable = "t"
-        case inelastic = "i"
     }
 }
 extension ResourceInputs: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+        js[.segmented] = self.segmented
         js[.tradeable] = self.tradeable
-        js[.inelastic] = self.inelastic
     }
 }
 extension ResourceInputs: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
+            segmented: try js[.segmented].decode(),
             tradeable: try js[.tradeable].decode(),
-            inelastic: try js[.inelastic].decode()
         )
     }
 }

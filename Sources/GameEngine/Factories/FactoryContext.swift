@@ -177,17 +177,22 @@ extension FactoryContext: TransactingContext {
             return
         }
 
-        let weights: ResourceInputWeights
+        let weights: (segmented: SegmentedWeights<InelasticDemand>, tradeable: AggregateWeights)
         let budget: OperatingBudget
         let sharesToIssue: Int64
 
         if  self.state.size.level == 0 {
-            weights = .init(
-                tiers: (.init(), .init(), self.state.inventory.x),
-                location: self.state.tile,
-                currency: country.currency.id,
-                turn: turn,
+            weights.segmented = .businessNew(
+                x: self.state.inventory.x,
+                markets: turn.localMarkets,
+                address: self.state.tile,
             )
+            weights.tradeable = .businessNew(
+                x: self.state.inventory.x,
+                markets: turn.worldMarkets,
+                currency: country.currency.id,
+            )
+
             budget = .init(
                 account: turn.bank[account: self.lei],
                 workers: nil,
@@ -209,12 +214,21 @@ extension FactoryContext: TransactingContext {
                 utilization = 0.5
             }
 
-            weights = .init(
-                tiers: (self.state.inventory.l, self.state.inventory.e, self.state.inventory.x),
-                location: self.state.tile,
-                currency: country.currency.id,
-                turn: turn,
+            weights.segmented = .business(
+                l: self.state.inventory.l,
+                e: self.state.inventory.e,
+                x: self.state.inventory.x,
+                markets: turn.localMarkets,
+                address: self.state.tile,
             )
+            weights.tradeable = .business(
+                l: self.state.inventory.l,
+                e: self.state.inventory.e,
+                x: self.state.inventory.x,
+                markets: turn.worldMarkets,
+                currency: country.currency.id,
+            )
+
             budget = .init(
                 account: turn.bank[account: self.lei],
                 workers: self.workers,
@@ -243,12 +257,13 @@ extension FactoryContext: TransactingContext {
             security: self.security,
         )
 
-        turn.localMarkets.trade(
-            selling: self.state.inventory.out.inelastic,
-            buying: (
-                (budget.l.inelastic, weights.l.inelastic.x),
-                (budget.e.inelastic, weights.e.inelastic.x),
-                (budget.x.inelastic, weights.x.inelastic.x),
+        turn.localMarkets.tradeAsBusiness(
+            selling: self.state.inventory.out.segmented,
+            buying: weights.segmented,
+            budget: (
+                budget.l.segmented,
+                budget.e.segmented,
+                budget.x.segmented
             ),
             as: self.lei,
             in: self.state.tile
@@ -413,7 +428,7 @@ extension FactoryContext {
     ) {
         if  budget.tradeable > 0 {
             {
-                $0 += self.state.inventory.x.trade(
+                $0 += self.state.inventory.x.tradeAsBusiness(
                     stockpileDays: stockpileTarget,
                     spendingLimit: budget.tradeable,
                     in: policy.currency.id,
@@ -441,19 +456,19 @@ extension FactoryContext {
     ) {
         {
             let stockpileNone: ResourceStockpileTarget = .init(lower: 0, today: 0, upper: 0)
-            let tl: TradeProceeds = self.state.inventory.l.trade(
+            let tl: TradeProceeds = self.state.inventory.l.tradeAsBusiness(
                 stockpileDays: stockpileNone,
                 spendingLimit: 0,
                 in: policy.currency.id,
                 on: &turn.worldMarkets,
             )
-            let te: TradeProceeds = self.state.inventory.e.trade(
+            let te: TradeProceeds = self.state.inventory.e.tradeAsBusiness(
                 stockpileDays: stockpileNone,
                 spendingLimit: 0,
                 in: policy.currency.id,
                 on: &turn.worldMarkets,
             )
-            let tx: TradeProceeds = self.state.inventory.x.trade(
+            let tx: TradeProceeds = self.state.inventory.x.tradeAsBusiness(
                 stockpileDays: stockpileNone,
                 spendingLimit: 0,
                 in: policy.currency.id,
@@ -478,13 +493,13 @@ extension FactoryContext {
         turn: inout Turn
     ) -> WorkforceChanges? {
         {
-            $0 += self.state.inventory.l.trade(
+            $0 += self.state.inventory.l.tradeAsBusiness(
                 stockpileDays: stockpileTarget,
                 spendingLimit: budget.l.tradeable,
                 in: policy.currency.id,
                 on: &turn.worldMarkets,
             )
-            $0 += self.state.inventory.e.trade(
+            $0 += self.state.inventory.e.tradeAsBusiness(
                 stockpileDays: stockpileTarget,
                 spendingLimit: budget.e.tradeable,
                 in: policy.currency.id,

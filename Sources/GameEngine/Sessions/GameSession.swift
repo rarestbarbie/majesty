@@ -44,8 +44,8 @@ extension GameSession {
         let world: GameWorld = .init(
             notifications: .init(date: save.date),
             bank: .init(accounts: save.accounts.dictionary),
+            segmentedMarkets: save.segmentedMarkets,
             tradeableMarkets: save.tradeableMarkets,
-            inelasticMarkets: save.inelasticMarkets,
             random: save.random,
         )
 
@@ -90,7 +90,7 @@ extension GameSession {
     private var snapshot: GameSnapshot {
         .init(
             context: self.context,
-            markets: (self.world.tradeableMarkets, self.world.inelasticMarkets),
+            markets: (self.world.tradeableMarkets, self.world.segmentedMarkets),
             bank: self.world.bank,
             date: self.world.date
         )

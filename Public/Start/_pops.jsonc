@@ -826,6 +826,11 @@
         "pops": [
             {
                 "race": "East Asian",
+                "type": "P",
+                "size": 9000
+            },
+            {
+                "race": "East Asian",
                 "type": "D",
                 "size": 52500000
             },
@@ -850,6 +855,11 @@
     {
         "tile": "399N-1,-1",
         "pops": [
+            {
+                "race": "East Asian",
+                "type": "P",
+                "size": 9000
+            },
             {
                 "race": "East Asian",
                 "type": "D",

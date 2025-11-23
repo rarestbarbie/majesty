@@ -3,33 +3,30 @@ import GameIDs
 import OrderedCollections
 
 @frozen public struct ResourceInputs {
+    public var segmented: OrderedDictionary<Resource, ResourceInput>
     public var tradeable: OrderedDictionary<Resource, ResourceInput>
-    public var inelastic: OrderedDictionary<Resource, ResourceInput>
 
     @inlinable public init(
+        segmented: OrderedDictionary<Resource, ResourceInput>,
         tradeable: OrderedDictionary<Resource, ResourceInput>,
-        inelastic: OrderedDictionary<Resource, ResourceInput>
     ) {
+        self.segmented = segmented
         self.tradeable = tradeable
-        self.inelastic = inelastic
     }
-    @inlinable public init() {
-        self.tradeable = [:]
-        self.inelastic = [:]
-    }
+    @inlinable public static var empty: Self { .init(segmented: [:], tradeable: [:]) }
 }
 extension ResourceInputs {
-    @inlinable public var count: Int { self.tradeable.count + self.inelastic.count }
+    @inlinable public var count: Int { self.segmented.count + self.tradeable.count }
 }
 extension ResourceInputs {
     public mutating func sync(
         with resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
-        self.tradeable.sync(with: resourceTier.tradeable) {
+        self.segmented.sync(with: resourceTier.segmented) {
             $1.turn(unitsDemanded: $0 * scalingFactor.x, efficiency: scalingFactor.z)
         }
-        self.inelastic.sync(with: resourceTier.inelastic) {
+        self.tradeable.sync(with: resourceTier.tradeable) {
             $1.turn(unitsDemanded: $0 * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }
@@ -37,17 +34,22 @@ extension ResourceInputs {
         from resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
+        for (id, amount): (Resource, Int64) in resourceTier.segmented {
+            self.segmented[id].consume(amount * scalingFactor.x, efficiency: scalingFactor.z)
+        }
         for (id, amount): (Resource, Int64) in resourceTier.tradeable {
             self.tradeable[id].consume(amount * scalingFactor.x, efficiency: scalingFactor.z)
-        }
-        for (id, amount): (Resource, Int64) in resourceTier.inelastic {
-            self.inelastic[id].consume(amount * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }
 }
 extension ResourceInputs {
     /// Returns the amount of funds actually spent.
-    public mutating func trade(
+    ///
+    /// The only difference between this and `tradeAsConsumer` is that this method uses
+    /// linear weights rather than square-rooted weights when distributing the budget. This
+    /// makes it buy even ratios of resources as a business would, rather than favoring
+    /// cheaper resources as a consumer would.
+    public mutating func tradeAsBusiness(
         stockpileDays target: ResourceStockpileTarget,
         spendingLimit budget: Int64,
         in currency: CurrencyID,
@@ -57,6 +59,26 @@ extension ResourceInputs {
             Double.init(
                 $0.needed($0.unitsDemanded * target.lower)
             ) * exchange.price(of: $0.id, in: currency)
+        }
+
+        return self.trade(
+            stockpileDays: target.today ... target.upper,
+            spendingLimit: budget,
+            in: currency,
+            on: &exchange,
+            weights: weights[...]
+        )
+    }
+    public mutating func tradeAsConsumer(
+        stockpileDays target: ResourceStockpileTarget,
+        spendingLimit budget: Int64,
+        in currency: CurrencyID,
+        on exchange: inout BlocMarkets,
+    ) -> TradeProceeds {
+        let weights: [Double] = self.tradeable.values.map {
+            Double.init(
+                $0.needed($0.unitsDemanded * target.lower)
+            ) * .sqrt(exchange.price(of: $0.id, in: currency))
         }
 
         return self.trade(

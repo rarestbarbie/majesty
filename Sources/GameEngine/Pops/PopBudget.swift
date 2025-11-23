@@ -13,7 +13,10 @@ struct PopBudget {
 }
 extension PopBudget {
     init(
-        weights: __shared ResourceInputWeights,
+        weights: __shared (
+            segmented: SegmentedWeights<ElasticDemand>,
+            tradeable: AggregateWeights
+        ),
         balance: Int64,
         stockpileMaxDays: Int64,
         d: (l: Int64, e: Int64, x: Int64)
@@ -24,19 +27,19 @@ extension PopBudget {
         self.dividend = 0
         self.buybacks = 0
 
-        let inelasticCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: weights.l.inelastic.total,
-            e: weights.e.inelastic.total,
-            x: weights.x.inelastic.total,
+        let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = (
+            l: weights.segmented.l.total,
+            e: weights.segmented.e.total,
+            x: weights.segmented.x.total,
         )
         let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: Int64.init(weights.l.tradeable.total.rounded(.up)),
-            e: Int64.init(weights.e.tradeable.total.rounded(.up)),
-            x: Int64.init(weights.x.tradeable.total.rounded(.up)),
+            l: Int64.init(weights.tradeable.l.total.rounded(.up)),
+            e: Int64.init(weights.tradeable.e.total.rounded(.up)),
+            x: Int64.init(weights.tradeable.x.total.rounded(.up)),
         )
         let totalCostPerDay: (l: Int64, e: Int64) = (
-            l: tradeableCostPerDay.l + inelasticCostPerDay.l,
-            e: tradeableCostPerDay.e + inelasticCostPerDay.e,
+            l: tradeableCostPerDay.l + segmentedCostPerDay.l,
+            e: tradeableCostPerDay.e + segmentedCostPerDay.e,
         )
 
         /// These are the minimum theoretical balances the pop would need to purchase 100% of
@@ -46,21 +49,21 @@ extension PopBudget {
             e: totalCostPerDay.e * d.e,
         )
 
-        self.l.distribute(
+        self.l.distributeAsConsumer(
             funds: balance / d.l,
-            inelastic: inelasticCostPerDay.l * stockpileMaxDays,
+            segmented: segmentedCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
         )
 
-        self.e.distribute(
+        self.e.distributeAsConsumer(
             funds: (balance - min.l) / d.e,
-            inelastic: inelasticCostPerDay.e * stockpileMaxDays,
+            segmented: segmentedCostPerDay.e * stockpileMaxDays,
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
         )
 
-        self.x.distribute(
+        self.x.distributeAsConsumer(
             funds: (balance - min.l - min.e) / d.x,
-            inelastic: inelasticCostPerDay.x * stockpileMaxDays,
+            segmented: segmentedCostPerDay.x * stockpileMaxDays,
             tradeable: tradeableCostPerDay.x * stockpileMaxDays,
         )
     }

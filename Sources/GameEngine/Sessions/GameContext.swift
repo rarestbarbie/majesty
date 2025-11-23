@@ -48,8 +48,8 @@ extension GameContext {
             random: world.random,
             player: self.player,
             accounts: world.bank.accounts.items,
+            segmentedMarkets: world.segmentedMarkets,
             tradeableMarkets: world.tradeableMarkets,
-            inelasticMarkets: world.inelasticMarkets,
             date: world.date,
             cultures: [_].init(self.cultures.state),
             countries: [_].init(self.countries.state),
@@ -436,7 +436,7 @@ extension GameContext {
         case .pop(let id):
             if  case .sell = side,
                 case .mine(let mine)? = fill.memo {
-                self.pops[modifying: id].state.mines[mine]?.out.inelastic[resource]?.report(
+                self.pops[modifying: id].state.mines[mine]?.out.segmented[resource]?.report(
                     unitsSold: fill.filled,
                     valueSold: fill.value,
                 )

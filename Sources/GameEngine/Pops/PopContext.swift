@@ -168,11 +168,24 @@ extension PopContext: AllocatingContext {
             scalingFactor: (self.state.z.size, z.x),
         )
 
-        let weights: ResourceInputWeights = .init(
-            tiers: (self.state.inventory.l, self.state.inventory.e, self.state.inventory.x),
-            location: self.state.tile,
-            currency: authority.currency.id,
-            turn: turn,
+        let weights: (
+            segmented: SegmentedWeights<ElasticDemand>,
+            tradeable: AggregateWeights
+        ) = (
+            segmented: .consumer(
+                l: self.state.inventory.l,
+                e: self.state.inventory.e,
+                x: self.state.inventory.x,
+                markets: turn.localMarkets,
+                address: self.state.tile,
+            ),
+            tradeable: .consumer(
+                l: self.state.inventory.l,
+                e: self.state.inventory.e,
+                x: self.state.inventory.x,
+                markets: turn.worldMarkets,
+                currency: authority.currency.id
+            )
         )
 
         let d: (l: Int64, e: Int64, x: Int64) = (7, 30, 365)
@@ -211,19 +224,20 @@ extension PopContext: AllocatingContext {
             break
         }
 
-        turn.localMarkets.trade(
-            selling: self.state.inventory.out.inelastic,
-            buying: (
-                (budget.l.inelastic, weights.l.inelastic.x),
-                (budget.e.inelastic, weights.e.inelastic.x),
-                (budget.x.inelastic, weights.x.inelastic.x),
+        turn.localMarkets.tradeAsConsumer(
+            selling: self.state.inventory.out.segmented,
+            buying: weights.segmented,
+            budget: (
+                budget.l.segmented,
+                budget.e.segmented,
+                budget.x.segmented,
             ),
             as: self.lei,
             in: self.state.tile,
         )
         for job: MiningJob in self.state.mines.values {
             turn.localMarkets.sell(
-                supply: job.out.inelastic,
+                supply: job.out.segmented,
                 entity: self.lei,
                 memo: .mine(job.id),
                 tile: self.state.tile,
@@ -279,7 +293,7 @@ extension PopContext: TransactingContext {
             let z: (l: Double, e: Double, x: Double) = self.state.needsScalePerCapita
 
             if  budget.l.tradeable > 0 {
-                account += self.state.inventory.l.trade(
+                account += self.state.inventory.l.tradeAsConsumer(
                     stockpileDays: target,
                     spendingLimit: budget.l.tradeable,
                     in: country.currency.id,
@@ -294,7 +308,7 @@ extension PopContext: TransactingContext {
             )
 
             if  budget.e.tradeable > 0 {
-                account += self.state.inventory.e.trade(
+                account += self.state.inventory.e.tradeAsConsumer(
                     stockpileDays: target,
                     spendingLimit: budget.e.tradeable,
                     in: country.currency.id,
@@ -309,7 +323,7 @@ extension PopContext: TransactingContext {
             )
 
             if  budget.x.tradeable > 0 {
-                account += self.state.inventory.x.trade(
+                account += self.state.inventory.x.tradeAsConsumer(
                     stockpileDays: target,
                     spendingLimit: budget.x.tradeable,
                     in: country.currency.id,
