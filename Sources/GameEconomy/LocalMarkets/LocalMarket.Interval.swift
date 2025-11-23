@@ -63,6 +63,12 @@ extension LocalMarket.Interval {
             self.demand = 0
         }
 
+        if  self.supply == 0, self.demand == 0 {
+            self.bid = max(.init(), limit.min)
+            self.ask = self.bid
+            return
+        }
+
         guard
         let (bid, ask): (bid: LocalPrice, ask: LocalPrice) = self.updated(
             rate: rate,
