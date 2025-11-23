@@ -49,19 +49,19 @@ extension PopBudget {
             e: totalCostPerDay.e * d.e,
         )
 
-        self.l.distribute(
+        self.l.distributeAsConsumer(
             funds: balance / d.l,
             segmented: segmentedCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
         )
 
-        self.e.distribute(
+        self.e.distributeAsConsumer(
             funds: (balance - min.l) / d.e,
             segmented: segmentedCostPerDay.e * stockpileMaxDays,
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
         )
 
-        self.x.distribute(
+        self.x.distributeAsConsumer(
             funds: (balance - min.l - min.e) / d.x,
             segmented: segmentedCostPerDay.x * stockpileMaxDays,
             tradeable: tradeableCostPerDay.x * stockpileMaxDays,

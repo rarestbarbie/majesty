@@ -70,7 +70,7 @@ extension OperatingBudget {
         self.dividend = max(0, (balance - self.min.l - self.min.e) / 3650)
         self.buybacks = max(0, (balance - self.min.l - self.min.e - self.dividend) / 365)
 
-        (w: self.workers, c: self.clerks) = self.l.distribute(
+        (w: self.workers, c: self.clerks) = self.l.distributeAsBusiness(
             funds: balance / d.l,
             segmented: segmentedCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
@@ -78,7 +78,8 @@ extension OperatingBudget {
             c: laborCostPerDay.c * stockpileMaxDays,
         ) ?? (0, 0)
 
-        self.e.distribute(
+        // corporate inputs are elastic
+        self.e.distributeAsConsumer(
             funds: (balance - self.min.l) / d.e,
             segmented: segmentedCostPerDay.e * stockpileMaxDays,
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
@@ -93,7 +94,8 @@ extension OperatingBudget {
             investment = investmentBase
         }
 
-        self.x.distribute(
+        // construction costs are inelastic
+        self.x.distributeAsBusiness(
             funds: investment,
             segmented: segmentedCostPerDay.x * stockpileMaxDays,
             tradeable: tradeableCostPerDay.x * stockpileMaxDays,
