@@ -17,7 +17,7 @@ extension AggregateWeights {
         markets: borrowing BlocMarkets,
         currency: CurrencyID,
     ) -> Self {
-        self.consumer(l: .empty, e: .empty, x: x, markets: markets, currency: currency)
+        self.business(l: .empty, e: .empty, x: x, markets: markets, currency: currency)
     }
 
     public static func business(
@@ -27,7 +27,11 @@ extension AggregateWeights {
         markets: borrowing BlocMarkets,
         currency: CurrencyID,
     ) -> Self {
-        self.consumer(l: l, e: e, x: x, markets: markets, currency: currency)
+        .init(
+            l: .compute(demands: l.tradeable, markets: markets, currency: currency),
+            e: .compute(demands: e.tradeable, markets: markets, currency: currency),
+            x: .compute(demands: x.tradeable, markets: markets, currency: currency)
+        )
     }
 }
 extension AggregateWeights {
@@ -39,9 +43,9 @@ extension AggregateWeights {
         currency: CurrencyID,
     ) -> Self {
         .init(
-            l: .compute(demands: l.segmented, markets: markets, currency: currency),
-            e: .compute(demands: e.segmented, markets: markets, currency: currency),
-            x: .compute(demands: x.segmented, markets: markets, currency: currency)
+            l: .compute(demands: l.tradeable, markets: markets, currency: currency),
+            e: .compute(demands: e.tradeable, markets: markets, currency: currency),
+            x: .compute(demands: x.tradeable, markets: markets, currency: currency)
         )
     }
 }
