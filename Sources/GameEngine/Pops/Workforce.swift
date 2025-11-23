@@ -42,7 +42,12 @@ extension Workforce {
 }
 extension Workforce {
     func explainChanges(_ ul: inout TooltipInstructionEncoder) {
-        ul["Today’s change", +] = +?self.change[/3]
+        if  self.change == 0, self.hired == 0, self.fired == 0, self.quit == 0 {
+            return
+        }
+        // we never want to elide this, but still show one of the sub-items, that wouldn’t
+        // make any sense
+        ul["Today’s change", +] = +self.change[/3]
         ul[>] {
             $0["Hired", +] = +?self.hired[/3]
             $0["Fired", +] = ??(-self.fired)[/3]

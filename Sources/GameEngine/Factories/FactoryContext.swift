@@ -353,14 +353,21 @@ extension FactoryContext: TransactingContext {
                         turn.jobs.fire[self.state.id, type] = block
                     }
                 } else if workers.count > 0, profit.operating < 0 {
-                    /// Fire up to 40% of workers based on operating loss.
-                    /// If gross profit is also negative, this happens more quickly.
-                    let l: Double = max(0, -0.4 * profit.operatingProfitability)
-                    let firable: Int64 = .init(l * Double.init(workers.count))
-                    if  firable > 0, profit.gross < 0 || turn.random.roll(1, 3) {
-                        turn.jobs.fire[self.state.id, type.workers.unit] = .init(
-                            size: .random(in: 0 ... firable, using: &turn.random.generator)
-                        )
+                    if  workers.count == 1, self.clerks?.count ?? 0 == 0 {
+                        // the other branch would never fire the last worker
+                        if  turn.random.roll(1, profit.gross < 0 ? 7 : 30) {
+                            turn.jobs.fire[self.state.id, type.workers.unit] = .init(size: 1)
+                        }
+                    } else {
+                        /// Fire up to 40% of workers based on operating loss.
+                        /// If gross profit is also negative, this happens more quickly.
+                        let l: Double = max(0, -0.4 * profit.operatingProfitability)
+                        let firable: Int64 = .init(l * Double.init(workers.count))
+                        if  firable > 0, profit.gross < 0 || turn.random.roll(1, 3) {
+                            turn.jobs.fire[self.state.id, type.workers.unit] = .init(
+                                size: .random(in: 0 ... firable, using: &turn.random.generator)
+                            )
+                        }
                     }
                 } else if case .hire(let type, let block)? = changes {
                     turn.jobs.hire.local[self.state.tile, type].append(block)
