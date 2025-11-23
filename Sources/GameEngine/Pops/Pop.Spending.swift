@@ -11,6 +11,10 @@ extension Pop.Spending {
             dividend: 0,
         )
     }
+
+    var totalExcludingEquityPurchases: Int64 {
+        self.dividend
+    }
 }
 #if TESTABLE
 extension Pop.Spending: Equatable, Hashable {}

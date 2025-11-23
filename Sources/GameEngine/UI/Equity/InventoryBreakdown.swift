@@ -131,16 +131,16 @@ extension InventoryBreakdown {
         )
 
         self.terms = Term.list {
-            let workersType: PopType = factory.type.workers.unit
+            let worker: PopType = factory.type.workers.unit
             guard
             let workers: Workforce = factory.workers,
-            let clerksType: PopType = factory.type.clerks?.unit,
+            let clerk: PopType = factory.type.clerks?.unit,
             let clerks: Workforce = factory.clerks else {
                 return
             }
 
-            $0[.pop(clerksType), (+)] = clerks.count[/3] ^^ clerks.change
-            $0[.pop(workersType), (+)] = workers.count[/3] ^^ workers.change
+            $0[.pop(clerk), +, tooltip: .FactoryClerks] = clerks.count[/3] ^^ clerks.change
+            $0[.pop(worker), +, tooltip: .FactoryWorkers] = workers.count[/3] ^^ workers.change
         }
 
         self.costs = factory.cashFlow.chart(rules: snapshot.rules)

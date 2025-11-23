@@ -33,45 +33,15 @@ extension GameSnapshot {
 }
 extension GameSnapshot {
     func tooltipFactoryAccount(_ id: FactoryID) -> Tooltip? {
-        guard let factory: Factory = self.context.factories.state[id] else {
-            return nil
-        }
+        self.context.factories[id]?.tooltipAccount(self.bank[account: .factory(id)])
+    }
 
-        let account: Bank.Account = self.bank[account: .factory(id)]
-        let profit: ProfitMargins = factory.profit
-        let liquid: TurnDelta<Int64> = account.Δ
-        let assets: TurnDelta<Int64> = factory.Δ.vl + factory.Δ.ve + factory.Δ.vx
-        let valuation: TurnDelta<Int64> = liquid + assets
+    func tooltipFactoryWorkers(_ id: FactoryID) -> Tooltip? {
+        self.context.factories[id]?.tooltipWorkers()
+    }
 
-        return .instructions {
-            $0["Total valuation", +] = valuation[/3]
-            $0[>] {
-                $0["Today’s profit", +] = +profit.operating[/3]
-                $0["Gross margin", +] = profit.grossMargin.map {
-                    (Double.init($0))[%2]
-                }
-                $0["Operating margin", +] = profit.operatingMargin.map {
-                    (Double.init($0))[%2]
-                }
-            }
-
-            $0["Illiquid assets", +] = assets[/3]
-            $0["Liquid assets", +] = liquid[/3]
-            $0[>] {
-                $0["Market spending", +] = +account.b[/3]
-                // $0["Market spending (amortized)", +] = +?(account.b + factory.Δ.vi.value)[/3]
-                $0["Market earnings", +] = +?account.r[/3]
-                $0["Subsidies", +] = +?account.s[/3]
-                $0["Salaries", +] = +?factory.spending.salaries[/3]
-                $0["Wages", +] = +?factory.spending.wages[/3]
-                $0["Interest and dividends", +] = +?factory.spending.dividend[/3]
-                $0["Stock buybacks", +] = factory.spending.buybacks[/3]
-                if account.e > 0 {
-                    $0["Market capitalization", +] = +account.e[/3]
-                }
-                // $0["Capital expenditures", +] = +?account.v[/3]
-            }
-        }
+    func tooltipFactoryClerks(_ id: FactoryID) -> Tooltip? {
+        self.context.factories[id]?.tooltipClerks()
     }
 
     func tooltipFactoryNeeds(
@@ -194,43 +164,11 @@ extension GameSnapshot {
         }
     }
 
-    func tooltipFactoryWorkers(
+    func tooltipFactorySummarizeEmployees(
         _ id: FactoryID,
         _ stratum: PopStratum,
     ) -> Tooltip? {
-        guard let factory: FactoryContext = self.context.factories[id] else {
-            return nil
-        }
-
-        let workforce: Workforce
-        let type: PopType
-
-        if case .Worker = stratum,
-            let workers: Workforce = factory.workers {
-            workforce = workers
-            type = factory.type.workers.unit
-        } else if
-            let clerks: Workforce = factory.clerks,
-            let clerkTeam: Quantity<PopType> = factory.type.clerks {
-            workforce = clerks
-            type = clerkTeam.unit
-        } else {
-            return nil
-        }
-
-        return .instructions {
-            $0[type.plural] = workforce.count[/3] / workforce.limit
-
-            $0["Today’s change", +] = +?(
-                workforce.hired - workforce.fired - workforce.quit
-            )[/3]
-
-            $0[>] {
-                $0["Hired", +] = +?workforce.hired[/3]
-                $0["Fired", +] = ??(-workforce.fired)[/3]
-                $0["Quit", +] = ??(-workforce.quit)[/3]
-            }
-        }
+        self.context.factories[id]?.tooltipSummarizeEmployees(stratum)
     }
 
     func tooltipFactoryOwnership(
@@ -342,48 +280,7 @@ extension GameSnapshot {
 }
 extension GameSnapshot {
     func tooltipPopAccount(_ id: PopID) -> Tooltip? {
-        guard let pop: Pop = self.context.pops.state[id] else {
-            return nil
-        }
-
-        let account: Bank.Account = self.bank[account: .pop(id)]
-        let liquid: TurnDelta<Int64> = account.Δ
-        let assets: TurnDelta<Int64> = pop.Δ.vl + pop.Δ.ve + pop.Δ.vx
-        let valuation: TurnDelta<Int64> = liquid + assets
-
-        return .instructions {
-            if case .Ward = pop.type.stratum {
-                let profit: ProfitMargins = pop.profit
-                $0["Total valuation", +] = valuation[/3]
-                $0[>] {
-                    $0["Today’s profit", +] = +profit.operating[/3]
-                    $0["Gross margin", +] = profit.grossMargin.map {
-                        (Double.init($0))[%2]
-                    }
-                    $0["Operating margin", +] = profit.operatingMargin.map {
-                        (Double.init($0))[%2]
-                    }
-                }
-            }
-
-            $0["Illiquid assets", +] = assets[/3]
-            $0["Liquid assets", +] = liquid[/3]
-            $0[>] {
-                $0["Welfare", +] = +?account.s[/3]
-                $0[pop.type.earnings, +] = +?account.r[/3]
-                $0["Interest and dividends", +] = +?account.i[/3]
-
-                $0["Market spending", +] = +?account.b[/3]
-                $0["Stock sales", +] = +?account.j[/3]
-                if case .Ward = pop.type.stratum {
-                    $0["Loans taken", +] = +?account.e[/3]
-                } else {
-                    $0["Investments", +] = +?account.e[/3]
-                }
-
-                $0["Inheritances", +] = +?account.d[/3]
-            }
-        }
+        self.context.pops[id]?.tooltipAccount(self.bank[account: .pop(id)])
     }
 
     func tooltipPopJobs(_ id: PopID) -> Tooltip? {

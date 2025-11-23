@@ -1,4 +1,6 @@
+import D
 import GameIDs
+import GameUI
 
 struct Workforce {
     var limit: Int64
@@ -36,5 +38,20 @@ extension Workforce {
         self.quit += job.quit
 
         self.pops.append((id: pop, count: job.count))
+    }
+}
+extension Workforce {
+    func explainChanges(_ ul: inout TooltipInstructionEncoder) {
+        if  self.change == 0, self.hired == 0, self.fired == 0, self.quit == 0 {
+            return
+        }
+        // we never want to elide this, but still show one of the sub-items, that wouldn’t
+        // make any sense
+        ul["Today’s change", +] = +self.change[/3]
+        ul[>] {
+            $0["Hired", +] = +?self.hired[/3]
+            $0["Fired", +] = ??(-self.fired)[/3]
+            $0["Quit", +] = ??(-self.quit)[/3]
+        }
     }
 }

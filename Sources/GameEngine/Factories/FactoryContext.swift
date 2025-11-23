@@ -353,14 +353,21 @@ extension FactoryContext: TransactingContext {
                         turn.jobs.fire[self.state.id, type] = block
                     }
                 } else if workers.count > 0, profit.operating < 0 {
-                    /// Fire up to 40% of workers based on operating loss.
-                    /// If gross profit is also negative, this happens more quickly.
-                    let l: Double = max(0, -0.4 * profit.operatingProfitability)
-                    let firable: Int64 = .init(l * Double.init(workers.count))
-                    if  firable > 0, profit.gross < 0 || turn.random.roll(1, 3) {
-                        turn.jobs.fire[self.state.id, type.workers.unit] = .init(
-                            size: .random(in: 0 ... firable, using: &turn.random.generator)
-                        )
+                    if  workers.count == 1, self.clerks?.count ?? 0 == 0 {
+                        // the other branch would never fire the last worker
+                        if  turn.random.roll(1, profit.gross < 0 ? 7 : 30) {
+                            turn.jobs.fire[self.state.id, type.workers.unit] = .init(size: 1)
+                        }
+                    } else {
+                        /// Fire up to 40% of workers based on operating loss.
+                        /// If gross profit is also negative, this happens more quickly.
+                        let l: Double = max(0, -0.4 * profit.operatingProfitability)
+                        let firable: Int64 = .init(l * Double.init(workers.count))
+                        if  firable > 0, profit.gross < 0 || turn.random.roll(1, 3) {
+                            turn.jobs.fire[self.state.id, type.workers.unit] = .init(
+                                size: .random(in: 0 ... firable, using: &turn.random.generator)
+                            )
+                        }
                     }
                 } else if case .hire(let type, let block)? = changes {
                     turn.jobs.hire.local[self.state.tile, type].append(block)
@@ -479,9 +486,8 @@ extension FactoryContext {
             #assert(te.loss == 0, "ne loss during liquidation is non-zero! (\(te.loss))")
             #assert(tx.loss == 0, "nx loss during liquidation is non-zero! (\(tx.loss))")
 
-            $0.r += tl.gain
-            $0.r += te.gain
-            $0.r += tx.gain
+            let proceeds: Int64 = tl.gain + te.gain + tx.gain
+            $0.r += proceeds
         } (&turn.bank[account: self.lei])
     }
 
@@ -555,23 +561,38 @@ extension FactoryContext {
     }
 }
 extension FactoryContext {
-    private func clerkEffects(
-        budget: Int64,
-        turn: inout Turn
-    ) -> (salaries: Update, bonus: Double)? {
+    private var clerkEffects: ClerkEffects? {
         guard
         let clerks: Workforce = self.clerks,
         let clerkTeam: FactoryMetadata.ClerkBonus = self.type.clerkBonus else {
             return nil
         }
 
-        let clerksOptimal: Int64 = self.workers.map { clerkTeam.optimal(for: $0.count) } ?? 0
+        let optimal: Int64 = self.workers.map { clerkTeam.optimal(for: $0.count) } ?? 0
+        return .init(
+            workforce: clerks,
+            optimal: optimal,
+            bonus: clerks.count < optimal
+                ? Double.init(clerks.count) / Double.init(optimal)
+                : 1,
+            clerk: clerkTeam.type,
+        )
+    }
 
-        let wagesOwed: Int64 = clerks.count * self.state.z.cn
+    private func clerkEffects(
+        budget: Int64,
+        turn: inout Turn
+    ) -> (salaries: Update, bonus: Double)? {
+        guard
+        let clerks: ClerkEffects = self.clerkEffects else {
+            return nil
+        }
+
+        let wagesOwed: Int64 = clerks.workforce.count * self.state.z.cn
         let wagesPaid: Int64 = turn.bank.transfer(
             budget: budget,
             source: self.lei,
-            recipients: turn.payscale(shuffling: clerks.pops, rate: self.state.z.cn),
+            recipients: turn.payscale(shuffling: clerks.workforce.pops, rate: self.state.z.cn),
         )
 
         let headcount: WorkforceChanges?
@@ -580,24 +601,26 @@ extension FactoryContext {
         if  wagesPaid < wagesOwed {
             // Not enough money to pay all clerks.
             let retention: Fraction = wagesPaid %/ wagesOwed
-            let retained: Int64 = clerks.count <> retention
+            let retained: Int64 = clerks.workforce.count <> retention
 
-            if  let layoff: PopJobLayoffBlock = .init(size: clerks.count - retained) {
-                headcount = .fire(clerkTeam.type, layoff)
+            if  let layoff: PopJobLayoffBlock = .init(size: clerks.workforce.count - retained) {
+                headcount = .fire(clerks.clerk, layoff)
             } else {
                 headcount = nil
             }
 
             wagesChange = -1
-        } else if let layoff: PopJobLayoffBlock = .init(size: clerks.count - clerksOptimal) {
-            headcount = .fire(clerkTeam.type, layoff)
+        } else if let layoff: PopJobLayoffBlock = .init(
+                size: clerks.workforce.count - clerks.optimal
+            ) {
+            headcount = .fire(clerks.clerk, layoff)
             wagesChange = 0
         } else {
             let clerksAffordable: Int64 = (budget - wagesPaid) / self.state.z.cn
-            let clerksNeeded: Int64 = clerksOptimal - clerks.count
+            let clerksNeeded: Int64 = clerks.optimal - clerks.workforce.count
             let clerksToHire: Int64 = min(clerksNeeded, clerksAffordable)
 
-            if  clerks.count < clerksNeeded,
+            if  clerks.workforce.count < clerksNeeded,
                 let p: Int = self.state.y.cf,
                 turn.random.roll(Int64.init(p), Int64.init(Self.pr)) {
                 // Was last in line to hire clerks yesterday, did not hire any clerks, and has
@@ -617,7 +640,7 @@ extension FactoryContext {
             )
 
             if  bid.size > 0 {
-                headcount = .hire(clerkTeam.type, bid)
+                headcount = .hire(clerks.clerk, bid)
             } else {
                 headcount = nil
             }
@@ -629,12 +652,7 @@ extension FactoryContext {
             headcount: headcount
         )
 
-        // Compute clerk bonus in effect for today
-        let bonus: Double = clerks.count < clerksOptimal
-            ? Double.init(clerks.count) / Double.init(clerksOptimal)
-            : 1
-
-        return (update, bonus)
+        return (update, clerks.bonus)
     }
 
     private func workerEffects(
@@ -755,6 +773,74 @@ extension FactoryContext {
     }
 }
 extension FactoryContext {
+    func tooltipAccount(_ account: Bank.Account) -> Tooltip? {
+        let profit: ProfitMargins = self.state.profit
+        let liquid: TurnDelta<Int64> = account.Δ
+        let assets: TurnDelta<Int64> = self.state.Δ.vl + self.state.Δ.ve + self.state.Δ.vx
+
+        return .instructions {
+            $0["Total valuation", +] = (liquid + assets)[/3]
+            $0[>] {
+                $0["Today’s profit", +] = +profit.operating[/3]
+                $0["Gross margin", +] = profit.grossMargin.map {
+                    (Double.init($0))[%2]
+                }
+                $0["Operating margin", +] = profit.operatingMargin.map {
+                    (Double.init($0))[%2]
+                }
+            }
+
+            $0["Illiquid assets", +] = assets[/3]
+            $0["Liquid assets", +] = liquid[/3]
+            $0[>] {
+                let excluded: Int64 = self.state.spending.totalExcludingEquityPurchases
+                $0["Market spending", +] = +(account.b + excluded)[/3]
+                $0["Market earnings", +] = +?account.r[/3]
+                $0["Subsidies", +] = +?account.s[/3]
+                $0["Salaries", +] = +?(-self.state.spending.salaries)[/3]
+                $0["Wages", +] = +?(-self.state.spending.wages)[/3]
+                $0["Interest and dividends", +] = +?(-self.state.spending.dividend)[/3]
+                $0["Stock buybacks", +] = (-self.state.spending.buybacks)[/3]
+                if account.e > 0 {
+                    $0["Market capitalization", +] = +account.e[/3]
+                }
+            }
+        }
+    }
+
+    func tooltipWorkers() -> Tooltip? {
+        guard let workforce: Workforce = self.workers else {
+            return nil
+        }
+        return .instructions {
+            $0[self.type.workers.unit.plural] = workforce.count[/3] / workforce.limit
+            $0["Current wage"] = self.state.Δ.wn[/3]
+            workforce.explainChanges(&$0)
+        }
+    }
+    func tooltipClerks() -> Tooltip? {
+        guard let clerks: ClerkEffects = self.clerkEffects else {
+            return nil
+        }
+        return .instructions {
+            $0[clerks.clerk.plural] = clerks.workforce.count[/3] / clerks.workforce.limit
+            $0[>] {
+                $0["Output bonus", +] = +clerks.bonus[%2]
+            }
+            $0["Current salary"] = self.state.Δ.wn[/3]
+            $0[>] = """
+            The optimal number of clerks for this factory is \(
+                clerks.optimal,
+                style: clerks.workforce.count <= clerks.optimal ? .em : .neg
+            )
+            """
+            $0[>] = """
+            Clerks help factories produce more, but are also much harder to fire
+            """
+            clerks.workforce.explainChanges(&$0)
+        }
+    }
+
     func tooltipNeeds(
         _ tier: ResourceTierIdentifier
     ) -> Tooltip? {
@@ -790,6 +876,29 @@ extension FactoryContext {
                     $0["Efficiency", -] = +?(self.state.z.ei - 1)[%2]
                 }
             }
+        }
+    }
+
+    func tooltipSummarizeEmployees(_ stratum: PopStratum) -> Tooltip? {
+        let workforce: Workforce
+        let type: PopType
+
+        if case .Worker = stratum,
+            let workers: Workforce = self.workers {
+            workforce = workers
+            type = self.type.workers.unit
+        } else if
+            let clerks: Workforce = self.clerks,
+            let clerkTeam: Quantity<PopType> = self.type.clerks {
+            workforce = clerks
+            type = clerkTeam.unit
+        } else {
+            return nil
+        }
+
+        return .instructions {
+            $0[type.plural] = workforce.count[/3] / workforce.limit
+            workforce.explainChanges(&$0)
         }
     }
 }

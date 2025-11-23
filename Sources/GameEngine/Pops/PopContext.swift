@@ -722,6 +722,46 @@ extension PopContext {
     }
 }
 extension PopContext {
+    func tooltipAccount(_ account: Bank.Account) -> Tooltip? {
+        let liquid: TurnDelta<Int64> = account.Δ
+        let assets: TurnDelta<Int64> = self.state.Δ.vl + self.state.Δ.ve + self.state.Δ.vx
+        let valuation: TurnDelta<Int64> = liquid + assets
+
+        return .instructions {
+            if case .Ward = self.state.type.stratum {
+                let profit: ProfitMargins = self.state.profit
+                $0["Total valuation", +] = valuation[/3]
+                $0[>] {
+                    $0["Today’s profit", +] = +profit.operating[/3]
+                    $0["Gross margin", +] = profit.grossMargin.map {
+                        (Double.init($0))[%2]
+                    }
+                    $0["Operating margin", +] = profit.operatingMargin.map {
+                        (Double.init($0))[%2]
+                    }
+                }
+            }
+
+            $0["Illiquid assets", +] = assets[/3]
+            $0["Liquid assets", +] = liquid[/3]
+            $0[>] {
+                let excluded: Int64 = self.state.spending.totalExcludingEquityPurchases
+                $0["Welfare", +] = +?account.s[/3]
+                $0[self.state.type.earnings, +] = +?account.r[/3]
+                $0["Interest and dividends", +] = +?account.i[/3]
+
+                $0["Market spending", +] = +?(account.b - excluded)[/3]
+                $0["Stock sales", +] = +?account.j[/3]
+                if case .Ward = self.state.type.stratum {
+                    $0["Loans taken", +] = +?account.e[/3]
+                } else {
+                    $0["Investments", +] = +?account.e[/3]
+                }
+
+                $0["Inheritances", +] = +?account.d[/3]
+            }
+        }
+    }
     func tooltipNeeds(_ tier: ResourceTierIdentifier) -> Tooltip? {
         .instructions {
             switch tier {

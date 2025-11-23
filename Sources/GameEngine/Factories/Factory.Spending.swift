@@ -15,6 +15,10 @@ extension Factory.Spending {
             wages: 0,
         )
     }
+
+    var totalExcludingEquityPurchases: Int64 {
+        self.dividend + self.salaries + self.wages
+    }
 }
 
 #if TESTABLE
