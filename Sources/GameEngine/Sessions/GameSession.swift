@@ -241,6 +241,14 @@ extension GameSession {
             return self.snapshot.tooltipFactoryAccount(
                 try arguments[0].decode(),
             )
+        case .FactoryClerks:
+            return self.snapshot.tooltipFactoryClerks(
+                try arguments[0].decode(),
+            )
+        case .FactoryWorkers:
+            return self.snapshot.tooltipFactoryWorkers(
+                try arguments[0].decode(),
+            )
         case .FactorySize:
             return self.snapshot.tooltipFactorySize(
                 try arguments[0].decode(),
@@ -265,8 +273,8 @@ extension GameSession {
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
-        case .FactoryWorkers:
-            return self.snapshot.tooltipFactoryWorkers(
+        case .FactorySummarizeEmployees:
+            return self.snapshot.tooltipFactorySummarizeEmployees(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )

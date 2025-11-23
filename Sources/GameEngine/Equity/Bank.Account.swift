@@ -16,7 +16,7 @@ extension Bank {
         /// Subsidies.
         var s: Int64
 
-        /// Interest and dividends, negative if owed.
+        /// Interest and dividends, positive for income, unset if paid out (counted in ``b``).
         var i: Int64
         /// Proceeds from stock sales. Not to be confused with ``e``.
         var j: Int64
@@ -40,18 +40,6 @@ extension Bank.Account {
         self.b += trade.loss
         self.r += trade.gain
     }
-    // static func += (self: inout Self, other: Self) {
-    //     self = .init(
-    //         settled: self.settled + other.settled,
-    //         b: self.b + other.b,
-    //         r: self.r + other.r,
-    //         s: self.s + other.s,
-    //         i: self.i + other.i,
-    //         j: self.j + other.j,
-    //         e: self.e + other.e,
-    //         d: self.d + other.d
-    //     )
-    // }
 }
 extension Bank.Account {
     var Δ: TurnDelta<Int64> {

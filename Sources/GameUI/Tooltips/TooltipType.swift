@@ -7,11 +7,13 @@ import JavaScriptKit
     case FactoryResourceIO
     case FactoryStockpile
     case FactoryExplainPrice
+    case FactoryClerks
+    case FactoryWorkers
     case FactoryNeeds
     case FactoryOwnershipCountry
     case FactoryOwnershipCulture
     case FactoryOwnershipSecurities
-    case FactoryWorkers
+    case FactorySummarizeEmployees
     case FactoryCashFlowItem
     case FactoryBudgetItem
 

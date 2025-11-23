@@ -1,4 +1,6 @@
+import D
 import GameIDs
+import GameUI
 
 struct Workforce {
     var limit: Int64
@@ -36,5 +38,15 @@ extension Workforce {
         self.quit += job.quit
 
         self.pops.append((id: pop, count: job.count))
+    }
+}
+extension Workforce {
+    func explainChanges(_ ul: inout TooltipInstructionEncoder) {
+        ul["Today’s change", +] = +?self.change[/3]
+        ul[>] {
+            $0["Hired", +] = +?self.hired[/3]
+            $0["Fired", +] = ??(-self.fired)[/3]
+            $0["Quit", +] = ??(-self.quit)[/3]
+        }
     }
 }
