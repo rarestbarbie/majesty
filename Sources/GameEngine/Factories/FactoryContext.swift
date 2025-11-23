@@ -879,6 +879,30 @@ extension FactoryContext {
         }
     }
 
+    func tooltipSize() -> Tooltip {
+        .instructions {
+            $0["Effective size"] = self.state.size.area?[/3]
+            $0["Growth progress"] = self.state.size.growthProgress[/0]
+                / Factory.Size.growthRequired
+
+            if  let liquidation: FactoryLiquidation = self.state.liquidation {
+                let shareCount: Int64 = self.equity.shareCount
+                $0[>] = """
+                This factory has been in bankruptcy proceedings since \
+                \(em: liquidation.started[.phrasal_US]) and there \(
+                    shareCount == 1 ? "is" : "are"
+                ) \(neg: shareCount) \(
+                    shareCount == 1 ? "share" : "shares"
+                ) left to liquidate
+                """
+            } else {
+                $0[>] = """
+                Doubling the factory level will quadruple its capacity
+                """
+            }
+        }
+    }
+
     func tooltipSummarizeEmployees(_ stratum: PopStratum) -> Tooltip? {
         let workforce: Workforce
         let type: PopType
