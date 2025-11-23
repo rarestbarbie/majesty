@@ -65,6 +65,9 @@ extension Inventory {
         value: Int64,
         tier: UInt8?
     ) {
+        var units: Int64 = units
+        var value: Int64 = value
+
         switch tier {
         case 0?:
             self.l.segmented[resource]?.report(
@@ -72,11 +75,23 @@ extension Inventory {
                 valuePurchased: value,
             )
         case 1?:
+            self.l.segmented[resource]?.capture(
+                unitsPurchased: &units,
+                valuePurchased: &value,
+            )
             self.e.segmented[resource]?.report(
                 unitsPurchased: units,
                 valuePurchased: value,
             )
         case 2?:
+            self.l.segmented[resource]?.capture(
+                unitsPurchased: &units,
+                valuePurchased: &value,
+            )
+            self.e.segmented[resource]?.capture(
+                unitsPurchased: &units,
+                valuePurchased: &value,
+            )
             self.x.segmented[resource]?.report(
                 unitsPurchased: units,
                 valuePurchased: value,
