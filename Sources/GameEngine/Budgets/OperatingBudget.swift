@@ -21,7 +21,10 @@ extension OperatingBudget {
         workers: Workforce?,
         clerks: (Workforce, FactoryMetadata.ClerkBonus)?,
         state: Factory.Dimensions,
-        weights: __shared ResourceInputWeights,
+        weights: __shared (
+            segmented: SegmentedWeights<InelasticDemand>,
+            tradeable: AggregateWeights
+        ),
         stockpileMaxDays: Int64,
         d: (l: Int64, e: Int64, x: Int64, v: Double?)
     ) {
@@ -30,14 +33,14 @@ extension OperatingBudget {
         self.x = .init()
 
         let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: weights.l.segmented.total,
-            e: weights.e.segmented.total,
-            x: weights.x.segmented.total,
+            l: weights.segmented.l.total,
+            e: weights.segmented.e.total,
+            x: weights.segmented.x.total,
         )
         let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: Int64.init(weights.l.tradeable.total.rounded(.up)),
-            e: Int64.init(weights.e.tradeable.total.rounded(.up)),
-            x: Int64.init(weights.x.tradeable.total.rounded(.up)),
+            l: Int64.init(weights.tradeable.l.total.rounded(.up)),
+            e: Int64.init(weights.tradeable.e.total.rounded(.up)),
+            x: Int64.init(weights.tradeable.x.total.rounded(.up)),
         )
         let totalCostPerDay: (l: Int64, e: Int64, x: Int64) = (
             l: tradeableCostPerDay.l + segmentedCostPerDay.l,

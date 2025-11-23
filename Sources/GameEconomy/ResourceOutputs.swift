@@ -14,10 +14,8 @@ import OrderedCollections
         self.segmented = segmented
         self.tradeable = tradeable
     }
-    @inlinable public init() {
-        self.segmented = [:]
-        self.tradeable = [:]
-    }
+
+    @inlinable public static var empty: Self { .init(segmented: [:], tradeable: [:]) }
 }
 extension ResourceOutputs {
     @inlinable public var count: Int { self.segmented.count + self.tradeable.count }

@@ -206,10 +206,10 @@ extension Pop: JavaScriptDecodable {
             type: try js[.type].decode(),
             nat: try js[.nat].decode(),
             inventory: .init(
-                out: try js[.inventory_out]?.decode() ?? .init(),
-                l: try js[.inventory_l]?.decode() ?? .init(),
-                e: try js[.inventory_e]?.decode() ?? .init(),
-                x: try js[.inventory_x]?.decode() ?? .init()
+                out: try js[.inventory_out]?.decode() ?? .empty,
+                l: try js[.inventory_l]?.decode() ?? .empty,
+                e: try js[.inventory_e]?.decode() ?? .empty,
+                x: try js[.inventory_x]?.decode() ?? .empty
             ),
             spending: .init(
                 buybacks: try js[.spending_buybacks]?.decode() ?? 0,

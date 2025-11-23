@@ -13,10 +13,7 @@ import OrderedCollections
         self.segmented = segmented
         self.tradeable = tradeable
     }
-    @inlinable public init() {
-        self.segmented = [:]
-        self.tradeable = [:]
-    }
+    @inlinable public static var empty: Self { .init(segmented: [:], tradeable: [:]) }
 }
 extension ResourceInputs {
     @inlinable public var count: Int { self.segmented.count + self.tradeable.count }
@@ -47,7 +44,12 @@ extension ResourceInputs {
 }
 extension ResourceInputs {
     /// Returns the amount of funds actually spent.
-    public mutating func trade(
+    ///
+    /// The only difference between this and `tradeAsConsumer` is that this method uses
+    /// linear weights rather than square-rooted weights when distributing the budget. This
+    /// makes it buy even ratios of resources as a business would, rather than favoring
+    /// cheaper resources as a consumer would.
+    public mutating func tradeAsBusiness(
         stockpileDays target: ResourceStockpileTarget,
         spendingLimit budget: Int64,
         in currency: CurrencyID,
@@ -56,7 +58,27 @@ extension ResourceInputs {
         let weights: [Double] = self.tradeable.values.map {
             Double.init(
                 $0.needed($0.unitsDemanded * target.lower)
-            ) * exchange.price(of: $0.id, in: currency)//.squareRoot()
+            ) * exchange.price(of: $0.id, in: currency)
+        }
+
+        return self.trade(
+            stockpileDays: target.today ... target.upper,
+            spendingLimit: budget,
+            in: currency,
+            on: &exchange,
+            weights: weights[...]
+        )
+    }
+    public mutating func tradeAsConsumer(
+        stockpileDays target: ResourceStockpileTarget,
+        spendingLimit budget: Int64,
+        in currency: CurrencyID,
+        on exchange: inout BlocMarkets,
+    ) -> TradeProceeds {
+        let weights: [Double] = self.tradeable.values.map {
+            Double.init(
+                $0.needed($0.unitsDemanded * target.lower)
+            ) * .sqrt(exchange.price(of: $0.id, in: currency))
         }
 
         return self.trade(

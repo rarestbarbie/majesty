@@ -19,7 +19,7 @@ extension MiningJob {
             hired: 0,
             fired: 0,
             quit: 0,
-            out: .init()
+            out: .empty
         )
     }
 }

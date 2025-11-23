@@ -11,10 +11,10 @@ struct Inventory {
 extension Inventory {
     init() {
         self.init(
-            out: .init(),
-            l: .init(),
-            e: .init(),
-            x: .init()
+            out: .empty,
+            l: .empty,
+            e: .empty,
+            x: .empty
         )
     }
 }

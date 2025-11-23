@@ -1,13 +1,16 @@
 import GameIDs
 import OrderedCollections
 
-/// Unlike ``PrecomputedBudgetTier``, the weights of `AggregateBudgetTier` are only an estimate.
-/// Therefore, we only track the total weight of all resources across the tier.
-@frozen public struct AggregateBudgetTier {
-    public let total: Double
+/// Unlike ``SegmentedWeights``, the costs of `AggregateWeights.Tier` are only an estimate.
+/// Therefore, we only track the total value of all resources across the tier.
+extension AggregateWeights {
+    @frozen public struct Tier {
+        public let total: Double
+    }
 }
-extension AggregateBudgetTier {
-    public static func compute(
+extension AggregateWeights.Tier {
+    static var empty: Self { .init(total: 0) }
+    static func compute(
         demands: OrderedDictionary<Resource, ResourceInput>,
         markets: borrowing BlocMarkets,
         currency: CurrencyID
