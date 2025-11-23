@@ -138,30 +138,7 @@ extension GameSnapshot {
     }
 
     func tooltipFactorySize(_ id: FactoryID) -> Tooltip? {
-        guard let factory: FactoryContext = self.context.factories[id] else {
-            return nil
-        }
-        return .instructions {
-            $0["Effective size"] = factory.state.size.area?[/3]
-            $0["Growth progress"] = factory.state.size.growthProgress[/0]
-                / Factory.Size.growthRequired
-
-            if  let liquidation: FactoryLiquidation = factory.state.liquidation {
-                let shareCount: Int64 = factory.equity.shareCount
-                $0[>] = """
-                This factory has been in bankruptcy proceedings since \
-                \(em: liquidation.started[.phrasal_US]) and there \(
-                    shareCount == 1 ? "is" : "are"
-                ) \(neg: shareCount) \(
-                    shareCount == 1 ? "share" : "shares"
-                ) left to liquidate
-                """
-            } else {
-                $0[>] = """
-                Doubling the factory level will quadruple its capacity
-                """
-            }
-        }
+        self.context.factories[id]?.tooltipSize()
     }
 
     func tooltipFactorySummarizeEmployees(
