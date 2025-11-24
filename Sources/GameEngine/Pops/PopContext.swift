@@ -117,23 +117,28 @@ extension PopContext: AllocatingContext {
         }
 
         if  case _? = self.livestock {
-            let _metric: Double = 2 * self.state.y.fl - 1
-            if  _metric < 0 {
-                let r: Decimal = 1‰ + authority.modifiers.livestockCullingEfficiency.value
-                let p: Double = -Double.init(r) * _metric
+            let employmentThreshold: Double = 0.95
+            if  self.stats.employmentBeforeEgress < employmentThreshold || self.state.y.fl < 1 {
                 let cullable: Int64 = self.state.z.size - 1
                 if  cullable > 0 {
+                    /// a number between -1 and 0
+                    let share: Double = min(
+                        self.stats.employmentBeforeEgress - employmentThreshold,
+                        self.state.y.fl - 1
+                    )
+                    let r: Decimal = 1‰ + authority.modifiers.livestockCullingEfficiency.value
+                    let p: Double = -Double.init(r) * share
                     self.state.z.size -= Binomial[cullable, p].sample(
                         using: &turn.random.generator
                     )
                 }
-            } else {
+            } else if self.state.z.profitability > 0 {
                 let r: Decimal = 1‰ + authority.modifiers.livestockBreedingEfficiency.value
-                let p: Double = Double.init(r) * _metric
+                let p: Double = Double.init(r) * self.state.z.profitability
                 self.state.z.size += Binomial[self.state.z.size, p].sample(
                     using: &turn.random.generator
                 ) + Int64.random(
-                    in: 0 ... Int64.init((4 * _metric).rounded()),
+                    in: 0 ... Int64.init((4 * self.state.z.profitability).rounded()),
                     using: &turn.random.generator
                 )
             }
