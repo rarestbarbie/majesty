@@ -67,6 +67,7 @@ extension FactoryMetadata {
         self.clerks.hash(into: &hasher)
         self.sharesInitial.hash(into: &hasher)
         self.sharesPerLevel.hash(into: &hasher)
+        self.terrainAllowed.hash(into: &hasher)
 
         return hasher.finalize()
     }

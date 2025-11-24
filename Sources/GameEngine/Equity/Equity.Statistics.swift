@@ -37,14 +37,14 @@ extension Equity<LEI>.Statistics {
                 let culture: String?
 
                 switch $1.id {
-                case .pop(let id):
+                case .building(let id):
                     guard
-                    let pop: Pop = context.pops[id] else {
+                    let building: Building = context.buildings[id] else {
                         return
                     }
 
-                    location = pop.tile
-                    culture = pop.nat
+                    location = building.tile
+                    culture = nil
 
                 case .factory(let id):
                     guard
@@ -54,6 +54,15 @@ extension Equity<LEI>.Statistics {
 
                     location = factory.tile
                     culture = nil
+
+                case .pop(let id):
+                    guard
+                    let pop: Pop = context.pops[id] else {
+                        return
+                    }
+
+                    location = pop.tile
+                    culture = pop.nat
                 }
 
                 guard

@@ -8,6 +8,7 @@ extension GameContext {
         let planets: RuntimeContextTable<PlanetContext>
         let cultures: RuntimeContextTable<CultureContext>
         let countries: RuntimeContextTable<CountryContext>
+        let buildings: RuntimeStateTable<BuildingContext>
         let factories: RuntimeStateTable<FactoryContext>
         let mines: RuntimeStateTable<MineContext>
         let pops: RuntimeStateTable<PopContext>

@@ -13,6 +13,7 @@ struct GameContext {
     private(set) var planets: RuntimeContextTable<PlanetContext>
     private(set) var cultures: RuntimeContextTable<CultureContext>
     private(set) var countries: RuntimeContextTable<CountryContext>
+    private(set) var buildings: DynamicContextTable<BuildingContext>
     private(set) var factories: DynamicContextTable<FactoryContext>
     private(set) var mines: DynamicContextTable<MineContext>
     private(set) var pops: DynamicContextTable<PopContext>
@@ -34,6 +35,7 @@ extension GameContext {
                 return rules.biology[type]
             },
             countries: try .init(states: save.countries) { _ in _none },
+            buildings: try .init(states: []) { _ in fatalError() },
             factories: try .init(states: save.factories) { rules.factories[$0.type] },
             mines: try .init(states: save.mines) { rules.mines[$0.type] },
             pops: try .init(states: save.pops) { rules.pops[$0.type] },
@@ -129,6 +131,7 @@ extension GameContext {
 extension GameContext {
     var pruningPass: PruningPass {
         .init(
+            buildings: self.buildings.keys,
             factories: self.factories.keys,
             mines: self.mines.keys,
             pops: self.pops.keys,
@@ -154,6 +157,7 @@ extension GameContext {
             planets: self.planets,
             cultures: self.cultures,
             countries: self.countries,
+            buildings: self.buildings.state,
             factories: self.factories.state,
             mines: self.mines.state,
             pops: self.pops.state,
@@ -192,6 +196,9 @@ extension GameContext {
 
         world.bank.prune(in: retain)
 
+        for i: Int in self.buildings.indices {
+            self.buildings[i].state.prune(in: retain)
+        }
         for i: Int in self.factories.indices {
             self.factories[i].state.prune(in: retain)
         }
@@ -247,14 +254,20 @@ extension GameContext {
 
             for stake: EquityStake<LEI> in pop.equity.shares.values {
                 switch stake.id {
-                case .pop(let id):
-                    self.pops[modifying: id].addPosition(
+                case .building(let id):
+                    // can buildings own slaves? probably not, but if they did, this is how it
+                    // would be calculated
+                    self.buildings[modifying: id].addPosition(
                         asset: pop.id.lei,
                         value: stake.shares
                     )
-
                 case .factory(let id):
                     self.factories[modifying: id].addPosition(
+                        asset: pop.id.lei,
+                        value: stake.shares
+                    )
+                case .pop(let id):
+                    self.pops[modifying: id].addPosition(
                         asset: pop.id.lei,
                         value: stake.shares
                     )
@@ -275,16 +288,20 @@ extension GameContext {
             self.factories[i].update(equityStatistics: equity)
 
             for stake: EquityStake<LEI> in factory.equity.shares.values {
-                // TODO: this isn’t correctly taking into account pop/factory death
+                // the pruning pass should have ensured that only valid stakes remain
                 switch stake.id {
-                case .pop(let id):
-                    self.pops[modifying: id].addPosition(
+                case .building(let id):
+                    self.buildings[modifying: id].addPosition(
                         asset: factory.id.lei,
                         value: stake.shares
                     )
-
                 case .factory(let id):
                     self.factories[modifying: id].addPosition(
+                        asset: factory.id.lei,
+                        value: stake.shares
+                    )
+                case .pop(let id):
+                    self.pops[modifying: id].addPosition(
                         asset: factory.id.lei,
                         value: stake.shares
                     )
@@ -344,6 +361,12 @@ extension GameContext {
             let shape: StockMarket.Shape = .init(r: 0.02)
             $0.match(shape: shape, random: &turn.random) {
                 switch $2.asset {
+                case .building(let id):
+                    self.buildings[modifying: id].state.equity.trade(
+                        random: &$0,
+                        bank: &turn.bank,
+                        fill: $2
+                    )
                 case .factory(let id):
                     self.factories[modifying: id].state.equity.trade(
                         random: &$0,
@@ -426,13 +449,18 @@ extension GameContext {
         side: LocalMarket.Side
     ) {
         switch fill.entity {
+        case .building(let id):
+            self.buildings[modifying: id].state.inventory.report(
+                resource: resource,
+                fill: fill,
+                side: side
+            )
         case .factory(let id):
             self.factories[modifying: id].state.inventory.report(
                 resource: resource,
                 fill: fill,
                 side: side
             )
-
         case .pop(let id):
             if  case .sell = side,
                 case .mine(let mine)? = fill.memo {
@@ -728,6 +756,7 @@ extension GameContext {
 }
 extension GameContext {
     private mutating func destroyObjects() {
+        self.buildings.lint()
         self.factories.lint()
         self.mines.lint()
         self.pops.lint()
