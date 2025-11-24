@@ -7,10 +7,10 @@
             "Storage": 1
         },
         "Cattle Ranch": {
-            "Heifers": 5
+            "Hormones": 1
         },
         "Chicken Farm": {
-            "Chicks": 25
+            "Hormones": 1
         }
     },
     "expansion": {

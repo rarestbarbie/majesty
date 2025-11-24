@@ -12,6 +12,15 @@ import GameIDs
     }
 }
 extension AggregateWeights {
+    @inlinable public var total: (l: Int64, e: Int64, x: Int64) {
+        (
+            l: Int64.init(self.l.total.rounded(.up)),
+            e: Int64.init(self.e.total.rounded(.up)),
+            x: Int64.init(self.x.total.rounded(.up)),
+        )
+    }
+}
+extension AggregateWeights {
     public static func businessNew(
         x: ResourceInputs,
         markets: borrowing BlocMarkets,

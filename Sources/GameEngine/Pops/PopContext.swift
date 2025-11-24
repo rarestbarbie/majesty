@@ -117,9 +117,10 @@ extension PopContext: AllocatingContext {
         }
 
         if  case _? = self.livestock {
-            if  self.state.z.profitability < 0 {
+            let _metric: Double = 2 * self.state.y.fl - 1
+            if  _metric < 0 {
                 let r: Decimal = 1‰ + authority.modifiers.livestockCullingEfficiency.value
-                let p: Double = -Double.init(r) * self.state.z.profitability
+                let p: Double = -Double.init(r) * _metric
                 let cullable: Int64 = self.state.z.size - 1
                 if  cullable > 0 {
                     self.state.z.size -= Binomial[cullable, p].sample(
@@ -128,11 +129,11 @@ extension PopContext: AllocatingContext {
                 }
             } else {
                 let r: Decimal = 1‰ + authority.modifiers.livestockBreedingEfficiency.value
-                let p: Double = Double.init(r) * self.state.z.profitability
+                let p: Double = Double.init(r) * _metric
                 self.state.z.size += Binomial[self.state.z.size, p].sample(
                     using: &turn.random.generator
                 ) + Int64.random(
-                    in: 0 ... Int64.init((4 * self.state.z.profitability).rounded()),
+                    in: 0 ... Int64.init((4 * _metric).rounded()),
                     using: &turn.random.generator
                 )
             }
@@ -168,39 +169,36 @@ extension PopContext: AllocatingContext {
             scalingFactor: (self.state.z.size, z.x),
         )
 
-        let weights: (
-            segmented: SegmentedWeights<ElasticDemand>,
-            tradeable: AggregateWeights
-        ) = (
-            segmented: .consumer(
-                l: self.state.inventory.l,
-                e: self.state.inventory.e,
-                x: self.state.inventory.x,
-                markets: turn.localMarkets,
-                address: self.state.tile,
-            ),
-            tradeable: .consumer(
-                l: self.state.inventory.l,
-                e: self.state.inventory.e,
-                x: self.state.inventory.x,
-                markets: turn.worldMarkets,
-                currency: authority.currency.id
+        let budget: PopBudget
+
+        if case .Ward = self.state.type.stratum {
+            let weights: (
+                segmented: SegmentedWeights<InelasticDemand>,
+                tradeable: AggregateWeights
+            ) = (
+                segmented: .business(
+                    l: self.state.inventory.l,
+                    e: self.state.inventory.e,
+                    x: self.state.inventory.x,
+                    markets: turn.localMarkets,
+                    address: self.state.tile,
+                ),
+                tradeable: .business(
+                    l: self.state.inventory.l,
+                    e: self.state.inventory.e,
+                    x: self.state.inventory.x,
+                    markets: turn.worldMarkets,
+                    currency: authority.currency.id
+                )
             )
-        )
 
-        let d: (l: Int64, e: Int64, x: Int64) = (7, 30, 365)
-        var budget: PopBudget = .init(
-            weights: weights,
-            balance: balance,
-            stockpileMaxDays: Self.stockpileDays.upperBound,
-            d: d
-        )
+            budget = .slave(
+                weights: weights,
+                balance: balance,
+                stockpileMaxDays: Self.stockpileDays.upperBound,
+                d: 7
+            )
 
-        equity:
-        switch self.state.type.stratum {
-        case .Ward:
-            budget.dividend = max(0, (balance - budget.min.l) / 3650)
-            budget.buybacks = max(0, (balance - budget.min.l - budget.dividend) / 365)
             // Align share price
             self.state.z.px = Double.init(self.equity.sharePrice)
             turn.stockMarkets.issueShares(
@@ -209,39 +207,76 @@ extension PopContext: AllocatingContext {
                 security: self.security,
             )
 
-        case .Owner:
-            let valueToInvest: Int64 = (balance - budget.min.l - budget.min.e) / d.x
-            if  valueToInvest <= 0 {
-                break equity
+            turn.localMarkets.tradeAsBusiness(
+                selling: self.state.inventory.out.segmented,
+                buying: weights.segmented,
+                budget: (
+                    budget.l.segmented,
+                    budget.e.segmented,
+                    budget.x.segmented,
+                ),
+                as: self.lei,
+                in: self.state.tile,
+            )
+        } else {
+            let d: (l: Int64, e: Int64, x: Int64) = (7, 30, 365)
+            let weights: (
+                segmented: SegmentedWeights<ElasticDemand>,
+                tradeable: AggregateWeights
+            ) = (
+                segmented: .consumer(
+                    l: self.state.inventory.l,
+                    e: self.state.inventory.e,
+                    x: self.state.inventory.x,
+                    markets: turn.localMarkets,
+                    address: self.state.tile,
+                ),
+                tradeable: .consumer(
+                    l: self.state.inventory.l,
+                    e: self.state.inventory.e,
+                    x: self.state.inventory.x,
+                    markets: turn.worldMarkets,
+                    currency: authority.currency.id
+                )
+            )
+
+            budget = .free(
+                weights: weights,
+                balance: balance,
+                stockpileMaxDays: Self.stockpileDays.upperBound,
+                d: d
+            )
+
+            if case .Owner = self.state.type.stratum {
+                let valueToInvest: Int64 = (balance - budget.min.l - budget.min.e) / d.x
+                if  valueToInvest > 0 {
+                    turn.stockMarkets.queueRandomPurchase(
+                        buyer: .pop(self.state.id),
+                        value: valueToInvest,
+                        currency: currency
+                    )
+                }
             }
-            turn.stockMarkets.queueRandomPurchase(
-                buyer: .pop(self.state.id),
-                value: valueToInvest,
-                currency: currency
-            )
 
-        default:
-            break
-        }
-
-        turn.localMarkets.tradeAsConsumer(
-            selling: self.state.inventory.out.segmented,
-            buying: weights.segmented,
-            budget: (
-                budget.l.segmented,
-                budget.e.segmented,
-                budget.x.segmented,
-            ),
-            as: self.lei,
-            in: self.state.tile,
-        )
-        for job: MiningJob in self.state.mines.values {
-            turn.localMarkets.sell(
-                supply: job.out.segmented,
-                entity: self.lei,
-                memo: .mine(job.id),
-                tile: self.state.tile,
+            turn.localMarkets.tradeAsConsumer(
+                selling: self.state.inventory.out.segmented,
+                buying: weights.segmented,
+                budget: (
+                    budget.l.segmented,
+                    budget.e.segmented,
+                    budget.x.segmented,
+                ),
+                as: self.lei,
+                in: self.state.tile,
             )
+            for job: MiningJob in self.state.mines.values {
+                turn.localMarkets.sell(
+                    supply: job.out.segmented,
+                    entity: self.lei,
+                    memo: .mine(job.id),
+                    tile: self.state.tile,
+                )
+            }
         }
 
         self.budget = budget
@@ -249,6 +284,8 @@ extension PopContext: AllocatingContext {
 }
 extension PopContext: TransactingContext {
     mutating func transact(turn: inout Turn) {
+        let enslaved: Bool = self.state.type.stratum == .Ward
+
         guard
         let country: CountryProperties = self.region?.occupiedBy,
         let budget: PopBudget = self.budget else {
@@ -264,11 +301,7 @@ extension PopContext: TransactingContext {
             )
             self.state.inventory.out.deposit(
                 from: self.output,
-                scalingFactor: (
-                    self.state.z.size,
-                    // yesterday’s fulfillment, not today’s, as we do not yet know it
-                    self.state.type.stratum == .Ward ? self.state.y.fl : 1
-                )
+                scalingFactor: (self.state.z.size, 1)
             )
 
             for j: Int in self.state.mines.values.indices {
@@ -293,7 +326,12 @@ extension PopContext: TransactingContext {
             let z: (l: Double, e: Double, x: Double) = self.state.needsScalePerCapita
 
             if  budget.l.tradeable > 0 {
-                account += self.state.inventory.l.tradeAsConsumer(
+                account += enslaved ? self.state.inventory.l.tradeAsBusiness(
+                    stockpileDays: target,
+                    spendingLimit: budget.l.tradeable,
+                    in: country.currency.id,
+                    on: &turn.worldMarkets,
+                ) : self.state.inventory.l.tradeAsConsumer(
                     stockpileDays: target,
                     spendingLimit: budget.l.tradeable,
                     in: country.currency.id,
@@ -306,6 +344,12 @@ extension PopContext: TransactingContext {
                 from: self.l,
                 scalingFactor: (self.state.z.size, z.l)
             )
+
+            if  enslaved {
+                self.state.z.fe = 1
+                self.state.z.fx = 0
+                return
+            }
 
             if  budget.e.tradeable > 0 {
                 account += self.state.inventory.e.tradeAsConsumer(
@@ -338,17 +382,10 @@ extension PopContext: TransactingContext {
             )
 
             // Welfare
-            if  self.state.type.stratum != .Ward {
-                account.s += self.state.z.size * country.minwage / 10
-            }
+            account.s += self.state.z.size * country.minwage / 10
         } (&turn.bank[account: self.lei])
 
-        liquidation:
-        if case .Ward = self.state.type.stratum {
-            // Pop is enslaved
-            self.state.z.fe = 1
-            self.state.z.fx = 0
-
+        if  enslaved {
             self.state.z.mix(profitability: self.state.profit.operatingProfitability)
 
             // Pay dividends to shareholders, if any.

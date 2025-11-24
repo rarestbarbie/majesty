@@ -11,6 +11,15 @@ import GameIDs
         self.x = x
     }
 }
+extension SegmentedWeights {
+    @inlinable public var total: (l: Int64, e: Int64, x: Int64) {
+        (
+            l: self.l.total,
+            e: self.e.total,
+            x: self.x.total,
+        )
+    }
+}
 // specialization presets
 extension SegmentedWeights<InelasticDemand> {
     public static func businessNew(
