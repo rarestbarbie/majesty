@@ -1,3 +1,5 @@
+import Assert
+
 extension Pop {
     struct Stats {
         private(set) var employmentBeforeEgress: Double
@@ -27,13 +29,18 @@ extension Pop.Stats {
             )
         } else {
             self.employmentBeforeEgress = state.inventory.out.segmented.values.reduce(0) {
-                let sold: Double = $1.units.added > 0
-                    ? Double.init($1.unitsSold) / Double.init($1.units.added)
-                    : 1
-
+                let sold: Double
+                if  $1.unitsSold < $1.units.added {
+                    // implies `units.added > 0`
+                    sold = Double.init($1.unitsSold) / Double.init($1.units.added)
+                } else {
+                    sold = 1
+                }
                 return max($0, sold)
             }
         }
+
+        #assert(0 ... 1 ~= self.employmentBeforeEgress, "Employment must be between 0 and 1")
 
         self.cashFlow.reset()
         self.cashFlow.update(with: state.inventory.l)
