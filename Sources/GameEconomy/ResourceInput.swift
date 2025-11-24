@@ -72,6 +72,26 @@ extension ResourceInput {
     }
 }
 extension ResourceInput {
+    @inlinable public mutating func capture(
+        unitsPurchased: inout Int64,
+        valuePurchased: inout Int64,
+    ) {
+        let unitsCaptured: Int64 = min(self.needed(self.unitsDemanded), unitsPurchased)
+        if  unitsCaptured == 0 {
+            return
+        }
+
+        let valueCaptured: Int64 = valuePurchased <> (unitsCaptured %/ unitsPurchased)
+
+        self.report(
+            unitsPurchased: unitsCaptured,
+            valuePurchased: valueCaptured
+        )
+
+        unitsPurchased -= unitsCaptured
+        valuePurchased -= valueCaptured
+    }
+
     @inlinable public mutating func report(
         unitsPurchased: Int64,
         valuePurchased: Int64,
