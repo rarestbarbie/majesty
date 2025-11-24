@@ -32,16 +32,8 @@ extension OperatingBudget {
         self.e = .init()
         self.x = .init()
 
-        let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: weights.segmented.l.total,
-            e: weights.segmented.e.total,
-            x: weights.segmented.x.total,
-        )
-        let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = (
-            l: Int64.init(weights.tradeable.l.total.rounded(.up)),
-            e: Int64.init(weights.tradeable.e.total.rounded(.up)),
-            x: Int64.init(weights.tradeable.x.total.rounded(.up)),
-        )
+        let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.total
+        let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.total
         let totalCostPerDay: (l: Int64, e: Int64, x: Int64) = (
             l: tradeableCostPerDay.l + segmentedCostPerDay.l,
             e: tradeableCostPerDay.e + segmentedCostPerDay.e,
