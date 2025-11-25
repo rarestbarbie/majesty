@@ -552,7 +552,9 @@ extension FactoryContext {
         )
 
         self.state.z.fl = self.state.inventory.l.fulfilled
-        self.state.z.fe = self.state.inventory.e.fulfilled
+        // `fulfilled` counts stockpiled resources that were saved for the next day,
+        // so to compute the actual usage today we need `min` it with the consumption fraction
+        self.state.z.fe = min(self.state.inventory.e.fulfilled, budget.corporate)
 
         return update.headcount
     }
