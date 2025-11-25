@@ -810,7 +810,7 @@ extension PopContext {
                 $0[>] {
                     $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
                     if let budget: PopBudget = self.state.budget, budget.investment > 0 {
-                            $0["Investment budget", +] = +budget.investment[/3]
+                            $0["Investment budget", +] = budget.investment[/3]
                     }
 
                     $0["Militancy", -] = +?Self.mil(fx: self.state.z.fx)[..3]
