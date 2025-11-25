@@ -11,6 +11,7 @@ extension PopType {
         case .Contractor: "Wages"
         case .Engineer: "Salaries"
         case .Farmer: "Salaries"
+        case .Consultant: "Retainers"
         case .Influencer: "Market earnings"
         case .Aristocrat: "Fundraising"
         case .Politician: "Fundraising"
@@ -28,6 +29,7 @@ extension PopType {
 
         case .Engineer: .remote
         case .Farmer: .remote
+        case .Consultant: .remote
         case .Influencer: nil
 
         case .Aristocrat: nil
