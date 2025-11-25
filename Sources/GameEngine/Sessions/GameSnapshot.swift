@@ -188,7 +188,7 @@ extension GameSnapshot {
         _ id: FactoryID,
         _ item: CashAllocationItem,
     ) -> Tooltip? {
-        switch self.context.factories[id]?.budget {
+        switch self.context.factories[id]?.state.budget {
         case .active(let budget)?:
             let statement: CashAllocationStatement = .init(from: budget)
             return statement.tooltip(item: item)
@@ -570,7 +570,7 @@ extension GameSnapshot {
         _ id: PopID,
         _ item: CashAllocationItem,
     ) -> Tooltip? {
-        if  let budget: PopBudget = self.context.pops[id]?.budget {
+        if  let budget: PopBudget = self.context.pops[id]?.state.budget {
             let statement: CashAllocationStatement = .init(from: budget)
             return statement.tooltip(item: item)
         } else {

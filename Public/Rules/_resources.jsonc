@@ -32,6 +32,10 @@
         "floor": "wage",
         "hours": 8
     },
+    "Advice": {
+        "emoji": "🧭",
+        "color": "#ffd29e"
+    },
     "Influence": {
         "emoji": "⚖️",
         "color": "#873a8a",

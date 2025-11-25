@@ -95,14 +95,19 @@
         "tile": "399N-2,3",
         "pops": [
             {
-                "race": "West Indian",
-                "type": "D",
-                "size": 260000
-            },
-            {
                 "race": "Atlantean",
                 "type": "O",
                 "size": 1100
+            },
+            {
+                "race": "Atlantean",
+                "type": "X",
+                "size": 16000
+            },
+            {
+                "race": "West Indian",
+                "type": "D",
+                "size": 260000
             },
             {
                 "race": "Atlantean",
@@ -135,6 +140,11 @@
                 "race": "Atlantean",
                 "type": "O",
                 "size": 5400
+            },
+            {
+                "race": "Atlantean",
+                "type": "X",
+                "size": 19000
             },
             {
                 "race": "Atlantean",
@@ -174,6 +184,11 @@
                 "size": 6100
             },
             {
+                "race": "Atlantean",
+                "type": "X",
+                "size": 18000
+            },
+            {
                 "race": "Black American",
                 "type": "O",
                 "size": 24
@@ -197,6 +212,11 @@
                 "race": "Jewish",
                 "type": "O",
                 "size": 6050
+            },
+            {
+                "race": "Jewish",
+                "type": "X",
+                "size": 12000
             },
             {
                 "race": "Jewish",

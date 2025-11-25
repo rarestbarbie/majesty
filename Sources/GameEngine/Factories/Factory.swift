@@ -18,6 +18,9 @@ struct Factory: LegalEntityState, Identifiable {
 
     var inventory: Inventory
     var spending: Spending
+    /// This is part of the persistent state, because it is only computed during a turn, and
+    /// we want the budget info to be available for inspection when loading a save.
+    var budget: FactoryBudget?
     var y: Dimensions
     var z: Dimensions
 
@@ -33,6 +36,7 @@ extension Factory: Sectionable {
             liquidation: nil,
             inventory: .init(),
             spending: .zero,
+            budget: nil,
             y: .init(),
             z: .init(),
             equity: [:],
@@ -91,6 +95,9 @@ extension Factory {
         case spending_salaries = "sC"
         case spending_wages = "sW"
 
+        case budget_liquidation = "bL"
+        case budget_operating = "bO"
+
         case y
         case z
 
@@ -116,6 +123,13 @@ extension Factory: JavaScriptEncodable {
         js[.spending_salaries] = self.spending.salaries
         js[.spending_wages] = self.spending.wages
 
+        switch self.budget {
+        case .constructing(let value)?: js[.budget_operating] = value
+        case .liquidating(let value)?: js[.budget_liquidation] = value
+        case .active(let value)?: js[.budget_operating] = value
+        case nil: break
+        }
+
         js[.y] = self.y
         js[.z] = self.z
 
@@ -124,15 +138,28 @@ extension Factory: JavaScriptEncodable {
 }
 extension Factory: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+        let size: Size = .init(
+            level: try js[.size_l]?.decode() ?? 1,
+            growthProgress: try js[.size_p]?.decode() ?? 0
+        )
+
+        let budget: FactoryBudget?
+
+        if  let value: OperatingBudget = try js[.budget_operating]?.decode() {
+            budget = size.level == 0 ? .constructing(value) : .active(value)
+        } else if
+            let value: LiquidationBudget = try js[.budget_liquidation]?.decode() {
+            budget = .liquidating(value)
+        } else {
+            budget = nil
+        }
+
         let today: Dimensions = try js[.z]?.decode() ?? .init()
         self.init(
             id: try js[.id].decode(),
             tile: try js[.tile].decode(),
             type: try js[.type].decode(),
-            size: .init(
-                level: try js[.size_l]?.decode() ?? 1,
-                growthProgress: try js[.size_p]?.decode() ?? 0
-            ),
+            size: size,
             liquidation: try js[.liquidation]?.decode(),
             inventory: .init(
                 out: try js[.inventory_out]?.decode() ?? .empty,
@@ -146,6 +173,7 @@ extension Factory: JavaScriptDecodable {
                 salaries: try js[.spending_salaries]?.decode() ?? 0,
                 wages: try js[.spending_wages]?.decode() ?? 0
             ),
+            budget: budget,
             y: try js[.y]?.decode() ?? today,
             z: today,
             equity: try js[.equity]?.decode() ?? [:]

@@ -18,10 +18,9 @@ extension Pop.Stats {
 }
 extension Pop.Stats {
     mutating func update(from state: Pop) {
-        self.employedBeforeEgress = state.employed()
-
         // we know pop size must be positive, as it would have been pruned during pruning
         if  state.inventory.out.segmented.isEmpty {
+            self.employedBeforeEgress = state.employed()
             self.employmentBeforeEgress = Double.init(
                 self.employedBeforeEgress
             ) / Double.init(
@@ -38,6 +37,11 @@ extension Pop.Stats {
                 }
                 return max($0, sold)
             }
+            // min is necessary here, because Double may round slightly up for very large Int64s
+            self.employedBeforeEgress = min(
+                state.z.size,
+                Int64.init(Double.init(state.z.size) * self.employmentBeforeEgress)
+            )
         }
 
         #assert(0 ... 1 ~= self.employmentBeforeEgress, "Employment must be between 0 and 1")

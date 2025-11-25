@@ -17,7 +17,7 @@ import Bijection
     case Engineer
     case Farmer
     case Influencer
-    // case academic
+    case Consultant
     // case bureaucrat
     // case manager
     // case soldier
@@ -41,8 +41,8 @@ extension PopType: RawRepresentable {
 
         case .Engineer:     "G"
         case .Farmer:       "F"
+        case .Consultant:   "X"
         case .Influencer:   "I"
-
         case .Aristocrat:   "O"
         case .Politician:   "P"
         }
@@ -82,6 +82,7 @@ extension PopType {
         case .Contractor:   .Worker
         case .Engineer:     .Clerk
         case .Farmer:       .Clerk
+        case .Consultant:   .Clerk
         case .Influencer:   .Clerk
         case .Aristocrat:   .Owner
         case .Politician:   .Owner
@@ -101,6 +102,7 @@ extension PopType {
 
         case .Engineer: "Engineer"
         case .Farmer: "Farmer"
+        case .Consultant: "Consultant"
         case .Influencer: "Influencer"
 
         case .Aristocrat: "Aristocrat"
@@ -119,6 +121,7 @@ extension PopType {
 
         case .Engineer: "Engineers"
         case .Farmer: "Farmers"
+        case .Consultant: "Consultants"
         case .Influencer: "Influencers"
 
         case .Aristocrat: "Aristocrats"

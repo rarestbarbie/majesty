@@ -24,6 +24,7 @@ extension TermType: RawRepresentable {
         case .pop(.Contractor): "pC"
         case .pop(.Engineer): "pG"
         case .pop(.Farmer): "pF"
+        case .pop(.Consultant): "pX"
         case .pop(.Influencer): "pI"
         case .pop(.Aristocrat): "pO"
         case .pop(.Politician): "pP"

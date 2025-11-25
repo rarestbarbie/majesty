@@ -18,7 +18,7 @@ extension StockMarkets {
     }
 }
 extension StockMarkets {
-    public mutating func queueRandomPurchase(buyer: LEI, value: Int64, currency: CurrencyID) {
+    @inlinable public mutating func queueRandomPurchase(buyer: LEI, value: Int64, currency: CurrencyID) {
         guard value > 0 else {
             return
         }

@@ -18,6 +18,7 @@ struct Pop: LegalEntityState, Identifiable {
 
     var inventory: Inventory
     var spending: Spending
+    var budget: PopBudget?
     var y: Dimensions
     var z: Dimensions
 
@@ -35,6 +36,7 @@ extension Pop: Sectionable {
             nat: section.culture,
             inventory: .init(),
             spending: .zero,
+            budget: nil,
             y: .init(),
             z: .init(),
             equity: [:],
@@ -77,9 +79,9 @@ extension Pop: Turnable {
 extension Pop {
     mutating func egress(
         evaluator: ConditionEvaluator,
-        targets: [(id: PopType, weight: Int64)],
         inherit: Fraction?,
         on turn: inout Turn,
+        weight: (PopType) -> Double,
     ) {
         let rate: Double = evaluator.output
         if  rate <= 0 {
@@ -89,13 +91,24 @@ extension Pop {
         let count: Int64 = Binomial[self.z.size, rate].sample(
             using: &turn.random.generator
         )
+        if  count <= 0 {
+            return
+        }
+
+        /// evaluate this lazily to avoid unnecessary work
+        var targets: [(id: PopType, weight: Double)] = PopType.allCases.compactMap {
+            let weight: Double = weight($0)
+            return weight > 0 ? (id: $0, weight: weight) : nil
+        }
+
+        targets.shuffle(using: &turn.random.generator)
 
         guard
         let breakdown: [Int64] = targets.distribute(count, share: \.weight) else {
             return
         }
 
-        for ((target, _), size): ((id: PopType, Int64), Int64) in zip(targets, breakdown)
+        for ((target, _), size): ((id: PopType, Double), Int64) in zip(targets, breakdown)
             where size > 0 {
 
             if self.type == target {
@@ -168,6 +181,8 @@ extension Pop {
         case spending_buybacks = "sE"
         case spending_dividend = "sI"
 
+        case budget = "b"
+
         case y
         case z
 
@@ -188,6 +203,7 @@ extension Pop: JavaScriptEncodable {
         js[.inventory_out] = self.inventory.out
         js[.spending_buybacks] = self.spending.buybacks
         js[.spending_dividend] = self.spending.dividend
+        js[.budget] = self.budget
 
         js[.y] = self.y
         js[.z] = self.z
@@ -215,6 +231,7 @@ extension Pop: JavaScriptDecodable {
                 buybacks: try js[.spending_buybacks]?.decode() ?? 0,
                 dividend: try js[.spending_dividend]?.decode() ?? 0,
             ),
+            budget: try js[.budget]?.decode(),
             y: try js[.y]?.decode() ?? today,
             z: today,
             equity: try js[.equity]?.decode() ?? [:],
