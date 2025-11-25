@@ -85,7 +85,7 @@ extension InventoryBreakdown {
         }
 
         self.costs = pop.stats.cashFlow.chart(rules: snapshot.rules)
-        if  let budget: PopBudget = pop.budget {
+        if  let budget: PopBudget = pop.state.budget {
             let statement: CashAllocationStatement = .init(from: budget)
             self.budget = statement.chart()
         } else {
@@ -146,7 +146,7 @@ extension InventoryBreakdown {
         self.costs = factory.cashFlow.chart(rules: snapshot.rules)
 
 
-        switch factory.budget {
+        switch factory.state.budget {
         case .active(let budget)?:
             let statement: CashAllocationStatement = .init(from: budget)
             self.budget = statement.chart()

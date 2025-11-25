@@ -20,9 +20,7 @@ struct FactoryContext: LegalEntityContext, RuntimeContext {
     private(set) var workers: Workforce?
     private(set) var clerks: Workforce?
     private(set) var equity: Equity<LEI>.Statistics
-
     private(set) var cashFlow: CashFlowStatement
-    private(set) var budget: FactoryBudget?
 
     init(type: FactoryMetadata, state: Factory) {
         self.type = type
@@ -34,10 +32,7 @@ struct FactoryContext: LegalEntityContext, RuntimeContext {
         self.workers = nil
         self.clerks = nil
         self.equity = .init()
-
         self.cashFlow = .init()
-
-        self.budget = nil
     }
 }
 extension FactoryContext: Identifiable {
@@ -45,6 +40,8 @@ extension FactoryContext: Identifiable {
 }
 extension FactoryContext {
     private static var stockpileDays: ClosedRange<Int64> { 3 ... 7 }
+
+    static var efficiencyBonusFromCorporate: Double { 0.3 }
     static var pr: Int { 8 }
 
     mutating func startIndexCount() {
@@ -133,7 +130,7 @@ extension FactoryContext: TransactingContext {
         if  self.state.size.level == 0 {
             self.state.z.ei = 1
         } else {
-            self.state.z.ei = 1 - 0.3 * self.state.y.fe
+            self.state.z.ei = 1 - Self.efficiencyBonusFromCorporate * .sqrt(self.state.y.fe)
         }
 
         // Reset fill positions, since they are copied from yesterday’s positions by default.
@@ -170,7 +167,7 @@ extension FactoryContext: TransactingContext {
         }
 
         if case _? = self.state.liquidation {
-            self.budget = .liquidating(
+            self.state.budget = .liquidating(
                 account: turn.bank[account: self.lei],
                 sharePrice: self.equity.sharePrice
             )
@@ -204,7 +201,7 @@ extension FactoryContext: TransactingContext {
             )
             sharesToIssue = max(0, self.type.sharesInitial - self.equity.shareCount)
 
-            self.budget = .constructing(budget)
+            self.state.budget = .constructing(budget)
         } else {
             let utilization: Double
             if  let workers: Workforce = self.workers,
@@ -245,7 +242,7 @@ extension FactoryContext: TransactingContext {
 
             sharesToIssue = budget.buybacks == 0 ? sharesIssued : 0
 
-            self.budget = .active(budget)
+            self.state.budget = .active(budget)
         }
 
         // only issue shares if the factory is not performing buybacks
@@ -273,7 +270,7 @@ extension FactoryContext: TransactingContext {
     mutating func transact(turn: inout Turn) {
         guard
         let country: CountryProperties = self.region?.occupiedBy,
-        let budget: FactoryBudget = self.budget else {
+        let budget: FactoryBudget = self.state.budget else {
             return
         }
 
@@ -458,7 +455,7 @@ extension FactoryContext {
 
     private mutating func liquidate(
         policy: CountryProperties,
-        budget: FactoryBudget.Liquidating,
+        budget: LiquidationBudget,
         turn: inout Turn
     ) {
         {
@@ -546,7 +543,7 @@ extension FactoryContext {
         )
         self.state.inventory.e.consume(
             from: self.type.corporate,
-            scalingFactor: (throughput, self.state.z.ei)
+            scalingFactor: (throughput, self.state.z.ei * budget.corporate)
         )
 
         self.state.inventory.out.deposit(
@@ -868,6 +865,13 @@ extension FactoryContext {
                 """ : """
                 Factories that purchase all of their corporate supplies are more efficient
                 """
+
+                if case .active(let budget)? = self.state.budget, budget.corporate < 1 {
+                    $0[>] = """
+                    Due to high \(em: "corporate costs"), this factory is only purchasing \
+                    \(neg: (100 * budget.corporate)[..1]) percent of its corporate supplies
+                    """
+                }
             case .x:
                 let inputs: ResourceInputs = self.state.inventory.x
                 $0["Capital expenditures"] = self.state.z.fx[%3]

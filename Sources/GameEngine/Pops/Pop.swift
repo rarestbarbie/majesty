@@ -18,6 +18,7 @@ struct Pop: LegalEntityState, Identifiable {
 
     var inventory: Inventory
     var spending: Spending
+    var budget: PopBudget?
     var y: Dimensions
     var z: Dimensions
 
@@ -35,6 +36,7 @@ extension Pop: Sectionable {
             nat: section.culture,
             inventory: .init(),
             spending: .zero,
+            budget: nil,
             y: .init(),
             z: .init(),
             equity: [:],
@@ -168,6 +170,8 @@ extension Pop {
         case spending_buybacks = "sE"
         case spending_dividend = "sI"
 
+        case budget = "b"
+
         case y
         case z
 
@@ -188,6 +192,7 @@ extension Pop: JavaScriptEncodable {
         js[.inventory_out] = self.inventory.out
         js[.spending_buybacks] = self.spending.buybacks
         js[.spending_dividend] = self.spending.dividend
+        js[.budget] = self.budget
 
         js[.y] = self.y
         js[.z] = self.z
@@ -215,6 +220,7 @@ extension Pop: JavaScriptDecodable {
                 buybacks: try js[.spending_buybacks]?.decode() ?? 0,
                 dividend: try js[.spending_dividend]?.decode() ?? 0,
             ),
+            budget: try js[.budget]?.decode(),
             y: try js[.y]?.decode() ?? today,
             z: today,
             equity: try js[.equity]?.decode() ?? [:],
