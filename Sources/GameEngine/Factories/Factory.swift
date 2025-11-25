@@ -145,10 +145,10 @@ extension Factory: JavaScriptDecodable {
 
         let budget: FactoryBudget?
 
-        if  let value: OperatingBudget = try js[.liquidation].decode() {
+        if  let value: OperatingBudget = try js[.budget_operating]?.decode() {
             budget = size.level == 0 ? .constructing(value) : .active(value)
         } else if
-            let value: LiquidationBudget = try js[.liquidation].decode() {
+            let value: LiquidationBudget = try js[.budget_liquidation]?.decode() {
             budget = .liquidating(value)
         } else {
             budget = nil
