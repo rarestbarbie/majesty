@@ -815,16 +815,16 @@ extension PopContext {
                 $0["Life needs fulfilled"] = self.state.z.fl[%3]
                 $0[>] {
                     $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
-                    $0["Militancy", -] = +?Self.mil(fl: self.state.z.fl)[%2]
-                    $0["Consciousness", -] = +?Self.con(fl: self.state.z.fl)[%2]
+                    $0["Militancy", -] = +?Self.mil(fl: self.state.z.fl)[..3]
+                    $0["Consciousness", -] = +?Self.con(fl: self.state.z.fl)[..3]
                 }
             case .e:
                 let inputs: ResourceInputs = self.state.inventory.e
                 $0["Everyday needs fulfilled"] = self.state.z.fe[%3]
                 $0[>] {
                     $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
-                    $0["Militancy", -] = +?Self.mil(fe: self.state.z.fe)[%2]
-                    $0["Consciousness", -] = +?Self.con(fe: self.state.z.fe)[%2]
+                    $0["Militancy", -] = +?Self.mil(fe: self.state.z.fe)[..3]
+                    $0["Consciousness", -] = +?Self.con(fe: self.state.z.fe)[..3]
                 }
             case .x:
                 let inputs: ResourceInputs = self.state.inventory.x
@@ -835,8 +835,8 @@ extension PopContext {
                             $0["Investment budget", +] = +budget.investment[/3]
                     }
 
-                    $0["Militancy", -] = +?Self.mil(fx: self.state.z.fx)[%2]
-                    $0["Consciousness", -] = +?Self.con(fx: self.state.z.fx)[%2]
+                    $0["Militancy", -] = +?Self.mil(fx: self.state.z.fx)[..3]
+                    $0["Consciousness", -] = +?Self.con(fx: self.state.z.fx)[..3]
                 }
             }
         }
