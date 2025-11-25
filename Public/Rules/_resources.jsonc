@@ -26,18 +26,15 @@
         "hours": 8
     },
     "Services": {
-        "emoji": "🍹",
+        "emoji": "💼",
         "color": "#242753",
         "local": true,
         "floor": "wage",
         "hours": 8
     },
     "Advice": {
-        "emoji": "💼",
-        "color": "#242753",
-        "local": true,
-        "floor": "wage",
-        "hours": 8
+        "emoji": "🧭",
+        "color": "#ffd29e"
     },
     "Influence": {
         "emoji": "⚖️",

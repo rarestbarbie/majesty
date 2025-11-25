@@ -7,9 +7,11 @@
             "Storage": 1
         },
         "Cattle Ranch": {
+            "Advice": 1,
             "Hormones": 1
         },
         "Chicken Farm": {
+            "Advice": 1,
             "Hormones": 1
         }
     },

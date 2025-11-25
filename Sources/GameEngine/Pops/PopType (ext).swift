@@ -36,6 +36,27 @@ extension PopType {
         case .Politician: .mining
         }
     }
+
+    func promotes(to target: Self) -> Bool {
+        switch (self.stratum, target.stratum) {
+        case (.Owner, .Owner): true
+        case (.Clerk, .Owner): true
+        case (.Clerk, .Clerk): true
+        case (.Worker, .Clerk): true
+        case (.Worker, .Worker): true
+        default: false
+        }
+    }
+    func demotes(to target: Self) -> Bool {
+        switch (self.stratum, target.stratum) {
+        case (.Owner, .Owner): true
+        case (.Owner, .Clerk): true
+        case (.Clerk, .Clerk): true
+        case (.Clerk, .Worker): true
+        case (.Worker, .Worker): true
+        default: false
+        }
+    }
 }
 extension PopType {
     var descending: PopTypeDescending { .init(rawValue: self) }

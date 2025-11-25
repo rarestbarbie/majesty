@@ -79,9 +79,9 @@ extension Pop: Turnable {
 extension Pop {
     mutating func egress(
         evaluator: ConditionEvaluator,
-        targets: [(id: PopType, weight: Int64)],
         inherit: Fraction?,
         on turn: inout Turn,
+        weight: (PopType) -> Double,
     ) {
         let rate: Double = evaluator.output
         if  rate <= 0 {
@@ -91,13 +91,24 @@ extension Pop {
         let count: Int64 = Binomial[self.z.size, rate].sample(
             using: &turn.random.generator
         )
+        if  count <= 0 {
+            return
+        }
+
+        /// evaluate this lazily to avoid unnecessary work
+        var targets: [(id: PopType, weight: Double)] = PopType.allCases.compactMap {
+            let weight: Double = weight($0)
+            return weight > 0 ? (id: $0, weight: weight) : nil
+        }
+
+        targets.shuffle(using: &turn.random.generator)
 
         guard
         let breakdown: [Int64] = targets.distribute(count, share: \.weight) else {
             return
         }
 
-        for ((target, _), size): ((id: PopType, Int64), Int64) in zip(targets, breakdown)
+        for ((target, _), size): ((id: PopType, Double), Int64) in zip(targets, breakdown)
             where size > 0 {
 
             if self.type == target {

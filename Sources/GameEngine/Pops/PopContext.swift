@@ -420,9 +420,11 @@ extension PopContext {
         self.state.z.vx = self.state.inventory.x.valueAcquired
 
         guard
-        let country: CountryProperties = self.region?.occupiedBy else {
+        let region: RegionalProperties = self.region else {
             return
         }
+
+        let authority: CountryProperties = region.occupiedBy
 
         self.state.z.mil += Self.mil(fl: self.state.z.fl)
         self.state.z.mil += Self.mil(fe: self.state.z.fe)
@@ -436,12 +438,12 @@ extension PopContext {
         self.state.z.con = max(0, min(10, self.state.z.con))
 
         if  self.state.type.stratum > .Ward {
-            self.convert(turn: &turn, country: country)
+            self.convert(turn: &turn, region: region)
         } else {
             self.state.equity.split(
                 price: self.state.z.px,
                 turn: &turn,
-                notifying: [country.id]
+                notifying: [authority.id]
             )
         }
 
@@ -450,7 +452,7 @@ extension PopContext {
         let factoryJobs: Range<Int> = self.state.factories.values.indices
         let miningJobs: Range<Int> = self.state.mines.values.indices
 
-        let w0: Double = .init(country.minwage)
+        let w0: Double = .init(authority.minwage)
         let q: Double = 0.002
         for i: Int in factoryJobs {
             {
@@ -500,54 +502,30 @@ extension PopContext {
 extension PopContext {
     private mutating func convert(
         turn: inout Turn,
-        country: CountryProperties,
+        region: RegionalProperties,
     ) {
-        var targetDemotions: [(id: PopType, weight: Int64)] = PopType.allCases.compactMap {
-            switch (self.state.type.stratum, $0.stratum) {
-            case (.Owner, .Owner):  break
-            case (.Owner, .Clerk):  break
-            case (.Clerk, .Clerk):  break
-            case (.Clerk, .Worker):  break
-            case (.Worker, .Worker):  break
-            default: return nil
-            }
-
-            return (id: $0, weight: 1)
-        }
-
-        targetDemotions.shuffle(using: &turn.random.generator)
+        let stats: PopulationStats = region.pops
+        let current: PopType = self.state.type
 
         // when demoting, inherit 1 percent
         self.state.egress(
-            evaluator: self.buildDemotionMatrix(country: country),
-            targets: targetDemotions,
+            evaluator: self.buildDemotionMatrix(country: region.occupiedBy),
             inherit: 1 %/ 100,
             on: &turn,
-        )
-
-        var targetPromotions: [(id: PopType, weight: Int64)] = PopType.allCases.compactMap {
-            switch (self.state.type.stratum, $0.stratum) {
-            case (.Owner, .Owner): break
-            case (.Clerk, .Owner): break
-            case (.Clerk, .Clerk): break
-            case (.Worker, .Clerk): break
-            case (.Worker, .Worker): break
-            default: return nil
-            }
-
-            return (id: $0, weight: 1)
+        ) {
+            current.demotes(to: $0) ? 0.01 + 0.4 * (stats.type[$0]?.employment ?? 0) : 0
         }
-
-        targetPromotions.shuffle(using: &turn.random.generator)
 
         // when promoting, inherit all
         self.state.egress(
-            evaluator: self.buildPromotionMatrix(country: country),
-            targets: targetPromotions,
+            evaluator: self.buildPromotionMatrix(country: region.occupiedBy),
             inherit: nil,
             on: &turn,
-        )
+        ) {
+            current.promotes(to: $0) ? 1 : 0
+        }
     }
+
     func buildDemotionMatrix<Matrix>(
         country: CountryProperties,
         type: Matrix.Type = Matrix.self,
