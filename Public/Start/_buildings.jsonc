@@ -1,0 +1,17 @@
+[
+    // American Midwest
+    {
+        "tile": "399N-1,2",
+        "buildings": {
+            "High Density Housing": 3
+        }
+    },
+
+    // American East Coast
+    {
+        "tile": "399N0,2",
+        "buildings": {
+            "High Density Housing": 3
+        }
+    }
+]

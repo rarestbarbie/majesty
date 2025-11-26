@@ -172,7 +172,7 @@ extension PopContext: AllocatingContext {
             scalingFactor: (self.state.z.size, z.x),
         )
 
-        let budget: PopBudget
+        let budget: Pop.Budget
 
         if case .Ward = self.state.type.stratum {
             let weights: (
@@ -287,7 +287,7 @@ extension PopContext: TransactingContext {
 
         guard
         let country: CountryProperties = self.region?.occupiedBy,
-        let budget: PopBudget = self.state.budget else {
+        let budget: Pop.Budget = self.state.budget else {
             return
         }
 
@@ -809,7 +809,7 @@ extension PopContext {
                 $0["Luxury needs fulfilled"] = self.state.z.fx[%3]
                 $0[>] {
                     $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
-                    if let budget: PopBudget = self.state.budget, budget.investment > 0 {
+                    if let budget: Pop.Budget = self.state.budget, budget.investment > 0 {
                             $0["Investment budget", +] = budget.investment[/3]
                     }
 

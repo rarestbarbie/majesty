@@ -19,6 +19,7 @@ public struct GameSave {
     let cultures: [Culture]
     var countries: [Country]
 
+    let buildings: [Building]
     let factories: [Factory]
     let mines: [Mine]
     var pops: [Pop]
@@ -38,6 +39,7 @@ extension GameSave {
         // case planets
         case cultures
         case countries
+        case buildings
         case factories
         case mines
         case pops
@@ -58,6 +60,7 @@ extension GameSave: JavaScriptEncodable {
 
         js[.cultures] = self.cultures
         js[.countries] = self.countries
+        js[.buildings] = self.buildings
         js[.factories] = self.factories
         js[.mines] = self.mines
         js[.pops] = self.pops
@@ -75,6 +78,7 @@ extension GameSave: JavaScriptDecodable {
             date: try js[.date].decode(),
             cultures: try js[.cultures].decode(),
             countries: try js[.countries].decode(),
+            buildings: try js[.buildings].decode(),
             factories: try js[.factories].decode(),
             mines: try js[.mines]?.decode() ?? [],
             pops: try js[.pops].decode(),

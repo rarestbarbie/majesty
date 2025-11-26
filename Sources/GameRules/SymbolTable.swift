@@ -26,10 +26,13 @@ extension SymbolTable {
     }
 }
 extension SymbolTable {
-    func map<T>(keys: SymbolTable<T>) throws -> [T: Value] {
+    @inlinable func map<T>(keys: SymbolTable<T>) throws -> [T: Value] {
         try self.map(keys: keys, value: \.self)
     }
-    func map<T, U>(keys: SymbolTable<T>, value: (Value) throws -> U) throws -> [T: U] {
+    @inlinable func map<T, U>(
+        keys: SymbolTable<T>,
+        value: (Value) throws -> U
+    ) throws -> [T: U] {
         try self.index.reduce(into: [:]) { $0[try keys[$1.key]] = try value($1.value) }
     }
 
@@ -55,7 +58,7 @@ extension SymbolTable<Exact> {
     }
 }
 extension SymbolTable<Int64> {
-    func quantities<T>(keys: SymbolTable<T>) throws -> [Quantity<T>]
+    @inlinable public func quantities<T>(keys: SymbolTable<T>) throws -> [Quantity<T>]
         where T: Hashable, T: Comparable {
         var quantities: [Quantity<T>] = try self.map(keys: keys).map {
             .init(amount: $1, unit: $0)

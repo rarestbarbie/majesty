@@ -24,6 +24,7 @@ public struct GameStart {
     let cultures: [Culture]
 
     let countries: [CountrySeed]
+    let buildings: [BuildingSeedGroup]
     let factories: [FactorySeedGroup]
     let popWealth: [PopWealth]
     let pops: [PopSeedGroup]
@@ -61,6 +62,20 @@ extension GameStart {
                 tilesControlled: seed.tiles,
             )
             countries.append(country)
+        }
+
+        var buildings: [Building] = []
+        var building: BuildingID = 0
+        for group: BuildingSeedGroup in self.buildings {
+            for seed: Quantity<BuildingType> in try group.buildings.quantities(
+                    keys: symbols.static.buildings
+                ) {
+                let section: Building.Section = .init(type: seed.unit, tile: group.tile)
+                var building: Building = .init(id: building.increment(), section: section)
+
+                building.z.size = seed.amount
+                buildings.append(building)
+            }
         }
 
         var factories: [Factory] = []
@@ -120,6 +135,7 @@ extension GameStart {
             date: self.date,
             cultures: self.cultures,
             countries: countries,
+            buildings: buildings,
             factories: factories,
             mines: [],
             pops: pops,
@@ -134,6 +150,7 @@ extension GameStart {
 
         case cultures
         case countries
+        case buildings
         case factories
         case pop_wealth
         case pops
@@ -149,6 +166,7 @@ extension GameStart: JavaScriptDecodable {
             random: try js[.random]?.decode() ?? .init(seed: 12345),
             cultures: try js[.cultures].decode(),
             countries: try js[.countries].decode(),
+            buildings: try js[.buildings].decode(),
             factories: try js[.factories].decode(),
             popWealth: try js[.pop_wealth].decode(),
             pops: try js[.pops].decode(),

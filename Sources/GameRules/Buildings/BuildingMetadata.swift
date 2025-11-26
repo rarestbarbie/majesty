@@ -12,6 +12,7 @@ public final class BuildingMetadata: GameMetadata {
     public let sharesPerLevel: Int64
 
     public let terrainAllowed: Set<TerrainType>
+    public let required: Bool
 
     init(
         identity: SymbolAssignment<BuildingType>,
@@ -20,8 +21,9 @@ public final class BuildingMetadata: GameMetadata {
         output: ResourceTier,
         sharesInitial: Int64,
         sharesPerLevel: Int64,
-        terrainAllowed: Set<TerrainType>
-    ) throws {
+        terrainAllowed: Set<TerrainType>,
+        required: Bool
+    ) {
         self.identity = identity
 
         self.maintenance = maintenance
@@ -31,6 +33,7 @@ public final class BuildingMetadata: GameMetadata {
         self.sharesInitial = sharesInitial
         self.sharesPerLevel = sharesPerLevel
         self.terrainAllowed = terrainAllowed
+        self.required = required
     }
 }
 extension BuildingMetadata {
@@ -44,6 +47,7 @@ extension BuildingMetadata {
         self.sharesInitial.hash(into: &hasher)
         self.sharesPerLevel.hash(into: &hasher)
         self.terrainAllowed.hash(into: &hasher)
+        self.required.hash(into: &hasher)
 
         return hasher.finalize()
     }

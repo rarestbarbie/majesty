@@ -1,0 +1,10 @@
+{
+    "shares_initial": 10,
+    "shares_per_level": 1,
+    "maintenance": {
+        "*": {}
+    },
+    "development": {
+        "*": {}
+    }
+}

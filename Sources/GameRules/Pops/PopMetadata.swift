@@ -60,6 +60,7 @@ extension PopMetadata {
     var hash: Int {
         var hasher: Hasher = .init()
 
+        self.id.hash(into: &hasher)
         self.singular.hash(into: &hasher)
         self.plural.hash(into: &hasher)
         self.color.hash(into: &hasher)

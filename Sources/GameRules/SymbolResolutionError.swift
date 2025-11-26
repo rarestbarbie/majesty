@@ -5,7 +5,7 @@ extension SymbolResolutionError: CustomStringConvertible {
     @inlinable public var description: String {
         switch self {
         case .undefined(let name):
-            return "Undefined symbol: '\(name)'"
+            return "Undefined symbol: '\(name)' (type = \(String.init(reflecting: T.self)))"
         }
     }
 }

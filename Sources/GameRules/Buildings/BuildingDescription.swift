@@ -6,6 +6,7 @@ struct BuildingDescription {
     let development: SymbolTable<Int64>
     let output: SymbolTable<Int64>
     let terrain: [Symbol]
+    let required: Bool
 }
 extension BuildingDescription: JavaScriptDecodable {
     enum ObjectKey: JSString {
@@ -13,6 +14,7 @@ extension BuildingDescription: JavaScriptDecodable {
         case development
         case output
         case terrain
+        case required
     }
 
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
@@ -20,7 +22,8 @@ extension BuildingDescription: JavaScriptDecodable {
             maintenance: try js[.maintenance].decode(),
             development: try js[.development].decode(),
             output: try js[.output].decode(),
-            terrain: try js[.terrain]?.decode() ?? []
+            terrain: try js[.terrain]?.decode() ?? [],
+            required: try js[.required]?.decode() ?? false
         )
     }
 }

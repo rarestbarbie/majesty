@@ -439,7 +439,7 @@ extension GameSnapshot {
                     }
                     if  let expanded: Mine.Expansion = mine.state.last {
                         $0[>] = """
-                        We recently discovered a deposit of size \(em: expanded.size[/3]) on \
+                        We recently unearthed a deposit of size \(em: expanded.size[/3]) on \
                         \(em: expanded.date[.phrasal_US])
                         """
                     }
@@ -570,7 +570,7 @@ extension GameSnapshot {
         _ id: PopID,
         _ item: CashAllocationItem,
     ) -> Tooltip? {
-        if  let budget: PopBudget = self.context.pops[id]?.state.budget {
+        if  let budget: Pop.Budget = self.context.pops[id]?.state.budget {
             let statement: CashAllocationStatement = .init(from: budget)
             return statement.tooltip(item: item)
         } else {

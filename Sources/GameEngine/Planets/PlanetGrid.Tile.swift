@@ -17,6 +17,9 @@ extension PlanetGrid {
         var geology: GeologicalMetadata
 
         // Computed statistics
+        private(set) var buildingsAlreadyPresent: Set<BuildingType>
+        private(set) var buildings: [BuildingID]
+
         private(set) var factoriesUnderConstruction: Int64
         private(set) var factoriesAlreadyPresent: Set<FactoryType>
         private(set) var factories: [FactoryID]
@@ -37,6 +40,9 @@ extension PlanetGrid {
             self.name = name
             self.terrain = terrain
             self.geology = geology
+
+            self.buildingsAlreadyPresent = []
+            self.buildings = []
 
             self.factoriesUnderConstruction = 0
             self.factoriesAlreadyPresent = []
@@ -80,6 +86,9 @@ extension PlanetGrid.Tile {
     }
 
     mutating func startIndexCount() {
+        self.buildingsAlreadyPresent.removeAll(keepingCapacity: true)
+        self.buildings.removeAll(keepingCapacity: true)
+
         self.factoriesUnderConstruction = 0
         self.factoriesAlreadyPresent.removeAll(keepingCapacity: true)
         self.factories.removeAll(keepingCapacity: true)
@@ -92,6 +101,10 @@ extension PlanetGrid.Tile {
 
     mutating func addResidentCount(_ pop: Pop, _ stats: Pop.Stats) {
         self.properties?.addResidentCount(pop, stats)
+    }
+    mutating func addResidentCount(_ building: Building) {
+        self.buildings.append(building.id)
+        self.buildingsAlreadyPresent.insert(building.type)
     }
     mutating func addResidentCount(_ factory: Factory) {
         self.factories.append(factory.id)
@@ -120,6 +133,21 @@ extension PlanetGrid.Tile {
                 return false
             }
         }
+    }
+}
+extension PlanetGrid.Tile {
+    func pickBuilding(
+        among buildings: OrderedDictionary<BuildingType, BuildingMetadata>,
+        using random: inout PseudoRandom,
+    ) -> BuildingMetadata? {
+        // TODO: enforce terrain restrictions...
+        // mandatory buildings
+        for building: BuildingMetadata in buildings.values where building.required {
+            if !self.buildingsAlreadyPresent.contains(building.id) {
+                return building
+            }
+        }
+        return nil
     }
 }
 extension PlanetGrid.Tile {
@@ -192,7 +220,8 @@ extension PlanetGrid.Tile {
 
         return choices.randomElement(using: &random.generator)
     }
-
+}
+extension PlanetGrid.Tile {
     func pickMine(
         among mines: OrderedDictionary<MineType, MineMetadata>,
         turn: inout Turn,

@@ -7,7 +7,8 @@
             "Medical Equipment": 1,
             "Groceries": 2,
             "Vehicles": 1,
-            "Water": 1
+            "Water": 1,
+            "Housing": 1
         },
         "e": {
             "Electronics": 1,
@@ -85,7 +86,8 @@
             "Medical Equipment": 2,
             "Groceries": 2,
             "Vehicles": 4,
-            "Water": 1
+            "Water": 1,
+            "Housing": 3
         },
         "e": {
             "Electronics": 2,
@@ -117,7 +119,8 @@
             "Medical Equipment": 2,
             "Groceries": 2,
             "Vehicles": 4,
-            "Water": 1
+            "Water": 1,
+            "Housing": 3
         },
         "e": {
             "Electronics": 2,

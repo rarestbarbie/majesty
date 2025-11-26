@@ -2,15 +2,17 @@ import GameEconomy
 import JavaScriptInterop
 import JavaScriptKit
 
-struct PopBudget {
-    private(set) var l: ResourceBudgetTier
-    private(set) var e: ResourceBudgetTier
-    private(set) var x: ResourceBudgetTier
-    let investment: Int64
-    let dividend: Int64
-    let buybacks: Int64
+extension Pop {
+    struct Budget {
+        private(set) var l: ResourceBudgetTier
+        private(set) var e: ResourceBudgetTier
+        private(set) var x: ResourceBudgetTier
+        let investment: Int64
+        let dividend: Int64
+        let buybacks: Int64
+    }
 }
-extension PopBudget {
+extension Pop.Budget {
     static func slave(
         weights: __shared (
             segmented: SegmentedWeights<InelasticDemand>,
@@ -99,7 +101,7 @@ extension PopBudget {
         return budget
     }
 }
-extension PopBudget {
+extension Pop.Budget {
     enum ObjectKey: JSString, Sendable {
         case l_segmented = "ls"
         case l_tradeable = "lt"
@@ -113,7 +115,7 @@ extension PopBudget {
         case buybacks = "b"
     }
 }
-extension PopBudget: JavaScriptEncodable {
+extension Pop.Budget: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.l_segmented] = self.l.segmented
         js[.l_tradeable] = self.l.tradeable
@@ -127,7 +129,7 @@ extension PopBudget: JavaScriptEncodable {
         js[.buybacks] = self.buybacks
     }
 }
-extension PopBudget: JavaScriptDecodable {
+extension Pop.Budget: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             l: .init(
@@ -150,5 +152,5 @@ extension PopBudget: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension PopBudget: Equatable, Hashable {}
+extension Pop.Budget: Equatable, Hashable {}
 #endif
