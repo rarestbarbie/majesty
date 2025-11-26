@@ -1,15 +1,14 @@
 import GameEconomy
+import JavaScriptInterop
+import JavaScriptKit
 
 struct PopBudget {
-    /// These are the minimum theoretical balances the pop would need to purchase 100% of
-    /// its needs in that tier on any particular day.
-    let min: (l: Int64, e: Int64)
-
     private(set) var l: ResourceBudgetTier
     private(set) var e: ResourceBudgetTier
     private(set) var x: ResourceBudgetTier
-    private(set) var dividend: Int64
-    private(set) var buybacks: Int64
+    let investment: Int64
+    let dividend: Int64
+    let buybacks: Int64
 }
 extension PopBudget {
     static func slave(
@@ -25,17 +24,19 @@ extension PopBudget {
         let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.total
         let totalCostPerDay: Int64 = tradeableCostPerDay.l + segmentedCostPerDay.l
 
+        let bl: Int64 = totalCostPerDay * d
+
+        let dividend: Int64 = max(0, (balance - bl) / 3650)
+        let buybacks: Int64 = max(0, (balance - bl - dividend) / 365)
+
         var budget: Self = .init(
-            min: (l: totalCostPerDay * d, e: 0),
             l: .init(),
             e: .init(),
             x: .init(),
-            dividend: 0,
-            buybacks: 0
+            investment: 0,
+            dividend: dividend,
+            buybacks: buybacks
         )
-
-        budget.dividend = max(0, (balance - budget.min.l) / 3650)
-        budget.buybacks = max(0, (balance - budget.min.l - budget.dividend) / 365)
 
         budget.l.distributeAsBusiness(
             funds: balance / d,
@@ -53,7 +54,8 @@ extension PopBudget {
         ),
         balance: Int64,
         stockpileMaxDays: Int64,
-        d: (l: Int64, e: Int64, x: Int64)
+        d: (l: Int64, e: Int64, x: Int64),
+        investor: Bool
     ) -> Self {
         let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.total
         let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.total
@@ -64,14 +66,14 @@ extension PopBudget {
 
         /// These are the minimum theoretical balances the pop would need to purchase 100% of
         /// its needs in that tier on any particular day.
+        let bl: Int64 = totalCostPerDay.l * d.l
+        let be: Int64 = totalCostPerDay.e * d.e
+
         var budget: Self = .init(
-            min: (
-                l: totalCostPerDay.l * d.l,
-                e: totalCostPerDay.e * d.e,
-            ),
             l: .init(),
             e: .init(),
             x: .init(),
+            investment: investor ? (balance - bl - be) / d.x : 0,
             dividend: 0,
             buybacks: 0
         )
@@ -83,13 +85,13 @@ extension PopBudget {
         )
 
         budget.e.distributeAsConsumer(
-            funds: (balance - budget.min.l) / d.e,
+            funds: (balance - bl) / d.e,
             segmented: segmentedCostPerDay.e * stockpileMaxDays,
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
         )
 
         budget.x.distributeAsConsumer(
-            funds: (balance - budget.min.l - budget.min.e) / d.x,
+            funds: (balance - bl - be) / d.x,
             segmented: segmentedCostPerDay.x * stockpileMaxDays,
             tradeable: tradeableCostPerDay.x * stockpileMaxDays,
         )
@@ -97,3 +99,56 @@ extension PopBudget {
         return budget
     }
 }
+extension PopBudget {
+    enum ObjectKey: JSString, Sendable {
+        case l_segmented = "ls"
+        case l_tradeable = "lt"
+        case e_segmented = "es"
+        case e_tradeable = "et"
+        case x_segmented = "xs"
+        case x_tradeable = "xt"
+
+        case investment = "i"
+        case dividend = "d"
+        case buybacks = "b"
+    }
+}
+extension PopBudget: JavaScriptEncodable {
+    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+        js[.l_segmented] = self.l.segmented
+        js[.l_tradeable] = self.l.tradeable
+        js[.e_segmented] = self.e.segmented
+        js[.e_tradeable] = self.e.tradeable
+        js[.x_segmented] = self.x.segmented
+        js[.x_tradeable] = self.x.tradeable
+
+        js[.investment] = self.investment
+        js[.dividend] = self.dividend
+        js[.buybacks] = self.buybacks
+    }
+}
+extension PopBudget: JavaScriptDecodable {
+    init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+        self.init(
+            l: .init(
+                segmented: try js[.l_segmented].decode(),
+                tradeable: try js[.l_tradeable].decode()
+            ),
+            e: .init(
+                segmented: try js[.e_segmented].decode(),
+                tradeable: try js[.e_tradeable].decode()
+            ),
+            x: .init(
+                segmented: try js[.x_segmented].decode(),
+                tradeable: try js[.x_tradeable].decode()
+            ),
+            investment: try js[.investment].decode(),
+            dividend: try js[.dividend].decode(),
+            buybacks: try js[.buybacks].decode(),
+        )
+    }
+}
+
+#if TESTABLE
+extension PopBudget: Equatable, Hashable {}
+#endif

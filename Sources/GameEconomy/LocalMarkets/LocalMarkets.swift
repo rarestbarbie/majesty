@@ -49,7 +49,7 @@ extension LocalMarkets {
             budget: budget,
             as: lei,
             in: tile,
-            progressive: (false, false, x: false)
+            progressive: (true, true, x: true)
         )
     }
     public mutating func tradeAsBusiness(
@@ -65,7 +65,7 @@ extension LocalMarkets {
             budget: budget,
             as: lei,
             in: tile,
-            progressive: (false, false, x: true)
+            progressive: (true, true, x: true)
         )
     }
 

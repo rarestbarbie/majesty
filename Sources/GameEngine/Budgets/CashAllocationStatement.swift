@@ -57,10 +57,10 @@ extension CashAllocationStatement {
         let share: Int64
         switch item {
         case .l:
-            label = self.factory ? "Inputs" : "Life needs"
+            label = self.factory ? "Materials" : "Life needs"
             share = self.l
         case .e:
-            label = self.factory ? "Maintenance" : "Everyday needs"
+            label = self.factory ? "Corporate" : "Everyday needs"
             share = self.e
         case .x:
             label = self.factory ? "Capital expenditures" : "Luxury needs"

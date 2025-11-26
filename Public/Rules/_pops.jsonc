@@ -64,6 +64,12 @@
     "Farmer": {
         "color": "#ff5959"
     },
+    "Consultant": {
+        "color": "#f7e8b7",
+        "output": {
+            "Advice": 8
+        }
+    },
     "Influencer": {
         "color": "#bf97ff",
         "output": {

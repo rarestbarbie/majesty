@@ -112,7 +112,8 @@ build_sprites() {
     echo "--- Baking Sprites ---"
 
     local SPRITE_WIDTH=56
-    local CONFIG_FILE="crop.cfg"
+    local CROP_CONFIG_FILE="crop.cfg"
+    local ERODE_CONFIG_FILE="erode.cfg"
 
     cd Art/Pops/
     mkdir -p Icons/
@@ -122,13 +123,15 @@ build_sprites() {
         local filename=$(basename "$file" .png)
 
         # --- Read settings from config file ---
-        local config_line=$(grep "^${filename}," "$CONFIG_FILE" || echo "")
+        local config_line=$(grep "^${filename}," "$CROP_CONFIG_FILE" || echo "")
+        local erode_line=$(grep "^${filename}," "$ERODE_CONFIG_FILE" || echo "")
 
         # Default crop is 0 pixels from each side
         local crop_t=0
         local crop_r=0
         local crop_b=0
         local crop_l=0
+        local erode=1
 
         if [[ -n "$config_line" ]]; then
             # If a config is found, parse it
@@ -138,7 +141,11 @@ build_sprites() {
             crop_l=$(echo "$config_line" | cut -d',' -f5)
         fi
 
-        echo "Processing $filename with adjustments (T,R,B,L): ${crop_t},${crop_r},${crop_b},${crop_l}"
+        if [[ -n "$erode_line" ]]; then
+            erode=$(echo "$erode_line" | cut -d',' -f2)
+        fi
+
+        echo "Processing $filename with adjustments (T,R,B,L,E): ${crop_t},${crop_r},${crop_b},${crop_l},${erode}"
 
         # --- Build crop/pad arguments for ImageMagick ---
         local op_args=()
@@ -181,7 +188,7 @@ build_sprites() {
             -background none \
             "${op_args[@]}" \
             +repage \
-            -morphology Erode Diamond:1 \
+            -morphology Erode Diamond:${erode} \
             -filter box -resize ${SPRITE_WIDTH} \
             "Icons/${filename}.png"
     done

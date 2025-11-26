@@ -2,8 +2,8 @@ import Fraction
 
 enum FactoryBudget {
     case constructing(OperatingBudget)
-    case liquidating(Liquidating)
     case active(OperatingBudget)
+    case liquidating(LiquidationBudget)
 }
 extension FactoryBudget {
     static func liquidating(
@@ -16,3 +16,6 @@ extension FactoryBudget {
         )
     }
 }
+#if TESTABLE
+extension FactoryBudget: Equatable, Hashable {}
+#endif

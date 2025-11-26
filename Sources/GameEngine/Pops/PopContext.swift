@@ -16,7 +16,6 @@ struct PopContext: RuntimeContext, LegalEntityContext {
     private(set) var livestock: CultureMetadata?
     private(set) var region: RegionalProperties?
     private(set) var equity: Equity<LEI>.Statistics
-    private(set) var budget: PopBudget?
     private(set) var mines: [MineID: MiningJobConditions]
 
     private var miningJobRank: [MineID: Int]
@@ -29,7 +28,6 @@ struct PopContext: RuntimeContext, LegalEntityContext {
         self.livestock = nil
         self.region = nil
         self.equity = .init()
-        self.budget = nil
         self.mines = [:]
         self.miningJobRank = [:]
         self.factoryJobPay = [:]
@@ -249,20 +247,16 @@ extension PopContext: AllocatingContext {
                 weights: weights,
                 balance: balance,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
-                d: d
+                d: d,
+                investor: self.state.type.stratum == .Owner
             )
 
-            if case .Owner = self.state.type.stratum {
-                let valueToInvest: Int64 = (balance - budget.min.l - budget.min.e) / d.x
-                if  valueToInvest > 0 {
-                    turn.stockMarkets.queueRandomPurchase(
-                        buyer: .pop(self.state.id),
-                        value: valueToInvest,
-                        currency: currency
-                    )
-                }
-            }
-
+            // this short-circuits internally if investment is zero
+            turn.stockMarkets.queueRandomPurchase(
+                buyer: .pop(self.state.id),
+                value: budget.investment,
+                currency: currency
+            )
             turn.localMarkets.tradeAsConsumer(
                 selling: self.state.inventory.out.segmented,
                 buying: weights.segmented,
@@ -284,7 +278,7 @@ extension PopContext: AllocatingContext {
             }
         }
 
-        self.budget = budget
+        self.state.budget = budget
     }
 }
 extension PopContext: TransactingContext {
@@ -293,7 +287,7 @@ extension PopContext: TransactingContext {
 
         guard
         let country: CountryProperties = self.region?.occupiedBy,
-        let budget: PopBudget = self.budget else {
+        let budget: PopBudget = self.state.budget else {
             return
         }
 
@@ -411,34 +405,45 @@ extension PopContext: TransactingContext {
     }
 }
 extension PopContext {
+    private static func mil(fl: Double) -> Double { 0.010 * (1.0 - fl) }
+    private static func mil(fe: Double) -> Double { 0.004 * (0.5 - fe) }
+    private static func mil(fx: Double) -> Double { 0.004 * (0.0 - fx) }
+
+    private static func con(fl: Double) -> Double { 0.010 * (fl - 1.0) }
+    private static func con(fe: Double) -> Double { 0.002 * (1.0 - fe) }
+    private static func con(fx: Double) -> Double { 0.020 * (fx - 0.0) }
+}
+extension PopContext {
     mutating func advance(turn: inout Turn) {
         self.state.z.vl = self.state.inventory.l.valueAcquired
         self.state.z.ve = self.state.inventory.e.valueAcquired
         self.state.z.vx = self.state.inventory.x.valueAcquired
 
         guard
-        let country: CountryProperties = self.region?.occupiedBy else {
+        let region: RegionalProperties = self.region else {
             return
         }
 
-        self.state.z.mil += 0.010 * (1.0 - self.state.z.fl)
-        self.state.z.mil += 0.004 * (0.5 - self.state.z.fe)
-        self.state.z.mil += 0.004 * (0.0 - self.state.z.fx)
+        let authority: CountryProperties = region.occupiedBy
 
-        self.state.z.con += 0.010 * (self.state.z.fl - 1.0)
-        self.state.z.con += 0.002 * (1.0 - self.state.z.fe)
-        self.state.z.con += 0.020 * (self.state.z.fx - 0.0)
+        self.state.z.mil += Self.mil(fl: self.state.z.fl)
+        self.state.z.mil += Self.mil(fe: self.state.z.fe)
+        self.state.z.mil += Self.mil(fx: self.state.z.fx)
+
+        self.state.z.con += Self.con(fl: self.state.z.fl)
+        self.state.z.con += Self.con(fe: self.state.z.fe)
+        self.state.z.con += Self.con(fx: self.state.z.fx)
 
         self.state.z.mil = max(0, min(10, self.state.z.mil))
         self.state.z.con = max(0, min(10, self.state.z.con))
 
         if  self.state.type.stratum > .Ward {
-            self.convert(turn: &turn, country: country)
+            self.convert(turn: &turn, region: region)
         } else {
             self.state.equity.split(
                 price: self.state.z.px,
                 turn: &turn,
-                notifying: [country.id]
+                notifying: [authority.id]
             )
         }
 
@@ -447,7 +452,7 @@ extension PopContext {
         let factoryJobs: Range<Int> = self.state.factories.values.indices
         let miningJobs: Range<Int> = self.state.mines.values.indices
 
-        let w0: Double = .init(country.minwage)
+        let w0: Double = .init(authority.minwage)
         let q: Double = 0.002
         for i: Int in factoryJobs {
             {
@@ -497,54 +502,30 @@ extension PopContext {
 extension PopContext {
     private mutating func convert(
         turn: inout Turn,
-        country: CountryProperties,
+        region: RegionalProperties,
     ) {
-        var targetDemotions: [(id: PopType, weight: Int64)] = PopType.allCases.compactMap {
-            switch (self.state.type.stratum, $0.stratum) {
-            case (.Owner, .Owner):  break
-            case (.Owner, .Clerk):  break
-            case (.Clerk, .Clerk):  break
-            case (.Clerk, .Worker):  break
-            case (.Worker, .Worker):  break
-            default: return nil
-            }
-
-            return (id: $0, weight: 1)
-        }
-
-        targetDemotions.shuffle(using: &turn.random.generator)
+        let stats: PopulationStats = region.pops
+        let current: PopType = self.state.type
 
         // when demoting, inherit 1 percent
         self.state.egress(
-            evaluator: self.buildDemotionMatrix(country: country),
-            targets: targetDemotions,
+            evaluator: self.buildDemotionMatrix(country: region.occupiedBy),
             inherit: 1 %/ 100,
             on: &turn,
-        )
-
-        var targetPromotions: [(id: PopType, weight: Int64)] = PopType.allCases.compactMap {
-            switch (self.state.type.stratum, $0.stratum) {
-            case (.Owner, .Owner): break
-            case (.Clerk, .Owner): break
-            case (.Clerk, .Clerk): break
-            case (.Worker, .Clerk): break
-            case (.Worker, .Worker): break
-            default: return nil
-            }
-
-            return (id: $0, weight: 1)
+        ) {
+            current.demotes(to: $0) ? 0.01 + 0.4 * (stats.type[$0]?.employment ?? 0) : 0
         }
-
-        targetPromotions.shuffle(using: &turn.random.generator)
 
         // when promoting, inherit all
         self.state.egress(
-            evaluator: self.buildPromotionMatrix(country: country),
-            targets: targetPromotions,
+            evaluator: self.buildPromotionMatrix(country: region.occupiedBy),
             inherit: nil,
             on: &turn,
-        )
+        ) {
+            current.promotes(to: $0) ? 1 : 0
+        }
     }
+
     func buildDemotionMatrix<Matrix>(
         country: CountryProperties,
         type: Matrix.Type = Matrix.self,
@@ -808,11 +789,33 @@ extension PopContext {
         .instructions {
             switch tier {
             case .l:
+                let inputs: ResourceInputs = self.state.inventory.l
                 $0["Life needs fulfilled"] = self.state.z.fl[%3]
+                $0[>] {
+                    $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
+                    $0["Militancy", -] = +?Self.mil(fl: self.state.z.fl)[..3]
+                    $0["Consciousness", -] = +?Self.con(fl: self.state.z.fl)[..3]
+                }
             case .e:
+                let inputs: ResourceInputs = self.state.inventory.e
                 $0["Everyday needs fulfilled"] = self.state.z.fe[%3]
+                $0[>] {
+                    $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
+                    $0["Militancy", -] = +?Self.mil(fe: self.state.z.fe)[..3]
+                    $0["Consciousness", -] = +?Self.con(fe: self.state.z.fe)[..3]
+                }
             case .x:
+                let inputs: ResourceInputs = self.state.inventory.x
                 $0["Luxury needs fulfilled"] = self.state.z.fx[%3]
+                $0[>] {
+                    $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
+                    if let budget: PopBudget = self.state.budget, budget.investment > 0 {
+                            $0["Investment budget", +] = budget.investment[/3]
+                    }
+
+                    $0["Militancy", -] = +?Self.mil(fx: self.state.z.fx)[..3]
+                    $0["Consciousness", -] = +?Self.con(fx: self.state.z.fx)[..3]
+                }
             }
         }
     }
