@@ -1,8 +1,10 @@
 import Assert
+import D
 import GameEconomy
 import GameRules
 import GameState
 import GameIDs
+import GameUI
 import Random
 
 struct BuildingContext: LegalEntityContext, RuntimeContext {
@@ -232,5 +234,88 @@ extension BuildingContext: TransactingContext {
             turn: &turn,
             notifying: [country.id]
         )
+    }
+}
+extension BuildingContext {
+    func explainProduction(_ ul: inout TooltipInstructionEncoder, base: Int64) {
+        ul["Production per facility"] = base[/3]
+    }
+    func explainNeeds(
+        _ ul: inout TooltipInstructionEncoder, base: Int64) {
+        let efficiency: Double = self.state.z.ei
+        ul["Demand per facility"] = (efficiency * Double.init(base))[..3]
+        ul[>] {
+            $0["Base"] = base[/3]
+            $0["Efficiency", -] = +?(efficiency - 1)[%2]
+        }
+    }
+}
+extension BuildingContext: LegalEntityTooltipBearing {
+    func tooltipExplainPrice(
+        _ line: InventoryLine,
+        market: (segmented: LocalMarketSnapshot?, tradeable: BlocMarket.State?)
+    ) -> Tooltip? {
+        switch line {
+        case .l(let id):
+            return self.state.inventory.l.tooltipExplainPrice(id, market)
+        case .e(let id):
+            return self.state.inventory.e.tooltipExplainPrice(id, market)
+        case .x(let id):
+            return self.state.inventory.x.tooltipExplainPrice(id, market)
+        case .o(let id):
+            return self.state.inventory.out.tooltipExplainPrice(id, market)
+        case .m:
+            return nil
+        }
+    }
+}
+extension BuildingContext {
+    func tooltipAccount(_ account: Bank.Account) -> Tooltip? {
+        let profit: ProfitMargins = self.state.profit
+        let liquid: TurnDelta<Int64> = account.Δ
+        let assets: TurnDelta<Int64> = self.state.Δ.vl + self.state.Δ.vx
+
+        return .instructions {
+            $0["Total valuation", +] = (liquid + assets)[/3]
+            $0[>] {
+                $0["Today’s profit", +] = +profit.operating[/3]
+                $0["Gross margin", +] = profit.grossMargin.map {
+                    (Double.init($0))[%2]
+                }
+                $0["Operating margin", +] = profit.operatingMargin.map {
+                    (Double.init($0))[%2]
+                }
+            }
+
+            $0["Illiquid assets", +] = assets[/3]
+            $0["Liquid assets", +] = liquid[/3]
+            $0[>] {
+                let excluded: Int64 = self.state.spending.totalExcludingEquityPurchases
+                $0["Market spending", +] = +(account.b + excluded)[/3]
+                $0["Market earnings", +] = +?account.r[/3]
+                $0["Subsidies", +] = +?account.s[/3]
+                $0["Interest and dividends", +] = +?(-self.state.spending.dividend)[/3]
+                $0["Stock buybacks", +] = (-self.state.spending.buybacks)[/3]
+                if account.e > 0 {
+                    $0["Market capitalization", +] = +account.e[/3]
+                }
+            }
+        }
+    }
+    func tooltipNeeds(_ tier: ResourceTierIdentifier) -> Tooltip? {
+        .instructions {
+            switch tier {
+            case .l:
+                let inputs: ResourceInputs = self.state.inventory.l
+                $0["Maintenance needs fulfilled"] = self.state.z.fl[%3]
+                $0[>] {
+                    $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
+                }
+            case .e:
+                return
+            case .x:
+                $0["Development needs fulfilled"] = self.state.z.fx[%3]
+            }
+        }
     }
 }

@@ -742,6 +742,20 @@ extension FactoryContext {
         return (update, hours)
     }
 }
+extension FactoryContext: LegalEntityTooltipBearing {
+    func tooltipExplainPrice(
+        _ line: InventoryLine,
+        market: (segmented: LocalMarketSnapshot?, tradeable: BlocMarket.State?)
+    ) -> Tooltip? {
+        switch line {
+        case .l(let id): return self.state.inventory.l.tooltipExplainPrice(id, market)
+        case .e(let id): return self.state.inventory.e.tooltipExplainPrice(id, market)
+        case .x(let id): return self.state.inventory.x.tooltipExplainPrice(id, market)
+        case .o(let id): return self.state.inventory.out.tooltipExplainPrice(id, market)
+        case .m: return nil
+        }
+    }
+}
 extension FactoryContext {
     func explainProduction(_ ul: inout TooltipInstructionEncoder, base: Int64) {
         let productivity: Double = Double.init(self.productivity)

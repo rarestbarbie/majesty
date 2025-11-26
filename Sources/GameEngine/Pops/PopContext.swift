@@ -744,6 +744,25 @@ extension PopContext {
         }
     }
 }
+extension PopContext: LegalEntityTooltipBearing {
+    func tooltipExplainPrice(
+        _ line: InventoryLine,
+        market: (segmented: LocalMarketSnapshot?, tradeable: BlocMarket.State?)
+    ) -> Tooltip? {
+        switch line {
+        case .l(let id):
+            return self.state.inventory.l.tooltipExplainPrice(id, market)
+        case .e(let id):
+            return self.state.inventory.e.tooltipExplainPrice(id, market)
+        case .x(let id):
+            return self.state.inventory.x.tooltipExplainPrice(id, market)
+        case .o(let id):
+            return self.state.inventory.out.tooltipExplainPrice(id, market)
+        case .m(let id):
+            return self.state.mines[id.mine]?.out.tooltipExplainPrice(id.resource, market)
+        }
+    }
+}
 extension PopContext {
     func tooltipAccount(_ account: Bank.Account) -> Tooltip? {
         let liquid: TurnDelta<Int64> = account.Δ

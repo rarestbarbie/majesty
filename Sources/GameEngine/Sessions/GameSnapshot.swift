@@ -32,6 +32,139 @@ extension GameSnapshot {
     }
 }
 extension GameSnapshot {
+    private func tooltipExplainPrice(
+        _ object: some LegalEntityTooltipBearing,
+        _ line: InventoryLine,
+    ) -> Tooltip? {
+        guard
+        let country: CountryProperties = object.region?.occupiedBy else {
+            return nil
+        }
+
+        let resource: Resource = line.resource
+        let market: (
+            segmented: LocalMarketSnapshot?,
+            tradeable: BlocMarket.State?
+        ) = (
+            self.markets.segmented[resource / object.state.tile]?.snapshot(country),
+            self.markets.tradeable[resource / country.currency.id]?.state
+        )
+
+        return object.tooltipExplainPrice(line, market: market)
+    }
+    private func tooltipStockpile(
+        _ object: some LegalEntityTooltipBearing,
+        _ resource: InventoryLine,
+    ) -> Tooltip? {
+        guard
+        let country: CountryProperties = object.region?.occupiedBy else {
+            return nil
+        }
+
+        switch resource {
+        case .l(let id): return object.state.inventory.l.tooltipStockpile(id, country: country)
+        case .e(let id): return object.state.inventory.e.tooltipStockpile(id, country: country)
+        case .x(let id): return object.state.inventory.x.tooltipStockpile(id, country: country)
+        case .o: return nil
+        case .m: return nil
+        }
+    }
+}
+extension GameSnapshot {
+    func tooltipBuildingAccount(_ id: BuildingID) -> Tooltip? {
+        self.context.buildings[id]?.tooltipAccount(self.bank[account: .building(id)])
+    }
+    func tooltipBuildingNeeds(
+        _ id: BuildingID,
+        _ tier: ResourceTierIdentifier
+    ) -> Tooltip? {
+        self.context.buildings[id]?.tooltipNeeds(tier)
+    }
+    func tooltipBuildingResourceIO(
+        _ id: BuildingID,
+        _ line: InventoryLine,
+    ) -> Tooltip? {
+        guard let building: BuildingContext = self.context.buildings[id] else {
+            return nil
+        }
+
+        switch line {
+        case .l(let resource):
+            return building.state.inventory.l.tooltipDemand(
+                resource,
+                tier: building.type.maintenance,
+                details: building.explainNeeds(_:base:)
+            )
+        case .e:
+            return nil
+        case .x(let resource):
+            return building.state.inventory.x.tooltipDemand(
+                resource,
+                tier: building.type.development,
+                details: building.explainNeeds(_:base:)
+            )
+
+        case .o(let resource):
+            return building.state.inventory.out.tooltipSupply(
+                resource,
+                tier: building.type.output,
+                details: building.explainProduction(_:base:)
+            )
+
+        case .m:
+            return nil
+        }
+    }
+    func tooltipBuildingStockpile(
+        _ id: BuildingID,
+        _ resource: InventoryLine,
+    ) -> Tooltip? {
+        self.context.buildings[id].map { self.tooltipStockpile($0, resource) } ?? nil
+    }
+    func tooltipBuildingExplainPrice(
+        _ id: BuildingID,
+        _ line: InventoryLine,
+    ) -> Tooltip? {
+        self.context.buildings[id].map { self.tooltipExplainPrice($0, line) } ?? nil
+    }
+    func tooltipBuildingSize(_ id: BuildingID) -> Tooltip? {
+        nil
+    }
+    func tooltipBuildingOwnership(
+        _ id: BuildingID,
+        culture: String,
+    ) -> Tooltip? {
+        self.context.buildings[id]?.tooltipOwnership(culture: culture, context: self.context)
+    }
+    func tooltipBuildingOwnership(
+        _ id: BuildingID,
+        country: CountryID,
+    ) -> Tooltip? {
+        self.context.buildings[id]?.tooltipOwnership(country: country, context: self.context)
+    }
+    func tooltipBuildingOwnership(
+        _ id: BuildingID,
+    ) -> Tooltip? {
+        self.context.buildings[id]?.tooltipOwnership()
+    }
+    func tooltipBuildingCashFlowItem(
+        _ id: BuildingID,
+        _ item: CashFlowItem,
+    ) -> Tooltip? {
+        self.context.buildings[id]?.cashFlow.tooltip(rules: self.context.rules, item: item)
+    }
+    func tooltipBuildingBudgetItem(
+        _ id: BuildingID,
+        _ item: CashAllocationItem,
+    ) -> Tooltip? {
+        guard let budget: Building.Budget = self.context.buildings[id]?.state.budget else {
+            return nil
+        }
+        let statement: CashAllocationStatement = .init(from: budget)
+        return statement.tooltip(item: item)
+    }
+}
+extension GameSnapshot {
     func tooltipFactoryAccount(_ id: FactoryID) -> Tooltip? {
         self.context.factories[id]?.tooltipAccount(self.bank[account: .factory(id)])
     }
@@ -95,46 +228,14 @@ extension GameSnapshot {
         _ id: FactoryID,
         _ resource: InventoryLine,
     ) -> Tooltip? {
-        guard
-        let factory: FactoryContext = self.context.factories[id],
-        let country: CountryProperties = factory.region?.occupiedBy else {
-            return nil
-        }
-
-        switch resource {
-        case .l(let id): return factory.state.inventory.l.tooltipStockpile(id, country: country)
-        case .e(let id): return factory.state.inventory.e.tooltipStockpile(id, country: country)
-        case .x(let id): return factory.state.inventory.x.tooltipStockpile(id, country: country)
-        case .o: return nil
-        case .m: return nil
-        }
+        self.context.factories[id].map { self.tooltipStockpile($0, resource) } ?? nil
     }
 
     func tooltipFactoryExplainPrice(
         _ id: FactoryID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        guard
-        let factory: FactoryContext = self.context.factories[id],
-        let country: CountryProperties = factory.region?.occupiedBy else {
-            return nil
-        }
-
-        let market: (
-            segmented: LocalMarketSnapshot?,
-            tradeable: BlocMarket.State?
-        ) = (
-            self.markets.segmented[line.resource / factory.state.tile]?.snapshot(country),
-            self.markets.tradeable[line.resource / country.currency.id]?.state
-        )
-
-        switch line {
-        case .l(let id): return factory.state.inventory.l.tooltipExplainPrice(id, market)
-        case .e(let id): return factory.state.inventory.e.tooltipExplainPrice(id, market)
-        case .x(let id): return factory.state.inventory.x.tooltipExplainPrice(id, market)
-        case .o(let id): return factory.state.inventory.out.tooltipExplainPrice(id, market)
-        case .m: return nil
-        }
+        self.context.factories[id].map { self.tooltipExplainPrice($0, line) } ?? nil
     }
 
     func tooltipFactorySize(_ id: FactoryID) -> Tooltip? {
@@ -152,20 +253,14 @@ extension GameSnapshot {
         _ id: FactoryID,
         culture: String,
     ) -> Tooltip? {
-        self.context.factories[id]?.tooltipOwnership(
-            culture: culture,
-            context: self.context
-        )
+        self.context.factories[id]?.tooltipOwnership(culture: culture, context: self.context)
     }
 
     func tooltipFactoryOwnership(
         _ id: FactoryID,
         country: CountryID,
     ) -> Tooltip? {
-        self.context.factories[id]?.tooltipOwnership(
-            country: country,
-            context: self.context
-        )
+        self.context.factories[id]?.tooltipOwnership(country: country, context: self.context)
     }
 
     func tooltipFactoryOwnership(
@@ -178,10 +273,7 @@ extension GameSnapshot {
         _ id: FactoryID,
         _ item: CashFlowItem,
     ) -> Tooltip? {
-        self.context.factories[id]?.cashFlow.tooltip(
-            rules: self.context.rules,
-            item: item
-        )
+        self.context.factories[id]?.cashFlow.tooltip(rules: self.context.rules, item: item)
     }
 
     func tooltipFactoryBudgetItem(
@@ -454,52 +546,14 @@ extension GameSnapshot {
         _ id: PopID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        guard
-        let pop: PopContext = self.context.pops[id],
-        let country: CountryProperties = pop.region?.occupiedBy else {
-            return nil
-        }
-
-        switch line {
-        case .l(let id): return pop.state.inventory.l.tooltipStockpile(id, country: country)
-        case .e(let id): return pop.state.inventory.e.tooltipStockpile(id, country: country)
-        case .x(let id): return pop.state.inventory.x.tooltipStockpile(id, country: country)
-        case .o: return nil
-        case .m: return nil
-        }
+        self.context.pops[id].map { self.tooltipStockpile($0, line) } ?? nil
     }
 
     func tooltipPopExplainPrice(
         _ pop: PopID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        guard
-        let pop: PopContext = self.context.pops[pop],
-        let country: CountryProperties = pop.region?.occupiedBy else {
-            return nil
-        }
-
-        let resource: Resource = line.resource
-        let market: (
-            segmented: LocalMarketSnapshot?,
-            tradeable: BlocMarket.State?
-        ) = (
-            self.markets.segmented[resource / pop.state.tile]?.snapshot(country),
-            self.markets.tradeable[resource / country.currency.id]?.state
-        )
-
-        switch line {
-        case .l(let id):
-            return pop.state.inventory.l.tooltipExplainPrice(id, market)
-        case .e(let id):
-            return pop.state.inventory.e.tooltipExplainPrice(id, market)
-        case .x(let id):
-            return pop.state.inventory.x.tooltipExplainPrice(id, market)
-        case .o(let id):
-            return pop.state.inventory.out.tooltipExplainPrice(id, market)
-        case .m(let id):
-            return pop.state.mines[id.mine]?.out.tooltipExplainPrice(id.resource, market)
-        }
+        self.context.pops[pop].map { self.tooltipExplainPrice($0, line) } ?? nil
     }
 
     func tooltipPopType(
