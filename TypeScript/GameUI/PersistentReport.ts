@@ -1,3 +1,3 @@
-import { ProductionReport, PopulationReport, TradeReport } from './exports.js';
+import { InfrastructureReport, ProductionReport, PopulationReport, TradeReport } from './exports.js';
 
-export type PersistentReport = ProductionReport | PopulationReport | TradeReport;
+export type PersistentReport = InfrastructureReport | ProductionReport | PopulationReport | TradeReport;

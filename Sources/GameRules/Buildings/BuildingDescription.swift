@@ -2,8 +2,8 @@ import JavaScriptInterop
 import JavaScriptKit
 
 struct BuildingDescription {
-    let maintenance: SymbolTable<Int64>
-    let development: SymbolTable<Int64>
+    let maintenance: SymbolTable<Int64>?
+    let development: SymbolTable<Int64>?
     let output: SymbolTable<Int64>
     let terrain: [Symbol]
     let required: Bool
@@ -19,8 +19,8 @@ extension BuildingDescription: JavaScriptDecodable {
 
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
-            maintenance: try js[.maintenance].decode(),
-            development: try js[.development].decode(),
+            maintenance: try js[.maintenance]?.decode(),
+            development: try js[.development]?.decode(),
             output: try js[.output].decode(),
             terrain: try js[.terrain]?.decode() ?? [],
             required: try js[.required]?.decode() ?? false

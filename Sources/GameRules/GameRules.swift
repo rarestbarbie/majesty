@@ -103,7 +103,7 @@ extension GameRules {
                     maintenance: .init(
                         metadata: resources,
                         quantity: try (
-                            try maintenanceCosts[$0.code] ?? maintenanceCosts[*]
+                            try $1.maintenance ?? maintenanceCosts[$0.code] ?? maintenanceCosts[*]
                         ).quantities(
                             keys: symbols.resources
                         )
@@ -111,7 +111,7 @@ extension GameRules {
                     development: .init(
                         metadata: resources,
                         quantity: try (
-                            try developmentCosts[$0.code] ?? developmentCosts[*]
+                            try $1.development ?? developmentCosts[$0.code] ?? developmentCosts[*]
                         ).quantities(
                             keys: symbols.resources
                         )

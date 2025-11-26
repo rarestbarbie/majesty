@@ -38,6 +38,7 @@ export class Application {
     private readonly screen: Screen;
     private readonly clock: Clock;
     private readonly tabs: {
+        infrastructure: HTMLElement;
         production: HTMLElement;
         population: HTMLElement;
         budget: HTMLElement;
@@ -82,6 +83,7 @@ export class Application {
         this.minimap = new Minimap();
         this.screen = new Screen();
         this.tabs = {
+            infrastructure: Application._tab(ScreenType.Infrastructure, 'infrastructure-tab'),
             production: Application._tab(ScreenType.Production, 'production-tab'),
             population: Application._tab(ScreenType.Population, 'population-tab'),
             budget: Application._tab(ScreenType.Budget, 'budget-tab'),
@@ -102,6 +104,7 @@ export class Application {
 
         const header: HTMLElement = document.createElement('header');
         header.id = 'tabs';
+        header.appendChild(this.tabs.infrastructure);
         header.appendChild(this.tabs.production);
         header.appendChild(this.tabs.population);
         header.appendChild(this.tabs.budget);
@@ -162,6 +165,9 @@ export class Application {
             switch (screen) {
             case ScreenType.Planet:
                 this.screen.open(ScreenType.Planet, action);
+                break;
+            case ScreenType.Infrastructure:
+                this.screen.open(ScreenType.Infrastructure, action);
                 break;
             case ScreenType.Production:
                 this.screen.open(ScreenType.Production, action);

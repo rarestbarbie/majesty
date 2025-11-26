@@ -2,9 +2,15 @@
     "shares_initial": 10,
     "shares_per_level": 1,
     "maintenance": {
-        "*": {}
+        "*": {
+            "Construction": 1,
+            "Appliances": 2
+        }
     },
     "development": {
-        "*": {}
+        "*": {
+            "Construction": 2,
+            "Appliances": 1
+        }
     }
 }

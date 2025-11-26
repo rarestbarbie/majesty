@@ -155,6 +155,53 @@ extension InventoryBreakdown {
             self.budget = nil
         }
     }
+
+    mutating func update(from building: BuildingContext, in snapshot: borrowing GameSnapshot) {
+        guard
+        let currency: CurrencyID = building.region?.occupiedBy.currency.id else {
+            return
+        }
+
+        self.tiers = [
+            .init(id: .l, label: "Maintenance", value: building.state.z.fl),
+            .init(id: .x, label: "Development", value: building.state.z.fx),
+        ]
+
+        let inputs: ResourceInputs
+
+        switch self.focus {
+        case .l: inputs = building.state.inventory.l
+        case .e: return
+        case .x: inputs = building.state.inventory.x
+        }
+
+        self.reset(inputs: inputs.count)
+        self.update(
+            from: inputs,
+            tier: self.focus,
+            currency: currency,
+            location: building.state.tile,
+            snapshot: snapshot
+        )
+
+        self.reset(outputs: building.state.inventory.out.count)
+        self.update(
+            from: building.state.inventory.out,
+            currency: currency,
+            location: building.state.tile,
+            snapshot: snapshot
+        )
+
+        self.terms = Term.list {
+            _ in
+        }
+
+        self.costs = building.cashFlow.chart(rules: snapshot.rules)
+        self.budget = building.state.budget.map {
+            let statement: CashAllocationStatement = .init(from: $0)
+            return statement.chart()
+        } ?? nil
+    }
 }
 extension InventoryBreakdown {
     private mutating func update(

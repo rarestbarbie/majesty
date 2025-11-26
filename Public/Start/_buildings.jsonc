@@ -3,7 +3,7 @@
     {
         "tile": "399N-1,2",
         "buildings": {
-            "High Density Housing": 3
+            "High Density Housing": 30000
         }
     },
 
@@ -11,7 +11,7 @@
     {
         "tile": "399N0,2",
         "buildings": {
-            "High Density Housing": 3
+            "High Density Housing": 30000
         }
     }
 ]

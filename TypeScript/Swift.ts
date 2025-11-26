@@ -9,6 +9,8 @@ import {
     CelestialViewState,
     ContextMenuType,
     FactoryDetailsTab,
+    InfrastructureReportRequest,
+    InfrastructureReport,
     MinimapLayer,
     NavigatorState,
     PlanetReportRequest,
@@ -22,7 +24,7 @@ import {
     TradeReportRequest,
     TradeReport,
     TooltipType,
-    GameUI
+    GameUI,
 } from './GameUI/exports.js';
 import { PlayerEvent } from './Multiplayer/exports.js';
 
@@ -41,6 +43,7 @@ export class Swift {
     declare public static gregorian: (date: GameDate) => GameDateComponents;
 
     declare public static openPlanet: (request: PlanetReportRequest) => PlanetReport;
+    declare public static openInfrastructure: (request: InfrastructureReportRequest) => InfrastructureReport;
     declare public static openProduction: (request: ProductionReportRequest) => ProductionReport;
     declare public static openPopulation: (request: PopulationReportRequest) => PopulationReport;
     declare public static openTrade: (request: TradeReportRequest) => TradeReport;

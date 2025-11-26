@@ -19,6 +19,15 @@ export * from './Markets/CandleGeometry.js';
 export * from './Charts/PieChart.js';
 export * from './Charts/PieChartComponent.js';
 export * from './Charts/PieChartSector.js';
+
+export * from './Buildings/BuildingDetails.js';
+export * from './Buildings/BuildingDetailsTab.js';
+export * from './Buildings/BuildingTableEntry.js';
+export * from './Buildings/BuildingTableRow.js';
+export * from './Buildings/InfrastructureOverview.js';
+export * from './Buildings/InfrastructureReportRequest.js';
+export * from './Buildings/InfrastructureReport.js';
+
 export * from './Factories/FactoryDetails.js';
 export * from './Factories/FactoryDetailsTab.js';
 export * from './Factories/FactoryTableEntry.js';
