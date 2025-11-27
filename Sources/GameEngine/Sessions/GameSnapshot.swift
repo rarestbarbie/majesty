@@ -92,11 +92,15 @@ extension GameSnapshot {
         case .l(let resource):
             return building.state.inventory.l.tooltipDemand(
                 resource,
+                tier: building.type.operations,
+                details: building.explainNeeds(_:base:)
+            )
+        case .e(let resource):
+            return building.state.inventory.e.tooltipDemand(
+                resource,
                 tier: building.type.maintenance,
                 details: building.explainNeeds(_:base:)
             )
-        case .e:
-            return nil
         case .x(let resource):
             return building.state.inventory.x.tooltipDemand(
                 resource,
@@ -127,8 +131,11 @@ extension GameSnapshot {
     ) -> Tooltip? {
         self.context.buildings[id].map { self.tooltipExplainPrice($0, line) } ?? nil
     }
-    func tooltipBuildingSize(_ id: BuildingID) -> Tooltip? {
-        nil
+    func tooltipBuildingActive(_ id: BuildingID) -> Tooltip? {
+        self.context.buildings[id]?.tooltipActive()
+    }
+    func tooltipBuildingVacant(_ id: BuildingID) -> Tooltip? {
+        self.context.buildings[id]?.tooltipVacant()
     }
     func tooltipBuildingOwnership(
         _ id: BuildingID,

@@ -742,7 +742,7 @@ extension GameContext {
                         _ in
                         type
                     } update: {
-                        $1.z.size = 1
+                        $1.z.active = 1
                     }
                 }
 

@@ -100,6 +100,10 @@ extension GameRules {
             buildings: try table.buildings.map {
                 BuildingMetadata.init(
                     identity: $0,
+                    operations: .init(
+                        metadata: resources,
+                        quantity: try $1.operations.quantities(keys: symbols.resources)
+                    ),
                     maintenance: .init(
                         metadata: resources,
                         quantity: try (
@@ -272,6 +276,9 @@ extension GameRules {
         // TODO: hash settings
 
         for value: ResourceMetadata in self.resources.all {
+            value.hash.hash(into: &hasher)
+        }
+        for value: BuildingMetadata in self.buildings.values {
             value.hash.hash(into: &hasher)
         }
         for value: FactoryMetadata in self.factories.values {

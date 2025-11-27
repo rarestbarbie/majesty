@@ -3,7 +3,8 @@ import JavaScriptKit
 
 @frozen public enum TooltipType: String, ConvertibleToJSValue, LoadableFromJSValue {
     case BuildingAccount
-    case BuildingSize
+    case BuildingActive
+    case BuildingVacant
     case BuildingResourceIO
     case BuildingStockpile
     case BuildingExplainPrice

@@ -7,6 +7,7 @@ import JavaScriptKit
 extension Building {
     struct Budget {
         var l: ResourceBudgetTier
+        var e: ResourceBudgetTier
         var x: ResourceBudgetTier
 
         var buybacks: Int64
@@ -22,32 +23,40 @@ extension Building.Budget {
             tradeable: AggregateWeights
         ),
         stockpileMaxDays: Int64,
-        d: (l: Int64, x: Int64, v: Double?)
+        d: (l: Int64, e: Int64, x: Int64, v: Double?)
     ) {
         self.l = .init()
+        self.e = .init()
         self.x = .init()
 
-        let segmentedCostPerDay: (l: Int64, _: Int64, x: Int64) = weights.segmented.total
-        let tradeableCostPerDay: (l: Int64, _: Int64, x: Int64) = weights.tradeable.total
-        let totalCostPerDay: (l: Int64, x: Int64) = (
+        let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.total
+        let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.total
+        let totalCostPerDay: (l: Int64, e: Int64, x: Int64) = (
             l: tradeableCostPerDay.l + segmentedCostPerDay.l,
+            e: tradeableCostPerDay.e + segmentedCostPerDay.e,
             x: tradeableCostPerDay.x + segmentedCostPerDay.x,
         )
 
         let balance: Int64 = account.settled
 
         let bl: Int64 = totalCostPerDay.l * d.l
+        let be: Int64 = totalCostPerDay.e * d.e
 
-        self.dividend = max(0, (balance - bl) / 3650)
-        self.buybacks = max(0, (balance - bl - self.dividend) / 365)
+        self.dividend = max(0, (balance - bl - be) / 3650)
+        self.buybacks = max(0, (balance - bl - be - self.dividend) / 365)
 
         self.l.distributeAsBusiness(
             funds: balance / d.l,
             segmented: segmentedCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
         )
+        self.e.distributeAsBusiness(
+            funds: (balance - bl) / d.e,
+            segmented: segmentedCostPerDay.e * stockpileMaxDays,
+            tradeable: tradeableCostPerDay.e * stockpileMaxDays,
+        )
 
-        let investmentBase: Int64 = (balance - bl) / d.x
+        let investmentBase: Int64 = (balance - bl - be) / d.x
         let investment: Int64
 
         if  let v: Double = d.v, v < 1 {
@@ -56,7 +65,6 @@ extension Building.Budget {
             investment = investmentBase
         }
 
-        // construction costs are inelastic
         self.x.distributeAsBusiness(
             funds: investment,
             segmented: segmentedCostPerDay.x * stockpileMaxDays,
@@ -68,6 +76,8 @@ extension Building.Budget {
     enum ObjectKey: JSString, Sendable {
         case l_segmented = "ls"
         case l_tradeable = "lt"
+        case e_segmented = "es"
+        case e_tradeable = "et"
         case x_segmented = "xs"
         case x_tradeable = "xt"
 
@@ -79,6 +89,8 @@ extension Building.Budget: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.l_segmented] = self.l.segmented
         js[.l_tradeable] = self.l.tradeable
+        js[.e_segmented] = self.e.segmented
+        js[.e_tradeable] = self.e.tradeable
         js[.x_segmented] = self.x.segmented
         js[.x_tradeable] = self.x.tradeable
 
@@ -92,6 +104,10 @@ extension Building.Budget: JavaScriptDecodable {
             l: .init(
                 segmented: try js[.l_segmented].decode(),
                 tradeable: try js[.l_tradeable].decode()
+            ),
+            e: .init(
+                segmented: try js[.e_segmented].decode(),
+                tradeable: try js[.e_tradeable].decode()
             ),
             x: .init(
                 segmented: try js[.x_segmented].decode(),

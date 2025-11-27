@@ -1,13 +1,18 @@
 {
     "High Density Housing": {
         "required": true,
+        "operations": {
+            "Electricity": 2,
+            "Services": 1,
+            "Appliances": 1
+        },
         "maintenance": {
-            "Construction": 1,
-            "Appliances": 2
+            "Electricity": 1,
+            "Construction": 1
         },
         "development": {
             "Construction": 2,
-            "Appliances": 1
+            "Appliances": 2
         },
         "output": {
             "Housing": 24

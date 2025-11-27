@@ -73,7 +73,7 @@ extension GameStart {
                 let section: Building.Section = .init(type: seed.unit, tile: group.tile)
                 var building: Building = .init(id: building.increment(), section: section)
 
-                building.z.size = seed.amount
+                building.z.active = seed.amount
                 buildings.append(building)
             }
         }

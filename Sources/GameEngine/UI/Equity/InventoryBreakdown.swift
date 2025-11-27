@@ -163,7 +163,8 @@ extension InventoryBreakdown {
         }
 
         self.tiers = [
-            .init(id: .l, label: "Maintenance", value: building.state.z.fl),
+            .init(id: .l, label: "Operations", value: building.state.z.fl),
+            .init(id: .e, label: "Maintenance", value: building.state.z.fe),
             .init(id: .x, label: "Development", value: building.state.z.fx),
         ]
 
@@ -171,7 +172,7 @@ extension InventoryBreakdown {
 
         switch self.focus {
         case .l: inputs = building.state.inventory.l
-        case .e: return
+        case .e: inputs = building.state.inventory.e
         case .x: inputs = building.state.inventory.x
         }
 
@@ -193,7 +194,8 @@ extension InventoryBreakdown {
         )
 
         self.terms = Term.list {
-            _ in
+            $0[.buildingsActive, +, tooltip: .BuildingActive] = building.state.Δ.active[/3]
+            $0[.buildingsVacant, +, tooltip: .BuildingVacant] = building.state.Δ.vacant[/3]
         }
 
         self.costs = building.cashFlow.chart(rules: snapshot.rules)

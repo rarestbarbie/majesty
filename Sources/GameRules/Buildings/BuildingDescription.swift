@@ -2,6 +2,7 @@ import JavaScriptInterop
 import JavaScriptKit
 
 struct BuildingDescription {
+    let operations: SymbolTable<Int64>
     let maintenance: SymbolTable<Int64>?
     let development: SymbolTable<Int64>?
     let output: SymbolTable<Int64>
@@ -10,6 +11,7 @@ struct BuildingDescription {
 }
 extension BuildingDescription: JavaScriptDecodable {
     enum ObjectKey: JSString {
+        case operations
         case maintenance
         case development
         case output
@@ -19,6 +21,7 @@ extension BuildingDescription: JavaScriptDecodable {
 
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
+            operations: try js[.operations].decode(),
             maintenance: try js[.maintenance]?.decode(),
             development: try js[.development]?.decode(),
             output: try js[.output].decode(),

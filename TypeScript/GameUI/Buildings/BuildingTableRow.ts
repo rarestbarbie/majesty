@@ -19,18 +19,18 @@ export class BuildingTableRow implements DiffableListElement<GameID> {
     public readonly id: GameID;
     public readonly node: HTMLAnchorElement;
 
-    private readonly label: HTMLSpanElement;
-    private readonly level: HTMLSpanElement;
-
+    private readonly typeLabel: HTMLSpanElement;
     private readonly type: ProgressCell;
     private readonly location: HTMLElement;
-    private readonly size: Ticker;
+    private readonly vacant: Ticker;
+    private readonly active: Ticker;
 
     public static get columns(): string[] {
         return [
             "Type",
             "Location",
-            "Size",
+            "Vacant",
+            "Active",
         ];
     }
 
@@ -38,34 +38,39 @@ export class BuildingTableRow implements DiffableListElement<GameID> {
         this.id = building.id;
         this.node = document.createElement('a');
 
-        this.label = document.createElement('span');
-        this.level = document.createElement('span');
-        this.level.classList.add('level');
+        this.typeLabel = document.createElement('span');
 
         const summary = document.createElement('div');
-        summary.appendChild(this.label);
-        summary.appendChild(this.level);
+        summary.appendChild(this.typeLabel);
 
         this.type = new ProgressCell(summary);
-        this.type.node.setAttribute('data-tooltip-type', TooltipType.BuildingSize);
+        this.type.node.setAttribute('data-tooltip-type', TooltipType.BuildingAccount);
         this.type.node.setAttribute('data-tooltip-arguments', JSON.stringify([building.id]));
         this.location = document.createElement('div');
 
 
-        this.size = new Ticker(Fortune.Bonus);
-        this.size.outer.setAttribute('data-tooltip-type', TooltipType.BuildingAccount);
-        this.size.outer.setAttribute('data-tooltip-arguments', JSON.stringify([building.id]));
+        this.vacant = new Ticker(Fortune.Bonus);
+        this.vacant.outer.setAttribute('data-tooltip-type', TooltipType.BuildingVacant);
+        this.vacant.outer.setAttribute('data-tooltip-arguments', JSON.stringify([building.id]));
+
+        this.active = new Ticker(Fortune.Bonus);
+        this.active.outer.setAttribute('data-tooltip-type', TooltipType.BuildingActive);
+        this.active.outer.setAttribute('data-tooltip-arguments', JSON.stringify([building.id]));
 
         this.node.href = `#screen=${ScreenType.Infrastructure}&id=${building.id}`;
         this.node.appendChild(this.type.node);
         this.node.appendChild(this.location);
-        this.node.appendChild(this.size.outer);
+        this.node.appendChild(this.vacant.outer);
+        this.node.appendChild(this.active.outer);
     }
 
     public update(building: BuildingTableEntry): void {
-        UpdateText(this.label, `${building.type}`);
+        UpdateText(this.typeLabel, `${building.type}`);
+        this.type.set(100 * building.progress);
+
         UpdateText(this.location, building.location);
 
-        this.size.updateBigIntChange(building.y_size, building.z_size);
+        this.vacant.updateBigIntChange(building.y_vacant, building.z_vacant);
+        this.active.updateBigIntChange(building.y_active, building.z_active);
     }
 }

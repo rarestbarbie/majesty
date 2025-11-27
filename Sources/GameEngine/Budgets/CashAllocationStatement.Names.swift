@@ -8,14 +8,14 @@ extension CashAllocationStatement {
 extension CashAllocationStatement.Names {
     var l: String {
         switch self {
-        case .building: "Maintenance"
+        case .building: "Operations"
         case .factory: "Materials"
         case .pop: "Subsistence needs"
         }
     }
     var e: String {
         switch self {
-        case .building: "Corporate expenses"
+        case .building: "Maintenance expenses"
         case .factory: "Corporate expenses"
         case .pop: "Everyday needs"
         }

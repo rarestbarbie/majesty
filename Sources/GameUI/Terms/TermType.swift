@@ -9,6 +9,8 @@ import JavaScriptInterop
     case stockAttraction
 
     case pop(PopType)
+    case buildingsActive
+    case buildingsVacant
 }
 extension TermType: RawRepresentable {
     @Bijection(label: "rawValue") @inlinable public var rawValue: String {
@@ -28,6 +30,8 @@ extension TermType: RawRepresentable {
         case .pop(.Influencer): "pI"
         case .pop(.Aristocrat): "pO"
         case .pop(.Politician): "pP"
+        case .buildingsActive: "bA"
+        case .buildingsVacant: "bV"
         }
     }
 }
