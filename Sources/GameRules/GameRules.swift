@@ -274,6 +274,9 @@ extension GameRules {
         for value: ResourceMetadata in self.resources.all {
             value.hash.hash(into: &hasher)
         }
+        for value: BuildingMetadata in self.buildings.values {
+            value.hash.hash(into: &hasher)
+        }
         for value: FactoryMetadata in self.factories.values {
             value.hash.hash(into: &hasher)
         }

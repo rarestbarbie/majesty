@@ -28,7 +28,7 @@ extension Building.Dimensions {
             fx: 0,
             ei: 1,
             px: 1,
-            profitability: 1
+            profitability: 0
         )
     }
 }
