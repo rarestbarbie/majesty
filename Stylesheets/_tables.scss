@@ -87,6 +87,9 @@
     }
 }
 
+[data-table='Buildings'] {
+    grid-template-columns: 2fr 1fr 0.5fr;
+}
 [data-table='Factories'] {
     grid-template-columns: 2fr 1fr 0.5fr 0.5fr 1fr 1fr 1fr;
 }

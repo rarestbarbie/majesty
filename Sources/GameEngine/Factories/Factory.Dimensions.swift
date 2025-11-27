@@ -107,7 +107,7 @@ extension Factory.Dimensions: JavaScriptDecodable {
             fe: try js[.fe]?.decode() ?? 0,
             fx: try js[.fx]?.decode() ?? 0,
             px: try js[.px]?.decode() ?? 0,
-            profitability: try js[.profitability]?.decode() ?? 1,
+            profitability: try js[.profitability]?.decode() ?? 0,
         )
     }
 }

@@ -30,6 +30,19 @@ export enum TooltipType {
     FactoryCashFlowItem = 'FactoryCashFlowItem',
     FactoryBudgetItem = 'FactoryBudgetItem',
 
+    // Building Tooltips
+    BuildingAccount = 'BuildingAccount',
+    BuildingSize = 'BuildingSize',
+    BuildingResourceIO = 'BuildingResourceIO',
+    BuildingStockpile = 'BuildingStockpile',
+    BuildingExplainPrice = 'BuildingExplainPrice',
+    BuildingNeeds = 'BuildingNeeds',
+    BuildingOwnershipCountry = 'BuildingOwnershipCountry',
+    BuildingOwnershipCulture = 'BuildingOwnershipCulture',
+    BuildingOwnershipSecurities = 'BuildingOwnershipSecurities',
+    BuildingCashFlowItem = 'BuildingCashFlowItem',
+    BuildingBudgetItem = 'BuildingBudgetItem',
+
     MarketLiquidity = 'MarketLiquidity',
 
     TileCulture = 'TileCulture',

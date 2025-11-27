@@ -172,7 +172,7 @@ extension PopContext: AllocatingContext {
             scalingFactor: (self.state.z.size, z.x),
         )
 
-        let budget: PopBudget
+        let budget: Pop.Budget
 
         if case .Ward = self.state.type.stratum {
             let weights: (
@@ -287,7 +287,7 @@ extension PopContext: TransactingContext {
 
         guard
         let country: CountryProperties = self.region?.occupiedBy,
-        let budget: PopBudget = self.state.budget else {
+        let budget: Pop.Budget = self.state.budget else {
             return
         }
 
@@ -744,6 +744,25 @@ extension PopContext {
         }
     }
 }
+extension PopContext: LegalEntityTooltipBearing {
+    func tooltipExplainPrice(
+        _ line: InventoryLine,
+        market: (segmented: LocalMarketSnapshot?, tradeable: BlocMarket.State?)
+    ) -> Tooltip? {
+        switch line {
+        case .l(let id):
+            return self.state.inventory.l.tooltipExplainPrice(id, market)
+        case .e(let id):
+            return self.state.inventory.e.tooltipExplainPrice(id, market)
+        case .x(let id):
+            return self.state.inventory.x.tooltipExplainPrice(id, market)
+        case .o(let id):
+            return self.state.inventory.out.tooltipExplainPrice(id, market)
+        case .m(let id):
+            return self.state.mines[id.mine]?.out.tooltipExplainPrice(id.resource, market)
+        }
+    }
+}
 extension PopContext {
     func tooltipAccount(_ account: Bank.Account) -> Tooltip? {
         let liquid: TurnDelta<Int64> = account.Δ
@@ -809,7 +828,7 @@ extension PopContext {
                 $0["Luxury needs fulfilled"] = self.state.z.fx[%3]
                 $0[>] {
                     $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
-                    if let budget: PopBudget = self.state.budget, budget.investment > 0 {
+                    if let budget: Pop.Budget = self.state.budget, budget.investment > 0 {
                             $0["Investment budget", +] = budget.investment[/3]
                     }
 

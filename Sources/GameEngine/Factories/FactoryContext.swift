@@ -270,7 +270,7 @@ extension FactoryContext: TransactingContext {
     mutating func transact(turn: inout Turn) {
         guard
         let country: CountryProperties = self.region?.occupiedBy,
-        let budget: FactoryBudget = self.state.budget else {
+        let budget: Factory.Budget = self.state.budget else {
             return
         }
 
@@ -395,7 +395,7 @@ extension FactoryContext: TransactingContext {
                 )
             )
 
-            self.state.z.mix(profitability: self.state.profit.operatingProfitability)
+            self.state.z.mix(profitability: profit.operatingProfitability)
         }
     }
 
@@ -496,18 +496,22 @@ extension FactoryContext {
         turn: inout Turn
     ) -> WorkforceChanges? {
         {
-            $0 += self.state.inventory.l.tradeAsBusiness(
-                stockpileDays: stockpileTarget,
-                spendingLimit: budget.l.tradeable,
-                in: policy.currency.id,
-                on: &turn.worldMarkets,
-            )
-            $0 += self.state.inventory.e.tradeAsBusiness(
-                stockpileDays: stockpileTarget,
-                spendingLimit: budget.e.tradeable,
-                in: policy.currency.id,
-                on: &turn.worldMarkets,
-            )
+            if  budget.l.tradeable > 0 {
+                $0 += self.state.inventory.l.tradeAsBusiness(
+                    stockpileDays: stockpileTarget,
+                    spendingLimit: budget.l.tradeable,
+                    in: policy.currency.id,
+                    on: &turn.worldMarkets,
+                )
+            }
+            if  budget.e.tradeable > 0 {
+                $0 += self.state.inventory.e.tradeAsBusiness(
+                    stockpileDays: stockpileTarget,
+                    spendingLimit: budget.e.tradeable,
+                    in: policy.currency.id,
+                    on: &turn.worldMarkets,
+                )
+            }
 
             #assert(
                 $0.balance >= 0,
@@ -738,6 +742,20 @@ extension FactoryContext {
         return (update, hours)
     }
 }
+extension FactoryContext: LegalEntityTooltipBearing {
+    func tooltipExplainPrice(
+        _ line: InventoryLine,
+        market: (segmented: LocalMarketSnapshot?, tradeable: BlocMarket.State?)
+    ) -> Tooltip? {
+        switch line {
+        case .l(let id): return self.state.inventory.l.tooltipExplainPrice(id, market)
+        case .e(let id): return self.state.inventory.e.tooltipExplainPrice(id, market)
+        case .x(let id): return self.state.inventory.x.tooltipExplainPrice(id, market)
+        case .o(let id): return self.state.inventory.out.tooltipExplainPrice(id, market)
+        case .m: return nil
+        }
+    }
+}
 extension FactoryContext {
     func explainProduction(_ ul: inout TooltipInstructionEncoder, base: Int64) {
         let productivity: Double = Double.init(self.productivity)
@@ -870,7 +888,7 @@ extension FactoryContext {
 
                 if case .active(let budget)? = self.state.budget, budget.corporate < 1 {
                     $0[>] = """
-                    Due to high \(em: "corporate costs"), this factory is only purchasing \
+                    Due to high \(em: "compliance costs"), this factory is only purchasing \
                     \(neg: (100 * budget.corporate)[..1]) percent of its corporate supplies
                     """
                 }

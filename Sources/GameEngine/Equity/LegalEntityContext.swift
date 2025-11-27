@@ -5,6 +5,7 @@ import GameState
 import GameUI
 
 protocol LegalEntityContext<State>: RuntimeContext where State: LegalEntityState {
+    var region: RegionalProperties? { get }
     var equity: Equity<LEI>.Statistics { get }
 }
 extension LegalEntityContext {

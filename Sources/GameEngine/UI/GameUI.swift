@@ -11,6 +11,7 @@ public struct GameUI {
     var screen: ScreenType?
     var report: (
         planet: PlanetReport,
+        infrastructure: InfrastructureReport,
         production: ProductionReport,
         population: PopulationReport,
         trade: TradeReport
@@ -29,6 +30,7 @@ public struct GameUI {
             .init(),
             .init(),
             .init(),
+            .init(),
         )
         self.views = (nil, nil)
         self.clock = .init()
@@ -43,11 +45,12 @@ extension GameUI {
 
         // Only update screens that are currently open
         switch self.screen {
-        case .Planet?:      self.report.planet.update(from: snapshot)
-        case .Production?:  self.report.production.update(from: snapshot)
-        case .Population?:  self.report.population.update(from: snapshot)
-        case .Trade?:       self.report.trade.update(from: snapshot)
-        case nil:           break
+        case .Planet?: self.report.planet.update(from: snapshot)
+        case .Infrastructure?: self.report.infrastructure.update(from: snapshot)
+        case .Production?: self.report.production.update(from: snapshot)
+        case .Population?: self.report.population.update(from: snapshot)
+        case .Trade?: self.report.trade.update(from: snapshot)
+        case nil: break
         }
 
         try self.views.0?.update(in: snapshot.context)
@@ -74,11 +77,12 @@ extension GameUI: JavaScriptEncodable {
         js[.navigator] = self.navigator
 
         switch self.screen {
-        case .Planet?:      js[.screen] = self.report.planet
-        case .Production?:  js[.screen] = self.report.production
-        case .Population?:  js[.screen] = self.report.population
-        case .Trade?:       js[.screen] = self.report.trade
-        case nil:           break
+        case .Planet?: js[.screen] = self.report.planet
+        case .Infrastructure?: js[.screen] = self.report.infrastructure
+        case .Production?: js[.screen] = self.report.production
+        case .Population?: js[.screen] = self.report.population
+        case .Trade?: js[.screen] = self.report.trade
+        case nil: break
         }
 
         js[.speed] = self.clock.speed

@@ -37,6 +37,7 @@ div.pie-chart.empty::before {
 }
 
 div.pie-chart {
+    g[data-tooltip-type='BuildingBudgetItem'],
     g[data-tooltip-type='FactoryBudgetItem'],
     g[data-tooltip-type='PopBudgetItem'] {
         .b {
@@ -44,6 +45,14 @@ div.pie-chart {
         }
         .d {
             fill: #fff23f;
+        }
+    }
+    g[data-tooltip-type='BuildingBudgetItem'] {
+        .l {
+            fill: #e0d5c9;
+        }
+        .x {
+            fill: #3fdd93;
         }
     }
     g[data-tooltip-type='FactoryBudgetItem'] {

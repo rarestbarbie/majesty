@@ -20,7 +20,7 @@ struct Factory: LegalEntityState, Identifiable {
     var spending: Spending
     /// This is part of the persistent state, because it is only computed during a turn, and
     /// we want the budget info to be available for inspection when loading a save.
-    var budget: FactoryBudget?
+    var budget: Budget?
     var y: Dimensions
     var z: Dimensions
 
@@ -65,6 +65,7 @@ extension Factory {
 extension Factory: Turnable {
     mutating func turn() {
         self.spending = .zero
+        self.budget = nil
         self.equity.turn()
     }
 }
@@ -143,7 +144,7 @@ extension Factory: JavaScriptDecodable {
             growthProgress: try js[.size_p]?.decode() ?? 0
         )
 
-        let budget: FactoryBudget?
+        let budget: Budget?
 
         if  let value: OperatingBudget = try js[.budget_operating]?.decode() {
             budget = size.level == 0 ? .constructing(value) : .active(value)

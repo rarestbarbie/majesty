@@ -5,7 +5,7 @@ import GameUI
 import VectorCharts
 
 struct CashAllocationStatement {
-    private let factory: Bool
+    private let names: Names
     private let buybacks: Int64
     private let dividend: Int64
     private let salaries: Int64
@@ -28,7 +28,7 @@ extension CashAllocationStatement {
 extension CashAllocationStatement {
     init(from budget: OperatingBudget) {
         self.init(
-            factory: true,
+            names: .factory,
             buybacks: budget.buybacks,
             dividend: budget.dividend,
             salaries: budget.clerks,
@@ -38,9 +38,21 @@ extension CashAllocationStatement {
             x: budget.x.total,
         )
     }
-    init(from budget: PopBudget) {
+    init(from budget: Building.Budget) {
         self.init(
-            factory: false,
+            names: .building,
+            buybacks: budget.buybacks,
+            dividend: budget.dividend,
+            salaries: 0,
+            wages: 0,
+            l: budget.l.total,
+            e: 0,
+            x: budget.x.total,
+        )
+    }
+    init(from budget: Pop.Budget) {
+        self.init(
+            names: .pop,
             buybacks: budget.buybacks,
             dividend: budget.dividend,
             salaries: 0,
@@ -57,13 +69,13 @@ extension CashAllocationStatement {
         let share: Int64
         switch item {
         case .l:
-            label = self.factory ? "Materials" : "Life needs"
+            label = self.names.l
             share = self.l
         case .e:
-            label = self.factory ? "Corporate" : "Everyday needs"
+            label = self.names.e
             share = self.e
         case .x:
-            label = self.factory ? "Capital expenditures" : "Luxury needs"
+            label = self.names.x
             share = self.x
         case .salaries:
             label = "Salaries"

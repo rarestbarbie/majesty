@@ -182,6 +182,10 @@
     }
 }
 
+#screen[data-screen='Infrastructure'] {
+    --color-bg-x: rgb(35, 252, 151);
+    --color-fg-x: rgb(35, 252, 151);
+}
 #screen[data-screen='Production'] {
     --color-bg-l: rgb(138, 138, 138);
     --color-fg-l: rgb(143, 143, 143);

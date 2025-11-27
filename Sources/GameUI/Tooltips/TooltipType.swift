@@ -2,6 +2,18 @@ import JavaScriptInterop
 import JavaScriptKit
 
 @frozen public enum TooltipType: String, ConvertibleToJSValue, LoadableFromJSValue {
+    case BuildingAccount
+    case BuildingSize
+    case BuildingResourceIO
+    case BuildingStockpile
+    case BuildingExplainPrice
+    case BuildingNeeds
+    case BuildingOwnershipCountry
+    case BuildingOwnershipCulture
+    case BuildingOwnershipSecurities
+    case BuildingCashFlowItem
+    case BuildingBudgetItem
+
     case FactoryAccount
     case FactorySize
     case FactoryResourceIO

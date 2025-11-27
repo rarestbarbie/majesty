@@ -1,4 +1,5 @@
 import {
+    InfrastructureOverview,
     PersistentReport,
     PlanetOverview,
     PopulationOverview,
@@ -117,6 +118,11 @@ export class Screen {
                 layout = ScreenLayout.Planet;
                 break;
 
+            case ScreenType.Infrastructure:
+                uninitialized = new InfrastructureOverview();
+                layout = ScreenLayout.Explorer;
+                break;
+
             case ScreenType.Production:
                 uninitialized = new ProductionOverview();
                 layout = ScreenLayout.Explorer;
@@ -150,6 +156,13 @@ export class Screen {
             if (state) {
                 throw new Error(`Unexpected update of type '${state.type}'!`);
             }
+        } else if (this.state.content instanceof InfrastructureOverview) {
+            if (state?.type !== ScreenType.Infrastructure) {
+                throw new Error(
+                    `Unexpected update of type '${state?.type}', expected 'Infrastructure'!`
+                );
+            }
+            this.state.content.update(state);
         } else if (this.state.content instanceof ProductionOverview) {
             if (state?.type !== ScreenType.Production) {
                 throw new Error(

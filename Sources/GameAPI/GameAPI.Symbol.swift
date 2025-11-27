@@ -18,6 +18,8 @@ extension GameAPI {
 
         case openPlanet
 
+        /// Switch to the Infrastructure screen and return its initial state.
+        case openInfrastructure
         /// Switch to the Production screen and return its initial state.
         case openProduction
         /// Switch to the Population screen and return its initial state.

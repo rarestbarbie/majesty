@@ -56,6 +56,7 @@ extension GameAPI {
         self[.push] = { stream.yield(($0, $1)) }
 
         self[.openPlanet] = { try Self.game?.openPlanet($0) }
+        self[.openInfrastructure] = { try Self.game?.openInfrastructure($0) }
         self[.openProduction] = { try Self.game?.openProduction($0) }
         self[.openPopulation] = { try Self.game?.openPopulation($0) }
         self[.openTrade] = { try Self.game?.openTrade($0) }

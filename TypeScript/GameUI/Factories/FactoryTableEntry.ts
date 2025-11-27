@@ -12,8 +12,6 @@ export interface FactoryTableEntry {
     readonly y_wn: bigint;
     readonly y_cn: bigint;
 
-    readonly y_ei: number;
-    readonly y_eo: number;
     readonly y_fi: number;
 
     readonly y_px: number;
@@ -21,8 +19,6 @@ export interface FactoryTableEntry {
     readonly t_wn: bigint;
     readonly t_cn: bigint;
 
-    readonly t_ei: number;
-    readonly t_eo: number;
     readonly t_fi: number;
 
     readonly t_px: number;

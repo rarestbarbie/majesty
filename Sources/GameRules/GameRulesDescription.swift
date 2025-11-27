@@ -2,6 +2,8 @@ import GameEconomy
 import JavaScriptInterop
 
 public struct GameRulesDescription {
+    let buildings: SymbolTable<BuildingDescription>
+    let buildingCosts: BuildingCosts
     let factories: SymbolTable<FactoryDescription>
     let factoryCosts: FactoryCosts
     let resources: SymbolTable<ResourceDescription>
@@ -16,6 +18,8 @@ public struct GameRulesDescription {
 extension GameRulesDescription: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<GameRules.Namespace>) throws {
         self.init(
+            buildings: try js[.buildings].decode(),
+            buildingCosts: try js[.building_costs].decode(),
             factories: try js[.factories].decode(),
             factoryCosts: try js[.factory_costs].decode(),
             resources: try js[.resources].decode(),

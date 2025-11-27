@@ -5,6 +5,7 @@ import OrderedCollections
 
 @frozen public struct GameRules {
     public let resources: Resources
+    public let buildings: OrderedDictionary<BuildingType, BuildingMetadata>
     public let factories: OrderedDictionary<FactoryType, FactoryMetadata>
     public let mines: OrderedDictionary<MineType, MineMetadata>
     public let technologies: OrderedDictionary<Technology, TechnologyMetadata>
@@ -19,6 +20,7 @@ import OrderedCollections
 extension GameRules {
     private typealias Tables = (
         resources: OrderedDictionary<SymbolAssignment<Resource>, ResourceDescription>,
+        buildings: OrderedDictionary<SymbolAssignment<BuildingType>, BuildingDescription>,
         factories: OrderedDictionary<SymbolAssignment<FactoryType>, FactoryDescription>,
         mines: OrderedDictionary<SymbolAssignment<MineType>, MineDescription>,
         technologies: OrderedDictionary<SymbolAssignment<Technology>, TechnologyDescription>,
@@ -36,6 +38,7 @@ extension GameRules {
             resolving: rules,
             table: (
                 try symbols.resources.extend(over: rules.resources),
+                try symbols.buildings.extend(over: rules.buildings),
                 try symbols.factories.extend(over: rules.factories),
                 try symbols.mines.extend(over: rules.mines),
                 try symbols.technologies.extend(over: rules.technologies),
@@ -74,6 +77,15 @@ extension GameRules {
             )
         }
 
+        let maintenanceCosts: EffectsTable<
+            BuildingType,
+            SymbolTable<Int64>
+        > = try rules.buildingCosts.maintenance.effects(keys: symbols.buildings, wildcard: "*")
+        let developmentCosts: EffectsTable<
+            BuildingType,
+            SymbolTable<Int64>
+        > = try rules.buildingCosts.development.effects(keys: symbols.buildings, wildcard: "*")
+
         let corporateCosts: EffectsTable<
             FactoryType,
             SymbolTable<Int64>
@@ -85,8 +97,39 @@ extension GameRules {
 
         self.init(
             resources: resources,
+            buildings: try table.buildings.map {
+                BuildingMetadata.init(
+                    identity: $0,
+                    maintenance: .init(
+                        metadata: resources,
+                        quantity: try (
+                            try $1.maintenance ?? maintenanceCosts[$0.code] ?? maintenanceCosts[*]
+                        ).quantities(
+                            keys: symbols.resources
+                        )
+                    ),
+                    development: .init(
+                        metadata: resources,
+                        quantity: try (
+                            try $1.development ?? developmentCosts[$0.code] ?? developmentCosts[*]
+                        ).quantities(
+                            keys: symbols.resources
+                        )
+                    ),
+                    output: .init(
+                        metadata: resources,
+                        quantity: try $1.output.quantities(keys: symbols.resources)
+                    ),
+                    sharesInitial: rules.buildingCosts.sharesInitial,
+                    sharesPerLevel: rules.buildingCosts.sharesPerLevel,
+                    terrainAllowed: .init(
+                        try $1.terrain.lazy.map { try symbols.terrains[$0] }
+                    ),
+                    required: $1.required
+                )
+            },
             factories: try table.factories.map {
-                return try .init(
+                try FactoryMetadata.init(
                     identity: $0,
                     materials: .init(
                         metadata: resources,
@@ -185,6 +228,7 @@ extension GameRules {
 
     private init(
         resources: OrderedDictionary<Resource, ResourceMetadata>,
+        buildings: OrderedDictionary<BuildingType, BuildingMetadata>,
         factories: OrderedDictionary<FactoryType, FactoryMetadata>,
         mines: OrderedDictionary<MineType, MineMetadata>,
         technologies: OrderedDictionary<Technology, TechnologyMetadata>,
@@ -208,6 +252,7 @@ extension GameRules {
                 local: resources.values.filter(\.local),
                 table: resources
             ),
+            buildings: buildings,
             factories: factories,
             mines: mines,
             technologies: technologies,
@@ -232,24 +277,19 @@ extension GameRules {
         for value: FactoryMetadata in self.factories.values {
             value.hash.hash(into: &hasher)
         }
-        for (key, value): (MineType, MineMetadata) in self.mines {
-            key.hash(into: &hasher)
+        for value: MineMetadata in self.mines.values {
             value.hash.hash(into: &hasher)
         }
-        for (key, value): (Technology, TechnologyMetadata) in self.technologies {
-            key.hash(into: &hasher)
+        for value: TechnologyMetadata in self.technologies.values {
             value.hash.hash(into: &hasher)
         }
-        for (key, value): (GeologicalType, GeologicalMetadata) in self.geology {
-            key.hash(into: &hasher)
+        for value: GeologicalMetadata in self.geology.values {
             value.hash.hash(into: &hasher)
         }
-        for (key, value): (TerrainType, TerrainMetadata) in self.terrains {
-            key.hash(into: &hasher)
+        for value: TerrainMetadata in self.terrains.values {
             value.hash.hash(into: &hasher)
         }
-        for (key, value): (PopType, PopMetadata) in self.pops.sorted(by: { $0.key < $1.key }) {
-            key.hash(into: &hasher)
+        for value: PopMetadata in self.pops.values.sorted(by: { $0.id < $1.id }) {
             value.hash.hash(into: &hasher)
         }
 

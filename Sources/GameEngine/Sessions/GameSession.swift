@@ -135,6 +135,13 @@ extension GameSession {
         return try self.ui.report.planet.open(request: request, snapshot: self.snapshot)
     }
 
+    public mutating func openInfrastructure(
+        _ request: InfrastructureReportRequest
+    ) throws -> InfrastructureReport {
+        self.ui.screen = .Infrastructure
+        return try self.ui.report.infrastructure.open(request: request, snapshot: self.snapshot)
+    }
+
     public mutating func openProduction(
         _ request: ProductionReportRequest
     ) throws -> ProductionReport {
@@ -237,6 +244,58 @@ extension GameSession {
         with arguments: borrowing JavaScriptDecoder<JavaScriptArrayKey>
     ) throws -> Tooltip? {
         switch type {
+        case .BuildingAccount:
+            return self.snapshot.tooltipBuildingAccount(
+                try arguments[0].decode(),
+            )
+        case .BuildingSize:
+            return self.snapshot.tooltipBuildingSize(
+                try arguments[0].decode(),
+            )
+        case .BuildingNeeds:
+            return self.snapshot.tooltipBuildingNeeds(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+            )
+        case .BuildingResourceIO:
+            return self.snapshot.tooltipBuildingResourceIO(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+            )
+        case .BuildingStockpile:
+            return self.snapshot.tooltipBuildingStockpile(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+            )
+        case .BuildingExplainPrice:
+            return self.snapshot.tooltipBuildingExplainPrice(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+            )
+        case .BuildingOwnershipCountry:
+            return self.snapshot.tooltipBuildingOwnership(
+                try arguments[0].decode(),
+                country: try arguments[1].decode(),
+            )
+        case .BuildingOwnershipCulture:
+            return self.snapshot.tooltipBuildingOwnership(
+                try arguments[0].decode(),
+                culture: try arguments[1].decode(),
+            )
+        case .BuildingOwnershipSecurities:
+            return self.snapshot.tooltipBuildingOwnership(
+                try arguments[0].decode(),
+            )
+        case .BuildingCashFlowItem:
+            return self.snapshot.tooltipBuildingCashFlowItem(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+            )
+        case .BuildingBudgetItem:
+            return self.snapshot.tooltipBuildingBudgetItem(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+            )
         case .FactoryAccount:
             return self.snapshot.tooltipFactoryAccount(
                 try arguments[0].decode(),

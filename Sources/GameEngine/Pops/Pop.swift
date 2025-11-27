@@ -18,7 +18,7 @@ struct Pop: LegalEntityState, Identifiable {
 
     var inventory: Inventory
     var spending: Spending
-    var budget: PopBudget?
+    var budget: Budget?
     var y: Dimensions
     var z: Dimensions
 
@@ -73,6 +73,7 @@ extension Pop: Turnable {
             return $0.count > 0
         }
         self.spending = .zero
+        self.budget = nil
         self.equity.turn()
     }
 }
