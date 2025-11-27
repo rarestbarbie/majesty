@@ -46,7 +46,7 @@ extension CashAllocationStatement {
             salaries: 0,
             wages: 0,
             l: budget.l.total,
-            e: 0,
+            e: budget.e.total,
             x: budget.x.total,
         )
     }

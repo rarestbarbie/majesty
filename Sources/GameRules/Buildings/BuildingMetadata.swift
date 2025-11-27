@@ -4,6 +4,7 @@ import GameIDs
 public final class BuildingMetadata: GameMetadata {
     public typealias ID = BuildingType
     public let identity: SymbolAssignment<BuildingType>
+    public let operations: ResourceTier
     public let maintenance: ResourceTier
     public let development: ResourceTier
     public let output: ResourceTier
@@ -16,6 +17,7 @@ public final class BuildingMetadata: GameMetadata {
 
     init(
         identity: SymbolAssignment<BuildingType>,
+        operations: ResourceTier,
         maintenance: ResourceTier,
         development: ResourceTier,
         output: ResourceTier,
@@ -26,6 +28,7 @@ public final class BuildingMetadata: GameMetadata {
     ) {
         self.identity = identity
 
+        self.operations = operations
         self.maintenance = maintenance
         self.development = development
         self.output = output
@@ -41,6 +44,7 @@ extension BuildingMetadata {
         var hasher: Hasher = .init()
 
         self.identity.hash(into: &hasher)
+        self.operations.hash(into: &hasher)
         self.maintenance.hash(into: &hasher)
         self.development.hash(into: &hasher)
         self.output.hash(into: &hasher)

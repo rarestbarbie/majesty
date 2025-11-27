@@ -248,8 +248,12 @@ extension GameSession {
             return self.snapshot.tooltipBuildingAccount(
                 try arguments[0].decode(),
             )
-        case .BuildingSize:
-            return self.snapshot.tooltipBuildingSize(
+        case .BuildingActive:
+            return self.snapshot.tooltipBuildingActive(
+                try arguments[0].decode(),
+            )
+        case .BuildingVacant:
+            return self.snapshot.tooltipBuildingVacant(
                 try arguments[0].decode(),
             )
         case .BuildingNeeds:

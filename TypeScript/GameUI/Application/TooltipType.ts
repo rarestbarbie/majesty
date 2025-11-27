@@ -32,7 +32,8 @@ export enum TooltipType {
 
     // Building Tooltips
     BuildingAccount = 'BuildingAccount',
-    BuildingSize = 'BuildingSize',
+    BuildingActive = 'BuildingActive',
+    BuildingVacant = 'BuildingVacant',
     BuildingResourceIO = 'BuildingResourceIO',
     BuildingStockpile = 'BuildingStockpile',
     BuildingExplainPrice = 'BuildingExplainPrice',

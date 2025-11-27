@@ -12,7 +12,7 @@ struct Building: LegalEntityState, Identifiable {
     let id: BuildingID
     let tile: Address
     var type: BuildingType
-
+    var mothballed: Int64
     var inventory: Inventory
     var spending: Spending
     var budget: Budget?
@@ -27,6 +27,7 @@ extension Building: Sectionable {
             id: id,
             tile: section.tile,
             type: section.type,
+            mothballed: 0,
             inventory: .init(),
             spending: .zero,
             budget: nil,
@@ -68,9 +69,11 @@ extension Building {
         case id
         case tile = "on"
         case type
+        case mothballed
 
         case inventory_out = "out"
         case inventory_l = "nl"
+        case inventory_e = "ne"
         case inventory_x = "nx"
 
         case spending_buybacks = "sE"
@@ -89,9 +92,11 @@ extension Building: JavaScriptEncodable {
         js[.id] = self.id
         js[.tile] = self.tile
         js[.type] = self.type
+        js[.mothballed] = self.mothballed
 
         js[.inventory_out] = self.inventory.out
         js[.inventory_l] = self.inventory.l
+        js[.inventory_e] = self.inventory.e
         js[.inventory_x] = self.inventory.x
 
         js[.spending_buybacks] = self.spending.buybacks
@@ -112,10 +117,11 @@ extension Building: JavaScriptDecodable {
             id: try js[.id].decode(),
             tile: try js[.tile].decode(),
             type: try js[.type].decode(),
+            mothballed: try js[.mothballed]?.decode() ?? 0,
             inventory: .init(
                 out: try js[.inventory_out]?.decode() ?? .empty,
                 l: try js[.inventory_l]?.decode() ?? .empty,
-                e: .empty,
+                e: try js[.inventory_e]?.decode() ?? .empty,
                 x: try js[.inventory_x]?.decode() ?? .empty,
             ),
             spending: .init(

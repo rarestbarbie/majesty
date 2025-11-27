@@ -51,7 +51,14 @@ extension BuildingContext {
         self.cashFlow.reset()
         self.cashFlow.update(with: self.state.inventory.l)
         self.cashFlow.update(with: self.state.inventory.e)
+        self.cashFlow.update(with: self.state.inventory.x)
     }
+}
+extension BuildingContext {
+    private static var vertex: Double { 0.5 }
+    private static var attrition: Double { 0.01 }
+    private static var mothball: Double { 0.01 }
+    private static var restore: Double { 0.01 }
 }
 extension BuildingContext: TransactingContext {
     mutating func allocate(turn: inout Turn) {
@@ -64,12 +71,16 @@ extension BuildingContext: TransactingContext {
 
         self.state.inventory.out.sync(with: self.type.output, releasing: 1)
         self.state.inventory.l.sync(
+            with: self.type.operations,
+            scalingFactor: (self.state.z.active, self.state.z.ei),
+        )
+        self.state.inventory.e.sync(
             with: self.type.maintenance,
-            scalingFactor: (self.state.z.size, self.state.z.ei),
+            scalingFactor: (self.state.z.total, self.state.z.ei),
         )
         self.state.inventory.x.sync(
             with: self.type.development,
-            scalingFactor: (self.state.z.size, self.state.z.ei),
+            scalingFactor: (self.state.z.total, self.state.z.ei),
         )
 
         if  self.equity.sharePrice.n > 0 {
@@ -86,14 +97,14 @@ extension BuildingContext: TransactingContext {
         ) = (
             segmented: .business(
                 l: self.state.inventory.l,
-                e: .empty,
+                e: self.state.inventory.e,
                 x: self.state.inventory.x,
                 markets: turn.localMarkets,
                 address: self.state.tile,
             ),
             tradeable: .business(
                 l: self.state.inventory.l,
-                e: .empty,
+                e: self.state.inventory.e,
                 x: self.state.inventory.x,
                 markets: turn.worldMarkets,
                 currency: country.currency.id,
@@ -105,10 +116,10 @@ extension BuildingContext: TransactingContext {
             state: self.state.z,
             weights: weights,
             stockpileMaxDays: Self.stockpileDays.upperBound,
-            d: (l: 30, x: 365, v: max(0, self.state.z.profitability))
+            d: (l: 30, e: 90, x: 365, v: max(0, self.state.z.profitability))
         )
 
-        let sharesTarget: Int64 = self.state.z.size * self.type.sharesPerLevel + self.type.sharesInitial
+        let sharesTarget: Int64 = self.state.z.total * self.type.sharesPerLevel + self.type.sharesInitial
         let sharesIssued: Int64 = max(0, sharesTarget - self.equity.shareCount)
 
         let sharesToIssue: Int64 = budget.buybacks == 0 ? sharesIssued : 0
@@ -126,7 +137,7 @@ extension BuildingContext: TransactingContext {
         turn.localMarkets.tradeAsBusiness(
             selling: self.state.inventory.out.segmented,
             buying: weights.segmented,
-            budget: (budget.l.segmented, 0, budget.x.segmented),
+            budget: (budget.l.segmented, budget.e.segmented, budget.x.segmented),
             as: self.lei,
             in: self.state.tile
         )
@@ -149,6 +160,14 @@ extension BuildingContext: TransactingContext {
                 $0 += self.state.inventory.l.tradeAsBusiness(
                     stockpileDays: stockpileTarget,
                     spendingLimit: budget.l.tradeable,
+                    in: country.currency.id,
+                    on: &turn.worldMarkets,
+                )
+            }
+            if  budget.e.tradeable > 0 {
+                $0 += self.state.inventory.e.tradeAsBusiness(
+                    stockpileDays: stockpileTarget,
+                    spendingLimit: budget.e.tradeable,
                     in: country.currency.id,
                     on: &turn.worldMarkets,
                 )
@@ -178,21 +197,27 @@ extension BuildingContext: TransactingContext {
 
         self.state.inventory.out.deposit(
             from: self.type.output,
-            scalingFactor: (self.state.z.size, 1)
+            scalingFactor: (self.state.z.active, 1)
         )
         self.state.inventory.l.consume(
+            from: self.type.operations,
+            scalingFactor: (self.state.z.active, self.state.z.ei)
+        )
+        self.state.inventory.e.consume(
             from: self.type.maintenance,
-            scalingFactor: (self.state.z.size, self.state.z.ei)
+            scalingFactor: (self.state.z.total, self.state.z.ei)
         )
         if  self.state.inventory.x.full {
-            self.state.z.size += max(1, self.state.z.size / 256)
+            // in this situation, `active` is usually close to or equal to `total`
+            self.state.z.active += max(1, self.state.z.total / 256)
             self.state.inventory.x.consume(
                 from: self.type.development,
-                scalingFactor: (self.state.z.size, self.state.z.ei)
+                scalingFactor: (self.state.z.total, self.state.z.ei)
             )
         }
 
         self.state.z.fl = self.state.inventory.l.fulfilled
+        self.state.z.fe = self.state.inventory.e.fulfilled
         self.state.z.fx = self.state.inventory.x.fulfilled
 
         self.state.spending.buybacks += turn.bank.buyback(
@@ -214,14 +239,48 @@ extension BuildingContext: TransactingContext {
     }
 
     mutating func advance(turn: inout Turn) {
-        if  self.state.z.fl < 1, self.state.z.size > 1 {
-            let attrition: Double = 0.01 * (1 - self.state.z.fl)
-            self.state.z.size -= Binomial[self.state.z.size - 1, attrition].sample(
+        if  self.state.z.fl < 1, self.state.z.active > 1 {
+            let attrition: Double = Self.attrition * (1 - self.state.z.fl)
+            self.state.z.active -= Binomial[self.state.z.active - 1, attrition].sample(
                 using: &turn.random.generator
             )
         }
+        if  self.state.z.fe < Self.vertex {
+            let parameter: Double = Self.vertex - self.state.z.fe
+            let attrition: Double = Self.attrition * parameter
+            let mothball: Double = Self.mothball * parameter
+
+            if  self.state.z.vacant > 0 {
+                let demolished: Int64 = Binomial[self.state.z.vacant, attrition].sample(
+                    using: &turn.random.generator
+                )
+                self.state.z.vacant -= demolished
+            }
+            if  self.state.z.active > 1 {
+                let mothballed: Int64 = Binomial[self.state.z.active - 1, mothball].sample(
+                    using: &turn.random.generator
+                )
+                self.state.z.active -= mothballed
+                self.state.z.vacant += mothballed
+                // without this, we have no way of knowing how many facilities transitioned
+                // specifically due to mothballing
+                self.state.mothballed  = mothballed
+            }
+        } else {
+            let parameter: Double = self.state.z.fe - Self.vertex
+            let restore: Double = Self.restore * parameter
+            if  self.state.z.vacant > 0 {
+                let restored: Int64 = Binomial[self.state.z.vacant, restore].sample(
+                    using: &turn.random.generator
+                )
+                self.state.z.active += restored
+                self.state.z.vacant -= restored
+                self.state.mothballed = -restored
+            }
+        }
 
         self.state.z.vl = self.state.inventory.l.valueAcquired
+        self.state.z.ve = self.state.inventory.e.valueAcquired
         self.state.z.vx = self.state.inventory.x.valueAcquired
 
         guard
@@ -273,7 +332,7 @@ extension BuildingContext {
     func tooltipAccount(_ account: Bank.Account) -> Tooltip? {
         let profit: ProfitMargins = self.state.profit
         let liquid: TurnDelta<Int64> = account.Δ
-        let assets: TurnDelta<Int64> = self.state.Δ.vl + self.state.Δ.vx
+        let assets: TurnDelta<Int64> = self.state.Δ.vl + self.state.Δ.ve + self.state.Δ.vx
 
         return .instructions {
             $0["Total valuation", +] = (liquid + assets)[/3]
@@ -302,17 +361,61 @@ extension BuildingContext {
             }
         }
     }
+    func tooltipActive() -> Tooltip? {
+        .instructions {
+            $0["Active facilities"] = self.state.z.active[/3]
+            let totalChange: Int64 = self.state.Δ.total.value
+            $0[>] = totalChange > 0 ? """
+            Today, \(pos: totalChange[/3]) facilities were \(em: "constructed")
+            """ : totalChange < 0 ? """
+            Today, \(pos: (-totalChange)[/3]) facilities were \(em: "demolished")
+            """ : nil
+        }
+    }
+    func tooltipVacant() -> Tooltip? {
+        .instructions {
+            $0["Vacant facilities"] = self.state.z.vacant[/3]
+            $0[>] = self.state.mothballed > 0 ? """
+            Today, \(pos: self.state.mothballed[/3]) facilities were \(em: "backgrounded")
+            """ : self.state.mothballed < 0 ? """
+            Today, \(pos: (-self.state.mothballed)[/3]) facilities were \(em: "restored")
+            """ : nil
+        }
+    }
     func tooltipNeeds(_ tier: ResourceTierIdentifier) -> Tooltip? {
         .instructions {
             switch tier {
             case .l:
                 let inputs: ResourceInputs = self.state.inventory.l
-                $0["Maintenance needs fulfilled"] = self.state.z.fl[%3]
+                $0["Operational needs fulfilled"] = self.state.z.fl[%3]
                 $0[>] {
                     $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
+                    let attrition: Double = Self.attrition * (1 - self.state.z.fl)
+                    $0["Attrition", +] = +?(attrition)[%2]
                 }
+                $0[>] = """
+                Only \(em: "active") facilities consume operational resources
+                """
             case .e:
-                return
+                let inputs: ResourceInputs = self.state.inventory.e
+                $0["Maintenance needs fulfilled"] = self.state.z.fe[%3]
+                $0[>] {
+                    $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
+                    if  self.state.z.fe < Self.vertex {
+                        let parameter: Double = Self.vertex - self.state.z.fe
+                        let attrition: Double = Self.attrition * parameter
+                        let mothball: Double = Self.mothball * parameter
+                        $0["Attrition", +] = +?(attrition)[%2]
+                        $0["Backgrounding", +] = +?(mothball)[%2]
+                    } else {
+                        let parameter: Double = self.state.z.fe - Self.vertex
+                        let restore: Double = Self.restore * parameter
+                        $0["Restoration", +] = +?(restore)[%2]
+                    }
+                }
+                $0[>] = """
+                All facilities consume maintenance resources, even when \(em: "backgrounded")
+                """
             case .x:
                 $0["Development needs fulfilled"] = self.state.z.fx[%3]
             }

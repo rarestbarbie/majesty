@@ -4,11 +4,14 @@ import JavaScriptInterop
 
 extension Building {
     struct Dimensions: LegalEntityMetrics {
-        var size: Int64
+        var active: Int64
+        var vacant: Int64
         var vl: Int64
+        var ve: Int64
         var vx: Int64
 
         var fl: Double
+        var fe: Double
         var fx: Double
 
         var ei: Double
@@ -21,10 +24,13 @@ extension Building {
 extension Building.Dimensions {
     init() {
         self.init(
-            size: 0,
+            active: 0,
+            vacant: 0,
             vl: 0,
+            ve: 0,
             vx: 0,
             fl: 0,
+            fe: 0,
             fx: 0,
             ei: 1,
             px: 1,
@@ -33,11 +39,17 @@ extension Building.Dimensions {
     }
 }
 extension Building.Dimensions {
+    var total: Int64 { self.active + self.vacant }
+}
+extension Building.Dimensions {
     enum ObjectKey: JSString, Sendable {
-        case size
+        case active
+        case vacant
         case vl
+        case ve
         case vx
         case fl
+        case fe
         case fx
         case ei
         case px
@@ -46,10 +58,13 @@ extension Building.Dimensions {
 }
 extension Building.Dimensions: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.size] = self.size
+        js[.active] = self.active
+        js[.vacant] = self.vacant
         js[.vl] = self.vl
+        js[.ve] = self.ve
         js[.vx] = self.vx
         js[.fl] = self.fl
+        js[.fe] = self.fe
         js[.fx] = self.fx
         js[.ei] = self.ei
         js[.px] = self.px
@@ -59,10 +74,13 @@ extension Building.Dimensions: JavaScriptEncodable {
 extension Building.Dimensions: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
-            size: try js[.size].decode(),
+            active: try js[.active]?.decode() ?? 0,
+            vacant: try js[.vacant]?.decode() ?? 0,
             vl: try js[.vl]?.decode() ?? 0,
+            ve: try js[.ve]?.decode() ?? 0,
             vx: try js[.vx]?.decode() ?? 0,
             fl: try js[.fl]?.decode() ?? 0,
+            fe: try js[.fe]?.decode() ?? 0,
             fx: try js[.fx]?.decode() ?? 0,
             ei: try js[.ei]?.decode() ?? 1,
             px: try js[.px]?.decode() ?? 1,

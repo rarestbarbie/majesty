@@ -39,6 +39,12 @@ ul.terms {
         &[data-term-id='eA'] {
             --term-icon: '🧲';
         }
+        &[data-term-id='bA'] {
+            --term-icon: '💡';
+        }
+        &[data-term-id='bV'] {
+            --term-icon: '💡';
+            filter: grayscale(100%);
+        }
     }
-
 }

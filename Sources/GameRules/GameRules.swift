@@ -100,6 +100,10 @@ extension GameRules {
             buildings: try table.buildings.map {
                 BuildingMetadata.init(
                     identity: $0,
+                    operations: .init(
+                        metadata: resources,
+                        quantity: try $1.operations.quantities(keys: symbols.resources)
+                    ),
                     maintenance: .init(
                         metadata: resources,
                         quantity: try (
