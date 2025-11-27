@@ -25,7 +25,8 @@ ul.terms {
                 margin: 0.2em 0 0.5em 0;
             }
         }
-        &[data-term-id^='e'] {
+        &[data-term-id^='e'],
+        &[data-term-id^='b'] {
             > span.label::before {
                 content: var(--term-icon);
             }
@@ -44,7 +45,11 @@ ul.terms {
         }
         &[data-term-id='bV'] {
             --term-icon: '💡';
-            filter: grayscale(100%);
+
+            span.label::before {
+                // filter: grayscale(100%) brightness(50%);
+                filter: grayscale(50%) hue-rotate(180deg) brightness(50%);
+            }
         }
     }
 }

@@ -239,6 +239,9 @@ extension BuildingContext: TransactingContext {
     }
 
     mutating func advance(turn: inout Turn) {
+        // some paths afterwards do not set mothballed
+        self.state.mothballed = 0
+
         if  self.state.z.fl < 1, self.state.z.active > 1 {
             let attrition: Double = Self.attrition * (1 - self.state.z.fl)
             self.state.z.active -= Binomial[self.state.z.active - 1, attrition].sample(
