@@ -48,20 +48,17 @@ extension FactoryContext {
         if self.state.size.level == 0 {
             self.workers = nil
             self.clerks = nil
-        } else if case _? = self.type.clerks {
-            self.workers = .empty
-            self.clerks = .empty
         } else {
             self.workers = .empty
-            self.clerks = nil
+            self.clerks = .empty
         }
     }
 
     mutating func addWorkforceCount(pop: Pop, job: FactoryJob) {
-        if  case pop.type = self.type.workers.unit {
+        if  self.type.workers.unit == pop.type {
             self.workers?.count(pop: pop.id, job: job)
         } else if
-            case pop.type? = self.type.clerks?.unit {
+            self.type.clerks.unit == pop.type {
             self.clerks?.count(pop: pop.id, job: job)
         } else {
             fatalError(
@@ -90,7 +87,7 @@ extension FactoryContext {
     ) throws {
         if  let area: Int64 = self.state.size.area {
             self.workers?.limit = area * self.type.workers.amount
-            self.clerks?.limit = area * (self.type.clerks?.amount ?? 0)
+            self.clerks?.limit = area * self.type.clerks.amount
         }
 
         self.region = context.planets[self.state.tile]?.properties
@@ -178,7 +175,8 @@ extension FactoryContext: TransactingContext {
         let budget: OperatingBudget
         let sharesToIssue: Int64
 
-        if  let workers: Workforce = self.workers {
+        if  let workers: Workforce = self.workers,
+            let clerks: Workforce = self.clerks {
             #assert(workers.limit > 0, "active factory has zero worker limit?!?!")
             let utilization: Double = min(1, Double.init(workers.count %/ workers.limit))
 
@@ -203,7 +201,7 @@ extension FactoryContext: TransactingContext {
                 state: self.state.z,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
                 workers: workers,
-                clerks: self.clerks.map { ($0, self.type.clerkBonus!) },
+                clerks: (clerks, self.type.clerkBonus),
                 invest: utilization * max(0, self.state.z.profitability),
                 d: .business,
             )
@@ -409,10 +407,9 @@ extension FactoryContext: TransactingContext {
                 fire.workers = fireToday.workers
             }
 
-            if  let clerks: Workforce = self.clerks,
-                let clerk: PopType = self.type.clerks?.unit {
+            if  let clerks: Workforce = self.clerks {
                 if  let fire: PopJobLayoffBlock = .init(size: fire.clerks) {
-                    turn.jobs.fire[self.state.id, clerk] = fire
+                    turn.jobs.fire[self.state.id, self.type.clerks.unit] = fire
                     // clerk salaries are not sticky, but will never fall below worker wage
                     self.state.z.cn = max(self.state.z.wn, self.state.z.cn - 1)
                 } else if hireToday.clerks > 0 {
@@ -428,12 +425,13 @@ extension FactoryContext: TransactingContext {
                         self.state.z.cn += 1
                     }
 
+                    let scope: PlanetID = self.state.tile.planet
                     let hire: PopJobOfferBlock = .init(
                         job: .factory(self.state.id),
                         bid: self.state.z.cn,
                         size: hireToday.clerks
                     )
-                    turn.jobs.hire.remote[self.state.tile.planet, clerk].append(hire)
+                    turn.jobs.hire.remote[scope, self.type.clerks.unit].append(hire)
                 }
             }
 
@@ -651,19 +649,19 @@ extension FactoryContext {
 extension FactoryContext {
     private var clerkEffects: ClerkEffects? {
         guard
-        let clerks: Workforce = self.clerks,
-        let clerkTeam: FactoryMetadata.ClerkBonus = self.type.clerkBonus else {
+        let workers: Workforce = self.workers,
+        let clerks: Workforce = self.clerks else {
             return nil
         }
 
-        let optimal: Int64 = self.workers.map { clerkTeam.optimal(for: $0.count) } ?? 0
+        let optimal: Int64 = self.type.clerkBonus.optimal(for: workers.count)
         return .init(
             workforce: clerks,
             optimal: optimal,
             bonus: clerks.count < optimal
                 ? Double.init(clerks.count) / Double.init(optimal)
                 : 1,
-            clerk: clerkTeam.type,
+            clerk: self.type.clerks.unit
         )
     }
 }
@@ -861,10 +859,9 @@ extension FactoryContext {
             workforce = workers
             type = self.type.workers.unit
         } else if
-            let clerks: Workforce = self.clerks,
-            let clerkTeam: Quantity<PopType> = self.type.clerks {
+            let clerks: Workforce = self.clerks {
             workforce = clerks
-            type = clerkTeam.unit
+            type = self.type.clerks.unit
         } else {
             return nil
         }

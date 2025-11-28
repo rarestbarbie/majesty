@@ -27,7 +27,7 @@ extension OperatingBudget {
         state: Factory.Dimensions,
         stockpileMaxDays: Int64,
         workers: Workforce?,
-        clerks: (Workforce, FactoryMetadata.ClerkBonus)?,
+        clerks: (Workforce, FactoryContext.ClerkBonus)?,
         invest: Double,
         d: CashAllocationBasis,
     ) -> Self {
