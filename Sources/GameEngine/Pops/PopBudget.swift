@@ -14,11 +14,12 @@ extension Pop {
 }
 extension Pop.Budget {
     static func slave(
+        account: Bank.Account,
         weights: __shared (
             segmented: SegmentedWeights<InelasticDemand>,
             tradeable: AggregateWeights
         ),
-        balance: Int64,
+        state: Pop.Dimensions,
         stockpileMaxDays: Int64,
         d: Int64,
     ) -> Self {
@@ -26,10 +27,14 @@ extension Pop.Budget {
         let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.total
         let totalCostPerDay: Int64 = tradeableCostPerDay.l + segmentedCostPerDay.l
 
-        let bl: Int64 = totalCostPerDay * d
+        let d: CashAllocationBasis = .business
+        let v: Int64 = state.vl + state.ve
+        let basis: Int64 = CashAllocationBasis.adjust(liquidity: account.settled, assets: v)
 
-        let dividend: Int64 = max(0, (balance - bl) / 3650)
-        let buybacks: Int64 = max(0, (balance - bl - dividend) / 365)
+        let bl: Int64 = totalCostPerDay * d.l
+
+        let dividend: Int64 = max(0, (basis - bl) / (10 * d.y))
+        let buybacks: Int64 = max(0, (basis - bl - dividend) / d.y)
 
         var budget: Self = .init(
             l: .init(),
@@ -41,7 +46,7 @@ extension Pop.Budget {
         )
 
         budget.l.distributeAsBusiness(
-            funds: balance / d,
+            funds: basis / d.l,
             segmented: segmentedCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
         )
@@ -50,13 +55,13 @@ extension Pop.Budget {
     }
 
     static func free(
+        account: Bank.Account,
         weights: __shared (
             segmented: SegmentedWeights<ElasticDemand>,
             tradeable: AggregateWeights
         ),
-        balance: Int64,
+        state: Pop.Dimensions,
         stockpileMaxDays: Int64,
-        d: (l: Int64, e: Int64, x: Int64),
         investor: Bool
     ) -> Self {
         let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.total
@@ -65,6 +70,10 @@ extension Pop.Budget {
             l: tradeableCostPerDay.l + segmentedCostPerDay.l,
             e: tradeableCostPerDay.e + segmentedCostPerDay.e,
         )
+
+        let d: CashAllocationBasis = .consumer
+        let v: Int64 = state.vl + state.ve
+        let basis: Int64 = CashAllocationBasis.adjust(liquidity: account.settled, assets: v)
 
         /// These are the minimum theoretical balances the pop would need to purchase 100% of
         /// its needs in that tier on any particular day.
@@ -75,25 +84,25 @@ extension Pop.Budget {
             l: .init(),
             e: .init(),
             x: .init(),
-            investment: investor ? (balance - bl - be) / d.x : 0,
+            investment: investor ? (basis - bl - be) / d.y : 0,
             dividend: 0,
             buybacks: 0
         )
 
         budget.l.distributeAsConsumer(
-            funds: balance / d.l,
+            funds: basis / d.l,
             segmented: segmentedCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
         )
 
         budget.e.distributeAsConsumer(
-            funds: (balance - bl) / d.e,
+            funds: (basis - bl) / d.e,
             segmented: segmentedCostPerDay.e * stockpileMaxDays,
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
         )
 
         budget.x.distributeAsConsumer(
-            funds: (balance - bl - be) / d.x,
+            funds: (basis - bl - be) / d.x,
             segmented: segmentedCostPerDay.x * stockpileMaxDays,
             tradeable: tradeableCostPerDay.x * stockpileMaxDays,
         )

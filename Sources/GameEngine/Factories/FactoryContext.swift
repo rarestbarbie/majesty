@@ -192,12 +192,12 @@ extension FactoryContext: TransactingContext {
 
             budget = .init(
                 account: turn.bank[account: self.lei],
+                weights: weights,
+                state: self.state.z,
                 workers: nil,
                 clerks: nil,
-                state: self.state.z,
-                weights: weights,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
-                d: (7, 30, 90, nil),
+                invest: 1
             )
             sharesToIssue = max(0, self.type.sharesInitial - self.equity.shareCount)
 
@@ -228,12 +228,12 @@ extension FactoryContext: TransactingContext {
 
             budget = .init(
                 account: turn.bank[account: self.lei],
+                weights: weights,
+                state: self.state.z,
                 workers: self.workers,
                 clerks: self.clerks.map { ($0, self.type.clerkBonus!) },
-                state: self.state.z,
-                weights: weights,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
-                d: (30, 60, 365, utilization * max(0, self.state.z.profitability))
+                invest: utilization * max(0, self.state.z.profitability)
             )
 
             let sharesTarget: Int64 = self.state.size.level * self.type.sharesPerLevel
