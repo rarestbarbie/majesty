@@ -1,9 +1,16 @@
 [
+    // California
+    {
+        "tile": "399N-2,3",
+        "buildings": {
+            "High Density Housing": 30000
+        }
+    },
     // American Midwest
     {
         "tile": "399N-1,2",
         "buildings": {
-            "High Density Housing": 30000
+            "High Density Housing": 90000
         }
     },
 
@@ -11,7 +18,7 @@
     {
         "tile": "399N0,2",
         "buildings": {
-            "High Density Housing": 30000
+            "High Density Housing": 90000
         }
     }
 ]

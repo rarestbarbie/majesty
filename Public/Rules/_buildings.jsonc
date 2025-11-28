@@ -3,7 +3,7 @@
         "required": true,
         "operations": {
             "Electricity": 2,
-            "Services": 1,
+            "Services": 2,
             "Appliances": 1
         },
         "maintenance": {
@@ -11,8 +11,8 @@
             "Construction": 1
         },
         "development": {
-            "Construction": 2,
-            "Appliances": 2
+            "Construction": 8,
+            "Appliances": 8
         },
         "output": {
             "Housing": 24

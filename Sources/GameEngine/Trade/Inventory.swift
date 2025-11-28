@@ -19,15 +19,6 @@ extension Inventory {
     }
 }
 extension Inventory {
-    func profit(variableCosts: Int64, fixedCosts: Int64) -> ProfitMargins {
-        .init(
-            variableCosts: variableCosts + self.l.valueConsumed,
-            fixedCosts: fixedCosts + self.e.valueConsumed,
-            revenue: self.out.valueSold
-        )
-    }
-}
-extension Inventory {
     mutating func report(resource: Resource, fill: LocalMarket.Fill, side: LocalMarket.Side) {
         switch side {
         case .sell:

@@ -20,7 +20,7 @@
             "Electricity": 20
         },
         "output": {
-            "Aluminum": 16
+            "Aluminum": 32
         },
         "workers": {
             "Driver": 5000,
@@ -404,7 +404,7 @@
             "Water": 1
         },
         "output": {
-            "Machine Parts": 12
+            "Machine Parts": 24
         },
         "workers": {
             "Driver": 5000,

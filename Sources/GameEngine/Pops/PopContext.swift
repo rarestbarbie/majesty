@@ -385,7 +385,7 @@ extension PopContext: TransactingContext {
         } (&turn.bank[account: self.lei])
 
         if  enslaved {
-            self.state.z.mix(profitability: self.state.profit.operatingProfitability)
+            self.state.z.mix(profitability: self.state.profit.marginalProfitability)
 
             // Pay dividends to shareholders, if any.
             self.state.spending.dividend += turn.bank.transfer(
@@ -809,7 +809,7 @@ extension PopContext {
             switch tier {
             case .l:
                 let inputs: ResourceInputs = self.state.inventory.l
-                $0["Life needs fulfilled"] = self.state.z.fl[%3]
+                $0["Life needs fulfilled"] = self.state.z.fl[%2]
                 $0[>] {
                     $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
                     $0["Militancy", -] = +?Self.mil(fl: self.state.z.fl)[..3]
@@ -817,7 +817,7 @@ extension PopContext {
                 }
             case .e:
                 let inputs: ResourceInputs = self.state.inventory.e
-                $0["Everyday needs fulfilled"] = self.state.z.fe[%3]
+                $0["Everyday needs fulfilled"] = self.state.z.fe[%2]
                 $0[>] {
                     $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
                     $0["Militancy", -] = +?Self.mil(fe: self.state.z.fe)[..3]
@@ -825,7 +825,7 @@ extension PopContext {
                 }
             case .x:
                 let inputs: ResourceInputs = self.state.inventory.x
-                $0["Luxury needs fulfilled"] = self.state.z.fx[%3]
+                $0["Luxury needs fulfilled"] = self.state.z.fx[%2]
                 $0[>] {
                     $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
                     if let budget: Pop.Budget = self.state.budget, budget.investment > 0 {

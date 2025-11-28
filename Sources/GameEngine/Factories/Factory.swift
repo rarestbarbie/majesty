@@ -1,3 +1,4 @@
+import Assert
 import JavaScriptKit
 import JavaScriptInterop
 import Fraction
@@ -71,9 +72,13 @@ extension Factory: Turnable {
 }
 extension Factory {
     var profit: ProfitMargins {
-        self.inventory.profit(
-            variableCosts: self.spending.wages,
-            fixedCosts: self.spending.salaries
+        // for Factories, compliance costs scale with number of workers, so all compliance costs
+        // are treated as operating costs
+        .init(
+            materialsCosts: self.inventory.l.valueConsumed + self.spending.wages,
+            operatingCosts: self.inventory.e.valueConsumed + self.spending.salariesUsed,
+            carryingCosts: self.spending.salariesIdle,
+            revenue: self.inventory.out.valueSold
         )
     }
 }
@@ -93,7 +98,8 @@ extension Factory {
 
         case spending_buybacks = "sE"
         case spending_dividend = "sI"
-        case spending_salaries = "sC"
+        case spending_salariesUsed = "sC"
+        case spending_salariesIdle = "sD"
         case spending_wages = "sW"
 
         case budget_liquidation = "bL"
@@ -121,7 +127,8 @@ extension Factory: JavaScriptEncodable {
 
         js[.spending_buybacks] = self.spending.buybacks
         js[.spending_dividend] = self.spending.dividend
-        js[.spending_salaries] = self.spending.salaries
+        js[.spending_salariesUsed] = self.spending.salariesUsed
+        js[.spending_salariesIdle] = self.spending.salariesIdle
         js[.spending_wages] = self.spending.wages
 
         switch self.budget {
@@ -171,7 +178,8 @@ extension Factory: JavaScriptDecodable {
             spending: .init(
                 buybacks: try js[.spending_buybacks]?.decode() ?? 0,
                 dividend: try js[.spending_dividend]?.decode() ?? 0,
-                salaries: try js[.spending_salaries]?.decode() ?? 0,
+                salariesUsed: try js[.spending_salariesUsed]?.decode() ?? 0,
+                salariesIdle: try js[.spending_salariesIdle]?.decode() ?? 0,
                 wages: try js[.spending_wages]?.decode() ?? 0
             ),
             budget: budget,

@@ -15,7 +15,7 @@ extension CashAllocationStatement.Names {
     }
     var e: String {
         switch self {
-        case .building: "Maintenance expenses"
+        case .building: "Maintenance"
         case .factory: "Corporate expenses"
         case .pop: "Everyday needs"
         }
