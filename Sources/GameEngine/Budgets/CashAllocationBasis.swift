@@ -10,6 +10,9 @@ struct CashAllocationBasis {
     }
 }
 extension CashAllocationBasis {
+    /// new businesses have no other expenses, so they should invest more in construction
+    static var businessNew: Self { .init(l: 7, e: 30, x: 45) }
+    /// currently the same as consumer basis
     static var business: Self { .init(l: 7, e: 30, x: 365) }
     static var consumer: Self { .init(l: 7, e: 30, x: 365) }
 

@@ -21,7 +21,6 @@ extension Pop.Budget {
         ),
         state: Pop.Dimensions,
         stockpileMaxDays: Int64,
-        d: Int64,
     ) -> Self {
         let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.total
         let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.total

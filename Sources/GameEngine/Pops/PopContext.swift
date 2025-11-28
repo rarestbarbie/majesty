@@ -199,7 +199,6 @@ extension PopContext: AllocatingContext {
                 weights: weights,
                 state: self.state.z,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
-                d: 7
             )
 
             // Align share price

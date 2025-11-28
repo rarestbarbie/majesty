@@ -5,34 +5,35 @@ import JavaScriptInterop
 import JavaScriptKit
 
 struct OperatingBudget {
-    var l: ResourceBudgetTier
-    var e: ResourceBudgetTier
-    var x: ResourceBudgetTier
+    let l: ResourceBudgetTier
+    let e: ResourceBudgetTier
+    let x: ResourceBudgetTier
     /// Target fulfillment for Corporate Tier, which may be less than 100 percent due to
     /// diminishing returns and high cost of Corporate inputs relative to Materials.
     let corporate: Double
 
-    var buybacks: Int64
-    var dividend: Int64
-    var workers: Int64
-    var clerks: Int64
+    let buybacks: Int64
+    let dividend: Int64
+    let workers: Int64
+    let clerks: Int64
 }
 extension OperatingBudget {
-    init(
+    static func factory(
         account: Bank.Account,
-        weights: __shared (
+        weights: (
             segmented: SegmentedWeights<InelasticDemand>,
             tradeable: AggregateWeights
         ),
         state: Factory.Dimensions,
+        stockpileMaxDays: Int64,
         workers: Workforce?,
         clerks: (Workforce, FactoryMetadata.ClerkBonus)?,
-        stockpileMaxDays: Int64,
-        invest: Double
-    ) {
-        self.l = .init()
-        self.e = .init()
-        self.x = .init()
+        invest: Double,
+        d: CashAllocationBasis,
+    ) -> Self {
+        var l: ResourceBudgetTier = .init()
+        var e: ResourceBudgetTier = .init()
+        var x: ResourceBudgetTier = .init()
 
         let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.total
         let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.total
@@ -45,15 +46,16 @@ extension OperatingBudget {
         // optimal fulfillment (fe) based on concave utility
         // Marginal Benefit = Total_Costs * 0.5 * MAX_EFFICIENCY_BONUS / sqrt(fe)
         // Equilibrium at fe = (0.5 * MAX_EFFICIENCY_BONUS * Total / Cost_E)^2
+        let corporate: Double
         if  totalCostPerDay.e > 0 {
             let halfBonus: Double = 0.5 * FactoryContext.efficiencyBonusFromCorporate
             /// does not include expansion costs! those are constant, and don’t scale nicely
             /// with factory utilization
             let total: Double = .init(totalCostPerDay.l + totalCostPerDay.e)
             let ratio: Double = (halfBonus * total) / Double.init(totalCostPerDay.e)
-            self.corporate = min(1.0, ratio * ratio)
+            corporate = min(1.0, ratio * ratio)
         } else {
-            self.corporate = 1.0
+            corporate = 1.0
         }
 
         let workersTarget: Int64 = workers.map { Swift.min($0.limit, $0.count + 1) } ?? 0
@@ -66,7 +68,6 @@ extension OperatingBudget {
             c: state.cn * clerksTarget,
         )
 
-        let d: CashAllocationBasis = .business
         let v: Int64 = state.vl + state.ve
         let basis: Int64 = CashAllocationBasis.adjust(liquidity: account.settled, assets: v)
 
@@ -74,13 +75,13 @@ extension OperatingBudget {
         /// of its needs in that tier on any particular day.
         let bl: Int64 = (totalCostPerDay.l + laborCostPerDay.w + laborCostPerDay.c) * d.l
         let be: Int64 = .init(
-            (Double.init(totalCostPerDay.e * d.e) * self.corporate).rounded(.up)
+            (Double.init(totalCostPerDay.e * d.e) * corporate).rounded(.up)
         )
 
-        self.dividend = max(0, (basis - bl - be) / (10 * d.y))
-        self.buybacks = max(0, (basis - bl - be - self.dividend) / d.y)
+        let dividend: Int64 = max(0, (basis - bl - be) / (10 * d.y))
+        let buybacks: Int64 = max(0, (basis - bl - be - dividend) / d.y)
 
-        (w: self.workers, c: self.clerks) = self.l.distributeAsBusiness(
+        let (workers, clerks): (w: Int64, c: Int64) = l.distributeAsBusiness(
             funds: basis / d.l,
             segmented: segmentedCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
@@ -88,10 +89,10 @@ extension OperatingBudget {
             c: laborCostPerDay.c * stockpileMaxDays,
         ) ?? (0, 0)
 
-        self.e.distributeAsBusiness(
+        e.distributeAsBusiness(
             funds: (basis - bl) / d.e,
-            segmented: Double.init(segmentedCostPerDay.e * stockpileMaxDays) * self.corporate,
-            tradeable: Double.init(tradeableCostPerDay.e * stockpileMaxDays) * self.corporate,
+            segmented: Double.init(segmentedCostPerDay.e * stockpileMaxDays) * corporate,
+            tradeable: Double.init(tradeableCostPerDay.e * stockpileMaxDays) * corporate,
         )
 
         let investmentBase: Int64 = (basis - bl - be) / d.x
@@ -104,10 +105,21 @@ extension OperatingBudget {
         }
 
         // construction costs are inelastic
-        self.x.distributeAsBusiness(
+        x.distributeAsBusiness(
             funds: investment,
             segmented: segmentedCostPerDay.x * stockpileMaxDays,
             tradeable: tradeableCostPerDay.x * stockpileMaxDays,
+        )
+
+        return .init(
+            l: l,
+            e: e,
+            x: x,
+            corporate: corporate,
+            buybacks: buybacks,
+            dividend: dividend,
+            workers: workers,
+            clerks: clerks
         )
     }
 }

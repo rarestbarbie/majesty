@@ -37,10 +37,6 @@ extension Building.Budget {
             x: tradeableCostPerDay.x + segmentedCostPerDay.x,
         )
 
-        /// if the stockpile is expanded sharply, that makes the next day’s balance look
-        /// artificially low, so we need to account for that when calculating budgets
-        /// as long as the `d` vector is reasonably sized (less than 75 percent of funds),
-        /// this will not cause overspending
         let d: CashAllocationBasis = .business
         let v: Int64 = state.vl + state.ve
         let basis: Int64 = CashAllocationBasis.adjust(liquidity: account.settled, assets: v)
@@ -48,8 +44,8 @@ extension Building.Budget {
         let bl: Int64 = totalCostPerDay.l * d.l
         let be: Int64 = totalCostPerDay.e * d.e
 
-        self.dividend = max(0, (basis - bl - be) / 3650)
-        self.buybacks = max(0, (basis - bl - be - self.dividend) / 365)
+        self.dividend = max(0, (basis - bl - be) / (10 * d.y))
+        self.buybacks = max(0, (basis - bl - be - self.dividend) / d.y)
 
         self.l.distributeAsBusiness(
             funds: basis / d.l,

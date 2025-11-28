@@ -9,6 +9,11 @@
         "nat": "Atlantean"
     },
     {
+        "type": "X",
+        "cash": 10000000,
+        "nat": "Atlantean"
+    },
+    {
         "type": "O",
         "cash": 90000000,
         "nat": "Jewish"

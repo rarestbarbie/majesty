@@ -20,12 +20,12 @@
             },
             {
                 "race": "Atlantean",
-                "type": "D",
+                "type": "X",
                 "size": 3500
             },
             {
                 "race": "Black American",
-                "type": "D",
+                "type": "X",
                 "size": 67
             }
         ]
@@ -37,7 +37,7 @@
         "pops": [
             {
                 "race": "Alaskan",
-                "type": "D",
+                "type": "X",
                 "size": 1100000
             },
             {
@@ -52,12 +52,12 @@
             },
             {
                 "race": "Atlantean",
-                "type": "D",
+                "type": "X",
                 "size": 650000
             },
             {
                 "race": "Black American",
-                "type": "D",
+                "type": "X",
                 "size": 1500
             }
         ]
@@ -74,7 +74,7 @@
             },
             {
                 "race": "Atlantean",
-                "type": "D",
+                "type": "X",
                 "size": 14000000
             },
             {
@@ -102,17 +102,12 @@
             {
                 "race": "Atlantean",
                 "type": "X",
-                "size": 16000
+                "size": 21016000
             },
             {
                 "race": "West Indian",
                 "type": "D",
                 "size": 260000
-            },
-            {
-                "race": "Atlantean",
-                "type": "D",
-                "size": 21000000
             },
             {
                 "race": "Mexican",
@@ -144,12 +139,7 @@
             {
                 "race": "Atlantean",
                 "type": "X",
-                "size": 19000
-            },
-            {
-                "race": "Atlantean",
-                "type": "D",
-                "size": 12000000
+                "size": 12019000
             },
             {
                 "race": "Mexican",
@@ -186,17 +176,12 @@
             {
                 "race": "Atlantean",
                 "type": "X",
-                "size": 18000
+                "size": 16600000
             },
             {
                 "race": "Black American",
                 "type": "O",
                 "size": 24
-            },
-            {
-                "race": "Atlantean",
-                "type": "D",
-                "size": 16100000
             },
             {
                 "race": "Mexican",
@@ -216,12 +201,17 @@
             {
                 "race": "Jewish",
                 "type": "X",
-                "size": 12000
+                "size": 215000
             },
             {
-                "race": "Jewish",
-                "type": "D",
-                "size": 205000
+                "race": "Chicken",
+                "type": "A",
+                "size": 36000
+            },
+            {
+                "race": "Cow",
+                "type": "A",
+                "size": 36000
             }
         ]
     },
@@ -237,7 +227,7 @@
             },
             {
                 "race": "Atlantean",
-                "type": "D",
+                "type": "X",
                 "size": 4300000
             },
             {
