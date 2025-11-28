@@ -17,13 +17,13 @@ extension Building {
 extension Building.Budget {
     init(
         account: Bank.Account,
-        state: Building.Dimensions,
         weights: __shared (
             segmented: SegmentedWeights<InelasticDemand>,
             tradeable: AggregateWeights
         ),
+        state: Building.Dimensions,
         stockpileMaxDays: Int64,
-        d: (l: Int64, e: Int64, x: Int64, v: Double?)
+        invest: Double
     ) {
         self.l = .init()
         self.e = .init()
@@ -37,30 +37,32 @@ extension Building.Budget {
             x: tradeableCostPerDay.x + segmentedCostPerDay.x,
         )
 
-        let balance: Int64 = account.settled
+        let d: CashAllocationBasis = .business
+        let v: Int64 = state.vl + state.ve
+        let basis: Int64 = CashAllocationBasis.adjust(liquidity: account.settled, assets: v)
 
         let bl: Int64 = totalCostPerDay.l * d.l
         let be: Int64 = totalCostPerDay.e * d.e
 
-        self.dividend = max(0, (balance - bl - be) / 3650)
-        self.buybacks = max(0, (balance - bl - be - self.dividend) / 365)
+        self.dividend = max(0, (basis - bl - be) / (10 * d.y))
+        self.buybacks = max(0, (basis - bl - be - self.dividend) / d.y)
 
         self.l.distributeAsBusiness(
-            funds: balance / d.l,
+            funds: basis / d.l,
             segmented: segmentedCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
         )
         self.e.distributeAsBusiness(
-            funds: (balance - bl) / d.e,
+            funds: (basis - bl) / d.e,
             segmented: segmentedCostPerDay.e * stockpileMaxDays,
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
         )
 
-        let investmentBase: Int64 = (balance - bl - be) / d.x
+        let investmentBase: Int64 = (basis - bl - be) / d.x
         let investment: Int64
 
-        if  let v: Double = d.v, v < 1 {
-            investment = Int64.init(Double.init(investmentBase) * v)
+        if  invest < 1 {
+            investment = Int64.init(Double.init(investmentBase) * invest)
         } else {
             investment = investmentBase
         }

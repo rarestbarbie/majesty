@@ -81,7 +81,7 @@ extension BuildingContext: TransactingContext {
         if  let mothball: Int64 = self.state.z.mothball(
                 active: self.state.z.active,
                 utilization: self.stats.utilization,
-                utilizationThreshold: 1,
+                utilizationThreshold: 0.99,
                 rate: Self.mothballing,
                 random: &turn.random
             ) {
@@ -138,15 +138,10 @@ extension BuildingContext: TransactingContext {
 
         let budget: Building.Budget = .init(
             account: turn.bank[account: self.lei],
-            state: self.state.z,
             weights: weights,
+            state: self.state.z,
             stockpileMaxDays: Self.stockpileDays.upperBound,
-            d: (
-                l: 30,
-                e: 90,
-                x: 365,
-                v: self.stats.utilization * max(0, self.state.z.profitability)
-            )
+            invest: self.stats.utilization * max(0, self.state.z.profitability)
         )
 
         let sharesTarget: Int64 = self.state.z.total * self.type.sharesPerLevel + self.type.sharesInitial

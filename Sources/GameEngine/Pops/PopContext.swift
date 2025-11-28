@@ -143,7 +143,6 @@ extension PopContext: AllocatingContext {
         }
 
         let currency: CurrencyID = authority.currency.id
-        let balance: Int64 = turn.bank[account: self.lei].settled
 
         self.state.inventory.out.sync(with: self.output, releasing: 1)
         for j: Int in self.state.mines.values.indices {
@@ -196,10 +195,10 @@ extension PopContext: AllocatingContext {
             )
 
             budget = .slave(
+                account: turn.bank[account: self.lei],
                 weights: weights,
-                balance: balance,
+                state: self.state.z,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
-                d: 7
             )
 
             // Align share price
@@ -222,7 +221,6 @@ extension PopContext: AllocatingContext {
                 in: self.state.tile,
             )
         } else {
-            let d: (l: Int64, e: Int64, x: Int64) = (7, 30, 365)
             let weights: (
                 segmented: SegmentedWeights<ElasticDemand>,
                 tradeable: AggregateWeights
@@ -244,10 +242,10 @@ extension PopContext: AllocatingContext {
             )
 
             budget = .free(
+                account: turn.bank[account: self.lei],
                 weights: weights,
-                balance: balance,
+                state: self.state.z,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
-                d: d,
                 investor: self.state.type.stratum == .Owner
             )
 

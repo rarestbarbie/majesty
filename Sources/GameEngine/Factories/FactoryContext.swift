@@ -178,38 +178,9 @@ extension FactoryContext: TransactingContext {
         let budget: OperatingBudget
         let sharesToIssue: Int64
 
-        if  self.state.size.level == 0 {
-            weights.segmented = .businessNew(
-                x: self.state.inventory.x,
-                markets: turn.localMarkets,
-                address: self.state.tile,
-            )
-            weights.tradeable = .businessNew(
-                x: self.state.inventory.x,
-                markets: turn.worldMarkets,
-                currency: country.currency.id,
-            )
-
-            budget = .init(
-                account: turn.bank[account: self.lei],
-                workers: nil,
-                clerks: nil,
-                state: self.state.z,
-                weights: weights,
-                stockpileMaxDays: Self.stockpileDays.upperBound,
-                d: (7, 30, 90, nil),
-            )
-            sharesToIssue = max(0, self.type.sharesInitial - self.equity.shareCount)
-
-            self.state.budget = .constructing(budget)
-        } else {
-            let utilization: Double
-            if  let workers: Workforce = self.workers,
-                    workers.limit > 0 {
-                utilization = min(1, Double.init(workers.count) / Double.init(workers.limit))
-            } else {
-                utilization = 0.5
-            }
+        if  let workers: Workforce = self.workers {
+            #assert(workers.limit > 0, "active factory has zero worker limit?!?!")
+            let utilization: Double = min(1, Double.init(workers.count %/ workers.limit))
 
             weights.segmented = .business(
                 l: self.state.inventory.l,
@@ -226,14 +197,15 @@ extension FactoryContext: TransactingContext {
                 currency: country.currency.id,
             )
 
-            budget = .init(
+            budget = .factory(
                 account: turn.bank[account: self.lei],
-                workers: self.workers,
-                clerks: self.clerks.map { ($0, self.type.clerkBonus!) },
-                state: self.state.z,
                 weights: weights,
+                state: self.state.z,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
-                d: (30, 60, 365, utilization * max(0, self.state.z.profitability))
+                workers: workers,
+                clerks: self.clerks.map { ($0, self.type.clerkBonus!) },
+                invest: utilization * max(0, self.state.z.profitability),
+                d: .business,
             )
 
             let sharesTarget: Int64 = self.state.size.level * self.type.sharesPerLevel
@@ -243,6 +215,33 @@ extension FactoryContext: TransactingContext {
             sharesToIssue = budget.buybacks == 0 ? sharesIssued : 0
 
             self.state.budget = .active(budget)
+        } else {
+            #assert(self.state.size.level == 0, "factory with no workers has `level > 0`?!")
+
+            weights.segmented = .businessNew(
+                x: self.state.inventory.x,
+                markets: turn.localMarkets,
+                address: self.state.tile,
+            )
+            weights.tradeable = .businessNew(
+                x: self.state.inventory.x,
+                markets: turn.worldMarkets,
+                currency: country.currency.id,
+            )
+
+            budget = .factory(
+                account: turn.bank[account: self.lei],
+                weights: weights,
+                state: self.state.z,
+                stockpileMaxDays: Self.stockpileDays.upperBound,
+                workers: nil,
+                clerks: nil,
+                invest: 1,
+                d: .businessNew,
+            )
+            sharesToIssue = max(0, self.type.sharesInitial - self.equity.shareCount)
+
+            self.state.budget = .constructing(budget)
         }
 
         // only issue shares if the factory is not performing buybacks
