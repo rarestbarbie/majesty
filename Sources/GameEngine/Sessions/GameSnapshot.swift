@@ -158,7 +158,7 @@ extension GameSnapshot {
         _ id: BuildingID,
         _ item: CashFlowItem,
     ) -> Tooltip? {
-        self.context.buildings[id]?.cashFlow.tooltip(rules: self.context.rules, item: item)
+        self.context.buildings[id]?.stats.cashFlow.tooltip(rules: self.context.rules, item: item)
     }
     func tooltipBuildingBudgetItem(
         _ id: BuildingID,

@@ -195,10 +195,10 @@ extension InventoryBreakdown {
 
         self.terms = Term.list {
             $0[.buildingsActive, +, tooltip: .BuildingActive] = building.state.Δ.active[/3]
-            $0[.buildingsVacant, +, tooltip: .BuildingVacant] = building.state.Δ.vacant[/3]
+            $0[.buildingsVacant, -, tooltip: .BuildingVacant] = building.state.Δ.vacant[/3]
         }
 
-        self.costs = building.cashFlow.chart(rules: snapshot.rules)
+        self.costs = building.stats.cashFlow.chart(rules: snapshot.rules)
         self.budget = building.state.budget.map {
             let statement: CashAllocationStatement = .init(from: $0)
             return statement.chart()

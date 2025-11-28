@@ -151,7 +151,13 @@ extension Pop {
     }
 
     var profit: ProfitMargins {
-        self.inventory.profit(variableCosts: 0, fixedCosts: 0)
+        // TODO: this probably needs to be revisited, Slaves should behave like Buildings
+        .init(
+            materialsCosts: self.inventory.l.valueConsumed,
+            operatingCosts: self.inventory.e.valueConsumed,
+            carryingCosts: 0,
+            revenue: self.inventory.out.valueSold
+        )
     }
 
     var decadence: Double {

@@ -13,6 +13,9 @@ struct Building: LegalEntityState, Identifiable {
     let tile: Address
     var type: BuildingType
     var mothballed: Int64
+    var destroyed: Int64
+    var restored: Int64
+    var created: Int64
     var inventory: Inventory
     var spending: Spending
     var budget: Budget?
@@ -28,6 +31,9 @@ extension Building: Sectionable {
             tile: section.tile,
             type: section.type,
             mothballed: 0,
+            destroyed: 0,
+            restored: 0,
+            created: 0,
             inventory: .init(),
             spending: .zero,
             budget: nil,
@@ -61,7 +67,21 @@ extension Building: Turnable {
 }
 extension Building {
     var profit: ProfitMargins {
-        self.inventory.profit(variableCosts: 0, fixedCosts: 0)
+        /// this is the minimum fraction of `fe` we would require if we only paid maintenance
+        /// for active facilities
+        let expected: Double = Double.init(self.z.active) / Double.init(self.z.total)
+        let prorate: Double = max(0, self.z.fe - expected)
+
+        let fixedCosts: Int64 = self.inventory.e.valueConsumed
+        /// this is a reasonable underestimate of the amount of maintenance costs that went
+        /// towards maintaining vacant facilities
+        let carryingCosts: Int64 = Int64.init(Double.init(fixedCosts) * prorate)
+        return .init(
+            materialsCosts: self.inventory.l.valueConsumed,
+            operatingCosts: fixedCosts - carryingCosts,
+            carryingCosts: carryingCosts,
+            revenue: self.inventory.out.valueSold
+        )
     }
 }
 extension Building {
@@ -70,6 +90,9 @@ extension Building {
         case tile = "on"
         case type
         case mothballed
+        case destroyed
+        case restored
+        case created
 
         case inventory_out = "out"
         case inventory_l = "nl"
@@ -93,6 +116,9 @@ extension Building: JavaScriptEncodable {
         js[.tile] = self.tile
         js[.type] = self.type
         js[.mothballed] = self.mothballed
+        js[.destroyed] = self.destroyed
+        js[.restored] = self.restored
+        js[.created] = self.created
 
         js[.inventory_out] = self.inventory.out
         js[.inventory_l] = self.inventory.l
@@ -118,6 +144,9 @@ extension Building: JavaScriptDecodable {
             tile: try js[.tile].decode(),
             type: try js[.type].decode(),
             mothballed: try js[.mothballed]?.decode() ?? 0,
+            destroyed: try js[.destroyed]?.decode() ?? 0,
+            restored: try js[.restored]?.decode() ?? 0,
+            created: try js[.created]?.decode() ?? 0,
             inventory: .init(
                 out: try js[.inventory_out]?.decode() ?? .empty,
                 l: try js[.inventory_l]?.decode() ?? .empty,

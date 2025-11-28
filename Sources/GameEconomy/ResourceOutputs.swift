@@ -19,6 +19,23 @@ import OrderedCollections
 }
 extension ResourceOutputs {
     @inlinable public var count: Int { self.segmented.count + self.tradeable.count }
+    /// Returns the utilization of the most utilized **segmented** resource output, or `nil` if
+    /// there are no segmented outputs.
+    ///
+    /// Utilization for tradeable outputs is not meaningful, because it is almost always
+    /// possible to dump excess tradeable goods onto the market.
+    @inlinable public var utilization: Double? {
+        self.segmented.isEmpty ? nil : self.segmented.values.reduce(0) {
+            let sold: Double
+            if  $1.unitsSold < $1.units.removed {
+                // implies `units.removed > 0`
+                sold = Double.init($1.unitsSold) / Double.init($1.units.removed)
+            } else {
+                sold = 1
+            }
+            return max($0, sold)
+        }
+    }
 }
 extension ResourceOutputs {
     public mutating func sync(

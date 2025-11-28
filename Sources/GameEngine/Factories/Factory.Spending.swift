@@ -2,7 +2,9 @@ extension Factory {
     struct Spending {
         var buybacks: Int64
         var dividend: Int64
-        var salaries: Int64
+        var salariesUsed: Int64
+        /// used for profit calculation only
+        var salariesIdle: Int64
         var wages: Int64
     }
 }
@@ -11,10 +13,13 @@ extension Factory.Spending {
         .init(
             buybacks: 0,
             dividend: 0,
-            salaries: 0,
+            salariesUsed: 0,
+            salariesIdle: 0,
             wages: 0,
         )
     }
+
+    var salaries: Int64 { self.salariesUsed + self.salariesIdle }
 
     var totalExcludingEquityPurchases: Int64 {
         self.dividend + self.salaries + self.wages
