@@ -81,7 +81,7 @@ extension BuildingContext: TransactingContext {
         if  let mothball: Int64 = self.state.z.mothball(
                 active: self.state.z.active,
                 utilization: self.stats.utilization,
-                utilizationThreshold: 1,
+                utilizationThreshold: 0.99,
                 rate: Self.mothballing,
                 random: &turn.random
             ) {
