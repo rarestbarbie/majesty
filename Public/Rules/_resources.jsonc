@@ -16,7 +16,8 @@
     "Housing": {
         "emoji": "🏠",
         "color": "#575a7e",
-        "local": true
+        "local": true,
+        "storable": true
     },
     "Construction": {
         "emoji": "🦺",
