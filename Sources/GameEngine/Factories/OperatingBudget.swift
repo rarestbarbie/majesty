@@ -48,11 +48,11 @@ extension OperatingBudget {
         // Equilibrium at fe = (0.5 * MAX_EFFICIENCY_BONUS * Total / Cost_E)^2
         let corporate: Double
         if  totalCostPerDay.e > 0 {
+            /// do not include expansion costs (those are constant, and don’t scale nicely
+            /// with factory utilization), or corporate costs themselves
             let halfBonus: Double = 0.5 * FactoryContext.efficiencyBonusFromCorporate
-            /// does not include expansion costs! those are constant, and don’t scale nicely
-            /// with factory utilization
-            let total: Double = .init(totalCostPerDay.l + totalCostPerDay.e)
-            let ratio: Double = (halfBonus * total) / Double.init(totalCostPerDay.e)
+            let materials: Double = .init(totalCostPerDay.l)
+            let ratio: Double = (halfBonus * materials) / Double.init(totalCostPerDay.e)
             corporate = min(1.0, ratio * ratio)
         } else {
             corporate = 1.0
