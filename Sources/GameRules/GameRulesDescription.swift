@@ -13,7 +13,7 @@ public struct GameRulesDescription {
     let biology: SymbolTable<CultureDescription>
     let geology: SymbolTable<GeologicalDescription>
     let terrains: SymbolTable<TerrainDescription>
-    let exchange: BlocMarkets.Settings
+    let exchange: WorldMarkets.Settings
 }
 extension GameRulesDescription: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<GameRules.Namespace>) throws {

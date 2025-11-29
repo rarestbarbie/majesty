@@ -12,7 +12,7 @@ extension AggregateWeights.Tier {
     static var empty: Self { .init(total: 0) }
     static func compute(
         demands: OrderedDictionary<Resource, ResourceInput>,
-        markets: borrowing BlocMarkets,
+        markets: borrowing WorldMarkets,
         currency: CurrencyID
     ) -> Self {
         .init(

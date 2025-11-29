@@ -23,7 +23,7 @@ import OrderedCollections
 /// ```swift
 /// $0[resource / currency].swap(&resourceAmount, limit: currencyAmount)
 /// ```
-@frozen public struct BlocMarkets: ~Copyable {
+@frozen public struct WorldMarkets: ~Copyable {
     @usableFromInline let settings: Settings
     @usableFromInline var table: OrderedDictionary<WorldMarket.ID, WorldMarket>
 
@@ -35,7 +35,7 @@ import OrderedCollections
         self.table = table
     }
 }
-extension BlocMarkets {
+extension WorldMarkets {
     public subscript(_ pair: WorldMarket.ID) -> LiquidityPool {
         get {
             self.table[pair]?.canonical ??
@@ -67,12 +67,12 @@ extension BlocMarkets {
         }
     }
 }
-extension BlocMarkets {
+extension WorldMarkets {
     @inlinable public var markets: OrderedDictionary<WorldMarket.ID, WorldMarket> {
         self.table
     }
 }
-extension BlocMarkets {
+extension WorldMarkets {
     /// This has O(n²) complexity, where n is the number of trading partners.
     public mutating func arbitrate(
         currency: CurrencyID,

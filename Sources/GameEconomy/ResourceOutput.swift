@@ -57,7 +57,7 @@ extension ResourceOutput {
 extension ResourceOutput {
     public mutating func sell(
         in currency: CurrencyID,
-        on exchange: inout BlocMarkets
+        on exchange: inout WorldMarkets
     ) -> Int64 {
         {
             let units: Int64 = self.units.removed - self.unitsSold

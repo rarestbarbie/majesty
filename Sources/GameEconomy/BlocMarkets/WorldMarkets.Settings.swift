@@ -1,7 +1,7 @@
 import Fraction
 import LiquidityPool
 
-extension BlocMarkets {
+extension WorldMarkets {
     @frozen public struct Settings {
         /// The fraction of the pool’s liquidity that will be drained each day. It is
         /// recommended to set this to no more than 0.5% of the transaction ``fee``.
@@ -26,7 +26,7 @@ extension BlocMarkets {
         }
     }
 }
-extension BlocMarkets.Settings {
+extension WorldMarkets.Settings {
     @inlinable public static var `default`: Self {
         .init(
             dividend: 0 %/ 1,
@@ -36,7 +36,7 @@ extension BlocMarkets.Settings {
         )
     }
 }
-extension BlocMarkets.Settings {
+extension WorldMarkets.Settings {
     func new(_ pair: WorldMarket.ID) -> WorldMarket {
         .init(
             state: .init(

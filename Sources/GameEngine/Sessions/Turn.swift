@@ -6,7 +6,7 @@ struct Turn: ~Copyable {
     var random: PseudoRandom
     var notifications: Notifications
     var bank: Bank
-    var worldMarkets: BlocMarkets
+    var worldMarkets: WorldMarkets
     var localMarkets: LocalMarkets
     var stockMarkets: StockMarkets
 
@@ -24,7 +24,7 @@ extension Turn {
         random: PseudoRandom,
         notifications: Notifications,
         bank: consuming Bank,
-        worldMarkets: consuming BlocMarkets,
+        worldMarkets: consuming WorldMarkets,
         localMarkets: consuming LocalMarkets,
     ) {
         self.random = random

@@ -4,7 +4,7 @@ import Testing
 
 @Suite struct ArbitrageTests {
     @Test static func trade() throws {
-        var exchange: BlocMarkets = .init()
+        var exchange: WorldMarkets = .init()
 
         let XAU: Resource = .init(rawValue: 1)
         /// United Nations Bancor
@@ -96,7 +96,7 @@ import Testing
     }
 
     @Test static func forex() throws {
-        var exchange: BlocMarkets = .init()
+        var exchange: WorldMarkets = .init()
 
         /// United Nations Bancor
         let UNB: CurrencyID = 0
