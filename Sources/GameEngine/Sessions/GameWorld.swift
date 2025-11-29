@@ -10,14 +10,14 @@ struct GameWorld: ~Copyable {
     var notifications: Notifications
     var bank: Bank
     var segmentedMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
-    var tradeableMarkets: OrderedDictionary<BlocMarket.ID, BlocMarket>
+    var tradeableMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>
 }
 extension GameWorld {
     init(
         notifications: Notifications,
         bank: Bank,
         segmentedMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>,
-        tradeableMarkets: OrderedDictionary<BlocMarket.ID, BlocMarket>,
+        tradeableMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>,
         random: PseudoRandom,
     ) {
         self.random = random

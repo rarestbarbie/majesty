@@ -3,7 +3,7 @@ import Fraction
 import LiquidityPool
 import RealModule
 
-extension BlocMarket {
+extension WorldMarket {
     @frozen public struct State {
         public let id: ID
         public let dividend: Fraction

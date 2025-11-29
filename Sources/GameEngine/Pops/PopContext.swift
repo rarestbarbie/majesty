@@ -741,7 +741,7 @@ extension PopContext {
 extension PopContext: LegalEntityTooltipBearing {
     func tooltipExplainPrice(
         _ line: InventoryLine,
-        market: (segmented: LocalMarketSnapshot?, tradeable: BlocMarket.State?)
+        market: (segmented: LocalMarketSnapshot?, tradeable: WorldMarket.State?)
     ) -> Tooltip? {
         switch line {
         case .l(let id):

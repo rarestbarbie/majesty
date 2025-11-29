@@ -37,7 +37,7 @@ extension BlocMarkets.Settings {
     }
 }
 extension BlocMarkets.Settings {
-    func new(_ pair: BlocMarket.ID) -> BlocMarket {
+    func new(_ pair: WorldMarket.ID) -> WorldMarket {
         .init(
             state: .init(
                 id: pair,

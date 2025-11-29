@@ -1,15 +1,15 @@
 import GameIDs
 
 extension CurrencyID {
-    @inlinable public static func / (a: Self, b: Self) -> BlocMarket.ID {
+    @inlinable public static func / (a: Self, b: Self) -> WorldMarket.ID {
         .init(.fiat(a), .fiat(b))
     }
 
-    @inlinable static func / (a: Self, b: BlocMarket.Asset) -> BlocMarket.ID {
+    @inlinable static func / (a: Self, b: WorldMarket.Asset) -> WorldMarket.ID {
         .init(.fiat(a), b)
     }
 
-    @inlinable static func / (a: BlocMarket.Asset, b: Self) -> BlocMarket.ID {
+    @inlinable static func / (a: WorldMarket.Asset, b: Self) -> WorldMarket.ID {
         .init(a, .fiat(b))
     }
 }

@@ -25,18 +25,18 @@ import OrderedCollections
 /// ```
 @frozen public struct BlocMarkets: ~Copyable {
     @usableFromInline let settings: Settings
-    @usableFromInline var table: OrderedDictionary<BlocMarket.ID, BlocMarket>
+    @usableFromInline var table: OrderedDictionary<WorldMarket.ID, WorldMarket>
 
     @inlinable public init(
         settings: Settings = .default,
-        table: OrderedDictionary<BlocMarket.ID, BlocMarket> = [:],
+        table: OrderedDictionary<WorldMarket.ID, WorldMarket> = [:],
     ) {
         self.settings = settings
         self.table = table
     }
 }
 extension BlocMarkets {
-    public subscript(_ pair: BlocMarket.ID) -> LiquidityPool {
+    public subscript(_ pair: WorldMarket.ID) -> LiquidityPool {
         get {
             self.table[pair]?.canonical ??
             self.table[pair.conjugated, default: self.settings.new(pair.conjugated)].conjugate
@@ -48,10 +48,10 @@ extension BlocMarkets {
                 let i: Int = self.table.index(forKey: pair.conjugated) {
                 yield &self.table.values[i].conjugate
             } else if pair.x < pair.y {
-                let new: BlocMarket = self.settings.new(pair)
+                let new: WorldMarket = self.settings.new(pair)
                 yield &self.table[pair, default: new].canonical
             } else {
-                let new: BlocMarket = self.settings.new(pair.conjugated)
+                let new: WorldMarket = self.settings.new(pair.conjugated)
                 yield &self.table[pair.conjugated, default: new].conjugate
             }
         }
@@ -68,7 +68,7 @@ extension BlocMarkets {
     }
 }
 extension BlocMarkets {
-    @inlinable public var markets: OrderedDictionary<BlocMarket.ID, BlocMarket> {
+    @inlinable public var markets: OrderedDictionary<WorldMarket.ID, WorldMarket> {
         self.table
     }
 }
@@ -117,7 +117,7 @@ extension BlocMarkets {
     }
 
     @_spi(testable) public mutating func arbitrate(
-        resource: BlocMarket.Asset,
+        resource: WorldMarket.Asset,
         currency: CurrencyID,
         partners: [CurrencyID],
         capital: inout Int64

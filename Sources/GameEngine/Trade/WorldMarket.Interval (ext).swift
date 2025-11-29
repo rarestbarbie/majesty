@@ -2,7 +2,7 @@ import GameEconomy
 import JavaScriptKit
 import JavaScriptInterop
 
-extension BlocMarket.Interval {
+extension WorldMarket.Interval {
     @frozen public enum ObjectKey: JSString, Sendable {
         case po
         case pl
@@ -18,7 +18,7 @@ extension BlocMarket.Interval {
         case l
     }
 }
-extension BlocMarket.Interval: JavaScriptEncodable {
+extension WorldMarket.Interval: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.po] = self.prices.o
         js[.pl] = self.prices.l
@@ -33,7 +33,7 @@ extension BlocMarket.Interval: JavaScriptEncodable {
         js[.l] = self.liquidity
     }
 }
-extension BlocMarket.Interval: JavaScriptDecodable {
+extension WorldMarket.Interval: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             prices: .init(
