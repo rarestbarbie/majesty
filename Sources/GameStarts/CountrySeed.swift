@@ -16,7 +16,7 @@ import JavaScriptKit
     public let researched: [Symbol]
     public let currency: CurrencyID
     public let suzerain: CountryID?
-    public let minwage: Int64
+    public let minwage: Int64?
     /// The tiles this country controls.
     public let tiles: [Address]
 }
@@ -42,7 +42,7 @@ extension CountrySeed: JavaScriptDecodable {
         self.researched = try js[.researched]?.decode() ?? []
         self.currency = try js[.currency].decode()
         self.suzerain = try js[.suzerain]?.decode()
-        self.minwage = try js[.minwage].decode()
+        self.minwage = try js[.minwage]?.decode()
         self.tiles = try js[.tiles]?.decode() ?? []
     }
 }

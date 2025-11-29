@@ -70,7 +70,7 @@ extension GameStart {
                 researched: researched.sorted(),
                 currency: seed.currency,
                 suzerain: seed.suzerain,
-                minwage: seed.minwage,
+                minwage: seed.minwage ?? 5,
                 tilesControlled: seed.tiles,
             )
             countries.append(country)

@@ -4,7 +4,7 @@
         "name": {
             "article": "The",
             "short": "America",
-            "long": "Republic of America",
+            "long": "Federal Republic of America",
             "color": "#272e97"
         },
         "culture_preferred": "Atlantean",
@@ -24,7 +24,7 @@
             // Midway
             "399N-4,1"
         ],
-        "minwage": 55,
+        "minwage": 260,
         "researched": [
         ]
     },
@@ -45,9 +45,7 @@
             // Hudson Bay
             "399N-1,1"
         ],
-        "minwage": 55,
-        "researched": [
-        ]
+        "minwage": 275
     },
 
     {
@@ -71,9 +69,7 @@
             // Caucasus
             "399N2,-2"
         ],
-        "minwage": 25,
-        "researched": [
-        ]
+        "minwage": 25
     },
     {
         "name": {
@@ -92,53 +88,174 @@
             // Alaska
             "399N-2,1"
         ],
-        "minwage": 25,
-        "researched": [
-        ]
+        "minwage": 30
     },
 
+    // all countries below set to US suzerain due to lack of foreign currency implementation
     {
         // TODO: should not spawn on starting map
         "name": {
             "article": "The",
-            "short": "United Nations",
-            "long": "United Nations",
-            "color": "#66a3ff"
+            "short": "Greenland",
+            "long": "Republic of Greenland",
+            "color": "#ff9f9f"
         },
-        "culture_preferred": "Atlantean",
-        "cultures_accepted": ["Italian", "Jewish"],
-        // placeholder suzerain/currency
+        "culture_preferred": "Inuit",
+        "cultures_accepted": [],
         "suzerain": 1,
         "currency": 1,
         "tiles": [
             // Greenland
-            "399N1,1",
+            "399N1,1"
+        ],
+        "minwage": 165
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Mexico",
+            "long": "Republic of Mexico",
+            "color": "#30633d"
+        },
+        "culture_preferred": "Mexican",
+        "cultures_accepted": ["West Indian"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Mexico
-            "399N-2,4",
+            "399N-2,4"
+        ],
+        "minwage": 35
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Central America",
+            "long": "Republic of Central America",
+            "color": "#9ad7ff"
+        },
+        "culture_preferred": "Hispanic",
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Central America
-            "399N-1,4",
+            "399N-1,4"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Caribbean Union",
+            "long": "Caribbean Union",
+            "color": "#ffde66"
+        },
+        "culture_preferred": "Black American",
+        "cultures_accepted": ["Hispanic", "Atlantean"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Caribbean Sea
-            "399N0,3",
+            "399N0,3"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Panama",
+            "long": "Republic of Panama",
+            "color": "#fa66ff"
+        },
+        "culture_preferred": "Hispanic",
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Panama
-            "399E5",
+            "399E5"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Colombia",
+            "long": "Republic of Colombia",
+            "color": "#ffe9a2"
+        },
+        "culture_preferred": "Hispanic",
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Colombia
-            "399N1,3",
+            "399N1,3"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Peru",
+            "long": "Republic of Peru",
+            "color": "#ff6666"
+        },
+        "culture_preferred": "Hispanic",
+        "cultures_accepted": ["Andean"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Peru
-            "399S0,3",
+            "399S0,3"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Brazil",
+            "long": "Federal Republic of Brazil",
+            "color": "#0c853e"
+        },
+        "culture_preferred": "Brazilian",
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Amazon
             "399S1,3",
             // Brazil
-            "399S2,2",
+            "399S2,2"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Argentina",
+            "long": "Republic of Argentina",
+            "color": "#74ddd8"
+        },
+        "culture_preferred": "South American",
+        "cultures_accepted": ["Hispanic"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Argentina
             "399S1,2",
             // Patagonia
             "399S0,2",
-            // West Antarctica
+             // West Antarctica
             "399S0,1",
             // East Antarctica
-            "399S1,0",
-            // Queen Maud Land
-            "399S1,-1",
+            "399S1,0"
+        ],
+        "minwage": 35
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "European Union",
+            "long": "European Union",
+            "color": "#3436ad"
+        },
+        "culture_preferred": "Atlantean",
+        "cultures_accepted": ["Jewish", "Italian", "Hispanic", "Hellenic", "West Slavic"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Northern Europe
             "399N2,0",
             // Southwestern Europe
@@ -148,34 +265,122 @@
             // Eastern Mediterranean
             "399N3,-2",
             // Eastern Europe
-            "399N2,-1",
+            "399N2,-1"
+        ],
+        "minwage": 250
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Joint Security Zone",
+            "long": "Joint Security Administration",
+            "color": "#214fe6"
+        },
+        "culture_preferred": "Jewish",
+        "cultures_accepted": ["Atlantean", "Hellenic"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Holy Land
-            "399N3,-3",
+            "399N3,-3"
+        ],
+        "minwage": 125
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Iran",
+            "long": "Duchy of Iran",
+            "color": "#71ffbd"
+        },
+        "culture_preferred": "Iranian",
+        "cultures_accepted": ["West Asian", "Caspian"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Persia
-            "399N2,-3",
+            "399N2,-3"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "China",
+            "long": "Popular Republic of China",
+            "color": "#cc2037"
+        },
+        "culture_preferred": "East Asian",
+        "cultures_accepted": ["Central Asian"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Southern China
             "399N0,-2",
             // Northern China
             "399N-1,-1",
+            // Taiwan
+            "399N-1,-2"
+        ],
+        "minwage": 95
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Australia",
+            "long": "Republic of Australia",
+            "color": "#0c159b"
+        },
+        "culture_preferred": "Atlantean",
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Western Australia
             "399S-1,-2",
             // Eastern Australia
             "399S-2,-1",
-            // New Zealand
-            "399S-2,0",
             // Antarctic Territories
             "399S-1,0",
             // New Territories
-            "399S0,-1",
-            // Japan
-            "399N-2,-1",
-            // Taiwan
-            "399N-1,-2"
+            "399S0,-1"
         ],
-        "minwage": 35,
-        "researched": [
-        ]
+        "minwage": 245
     },
+    {
+        "name": {
+            "article": "The",
+            "short": "New Zealand",
+            "long": "Republic of New Zealand",
+            "color": "#0f145e"
+        },
+        "culture_preferred": "Atlantean",
+        "cultures_accepted": ["Maori"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // New Zealand
+            "399S-2,0"
+        ],
+        "minwage": 255
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Japan",
+            "long": "Duchy of Japan",
+            "color": "#ffb3b3"
+        },
+        "culture_preferred": "Japanese",
+        "cultures_accepted": [],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Japan
+            "399N-2,-1"
+        ],
+        "minwage": 190
+    },
+
+    // countries without suzerain set
     {
         "name": {
             "article": "The",
@@ -192,9 +397,7 @@
             // Bay of Bengal
             "399S2,-4"
         ],
-        "minwage": 35,
-        "researched": [
-        ]
+        "minwage": 35
     },
     {
         "name": {
@@ -210,17 +413,7 @@
             // Thailand
             "399N0,-3"
         ],
-        "minwage": 35,
-        "researched": [
-            "Forced Insemination",
-            "Industrial Gas Chambers",
-            "Mechanized Production",
-            "Hydraulic Fracking",
-            "Deepwater Drilling",
-            "Bayer Process",
-            "Taconite Concentration",
-            "Direct Lithium Extraction"
-        ]
+        "minwage": 35
     },
     {
         "name": {
@@ -238,9 +431,7 @@
             // Congo
             "399S4,-2"
         ],
-        "minwage": 35,
-        "researched": [
-        ]
+        "minwage": 35
     },
     {
         "name": {
@@ -256,8 +447,6 @@
             // Ethiopia
             "399N4,-3"
         ],
-        "minwage": 35,
-        "researched": [
-        ]
+        "minwage": 35
     }
 ]
