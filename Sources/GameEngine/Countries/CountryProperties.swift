@@ -1,56 +1,33 @@
-import Fraction
 import GameEconomy
-import GameRules
 import GameIDs
+import GameRules
+import GameState
 
-final class CountryProperties {
-    var intrinsic: Country
-    private(set) var modifiers: CountryModifiers
-    private(set) var localMarkets: LocalMarketModifiers
-    private(set) var criticalResources: [Resource]
-
-    init(intrinsic state: Country) {
-        self.intrinsic = state
-        self.modifiers = .init()
-        self.localMarkets = .init()
-        self.criticalResources = []
-    }
-}
-extension CountryProperties: Identifiable {
-    var id: CountryID { self.intrinsic.id }
+struct CountryProperties {
+    let modifiers: CountryModifiers
+    let minwage: Int64
+    let currency: Currency
+    let culturePreferred: Culture
+    let culturesAccepted: [Culture]
+    let criticalResources: [Resource]
 }
 extension CountryProperties {
-    var currency: Currency { self.intrinsic.currency }
-    var minwage: Int64 { self.intrinsic.minwage }
-    var culturePreferred: String { self.intrinsic.culturePreferred }
-}
-extension CountryProperties {
-    func update(rules: GameRules) {
-        self.modifiers = .init()
-        self.modifiers.update(from: self.intrinsic.researched, rules: rules)
-        // right now this never changes, but it might in the future
-        self.criticalResources.removeAll(keepingCapacity: true)
-
-        for resource: ResourceMetadata in rules.resources.local {
-            let min: LocalPriceLevel?
-
-            if let hours: Int64 = resource.hours {
-                min = .init(
-                    price: LocalPrice.init(self.minwage %/ hours),
-                    label: .minimumWage
-                )
-            } else {
-                min = nil
-            }
-
-            self.localMarkets.templates[resource.id] = .init(
-                storage: resource.storable ? 16 : nil,
-                limit: (min: min, max: nil)
-            )
-
-            if  resource.critical {
-                self.criticalResources.append(resource.id)
-            }
+    static func compute(for country: Country, in context: GameContext) throws -> Self {
+        guard
+        let currency: Currency = context.currencies[country.currency] else {
+            fatalError("Country '\(country.name.long)' has no currency!!!")
         }
+        return .init(
+            modifiers: .compute(for: country, rules: context.rules),
+            minwage: country.minwage,
+            currency: currency,
+            culturePreferred: try context.cultures.state[country.culturePreferred].state,
+            culturesAccepted: try country.culturesAccepted.map {
+                try context.cultures.state[$0].state
+            },
+            criticalResources: context.rules.resources.local.compactMap {
+                $0.critical ? $0.id : nil
+            }
+        )
     }
 }

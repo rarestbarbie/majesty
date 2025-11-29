@@ -13,7 +13,7 @@ struct FactoryContext: LegalEntityContext, RuntimeContext {
     let type: FactoryMetadata
     var state: Factory
 
-    private(set) var region: RegionalProperties?
+    private(set) var region: RegionalAuthority?
 
     private(set) var productivity: Int64
 
@@ -90,16 +90,14 @@ extension FactoryContext {
             self.clerks?.limit = area * self.type.clerks.amount
         }
 
-        self.region = context.planets[self.state.tile]?.properties
+        self.region = context.planets[self.state.tile]?.authority
 
         guard
-        let occupiedBy: CountryProperties = self.region?.occupiedBy else {
+        let region: RegionalProperties = self.region?.properties else {
             return
         }
 
-        self.productivity = occupiedBy.modifiers.factoryProductivity[
-            self.state.type
-        ]?.value ?? 1
+        self.productivity = region.modifiers.factoryProductivity[self.state.type]?.value ?? 1
 
         self.cashFlow.reset()
         self.cashFlow.update(with: self.state.inventory.l)
@@ -111,13 +109,13 @@ extension FactoryContext {
 extension FactoryContext: TransactingContext {
     mutating func allocate(turn: inout Turn) {
         guard
-        let country: CountryProperties = self.region?.occupiedBy else {
+        let region: RegionalProperties = self.region?.properties else {
             return
         }
 
         // Align wages with the national minimum wage.
-        self.state.z.wn = max(self.state.z.wn, country.minwage)
-        self.state.z.cn = max(self.state.z.cn, country.minwage)
+        self.state.z.wn = max(self.state.z.wn, region.minwage)
+        self.state.z.cn = max(self.state.z.cn, region.minwage)
 
         #assert(
             0 ... 1 ~= self.state.y.fe,
@@ -192,7 +190,7 @@ extension FactoryContext: TransactingContext {
                 e: self.state.inventory.e,
                 x: self.state.inventory.x,
                 markets: turn.worldMarkets,
-                currency: country.currency.id,
+                currency: region.currency.id,
             )
 
             budget = .factory(
@@ -224,7 +222,7 @@ extension FactoryContext: TransactingContext {
             weights.tradeable = .businessNew(
                 x: self.state.inventory.x,
                 markets: turn.worldMarkets,
-                currency: country.currency.id,
+                currency: region.currency.id,
             )
 
             budget = .factory(
@@ -246,7 +244,7 @@ extension FactoryContext: TransactingContext {
         // but this needs to be called even if quantity is zero, or the security will not
         // be tradeable today
         turn.stockMarkets.issueShares(
-            currency: country.currency.id,
+            currency: region.currency.id,
             quantity: sharesToIssue,
             security: self.security,
         )
@@ -266,7 +264,7 @@ extension FactoryContext: TransactingContext {
 
     mutating func transact(turn: inout Turn) {
         guard
-        let country: CountryProperties = self.region?.occupiedBy,
+        let region: RegionalProperties = self.region?.properties,
         let budget: Factory.Budget = self.state.budget else {
             return
         }
@@ -280,14 +278,14 @@ extension FactoryContext: TransactingContext {
         case .constructing(let budget):
             self.state.z.profitability = 1
             self.construct(
-                policy: country,
+                region: region,
                 budget: budget.l,
                 stockpileTarget: stockpileTarget,
                 turn: &turn
             )
 
         case .liquidating(let budget):
-            self.liquidate(country: country, budget: budget, turn: &turn)
+            self.liquidate(region: region, budget: budget, turn: &turn)
 
             self.state.z.profitability = -1
             self.state.spending.buybacks += turn.bank.buyback(
@@ -341,7 +339,7 @@ extension FactoryContext: TransactingContext {
             if  let workers: Workforce = self.workers {
                 let update: FloorUpdate = self.operate(
                     workers: workers,
-                    country: country,
+                    region: region,
                     budget: budget,
                     stockpileTarget: stockpileTarget,
                     turn: &turn
@@ -456,7 +454,7 @@ extension FactoryContext: TransactingContext {
             }
 
             self.construct(
-                policy: country,
+                region: region,
                 budget: budget.x,
                 stockpileTarget: stockpileTarget,
                 turn: &turn
@@ -487,7 +485,7 @@ extension FactoryContext: TransactingContext {
         self.state.z.vx = self.state.inventory.x.valueAcquired
 
         guard case nil = self.state.liquidation,
-        let country: CountryProperties = self.region?.occupiedBy else {
+        let player: CountryID = self.region?.occupiedBy else {
             return
         }
 
@@ -500,14 +498,14 @@ extension FactoryContext: TransactingContext {
             self.state.equity.split(
                 price: self.state.z.px,
                 turn: &turn,
-                notifying: [country.id]
+                notifying: [player]
             )
         }
     }
 }
 extension FactoryContext {
     private mutating func construct(
-        policy: CountryProperties,
+        region: RegionalProperties,
         budget: ResourceBudgetTier,
         stockpileTarget: ResourceStockpileTarget,
         turn: inout Turn
@@ -517,7 +515,7 @@ extension FactoryContext {
                 $0 += self.state.inventory.x.tradeAsBusiness(
                     stockpileDays: stockpileTarget,
                     spendingLimit: budget.tradeable,
-                    in: policy.currency.id,
+                    in: region.currency.id,
                     on: &turn.worldMarkets,
                 )
             } (&turn.bank[account: self.lei])
@@ -536,7 +534,7 @@ extension FactoryContext {
     }
 
     private mutating func liquidate(
-        country: CountryProperties,
+        region: RegionalProperties,
         budget: LiquidationBudget,
         turn: inout Turn
     ) {
@@ -545,19 +543,19 @@ extension FactoryContext {
             let tl: TradeProceeds = self.state.inventory.l.tradeAsBusiness(
                 stockpileDays: stockpileNone,
                 spendingLimit: 0,
-                in: country.currency.id,
+                in: region.currency.id,
                 on: &turn.worldMarkets,
             )
             let te: TradeProceeds = self.state.inventory.e.tradeAsBusiness(
                 stockpileDays: stockpileNone,
                 spendingLimit: 0,
-                in: country.currency.id,
+                in: region.currency.id,
                 on: &turn.worldMarkets,
             )
             let tx: TradeProceeds = self.state.inventory.x.tradeAsBusiness(
                 stockpileDays: stockpileNone,
                 spendingLimit: 0,
-                in: country.currency.id,
+                in: region.currency.id,
                 on: &turn.worldMarkets,
             )
 
@@ -572,7 +570,7 @@ extension FactoryContext {
 
     private mutating func operate(
         workers: Workforce,
-        country: CountryProperties,
+        region: RegionalProperties,
         budget: OperatingBudget,
         stockpileTarget: ResourceStockpileTarget,
         turn: inout Turn
@@ -582,7 +580,7 @@ extension FactoryContext {
                 $0 += self.state.inventory.l.tradeAsBusiness(
                     stockpileDays: stockpileTarget,
                     spendingLimit: budget.l.tradeable,
-                    in: country.currency.id,
+                    in: region.currency.id,
                     on: &turn.worldMarkets,
                 )
             }
@@ -590,7 +588,7 @@ extension FactoryContext {
                 $0 += self.state.inventory.e.tradeAsBusiness(
                     stockpileDays: stockpileTarget,
                     spendingLimit: budget.e.tradeable,
-                    in: country.currency.id,
+                    in: region.currency.id,
                     on: &turn.worldMarkets,
                 )
             }
@@ -604,7 +602,7 @@ extension FactoryContext {
             )
 
             $0.r += self.state.inventory.out.sell(
-                in: country.currency.id,
+                in: region.currency.id,
                 on: &turn.worldMarkets
             )
         } (&turn.bank[account: self.lei])

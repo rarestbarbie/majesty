@@ -10,7 +10,7 @@ import Random
 extension PlanetGrid {
     struct Tile: Identifiable {
         let id: Address
-        var properties: RegionalProperties?
+        private(set) var authority: RegionalAuthority?
 
         var name: String?
         var terrain: TerrainMetadata
@@ -35,7 +35,7 @@ extension PlanetGrid {
             geology: GeologicalMetadata,
         ) {
             self.id = id
-            self.properties = nil
+            self.authority = nil
 
             self.name = name
             self.terrain = terrain
@@ -56,10 +56,10 @@ extension PlanetGrid {
     }
 }
 extension PlanetGrid.Tile {
-    var governedBy: CountryProperties? { self.properties?.governedBy }
-    var occupiedBy: CountryProperties? { self.properties?.occupiedBy }
+    var governedBy: CountryID? { self.authority?.governedBy }
+    var occupiedBy: CountryID? { self.authority?.occupiedBy }
 
-    var pops: PopulationStats { self.properties?.pops ?? .init() }
+    var pops: PopulationStats { self.authority?.pops ?? .init() }
 }
 extension PlanetGrid.Tile {
     mutating func copy(from source: Self) {
@@ -70,17 +70,22 @@ extension PlanetGrid.Tile {
 }
 extension PlanetGrid.Tile {
     mutating func update(
-        governedBy: CountryProperties,
-        occupiedBy: CountryProperties,
+        governedBy: CountryID,
+        occupiedBy: CountryID,
+        properties: CountryProperties,
     ) {
-        if  let properties: RegionalProperties = self.properties {
-            properties.governedBy = governedBy
-            properties.occupiedBy = occupiedBy
+        if  let authority: RegionalAuthority = self.authority {
+            authority.update(
+                governedBy: governedBy,
+                occupiedBy: occupiedBy,
+                country: properties
+            )
         } else {
-            self.properties = .init(
+            self.authority = .init(
                 id: self.id,
                 governedBy: governedBy,
-                occupiedBy: occupiedBy
+                occupiedBy: occupiedBy,
+                country: properties
             )
         }
     }
@@ -96,11 +101,11 @@ extension PlanetGrid.Tile {
         self.minesAlreadyPresent.removeAll(keepingCapacity: true)
         self.mines.removeAll(keepingCapacity: true)
 
-        self.properties?.startIndexCount()
+        self.authority?.startIndexCount()
     }
 
     mutating func addResidentCount(_ pop: Pop, _ stats: Pop.Stats) {
-        self.properties?.addResidentCount(pop, stats)
+        self.authority?.addResidentCount(pop, stats)
     }
     mutating func addResidentCount(_ building: Building) {
         self.buildings.append(building.id)
@@ -120,11 +125,11 @@ extension PlanetGrid.Tile {
     }
 
     mutating func afterIndexCount(world: borrowing GameWorld) {
-        guard let region: RegionalProperties = self.properties else {
+        guard let region: RegionalAuthority = self.authority else {
             return
         }
 
-        self.criticalShortages = region.occupiedBy.criticalResources.filter {
+        self.criticalShortages = region.properties.criticalResources.filter {
             if  let localMarket: LocalMarket = world.segmentedMarkets[$0 / self.id],
                     localMarket.today.supply == 0,
                     localMarket.today.demand > 0 {
@@ -174,7 +179,7 @@ extension PlanetGrid.Tile {
         among factories: OrderedDictionary<FactoryType, FactoryMetadata>,
         using random: inout PseudoRandom,
     ) -> FactoryMetadata? {
-        guard let pops: PopulationStats = self.properties?.pops else {
+        guard let pops: PopulationStats = self.authority?.pops else {
             return nil
         }
 
@@ -234,7 +239,7 @@ extension PlanetGrid.Tile {
         }
 
         guard
-        let region: RegionalProperties = self.properties,
+        let region: RegionalProperties = self.authority?.properties,
         let factor: Fraction = region.pops.type[.Miner]?.mineExpansionFactor else {
             return nil
         }

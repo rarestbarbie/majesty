@@ -32,7 +32,7 @@ extension GameSession {
         map: borrowing TerrainMap,
     ) throws -> Self {
         let rules: GameRules = try .init(resolving: rules, with: &start.symbols)
-        let save: GameSave = try start.unpack()
+        let save: GameSave = try start.unpack(rules: rules)
         return try .load(save, rules: rules, map: map)
     }
 
@@ -218,8 +218,8 @@ extension GameSession {
 
         return .items {
             $0["Switch to Player"] {
-                if  let country: CountryProperties = tile.properties?.governedBy {
-                    $0[.SwitchToPlayer] = country.id
+                if  let country: CountryID = tile.authority?.governedBy {
+                    $0[.SwitchToPlayer] = country
                 }
             }
         }

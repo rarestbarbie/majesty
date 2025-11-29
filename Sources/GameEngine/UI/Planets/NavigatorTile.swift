@@ -12,7 +12,7 @@ struct NavigatorTile {
 
     private var name: String
     private var terrain: String
-    private var culture: PieChart<String, PieChartLabel>?
+    private var culture: PieChart<CultureID, PieChartLabel>?
     private var popType: PieChart<PopType, PieChartLabel>?
 
     init(id: Address) {
@@ -36,15 +36,15 @@ extension NavigatorTile {
         self.name = "\(tile.name ?? tile.terrain.title) (\(planet.state.name))"
         self.terrain = tile.terrain.title
 
-        let pops: PopulationStats = tile.properties?.pops ?? .init()
+        let pops: PopulationStats = tile.pops
 
         let culture: [
-            (key: String, (share: Int64, PieChartLabel))
+            (key: CultureID, (share: Int64, PieChartLabel))
         ] = pops.free.cultures.compactMap {
             guard let culture: Culture = context.cultures.state[$0] else {
                 return nil
             }
-            let label: PieChartLabel = .init(color: culture.color, name: $0)
+            let label: PieChartLabel = .init(color: culture.color, name: culture.name)
             return ($0, ($1, label))
         }
         let popType: [

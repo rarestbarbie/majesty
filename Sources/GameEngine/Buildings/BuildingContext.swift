@@ -12,7 +12,7 @@ struct BuildingContext: LegalEntityContext, RuntimeContext {
     var state: Building
     private(set) var stats: Building.Stats
 
-    private(set) var region: RegionalProperties?
+    private(set) var region: RegionalAuthority?
     private(set) var equity: Equity<LEI>.Statistics
 
     init(type: BuildingMetadata, state: Building) {
@@ -46,7 +46,7 @@ extension BuildingContext {
         world _: borrowing GameWorld,
         context: ComputationPass
     ) throws {
-        self.region = context.planets[self.state.tile]?.properties
+        self.region = context.planets[self.state.tile]?.authority
     }
 }
 extension BuildingContext {
@@ -74,7 +74,7 @@ extension BuildingContext {
 extension BuildingContext: TransactingContext {
     mutating func allocate(turn: inout Turn) {
         guard
-        let country: CountryProperties = self.region?.occupiedBy else {
+        let region: RegionalProperties = self.region?.properties else {
             return
         }
 
@@ -132,7 +132,7 @@ extension BuildingContext: TransactingContext {
                 e: self.state.inventory.e,
                 x: self.state.inventory.x,
                 markets: turn.worldMarkets,
-                currency: country.currency.id,
+                currency: region.currency.id,
             )
         )
 
@@ -154,7 +154,7 @@ extension BuildingContext: TransactingContext {
         // needs to be called even if quantity is zero, or the security will not
         // be tradeable today
         turn.stockMarkets.issueShares(
-            currency: country.currency.id,
+            currency: region.currency.id,
             quantity: sharesToIssue,
             security: self.security,
         )
@@ -170,7 +170,7 @@ extension BuildingContext: TransactingContext {
 
     mutating func transact(turn: inout Turn) {
         guard
-        let country: CountryProperties = self.region?.occupiedBy,
+        let region: RegionalProperties = self.region?.properties,
         let budget: Building.Budget = self.state.budget else {
             return
         }
@@ -185,7 +185,7 @@ extension BuildingContext: TransactingContext {
                 $0 += self.state.inventory.l.tradeAsBusiness(
                     stockpileDays: stockpileTarget,
                     spendingLimit: budget.l.tradeable,
-                    in: country.currency.id,
+                    in: region.currency.id,
                     on: &turn.worldMarkets,
                 )
             }
@@ -193,7 +193,7 @@ extension BuildingContext: TransactingContext {
                 $0 += self.state.inventory.e.tradeAsBusiness(
                     stockpileDays: stockpileTarget,
                     spendingLimit: budget.e.tradeable,
-                    in: country.currency.id,
+                    in: region.currency.id,
                     on: &turn.worldMarkets,
                 )
             }
@@ -201,7 +201,7 @@ extension BuildingContext: TransactingContext {
                 $0 += self.state.inventory.x.tradeAsBusiness(
                     stockpileDays: stockpileTarget,
                     spendingLimit: budget.x.tradeable,
-                    in: country.currency.id,
+                    in: region.currency.id,
                     on: &turn.worldMarkets,
                 )
             }
@@ -215,7 +215,7 @@ extension BuildingContext: TransactingContext {
             )
 
             $0.r += self.state.inventory.out.sell(
-                in: country.currency.id,
+                in: region.currency.id,
                 on: &turn.worldMarkets
             )
         } (&turn.bank[account: self.lei])
@@ -296,14 +296,14 @@ extension BuildingContext: TransactingContext {
         self.state.z.vx = self.state.inventory.x.valueAcquired
 
         guard
-        let country: CountryProperties = self.region?.occupiedBy else {
+        let player: CountryID = self.region?.occupiedBy else {
             return
         }
 
         self.state.equity.split(
             price: self.state.z.px,
             turn: &turn,
-            notifying: [country.id]
+            notifying: [player]
         )
     }
 }

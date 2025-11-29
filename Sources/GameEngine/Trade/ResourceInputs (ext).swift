@@ -80,8 +80,8 @@ extension ResourceInputs {
         }
     }
 
-    func tooltipStockpile(_ id: Resource, country: CountryProperties) -> Tooltip? {
-        let currency: String = country.currency.name
+    func tooltipStockpile(_ id: Resource, region: RegionalProperties) -> Tooltip? {
+        let currency: String = region.currency.name
 
         let units: Reservoir
         let value: Reservoir

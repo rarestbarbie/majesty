@@ -6,11 +6,13 @@ import GameRules
 import GameState
 import GameTerrain
 import JavaScriptKit
+import OrderedCollections
 
 struct GameContext {
     var player: CountryID
 
     private(set) var planets: RuntimeContextTable<PlanetContext>
+    private(set) var currencies: OrderedDictionary<CurrencyID, Currency>
     private(set) var cultures: RuntimeContextTable<CultureContext>
     private(set) var countries: RuntimeContextTable<CountryContext>
     private(set) var buildings: DynamicContextTable<BuildingContext>
@@ -27,13 +29,8 @@ extension GameContext {
         return .init(
             player: save.player,
             planets: [:],
-            cultures: try .init(states: save.cultures) {
-                guard
-                let type: CultureType = try? save.symbols[biology: $0.type ?? "_Pet"] else {
-                    return nil
-                }
-                return rules.biology[type]
-            },
+            currencies: save.currencies.reduce(into: [:]) { $0[$1.id] = $1 },
+            cultures: try .init(states: save.cultures) { rules.biology[$0.type] },
             countries: try .init(states: save.countries) { _ in _none },
             buildings: try .init(states: save.buildings) { rules.buildings[$0.type] },
             factories: try .init(states: save.factories) { rules.factories[$0.type] },
@@ -53,6 +50,7 @@ extension GameContext {
             segmentedMarkets: world.segmentedMarkets,
             tradeableMarkets: world.tradeableMarkets,
             date: world.date,
+            currencies: self.currencies.values.elements,
             cultures: [_].init(self.cultures.state),
             countries: [_].init(self.countries.state),
             buildings: [_].init(self.buildings.state),
@@ -166,6 +164,12 @@ extension GameContext {
         )
     }
 
+    private var countryPass: CountryContext.ComputationPass {
+        .init(
+            player: self.player,
+            rules: self.rules,
+        )
+    }
     private var buildingPass: BuildingContext.ComputationPass {
         self.factoryPass
     }
@@ -210,12 +214,15 @@ extension GameContext {
             self.pops[i].state.prune(in: retain)
         }
     }
-    private mutating func index(world: borrowing GameWorld) {
-        for country: CountryContext in self.countries {
-            for address: Address in country.state.tilesControlled {
-                self.planets[address]?.update(
-                    governedBy: country.properties,
-                    occupiedBy: country.properties,
+    private mutating func index(world: borrowing GameWorld) throws {
+        for i: Int in self.countries.indices {
+            let country: Country = self.countries.state[i]
+            let properties: CountryProperties = try .compute(for: country, in: self)
+            for tile: Address in country.tilesControlled {
+                self.planets[tile]?.update(
+                    governedBy: country.id,
+                    occupiedBy: country.id,
+                    properties: properties,
                 )
             }
         }
@@ -315,11 +322,11 @@ extension GameContext {
         // need to call this first, to update prices before trading
         turn.localMarkets.turn {
             guard
-            let region: RegionalProperties = self.planets[$0.id.location]?.properties else {
+            let region: RegionalAuthority = self.planets[$0.id.location]?.authority else {
                 fatalError("LocalMarket \($0.id) exists in a tile with no authority!!!")
             }
 
-            $0.turn(shape: region.occupiedBy.localMarkets[$0.id.resource])
+            $0.turn(shape: region.properties.modifiers.localMarkets[$0.id.resource] ?? .default)
         }
 
         self.buildings.turn { $0.turn(on: &turn) }
@@ -403,16 +410,13 @@ extension GameContext {
 
     mutating func compute(_ world: inout GameWorld) throws {
         self.prune(world: &world)
-        self.index(world: world)
+        try self.index(world: world)
 
         for i: Int in self.planets.indices {
             try self.planets[i].afterIndexCount(world: world, context: self.territoryPass)
         }
         for i: Int in self.cultures.indices {
             try self.cultures[i].afterIndexCount(world: world, context: self.territoryPass)
-        }
-        for i: Int in self.countries.indices {
-            try self.countries[i].afterIndexCount(world: world, context: self.territoryPass)
         }
 
         for i: Int in self.buildings.indices {

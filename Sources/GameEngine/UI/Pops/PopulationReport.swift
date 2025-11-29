@@ -66,14 +66,14 @@ extension PopulationReport: PersistentReport {
     }
 
     mutating func update(from snapshot: borrowing GameSnapshot) {
-        let country: CountryProperties = snapshot.player
+        let country: CountryID = snapshot.player
 
         let filterable: (
             locations: [Address: FilterLabel],
             Never?
         ) = snapshot.pops.reduce(into: ([:], nil)) {
             let tile: Address = $1.state.tile
-            if case country.id? = $1.region?.governedBy.id {
+            if case country? = $1.region?.governedBy {
                 {
                     $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
                 } (&$0.locations[tile])
@@ -93,13 +93,13 @@ extension PopulationReport: PersistentReport {
             details: &self.pop,
             default: filters.location.first?.id ?? .all
         ) {
-            guard case country.id? = $0.region?.governedBy.id else {
+            guard case country? = $0.region?.governedBy else {
                 return nil
             }
             guard
             let planet: PlanetContext = snapshot.planets[$0.state.tile.planet],
             let tile: PlanetGrid.Tile = planet.grid.tiles[$0.state.tile.tile],
-            let culture: Culture = snapshot.cultures.state[$0.state.nat] else {
+            let culture: Culture = snapshot.cultures.state[$0.state.race] else {
                 return nil
             }
 
@@ -108,7 +108,7 @@ extension PopulationReport: PersistentReport {
                 location: tile.name ?? planet.state.name,
                 type: $0.state.type,
                 color: culture.color,
-                nat: $0.state.nat,
+                nat: culture.name,
                 une: 1 - $0.stats.employmentBeforeEgress,
                 yesterday: $0.state.y,
                 today: $0.state.z,

@@ -16,8 +16,9 @@ public struct GameSave {
     let tradeableMarkets: OrderedDictionary<BlocMarket.ID, BlocMarket>
     let date: GameDate
 
+    let currencies: [Currency]
     let cultures: [Culture]
-    var countries: [Country]
+    let countries: [Country]
 
     let buildings: [Building]
     let factories: [Factory]
@@ -37,6 +38,7 @@ extension GameSave {
 
         // case terrain
         // case planets
+        case currencies
         case cultures
         case countries
         case buildings
@@ -58,6 +60,7 @@ extension GameSave: JavaScriptEncodable {
         js[.markets_tradeable] = self.tradeableMarkets
         js[.date] = self.date
 
+        js[.currencies] = self.currencies
         js[.cultures] = self.cultures
         js[.countries] = self.countries
         js[.buildings] = self.buildings
@@ -76,6 +79,7 @@ extension GameSave: JavaScriptDecodable {
             segmentedMarkets: try js[.markets_segmented]?.decode() ?? [:],
             tradeableMarkets: try js[.markets_tradeable]?.decode() ?? [:],
             date: try js[.date].decode(),
+            currencies: try js[.currencies].decode(),
             cultures: try js[.cultures].decode(),
             countries: try js[.countries].decode(),
             buildings: try js[.buildings].decode(),

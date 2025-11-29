@@ -30,14 +30,14 @@ extension InfrastructureReport: PersistentReport {
     }
 
     mutating func update(from snapshot: borrowing GameSnapshot) {
-        let country: CountryProperties = snapshot.player
+        let country: CountryID = snapshot.player
 
         let filterable: (
             locations: [Address: FilterLabel],
             Never?
         ) = snapshot.buildings.reduce(into: ([:], nil)) {
             let tile: Address = $1.state.tile
-            if case country.id? = $1.region?.governedBy.id {
+            if case country? = $1.region?.governedBy {
                 {
                     $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
                 } (&$0.locations[tile])
@@ -57,7 +57,7 @@ extension InfrastructureReport: PersistentReport {
             details: &self.building,
             default: filters.location.first?.id ?? .all
         ) {
-            guard case country.id? = $0.region?.governedBy.id else {
+            guard case country? = $0.region?.governedBy else {
                 return nil
             }
             guard

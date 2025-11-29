@@ -7,6 +7,6 @@ extension Equity.Statistics {
         let bought: Int64
         let sold: Int64
         let country: CountryID
-        let culture: String?
+        let culture: CultureID?
     }
 }

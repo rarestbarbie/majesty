@@ -6,16 +6,16 @@
     {
         "type": "O",
         "cash": 10000000,
-        "nat": "Atlantean"
+        "race": "Atlantean"
     },
     {
         "type": "X",
         "cash": 10000000,
-        "nat": "Atlantean"
+        "race": "Atlantean"
     },
     {
         "type": "O",
         "cash": 90000000,
-        "nat": "Jewish"
+        "race": "Jewish"
     }
 ]
