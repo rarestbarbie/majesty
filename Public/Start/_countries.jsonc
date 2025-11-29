@@ -95,9 +95,8 @@
     {
         // TODO: should not spawn on starting map
         "name": {
-            "article": "The",
             "short": "Greenland",
-            "long": "Republic of Greenland",
+            "long": "Kalaallit Nunaat",
             "color": "#ff9f9f"
         },
         "culture_preferred": "Inuit",
