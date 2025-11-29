@@ -264,7 +264,9 @@
             // Eastern Mediterranean
             "399N3,-2",
             // Eastern Europe
-            "399N2,-1"
+            "399N2,-1",
+            // Queen Maud Land
+            "399S1,-1"
         ],
         "minwage": 250
     },
