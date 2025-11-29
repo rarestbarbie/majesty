@@ -37,7 +37,7 @@ extension InfrastructureReport: PersistentReport {
             Never?
         ) = snapshot.buildings.reduce(into: ([:], nil)) {
             let tile: Address = $1.state.tile
-            if case country? = $1.region?.governedBy {
+            if case country? = $1.region?.bloc {
                 {
                     $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
                 } (&$0.locations[tile])
@@ -57,7 +57,7 @@ extension InfrastructureReport: PersistentReport {
             details: &self.building,
             default: filters.location.first?.id ?? .all
         ) {
-            guard case country? = $0.region?.governedBy else {
+            guard case country? = $0.region?.bloc else {
                 return nil
             }
             guard

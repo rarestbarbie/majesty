@@ -72,12 +72,14 @@ extension PlanetGrid.Tile {
     mutating func update(
         governedBy: CountryID,
         occupiedBy: CountryID,
+        suzerain: CountryID?,
         properties: CountryProperties,
     ) {
         if  let authority: RegionalAuthority = self.authority {
             authority.update(
                 governedBy: governedBy,
                 occupiedBy: occupiedBy,
+                suzerain: suzerain,
                 country: properties
             )
         } else {
@@ -85,6 +87,7 @@ extension PlanetGrid.Tile {
                 id: self.id,
                 governedBy: governedBy,
                 occupiedBy: occupiedBy,
+                suzerain: suzerain,
                 country: properties
             )
         }

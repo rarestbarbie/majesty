@@ -222,6 +222,7 @@ extension GameContext {
                 self.planets[tile]?.update(
                     governedBy: country.id,
                     occupiedBy: country.id,
+                    suzerain: country.suzerain,
                     properties: properties,
                 )
             }
