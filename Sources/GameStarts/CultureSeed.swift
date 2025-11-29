@@ -29,7 +29,7 @@ extension CultureSeed: JavaScriptEncodable {
 extension CultureSeed: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
-            id: try js[.id].decode(),
+            id: try js[.id]?.decode(),
             name: try js[.name].decode(),
             type: try js[.type]?.decode(),
             color: try js[.color].decode()
