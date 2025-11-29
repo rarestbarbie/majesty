@@ -1,0 +1,33 @@
+[
+    {
+        "id": 1,
+        "name": "USD",
+        "long": "American Dollar"
+    },
+
+    {
+        "id": 3,
+        "name": "RUB",
+        "long": "Ruble"
+    },
+    {
+        "id": 4,
+        "name": "INR",
+        "long": "Rupee"
+    },
+    {
+        "id": 5,
+        "name": "THB",
+        "long": "Baht"
+    },
+    {
+        "id": 6,
+        "name": "SAF",
+        "long": "Franc"
+    },
+    {
+        "id": 7,
+        "name": "ETB",
+        "long": "Birr"
+    }
+]

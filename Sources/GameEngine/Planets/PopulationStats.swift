@@ -39,9 +39,9 @@ extension PopulationStats {
     }
 }
 extension PopulationStats {
-    func tooltip(culture: String) -> Tooltip? {
-        let free: Int64? = self.free.cultures[culture]
-        let enslaved: Int64? = self.enslaved.cultures[culture]
+    func tooltip(culture: Culture) -> Tooltip? {
+        let free: Int64? = self.free.cultures[culture.id]
+        let enslaved: Int64? = self.enslaved.cultures[culture.id]
 
         let share: Int64
         let total: Int64
@@ -62,7 +62,7 @@ extension PopulationStats {
         }
 
         return .instructions(style: .borderless) {
-            $0[culture] = (Double.init(share) / Double.init(total))[%3]
+            $0[culture.name] = (Double.init(share) / Double.init(total))[%3]
             $0[>] {
                 $0["Free"] = free?[/3]
                 $0["Enslaved"] = enslaved?[/3]

@@ -5,7 +5,7 @@ import GameState
 import GameUI
 
 protocol LegalEntityContext<State>: RuntimeContext where State: LegalEntityState {
-    var region: RegionalProperties? { get }
+    var region: RegionalAuthority? { get }
     var equity: Equity<LEI>.Statistics { get }
 }
 extension LegalEntityContext {
@@ -21,14 +21,18 @@ extension LegalEntityContext {
 }
 extension LegalEntityContext {
     func tooltipOwnership(
-        culture: String,
+        culture: CultureID,
         context: GameContext,
-    ) -> Tooltip {
+    ) -> Tooltip? {
+        guard
+        let culture: Culture = context.cultures.state[culture] else {
+            return nil
+        }
         let (share, total): (share: Int64, total: Int64) = self.equity.owners.reduce(
             into: (0, 0)
         ) {
             if case .pop(let id) = $1.id,
-                let pop: Pop = context.pops.state[id], pop.nat == culture {
+                let pop: Pop = context.pops.state[id], pop.race == culture.id {
                 $0.share += $1.shares
             }
 
@@ -36,8 +40,8 @@ extension LegalEntityContext {
         }
 
         return .instructions(style: .borderless) {
-            $0[culture] = (Double.init(share) / Double.init(total))[%3]
-            $0[>] = "The \(em: culture) shareholders own \(em: share[/3]) shares"
+            $0[culture.name] = (Double.init(share) / Double.init(total))[%3]
+            $0[>] = "The \(em: culture.name) shareholders own \(em: share[/3]) shares"
         }
     }
 

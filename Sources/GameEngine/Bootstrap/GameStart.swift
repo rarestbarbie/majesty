@@ -7,13 +7,6 @@ import JavaScriptInterop
 import OrderedCollections
 import Random
 
-extension GameStart {
-    struct Symbols {
-        let `static`: GameSaveSymbols
-        // TODO: cultures go here
-    }
-}
-
 // should live in GameStarts, but needs ``Culture``
 public struct GameStart {
     let date: GameDate
@@ -21,7 +14,8 @@ public struct GameStart {
     let random: PseudoRandom
 
     // TODO
-    let cultures: [Culture]
+    let currencies: [Currency]
+    let cultures: [CultureSeed]
 
     let countries: [CountrySeed]
     let buildings: [BuildingSeedGroup]
@@ -32,7 +26,7 @@ public struct GameStart {
     var symbols: GameSaveSymbols
 }
 extension GameStart {
-    private static func highest<Seed, ID>(
+    static func highest<Seed, ID>(
         in seeds: some Sequence<Seed>
     ) -> ID where Seed: Identifiable, Seed.ID == ID?, ID: GameID {
         var highest: ID = 0
@@ -45,19 +39,37 @@ extension GameStart {
         return highest
     }
 
-    func unpack() throws -> GameSave {
-        let symbols: GameStart.Symbols = .init(static: self.symbols)
+    func unpack(rules: GameRules) throws -> GameSave {
+        let symbols: GameStart.Symbols = .init(static: self.symbols, cultures: self.cultures)
+
+        let starter: Set<Technology> = rules.technologies.values.reduce(into: []) {
+            if  $1.starter {
+                $0.insert($1.id)
+            }
+        }
+        let cultures: [Culture] = try self.cultures.map {
+            .init(
+                id: try symbols.cultures[$0.name],
+                name: $0.name.name,
+                type: try symbols.static[biology: $0.type ?? "_Pet"],
+                color: $0.color
+            )
+        }
 
         var countries: [Country] = []
         var country: CountryID = Self.highest(in: self.countries)
         for seed: CountrySeed in self.countries {
+            let researched: Set<Technology> = try seed.researched.reduce(into: starter) {
+                $0.insert(try symbols.static.technologies[$1])
+            }
             let country: Country = .init(
                 id: seed.id ?? country.increment(),
                 name: seed.name,
-                culturePreferred: seed.culturePreferred.name,
-                culturesAccepted: seed.culturesAccepted.map(\.name),
-                researched: try seed.researched.map { try symbols.static.technologies[$0] },
+                culturePreferred: try symbols.cultures[seed.culturePreferred],
+                culturesAccepted: try seed.culturesAccepted.map { try symbols.cultures[$0] },
+                researched: researched.sorted(),
                 currency: seed.currency,
+                suzerain: seed.suzerain,
                 minwage: seed.minwage,
                 tilesControlled: seed.tiles,
             )
@@ -98,7 +110,7 @@ extension GameStart {
         for group: PopSeedGroup in self.pops {
             for seed: PopSeed in group.pops {
                 let section: Pop.Section = .init(
-                    culture: seed.race.name,
+                    race: try symbols.cultures[seed.race],
                     type: seed.type,
                     tile: group.tile
                 )
@@ -114,7 +126,7 @@ extension GameStart {
         // this is very slow, but we only do it once when initializing a new game
         for seed: PopWealth in self.popWealth {
             for pop: Pop in pops {
-                if  let nat: String = seed.nat, pop.nat != nat {
+                if  let race: Symbol = seed.race, try symbols.cultures[race] != pop.race {
                     continue
                 }
                 if  pop.type != seed.type {
@@ -133,7 +145,8 @@ extension GameStart {
             segmentedMarkets: [:],
             tradeableMarkets: [:],
             date: self.date,
-            cultures: self.cultures,
+            currencies: self.currencies,
+            cultures: cultures,
             countries: countries,
             buildings: buildings,
             factories: factories,
@@ -154,6 +167,7 @@ extension GameStart {
         case factories
         case pop_wealth
         case pops
+        case currencies
 
         case symbols
     }
@@ -164,6 +178,7 @@ extension GameStart: JavaScriptDecodable {
             date: try js[.date].decode(),
             player: try js[.player].decode(),
             random: try js[.random]?.decode() ?? .init(seed: 12345),
+            currencies: try js[.currencies].decode(),
             cultures: try js[.cultures].decode(),
             countries: try js[.countries].decode(),
             buildings: try js[.buildings].decode(),

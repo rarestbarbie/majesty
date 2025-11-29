@@ -14,7 +14,7 @@ struct PopContext: RuntimeContext, LegalEntityContext {
     var state: Pop
     private(set) var stats: Pop.Stats
     private(set) var livestock: CultureMetadata?
-    private(set) var region: RegionalProperties?
+    private(set) var region: RegionalAuthority?
     private(set) var equity: Equity<LEI>.Statistics
     private(set) var mines: [MineID: MiningJobConditions]
 
@@ -60,7 +60,7 @@ extension PopContext {
         world _: borrowing GameWorld,
         context: ComputationPass
     ) throws {
-        self.region = context.planets[self.state.tile]?.properties
+        self.region = context.planets[self.state.tile]?.authority
 
         self.mines.removeAll(keepingCapacity: true)
         for job: MiningJob in self.state.mines.values {
@@ -76,7 +76,7 @@ extension PopContext {
         self.miningJobRank = [:]
 
         if  case .Livestock = self.state.type {
-            self.livestock = context.cultures[self.state.nat]?.type
+            self.livestock = context.cultures[self.state.race]?.type
         } else if
             case .Miner = self.state.type {
             // mining yield does not affect Politicians
@@ -110,7 +110,7 @@ extension PopContext {
 }
 extension PopContext: AllocatingContext {
     mutating func allocate(turn: inout Turn) {
-        guard let authority: CountryProperties = self.region?.occupiedBy else {
+        guard let region: RegionalProperties = self.region?.properties else {
             return
         }
 
@@ -124,14 +124,14 @@ extension PopContext: AllocatingContext {
                         self.stats.employmentBeforeEgress - employmentThreshold,
                         self.state.y.fl - 1
                     )
-                    let r: Decimal = 1‰ + authority.modifiers.livestockCullingEfficiency.value
+                    let r: Decimal = 1‰ + region.modifiers.livestockCullingEfficiency.value
                     let p: Double = -Double.init(r) * share
                     self.state.z.size -= Binomial[cullable, p].sample(
                         using: &turn.random.generator
                     )
                 }
             } else if self.state.z.profitability > 0 {
-                let r: Decimal = 1‰ + authority.modifiers.livestockBreedingEfficiency.value
+                let r: Decimal = 1‰ + region.modifiers.livestockBreedingEfficiency.value
                 let p: Double = Double.init(r) * self.state.z.profitability
                 self.state.z.size += Binomial[self.state.z.size, p].sample(
                     using: &turn.random.generator
@@ -142,7 +142,7 @@ extension PopContext: AllocatingContext {
             }
         }
 
-        let currency: CurrencyID = authority.currency.id
+        let currency: CurrencyID = region.currency.id
 
         self.state.inventory.out.sync(with: self.output, releasing: 1)
         for j: Int in self.state.mines.values.indices {
@@ -190,7 +190,7 @@ extension PopContext: AllocatingContext {
                     e: self.state.inventory.e,
                     x: self.state.inventory.x,
                     markets: turn.worldMarkets,
-                    currency: authority.currency.id
+                    currency: currency
                 )
             )
 
@@ -237,7 +237,7 @@ extension PopContext: AllocatingContext {
                     e: self.state.inventory.e,
                     x: self.state.inventory.x,
                     markets: turn.worldMarkets,
-                    currency: authority.currency.id
+                    currency: currency
                 )
             )
 
@@ -284,7 +284,7 @@ extension PopContext: TransactingContext {
         let enslaved: Bool = self.state.type.stratum == .Ward
 
         guard
-        let country: CountryProperties = self.region?.occupiedBy,
+        let region: RegionalProperties = self.region?.properties,
         let budget: Pop.Budget = self.state.budget else {
             return
         }
@@ -293,7 +293,7 @@ extension PopContext: TransactingContext {
             (account: inout Bank.Account) in
 
             account.r += self.state.inventory.out.sell(
-                in: country.currency.id,
+                in: region.currency.id,
                 on: &turn.worldMarkets
             )
             self.state.inventory.out.deposit(
@@ -312,7 +312,7 @@ extension PopContext: TransactingContext {
                         from: conditions.output,
                         scalingFactor: ($0.count, conditions.factor)
                     )
-                    return $0.out.sell(in: country.currency.id, on: &turn.worldMarkets)
+                    return $0.out.sell(in: region.currency.id, on: &turn.worldMarkets)
                 } (&self.state.mines.values[j])
             }
 
@@ -326,12 +326,12 @@ extension PopContext: TransactingContext {
                 account += enslaved ? self.state.inventory.l.tradeAsBusiness(
                     stockpileDays: target,
                     spendingLimit: budget.l.tradeable,
-                    in: country.currency.id,
+                    in: region.currency.id,
                     on: &turn.worldMarkets,
                 ) : self.state.inventory.l.tradeAsConsumer(
                     stockpileDays: target,
                     spendingLimit: budget.l.tradeable,
-                    in: country.currency.id,
+                    in: region.currency.id,
                     on: &turn.worldMarkets,
                 )
             }
@@ -352,7 +352,7 @@ extension PopContext: TransactingContext {
                 account += self.state.inventory.e.tradeAsConsumer(
                     stockpileDays: target,
                     spendingLimit: budget.e.tradeable,
-                    in: country.currency.id,
+                    in: region.currency.id,
                     on: &turn.worldMarkets,
                 )
             }
@@ -367,7 +367,7 @@ extension PopContext: TransactingContext {
                 account += self.state.inventory.x.tradeAsConsumer(
                     stockpileDays: target,
                     spendingLimit: budget.x.tradeable,
-                    in: country.currency.id,
+                    in: region.currency.id,
                     on: &turn.worldMarkets,
                 )
             }
@@ -379,7 +379,7 @@ extension PopContext: TransactingContext {
             )
 
             // Welfare
-            account.s += self.state.z.size * country.minwage / 10
+            account.s += self.state.z.size * region.minwage / 10
         } (&turn.bank[account: self.lei])
 
         if  enslaved {
@@ -418,11 +418,9 @@ extension PopContext {
         self.state.z.vx = self.state.inventory.x.valueAcquired
 
         guard
-        let region: RegionalProperties = self.region else {
+        let region: RegionalAuthority = self.region else {
             return
         }
-
-        let authority: CountryProperties = region.occupiedBy
 
         self.state.z.mil += Self.mil(fl: self.state.z.fl)
         self.state.z.mil += Self.mil(fe: self.state.z.fe)
@@ -436,12 +434,12 @@ extension PopContext {
         self.state.z.con = max(0, min(10, self.state.z.con))
 
         if  self.state.type.stratum > .Ward {
-            self.convert(turn: &turn, region: region)
+            self.convert(turn: &turn, region: region.properties)
         } else {
             self.state.equity.split(
                 price: self.state.z.px,
                 turn: &turn,
-                notifying: [authority.id]
+                notifying: [region.occupiedBy]
             )
         }
 
@@ -450,7 +448,7 @@ extension PopContext {
         let factoryJobs: Range<Int> = self.state.factories.values.indices
         let miningJobs: Range<Int> = self.state.mines.values.indices
 
-        let w0: Double = .init(authority.minwage)
+        let w0: Double = .init(region.properties.minwage)
         let q: Double = 0.002
         for i: Int in factoryJobs {
             {
@@ -507,7 +505,7 @@ extension PopContext {
 
         // when demoting, inherit 1 percent
         self.state.egress(
-            evaluator: self.buildDemotionMatrix(country: region.occupiedBy),
+            evaluator: self.buildDemotionMatrix(region: region),
             inherit: 1 %/ 100,
             on: &turn,
         ) {
@@ -516,7 +514,7 @@ extension PopContext {
 
         // when promoting, inherit all
         self.state.egress(
-            evaluator: self.buildPromotionMatrix(country: region.occupiedBy),
+            evaluator: self.buildPromotionMatrix(region: region),
             inherit: nil,
             on: &turn,
         ) {
@@ -525,7 +523,7 @@ extension PopContext {
     }
 
     func buildDemotionMatrix<Matrix>(
-        country: CountryProperties,
+        region: RegionalProperties,
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
@@ -564,25 +562,25 @@ extension PopContext {
                 $0[$1 >= 9.0] = -10%
             } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
 
-            switch self.state.type.stratum {
-            case .Ward:
+            let culture: Culture = region.culturePreferred
+            if case .Ward = self.state.type.stratum {
                 $0[true] {
                     $0 = -100%
                 } = { "\(+$0[%]): Pop is \(em: "enslaved")" }
-
-            default:
-                $0[self.state.nat] {
-                    $0[$1 != country.culturePreferred] = +100%
-                } = { "\(+$0[%]): Culture is not \(em: $1)" }
-                $0[self.state.nat] {
-                    $0[$1 == country.culturePreferred] = -5%
-                } = { "\(+$0[%]): Culture is \(em: $1)" }
+            } else if self.state.race == culture.id {
+                $0[true] {
+                    $0 = -5%
+                } = { "\(+$0[%]): Culture is \(em: culture.name)" }
+            } else {
+                $0[true] {
+                    $0 = +100%
+                } = { "\(+$0[%]): Culture is not \(em: culture.name)" }
             }
         }
     }
 
     func buildPromotionMatrix<Matrix>(
-        country: CountryProperties,
+        region: RegionalProperties,
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
@@ -641,22 +639,20 @@ extension PopContext {
                 $0[$1 >= 8.0] = -10%
             } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
 
-            switch self.state.type.stratum {
-            case .Ward:
+            let culture: Culture = region.culturePreferred
+            if case .Ward = self.state.type.stratum {
                 $0[true] {
                     $0 = -100%
                 } = { "\(+$0[%]): Pop is \(em: "enslaved")" }
-
-            case _:
-                break
+            } else if self.state.race == culture.id {
+                $0[true] {
+                    $0 = +5%
+                } = { "\(+$0[%]): Culture is \(em: culture.name)" }
+            } else {
+                $0[true] {
+                    $0 = -75%
+                } = { "\(+$0[%]): Culture is not \(em: culture.name)" }
             }
-
-            $0[self.state.nat] {
-                $0[$1 != country.culturePreferred] = -75%
-            } = { "\(+$0[%]): Culture is not \(em: $1)" }
-            $0[self.state.nat] {
-                $0[$1 == country.culturePreferred] = +5%
-            } = { "\(+$0[%]): Culture is \(em: $1)" }
         }
     }
 }
@@ -693,7 +689,7 @@ extension PopContext {
         mine: MiningJobConditions
     ) {
         guard
-        let mil: Double = self.region?.pops.free.mil.average else {
+        let mil: Double = self.region?.properties.pops.free.mil.average else {
             return
         }
 
@@ -708,7 +704,7 @@ extension PopContext {
         mine: MiningJobConditions
     ) {
         guard
-        let modifiers: CountryModifiers = self.region?.occupiedBy.modifiers,
+        let modifiers: CountryModifiers = self.region?.properties.modifiers,
         let modifiers: CountryModifiers.Stack<
             Decimal
         > = modifiers.miningEfficiency[mine.type] else {

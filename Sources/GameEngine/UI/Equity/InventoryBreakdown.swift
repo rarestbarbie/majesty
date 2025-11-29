@@ -38,7 +38,7 @@ extension InventoryBreakdown {
 
     mutating func update(from pop: PopContext, in snapshot: borrowing GameSnapshot) {
         guard
-        let currency: CurrencyID = pop.region?.occupiedBy.currency.id else {
+        let currency: CurrencyID = pop.region?.properties.currency.id else {
             return
         }
 
@@ -95,7 +95,7 @@ extension InventoryBreakdown {
 
     mutating func update(from factory: FactoryContext, in snapshot: borrowing GameSnapshot) {
         guard
-        let currency: CurrencyID = factory.region?.occupiedBy.currency.id else {
+        let currency: CurrencyID = factory.region?.properties.currency.id else {
             return
         }
 
@@ -131,13 +131,14 @@ extension InventoryBreakdown {
         )
 
         self.terms = Term.list {
-            let worker: PopType = factory.type.workers.unit
             guard
             let workers: Workforce = factory.workers,
-            let clerk: PopType = factory.type.clerks?.unit,
             let clerks: Workforce = factory.clerks else {
                 return
             }
+
+            let worker: PopType = factory.type.workers.unit
+            let clerk: PopType = factory.type.clerks.unit
 
             $0[.pop(clerk), +, tooltip: .FactoryClerks] = clerks.count[/3] ^^ clerks.change
             $0[.pop(worker), +, tooltip: .FactoryWorkers] = workers.count[/3] ^^ workers.change
@@ -158,7 +159,7 @@ extension InventoryBreakdown {
 
     mutating func update(from building: BuildingContext, in snapshot: borrowing GameSnapshot) {
         guard
-        let currency: CurrencyID = building.region?.occupiedBy.currency.id else {
+        let currency: CurrencyID = building.region?.properties.currency.id else {
             return
         }
 

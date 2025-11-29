@@ -1,3 +1,4 @@
+import { GameID } from '../../GameEngine/exports.js';
 import {
     NavigatorTileState,
     PieChart,
@@ -10,7 +11,7 @@ export class NavigatorTile {
     private readonly detail: HTMLDivElement;
 
     private readonly charts: {
-        readonly culture: PieChart<string>;
+        readonly culture: PieChart<GameID>;
         readonly popType: PieChart<string>;
     };
 
@@ -18,7 +19,7 @@ export class NavigatorTile {
         this.header = document.createElement('header');
 
         this.charts = {
-            culture: new PieChart<string>(TooltipType.TileCulture),
+            culture: new PieChart<GameID>(TooltipType.TileCulture),
             popType: new PieChart<string>(TooltipType.TilePopType),
         };
 

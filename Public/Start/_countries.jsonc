@@ -1,23 +1,16 @@
 [
     {
+        "id": 1,
         "name": {
             "article": "The",
-            "short": "United Nations",
-            "long": "United Nations",
-            "color": "#66a3ff"
+            "short": "America",
+            "long": "Republic of America",
+            "color": "#272e97"
         },
         "culture_preferred": "Atlantean",
-        "cultures_accepted": ["Italian", "Jewish"],
-        "currency": {
-            "id": 1,
-            "name": "UNB",
-            "long": "United Nations Bancor"
-        },
+        "cultures_accepted": ["Jewish"],
+        "currency": 1,
         "tiles": [
-            // Aleutian Islands
-            "399N-2,0",
-            // Alaska
-            "399N-2,1",
             // Pacific Northwest
             "399N-2,2",
             // California
@@ -26,8 +19,98 @@
             "399N-1,2",
             // American East Coast
             "399N0,2",
+            // Hawaii
+            "399N-4,2",
+            // Midway
+            "399N-4,1"
+        ],
+        "minwage": 55,
+        "researched": [
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Canada",
+            "long": "Duchy of Canada",
+            "color": "#ff6673"
+        },
+        "culture_preferred": "Atlantean",
+        "cultures_accepted": ["Inuit", "Alaskan"],
+        "currency": 1,
+        "suzerain": 1,
+        "tiles": [
             // Canada
             "399N0,1",
+            // Hudson Bay
+            "399N-1,1"
+        ],
+        "minwage": 55,
+        "researched": [
+        ]
+    },
+
+    {
+        "id": 3,
+        "name": {
+            "article": "The",
+            "short": "Russia",
+            "long": "Russian Federation",
+            "color": "#caa12f"
+        },
+        "culture_preferred": "Russian",
+        "cultures_accepted": ["Caspian", "Central Asian"],
+        "currency": 3,
+        "tiles": [
+            // Russia
+            "399N1,-1",
+            // Siberia
+            "399N0,-1",
+            // Bering Sea
+            "399N-1,0",
+            // Caucasus
+            "399N2,-2"
+        ],
+        "minwage": 25,
+        "researched": [
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Alaska",
+            "long": "Republic of Alaska",
+            "color": "#7c2121"
+        },
+        "culture_preferred": "Alaskan",
+        "cultures_accepted": ["Inuit"],
+        "suzerain": 3,
+        "currency": 3,
+        "tiles": [
+            // Aleutian Islands
+            "399N-2,0",
+            // Alaska
+            "399N-2,1"
+        ],
+        "minwage": 25,
+        "researched": [
+        ]
+    },
+
+    {
+        // TODO: should not spawn on starting map
+        "name": {
+            "article": "The",
+            "short": "United Nations",
+            "long": "United Nations",
+            "color": "#66a3ff"
+        },
+        "culture_preferred": "Atlantean",
+        "cultures_accepted": ["Italian", "Jewish"],
+        // placeholder suzerain/currency
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
             // Greenland
             "399N1,1",
             // Mexico
@@ -91,50 +174,6 @@
         ],
         "minwage": 35,
         "researched": [
-            "Forced Insemination",
-            "Industrial Gas Chambers",
-            "Mechanized Production",
-            "Hydraulic Fracking",
-            "Deepwater Drilling",
-            "Bayer Process",
-            "Taconite Concentration",
-            "Direct Lithium Extraction"
-        ]
-    },
-    {
-        "name": {
-            "article": "The",
-            "short": "Russia",
-            "long": "Russian Federation",
-            "color": "#caa12f"
-        },
-        "culture_preferred": "Russian",
-        "cultures_accepted": ["Caspian", "Central Asian"],
-        "currency": {
-            "id": 2,
-            "name": "RUB",
-            "long": "Ruble"
-        },
-        "tiles": [
-            // Russia
-            "399N1,-1",
-            // Siberia
-            "399N0,-1",
-            // Bering Sea
-            "399N-1,0",
-            // Caucasus
-            "399N2,-2"
-        ],
-        "minwage": 35,
-        "researched": [
-            "Forced Insemination",
-            "Industrial Gas Chambers",
-            "Mechanized Production",
-            "Hydraulic Fracking",
-            "Deepwater Drilling",
-            "Bayer Process",
-            "Taconite Concentration",
-            "Direct Lithium Extraction"
         ]
     },
     {
@@ -146,11 +185,7 @@
         },
         "culture_preferred": "South Asian",
         "cultures_accepted": [],
-        "currency": {
-            "id": 3,
-            "name": "INR",
-            "long": "Rupee"
-        },
+        "currency": 4,
         "tiles": [
             // India
             "399N2,-4",
@@ -159,14 +194,6 @@
         ],
         "minwage": 35,
         "researched": [
-            "Forced Insemination",
-            "Industrial Gas Chambers",
-            "Mechanized Production",
-            "Hydraulic Fracking",
-            "Deepwater Drilling",
-            "Bayer Process",
-            "Taconite Concentration",
-            "Direct Lithium Extraction"
         ]
     },
     {
@@ -178,11 +205,7 @@
         },
         "culture_preferred": "Thai",
         "cultures_accepted": [],
-        "currency": {
-            "id": 4,
-            "name": "THB",
-            "long": "Baht"
-        },
+        "currency": 5,
         "tiles": [
             // Thailand
             "399N0,-3"
@@ -208,11 +231,7 @@
         },
         "culture_preferred": "Sahelian",
         "cultures_accepted": ["West African"],
-        "currency": {
-            "id": 5,
-            "name": "SAF",
-            "long": "Franc"
-        },
+        "currency": 6,
         "tiles": [
             // West Africa
             "399N4,-1",
@@ -221,14 +240,6 @@
         ],
         "minwage": 35,
         "researched": [
-            "Forced Insemination",
-            "Industrial Gas Chambers",
-            "Mechanized Production",
-            "Hydraulic Fracking",
-            "Deepwater Drilling",
-            "Bayer Process",
-            "Taconite Concentration",
-            "Direct Lithium Extraction"
         ]
     },
     {
@@ -240,25 +251,13 @@
         },
         "culture_preferred": "Ethiopian",
         "cultures_accepted": [],
-        "currency": {
-            "id": 6,
-            "name": "ETB",
-            "long": "Birr"
-        },
+        "currency": 7,
         "tiles": [
             // Ethiopia
             "399N4,-3"
         ],
         "minwage": 35,
         "researched": [
-            "Forced Insemination",
-            "Industrial Gas Chambers",
-            "Mechanized Production",
-            "Hydraulic Fracking",
-            "Deepwater Drilling",
-            "Bayer Process",
-            "Taconite Concentration",
-            "Direct Lithium Extraction"
         ]
     }
 ]

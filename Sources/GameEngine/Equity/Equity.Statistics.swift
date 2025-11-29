@@ -34,7 +34,7 @@ extension Equity<LEI>.Statistics {
         return .init(
             owners: equity.shares.values.reduce(into: []) {
                 let location: Address
-                let culture: String?
+                let culture: CultureID?
 
                 switch $1.id {
                 case .building(let id):
@@ -62,11 +62,11 @@ extension Equity<LEI>.Statistics {
                     }
 
                     location = pop.tile
-                    culture = pop.nat
+                    culture = pop.race
                 }
 
                 guard
-                let region: RegionalProperties = context.planets[location]?.properties else {
+                let region: RegionalAuthority = context.planets[location]?.authority else {
                     return
                 }
 
@@ -76,7 +76,7 @@ extension Equity<LEI>.Statistics {
                         shares: $1.shares,
                         bought: $1.bought,
                         sold: $1.sold,
-                        country: region.governedBy.id,
+                        country: region.governedBy,
                         culture: culture
                     )
                 )

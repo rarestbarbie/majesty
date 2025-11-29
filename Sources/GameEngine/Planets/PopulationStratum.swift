@@ -3,7 +3,7 @@ import GameIDs
 @dynamicMemberLookup struct PopulationStratum {
     var all: [PopID]
     var total: Int64
-    var cultures: [String: Int64]
+    var cultures: [CultureID: Int64]
     var weighted: Fields
 }
 extension PopulationStratum {
@@ -36,7 +36,7 @@ extension PopulationStratum {
         let weight: Double = .init(pop.z.size)
         self.all.append(pop.id)
         self.total += pop.z.size
-        self.cultures[pop.nat, default: 0] += pop.z.size
+        self.cultures[pop.race, default: 0] += pop.z.size
         self.weighted.mil += pop.z.mil * weight
         self.weighted.con += pop.z.con * weight
     }

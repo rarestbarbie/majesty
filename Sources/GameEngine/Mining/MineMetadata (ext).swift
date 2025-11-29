@@ -63,10 +63,9 @@ extension MineMetadata {
             return size
         }
 
-        let authority: CountryProperties = tile.occupiedBy
         let factor: Decimal
 
-        if  let modifier: Decimal = authority.modifiers.miningWidth[self.id]?.value {
+        if  let modifier: Decimal = tile.modifiers.miningWidth[self.id]?.value {
             factor = Self.width + modifier
         } else {
             factor = Self.width
@@ -79,8 +78,6 @@ extension MineMetadata {
         efficiency: Double,
         value: Double
     ) {
-        let authority: CountryProperties = tile.occupiedBy
-
         let efficiency: Double
         if case .Politician = self.miner {
             let mil: Double = tile.pops.free.mil.average
@@ -88,7 +85,7 @@ extension MineMetadata {
                 Self.efficiencyPoliticians
             ) + Self.efficiencyPoliticiansPerMilitancyPoint * mil
         } else {
-            let bonus: Decimal = authority.modifiers.miningEfficiency[self.id]?.value ?? 0
+            let bonus: Decimal = tile.modifiers.miningEfficiency[self.id]?.value ?? 0
             efficiency = Double.init(
                 Self.efficiencyMiners + bonus
             )
@@ -100,7 +97,7 @@ extension MineMetadata {
             yieldBeforeScaling += price * Double.init(amount)
         }
         for (id, amount): (Resource, Int64) in self.base.tradeable {
-            let price: Double = turn.worldMarkets.price(of: id, in: authority.currency.id)
+            let price: Double = turn.worldMarkets.price(of: id, in: tile.currency.id)
             yieldBeforeScaling += price * Double.init(amount)
         }
 

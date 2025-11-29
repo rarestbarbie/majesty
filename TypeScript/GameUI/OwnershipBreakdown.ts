@@ -13,7 +13,7 @@ export class OwnershipBreakdown {
     public readonly node: HTMLDivElement;
 
     private readonly byCountry: PieChart<GameID>;
-    private readonly byCulture: PieChart<string>;
+    private readonly byCulture: PieChart<GameID>;
 
     private readonly terms: StaticList<Term, string>;
 
@@ -22,7 +22,7 @@ export class OwnershipBreakdown {
         tooltipCulture: TooltipType,
     ) {
         this.byCountry = new PieChart<GameID>(tooltipCountry);
-        this.byCulture = new PieChart<string>(tooltipCulture);
+        this.byCulture = new PieChart<GameID>(tooltipCulture);
 
         const left: HTMLDivElement = document.createElement('div');
 

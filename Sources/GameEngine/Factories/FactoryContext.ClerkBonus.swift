@@ -3,13 +3,12 @@ import GameEconomy
 import GameRules
 import GameIDs
 
-extension FactoryMetadata {
+extension FactoryContext {
     struct ClerkBonus {
         let ratio: Fraction
-        let type: PopType
     }
 }
-extension FactoryMetadata.ClerkBonus {
+extension FactoryContext.ClerkBonus {
     func optimal(for workers: Int64) -> Int64 {
         workers >< self.ratio
     }

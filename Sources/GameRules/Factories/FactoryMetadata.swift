@@ -9,7 +9,7 @@ public final class FactoryMetadata: GameMetadata {
     public let expansion: ResourceTier
     public let output: ResourceTier
     public let workers: Quantity<PopType>
-    public let clerks: Quantity<PopType>?
+    public let clerks: Quantity<PopType>
 
     public let sharesInitial: Int64
     public let sharesPerLevel: Int64
@@ -40,12 +40,12 @@ public final class FactoryMetadata: GameMetadata {
         guard workers.count == 1 else {
             throw FactoryMetadataError.workers(workers.map { $0.unit })
         }
-        guard clerks.count <= 1 else {
+        guard clerks.count == 1 else {
             throw FactoryMetadataError.clerks(clerks.map { $0.unit })
         }
 
         self.workers = workers[0]
-        self.clerks = clerks.first
+        self.clerks = clerks[0]
 
         self.sharesInitial = sharesInitial
         self.sharesPerLevel = sharesPerLevel

@@ -18,12 +18,12 @@ import OrderedCollections
     let date: GameDate
 }
 extension GameSnapshot {
-    var player: CountryProperties {
+    var playerCountry: Country {
         guard
         let player: CountryContext = self.countries[self.context.player] else {
             fatalError("player country does not exist in snapshot!")
         }
-        return player.properties
+        return player.state
     }
 }
 extension GameSnapshot {
@@ -37,7 +37,7 @@ extension GameSnapshot {
         _ line: InventoryLine,
     ) -> Tooltip? {
         guard
-        let country: CountryProperties = object.region?.occupiedBy else {
+        let region: RegionalProperties = object.region?.properties else {
             return nil
         }
 
@@ -46,8 +46,8 @@ extension GameSnapshot {
             segmented: LocalMarketSnapshot?,
             tradeable: BlocMarket.State?
         ) = (
-            self.markets.segmented[resource / object.state.tile]?.snapshot(country),
-            self.markets.tradeable[resource / country.currency.id]?.state
+            self.markets.segmented[resource / object.state.tile]?.snapshot(region),
+            self.markets.tradeable[resource / region.currency.id]?.state
         )
 
         return object.tooltipExplainPrice(line, market: market)
@@ -57,14 +57,14 @@ extension GameSnapshot {
         _ resource: InventoryLine,
     ) -> Tooltip? {
         guard
-        let country: CountryProperties = object.region?.occupiedBy else {
+        let region: RegionalProperties = object.region?.properties else {
             return nil
         }
 
         switch resource {
-        case .l(let id): return object.state.inventory.l.tooltipStockpile(id, country: country)
-        case .e(let id): return object.state.inventory.e.tooltipStockpile(id, country: country)
-        case .x(let id): return object.state.inventory.x.tooltipStockpile(id, country: country)
+        case .l(let id): return object.state.inventory.l.tooltipStockpile(id, region: region)
+        case .e(let id): return object.state.inventory.e.tooltipStockpile(id, region: region)
+        case .x(let id): return object.state.inventory.x.tooltipStockpile(id, region: region)
         case .o: return nil
         case .m: return nil
         }
@@ -139,7 +139,7 @@ extension GameSnapshot {
     }
     func tooltipBuildingOwnership(
         _ id: BuildingID,
-        culture: String,
+        culture: CultureID,
     ) -> Tooltip? {
         self.context.buildings[id]?.tooltipOwnership(culture: culture, context: self.context)
     }
@@ -258,7 +258,7 @@ extension GameSnapshot {
 
     func tooltipFactoryOwnership(
         _ id: FactoryID,
-        culture: String,
+        culture: CultureID,
     ) -> Tooltip? {
         self.context.factories[id]?.tooltipOwnership(culture: culture, context: self.context)
     }
@@ -305,11 +305,11 @@ extension GameSnapshot {
     ) -> Tooltip? {
         guard
         let planet: PlanetContext = self.context.planets[id],
-        let tile: PlanetGrid.Tile = planet.grid.tiles[cell],
-        let pops: PopulationStats = tile.properties?.pops else {
+        let tile: PlanetGrid.Tile = planet.grid.tiles[cell] else {
             return nil
         }
 
+        let pops: PopulationStats = tile.pops
         return .instructions(style: .borderless) {
             switch layer {
             case .Terrain:
@@ -516,7 +516,7 @@ extension GameSnapshot {
                             size: mine.state.z.size,
                             yieldRank: yieldRank
                         ),
-                        let miners: PopulationStats.Row = tile.properties?.pops.type[.Miner],
+                        let miners: PopulationStats.Row = tile.pops.type[.Miner],
                         let fromWorkers: Fraction = miners.mineExpansionFactor {
                         let fromDeposit: Double = .init(
                             mine.type.scale %/ (mine.type.scale + mine.state.z.size)
@@ -568,12 +568,12 @@ extension GameSnapshot {
     ) -> Tooltip? {
         guard
         let pop: PopContext = self.context.pops[id],
-        let country: CountryProperties = pop.region?.occupiedBy else {
+        let region: RegionalProperties = pop.region?.properties else {
             return nil
         }
 
-        let promotion: ConditionBreakdown = pop.buildPromotionMatrix(country: country)
-        let demotion: ConditionBreakdown = pop.buildDemotionMatrix(country: country)
+        let promotion: ConditionBreakdown = pop.buildPromotionMatrix(region: region)
+        let demotion: ConditionBreakdown = pop.buildDemotionMatrix(region: region)
 
         let promotions: Int64 = promotion.output > 0
             ? .init(Double.init(pop.state.z.size) * promotion.output * 30)
@@ -596,7 +596,7 @@ extension GameSnapshot {
 
     func tooltipPopOwnership(
         _ id: PopID,
-        culture: String,
+        culture: CultureID,
     ) -> Tooltip? {
         self.context.pops[id]?.tooltipOwnership(
             culture: culture,
@@ -681,14 +681,17 @@ extension GameSnapshot {
 extension GameSnapshot {
     func tooltipTileCulture(
         _ id: Address,
-        _ culture: String,
+        _ culture: CultureID,
     ) -> Tooltip? {
-        self.context.planets[id]?.properties?.pops.tooltip(culture: culture)
+        guard let culture: Culture = self.context.cultures.state[culture] else {
+            return nil
+        }
+        return self.context.planets[id]?.pops.tooltip(culture: culture)
     }
     func tooltipTilePopType(
         _ id: Address,
         _ popType: PopType,
     ) -> Tooltip? {
-        self.context.planets[id]?.properties?.pops.tooltip(popType: popType)
+        self.context.planets[id]?.pops.tooltip(popType: popType)
     }
 }

@@ -1,5 +1,7 @@
 import ColorText
 import D
+import Fraction
+import GameEconomy
 import GameConditions
 import GameIDs
 import GameRules
@@ -13,17 +15,46 @@ struct CountryModifiers {
     private(set) var livestockBreedingEfficiency: Stack<Decimal>
     private(set) var livestockCullingEfficiency: Stack<Decimal>
 
-    init() {
+    let localMarkets: [Resource: LocalMarket.Shape]
+
+    private init(localMarkets: [Resource: LocalMarket.Shape]) {
         self.factoryProductivity = [:]
         self.miningEfficiency = [:]
         self.miningWidth = [:]
 
         self.livestockBreedingEfficiency = .zero
         self.livestockCullingEfficiency = .zero
+
+        self.localMarkets = localMarkets
     }
 }
 extension CountryModifiers {
-    mutating func update(from technologies: [Technology], rules: GameRules) {
+    static func compute(for country: Country, rules: GameRules) -> Self {
+        var localMarkets: [Resource: LocalMarket.Shape] = [:]
+        for resource: ResourceMetadata in rules.resources.local {
+            let min: LocalPriceLevel?
+
+            if let hours: Int64 = resource.hours {
+                min = .init(
+                    price: LocalPrice.init(country.minwage %/ hours),
+                    label: .minimumWage
+                )
+            } else {
+                min = nil
+            }
+
+            localMarkets[resource.id] = .init(
+                storage: resource.storable ? 16 : nil,
+                limit: (min: min, max: nil)
+            )
+        }
+
+        var modifiers: CountryModifiers = .init(localMarkets: localMarkets)
+        ;   modifiers.update(from: country.researched, rules: rules)
+        return modifiers
+    }
+
+    private mutating func update(from technologies: [Technology], rules: GameRules) {
         for id: Technology in technologies {
             guard
             let technology: TechnologyMetadata = rules.technologies[id] else {

@@ -14,7 +14,7 @@ struct Pop: LegalEntityState, Identifiable {
     let id: PopID
     let tile: Address
     let type: PopType
-    let nat: String
+    let race: CultureID
 
     var inventory: Inventory
     var spending: Spending
@@ -33,7 +33,7 @@ extension Pop: Sectionable {
             id: id,
             tile: section.tile,
             type: section.type,
-            nat: section.culture,
+            race: section.race,
             inventory: .init(),
             spending: .zero,
             budget: nil,
@@ -46,7 +46,7 @@ extension Pop: Sectionable {
     }
 
     var section: Section {
-        .init(culture: self.nat, type: self.type, tile: self.tile)
+        .init(race: self.race, type: self.type, tile: self.tile)
     }
 }
 extension Pop: Deletable {
@@ -117,12 +117,7 @@ extension Pop {
                 continue
             }
 
-            let section: Section = .init(
-                culture: self.nat,
-                type: target,
-                tile: self.tile
-            )
-
+            let section: Section = .init(race: self.race, type: target, tile: self.tile)
             let inherits: Fraction
             if  size < self.z.size {
                 let fraction: Fraction = size %/ self.z.size
@@ -178,7 +173,7 @@ extension Pop {
         case id
         case tile = "on"
         case type
-        case nat
+        case race
 
         case inventory_out = "out"
         case inventory_l = "nl"
@@ -203,7 +198,7 @@ extension Pop: JavaScriptEncodable {
         js[.id] = self.id
         js[.tile] = self.tile
         js[.type] = self.type
-        js[.nat] = self.nat
+        js[.race] = self.race
         js[.inventory_l] = self.inventory.l
         js[.inventory_e] = self.inventory.e
         js[.inventory_x] = self.inventory.x
@@ -227,7 +222,7 @@ extension Pop: JavaScriptDecodable {
             id: try js[.id]?.decode() ?? 0,
             tile: try js[.tile].decode(),
             type: try js[.type].decode(),
-            nat: try js[.nat].decode(),
+            race: try js[.race].decode(),
             inventory: .init(
                 out: try js[.inventory_out]?.decode() ?? .empty,
                 l: try js[.inventory_l]?.decode() ?? .empty,
