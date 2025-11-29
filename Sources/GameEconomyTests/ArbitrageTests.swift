@@ -47,7 +47,7 @@ import Testing
         #expect(exchange[XAU / MAR].assets == (base: 1_002, quote: 1))
         #expect(exchange[XAU / UNB].assets == (base: 1, quote: 10_002))
 
-        var capital: Int64 = 10
+        var capital: Int64 = 1000
 
         /// Arbitrage should fail, because the forex market is not liquid enough.
         #expect(
@@ -58,7 +58,7 @@ import Testing
                 capital: &capital
             )
         )
-        #expect(capital == 10)
+        #expect(capital == 1000)
 
         /// Inject 100 units of liquidity into the forex market on both sides.
         exchange[MAR / UNB] = .init(liquidity: (base: 100, quote: 100))
@@ -92,7 +92,7 @@ import Testing
         #expect(exchange[MAR / UNB].volume.quote.total == 9_900)
 
         /// The trader should have made a sizable profit from the exchange.
-        #expect(capital == 108)
+        #expect(capital == 1098)
     }
 
     @Test static func forex() throws {

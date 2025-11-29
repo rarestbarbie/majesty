@@ -1,3 +1,5 @@
+import Assert
+import Fraction
 import GameIDs
 import LiquidityPool
 import OrderedCollections
@@ -116,85 +118,144 @@ extension WorldMarkets {
         )
     }
 
+    /// Attempts to find and execute profitable triangular arbitrage loops.
     @_spi(testable) public mutating func arbitrate(
         resource: WorldMarket.Asset,
         currency: CurrencyID,
         partners: [CurrencyID],
         capital: inout Int64
     ) -> ResourceArbitrage? {
-        /// This is the maximum amount of `resource` that we can export from the local market,
-        /// and how much of the `capital` it would cost.
-        let export: (cost: Int64, amount: Int64) = self[currency / resource].assets.quote(
-            capital
-        )
-        var best: ResourceArbitrage.Opportunity? = nil
-
+        var best: (market: CurrencyID, profit: Int64, size: Int64)? = nil
         for foreign: CurrencyID in partners {
-            if case .fiat(let fiat) = resource, fiat == foreign {
-                // Skip the same currency.
+            guard
+            let trade: (profit: Int64, size: Int64) = self.evaluate(
+                resource: resource,
+                currency: currency,
+                foreign: foreign,
+                capital: capital
+            ) else {
                 continue
             }
 
-            /// This is how much we would receive (`f`) in foreign currency. Some of the
-            /// exported resource might not get sold.
-            let (e, f): (cost: Int64, Int64) = self[resource / foreign].assets.quote(
-                export.amount
-            )
-            /// This is how much we would receive (`l`) in the local currency after converting
-            /// the proceeds (`f`). Some of the foreign currency might not get sold.
-            let (k, l): (cost: Int64, Int64) = self[foreign / currency].assets.quote(f)
-
-            /// Compute how much `resource` we would have to sell in this market to get the
-            /// amount of foreign currency that we can actually convert back, which may be less
-            /// than the total exportable amount, or even the exportable amount in this market.
-            let bottleneckedOnForex: Bool = k < f
-            let volume: Int64 = bottleneckedOnForex
-                ? self[resource / foreign].assets.quote(.max, limit: k).cost
-                : e
-
-            /// Now let’s compute how much it would actually cost just to buy the amount of
-            /// `resource` that we can actually export to this market.
-            let actual: (cost: Int64, _) = self[currency / resource].assets.quote(
-                .max,
-                limit: volume
-            )
-
-            assert(volume <= e)
-            assert(actual.cost <= export.cost)
-
-            let profit: Int64 = l - actual.cost
-            if  profit > best?.profit ?? 0 {
-                best = .init(
-                    market: foreign,
-                    profit: profit,
-                    volume: volume,
-                    bottleneckedOnForex: bottleneckedOnForex
-                )
+            if  trade.profit > best?.profit ?? 0 {
+                best = (foreign, trade.profit, trade.size)
             }
         }
 
-        guard
-        let best: ResourceArbitrage.Opportunity else {
-            // No arbitrage opportunity.
+        // 6. Execution
+        guard let match: (market: CurrencyID, profit: Int64, size: Int64) = best else {
             return nil
         }
 
-        var v: Int64 = self[currency / resource].swap(&capital, limit: best.volume)
+        var v: Int64 = self[currency / resource].swap(&capital, limit: match.size)
+        var f: Int64 = self[resource / match.market].sell(&v)
+        let l: Int64 = self[match.market / currency].sell(&f)
 
-        assert(v == best.volume)
-
-        var f: Int64 = self[resource / best.market].sell(&v)
-        let l: Int64 = self[best.market / currency].sell(&f)
-
-        assert(v == 0)
-        assert(f == 0)
+        // Accounting sanity check
+        #assert(v == 0, "Not all of the exported resource was sold in the arbitrage loop!!!")
+        #assert(f == 0, "Not all of the foreign currency was sold in the arbitrage loop!!!")
 
         capital += l
 
         return .init(
-            exported: best.volume,
+            exported: match.size,
             proceeds: l,
-            currency: best.market
+            currency: match.market
         )
+    }
+
+    /// The algorithm uses a Linear Approximation to determine the optimal trade size
+    /// in O(1) time per route, rather than iteratively searching for the peak.
+    private func evaluate(
+        resource: WorldMarket.Asset,
+        currency: CurrencyID,
+        foreign: CurrencyID,
+        capital: Int64
+    ) -> (profit: Int64, size: Int64)? {
+        if  case .fiat(foreign) = resource {
+            return nil
+        }
+
+        // 1. Snapshot the Pools (O(1) Access)
+        // The subscript logic guarantees these are oriented as Base -> Quote for our direction.
+        // Loop: Currency -> Resource -> Foreign -> Currency
+        let p: (LiquidityPool, LiquidityPool, LiquidityPool) = (
+            self[currency / resource],
+            self[resource / foreign],
+            self[foreign / currency],
+        )
+
+        // 2. "Flash Check" via Spot Price (Double Math)
+        // Calculate the infinitesimal spot price of the entire loop (Π).
+        let s: (Double, Double, Double) = (
+            p.0.price,
+            p.1.price,
+            p.2.price
+        )
+
+        // filter out unprofitable loops early, and loops that make less than 0.1% profit
+        let Π: Double = s.0 * s.1 * s.2
+        if  Π <= 1.001 {
+            return nil
+        }
+
+        // 3. Calculate Optimal Trade Size (Linear Approximation)
+        // Formula: x* ≈ (Π - 1) / (2 * Sum(1/X_n))
+        // This estimates the input amount where Marginal Return = 1.0 (Peak Profit).
+        let friction: Double =
+        (1.0 / Double.init(p.0.assets.base)) +
+        (1.0 / Double.init(p.1.assets.base)) +
+        (1.0 / Double.init(p.2.assets.base))
+
+        let optimalFloat: Double = (Π - 1.0) / (2.0 * friction)
+
+        // 4. Safety Clamping
+        // We multiply by 0.99 to account for the convexity of the CPMM curve (the linear
+        // guess usually slightly overshoots). We also strictly clamp to available capital
+        // and the shallowest pool depth to prevent pool draining.
+        let bottleneck: Int64 = min(p.0.assets.base, min(p.1.assets.base, p.2.assets.base))
+        let limit: Int64 = min(capital, bottleneck)
+
+        let quantity: Int64 = min(Int64(optimalFloat * 0.99), limit)
+        if  quantity <= 0 {
+            return nil
+        }
+
+        // 5. Verify Exact Profit (Integer Math)
+        // We simulate the trade with the guessed size to get the true integer profit.
+
+        let (cost, exportable): (cost: Int64, Int64) = p.0.assets.quote(quantity)
+        /// This is how much we would receive (`received`) in foreign currency. Some of the
+        /// exported resource might not get sold.
+        let (exported, received): (cost: Int64, Int64)  = p.1.assets.quote(exportable)
+        /// This is how much we would receive (`revenue`) in the local currency after converting
+        /// the proceeds (`received`). Some of the foreign currency might not get sold.
+        let (converted, revenue): (cost: Int64, Int64)  = p.2.assets.quote(received)
+
+        /// Compute how much `resource` we would have to sell in this market to get the
+        /// amount of foreign currency that we can actually convert back, which may be less
+        /// than the total exportable amount, or even the exportable amount in this market.
+        let actual: (cost: Int64, volume: Int64)
+        if  converted < received {
+            // we are bottlenecked on forex conversion, compute the amount of resource we would
+            // need to sell to get at most `converted` foreign currency
+            actual.volume = p.1.assets.quote(.max, limit: converted).cost
+        } else {
+            actual.volume = exported
+        }
+
+        /// Now let’s compute how much it would actually cost just to buy the amount of
+        /// `resource` that we can actually export to this market.
+        if  actual.volume < exportable {
+            actual.cost = p.0.assets.quote(.max, limit: actual.volume).cost
+        } else {
+            actual.cost = cost
+        }
+
+        #assert(actual.volume <= exported, "Exported more resource than we could sell!!!")
+        #assert(actual.cost <= cost, "Spent more capital than we had!!!")
+
+        let profit: Int64 = revenue - actual.cost
+        return profit > 0 ? (profit, actual.volume) : nil
     }
 }
