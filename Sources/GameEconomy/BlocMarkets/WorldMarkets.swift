@@ -202,11 +202,12 @@ extension WorldMarkets {
         // 3. Calculate Optimal Trade Size (Linear Approximation)
         // Formula: x* ≈ (Π - 1) / (2 * Sum(1/X_n))
         // This estimates the input amount where Marginal Return = 1.0 (Peak Profit).
-        let friction: Double =
-        (1.0 / Double.init(p.0.assets.base)) +
-        (1.0 / Double.init(p.1.assets.base)) +
-        (1.0 / Double.init(p.2.assets.base))
-
+        let f: (Double, Double, Double) = (
+            1 / Double.init(p.0.assets.base),
+            s.0 / Double.init(p.1.assets.base),
+            s.1 * s.0 / Double.init(p.2.assets.base)
+        )
+        let friction: Double = f.0 + f.1 + f.2
         let optimalFloat: Double = (Π - 1.0) / (2.0 * friction)
 
         // 4. Safety Clamping
@@ -216,7 +217,7 @@ extension WorldMarkets {
         let bottleneck: Int64 = min(p.0.assets.base, min(p.1.assets.base, p.2.assets.base))
         let limit: Int64 = min(capital, bottleneck)
 
-        let quantity: Int64 = min(Int64(optimalFloat * 0.99), limit)
+        let quantity: Int64 = min(Int64.init(optimalFloat * 0.99), limit)
         if  quantity <= 0 {
             return nil
         }
