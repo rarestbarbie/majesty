@@ -167,7 +167,7 @@ export class PopulationOverview extends ScreenContent {
     }
 
     public update(state: PopulationReport): void {
-        if (!this.dom || state.pops.length == 0) {
+        if (!this.dom) {
             return;
         }
 
