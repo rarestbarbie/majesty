@@ -208,7 +208,7 @@ extension WorldMarkets {
             s.1 * s.0 / Double.init(p.2.assets.base)
         )
         let friction: Double = f.0 + f.1 + f.2
-        let optimalFloat: Double = (Π - 1.0) / (2.0 * friction)
+        let optimum: Double = (Π - 1.0) / (2.0 * friction)
 
         // 4. Safety Clamping
         // We multiply by 0.99 to account for the convexity of the CPMM curve (the linear
@@ -217,7 +217,7 @@ extension WorldMarkets {
         let bottleneck: Int64 = min(p.0.assets.base, min(p.1.assets.base, p.2.assets.base))
         let limit: Int64 = min(capital, bottleneck)
 
-        let quantity: Int64 = min(Int64.init(optimalFloat * 0.99), limit)
+        let quantity: Int64 = min(Int64.init(optimum * 0.99), limit)
         if  quantity <= 0 {
             return nil
         }
