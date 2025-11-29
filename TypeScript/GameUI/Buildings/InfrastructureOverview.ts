@@ -159,7 +159,7 @@ export class InfrastructureOverview extends ScreenContent {
     }
 
     public update(state: InfrastructureReport): void {
-        if (!this.dom || state.buildings.length == 0) {
+        if (!this.dom) {
             return;
         }
 

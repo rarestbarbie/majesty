@@ -159,7 +159,7 @@ export class ProductionOverview extends ScreenContent {
     }
 
     public update(state: ProductionReport): void {
-        if (!this.dom || state.factories.length == 0) {
+        if (!this.dom) {
             return;
         }
 
