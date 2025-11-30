@@ -80,9 +80,9 @@ extension WorldMarkets {
         currency: CurrencyID,
         partners: [CurrencyID],
         capital: inout Int64
-    ) -> [ResourceArbitrage] {
+    ) -> [ArbitrageOpportunity] {
         partners.reduce(into: []) {
-            if let arbitrage: ResourceArbitrage = self.arbitrate(
+            if  let arbitrage: ArbitrageOpportunity = self.arbitrate(
                     resource: .fiat($1),
                     currency: currency,
                     partners: partners,
@@ -104,12 +104,12 @@ extension WorldMarkets {
     /// -   Parameter `capital`:
     ///     The amount of funds available for the initial purchase.
     ///     This has units of `currency`.
-    public mutating func arbitrate(
+    @inlinable public mutating func arbitrate(
         resource: Resource,
         currency: CurrencyID,
         partners: [CurrencyID],
         capital: inout Int64
-    ) -> ResourceArbitrage? {
+    ) -> ArbitrageOpportunity? {
         self.arbitrate(
             resource: .good(resource),
             currency: currency,
@@ -119,13 +119,13 @@ extension WorldMarkets {
     }
 
     /// Attempts to find and execute profitable triangular arbitrage loops.
-    @_spi(testable) public mutating func arbitrate(
+    @inlinable public mutating func arbitrate(
         resource: WorldMarket.Asset,
         currency: CurrencyID,
         partners: [CurrencyID],
         capital: inout Int64
-    ) -> ResourceArbitrage? {
-        var best: (market: CurrencyID, profit: Int64, size: Int64)? = nil
+    ) -> ArbitrageOpportunity? {
+        var best: ArbitrageOpportunity? = nil
         for foreign: CurrencyID in partners {
             guard
             let trade: (profit: Int64, size: Int64) = self.evaluate(
@@ -138,35 +138,63 @@ extension WorldMarkets {
             }
 
             if  trade.profit > best?.profit ?? 0 {
-                best = (foreign, trade.profit, trade.size)
+                best = .init(market: foreign, profit: trade.profit, volume: trade.size)
             }
         }
 
         // 6. Execution
-        guard let match: (market: CurrencyID, profit: Int64, size: Int64) = best else {
+        guard let match: ArbitrageOpportunity = best else {
             return nil
         }
 
-        var v: Int64 = self[currency / resource].swap(&capital, limit: match.size)
-        var f: Int64 = self[resource / match.market].sell(&v)
-        let l: Int64 = self[match.market / currency].sell(&f)
+        self.execute(
+            resource: resource,
+            currency: currency,
+            triangle: match,
+            capital: &capital
+        )
+
+        return match
+    }
+
+    public mutating func execute(
+        resource: WorldMarket.Asset,
+        currency: CurrencyID,
+        triangle: ArbitrageOpportunity,
+        capital: inout Int64
+    ) {
+        var v: Int64 = self[currency / resource].swap(&capital, limit: triangle.volume)
+        var f: Int64 = self[resource / triangle.market].sell(&v)
+        let l: Int64 = self[triangle.market / currency].sell(&f)
 
         // Accounting sanity check
         #assert(v == 0, "Not all of the exported resource was sold in the arbitrage loop!!!")
         #assert(f == 0, "Not all of the foreign currency was sold in the arbitrage loop!!!")
 
         capital += l
+    }
 
-        return .init(
-            exported: match.size,
-            proceeds: l,
-            currency: match.market
-        )
+    public func evaluate(
+        resource: WorldMarket.Asset,
+        currency: CurrencyID,
+        foreign: CurrencyID,
+        capital: Int64
+    ) -> ArbitrageOpportunity? {
+        guard let trade: (profit: Int64, size: Int64) = self.evaluate(
+            resource: resource,
+            currency: currency,
+            foreign: foreign,
+            capital: capital
+        ) else {
+            return nil
+        }
+
+        return .init(market: foreign, profit: trade.profit, volume: trade.size)
     }
 
     /// The algorithm uses a Linear Approximation to determine the optimal trade size
     /// in O(1) time per route, rather than iteratively searching for the peak.
-    private func evaluate(
+    @usableFromInline func evaluate(
         resource: WorldMarket.Asset,
         currency: CurrencyID,
         foreign: CurrencyID,
@@ -240,6 +268,9 @@ extension WorldMarkets {
         if  converted < received {
             // we are bottlenecked on forex conversion, compute the amount of resource we would
             // need to sell to get at most `converted` foreign currency
+
+            // this isn’t really a useful signal about the liquidity of the forex market, we
+            // only do it to make sure the exact quantities line up
             actual.volume = p.1.assets.quote(.max, limit: converted).cost
         } else {
             actual.volume = exported

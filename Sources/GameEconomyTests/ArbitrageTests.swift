@@ -63,7 +63,7 @@ import Testing
         /// Inject 100 units of liquidity into the forex market on both sides.
         exchange[MAR / UNB] = .init(liquidity: (base: 100, quote: 100))
 
-        let arbitrage: ResourceArbitrage = try #require(
+        let arbitrage: ArbitrageOpportunity = try #require(
             exchange.arbitrate(
                 resource: XAU,
                 currency: MAR,
@@ -72,9 +72,9 @@ import Testing
             )
         )
 
-        #expect(arbitrage.exported == 98)
-        #expect(arbitrage.proceeds == 99)
-        #expect(arbitrage.currency == UNB)
+        #expect(arbitrage.volume == 98)
+        #expect(arbitrage.profit == 98)
+        #expect(arbitrage.market == UNB)
 
         /// Some of the Martian gold should have left Mars. Its local price should be higher
         /// than it was before.
@@ -125,7 +125,7 @@ import Testing
         /// Since the Lunar Bancor can also be turned back into United Nations Bancor at a 1:1
         /// exchange rate, the arbitrageur end up with much more UNB than they started with.
         var capital: Int64 = 5
-        let arbitrage: ResourceArbitrage = try #require(
+        let arbitrage: ArbitrageOpportunity = try #require(
             exchange.arbitrate(
                 resource: .fiat(MAR),
                 currency: UNB,
@@ -137,12 +137,13 @@ import Testing
         /// In an infinitely liquid market, the arbitrageur would profited tenfold, but since
         /// the three markets have finite liquidity, the actual profit is lower.
         #expect(capital == 23)
-        #expect(arbitrage.exported == 43)
+        #expect(arbitrage.profit == 18)
+        #expect(arbitrage.volume == 43)
         /// Although a similar arbitrage opportunity exists with the Ceres Reserve Note,
         /// the arbitrageur should have chosen the Lunar Bancor, since it is more profitable.
         /// It is more profitable because the LUB/UNB market is more liquid than the CRN/UNB
         /// market, so it would experience less slippage.
-        #expect(arbitrage.currency == LUB)
+        #expect(arbitrage.market == LUB)
 
         /// The Martian Rand should have appreciated against the United Nations Bancor,
         /// since it had been pegged to the Lunar Bancor, which itself had been pegged to the
@@ -183,7 +184,7 @@ import Testing
 
         // this is basically the same setup as before, but with larger capital
         var capital: Int64 = 1000
-        let arbitrage: ResourceArbitrage = try #require(
+        let arbitrage: ArbitrageOpportunity = try #require(
             exchange.arbitrate(
                 resource: .fiat(MAR),
                 currency: UNB,
@@ -194,8 +195,9 @@ import Testing
 
         // absolute profit is the same, but volume moved is much larger ...
         #expect(capital == 1018)
-        #expect(arbitrage.exported == 164)
-        #expect(arbitrage.currency == LUB)
+        #expect(arbitrage.profit == 18)
+        #expect(arbitrage.volume == 164)
+        #expect(arbitrage.market == LUB)
 
         // ... and has a correspondingly larger impact on the markets.
         #expect(exchange[MAR / UNB].assets == (base: 836, quote: 120))
