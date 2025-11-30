@@ -93,14 +93,16 @@ extension GameStart {
         var factories: [Factory] = []
         var factory: FactoryID = 0
         for group: FactorySeedGroup in self.factories {
-            for seed: Symbol in group.factories {
+            for seed: Quantity<FactoryType> in try group.factories.quantities(
+                    keys: symbols.static.factories
+                ) {
                 let section: Factory.Section = .init(
-                    type: try symbols.static.factories[seed],
+                    type: seed.unit,
                     tile: group.tile
                 )
                 var factory: Factory = .init(id: factory.increment(), section: section)
 
-                factory.size = .init(level: 0, growthProgress: Factory.Size.growthRequired - 1)
+                factory.size = .init(level: seed.amount)
                 factories.append(factory)
             }
         }

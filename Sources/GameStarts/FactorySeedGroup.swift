@@ -6,7 +6,7 @@ import JavaScriptKit
 
 @frozen public struct FactorySeedGroup {
     public let tile: Address
-    public let factories: [Symbol]
+    public let factories: SymbolTable<Int64>
 }
 extension FactorySeedGroup: JavaScriptDecodable {
     @frozen public enum ObjectKey: JSString {
@@ -17,7 +17,7 @@ extension FactorySeedGroup: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             tile: try js[.tile].decode(),
-            factories: try js[.factories]?.decode() ?? []
+            factories: try js[.factories]?.decode() ?? [:]
         )
     }
 }
