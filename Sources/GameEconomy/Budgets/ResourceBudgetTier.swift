@@ -55,6 +55,31 @@ extension ResourceBudgetTier {
     }
     public mutating func distributeAsBusiness(
         funds available: Int64,
+        segmented: Double,
+        tradeable: Double,
+        w: Double,
+    ) -> Int64? {
+        guard available > 0 else {
+            return nil
+        }
+
+        let totalCost: Int64 = .init((tradeable + segmented + w).rounded(.up))
+        let items: [Int64]? = [
+            tradeable,
+            segmented,
+            w
+        ].distribute(min(totalCost, available))
+
+        if  let items: [Int64] {
+            self.tradeable += items[0]
+            self.segmented += items[1]
+            return items[2]
+        } else {
+            return nil
+        }
+    }
+    public mutating func distributeAsBusiness(
+        funds available: Int64,
         segmented: Int64,
         tradeable: Int64,
     ) {
@@ -77,13 +102,35 @@ extension ResourceBudgetTier {
         segmented: Int64,
         tradeable: Int64,
         w: Int64,
+    ) -> Int64? {
+        guard available > 0 else {
+            return nil
+        }
+
+        // closure instead of keypath, to avoid compiler optimization issues
+        let items: [Int64]? = [tradeable, segmented, w].distribute(share: { $0 }) {
+            min($0, available)
+        }
+
+        if  let items: [Int64] {
+            self.tradeable += items[0]
+            self.segmented += items[1]
+            return items[2]
+        } else {
+            return nil
+        }
+    }
+    public mutating func distributeAsBusiness(
+        funds available: Int64,
+        segmented: Int64,
+        tradeable: Int64,
+        w: Int64,
         c: Int64,
     ) -> (w: Int64, c: Int64)? {
         guard available > 0 else {
             return nil
         }
 
-        // closure instead of keypath, to avoid compiler optimization issues
         let items: [Int64]? = [tradeable, segmented, w, c].distribute(share: { $0 }) {
             min($0, available)
         }

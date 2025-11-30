@@ -23,11 +23,12 @@ extension Factory {
         /// Input efficiency.
         var ei: Double
         /// Output efficiency.
-        var eo: Double
+        var eo: Double { 1 }
 
         var fl: Double
         var fe: Double
         var fx: Double
+        var fk: Double
 
         /// Share price.
         var px: Double
@@ -46,10 +47,10 @@ extension Factory.Dimensions {
             cf: nil,
             cn: 1,
             ei: 1,
-            eo: 1,
             fl: 0,
             fe: 0,
             fx: 0,
+            fk: 0,
             px: 1,
             profitability: 1
         )
@@ -65,10 +66,10 @@ extension Factory.Dimensions {
         case cf = "cf"
         case cn = "cn"
         case ei = "ei"
-        case eo = "eo"
         case fl = "fl"
         case fe = "fe"
         case fx = "fx"
+        case fk = "fk"
         case px = "px"
         case profitability = "pa"
     }
@@ -83,10 +84,10 @@ extension Factory.Dimensions: JavaScriptEncodable {
         js[.cf] = self.cf
         js[.cn] = self.cn
         js[.ei] = self.ei
-        js[.eo] = self.eo
         js[.fl] = self.fl
         js[.fe] = self.fe
         js[.fx] = self.fx
+        js[.fk] = self.fk
         js[.px] = self.px
         js[.profitability] = self.profitability
     }
@@ -102,10 +103,10 @@ extension Factory.Dimensions: JavaScriptDecodable {
             cf: try js[.cf]?.decode(),
             cn: try js[.cn]?.decode() ?? 1,
             ei: try js[.ei]?.decode() ?? 1,
-            eo: try js[.eo]?.decode() ?? 1,
             fl: try js[.fl]?.decode() ?? 0,
             fe: try js[.fe]?.decode() ?? 0,
             fx: try js[.fx]?.decode() ?? 0,
+            fk: try js[.fk]?.decode() ?? 0,
             px: try js[.px]?.decode() ?? 0,
             profitability: try js[.profitability]?.decode() ?? 0,
         )
