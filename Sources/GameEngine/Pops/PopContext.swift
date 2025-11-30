@@ -527,12 +527,14 @@ extension PopContext {
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
-            $0[1 - self.stats.employmentBeforeEgress] {
-                $0[$1 >= 0.1] = +2‱
-                $0[$1 >= 0.2] = +1‱
-                $0[$1 >= 0.3] = +1‱
-                $0[$1 >= 0.4] = +1‱
-            } = { "\(+$0[%]): Unemployment is above \(em: $1[%0])" }
+            if !self.state.type.aristocratic {
+                $0[1 - self.stats.employmentBeforeEgress] {
+                    $0[$1 >= 0.1] = +2‱
+                    $0[$1 >= 0.2] = +1‱
+                    $0[$1 >= 0.3] = +1‱
+                    $0[$1 >= 0.4] = +1‱
+                } = { "\(+$0[%]): Unemployment is above \(em: $1[%0])" }
+            }
 
             $0[self.state.y.fl] {
                 $0[$1 < 1.00] = +1‰
