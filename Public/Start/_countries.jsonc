@@ -24,7 +24,7 @@
             // Midway
             "399N-4,1"
         ],
-        "minwage": 260,
+        "minwage": 50,
         "researched": [
         ]
     },
@@ -45,7 +45,7 @@
             // Hudson Bay
             "399N-1,1"
         ],
-        "minwage": 275
+        "minwage": 50
     },
 
     {
@@ -107,7 +107,7 @@
             // Greenland
             "399N1,1"
         ],
-        "minwage": 165
+        "minwage": 50
     },
     {
         "name": {
@@ -268,7 +268,7 @@
             // Queen Maud Land
             "399S1,-1"
         ],
-        "minwage": 250
+        "minwage": 50
     },
     {
         "name": {
@@ -285,7 +285,7 @@
             // Holy Land
             "399N3,-3"
         ],
-        "minwage": 125
+        "minwage": 30
     },
     {
         "name": {
@@ -322,7 +322,7 @@
             // Taiwan
             "399N-1,-2"
         ],
-        "minwage": 95
+        "minwage": 25
     },
     {
         "name": {
@@ -344,7 +344,7 @@
             // New Territories
             "399S0,-1"
         ],
-        "minwage": 245
+        "minwage": 50
     },
     {
         "name": {
@@ -361,7 +361,7 @@
             // New Zealand
             "399S-2,0"
         ],
-        "minwage": 255
+        "minwage": 50
     },
     {
         "name": {
@@ -378,7 +378,7 @@
             // Japan
             "399N-2,-1"
         ],
-        "minwage": 190
+        "minwage": 50
     },
 
     // countries without suzerain set

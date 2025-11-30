@@ -64,10 +64,11 @@ extension PopType: LosslessStringConvertible {
     }
 }
 extension PopType {
-    @inlinable public var miner: Bool {
+    @inlinable public var aristocratic: Bool {
         switch self {
-        case .Politician: true
-        case .Miner: true
+        case .Influencer: true
+        case .Consultant: true
+        case .Aristocrat: true
         default: false
         }
     }

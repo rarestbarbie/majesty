@@ -42,8 +42,19 @@ extension FactoryContext {
     private static var stockpileDays: ClosedRange<Int64> { 3 ... 7 }
 
     static var efficiencyBonusFromCorporate: Double { 0.3 }
-    static var pr: Int { 8 }
+    static var efficiencyBonusFromClerks: Double { 0.3 }
 
+    static func efficiencyBonusFromCorporate(fe: Double) -> Double {
+        Self.efficiencyBonusFromCorporate * .sqrt(fe)
+    }
+    static func efficiencyBonusFromClerks(fk: Double) -> Double {
+        Self.efficiencyBonusFromClerks * .sqrt(fk)
+    }
+
+
+    static var pr: Int { 8 }
+}
+extension FactoryContext {
     mutating func startIndexCount() {
         if self.state.size.level == 0 {
             self.workers = nil
@@ -121,11 +132,13 @@ extension FactoryContext: TransactingContext {
             0 ... 1 ~= self.state.y.fe,
             "Factory input efficiency out of bounds! (\(self.state.y.fe))"
         )
-        // Input efficiency, bonus from buying all corporate needs yesterday.
+        // Input efficiency, bonus from paying clerks and buying all corporate needs yesterday
         if  self.state.size.level == 0 {
             self.state.z.ei = 1
         } else {
-            self.state.z.ei = 1 - Self.efficiencyBonusFromCorporate * .sqrt(self.state.y.fe)
+            self.state.z.ei = 1
+                - Self.efficiencyBonusFromCorporate(fe: self.state.y.fe)
+                - Self.efficiencyBonusFromClerks(fk: self.state.y.fk)
         }
 
         // Reset fill positions, since they are copied from yesterday’s positions by default.
@@ -197,9 +210,10 @@ extension FactoryContext: TransactingContext {
                 account: turn.bank[account: self.lei],
                 weights: weights,
                 state: self.state.z,
+                type: self.type,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
                 workers: workers,
-                clerks: (clerks, self.type.clerkBonus),
+                clerks: clerks,
                 invest: utilization * max(0, self.state.z.profitability),
                 d: .business,
             )
@@ -229,6 +243,7 @@ extension FactoryContext: TransactingContext {
                 account: turn.bank[account: self.lei],
                 weights: weights,
                 state: self.state.z,
+                type: self.type,
                 stockpileMaxDays: Self.stockpileDays.upperBound,
                 workers: nil,
                 clerks: nil,
@@ -307,37 +322,30 @@ extension FactoryContext: TransactingContext {
             let hireToday: (clerks: Int64, workers: Int64)
             let hireLater: (clerks: Int64, workers: Int64)
 
-            if  let clerks: ClerkEffects = self.clerkEffects {
-                let update: OfficeUpdate = .operate(
+            let profit: ProfitMargins
+
+            if  let workers: Workforce = self.workers,
+                let clerks: Workforce = self.clerks {
+                let office: OfficeUpdate = .operate(
                     factory: self.state,
                     type: self.type,
+                    workers: workers,
                     clerks: clerks,
-                    budget: budget.clerks,
+                    budget: budget,
                     turn: &turn
                 )
 
-                self.state.spending.salariesUsed += update.salariesPaid - update.salariesIdle
-                self.state.spending.salariesIdle += update.salariesIdle
+                self.state.spending.salariesUsed += office.salariesPaid - office.salariesIdle
+                self.state.spending.salariesIdle += office.salariesIdle
 
-                self.state.z.eo = 1 + update.bonus
+                self.state.z.fk = office.fk
 
-                fireToday.clerks = update.fireToday
-                fireLater.clerks = update.fireLater
-                hireToday.clerks = update.hireToday
-                hireLater.clerks = update.hireLater
-            } else {
-                self.state.z.eo = 1
+                fireToday.clerks = office.fireToday
+                fireLater.clerks = office.fireLater
+                hireToday.clerks = office.hireToday
+                hireLater.clerks = office.hireLater
 
-                fireToday.clerks = 0
-                fireLater.clerks = 0
-                hireToday.clerks = 0
-                hireLater.clerks = 0
-            }
-
-            let profit: ProfitMargins
-
-            if  let workers: Workforce = self.workers {
-                let update: FloorUpdate = self.operate(
+                let floor: FloorUpdate = self.operate(
                     workers: workers,
                     region: region,
                     budget: budget,
@@ -369,26 +377,33 @@ extension FactoryContext: TransactingContext {
                         }
                     }
 
-                    let fireExpedited: Int64 = max(0, fire - update.fireToday)
-                    fireToday.workers = update.fireToday + fireExpedited
-                    fireLater.workers = max(0, update.fireLater - fireExpedited)
+                    let fireExpedited: Int64 = max(0, fire - floor.fireToday)
+                    fireToday.workers = floor.fireToday + fireExpedited
+                    fireLater.workers = max(0, floor.fireLater - fireExpedited)
 
                     hireToday.workers = 0
                     hireLater.workers = 0
                 } else {
-                    fireToday.workers = update.fireToday
-                    fireLater.workers = update.fireLater
+                    fireToday.workers = floor.fireToday
+                    fireLater.workers = floor.fireLater
 
-                    hireToday.workers = update.hireToday
-                    hireLater.workers = update.hireLater
+                    hireToday.workers = floor.hireToday
+                    hireLater.workers = floor.hireLater
                 }
             } else {
-                profit = self.state.profit
+                self.state.z.fk = 0
+
+                fireToday.clerks = 0
+                fireLater.clerks = 0
+                hireToday.clerks = 0
+                hireLater.clerks = 0
 
                 fireToday.workers = 0
                 fireLater.workers = 0
                 hireToday.workers = 0
                 hireLater.workers = 0
+
+                profit = self.state.profit
             }
 
             let fire: (clerks: Int64, workers: Int64)
@@ -628,7 +643,7 @@ extension FactoryContext {
         )
         self.state.inventory.e.consume(
             from: self.type.corporate,
-            scalingFactor: (throughput, self.state.z.ei * budget.corporate)
+            scalingFactor: (throughput, self.state.z.ei * budget.fe)
         )
 
         self.state.inventory.out.deposit(
@@ -639,28 +654,9 @@ extension FactoryContext {
         self.state.z.fl = self.state.inventory.l.fulfilled
         // `fulfilled` counts stockpiled resources that were saved for the next day,
         // so to compute the actual usage today we need `min` it with the consumption fraction
-        self.state.z.fe = min(self.state.inventory.e.fulfilled, budget.corporate)
+        self.state.z.fe = min(self.state.inventory.e.fulfilled, budget.fe)
 
         return update
-    }
-}
-extension FactoryContext {
-    private var clerkEffects: ClerkEffects? {
-        guard
-        let workers: Workforce = self.workers,
-        let clerks: Workforce = self.clerks else {
-            return nil
-        }
-
-        let optimal: Int64 = self.type.clerkBonus.optimal(for: workers.count)
-        return .init(
-            workforce: clerks,
-            optimal: optimal,
-            bonus: clerks.count < optimal
-                ? Double.init(clerks.count) / Double.init(optimal)
-                : 1,
-            clerk: self.type.clerks.unit
-        )
     }
 }
 extension FactoryContext: LegalEntityTooltipBearing {
@@ -757,25 +753,37 @@ extension FactoryContext {
         }
     }
     func tooltipClerks() -> Tooltip? {
-        guard let clerks: ClerkEffects = self.clerkEffects else {
+        guard
+        let workers: Workforce = self.workers,
+        let clerks: Workforce = self.clerks else {
             return nil
         }
         return .instructions {
-            $0[clerks.clerk.plural] = clerks.workforce.count[/3] / clerks.workforce.limit
+            $0[self.type.clerks.unit.plural] = clerks.count[/3] / clerks.limit
             $0[>] {
-                $0["Output bonus", +] = +clerks.bonus[%2]
+                let bonus: Double = Self.efficiencyBonusFromClerks(fk: self.state.z.fk)
+                $0["Input efficiency", -] = +(-bonus)[%2]
             }
             $0["Current salary"] = self.state.Δ.wn[/3]
+
+            let clerkHorizon: Int64 = self.type.clerkHorizon(for: workers.count)
+            if case .active(let budget)? = self.state.budget, budget.fk < 1 {
+                $0[>] = """
+                Due to the present \(em: "skills shortage"), this factory is only employing \
+                \(neg: (100 * budget.fk)[..1]) percent of its maximum number of clerks
+                """
+            }
+
             $0[>] = """
-            The optimal number of clerks for this factory is \(
-                clerks.optimal,
-                style: clerks.workforce.count <= clerks.optimal ? .em : .neg
-            )
+            At most \(
+                clerkHorizon,
+                style: clerks.count <= clerkHorizon ? .em : .neg
+            ) clerks may contribute to this factory
             """
             $0[>] = """
             Clerks help factories produce more, but are also much harder to fire
             """
-            clerks.workforce.explainChanges(&$0)
+            clerks.explainChanges(&$0)
         }
     }
 
@@ -801,16 +809,19 @@ extension FactoryContext {
                     $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
                     $0["Efficiency", -] = +?(self.state.z.ei - 1)[%2]
                 }
-                $0[>] = self.state.z.ei < 1 ? """
-                Today this factory saved \(pos: (1 - self.state.z.ei)[%1]) on all inputs
+
+                let bonus: Double = Self.efficiencyBonusFromCorporate(fe: self.state.z.fe)
+
+                $0[>] = bonus > 0 ? """
+                Today this factory saved \(pos: bonus[%1]) on all inputs
                 """ : """
                 Factories that purchase all of their corporate supplies are more efficient
                 """
 
-                if case .active(let budget)? = self.state.budget, budget.corporate < 1 {
+                if case .active(let budget)? = self.state.budget, budget.fe < 1 {
                     $0[>] = """
                     Due to high \(em: "compliance costs"), this factory is only purchasing \
-                    \(neg: (100 * budget.corporate)[..1]) percent of its corporate supplies
+                    \(neg: (100 * budget.fe)[..1]) percent of its corporate supplies
                     """
                 }
             case .x:
