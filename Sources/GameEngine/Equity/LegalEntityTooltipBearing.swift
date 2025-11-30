@@ -4,6 +4,6 @@ import GameUI
 protocol LegalEntityTooltipBearing: LegalEntityContext {
     func tooltipExplainPrice(
         _ line: InventoryLine,
-        market: (segmented: LocalMarketSnapshot?, tradeable: BlocMarket.State?)
+        market: (segmented: LocalMarketSnapshot?, tradeable: WorldMarket.State?)
     ) -> Tooltip?
 }

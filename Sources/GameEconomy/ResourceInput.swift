@@ -107,7 +107,7 @@ extension ResourceInput {
         stockpileDays: ClosedRange<Int64>,
         budget: Int64,
         in currency: CurrencyID,
-        on exchange: inout BlocMarkets
+        on exchange: inout WorldMarkets
     ) -> Int64 {
         {
             let target: Int64 = self.unitsDemanded * stockpileDays.lowerBound

@@ -65,7 +65,7 @@ extension ResourceOutputs {
     /// Returns the amount of funds actually received.
     public mutating func sell(
         in currency: CurrencyID,
-        on exchange: inout BlocMarkets,
+        on exchange: inout WorldMarkets,
     ) -> Int64 {
         self.tradeable.values.indices.reduce(into: 0) {
             $0 += self.tradeable.values[$1].sell(in: currency, on: &exchange)

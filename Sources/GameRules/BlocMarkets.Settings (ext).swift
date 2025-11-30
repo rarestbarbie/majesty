@@ -3,7 +3,7 @@ import GameEconomy
 import JavaScriptKit
 import JavaScriptInterop
 
-extension BlocMarkets.Settings {
+extension WorldMarkets.Settings {
     @frozen public enum ObjectKey: JSString {
         case dividend
         case fee
@@ -11,7 +11,7 @@ extension BlocMarkets.Settings {
         case history
     }
 }
-extension BlocMarkets.Settings: JavaScriptDecodable {
+extension WorldMarkets.Settings: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         let capital: Fraction = try js[.capital].decode()
         self.init(

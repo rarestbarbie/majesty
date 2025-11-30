@@ -13,7 +13,7 @@ public struct GameSave {
 
     let accounts: OrderedDictionary<LEI, Bank.Account>.Items
     let segmentedMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
-    let tradeableMarkets: OrderedDictionary<BlocMarket.ID, BlocMarket>
+    let tradeableMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>
     let date: GameDate
 
     let currencies: [Currency]

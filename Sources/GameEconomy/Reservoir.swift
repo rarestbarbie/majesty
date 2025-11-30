@@ -13,7 +13,21 @@ extension Reservoir {
     @inlinable static var zero: Self { .init(total: 0, added: 0, removed: 0) }
 }
 extension Reservoir {
-    @inlinable public var total: Int64 { self.value }
+    @inlinable public var total: Int64 {
+        get {
+            self.value
+        }
+        set(after) {
+            let delta = after - self.value
+            if  delta < 0 {
+                self.removed -= delta
+            } else {
+                self.added += delta
+            }
+            self.value = after
+        }
+    }
+
     @inlinable public var change: Int64 { self.added - self.removed }
     @inlinable public var before: Int64 { self.value - self.change }
 
@@ -21,6 +35,7 @@ extension Reservoir {
         self.added = 0
         self.removed = 0
     }
+
     @inlinable public static func -= (self: inout Self, change: Int64) {
         if  change >= 0 {
             self.value -= change

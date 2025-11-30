@@ -666,7 +666,7 @@ extension FactoryContext {
 extension FactoryContext: LegalEntityTooltipBearing {
     func tooltipExplainPrice(
         _ line: InventoryLine,
-        market: (segmented: LocalMarketSnapshot?, tradeable: BlocMarket.State?)
+        market: (segmented: LocalMarketSnapshot?, tradeable: WorldMarket.State?)
     ) -> Tooltip? {
         switch line {
         case .l(let id): return self.state.inventory.l.tooltipExplainPrice(id, market)

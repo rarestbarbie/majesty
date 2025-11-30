@@ -3,7 +3,7 @@ import GameEconomy
 import JavaScriptKit
 import JavaScriptInterop
 
-extension BlocMarket.State {
+extension WorldMarket.State {
     @frozen public enum ObjectKey: JSString, Sendable {
         case id
         case b
@@ -13,7 +13,7 @@ extension BlocMarket.State {
         case fee
     }
 }
-extension BlocMarket.State: JavaScriptEncodable {
+extension WorldMarket.State: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.b] = self.capital.base
@@ -23,7 +23,7 @@ extension BlocMarket.State: JavaScriptEncodable {
         js[.fee] = self.fee
     }
 }
-extension BlocMarket.State: JavaScriptDecodable {
+extension WorldMarket.State: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             id: try js[.id].decode(),

@@ -1,13 +1,15 @@
 import GameEconomy
 import GameIDs
 import Random
+import OrderedCollections
 
 struct Turn: ~Copyable {
     var random: PseudoRandom
     var notifications: Notifications
     var bank: Bank
-    var worldMarkets: BlocMarkets
+    var worldMarkets: WorldMarkets
     var localMarkets: LocalMarkets
+    var tradeRoutes: OrderedDictionary<CurrencyID, TradeRoutes>
     var stockMarkets: StockMarkets
 
     var conversions: [Pop.Conversion]
@@ -24,14 +26,16 @@ extension Turn {
         random: PseudoRandom,
         notifications: Notifications,
         bank: consuming Bank,
-        worldMarkets: consuming BlocMarkets,
+        worldMarkets: consuming WorldMarkets,
         localMarkets: consuming LocalMarkets,
+        tradeRoutes: OrderedDictionary<CurrencyID, TradeRoutes>,
     ) {
         self.random = random
         self.notifications = notifications
         self.bank = bank
         self.worldMarkets = worldMarkets
         self.localMarkets = localMarkets
+        self.tradeRoutes = tradeRoutes
         self.stockMarkets = .init()
         self.conversions = []
         self.jobs = ((.init(), .init()), .init())

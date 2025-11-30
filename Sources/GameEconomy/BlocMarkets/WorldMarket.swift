@@ -4,7 +4,7 @@ import GameIDs
 import LiquidityPool
 import RealModule
 
-@frozen public struct BlocMarket: Identifiable {
+@frozen public struct WorldMarket: Identifiable {
     public let id: ID
     public let dividend: Fraction
     @usableFromInline var history: Deque<Interval>
@@ -25,7 +25,7 @@ import RealModule
         self.current = current
     }
 }
-extension BlocMarket {
+extension WorldMarket {
     @inlinable public init(state: State) {
         let pool: LiquidityPool = .init(
             assets: state.capital,
@@ -50,7 +50,7 @@ extension BlocMarket {
         )
     }
 }
-extension BlocMarket {
+extension WorldMarket {
     /// Unlike ``pool``, this property updates the candle on mutation.
     var canonical: LiquidityPool {
         _read {
@@ -73,10 +73,10 @@ extension BlocMarket {
         }
     }
 }
-extension BlocMarket {
+extension WorldMarket {
     @inlinable public var price: Double { self.current.c }
 }
-extension BlocMarket {
+extension WorldMarket {
     @inlinable public mutating func turn(history: Int) {
         if  self.history.count >= history {
             self.history.removeFirst(self.history.count - history + 1)

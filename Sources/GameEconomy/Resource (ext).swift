@@ -1,11 +1,11 @@
 import GameIDs
 
 extension Resource {
-    @inlinable public static func / (self: Self, fiat: CurrencyID) -> BlocMarket.ID {
+    @inlinable public static func / (self: Self, fiat: CurrencyID) -> WorldMarket.ID {
         .good(self) / fiat
     }
 
-    @inlinable public static func / (fiat: CurrencyID, self: Self) -> BlocMarket.ID {
+    @inlinable public static func / (fiat: CurrencyID, self: Self) -> WorldMarket.ID {
         fiat / .good(self)
     }
 }

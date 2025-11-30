@@ -46,6 +46,8 @@ extension GameSession {
             bank: .init(accounts: save.accounts.dictionary),
             segmentedMarkets: save.segmentedMarkets,
             tradeableMarkets: save.tradeableMarkets,
+            // placeholder
+            tradeRoutes: [:],
             random: save.random,
         )
 

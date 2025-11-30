@@ -10,14 +10,16 @@ struct GameWorld: ~Copyable {
     var notifications: Notifications
     var bank: Bank
     var segmentedMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
-    var tradeableMarkets: OrderedDictionary<BlocMarket.ID, BlocMarket>
+    var tradeableMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>
+    var tradeRoutes: OrderedDictionary<CurrencyID, TradeRoutes>
 }
 extension GameWorld {
     init(
         notifications: Notifications,
         bank: Bank,
         segmentedMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>,
-        tradeableMarkets: OrderedDictionary<BlocMarket.ID, BlocMarket>,
+        tradeableMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>,
+        tradeRoutes: OrderedDictionary<CurrencyID, TradeRoutes>,
         random: PseudoRandom,
     ) {
         self.random = random
@@ -25,6 +27,7 @@ extension GameWorld {
         self.bank = bank
         self.tradeableMarkets = tradeableMarkets
         self.segmentedMarkets = segmentedMarkets
+        self.tradeRoutes = tradeRoutes
     }
 }
 extension GameWorld {
@@ -44,6 +47,7 @@ extension GameWorld {
                 localMarkets: .init(
                     table: self.segmentedMarkets
                 ),
+                tradeRoutes: self.tradeRoutes
             )
         }
         _modify {
@@ -54,6 +58,7 @@ extension GameWorld {
                     bank: .init(accounts: [:]),
                     segmentedMarkets: [:],
                     tradeableMarkets: [:],
+                    tradeRoutes: [:],
                     random: .init(seed: 0),
                 )
             }
@@ -63,6 +68,7 @@ extension GameWorld {
                     bank: turn.bank,
                     segmentedMarkets: turn.localMarkets.markets,
                     tradeableMarkets: turn.worldMarkets.markets,
+                    tradeRoutes: turn.tradeRoutes,
                     random: turn.random,
                 )
             }

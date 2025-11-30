@@ -23,7 +23,7 @@ extension AggregateWeights {
 extension AggregateWeights {
     public static func businessNew(
         x: ResourceInputs,
-        markets: borrowing BlocMarkets,
+        markets: borrowing WorldMarkets,
         currency: CurrencyID,
     ) -> Self {
         self.business(l: .empty, e: .empty, x: x, markets: markets, currency: currency)
@@ -33,7 +33,7 @@ extension AggregateWeights {
         l: ResourceInputs,
         e: ResourceInputs,
         x: ResourceInputs,
-        markets: borrowing BlocMarkets,
+        markets: borrowing WorldMarkets,
         currency: CurrencyID,
     ) -> Self {
         .init(
@@ -48,7 +48,7 @@ extension AggregateWeights {
         l: ResourceInputs,
         e: ResourceInputs,
         x: ResourceInputs,
-        markets: borrowing BlocMarkets,
+        markets: borrowing WorldMarkets,
         currency: CurrencyID,
     ) -> Self {
         .init(

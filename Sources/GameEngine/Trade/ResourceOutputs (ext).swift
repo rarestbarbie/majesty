@@ -60,7 +60,7 @@ extension ResourceOutputs {
         _ id: Resource,
         _ market: (
             segmented: LocalMarketSnapshot?,
-            tradeable: BlocMarket.State?
+            tradeable: WorldMarket.State?
         ),
     ) -> Tooltip? {
         if  let filled: ResourceOutput = self.tradeable[id],

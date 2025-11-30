@@ -11,7 +11,7 @@ import OrderedCollections
 @dynamicMemberLookup struct GameSnapshot: ~Copyable {
     let context: GameContext
     let markets: (
-        tradeable: OrderedDictionary<BlocMarket.ID, BlocMarket>,
+        tradeable: OrderedDictionary<WorldMarket.ID, WorldMarket>,
         segmented: OrderedDictionary<LocalMarket.ID, LocalMarket>
     )
     let bank: Bank
@@ -44,7 +44,7 @@ extension GameSnapshot {
         let resource: Resource = line.resource
         let market: (
             segmented: LocalMarketSnapshot?,
-            tradeable: BlocMarket.State?
+            tradeable: WorldMarket.State?
         ) = (
             self.markets.segmented[resource / object.state.tile]?.snapshot(region),
             self.markets.tradeable[resource / region.currency.id]?.state
@@ -641,15 +641,15 @@ extension GameSnapshot {
 }
 extension GameSnapshot {
     func tooltipMarketLiquidity(
-        _ id: BlocMarket.ID
+        _ id: WorldMarket.ID
     ) -> Tooltip? {
         guard
-        let market: BlocMarket.State = self.markets.tradeable[id]?.state,
+        let market: WorldMarket.State = self.markets.tradeable[id]?.state,
         let last: Int = market.history.indices.last else {
             return nil
         }
 
-        let interval: (BlocMarket.Interval, BlocMarket.Interval)
+        let interval: (WorldMarket.Interval, WorldMarket.Interval)
         interval.1 = market.history[last]
         interval.0 = last != market.history.startIndex
             ? market.history[market.history.index(before: last)]

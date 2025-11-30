@@ -3,8 +3,8 @@ import GameIDs
 import Testing
 
 @Suite struct ArbitrageTests {
-    @Test static func trade() throws {
-        var exchange: BlocMarkets = .init()
+    @Test static func Commodity() throws {
+        var exchange: WorldMarkets = .init()
 
         let XAU: Resource = .init(rawValue: 1)
         /// United Nations Bancor
@@ -47,7 +47,7 @@ import Testing
         #expect(exchange[XAU / MAR].assets == (base: 1_002, quote: 1))
         #expect(exchange[XAU / UNB].assets == (base: 1, quote: 10_002))
 
-        var capital: Int64 = 10
+        var capital: Int64 = 1000
 
         /// Arbitrage should fail, because the forex market is not liquid enough.
         #expect(
@@ -58,12 +58,12 @@ import Testing
                 capital: &capital
             )
         )
-        #expect(capital == 10)
+        #expect(capital == 1000)
 
         /// Inject 100 units of liquidity into the forex market on both sides.
         exchange[MAR / UNB] = .init(liquidity: (base: 100, quote: 100))
 
-        let arbitrage: ResourceArbitrage = try #require(
+        let arbitrage: ArbitrageOpportunity = try #require(
             exchange.arbitrate(
                 resource: XAU,
                 currency: MAR,
@@ -72,9 +72,9 @@ import Testing
             )
         )
 
-        #expect(arbitrage.exported == 98)
-        #expect(arbitrage.proceeds == 99)
-        #expect(arbitrage.currency == UNB)
+        #expect(arbitrage.volume == 98)
+        #expect(arbitrage.profit == 98)
+        #expect(arbitrage.market == UNB)
 
         /// Some of the Martian gold should have left Mars. Its local price should be higher
         /// than it was before.
@@ -92,11 +92,11 @@ import Testing
         #expect(exchange[MAR / UNB].volume.quote.total == 9_900)
 
         /// The trader should have made a sizable profit from the exchange.
-        #expect(capital == 108)
+        #expect(capital == 1098)
     }
 
-    @Test static func forex() throws {
-        var exchange: BlocMarkets = .init()
+    @Test static func ForexSmall() throws {
+        var exchange: WorldMarkets = .init()
 
         /// United Nations Bancor
         let UNB: CurrencyID = 0
@@ -125,7 +125,7 @@ import Testing
         /// Since the Lunar Bancor can also be turned back into United Nations Bancor at a 1:1
         /// exchange rate, the arbitrageur end up with much more UNB than they started with.
         var capital: Int64 = 5
-        let arbitrage: ResourceArbitrage = try #require(
+        let arbitrage: ArbitrageOpportunity = try #require(
             exchange.arbitrate(
                 resource: .fiat(MAR),
                 currency: UNB,
@@ -137,11 +137,13 @@ import Testing
         /// In an infinitely liquid market, the arbitrageur would profited tenfold, but since
         /// the three markets have finite liquidity, the actual profit is lower.
         #expect(capital == 23)
+        #expect(arbitrage.profit == 18)
+        #expect(arbitrage.volume == 43)
         /// Although a similar arbitrage opportunity exists with the Ceres Reserve Note,
         /// the arbitrageur should have chosen the Lunar Bancor, since it is more profitable.
         /// It is more profitable because the LUB/UNB market is more liquid than the CRN/UNB
         /// market, so it would experience less slippage.
-        #expect(arbitrage.currency == LUB)
+        #expect(arbitrage.market == LUB)
 
         /// The Martian Rand should have appreciated against the United Nations Bancor,
         /// since it had been pegged to the Lunar Bancor, which itself had been pegged to the
@@ -158,6 +160,50 @@ import Testing
 
         /// The Ceres Reserve Note should be unaffected, since it was not involved in the
         /// arbitrage.
+        #expect(exchange[CRN / UNB].assets == (base: 50, quote: 50))
+        #expect(exchange[CRN / MAR].assets == (base: 100, quote: 100))
+        #expect(exchange[CRN / LUB].assets == (base: 100, quote: 100))
+    }
+
+    @Test static func ForexLarge() throws {
+        var exchange: WorldMarkets = .init()
+
+        let UNB: CurrencyID = 0
+        let MAR: CurrencyID = 1
+        let LUB: CurrencyID = 2
+        let CRN: CurrencyID = 3
+
+        exchange[MAR / UNB] = .init(liquidity: (base: 1000, quote: 100))
+        exchange[LUB / UNB] = .init(liquidity: (base: 100, quote: 100))
+        exchange[CRN / UNB] = .init(liquidity: (base: 50, quote: 50))
+
+        exchange[LUB / MAR] = .init(liquidity: (base: 100, quote: 100))
+        exchange[CRN / MAR] = .init(liquidity: (base: 100, quote: 100))
+
+        exchange[CRN / LUB] = .init(liquidity: (base: 100, quote: 100))
+
+        // this is basically the same setup as before, but with larger capital
+        var capital: Int64 = 1000
+        let arbitrage: ArbitrageOpportunity = try #require(
+            exchange.arbitrate(
+                resource: .fiat(MAR),
+                currency: UNB,
+                partners: [LUB, CRN],
+                capital: &capital
+            )
+        )
+
+        // absolute profit is the same, but volume moved is much larger ...
+        #expect(capital == 1018)
+        #expect(arbitrage.profit == 18)
+        #expect(arbitrage.volume == 164)
+        #expect(arbitrage.market == LUB)
+
+        // ... and has a correspondingly larger impact on the markets.
+        #expect(exchange[MAR / UNB].assets == (base: 836, quote: 120))
+        #expect(exchange[LUB / UNB].assets == (base: 162, quote: 62))
+        #expect(exchange[LUB / MAR].assets == (base: 38, quote: 264))
+
         #expect(exchange[CRN / UNB].assets == (base: 50, quote: 50))
         #expect(exchange[CRN / MAR].assets == (base: 100, quote: 100))
         #expect(exchange[CRN / LUB].assets == (base: 100, quote: 100))
