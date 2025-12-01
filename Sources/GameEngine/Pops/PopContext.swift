@@ -554,7 +554,11 @@ extension PopContext {
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
-            if !self.state.type.aristocratic {
+            if self.state.type.aristocratic {
+                $0[true] {
+                    $0 = -2‰
+                } = { "\(+$0[%]): Pop is \(em: "aristocratic")" }
+            } else {
                 $0[1 - self.stats.employmentBeforeEgress] {
                     $0[$1 >= 0.1] = +2‱
                     $0[$1 >= 0.2] = +1‱
