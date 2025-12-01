@@ -18,7 +18,7 @@ let package: Package = .init(
         .package(url: "https://github.com/apple/swift-collections", from: "1.2.1"),
         .package(url: "https://github.com/ordo-one/package-distributions", from: "0.2.0"),
         .package(url: "https://github.com/tayloraswift/dollup", from: "0.5.0"),
-        .package(url: "https://github.com/tayloraswift/d", from: "0.4.0"),
+        .package(url: "https://github.com/tayloraswift/d", from: "0.4.3"),
     ],
     targets: [
         .executableTarget(

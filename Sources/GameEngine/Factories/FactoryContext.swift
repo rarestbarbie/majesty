@@ -801,7 +801,7 @@ extension FactoryContext {
 
             $0[>] = """
             At most \(
-                clerkHorizon,
+                clerkHorizon[/3],
                 style: clerks.count <= clerkHorizon ? .em : .neg
             ) clerks may contribute to this factory
             """
