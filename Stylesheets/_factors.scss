@@ -29,7 +29,7 @@ ul.factors {
         }
     }
 
-    > li:not([data-indent]) > span {
+    > li.indent-none > span {
         font-weight: bold;
     }
 }

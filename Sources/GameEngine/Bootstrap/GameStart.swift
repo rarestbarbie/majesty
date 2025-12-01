@@ -118,8 +118,8 @@ extension GameStart {
                 )
                 var pop: Pop = .init(id: seed.id ?? pop.increment(), section: section)
 
-                pop.y.size = seed.size
-                pop.z.size = seed.size
+                pop.y.active = seed.size
+                pop.z.active = seed.size
                 pops.append(pop)
             }
         }
@@ -135,7 +135,7 @@ extension GameStart {
                     continue
                 }
 
-                accounts[.pop(pop.id), default: .zero].s += seed.cash * pop.z.size
+                accounts[.pop(pop.id), default: .zero].s += seed.cash * pop.z.total
             }
         }
 

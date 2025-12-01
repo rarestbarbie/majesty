@@ -37,16 +37,18 @@ extension TermListEncoder {
     @inlinable public subscript(
         indent: (IndentNone) -> (),
         label: TermType,
-        tooltip tooltip: TooltipType? = nil
+        tooltip tooltip: TooltipType? = nil,
+        help help: TooltipType? = nil
     ) -> ColorText? {
         get { nil }
-        set (lines) { self[>0, label, tooltip: tooltip] = lines }
+        set (lines) { self[>0, label, tooltip: tooltip, help: help] = lines }
     }
     /// Writes the assigned string with the specified indentation level.
     @inlinable public subscript(
         indent: Indent,
         label: TermType,
-        tooltip tooltip: TooltipType? = nil
+        tooltip tooltip: TooltipType? = nil,
+        help help: TooltipType? = nil
     ) -> ColorText? {
         get { nil }
         set (lines) {
@@ -55,7 +57,8 @@ extension TermListEncoder {
                     .init(
                         id: label,
                         details: .header(self.indent + indent.level, lines),
-                        tooltip: tooltip
+                        tooltip: tooltip,
+                        help: help
                     )
                 )
             }
@@ -66,6 +69,7 @@ extension TermListEncoder {
         label: TermType,
         fortune: Fortune?,
         tooltip: TooltipType?,
+        help: TooltipType?
     ) -> TooltipInstruction.Factor? {
         get { nil }
         set (value) {
@@ -79,7 +83,8 @@ extension TermListEncoder {
                         .init(fortune: fortune, indent: self.indent, text: ""),
                         value
                     ),
-                    tooltip: tooltip
+                    tooltip: tooltip,
+                    help: help
                 )
             )
         }
@@ -89,13 +94,14 @@ extension TermListEncoder {
         label: TermType,
         _: (Style) -> () = { (_: Fortune.None) in },
         tooltip tooltip: TooltipType? = nil,
+        help help: TooltipType? = nil
     ) -> Factor? where Style: FortuneType, Factor: NumericRepresentation {
         get { nil }
         set (value) {
             guard let factor: Factor = value else {
                 return
             }
-            self[label, Style.fortune, tooltip] = TooltipInstruction.Factor.init(
+            self[label, Style.fortune, tooltip, help] = TooltipInstruction.Factor.init(
                 value: "\(factor)",
                 sign: factor.sign.map { $0 ? .pos : .neg },
             )
@@ -106,6 +112,7 @@ extension TermListEncoder {
         label: TermType,
         _: (Style) -> () = { (_: Fortune.None) in },
         tooltip tooltip: TooltipType? = nil,
+        help help: TooltipType? = nil
     ) -> TooltipInstruction.Ticker? where Style: FortuneType {
         get { nil }
         set (value) {
@@ -119,7 +126,8 @@ extension TermListEncoder {
                         .init(fortune: Style.fortune, indent: self.indent, text: ""),
                         value
                     ),
-                    tooltip: tooltip
+                    tooltip: tooltip,
+                    help: help
                 )
             )
         }
@@ -129,6 +137,7 @@ extension TermListEncoder {
         label: TermType,
         _: (Style) -> () = { (_: Fortune.None) in },
         tooltip tooltip: TooltipType? = nil,
+        help help: TooltipType? = nil
     ) -> TooltipInstruction.Count? where Style: FortuneType {
         get { nil }
         set (value) {
@@ -142,7 +151,8 @@ extension TermListEncoder {
                         .init(fortune: Style.fortune, indent: self.indent, text: ""),
                         value
                     ),
-                    tooltip: tooltip
+                    tooltip: tooltip,
+                    help: help
                 )
             )
         }

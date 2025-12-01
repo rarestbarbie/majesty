@@ -26,7 +26,7 @@ extension PopulationStats {
 
     mutating func addResidentCount(_ pop: Pop, _ stats: Pop.Stats) {
         {
-            $0.count += pop.z.size
+            $0.count += pop.z.total
             $0.employed += stats.employedBeforeEgress
         } (&self.type[pop.type, default: .zero])
 

@@ -30,6 +30,7 @@ extension BuildingContext: Identifiable {
 extension BuildingContext {
     typealias ComputationPass = FactoryContext.ComputationPass
     private static var stockpileDays: ClosedRange<Int64> { 3 ... 7 }
+    private static var utilizationThreshold: Double { 0.99 }
 }
 extension BuildingContext {
     mutating func startIndexCount() {
@@ -49,28 +50,6 @@ extension BuildingContext {
         self.region = context.planets[self.state.tile]?.authority
     }
 }
-extension BuildingContext {
-    private static var mothballing: Double { 0.1 }
-
-    private static var attrition: Double { 0.01 }
-    private static var restore: Double { 0.04 }
-    private static var vertex: Double { 0.5 }
-
-    private var restoration: Double? {
-        guard self.state.z.fe > Self.vertex else {
-            return nil
-        }
-        let parameter: Double = self.state.z.fe - Self.vertex
-        return Self.restore * parameter
-    }
-    private var attrition: Double? {
-        guard self.state.z.fe < Self.vertex else {
-            return nil
-        }
-        let parameter: Double = Self.vertex - self.state.z.fe
-        return Self.attrition * parameter
-    }
-}
 extension BuildingContext: TransactingContext {
     mutating func allocate(turn: inout Turn) {
         guard
@@ -78,18 +57,24 @@ extension BuildingContext: TransactingContext {
             return
         }
 
-        if  let mothball: Int64 = self.state.z.mothball(
-                active: self.state.z.active,
-                utilization: self.stats.utilization,
-                utilizationThreshold: 0.99,
-                rate: Self.mothballing,
+        if  let units: Int64 = self.state.backgroundable(
+                base: self.stats.utilization - Self.utilizationThreshold,
                 random: &turn.random
             ) {
-            self.state.z.active -= mothball
-            self.state.z.vacant += mothball
-            self.state.mothballed = mothball
-        } else {
-            self.state.mothballed = 0
+            self.state.z.background(active: units)
+            self.state.mothballed += units
+        } else if
+            let restoration: Double = self.state.restoration,
+            self.state.z.vacant > 0,
+            self.stats.utilization > Self.utilizationThreshold {
+            let scale: Double = 1 / (1 - Self.utilizationThreshold) * (
+                self.stats.utilization - Self.utilizationThreshold
+            )
+            let restored: Int64 = Binomial[self.state.z.vacant, restoration * scale].sample(
+                using: &turn.random.generator
+            )
+            self.state.z.restore(vacant: restored)
+            self.state.restored += restored
         }
 
         self.state.z.ei = 1
@@ -141,7 +126,7 @@ extension BuildingContext: TransactingContext {
             weights: weights,
             state: self.state.z,
             stockpileMaxDays: Self.stockpileDays.upperBound,
-            invest: self.stats.utilization * max(0, self.state.z.profitability)
+            invest: self.state.developmentRate(utilization: self.stats.utilization)
         )
 
         let sharesTarget: Int64 = self.state.z.total * self.type.sharesPerLevel + self.type.sharesInitial
@@ -234,14 +219,13 @@ extension BuildingContext: TransactingContext {
         )
         if  self.state.inventory.x.full {
             // in this situation, `active` is usually close to or equal to `total`
-            self.state.created = max(1, self.state.z.total / 256)
-            self.state.z.active += self.state.created
+            let created: Int64 = max(1, self.state.z.total / 256)
+            self.state.created += created
+            self.state.z.active += created
             self.state.inventory.x.consume(
                 from: self.type.development,
                 scalingFactor: (self.state.z.total, self.state.z.ei)
             )
-        } else {
-            self.state.created = 0
         }
 
         self.state.z.fl = self.state.inventory.l.fulfilled
@@ -267,27 +251,13 @@ extension BuildingContext: TransactingContext {
     }
 
     mutating func advance(turn: inout Turn) {
-        self.state.destroyed = 0
-        self.state.restored = 0
-
-        if  let attrition: Double = self.attrition {
+        if  let attrition: Double = self.state.attrition {
             if  self.state.z.vacant > 0 {
                 let destroyed: Int64 = Binomial[self.state.z.vacant, attrition].sample(
                     using: &turn.random.generator
                 )
                 self.state.z.vacant -= destroyed
                 self.state.destroyed += destroyed
-            }
-        } else if self.state.mothballed == 0,
-            let restoration: Double = self.restoration {
-            // if doesn’t make sense to restore buildings if mothballing is occurring
-            if  self.state.z.vacant > 0 {
-                let restored: Int64 = Binomial[self.state.z.vacant, restoration].sample(
-                    using: &turn.random.generator
-                )
-                self.state.z.active += restored
-                self.state.z.vacant -= restored
-                self.state.restored += restored
             }
         }
 
@@ -381,6 +351,20 @@ extension BuildingContext {
                 $0["Restoration", +] = +?self.state.restored[/3]
                 $0["Development", +] = +?self.state.created[/3]
             }
+        }
+    }
+    func tooltipActiveHelp() -> Tooltip? {
+        .instructions {
+            let developmentRate: Double = self.state.developmentRate(
+                utilization: self.stats.utilization
+            )
+            $0["Developer attraction", +] = developmentRate[%2]
+            $0[>] {
+                $0["Profitability", +] = max(0, self.state.z.profitability)[%1]
+                $0["Vacancy rate", +] = +?(self.state.developmentRateVacancyFactor - 1)[%2]
+                $0["Unsold inventory", +] = +?(self.stats.utilization - 1)[%2]
+            }
+
             let total: Int64 = self.state.z.total
             $0[>] = """
             There \(total == 1 ? "is" : "are") \(em: total[/3]) total \
@@ -396,6 +380,21 @@ extension BuildingContext {
                 $0["Restoration", -] = +?(-self.state.restored)[/3]
                 $0["Attrition", +] = +?(-self.state.destroyed)[/3]
             }
+        }
+    }
+    func tooltipVacantHelp() -> Tooltip? {
+        .instructions {
+            $0["Vacancy rate", -] = self.state.Δ.vacancy[%1]
+            $0[>] {
+                $0["Investor attraction", +] = +?(
+                    self.state.developmentRateVacancyFactor - 1
+                )[%2]
+            }
+
+            $0[>] = """
+            Vacant buildings depress investment in new construction and can also encourage \
+            \(em: "crime")
+            """
         }
     }
     func tooltipNeeds(_ tier: ResourceTierIdentifier) -> Tooltip? {
@@ -414,8 +413,8 @@ extension BuildingContext {
                 let inputs: ResourceInputs = self.state.inventory.e
                 $0["Maintenance needs fulfilled"] = self.state.z.fe[%2]
                 $0[>] {
-                    $0["Restoration", +] = self.restoration.map { +$0[%2] }
-                    $0["Attrition", +] = self.attrition.map { +(-$0)[%2] }
+                    $0["Restoration", +] = self.state.restoration.map { +$0[%2] }
+                    $0["Attrition", +] = self.state.attrition.map { +(-$0)[%2] }
                     $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
                 }
                 $0[>] = """

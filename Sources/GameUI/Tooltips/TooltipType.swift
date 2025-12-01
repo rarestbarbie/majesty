@@ -4,7 +4,9 @@ import JavaScriptKit
 @frozen public enum TooltipType: String, ConvertibleToJSValue, LoadableFromJSValue {
     case BuildingAccount
     case BuildingActive
+    case BuildingActiveHelp
     case BuildingVacant
+    case BuildingVacantHelp
     case BuildingResourceIO
     case BuildingStockpile
     case BuildingExplainPrice
@@ -21,7 +23,9 @@ import JavaScriptKit
     case FactoryStockpile
     case FactoryExplainPrice
     case FactoryClerks
+    case FactoryClerksHelp
     case FactoryWorkers
+    case FactoryWorkersHelp
     case FactoryNeeds
     case FactoryOwnershipCountry
     case FactoryOwnershipCulture
@@ -33,6 +37,10 @@ import JavaScriptKit
     case PlanetCell
 
     case PopAccount
+    case PopActive
+    case PopActiveHelp
+    case PopVacant
+    case PopVacantHelp
     case PopJobs
     case PopResourceIO
     case PopResourceOrigin

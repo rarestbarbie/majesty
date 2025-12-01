@@ -120,29 +120,6 @@ extension ResourceBudgetTier {
             return nil
         }
     }
-    public mutating func distributeAsBusiness(
-        funds available: Int64,
-        segmented: Int64,
-        tradeable: Int64,
-        w: Int64,
-        c: Int64,
-    ) -> (w: Int64, c: Int64)? {
-        guard available > 0 else {
-            return nil
-        }
-
-        let items: [Int64]? = [tradeable, segmented, w, c].distribute(share: { $0 }) {
-            min($0, available)
-        }
-
-        if  let items: [Int64] {
-            self.tradeable += items[0]
-            self.segmented += items[1]
-            return (w: items[2], c: items[3])
-        } else {
-            return nil
-        }
-    }
 }
 #if TESTABLE
 extension ResourceBudgetTier: Equatable, Hashable {}

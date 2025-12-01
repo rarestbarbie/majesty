@@ -748,13 +748,27 @@ extension FactoryContext {
         }
         return .instructions {
             $0[self.type.workers.unit.plural] = workforce.count[/3] / workforce.limit
-            $0["Current wage"] = self.state.Δ.wn[/3]
             workforce.explainChanges(&$0)
+        }
+    }
+    func tooltipWorkersHelp() -> Tooltip? {
+        return .instructions {
+            $0["Current wage"] = self.state.Δ.wn[/3]
+            if  let _: Int = self.state.z.wf {
+                $0[>] = """
+                This factory does not offer a \(em: "competitive wage"), which is causing it \
+                to have difficulty hiring workers
+                """
+            } else {
+                $0[>] = """
+                The wages paid to workers are \(em: "sticky") and will only decrease if the \
+                factory goes bankrupt
+                """
+            }
         }
     }
     func tooltipClerks() -> Tooltip? {
         guard
-        let workers: Workforce = self.workers,
         let clerks: Workforce = self.clerks else {
             return nil
         }
@@ -764,6 +778,17 @@ extension FactoryContext {
                 let bonus: Double = Self.efficiencyBonusFromClerks(fk: self.state.z.fk)
                 $0["Input efficiency", -] = +(-bonus)[%2]
             }
+
+            clerks.explainChanges(&$0)
+        }
+    }
+    func tooltipClerksHelp() -> Tooltip? {
+        guard
+        let workers: Workforce = self.workers,
+        let clerks: Workforce = self.clerks else {
+            return nil
+        }
+        return .instructions {
             $0["Current salary"] = self.state.Δ.wn[/3]
 
             let clerkHorizon: Int64 = self.type.clerkHorizon(for: workers.count)
@@ -776,14 +801,13 @@ extension FactoryContext {
 
             $0[>] = """
             At most \(
-                clerkHorizon,
+                clerkHorizon[/3],
                 style: clerks.count <= clerkHorizon ? .em : .neg
             ) clerks may contribute to this factory
             """
             $0[>] = """
-            Clerks help factories produce more, but are also much harder to fire
+            Clerks make factories more efficient, but are also much harder to fire
             """
-            clerks.explainChanges(&$0)
         }
     }
 

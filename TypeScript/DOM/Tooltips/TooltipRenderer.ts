@@ -38,8 +38,25 @@ export class TooltipRenderer {
         const list: HTMLUListElement = document.createElement('ul');
         list.className = 'factors';
 
+        let indentPrevious: number = 0;
         for (const instruction of tooltip.instructions) {
-            list.appendChild(this.renderItem(instruction));
+            const li: HTMLLIElement = this.renderItem(instruction);
+            const indent: number = instruction.indent ?? 0;
+
+            li.style.setProperty('--indent', `${indent}`);
+
+            if (indent === 0) {
+                li.classList.add('indent-none');
+            }
+
+            if (indent > indentPrevious) {
+                li.setAttribute('data-indent', 'indent');
+            } else if (indent < indentPrevious) {
+                li.setAttribute('data-indent', 'outdent');
+            }
+
+            indentPrevious = indent;
+            list.appendChild(li);
         }
 
         return [list];
@@ -103,12 +120,6 @@ export class TooltipRenderer {
                 li.appendChild(count);
                 break;
             }
-        }
-
-        if (instruction.indent !== undefined) {
-            const indent: string = `${instruction.indent}`;
-            li.style.setProperty('--indent', indent);
-            li.setAttribute('data-indent', indent);
         }
 
         return li;

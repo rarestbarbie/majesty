@@ -254,8 +254,16 @@ extension GameSession {
             return self.snapshot.tooltipBuildingActive(
                 try arguments[0].decode(),
             )
+        case .BuildingActiveHelp:
+            return self.snapshot.tooltipBuildingActiveHelp(
+                try arguments[0].decode(),
+            )
         case .BuildingVacant:
             return self.snapshot.tooltipBuildingVacant(
+                try arguments[0].decode(),
+            )
+        case .BuildingVacantHelp:
+            return self.snapshot.tooltipBuildingVacantHelp(
                 try arguments[0].decode(),
             )
         case .BuildingNeeds:
@@ -310,8 +318,16 @@ extension GameSession {
             return self.snapshot.tooltipFactoryClerks(
                 try arguments[0].decode(),
             )
+        case .FactoryClerksHelp:
+            return self.snapshot.tooltipFactoryClerksHelp(
+                try arguments[0].decode(),
+            )
         case .FactoryWorkers:
             return self.snapshot.tooltipFactoryWorkers(
+                try arguments[0].decode(),
+            )
+        case .FactoryWorkersHelp:
+            return self.snapshot.tooltipFactoryWorkersHelp(
                 try arguments[0].decode(),
             )
         case .FactorySize:
@@ -375,6 +391,22 @@ extension GameSession {
             )
         case .PopAccount:
             return self.snapshot.tooltipPopAccount(
+                try arguments[0].decode(),
+            )
+        case .PopActive:
+            return self.snapshot.tooltipPopActive(
+                try arguments[0].decode(),
+            )
+        case .PopActiveHelp:
+            return self.snapshot.tooltipPopActiveHelp(
+                try arguments[0].decode(),
+            )
+        case .PopVacant:
+            return self.snapshot.tooltipPopVacant(
+                try arguments[0].decode(),
+            )
+        case .PopVacantHelp:
+            return self.snapshot.tooltipPopVacantHelp(
                 try arguments[0].decode(),
             )
         case .PopJobs:

@@ -84,6 +84,17 @@ extension InventoryBreakdown {
             )
         }
 
+        self.terms = Term.list {
+            guard case .Ward = pop.state.type.stratum else {
+                return
+            }
+
+            let Δ: TurnDelta<Pop.Dimensions> = pop.state.Δ
+            // reusing the buildings indicators for slaves
+            $0[.buildingsActive, +, tooltip: .PopActive, help: .PopActiveHelp] = Δ.active[/3]
+            $0[.buildingsVacant, -, tooltip: .PopVacant, help: .PopVacantHelp] = Δ.vacant[/3]
+        }
+
         self.costs = pop.stats.cashFlow.chart(rules: snapshot.rules)
         if  let budget: Pop.Budget = pop.state.budget {
             let statement: CashAllocationStatement = .init(from: budget)
@@ -131,17 +142,23 @@ extension InventoryBreakdown {
         )
 
         self.terms = Term.list {
-            guard
-            let workers: Workforce = factory.workers,
-            let clerks: Workforce = factory.clerks else {
-                return
+            for case (let type, let state?, let tooltip, let help) in [
+                    (
+                        factory.type.workers.unit,
+                        factory.workers,
+                        TooltipType.FactoryWorkers,
+                        TooltipType.FactoryWorkersHelp
+                    ),
+                    (
+                        factory.type.clerks.unit,
+                        factory.clerks,
+                        TooltipType.FactoryClerks,
+                        TooltipType.FactoryClerksHelp
+                    ),
+                ] {
+                let term: TermType = .pop(type)
+                $0[term, +, tooltip: tooltip, help: help] = state.count[/3] ^^ state.change
             }
-
-            let worker: PopType = factory.type.workers.unit
-            let clerk: PopType = factory.type.clerks.unit
-
-            $0[.pop(clerk), +, tooltip: .FactoryClerks] = clerks.count[/3] ^^ clerks.change
-            $0[.pop(worker), +, tooltip: .FactoryWorkers] = workers.count[/3] ^^ workers.change
         }
 
         self.costs = factory.cashFlow.chart(rules: snapshot.rules)
@@ -195,8 +212,9 @@ extension InventoryBreakdown {
         )
 
         self.terms = Term.list {
-            $0[.buildingsActive, +, tooltip: .BuildingActive] = building.state.Δ.active[/3]
-            $0[.buildingsVacant, -, tooltip: .BuildingVacant] = building.state.Δ.vacant[/3]
+            let Δ: TurnDelta<Building.Dimensions> = building.state.Δ
+            $0[.buildingsActive, +, tooltip: .BuildingActive, help: .BuildingActiveHelp] = Δ.active[/3]
+            $0[.buildingsVacant, -, tooltip: .BuildingVacant, help: .BuildingVacantHelp] = Δ.vacant[/3]
         }
 
         self.costs = building.stats.cashFlow.chart(rules: snapshot.rules)

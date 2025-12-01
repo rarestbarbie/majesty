@@ -38,7 +38,8 @@ extension PopContext: Identifiable {
 }
 extension PopContext {
     private static var stockpileDays: ClosedRange<Int64> { 3 ... 7 }
-
+}
+extension PopContext {
     mutating func startIndexCount() {
         // computed during indexing, because the index pass uses it
         self.stats.update(from: self.state)
@@ -114,31 +115,18 @@ extension PopContext: AllocatingContext {
             return
         }
 
-        if  case _? = self.livestock {
-            let employmentThreshold: Double = 0.95
-            if  self.stats.employmentBeforeEgress < employmentThreshold || self.state.y.fl < 1 {
-                let cullable: Int64 = self.state.z.size - 1
-                if  cullable > 0 {
-                    /// a number between -1 and 0
-                    let share: Double = min(
-                        self.stats.employmentBeforeEgress - employmentThreshold,
-                        self.state.y.fl - 1
-                    )
-                    let r: Decimal = 1‰ + region.modifiers.livestockCullingEfficiency.value
-                    let p: Double = -Double.init(r) * share
-                    self.state.z.size -= Binomial[cullable, p].sample(
-                        using: &turn.random.generator
-                    )
-                }
-            } else if self.state.z.profitability > 0 {
-                let r: Decimal = 1‰ + region.modifiers.livestockBreedingEfficiency.value
-                let p: Double = Double.init(r) * self.state.z.profitability
-                self.state.z.size += Binomial[self.state.z.size, p].sample(
-                    using: &turn.random.generator
-                ) + Int64.random(
-                    in: 0 ... Int64.init((4 * self.state.z.profitability).rounded()),
+        if case .Ward = self.state.type.stratum {
+            if  let units: Int64 = self.state.backgroundable(random: &turn.random) {
+                self.state.z.background(active: units)
+                self.state.mothballed += units
+            } else if
+                let restoration: Double = self.state.restoration,
+                self.state.z.vacant > 0 {
+                let restored: Int64 = Binomial[self.state.z.vacant, restoration].sample(
                     using: &turn.random.generator
                 )
+                self.state.z.restore(vacant: restored)
+                self.state.restored += restored
             }
         }
 
@@ -160,15 +148,15 @@ extension PopContext: AllocatingContext {
         let z: (l: Double, e: Double, x: Double) = self.state.needsScalePerCapita
         self.state.inventory.l.sync(
             with: self.l,
-            scalingFactor: (self.state.z.size, z.l),
+            scalingFactor: (self.state.z.active, z.l),
         )
         self.state.inventory.e.sync(
             with: self.e,
-            scalingFactor: (self.state.z.size, z.e),
+            scalingFactor: (self.state.z.total, z.e),
         )
         self.state.inventory.x.sync(
             with: self.x,
-            scalingFactor: (self.state.z.size, z.x),
+            scalingFactor: (self.state.z.active, z.x),
         )
 
         let budget: Pop.Budget
@@ -205,7 +193,7 @@ extension PopContext: AllocatingContext {
             self.state.z.px = Double.init(self.equity.sharePrice)
             turn.stockMarkets.issueShares(
                 currency: currency,
-                quantity: max(0, self.state.z.size - self.equity.shareCount),
+                quantity: max(0, self.state.z.total - self.equity.shareCount),
                 security: self.security,
             )
 
@@ -298,7 +286,7 @@ extension PopContext: TransactingContext {
             )
             self.state.inventory.out.deposit(
                 from: self.output,
-                scalingFactor: (self.state.z.size, 1)
+                scalingFactor: (self.state.z.active, 1)
             )
 
             for j: Int in self.state.mines.values.indices {
@@ -339,17 +327,16 @@ extension PopContext: TransactingContext {
             self.state.z.fl = self.state.inventory.l.fulfilled
             self.state.inventory.l.consume(
                 from: self.l,
-                scalingFactor: (self.state.z.size, z.l)
+                scalingFactor: (self.state.z.active, z.l)
             )
 
-            if  enslaved {
-                self.state.z.fe = 1
-                self.state.z.fx = 0
-                return
-            }
-
             if  budget.e.tradeable > 0 {
-                account += self.state.inventory.e.tradeAsConsumer(
+                account += enslaved ? self.state.inventory.e.tradeAsBusiness(
+                    stockpileDays: target,
+                    spendingLimit: budget.e.tradeable,
+                    in: region.currency.id,
+                    on: &turn.worldMarkets,
+                ) : self.state.inventory.e.tradeAsConsumer(
                     stockpileDays: target,
                     spendingLimit: budget.e.tradeable,
                     in: region.currency.id,
@@ -360,8 +347,13 @@ extension PopContext: TransactingContext {
             self.state.z.fe = self.state.inventory.e.fulfilled
             self.state.inventory.e.consume(
                 from: self.e,
-                scalingFactor: (self.state.z.size, z.e)
+                scalingFactor: (self.state.z.total, z.e)
             )
+
+            if  enslaved {
+                self.state.z.fx = 0
+                return
+            }
 
             if  budget.x.tradeable > 0 {
                 account += self.state.inventory.x.tradeAsConsumer(
@@ -375,11 +367,11 @@ extension PopContext: TransactingContext {
             self.state.z.fx = self.state.inventory.x.fulfilled
             self.state.inventory.x.consume(
                 from: self.x,
-                scalingFactor: (self.state.z.size, z.x)
+                scalingFactor: (self.state.z.active, z.x)
             )
 
             // Welfare
-            account.s += self.state.z.size * region.minwage / 10
+            account.s += self.state.z.active * region.minwage / 10
         } (&turn.bank[account: self.lei])
 
         if  enslaved {
@@ -403,6 +395,9 @@ extension PopContext: TransactingContext {
     }
 }
 extension PopContext {
+    private static var slaveBreedingBase: Decimal { 1‰ }
+    private static var slaveCullingBase: Decimal { 1‰ }
+
     private static func mil(fl: Double) -> Double { 0.010 * (1.0 - fl) }
     private static func mil(fe: Double) -> Double { 0.004 * (0.5 - fe) }
     private static func mil(fx: Double) -> Double { 0.004 * (0.0 - fx) }
@@ -418,9 +413,11 @@ extension PopContext {
         self.state.z.vx = self.state.inventory.x.valueAcquired
 
         guard
-        let region: RegionalAuthority = self.region else {
+        let authority: RegionalAuthority = self.region else {
             return
         }
+
+        let region: RegionalProperties = authority.properties
 
         self.state.z.mil += Self.mil(fl: self.state.z.fl)
         self.state.z.mil += Self.mil(fe: self.state.z.fe)
@@ -433,14 +430,44 @@ extension PopContext {
         self.state.z.mil = max(0, min(10, self.state.z.mil))
         self.state.z.con = max(0, min(10, self.state.z.con))
 
-        if  self.state.type.stratum > .Ward {
-            self.convert(turn: &turn, region: region.properties)
-        } else {
+        if case .Ward = self.state.type.stratum {
+            if  let attrition: Double = self.state.attrition {
+                if  self.state.z.vacant > 0 {
+                    let r: Decimal = Self.slaveCullingBase
+                        + region.modifiers.livestockCullingEfficiency.value
+                    let p: Double = Double.init(r) * attrition
+                    let destroyed: Int64 = Binomial[self.state.z.vacant, p].sample(
+                        using: &turn.random.generator
+                    )
+                    self.state.z.vacant -= destroyed
+                    self.state.destroyed += destroyed
+                }
+            } else {
+                let developmentRate: Double = self.state.developmentRate(utilization: 1)
+                if  developmentRate > 0 {
+                    let r: Decimal = Self.slaveBreedingBase
+                        + region.modifiers.livestockBreedingEfficiency.value
+                    let p: Double = Double.init(r) * developmentRate
+                    // all slaves, including backgrounded ones, can breed
+                    let birthed: Int64 = Binomial[self.state.z.total, p].sample(
+                        using: &turn.random.generator
+                    ) + Int64.random(
+                        in: 0 ... Int64.init((4 * developmentRate).rounded()),
+                        using: &turn.random.generator
+                    )
+
+                    self.state.z.active += birthed
+                    self.state.created += birthed
+                }
+            }
+
             self.state.equity.split(
                 price: self.state.z.px,
                 turn: &turn,
-                notifying: [region.occupiedBy]
+                notifying: [authority.occupiedBy]
             )
+        } else {
+            self.convert(turn: &turn, region: region)
         }
 
         // We do not need to remove jobs that have no employees left, that will be done
@@ -448,7 +475,7 @@ extension PopContext {
         let factoryJobs: Range<Int> = self.state.factories.values.indices
         let miningJobs: Range<Int> = self.state.mines.values.indices
 
-        let w0: Double = .init(region.properties.minwage)
+        let w0: Double = .init(region.minwage)
         let q: Double = 0.002
         for i: Int in factoryJobs {
             {
@@ -469,7 +496,7 @@ extension PopContext {
             } (&self.state.mines.values[i])
         }
 
-        let unemployed: Int64 = self.state.z.size - self.state.employed()
+        let unemployed: Int64 = self.state.z.active - self.state.employed()
         if  unemployed < 0 {
             /// We have negative unemployment! This happens when the popuation shrinks, either
             /// through pop death or conversion.
@@ -798,6 +825,97 @@ extension PopContext {
 
                 $0["Inheritances", +] = +?account.d[/3]
             }
+        }
+    }
+    func tooltipActive() -> Tooltip? {
+        .instructions {
+            $0["Active slaves", +] = self.state.Δ.active[/3]
+            $0[>] {
+                $0["Backgrounding", +] = +?(-self.state.mothballed)[/3]
+                $0["Rehabilitation", +] = +?self.state.restored[/3]
+                $0["Breeding", +] = +?self.state.created[/3]
+            }
+        }
+    }
+    func tooltipActiveHelp() -> Tooltip? {
+        .instructions {
+            guard
+            let modifiers: CountryModifiers = self.region?.properties.modifiers else {
+                return
+            }
+
+            let slaveBreedingEfficiency: Decimal = Self.slaveBreedingBase
+                + modifiers.livestockBreedingEfficiency.value
+            let slaveBreedingRate: Double = Double.init(
+                slaveBreedingEfficiency
+            ) * self.state.developmentRate(utilization: 1)
+
+            $0["Breeding rate", +] = slaveBreedingRate[%2]
+            $0[>] {
+                $0["Profitability", +] = max(0, self.state.z.profitability)[%1]
+                $0["Background population", +] = +?(
+                    self.state.developmentRateVacancyFactor - 1
+                )[%2]
+            }
+            $0["Breeding efficiency", +] = slaveBreedingEfficiency[%]
+            $0[>] {
+                $0["Base"] = Self.slaveBreedingBase[%]
+                for (effect, provenance): (Decimal, EffectProvenance)
+                    in modifiers.livestockBreedingEfficiency.blame {
+                    $0[provenance.name, +] = +effect[%]
+                }
+            }
+
+            let total: Int64 = self.state.z.total
+            $0[>] = """
+            There \(total == 1 ? "is" : "are") \(em: total[/3]) total \
+            \(total == 1 ? "slave" : "slaves") of this type in this region
+            """
+        }
+    }
+    func tooltipVacant() -> Tooltip? {
+        .instructions {
+            $0["Backgrounded slaves", -] = self.state.Δ.vacant[/3]
+            $0[>] {
+                $0["Backgrounding", -] = +?self.state.mothballed[/3]
+                $0["Rehabilitation", -] = +?(-self.state.restored)[/3]
+                $0["Attrition", +] = +?(-self.state.destroyed)[/3]
+            }
+        }
+    }
+    func tooltipVacantHelp() -> Tooltip? {
+        .instructions {
+            guard
+            let modifiers: CountryModifiers = self.region?.properties.modifiers else {
+                return
+            }
+
+            let attrition: Double = self.state.attrition ?? 0
+
+            let slaveCullingEfficiency: Decimal = Self.slaveCullingBase
+                + modifiers.livestockCullingEfficiency.value
+            let slaveCullingRate: Double = Double.init(
+                slaveCullingEfficiency
+            ) * attrition
+
+            $0["Culling rate"] = slaveCullingRate[%2]
+            $0[>] {
+                $0["Everyday needs fulfilled", -] = +(attrition - 1)[%1]
+            }
+
+            $0["Culling efficiency", +] = slaveCullingEfficiency[%]
+            $0[>] {
+                $0[>] = "Base: \(em: Self.slaveCullingBase[%])"
+                for (effect, provenance): (Decimal, EffectProvenance)
+                    in modifiers.livestockCullingEfficiency.blame {
+                    $0[provenance.name, +] = +effect[%]
+                }
+            }
+
+            $0[>] = """
+            Unsold slaves may be \(em: "backgrounded") for a time to reduce upkeep and allow \
+            the market to rebalance
+            """
         }
     }
     func tooltipNeeds(_ tier: ResourceTierIdentifier) -> Tooltip? {

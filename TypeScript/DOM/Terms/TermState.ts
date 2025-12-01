@@ -6,4 +6,5 @@ export interface TermState {
     readonly id: string;
     readonly details: TooltipInstruction;
     readonly tooltip?: string;
+    readonly help?: string;
 }

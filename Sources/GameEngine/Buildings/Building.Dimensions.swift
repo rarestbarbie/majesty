@@ -3,7 +3,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 extension Building {
-    struct Dimensions: LegalEntityMetrics {
+    struct Dimensions: BackgroundableMetrics, LegalEntityMetrics {
         var active: Int64
         var vacant: Int64
         var vl: Int64
@@ -39,12 +39,9 @@ extension Building.Dimensions {
     }
 }
 extension Building.Dimensions {
-    var total: Int64 { self.active + self.vacant }
-}
-extension Building.Dimensions {
     enum ObjectKey: JSString, Sendable {
-        case active
-        case vacant
+        case active = "a"
+        case vacant = "v"
         case vl
         case ve
         case vx
@@ -59,7 +56,7 @@ extension Building.Dimensions {
 extension Building.Dimensions: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.active] = self.active
-        js[.vacant] = self.vacant
+        js[.vacant] = self.vacant == 0 ? nil : self.vacant
         js[.vl] = self.vl
         js[.ve] = self.ve
         js[.vx] = self.vx

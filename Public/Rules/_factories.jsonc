@@ -78,20 +78,6 @@
             "Engineer": 5000
         }
     },
-    "Cattle Ranch": {
-        "materials": {
-            "Vehicles": 1,
-            "Heifers": 20
-        },
-        "output": {
-            "Beef": 20
-        },
-        "workers": {
-            "Driver": 5000,
-            "Farmer": 3000
-        },
-        "terrain": ["Archipelago", "Desert", "Forest", "Rainforest", "Steppe"]
-    },
     "Cereal Farm": {
         "materials": {
             "Water": 20,
@@ -121,20 +107,6 @@
             "Driver": 5000,
             "Engineer": 5000
         }
-    },
-    "Chicken Farm": {
-        "materials": {
-            "Machine Parts": 1,
-            "Chicks": 100
-        },
-        "output": {
-            "Poultry": 100
-        },
-        "workers": {
-            "Driver": 5000,
-            "Farmer": 3000
-        },
-        "terrain": ["Archipelago", "Desert", "Forest", "Rainforest", "Steppe"]
     },
     "Chicken Plant": {
         "materials": {
