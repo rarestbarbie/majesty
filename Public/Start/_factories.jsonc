@@ -40,7 +40,8 @@
             "Cereal Farm": 1,
             "Machine Parts Factory": 1,
             "Automotive Assembly Plant": 1,
-            "Appliance Factory": 1
+            "Appliance Factory": 1,
+            "Nuclear Power Plant": 0
         }
     },
 
@@ -50,7 +51,6 @@
         "factories": {
             "Hydroelectric Dam": 5,
             "Supermarket": 2,
-            "Nuclear Power Plant": 1,
             "Cereal Farm": 1,
             "Machine Parts Factory": 2
         }

@@ -1,16 +1,33 @@
 [
+    // Alaska
+    {
+        "tile": "399N-2,1",
+        "buildings": {
+            "High Density Housing": 20000
+        }
+    },
+
+    // Pacific Northwest
+    {
+        "tile": "399N-2,2",
+        "buildings": {
+            "High Density Housing": 60000
+        }
+    },
+
     // California
     {
         "tile": "399N-2,3",
         "buildings": {
-            "High Density Housing": 30000
+            "High Density Housing": 60000
         }
     },
+
     // American Midwest
     {
         "tile": "399N-1,2",
         "buildings": {
-            "High Density Housing": 90000
+            "High Density Housing": 100000
         }
     },
 
@@ -19,6 +36,229 @@
         "tile": "399N0,2",
         "buildings": {
             "High Density Housing": 90000
+        }
+    },
+
+    // Canada
+    {
+        "tile": "399N0,1",
+        "buildings": {
+            "High Density Housing": 40000
+        }
+    },
+
+    // Greenland
+    {
+        "tile": "399N1,1",
+        "buildings": {
+            "High Density Housing": 5000
+        }
+    },
+
+    // Mexico
+    {
+        "tile": "399N-2,4",
+        "buildings": {
+            "High Density Housing": 20000
+        }
+    },
+
+    // Central America
+    {
+        "tile": "399N-1,4",
+        "buildings": {
+            "High Density Housing": 20000
+        }
+    },
+
+    // Caribbean Sea
+    {
+        "tile": "399N0,3",
+        "buildings": {
+            "High Density Housing": 10000
+        }
+    },
+
+    // Panama
+    {
+        "tile": "399E5",
+        "buildings": {
+            "High Density Housing": 20000
+        }
+    },
+
+    // Colombia
+    {
+        "tile": "399N1,3",
+        "buildings": {
+            "High Density Housing": 40000
+        }
+    },
+
+    // Peru
+    {
+        "tile": "399S0,3",
+        "buildings": {
+            "High Density Housing": 20000
+        }
+    },
+
+    // Amazon
+    {
+        "tile": "399S1,3",
+        "buildings": {
+            "High Density Housing": 10000
+        }
+    },
+
+    // Brazil
+    {
+        "tile": "399S2,2",
+        "buildings": {
+            "High Density Housing": 40000
+        }
+    },
+
+    // Argentina
+    {
+        "tile": "399S1,2",
+        "buildings": {
+            "High Density Housing": 40000
+        }
+    },
+
+    // Patagonia
+    {
+        "tile": "399S0,2",
+        "buildings": {
+            "High Density Housing": 10000
+        }
+    },
+
+    // West Antarctica
+    {
+        "tile": "399S0,1",
+        "buildings": {
+            "High Density Housing": 4000
+        }
+    },
+
+    // East Antarctica
+    {
+        "tile": "399S1,0",
+        "buildings": {
+            "High Density Housing": 3000
+        }
+    },
+
+    // Queen Maud Land
+    {
+        "tile": "399S1,-1",
+        "buildings": {
+            "High Density Housing": 1000
+        }
+    },
+
+    // Northern Europe
+    {
+        "tile": "399N2,0",
+        "buildings": {
+            "High Density Housing": 80000
+        }
+    },
+
+    // Southwestern Europe
+    {
+        "tile": "399N3,0",
+        "buildings": {
+            "High Density Housing": 70000
+        }
+    },
+
+    // Atlantropa
+    {
+        "tile": "399N3,-1",
+        "buildings": {
+            "High Density Housing": 40000
+        }
+    },
+
+    // Eastern Mediterranean
+    {
+        "tile": "399N3,-2",
+        "buildings": {
+            "High Density Housing": 40000
+        }
+    },
+
+    // Eastern Europe
+    {
+        "tile": "399N2,-1",
+        "buildings": {
+            "High Density Housing": 40000
+        }
+    },
+
+    // Holy Land
+    {
+        "tile": "399N3,-3",
+        "buildings": {
+            "High Density Housing": 60000
+        }
+    },
+
+    // Persia
+    {
+        "tile": "399N2,-3",
+        "buildings": {
+            "High Density Housing": 40000
+        }
+    },
+
+    // Southern China
+    {
+        "tile": "399N0,-2",
+        "buildings": {
+            "High Density Housing": 120000
+        }
+    },
+    // Northern China
+    {
+        "tile": "399N-1,-1",
+        "buildings": {
+            "High Density Housing": 120000
+        }
+    },
+
+    // Western Australia
+    {
+        "tile": "399S-1,-2",
+        "buildings": {
+            "High Density Housing": 40000
+        }
+    },
+
+    // Eastern Australia
+    {
+        "tile": "399S-2,-1",
+        "buildings": {
+            "High Density Housing": 40000
+        }
+    },
+
+    // Japan
+    {
+        "tile": "399N-2,-1",
+        "buildings": {
+            "High Density Housing": 50000
+        }
+    },
+
+    // Taiwan
+    {
+        "tile": "399N-1,-2",
+        "buildings": {
+            "High Density Housing": 40000
         }
     }
 ]

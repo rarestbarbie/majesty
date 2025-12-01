@@ -2,7 +2,8 @@
     "High Density Housing": {
         "required": true,
         "operations": {
-            "Electricity": 2,
+            "Electricity": 8,
+            "Water": 24,
             "Services": 2,
             "Appliances": 1
         },
@@ -12,7 +13,8 @@
         },
         "development": {
             "Construction": 8,
-            "Appliances": 8
+            "Appliances": 8,
+            "Influence": 1
         },
         "output": {
             "Housing": 24

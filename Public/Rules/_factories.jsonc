@@ -95,7 +95,7 @@
     },
     "Chemical Synthesis Plant": {
         "materials": {
-            "Hydrocarbons": 4,
+            "Hydrocarbons": 2,
             // "Graphite": 1,
             // "Ammonia": 1,
             "Water": 2
@@ -242,7 +242,7 @@
     "Fossil Power Plant": {
         "materials": {
             "Construction": 1,
-            "Hydrocarbons": 5,
+            "Hydrocarbons": 6,
             "Water": 5
         },
         "output": {
@@ -255,11 +255,12 @@
     },
     "Hydroelectric Dam": {
         "materials": {
-            "Construction": 1
+            "Construction": 1,
+            "Machine Parts": 1
         },
         "output": {
-            "Electricity": 12,
-            "Water": 128
+            "Electricity": 8,
+            "Water": 300
         },
         "workers": {
             "Driver": 1000,
@@ -402,7 +403,7 @@
     },
     "Nuclear Power Plant": {
         "materials": {
-            "Water": 1,
+            "Water": 2,
             "Nuclear Fuel": 1
         },
         "output": {
@@ -435,7 +436,7 @@
             "Water": 8
         },
         "output": {
-            "Polymers": 8
+            "Polymers": 32
         },
         "workers": {
             "Driver": 5000,
