@@ -4,7 +4,8 @@
         "tile": "399N-2,1",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Supermarket": 1
+            "Supermarket": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -14,7 +15,8 @@
         "factories": {
             "Hydroelectric Dam": 3,
             "Supermarket": 1,
-            "Data Center": 1
+            "Data Center": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -27,7 +29,8 @@
             "Plantation": 1,
             "Creator Studio": 1,
             "Machine Parts Factory": 1,
-            "Polypropylene Plant": 1
+            "Polypropylene Plant": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -41,7 +44,8 @@
             "Machine Parts Factory": 1,
             "Automotive Assembly Plant": 1,
             "Appliance Factory": 1,
-            "Nuclear Power Plant": 0
+            "Nuclear Power Plant": 0,
+            "Fossil Power Plant": 3
         }
     },
 
@@ -52,7 +56,8 @@
             "Hydroelectric Dam": 5,
             "Supermarket": 2,
             "Cereal Farm": 1,
-            "Machine Parts Factory": 2
+            "Machine Parts Factory": 2,
+            "Fossil Power Plant": 7
         }
     },
 
@@ -76,7 +81,8 @@
         "tile": "399N-2,4",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Clothing Workshop": 1
+            "Clothing Workshop": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -131,7 +137,8 @@
     {
         "tile": "399S2,2",
         "factories": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -177,7 +184,8 @@
             "Supermarket": 3,
             "Instrument Factory": 2,
             "Machine Parts Factory": 1,
-            "Polypropylene Plant": 1
+            "Polypropylene Plant": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -198,7 +206,8 @@
         "tile": "399N3,-1",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Supermarket": 1
+            "Supermarket": 1,
+            "Fossil Power Plant": 1
         }
     },
 
