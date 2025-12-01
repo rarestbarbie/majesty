@@ -2,12 +2,11 @@
     "*": {
         "l": {
             "Appliances": 1,
-            "Electricity": 1,
+            "Electricity": 2,
             "Clothing": 2,
             "Medical Equipment": 1,
             "Groceries": 2,
             "Vehicles": 1,
-            "Water": 1,
             "Housing": 1
         },
         "e": {
@@ -76,19 +75,18 @@
     "Influencer": {
         "color": "#bf97ff",
         "output": {
-            "Advertising": 50
+            "Advertising": 36
         }
     },
     "Aristocrat": {
         "color": "#fd6dd2",
         "l": {
             "Appliances": 2,
-            "Electricity": 1,
+            "Electricity": 3,
             "Clothing": 6,
             "Medical Equipment": 2,
             "Groceries": 2,
             "Vehicles": 4,
-            "Water": 1,
             "Housing": 3
         },
         "e": {
@@ -116,12 +114,11 @@
         "color": "#401249",
         "l": {
             "Appliances": 2,
-            "Electricity": 1,
+            "Electricity": 3,
             "Clothing": 6,
             "Medical Equipment": 2,
             "Groceries": 2,
             "Vehicles": 4,
-            "Water": 1,
             "Housing": 3
         },
         "e": {

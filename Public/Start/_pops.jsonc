@@ -105,7 +105,7 @@
                 "size": 21016000
             },
             {
-                "race": "West Indian",
+                "race": "Turtle Islander",
                 "type": "D",
                 "size": 260000
             },
@@ -120,7 +120,7 @@
                 "size": 2500000
             },
             {
-                "race": "West Indian",
+                "race": "Turtle Islander",
                 "type": "D",
                 "size": 80000
             }
@@ -244,6 +244,11 @@
                 "race": "Inuit",
                 "type": "D",
                 "size": 330000
+            },
+            {
+                "race": "Turtle Islander",
+                "type": "D",
+                "size": 260000
             }
         ]
     },
@@ -270,7 +275,7 @@
         "tile": "399N-2,4",
         "pops": [
             {
-                "race": "Mexican",
+                "race": "Hispanic",
                 "type": "O",
                 "size": 110
             },
@@ -283,6 +288,11 @@
                 "race": "Hispanic",
                 "type": "D",
                 "size": 910000
+            },
+            {
+                "race": "Turtle Islander",
+                "type": "D",
+                "size": 550000
             },
             {
                 "race": "Chicken",
@@ -304,7 +314,12 @@
             {
                 "race": "Hispanic",
                 "type": "D",
-                "size": 1020000
+                "size": 720000
+            },
+            {
+                "race": "Turtle Islander",
+                "type": "D",
+                "size": 400000
             }
         ]
     },
@@ -350,7 +365,17 @@
             {
                 "race": "Hispanic",
                 "type": "D",
-                "size": 2100000
+                "size": 1900000
+            },
+            {
+                "race": "Black American",
+                "type": "D",
+                "size": 350000
+            },
+            {
+                "race": "Andean",
+                "type": "D",
+                "size": 70000
             }
         ]
     },
@@ -385,6 +410,11 @@
                 "race": "Black American",
                 "type": "D",
                 "size": 1700
+            },
+            {
+                "race": "Andean",
+                "type": "D",
+                "size": 45000
             }
         ]
     },
@@ -546,7 +576,7 @@
                 "size": 310000
             },
             {
-                "race": "West Mediterranean",
+                "race": "East Mediterranean",
                 "type": "D",
                 "size": 280000
             },
@@ -702,6 +732,16 @@
                 "size": 2700000
             },
             {
+                "race": "East Mediterranean",
+                "type": "D",
+                "size": 550000
+            },
+            {
+                "race": "Caucasian",
+                "type": "D",
+                "size": 100000
+            },
+            {
                 "race": "West Slavic",
                 "type": "D",
                 "size": 1100000
@@ -796,7 +836,7 @@
                 "size": 970000
             },
             {
-                "race": "West Mediterranean",
+                "race": "East Mediterranean",
                 "type": "D",
                 "size": 1150000
             },

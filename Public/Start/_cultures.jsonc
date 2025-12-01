@@ -12,7 +12,7 @@
         "color": "#e8f4ff"
     },
     {
-        "name": "West Indian",
+        "name": "Turtle Islander",
         "color": "#d45039"
     },
     {
@@ -104,11 +104,15 @@
         "color": "#ceff7e"
     },
     {
+        "name": "Caucasian",
+        "color": "#ffae18"
+    },
+    {
         "name": "Anatolian",
         "color": "#610028"
     },
     {
-        "name": "West Mediterranean",
+        "name": "East Mediterranean",
         "color": "#941449"
     },
     {
