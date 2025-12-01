@@ -396,19 +396,6 @@
         "color": "#91091b"
     },
 
-    "Heifers": {
-        "emoji": "🐄",
-        "color": "#7c566c",
-        "local": true,
-        "storable": true
-    },
-    "Chicks": {
-        "emoji": "🐥",
-        "color": "#fffc4a",
-        "local": true,
-        "storable": true
-    },
-
     "Adderall": {
         "emoji": "💊",
         "color": "#9dffe6"

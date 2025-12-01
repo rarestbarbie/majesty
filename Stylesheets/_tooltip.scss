@@ -61,18 +61,15 @@
         > li {
             padding-left: calc(var(--indent, 0) * 1.5em);
 
-            &:not([data-indent]) + li[data-indent] {
+            &[data-indent='indent'] {
                 margin-top: 0.25rem;
 
                 > p {
                     margin-top: 0;
                 }
             }
-            &[data-indent] + li:not([data-indent]) {
+            &[data-indent='outdent'] {
                 margin-top: 0.5rem;
-            }
-            &[data-indent]:last-child {
-                margin-bottom: 0.25rem;
             }
 
             white-space: pre-wrap;

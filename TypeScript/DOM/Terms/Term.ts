@@ -70,13 +70,25 @@ export class Term implements DiffableListElement<string> {
             }
         }
 
+        const tooltipArgumentsEncoded: string | undefined = tooltipArguments !== undefined
+            ? JSON.stringify(tooltipArguments)
+            : undefined;
+
         if (term.tooltip !== undefined) {
             this.details.outer.setAttribute('data-tooltip-type', term.tooltip);
-
-            if (tooltipArguments !== undefined) {
+            if (tooltipArgumentsEncoded !== undefined) {
                 this.details.outer.setAttribute(
                     'data-tooltip-arguments',
-                    JSON.stringify(tooltipArguments),
+                    tooltipArgumentsEncoded,
+                );
+            }
+        }
+        if (term.help !== undefined) {
+            this.label.setAttribute('data-tooltip-type', term.help);
+            if (tooltipArgumentsEncoded !== undefined) {
+                this.label.setAttribute(
+                    'data-tooltip-arguments',
+                    tooltipArgumentsEncoded,
                 );
             }
         }

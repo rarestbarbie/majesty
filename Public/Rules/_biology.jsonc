@@ -3,7 +3,7 @@
     },
     "Chickens": {
         "meat": {
-            "Chicks": 6
+            "Poultry": 6
         },
         "diet": {
             "Water": 1,
@@ -12,7 +12,7 @@
     },
     "Cattle": {
         "meat": {
-            "Heifers": 6
+            "Beef": 6
         },
         "diet": {
             "Water": 5,

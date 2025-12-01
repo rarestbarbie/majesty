@@ -19,7 +19,7 @@ extension Building.Stats {
             self.utilization = 1
         }
 
-        #assert(0 ... 1 ~= self.utilization, "Employment must be between 0 and 1")
+        #assert(0 ... 1 ~= self.utilization, "Utilization must be between 0 and 1")
 
         self.cashFlow.reset()
         self.cashFlow.update(with: state.inventory.l)

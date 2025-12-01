@@ -60,39 +60,31 @@ extension Building {
 }
 extension Building: Turnable {
     mutating func turn() {
+        self.mothballed = 0
+        self.destroyed = 0
+        self.restored = 0
+        self.created = 0
+
         self.spending = .zero
         self.budget = nil
         self.equity.turn()
     }
 }
-extension Building {
-    var profit: ProfitMargins {
-        /// this is the minimum fraction of `fe` we would require if we only paid maintenance
-        /// for active facilities
-        let expected: Double = Double.init(self.z.active) / Double.init(self.z.total)
-        let prorate: Double = max(0, self.z.fe - expected)
-
-        let fixedCosts: Int64 = self.inventory.e.valueConsumed
-        /// this is a reasonable underestimate of the amount of maintenance costs that went
-        /// towards maintaining vacant facilities
-        let carryingCosts: Int64 = Int64.init(Double.init(fixedCosts) * prorate)
-        return .init(
-            materialsCosts: self.inventory.l.valueConsumed,
-            operatingCosts: fixedCosts - carryingCosts,
-            carryingCosts: carryingCosts,
-            revenue: self.inventory.out.valueSold
-        )
-    }
+extension Building: Backgroundable {
+    static var mothballing: Double { -0.1 }
+    static var restoration: Double { 0.04 }
+    static var attrition: Double { 0.01 }
+    static var vertex: Double { 0.5 }
 }
 extension Building {
     enum ObjectKey: JSString, Sendable {
         case id
         case tile = "on"
         case type
-        case mothballed
-        case destroyed
-        case restored
-        case created
+        case mothballed = "dm"
+        case destroyed = "dd"
+        case restored = "dr"
+        case created = "dc"
 
         case inventory_out = "out"
         case inventory_l = "nl"
@@ -115,10 +107,10 @@ extension Building: JavaScriptEncodable {
         js[.id] = self.id
         js[.tile] = self.tile
         js[.type] = self.type
-        js[.mothballed] = self.mothballed
-        js[.destroyed] = self.destroyed
-        js[.restored] = self.restored
-        js[.created] = self.created
+        js[.mothballed] = self.mothballed == 0 ? nil : self.mothballed
+        js[.destroyed] = self.destroyed == 0 ? nil : self.destroyed
+        js[.restored] = self.restored == 0 ? nil : self.restored
+        js[.created] = self.created == 0 ? nil : self.created
 
         js[.inventory_out] = self.inventory.out
         js[.inventory_l] = self.inventory.l

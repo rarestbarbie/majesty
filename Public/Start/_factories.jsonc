@@ -38,8 +38,6 @@
             "Hydroelectric Dam": 5,
             "Supermarket": 2,
             "Cereal Farm": 1,
-            "Cattle Ranch": 1,
-            "Chicken Farm": 1,
             "Machine Parts Factory": 1,
             "Automotive Assembly Plant": 1,
             "Appliance Factory": 1
@@ -133,8 +131,7 @@
     {
         "tile": "399S2,2",
         "factories": {
-            "Hydroelectric Dam": 1,
-            "Cattle Ranch": 1
+            "Hydroelectric Dam": 1
         }
     },
 
@@ -142,8 +139,7 @@
     {
         "tile": "399S1,2",
         "factories": {
-            "Hydroelectric Dam": 1,
-            "Cattle Ranch": 1
+            "Hydroelectric Dam": 1
         }
     },
 
@@ -277,8 +273,7 @@
         "tile": "399S-1,-2",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Supermarket": 1,
-            "Cattle Ranch": 1
+            "Supermarket": 1
         }
     },
 
@@ -287,8 +282,7 @@
         "tile": "399S-2,-1",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Supermarket": 1,
-            "Cattle Ranch": 1
+            "Supermarket": 1
         }
     },
 

@@ -4,9 +4,9 @@ import JavaScriptKit
 
 extension Pop {
     struct Budget {
-        private(set) var l: ResourceBudgetTier
-        private(set) var e: ResourceBudgetTier
-        private(set) var x: ResourceBudgetTier
+        let l: ResourceBudgetTier
+        let e: ResourceBudgetTier
+        let x: ResourceBudgetTier
         let investment: Int64
         let dividend: Int64
         let buybacks: Int64
@@ -24,33 +24,43 @@ extension Pop.Budget {
     ) -> Self {
         let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.total
         let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.total
-        let totalCostPerDay: Int64 = tradeableCostPerDay.l + segmentedCostPerDay.l
+        let totalCostPerDay: (l: Int64, e: Int64) = (
+            l: tradeableCostPerDay.l + segmentedCostPerDay.l,
+            e: tradeableCostPerDay.e + segmentedCostPerDay.e,
+        )
 
         let d: CashAllocationBasis = .business
         let v: Int64 = state.vl + state.ve
         let basis: Int64 = CashAllocationBasis.adjust(liquidity: account.settled, assets: v)
 
-        let bl: Int64 = totalCostPerDay * d.l
+        let bl: Int64 = totalCostPerDay.l * d.l
+        let be: Int64 = totalCostPerDay.e * d.e
 
-        let dividend: Int64 = max(0, (basis - bl) / (10 * d.y))
-        let buybacks: Int64 = max(0, (basis - bl - dividend) / d.y)
+        var l: ResourceBudgetTier = .init()
+        var e: ResourceBudgetTier = .init()
 
-        var budget: Self = .init(
-            l: .init(),
-            e: .init(),
-            x: .init(),
-            investment: 0,
-            dividend: dividend,
-            buybacks: buybacks
-        )
-
-        budget.l.distributeAsBusiness(
+        l.distributeAsBusiness(
             funds: basis / d.l,
             segmented: segmentedCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
         )
 
-        return budget
+        e.distributeAsBusiness(
+            funds: (basis - bl) / d.e,
+            segmented: segmentedCostPerDay.e * stockpileMaxDays,
+            tradeable: tradeableCostPerDay.e * stockpileMaxDays,
+        )
+
+        let dividend: Int64 = max(0, (basis - bl - be) / (10 * d.y))
+        let buybacks: Int64 = max(0, (basis - bl - be - dividend) / d.y)
+        return .init(
+            l: l,
+            e: e,
+            x: .init(),
+            investment: 0,
+            dividend: dividend,
+            buybacks: buybacks
+        )
     }
 
     static func free(
@@ -79,34 +89,36 @@ extension Pop.Budget {
         let bl: Int64 = totalCostPerDay.l * d.l
         let be: Int64 = totalCostPerDay.e * d.e
 
-        var budget: Self = .init(
-            l: .init(),
-            e: .init(),
-            x: .init(),
-            investment: investor ? (basis - bl - be) / d.y : 0,
-            dividend: 0,
-            buybacks: 0
-        )
+        var l: ResourceBudgetTier = .init()
+        var e: ResourceBudgetTier = .init()
+        var x: ResourceBudgetTier = .init()
 
-        budget.l.distributeAsConsumer(
+        l.distributeAsConsumer(
             funds: basis / d.l,
             segmented: segmentedCostPerDay.l * stockpileMaxDays,
             tradeable: tradeableCostPerDay.l * stockpileMaxDays,
         )
 
-        budget.e.distributeAsConsumer(
+        e.distributeAsConsumer(
             funds: (basis - bl) / d.e,
             segmented: segmentedCostPerDay.e * stockpileMaxDays,
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
         )
 
-        budget.x.distributeAsConsumer(
+        x.distributeAsConsumer(
             funds: (basis - bl - be) / d.x,
             segmented: segmentedCostPerDay.x * stockpileMaxDays,
             tradeable: tradeableCostPerDay.x * stockpileMaxDays,
         )
 
-        return budget
+        return .init(
+            l: l,
+            e: e,
+            x: x,
+            investment: investor ? (basis - bl - be) / d.y : 0,
+            dividend: 0,
+            buybacks: 0
+        )
     }
 }
 extension Pop.Budget {

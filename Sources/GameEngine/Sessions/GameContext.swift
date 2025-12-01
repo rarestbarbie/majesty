@@ -708,7 +708,7 @@ extension GameContext {
                     conversion.size %/ (conversion.size + $1.z.size)
                 )
 
-                $1.z.size += conversion.size
+                $1.z.active += conversion.size
                 $1.z.mil = weight.mix(inherited.mil, $1.z.mil)
                 $1.z.con = weight.mix(inherited.con, $1.z.con)
                 return $1.id

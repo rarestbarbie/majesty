@@ -16,6 +16,11 @@ struct Pop: LegalEntityState, Identifiable {
     let type: PopType
     let race: CultureID
 
+    var mothballed: Int64
+    var destroyed: Int64
+    var restored: Int64
+    var created: Int64
+
     var inventory: Inventory
     var spending: Spending
     var budget: Budget?
@@ -34,6 +39,10 @@ extension Pop: Sectionable {
             tile: section.tile,
             type: section.type,
             race: section.race,
+            mothballed: 0,
+            destroyed: 0,
+            restored: 0,
+            created: 0,
             inventory: .init(),
             spending: .zero,
             budget: nil,
@@ -72,10 +81,24 @@ extension Pop: Turnable {
             $0.turn()
             return $0.count > 0
         }
+
+        self.mothballed = 0
+        self.destroyed = 0
+        self.restored = 0
+        self.created = 0
+
         self.spending = .zero
         self.budget = nil
         self.equity.turn()
     }
+}
+extension Pop: Backgroundable {
+    static var mothballing: Double { -0.1 }
+    static var restoration: Double { 0.04 }
+    // slave culling is determined by technology, so setting attrition to 200% scales the
+    // input parameter to the range [0, 1], since we are multiplying it by the actual rate later
+    static var attrition: Double { 2 }
+    static var vertex: Double { 0.5 }
 }
 extension Pop {
     mutating func egress(
@@ -89,7 +112,7 @@ extension Pop {
             return
         }
 
-        let count: Int64 = Binomial[self.z.size, rate].sample(
+        let count: Int64 = Binomial[self.z.active, rate].sample(
             using: &turn.random.generator
         )
         if  count <= 0 {
@@ -119,8 +142,8 @@ extension Pop {
 
             let section: Section = .init(race: self.race, type: target, tile: self.tile)
             let inherits: Fraction
-            if  size < self.z.size {
-                let fraction: Fraction = size %/ self.z.size
+            if  size < self.z.active {
+                let fraction: Fraction = size %/ self.z.active
                 inherits = inherit.map { $0 * fraction } ?? fraction
             } else {
                 inherits = 1
@@ -130,12 +153,12 @@ extension Pop {
                 .init(from: self.id, size: size, to: section, inherits: inherits)
             )
             // we must deduct this now, because we might have multiple calls to `egress`
-            self.z.size -= size
+            self.z.active -= size
         }
 
         #assert(
-            self.z.size >= 0,
-            "Pop (id = \(self.id)) has negative size (\(self.z.size))!"
+            self.z.active >= 0,
+            "Pop (id = \(self.id)) has negative size (\(self.z.active))!"
         )
     }
 }
@@ -143,16 +166,6 @@ extension Pop {
     func employed() -> Int64 {
         self.factories.values.reduce(0) { $0 + $1.count } +
         self.mines.values.reduce(0) { $0 + $1.count }
-    }
-
-    var profit: ProfitMargins {
-        // TODO: this probably needs to be revisited, Slaves should behave like Buildings
-        .init(
-            materialsCosts: self.inventory.l.valueConsumed,
-            operatingCosts: self.inventory.e.valueConsumed,
-            carryingCosts: 0,
-            revenue: self.inventory.out.valueSold
-        )
     }
 
     var decadence: Double {
@@ -174,6 +187,11 @@ extension Pop {
         case tile = "on"
         case type
         case race
+
+        case mothballed = "dm"
+        case destroyed = "dd"
+        case restored = "dr"
+        case created = "dc"
 
         case inventory_out = "out"
         case inventory_l = "nl"
@@ -199,6 +217,10 @@ extension Pop: JavaScriptEncodable {
         js[.tile] = self.tile
         js[.type] = self.type
         js[.race] = self.race
+        js[.mothballed] = self.mothballed == 0 ? nil : self.mothballed
+        js[.destroyed] = self.destroyed == 0 ? nil : self.destroyed
+        js[.restored] = self.restored == 0 ? nil : self.restored
+        js[.created] = self.created == 0 ? nil : self.created
         js[.inventory_l] = self.inventory.l
         js[.inventory_e] = self.inventory.e
         js[.inventory_x] = self.inventory.x
@@ -223,6 +245,10 @@ extension Pop: JavaScriptDecodable {
             tile: try js[.tile].decode(),
             type: try js[.type].decode(),
             race: try js[.race].decode(),
+            mothballed: try js[.mothballed]?.decode() ?? 0,
+            destroyed: try js[.destroyed]?.decode() ?? 0,
+            restored: try js[.restored]?.decode() ?? 0,
+            created: try js[.created]?.decode() ?? 0,
             inventory: .init(
                 out: try js[.inventory_out]?.decode() ?? .empty,
                 l: try js[.inventory_l]?.decode() ?? .empty,

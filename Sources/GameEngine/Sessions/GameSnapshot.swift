@@ -134,8 +134,14 @@ extension GameSnapshot {
     func tooltipBuildingActive(_ id: BuildingID) -> Tooltip? {
         self.context.buildings[id]?.tooltipActive()
     }
+    func tooltipBuildingActiveHelp(_ id: BuildingID) -> Tooltip? {
+        self.context.buildings[id]?.tooltipActiveHelp()
+    }
     func tooltipBuildingVacant(_ id: BuildingID) -> Tooltip? {
         self.context.buildings[id]?.tooltipVacant()
+    }
+    func tooltipBuildingVacantHelp(_ id: BuildingID) -> Tooltip? {
+        self.context.buildings[id]?.tooltipVacantHelp()
     }
     func tooltipBuildingOwnership(
         _ id: BuildingID,
@@ -179,9 +185,15 @@ extension GameSnapshot {
     func tooltipFactoryWorkers(_ id: FactoryID) -> Tooltip? {
         self.context.factories[id]?.tooltipWorkers()
     }
+    func tooltipFactoryWorkersHelp(_ id: FactoryID) -> Tooltip? {
+        self.context.factories[id]?.tooltipWorkersHelp()
+    }
 
     func tooltipFactoryClerks(_ id: FactoryID) -> Tooltip? {
         self.context.factories[id]?.tooltipClerks()
+    }
+    func tooltipFactoryClerksHelp(_ id: FactoryID) -> Tooltip? {
+        self.context.factories[id]?.tooltipClerksHelp()
     }
 
     func tooltipFactoryNeeds(
@@ -357,6 +369,19 @@ extension GameSnapshot {
 extension GameSnapshot {
     func tooltipPopAccount(_ id: PopID) -> Tooltip? {
         self.context.pops[id]?.tooltipAccount(self.bank[account: .pop(id)])
+    }
+
+    func tooltipPopActive(_ id: PopID) -> Tooltip? {
+        self.context.pops[id]?.tooltipActive()
+    }
+    func tooltipPopActiveHelp(_ id: PopID) -> Tooltip? {
+        self.context.pops[id]?.tooltipActiveHelp()
+    }
+    func tooltipPopVacant(_ id: PopID) -> Tooltip? {
+        self.context.pops[id]?.tooltipVacant()
+    }
+    func tooltipPopVacantHelp(_ id: PopID) -> Tooltip? {
+        self.context.pops[id]?.tooltipVacantHelp()
     }
 
     func tooltipPopJobs(_ id: PopID) -> Tooltip? {
