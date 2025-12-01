@@ -148,15 +148,15 @@ extension PopContext: AllocatingContext {
         let z: (l: Double, e: Double, x: Double) = self.state.needsScalePerCapita
         self.state.inventory.l.sync(
             with: self.l,
-            scalingFactor: (self.state.z.size, z.l),
+            scalingFactor: (self.state.z.active, z.l),
         )
         self.state.inventory.e.sync(
             with: self.e,
-            scalingFactor: (self.state.z.size, z.e),
+            scalingFactor: (self.state.z.total, z.e),
         )
         self.state.inventory.x.sync(
             with: self.x,
-            scalingFactor: (self.state.z.size, z.x),
+            scalingFactor: (self.state.z.active, z.x),
         )
 
         let budget: Pop.Budget
@@ -193,7 +193,7 @@ extension PopContext: AllocatingContext {
             self.state.z.px = Double.init(self.equity.sharePrice)
             turn.stockMarkets.issueShares(
                 currency: currency,
-                quantity: max(0, self.state.z.size - self.equity.shareCount),
+                quantity: max(0, self.state.z.total - self.equity.shareCount),
                 security: self.security,
             )
 
@@ -286,7 +286,7 @@ extension PopContext: TransactingContext {
             )
             self.state.inventory.out.deposit(
                 from: self.output,
-                scalingFactor: (self.state.z.size, 1)
+                scalingFactor: (self.state.z.active, 1)
             )
 
             for j: Int in self.state.mines.values.indices {
@@ -327,7 +327,7 @@ extension PopContext: TransactingContext {
             self.state.z.fl = self.state.inventory.l.fulfilled
             self.state.inventory.l.consume(
                 from: self.l,
-                scalingFactor: (self.state.z.size, z.l)
+                scalingFactor: (self.state.z.active, z.l)
             )
 
             if  budget.e.tradeable > 0 {
@@ -347,7 +347,7 @@ extension PopContext: TransactingContext {
             self.state.z.fe = self.state.inventory.e.fulfilled
             self.state.inventory.e.consume(
                 from: self.e,
-                scalingFactor: (self.state.z.size, z.e)
+                scalingFactor: (self.state.z.total, z.e)
             )
 
             if  enslaved {
@@ -367,11 +367,11 @@ extension PopContext: TransactingContext {
             self.state.z.fx = self.state.inventory.x.fulfilled
             self.state.inventory.x.consume(
                 from: self.x,
-                scalingFactor: (self.state.z.size, z.x)
+                scalingFactor: (self.state.z.active, z.x)
             )
 
             // Welfare
-            account.s += self.state.z.size * region.minwage / 10
+            account.s += self.state.z.active * region.minwage / 10
         } (&turn.bank[account: self.lei])
 
         if  enslaved {
@@ -496,7 +496,7 @@ extension PopContext {
             } (&self.state.mines.values[i])
         }
 
-        let unemployed: Int64 = self.state.z.size - self.state.employed()
+        let unemployed: Int64 = self.state.z.active - self.state.employed()
         if  unemployed < 0 {
             /// We have negative unemployment! This happens when the popuation shrinks, either
             /// through pop death or conversion.

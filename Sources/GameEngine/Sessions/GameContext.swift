@@ -521,7 +521,7 @@ extension GameContext {
                 return
             }
 
-            let unemployed: Int64 = pop.z.size - pop.employed()
+            let unemployed: Int64 = pop.z.active - pop.employed()
             if  unemployed <= 0 {
                 return
             }
@@ -705,7 +705,7 @@ extension GameContext {
                 self.rules.pops[$0.type]
             } update: {
                 let weight: Fraction.Interpolator<Double> = .init(
-                    conversion.size %/ (conversion.size + $1.z.size)
+                    conversion.size %/ (conversion.size + $1.z.total)
                 )
 
                 $1.z.active += conversion.size

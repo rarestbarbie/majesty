@@ -23,16 +23,18 @@ extension Pop.Stats {
             self.employmentBeforeEgress = utilization
             // min is necessary here, because Double may round slightly up for very large Int64s
             self.employedBeforeEgress = min(
-                pop.z.size,
-                Int64.init(Double.init(pop.z.size) * self.employmentBeforeEgress)
+                pop.z.active,
+                Int64.init(Double.init(pop.z.active) * self.employmentBeforeEgress)
             )
         } else if pop.inventory.out.tradeable.isEmpty {
             // we know pop size must be positive, as it would have been pruned during pruning
             let employed: Int64 = pop.employed()
             self.employedBeforeEgress = employed
-            self.employmentBeforeEgress = Double.init(employed) / Double.init(pop.z.size)
+            self.employmentBeforeEgress = pop.z.active > 0
+                ? Double.init(employed) / Double.init(pop.z.active)
+                : 0
         } else if pop.type.stratum <= .Worker {
-            self.employedBeforeEgress = pop.z.size
+            self.employedBeforeEgress = pop.z.active
             self.employmentBeforeEgress = 1
         } else {
             self.employedBeforeEgress = 0

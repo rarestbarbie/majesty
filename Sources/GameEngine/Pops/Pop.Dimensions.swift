@@ -5,8 +5,6 @@ extension Pop {
     struct Dimensions: BackgroundableMetrics, LegalEntityMetrics {
         var active: Int64
         var vacant: Int64
-
-        var size: Int64 { self.active + self.vacant }
         var mil: Double
         var con: Double
         var fl: Double

@@ -601,10 +601,10 @@ extension GameSnapshot {
         let demotion: ConditionBreakdown = pop.buildDemotionMatrix(region: region)
 
         let promotions: Int64 = promotion.output > 0
-            ? .init(Double.init(pop.state.z.size) * promotion.output * 30)
+            ? .init(Double.init(pop.state.z.active) * promotion.output * 30)
             : 0
         let demotions: Int64 = demotion.output > 0
-            ? .init(Double.init(pop.state.z.size) * demotion.output * 30)
+            ? .init(Double.init(pop.state.z.active) * demotion.output * 30)
             : 0
 
         return .conditions(

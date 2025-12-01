@@ -135,7 +135,7 @@ extension GameStart {
                     continue
                 }
 
-                accounts[.pop(pop.id), default: .zero].s += seed.cash * pop.z.size
+                accounts[.pop(pop.id), default: .zero].s += seed.cash * pop.z.total
             }
         }
 

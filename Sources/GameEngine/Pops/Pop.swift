@@ -60,7 +60,7 @@ extension Pop: Sectionable {
 }
 extension Pop: Deletable {
     var dead: Bool {
-        self.z.size <= 0
+        self.z.total <= 0
     }
 }
 extension Pop {

@@ -52,7 +52,7 @@ extension PopTableEntry: JavaScriptEncodable {
         js[.nat] = self.nat
         js[.une] = self.une
 
-        js[.yesterday_size] = self.yesterday.size
+        js[.yesterday_size] = self.yesterday.total
         js[.yesterday_mil] = self.yesterday.mil
         js[.yesterday_con] = self.yesterday.con
         js[.yesterday_fl] = self.yesterday.fl
@@ -60,7 +60,7 @@ extension PopTableEntry: JavaScriptEncodable {
         js[.yesterday_fx] = self.yesterday.fx
         js[.yesterday_px] = self.yesterday.px
 
-        js[.today_size] = self.today.size
+        js[.today_size] = self.today.total
         js[.today_mil] = self.today.mil
         js[.today_con] = self.today.con
         js[.today_fl] = self.today.fl

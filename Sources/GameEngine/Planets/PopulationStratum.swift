@@ -33,10 +33,10 @@ extension PopulationStratum {
     }
 
     mutating func addResidentCount(_ pop: Pop) {
-        let weight: Double = .init(pop.z.size)
+        let weight: Double = .init(pop.z.total)
         self.all.append(pop.id)
-        self.total += pop.z.size
-        self.cultures[pop.race, default: 0] += pop.z.size
+        self.total += pop.z.total
+        self.cultures[pop.race, default: 0] += pop.z.total
         self.weighted.mil += pop.z.mil * weight
         self.weighted.con += pop.z.con * weight
     }
