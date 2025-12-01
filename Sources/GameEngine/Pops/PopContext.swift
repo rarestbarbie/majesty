@@ -900,7 +900,7 @@ extension PopContext {
 
             $0["Culling rate"] = slaveCullingRate[%2]
             $0[>] {
-                $0["Everyday needs fulfilled", -] = +?(attrition - 1)[%1]
+                $0["Everyday needs fulfilled", -] = +(attrition - 1)[%1]
             }
 
             $0["Culling efficiency", +] = slaveCullingEfficiency[%]
