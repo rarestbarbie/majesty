@@ -41,7 +41,7 @@
         },
         "workers": {
             "Driver": 5000,
-            "Engineer": 5000
+            "Engineer": 3000
         }
     },
     "Automotive Assembly Plant": {
@@ -55,6 +55,10 @@
             "Machine Parts": 4,
             "Appliances": 4,
             "Instruments": 1
+        },
+        "corporate": {
+            "Advice": 1,
+            "Advertising": 1
         },
         "output": {
             "Vehicles": 12
@@ -166,10 +170,11 @@
             "Polymers": 4,
             "Produce": 4,
             "Mica": 2,
-            "Water": 2
+            "Water": 2,
+            "Advertising": 1
         },
         "output": {
-            "Makeup": 10,
+            "Makeup": 12,
             "Medical Equipment": 2
         },
         "workers": {
