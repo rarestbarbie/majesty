@@ -14,10 +14,6 @@ public struct PopulationReport {
         TableColumnMetadata<ColumnControl>,
         TableColumnMetadata<ColumnControl>,
         TableColumnMetadata<ColumnControl>,
-        TableColumnMetadata<ColumnControl>,
-        TableColumnMetadata<ColumnControl>,
-        TableColumnMetadata<ColumnControl>,
-        TableColumnMetadata<ColumnControl>,
         TableColumnMetadata<ColumnControl>
     )
     private var sort: Sort
@@ -34,11 +30,7 @@ public struct PopulationReport {
             .init(id: 3, name: "Location"),
             .init(id: 4, name: "Militancy"),
             .init(id: 5, name: "Consciousness"),
-            .init(id: 6, name: "Unemp."),
-            .init(id: 7, name: "Net worth"),
-            .init(id: 8, name: "Needs"),
-            .init(id: 9, name: ""),
-            .init(id: 10, name: ""),
+            .init(id: 6, name: "Needs"),
         )
         self.sort = .init()
         self.pops = []
@@ -170,10 +162,6 @@ extension PopulationReport: JavaScriptEncodable {
             self.columns.4,
             self.columns.5,
             self.columns.6,
-            self.columns.7,
-            self.columns.8,
-            self.columns.9,
-            self.columns.10,
         ]
 
         js[.pops] = self.pops

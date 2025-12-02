@@ -36,7 +36,7 @@ export class ProductionOverview extends ScreenContent {
         readonly index: FilterTabs;
         readonly panel: HTMLDivElement;
         readonly title: HTMLElement;
-        readonly titleName: HTMLSpanElement;
+        readonly titleName: HTMLHeadingElement;
         readonly stats: HTMLDivElement;
         readonly nav: HTMLElement;
     };
@@ -87,18 +87,18 @@ export class ProductionOverview extends ScreenContent {
                 index: new FilterTabs(this.filters),
                 panel: document.createElement('div'),
                 title: document.createElement('header'),
-                titleName: document.createElement('span'),
+                titleName: document.createElement('h3'),
                 stats: document.createElement('div'),
                 nav: document.createElement('nav'),
             }
 
             this.dom.title.appendChild(this.dom.titleName);
+            this.dom.title.appendChild(this.dom.nav);
 
             const upper: HTMLDivElement = document.createElement('div');
             upper.classList.add('upper');
             upper.appendChild(this.dom.title);
             upper.appendChild(this.dom.stats);
-            upper.appendChild(this.dom.nav);
 
             this.dom.panel.appendChild(upper);
             this.dom.panel.appendChild(this.factories.node);
@@ -116,7 +116,7 @@ export class ProductionOverview extends ScreenContent {
 
             switch (tab) {
             case FactoryDetailsTab.Inventory: link.textContent = 'Consumption'; break;
-            case FactoryDetailsTab.Ownership: link.textContent = 'Capital Structure'; break;
+            case FactoryDetailsTab.Ownership: link.textContent = 'Investors'; break;
             }
 
             if (tab == state.factory?.open.type) {

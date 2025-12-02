@@ -9,6 +9,7 @@ import {
 import { GameID, hex } from '../../GameEngine/exports.js';
 import {
     ProgressCell,
+    ProgressTriad,
     PopIcon,
     PopTableEntry,
     ScreenType,
@@ -21,15 +22,13 @@ export class PopTableRow implements DiffableListElement<GameID> {
 
     private readonly size: Ticker;
     private readonly type: PopIcon;
-    private readonly location: HTMLElement;
+
+    /// Location cell doubles as the background for the unemployment meter
+    private readonly location: ProgressCell;
     private readonly nat: HTMLElement;
     private readonly mil: Ticker;
     private readonly con: Ticker;
-    private readonly jobs: ProgressCell;
-    private readonly px: Ticker;
-    private readonly fl: ProgressCell;
-    private readonly fe: ProgressCell;
-    private readonly fx: ProgressCell;
+    private readonly needs: ProgressTriad;
 
     constructor(pop: PopTableEntry) {
         this.id = pop.id;
@@ -37,56 +36,27 @@ export class PopTableRow implements DiffableListElement<GameID> {
 
         this.size = new Ticker(Fortune.Bonus);
         this.type = new PopIcon();
-
-        this.location = document.createElement('div');
         this.nat = document.createElement('div');
+        this.nat.setAttribute('data-tooltip-type', TooltipType.PopAccount);
+        this.nat.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
+
+        this.location = new ProgressCell();
+        this.location.node.setAttribute('data-tooltip-type', TooltipType.PopJobs);
+        this.location.node.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
+
         this.mil = new Ticker(Fortune.Malus);
         this.con = new Ticker(Fortune.Malus);
 
-        this.jobs = new ProgressCell();
-        this.jobs.node.setAttribute('data-tooltip-type', TooltipType.PopJobs);
-        this.jobs.node.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
-
-        this.px = new Ticker(Fortune.Bonus);
-        this.px.outer.setAttribute('data-tooltip-type', TooltipType.PopAccount);
-        this.px.outer.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
-
-        this.fl = new ProgressCell();
-        this.fl.node.classList.add('needs-cup');
-        this.fl.node.setAttribute('data-tooltip-type', TooltipType.PopNeeds);
-        this.fl.node.setAttribute(
-            'data-tooltip-arguments',
-            JSON.stringify([pop.id, 'l'])
-        );
-
-        this.fe = new ProgressCell();
-        this.fe.node.classList.add('needs-cup');
-        this.fe.node.setAttribute('data-tooltip-type', TooltipType.PopNeeds);
-        this.fe.node.setAttribute(
-            'data-tooltip-arguments',
-            JSON.stringify([pop.id, 'e'])
-        );
-
-        this.fx = new ProgressCell();
-        this.fx.node.classList.add('needs-cup');
-        this.fx.node.setAttribute('data-tooltip-type', TooltipType.PopNeeds);
-        this.fx.node.setAttribute(
-            'data-tooltip-arguments',
-            JSON.stringify([pop.id, 'x'])
-        );
+        this.needs = new ProgressTriad(pop.id, TooltipType.PopNeeds);
 
         this.node.href = `#screen=${ScreenType.Population}&id=${pop.id}`;
         this.node.appendChild(this.size.outer);
         this.node.appendChild(this.type.node);
         this.node.appendChild(this.nat); // Comes before location!
-        this.node.appendChild(this.location);
+        this.node.appendChild(this.location.node);
         this.node.appendChild(this.mil.outer);
         this.node.appendChild(this.con.outer);
-        this.node.appendChild(this.jobs.node);
-        this.node.appendChild(this.px.outer);
-        this.node.appendChild(this.fl.node);
-        this.node.appendChild(this.fe.node);
-        this.node.appendChild(this.fx.node);
+        this.node.appendChild(this.needs.node);
     }
 
     public update(pop: PopTableEntry): void {
@@ -96,22 +66,13 @@ export class PopTableRow implements DiffableListElement<GameID> {
         this.type.set({ id: pop.id, type: pop.type });
 
         UpdateText(this.nat, pop.nat);
-        UpdateText(this.location, pop.location);
+
+        UpdateText(this.location.summary, pop.location);
+        this.location.set(pop.une * 100);
 
         this.mil.updatePriceChange(pop.y_mil, pop.t_mil);
         this.con.updatePriceChange(pop.y_con, pop.t_con);
 
-        UpdateDecimal(this.jobs.summary, pop.une * 100, 2);
-        this.jobs.set(pop.une * 100);
-
-        this.px.updatePriceChange(pop.y_px, pop.t_px);
-
-        UpdateDecimal(this.fl.summary, pop.t_fl * 100, 1);
-        UpdateDecimal(this.fe.summary, pop.t_fe * 100, 1);
-        UpdateDecimal(this.fx.summary, pop.t_fx * 100, 1);
-
-        this.fl.set(pop.t_fl * 100);
-        this.fe.set(pop.t_fe * 100);
-        this.fx.set(pop.t_fx * 100);
+        this.needs.set(100 * pop.t_fl, 100 * pop.t_fe, 100 * pop.t_fx);
     }
 }

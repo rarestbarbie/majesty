@@ -38,7 +38,7 @@ export class PopulationOverview extends ScreenContent {
         readonly panel: HTMLDivElement;
         readonly title: HTMLElement;
         readonly titleIcon: PopIcon;
-        readonly titleName: HTMLSpanElement;
+        readonly titleName: HTMLHeadingElement;
         readonly stats: HTMLDivElement;
         readonly nav: HTMLElement;
     };
@@ -104,19 +104,19 @@ export class PopulationOverview extends ScreenContent {
                 panel: document.createElement('div'),
                 title: document.createElement('header'),
                 titleIcon: new PopIcon(),
-                titleName: document.createElement('span'),
+                titleName: document.createElement('h3'),
                 stats: document.createElement('div'),
                 nav: document.createElement('nav'),
             }
 
             this.dom.title.appendChild(this.dom.titleIcon.node);
             this.dom.title.appendChild(this.dom.titleName);
+            this.dom.title.appendChild(this.dom.nav);
 
             const upper: HTMLDivElement = document.createElement('div');
             upper.classList.add('upper');
             upper.appendChild(this.dom.title);
             upper.appendChild(this.dom.stats);
-            upper.appendChild(this.dom.nav);
 
             this.dom.panel.appendChild(upper);
             this.dom.panel.appendChild(this.pops.node);
@@ -134,7 +134,7 @@ export class PopulationOverview extends ScreenContent {
 
             switch (tab) {
             case PopDetailsTab.Inventory: link.textContent = 'Consumption'; break;
-            case PopDetailsTab.Ownership: link.textContent = 'Capital Structure'; break;
+            case PopDetailsTab.Ownership: link.textContent = 'Investors'; break;
             }
 
             if (tab == state.pop?.open.type) {
