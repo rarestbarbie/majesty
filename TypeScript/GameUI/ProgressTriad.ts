@@ -1,17 +1,8 @@
 import {
-    Fortune,
-    DiffableListElement,
-    Ticker,
-    UpdateBigInt,
-    UpdateText,
     UpdateDecimal,
 } from '../DOM/exports.js';
 import { GameID } from '../GameEngine/exports.js';
 import {
-    ProgressCell,
-    PopIcon,
-    PopTableEntry,
-    ScreenType,
     TooltipType,
 } from './exports.js';
 
