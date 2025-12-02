@@ -1,4 +1,5 @@
 export * from './ProgressCell.js';
+export * from './ProgressTriad.js';
 export * from './Application/ContextMenuType.js';
 export * from './Application/TooltipType.js';
 export * from './Application/ScreenType.js';

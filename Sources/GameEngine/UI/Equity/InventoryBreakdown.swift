@@ -144,16 +144,16 @@ extension InventoryBreakdown {
         self.terms = Term.list {
             for case (let type, let state?, let tooltip, let help) in [
                     (
-                        factory.type.workers.unit,
-                        factory.workers,
-                        TooltipType.FactoryWorkers,
-                        TooltipType.FactoryWorkersHelp
-                    ),
-                    (
                         factory.type.clerks.unit,
                         factory.clerks,
                         TooltipType.FactoryClerks,
                         TooltipType.FactoryClerksHelp
+                    ),
+                    (
+                        factory.type.workers.unit,
+                        factory.workers,
+                        TooltipType.FactoryWorkers,
+                        TooltipType.FactoryWorkersHelp
                     ),
                 ] {
                 let term: TermType = .pop(type)

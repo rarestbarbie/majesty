@@ -18,9 +18,6 @@
         z-index: -1;
     }
 }
-[data-cell='progress'].needs-cup {
-    --progress-bar-opacity: 0.25;
-}
 [data-cell='progress'].bloody {
     --progress-bar-bg: rgb(255, 0, 0);
 }
@@ -29,6 +26,8 @@
     display: grid;
     align-content: start;
     overflow-y: scroll;
+
+    padding-right: 0.6rem;
 
     > header {
         font-weight: bold;
@@ -91,7 +90,7 @@
     grid-template-columns: 2fr 1fr 0.5fr 0.5fr;
 }
 [data-table='Factories'] {
-    grid-template-columns: 2fr 1fr 0.5fr 0.5fr 1fr 1fr 1fr;
+    grid-template-columns: 2fr 1fr 0.5fr 0.5fr 1fr 0.5fr;
 }
 [data-table='Factories'] > * > [data-cell='progress']:nth-child(1) {
     > div {
@@ -103,29 +102,7 @@
         }
     }
 }
-[data-table='Pops'] {
-    grid-template-columns: 1.5fr 0.4fr 1.3fr 1.4fr 1fr 1fr 1fr 1fr 0.5fr 0.5fr 0.5fr 0.1fr;
-}
-
-[data-table='Pops'] > *:hover    > [data-cell='progress'].needs-cup,
-[data-table='Pops'] > *.selected > [data-cell='progress'].needs-cup {
-    background-color: transparent;
-}
-[data-table='Pops'] > *:hover    > [data-cell='progress'].needs-cup,
-[data-table='Pops'] > *.selected > [data-cell='progress'].needs-cup {
-    --progress-bar-opacity: 0.5;
-}
-
-[data-table='Pops'] > * > [data-cell='progress']:nth-last-child(3) {
-    --progress-bar-bg: var(--color-bg-l);
-}
-[data-table='Pops'] > * > [data-cell='progress']:nth-last-child(2) {
-    --progress-bar-bg: var(--color-bg-e);
-}
-[data-table='Pops'] > * > [data-cell='progress']:nth-last-child(1) {
-    --progress-bar-bg: var(--color-bg-x);
-}
 
 [data-table='Markets'] {
-    grid-template-columns: 1fr 1fr 1fr 1fr 1fr 2fr;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1.5fr;
 }
