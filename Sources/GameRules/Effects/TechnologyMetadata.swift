@@ -1,6 +1,6 @@
 import GameIDs
 
-public final class TechnologyMetadata: GameMetadata {
+public final class TechnologyMetadata: GameObjectMetadata {
     public typealias ID = Technology
     public let identity: SymbolAssignment<Technology>
     public let starter: Bool

@@ -22,7 +22,7 @@ extension PlanetGrid {
     mutating func replace(
         surface: PlanetSurface,
         symbols: GameSaveSymbols,
-        rules: GameRules,
+        rules: GameMetadata,
         terrainDefault: TerrainMetadata,
         geologyDefault: GeologicalMetadata
     ) throws {
@@ -105,7 +105,7 @@ extension PlanetGrid {
     private static func resolve(
         surface: PlanetSurface?,
         symbols: GameSaveSymbols,
-        rules: GameRules
+        rules: GameMetadata
     ) throws -> OrderedDictionary<HexCoordinate, Tile> {
         var tiles: OrderedDictionary<HexCoordinate, Tile> = [:]
 

@@ -13,7 +13,6 @@ struct GameContext {
 
     private(set) var planets: RuntimeContextTable<PlanetContext>
     private(set) var currencies: OrderedDictionary<CurrencyID, Currency>
-    private(set) var cultures: RuntimeContextTable<CultureContext>
     private(set) var countries: RuntimeContextTable<CountryContext>
     private(set) var buildings: DynamicContextTable<BuildingContext>
     private(set) var factories: DynamicContextTable<FactoryContext>
@@ -21,21 +20,25 @@ struct GameContext {
     private(set) var pops: DynamicContextTable<PopContext>
 
     let symbols: GameSaveSymbols
-    let rules: GameRules
+    var rules: GameMetadata
 }
 extension GameContext {
-    static func load(_ save: borrowing GameSave, rules: GameRules) throws -> Self {
+    static func load(_ save: borrowing GameSave, rules: consuming GameMetadata) throws -> Self {
         let _none: _NoMetadata = .init()
+        // closure captures `rules`, and calls a mutating subscript! writing it inline would
+        // still be correct, due to order of evaluation, but this is much clearer
+        let pops: DynamicContextTable<PopContext> = try .init(states: save.pops) {
+            rules.pops[$0.type]
+        }
         return .init(
             player: save.player,
             planets: [:],
             currencies: save.currencies.reduce(into: [:]) { $0[$1.id] = $1 },
-            cultures: try .init(states: save.cultures) { rules.biology[$0.type] },
             countries: try .init(states: save.countries) { _ in _none },
             buildings: try .init(states: save.buildings) { rules.buildings[$0.type] },
             factories: try .init(states: save.factories) { rules.factories[$0.type] },
             mines: try .init(states: save.mines) { rules.mines[$0.type] },
-            pops: try .init(states: save.pops) { rules.pops[$0.type] },
+            pops: pops,
             symbols: save.symbols,
             rules: rules,
         )
@@ -46,12 +49,12 @@ extension GameContext {
             symbols: self.symbols,
             random: world.random,
             player: self.player,
+            cultures: self.rules.pops.cultures.values.sorted { $0.id < $1.id },
             accounts: world.bank.accounts.items,
             segmentedMarkets: world.segmentedMarkets,
             tradeableMarkets: world.tradeableMarkets,
             date: world.date,
             currencies: self.currencies.values.elements,
-            cultures: [_].init(self.cultures.state),
             countries: [_].init(self.countries.state),
             buildings: [_].init(self.buildings.state),
             factories: [_].init(self.factories.state),
@@ -141,7 +144,6 @@ extension GameContext {
         .init(
             player: self.player,
             planets: self.planets.state,
-            cultures: self.cultures.state,
             countries: self.countries.state,
             factories: self.factories.state,
             mines: self.mines.state,
@@ -154,7 +156,6 @@ extension GameContext {
         .init(
             player: self.player,
             planets: self.planets,
-            cultures: self.cultures,
             countries: self.countries,
             buildings: self.buildings.state,
             factories: self.factories.state,
@@ -192,7 +193,6 @@ extension GameContext {
             player: self.player,
             rules: self.rules,
             planets: self.planets,
-            cultures: self.cultures,
             factories: self.factories.state,
             mines: self.mines.state,
         )
@@ -313,9 +313,6 @@ extension GameContext {
         for i: Int in self.planets.indices {
             try self.planets[i].advance(turn: &turn, context: self)
         }
-        for i: Int in self.cultures.indices {
-            try self.cultures[i].advance(turn: &turn, context: self)
-        }
         for i: Int in self.countries.indices {
             try self.countries[i].advance(turn: &turn, context: self)
         }
@@ -396,8 +393,8 @@ extension GameContext {
         self.pops.turn { $0.advance(turn: &turn) }
 
         let unfilled: (
-            [(PopType, [PopJobOfferBlock])],
-            [(PopType, [PopJobOfferBlock])]
+            [(PopOccupation, [PopJobOfferBlock])],
+            [(PopOccupation, [PopJobOfferBlock])]
         ) = self.postPopHirings(&turn, order: shuffled)
         self.postPopFirings(&turn)
 
@@ -415,9 +412,6 @@ extension GameContext {
 
         for i: Int in self.planets.indices {
             try self.planets[i].afterIndexCount(world: world, context: self.territoryPass)
-        }
-        for i: Int in self.cultures.indices {
-            try self.cultures[i].afterIndexCount(world: world, context: self.territoryPass)
         }
 
         for i: Int in self.buildings.indices {
@@ -489,7 +483,7 @@ extension GameContext {
         var layoffs: [Turn.Jobs.Fire.Key: PopJobLayoffBlock] = turn.jobs.fire.turn()
 
         self.pops.turn {
-            let type: PopType = $0.state.type
+            let type: PopOccupation = $0.state.occupation
             for j: Int in $0.state.factories.values.indices {
                 {
                     $0.fire(&layoffs[.factory(type, $0.id)])
@@ -503,8 +497,8 @@ extension GameContext {
         }
     }
     private mutating func postPopHirings(_ turn: inout Turn, order: ResidentOrder) -> (
-        [(PopType, [PopJobOfferBlock])],
-        [(PopType, [PopJobOfferBlock])]
+        [(PopOccupation, [PopJobOfferBlock])],
+        [(PopOccupation, [PopJobOfferBlock])]
     ) {
         let offers: (
             remote: [Turn.Jobs.Hire<PlanetID>.Key: [(Int, Int64)]],
@@ -517,7 +511,7 @@ extension GameContext {
             let pop: Pop = self.pops.state[i]
 
             guard
-            let jobMode: PopJobMode = pop.type.jobMode else {
+            let jobMode: PopJobMode = pop.occupation.jobMode else {
                 return
             }
 
@@ -530,25 +524,25 @@ extension GameContext {
             case .hourly, .mining:
                 let key: Turn.Jobs.Hire<Address>.Key = .init(
                     location: pop.tile,
-                    type: pop.type
+                    type: pop.occupation
                 )
                 $0.local[key, default: []].append((i, unemployed))
 
             case .remote:
                 let key: Turn.Jobs.Hire<PlanetID>.Key = .init(
                     location: pop.tile.planet,
-                    type: pop.type
+                    type: pop.occupation
                 )
                 $0.remote[key, default: []].append((i, unemployed))
             }
         }
 
-        let workersUnavailable: [(PopType, [PopJobOfferBlock])] = turn.jobs.hire.local.turn {
+        let workersUnavailable: [(PopOccupation, [PopJobOfferBlock])] = turn.jobs.hire.local.turn {
             if var pops: [(index: Int, unemployed: Int64)] = offers.local[$0] {
                 self.postPopHirings(matching: &pops, with: &$1)
             }
         }
-        let clerksUnavailable: [(PopType, [PopJobOfferBlock])] = turn.jobs.hire.remote.turn {
+        let clerksUnavailable: [(PopOccupation, [PopJobOfferBlock])] = turn.jobs.hire.remote.turn {
             if var pops: [(index: Int, unemployed: Int64)] = offers.remote[$0] {
                 self.postPopHirings(matching: &pops, with: &$1)
             }
@@ -598,9 +592,9 @@ extension GameContext {
 }
 extension GameContext {
     private mutating func awardRanksToFactories(
-        _ types: some Sequence<(PopType, [PopJobOfferBlock])>
+        _ types: some Sequence<(PopOccupation, [PopJobOfferBlock])>
     ) {
-        for (type, unfilled): (PopType, [PopJobOfferBlock]) in types {
+        for (type, unfilled): (PopOccupation, [PopJobOfferBlock]) in types {
             /// The last `q` factories will always raise wages. The next factory after the first
             /// `q` will raise wages with probability `r / 8`.
             let (q, r): (Int, remainder: Int) = unfilled.count.quotientAndRemainder(
@@ -637,7 +631,7 @@ extension GameContext {
     private mutating func awardRanksToMines() {
         for i: Int in self.planets.indices {
             for tile: PlanetGrid.Tile in self.planets[i].grid.tiles.values {
-                var ranks: [PopType: [(id: MineID, yield: Double)]] = [:]
+                var ranks: [PopOccupation: [(id: MineID, yield: Double)]] = [:]
                 for mine: MineID in tile.mines {
                     guard
                     let mine: MineContext = self.mines[mine] else {

@@ -39,7 +39,7 @@ extension GameStart {
         return highest
     }
 
-    func unpack(rules: GameRules) throws -> GameSave {
+    func unpack(rules: inout GameMetadata) throws -> GameSave {
         let symbols: GameStart.Symbols = .init(static: self.symbols, cultures: self.cultures)
 
         let starter: Set<Technology> = rules.technologies.values.reduce(into: []) {
@@ -55,6 +55,10 @@ extension GameStart {
                 color: $0.color
             )
         }
+
+        rules.pops.register(cultures: cultures)
+
+        var random: PseudoRandom = self.random
 
         var countries: [Country] = []
         var country: CountryID = Self.highest(in: self.countries)
@@ -109,18 +113,47 @@ extension GameStart {
 
         var pops: [Pop] = []
         var pop: PopID = Self.highest(in: self.pops.lazy.map(\.pops).joined())
+
+        func p(gender: Gender) -> Int64 {
+            switch gender {
+            case .FT: return 0_15
+            case .FTS: return 0_15
+            case .FC: return 4_00
+            case .FCS: return 45_00
+            case .XTL: return 0_40
+            case .XT: return 0_40
+            case .XTG: return 0_20
+            case .XCL: return 0_05
+            case .XC: return 0_05
+            case .XCG: return 0_05
+            case .MT: return 0_20
+            case .MTS: return 0_20
+            case .MC: return 2_00
+            case .MCS: return 48_00
+            }
+        }
         for group: PopSeedGroup in self.pops {
             for seed: PopSeed in group.pops {
-                let section: Pop.Section = .init(
-                    race: try symbols.cultures[seed.race],
-                    type: seed.type,
-                    tile: group.tile
-                )
-                var pop: Pop = .init(id: seed.id ?? pop.increment(), section: section)
+                let genders: [Gender] = Gender.allCases.shuffled(using: &random.generator)
+                guard
+                let sizes: [Int64] = genders.distribute(seed.size, share: p(gender:)) else {
+                    continue
+                }
+                for (gender, size): (Gender, Int64) in zip(genders, sizes) {
+                    let section: Pop.Section = .init(
+                        type: .init(
+                            occupation: seed.type,
+                            gender: gender,
+                            race: try symbols.cultures[seed.race]
+                        ),
+                        tile: group.tile
+                    )
+                    var pop: Pop = .init(id: seed.id ?? pop.increment(), section: section)
 
-                pop.y.active = seed.size
-                pop.z.active = seed.size
-                pops.append(pop)
+                    pop.y.active = size
+                    pop.z.active = size
+                    pops.append(pop)
+                }
             }
         }
 
@@ -131,7 +164,7 @@ extension GameStart {
                 if  let race: Symbol = seed.race, try symbols.cultures[race] != pop.race {
                     continue
                 }
-                if  pop.type != seed.type {
+                if  pop.occupation != seed.type {
                     continue
                 }
 
@@ -141,14 +174,14 @@ extension GameStart {
 
         return .init(
             symbols: symbols.static,
-            random: self.random,
+            random: random,
             player: self.player,
+            cultures: cultures,
             accounts: accounts.items,
             segmentedMarkets: [:],
             tradeableMarkets: [:],
             date: self.date,
             currencies: self.currencies,
-            cultures: cultures,
             countries: countries,
             buildings: buildings,
             factories: factories,

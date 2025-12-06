@@ -2,7 +2,7 @@ import Color
 import GameIDs
 import OrderedCollections
 
-public final class GeologicalMetadata: GameMetadata {
+public final class GeologicalMetadata: GameObjectMetadata {
     public typealias ID = GeologicalType
     public let identity: SymbolAssignment<GeologicalType>
     public let title: String

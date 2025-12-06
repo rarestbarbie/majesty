@@ -21,6 +21,7 @@ extension PopTableEntry: JavaScriptEncodable {
         case id
         case location
         case type
+        case gender
         case color
         case nat
         case une
@@ -47,7 +48,8 @@ extension PopTableEntry: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.location] = self.location
-        js[.type] = self.type
+        js[.type] = self.type.occupation
+        js[.gender] = self.type.gender
         js[.color] = self.color
         js[.nat] = self.nat
         js[.une] = self.une

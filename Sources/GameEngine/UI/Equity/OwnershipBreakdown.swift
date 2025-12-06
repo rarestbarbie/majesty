@@ -39,7 +39,7 @@ extension OwnershipBreakdown {
                 $0.country[country.id, default: (0, label)].share += $1.shares
             }
             if  let culture: CultureID = $1.culture,
-                let culture: Culture = context.cultures.state[culture] {
+                let culture: Culture = context.rules.pops.cultures[culture] {
                 let label: PieChartLabel = .init(color: culture.color, name: culture.name)
                 $0.culture[culture.id, default: (0, label)].share += $1.shares
             }

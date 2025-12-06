@@ -8,7 +8,7 @@ import JavaScriptInterop
     case stockPrice
     case stockAttraction
 
-    case pop(PopType)
+    case pop(PopOccupation)
     case buildingsActive
     case buildingsVacant
 }

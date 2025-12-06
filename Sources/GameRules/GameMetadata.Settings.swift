@@ -1,6 +1,6 @@
 import GameEconomy
 
-extension GameRules {
+extension GameMetadata {
     @frozen public struct Settings {
         public let exchange: WorldMarkets.Settings
     }

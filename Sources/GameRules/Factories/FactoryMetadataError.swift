@@ -1,8 +1,8 @@
 import GameIDs
 
 enum FactoryMetadataError: Error {
-    case workers([PopType])
-    case clerks([PopType])
+    case workers([PopOccupation])
+    case clerks([PopOccupation])
 }
 extension FactoryMetadataError: CustomStringConvertible {
     var description: String {

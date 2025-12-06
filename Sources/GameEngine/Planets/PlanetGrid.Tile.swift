@@ -243,7 +243,7 @@ extension PlanetGrid.Tile {
 
         guard
         let region: RegionalProperties = self.authority?.properties,
-        let factor: Fraction = region.pops.type[.Miner]?.mineExpansionFactor else {
+        let factor: Fraction = region.pops.occupation[.Miner]?.mineExpansionFactor else {
             return nil
         }
 

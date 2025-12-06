@@ -1,15 +1,15 @@
 import GameEconomy
 import GameIDs
 
-public final class FactoryMetadata: GameMetadata {
+public final class FactoryMetadata: GameObjectMetadata {
     public typealias ID = FactoryType
     public let identity: SymbolAssignment<FactoryType>
     public let materials: ResourceTier
     public let corporate: ResourceTier
     public let expansion: ResourceTier
     public let output: ResourceTier
-    public let workers: Quantity<PopType>
-    public let clerks: Quantity<PopType>
+    public let workers: Quantity<PopOccupation>
+    public let clerks: Quantity<PopOccupation>
 
     public let sharesInitial: Int64
     public let sharesPerLevel: Int64
@@ -22,7 +22,7 @@ public final class FactoryMetadata: GameMetadata {
         corporate: ResourceTier,
         expansion: ResourceTier,
         output: ResourceTier,
-        workers divisions: [Quantity<PopType>],
+        workers divisions: [Quantity<PopOccupation>],
         sharesInitial: Int64,
         sharesPerLevel: Int64,
         terrainAllowed: Set<TerrainType>
@@ -34,8 +34,8 @@ public final class FactoryMetadata: GameMetadata {
         self.expansion = expansion
         self.output = output
 
-        let workers: [Quantity<PopType>] = divisions.filter { $0.unit.stratum <= .Worker }
-        let clerks: [Quantity<PopType>] = divisions.filter { $0.unit.stratum > .Worker }
+        let workers: [Quantity<PopOccupation>] = divisions.filter { $0.unit.stratum <= .Worker }
+        let clerks: [Quantity<PopOccupation>] = divisions.filter { $0.unit.stratum > .Worker }
 
         guard workers.count == 1 else {
             throw FactoryMetadataError.workers(workers.map { $0.unit })

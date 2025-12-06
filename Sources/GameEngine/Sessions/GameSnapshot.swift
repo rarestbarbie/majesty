@@ -405,7 +405,7 @@ extension GameSnapshot {
                 for output: ResourceOutput in pop.state.inventory.out.segmented.values {
                     let name: String = self.context.rules.resources[output.id].title
                     $0[>] = """
-                    Today these \(pop.state.type.plural) sold \(
+                    Today these \(pop.state.occupation.plural) sold \(
                         output.unitsSold[/3],
                         style: output.unitsSold < output.units.added ? .neg : .pos
                     ) of \
@@ -541,7 +541,7 @@ extension GameSnapshot {
                             size: mine.state.z.size,
                             yieldRank: yieldRank
                         ),
-                        let miners: PopulationStats.Row = tile.pops.type[.Miner],
+                        let miners: PopulationStats.Row = tile.pops.occupation[.Miner],
                         let fromWorkers: Fraction = miners.mineExpansionFactor {
                         let fromDeposit: Double = .init(
                             mine.type.scale %/ (mine.type.scale + mine.state.z.size)
@@ -708,15 +708,15 @@ extension GameSnapshot {
         _ id: Address,
         _ culture: CultureID,
     ) -> Tooltip? {
-        guard let culture: Culture = self.context.cultures.state[culture] else {
+        guard let culture: Culture = self.context.rules.pops.cultures[culture] else {
             return nil
         }
         return self.context.planets[id]?.pops.tooltip(culture: culture)
     }
     func tooltipTilePopType(
         _ id: Address,
-        _ popType: PopType,
+        _ occupation: PopOccupation,
     ) -> Tooltip? {
-        self.context.planets[id]?.pops.tooltip(popType: popType)
+        self.context.planets[id]?.pops.tooltip(occupation: occupation)
     }
 }

@@ -25,7 +25,7 @@ extension LegalEntityContext {
         context: GameContext,
     ) -> Tooltip? {
         guard
-        let culture: Culture = context.cultures.state[culture] else {
+        let culture: Culture = context.rules.pops.cultures[culture] else {
             return nil
         }
         let (share, total): (share: Int64, total: Int64) = self.equity.owners.reduce(

@@ -6,6 +6,6 @@ import OrderedCollections
 extension CountryContext {
     struct ComputationPass {
         let player: CountryID
-        let rules: GameRules
+        let rules: GameMetadata
     }
 }

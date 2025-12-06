@@ -5,7 +5,7 @@ import GameRules
 extension FactoryContext {
     struct ComputationPass {
         let player: CountryID
-        let rules: GameRules
+        let rules: GameMetadata
 
         let planets: RuntimeContextTable<PlanetContext>
     }

@@ -21,9 +21,9 @@ extension CountryProperties {
             modifiers: .compute(for: country, rules: context.rules),
             minwage: country.minwage,
             currency: currency,
-            culturePreferred: try context.cultures.state[country.culturePreferred].state,
+            culturePreferred: try context.rules.pops.cultures[defined: country.culturePreferred],
             culturesAccepted: try country.culturesAccepted.map {
-                try context.cultures.state[$0].state
+                try context.rules.pops.cultures[defined: $0]
             },
             criticalResources: context.rules.resources.local.compactMap {
                 $0.critical ? $0.id : nil
