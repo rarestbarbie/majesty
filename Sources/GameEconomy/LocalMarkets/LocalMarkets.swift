@@ -128,7 +128,11 @@ extension LocalMarkets {
         progressive: Bool,
     ) {
         guard budgetTotal > 0,
-        let budgets: [Int64] = weights.demands.distribute(budgetTotal, share: \.value) else {
+        let budgets: [Int64] = weights.demands.distribute(
+            budgetTotal,
+            // no keypath, compiler optimization bug
+            share: { $0.value }
+        ) else {
             return
         }
 
