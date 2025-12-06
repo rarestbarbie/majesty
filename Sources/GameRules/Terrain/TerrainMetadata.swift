@@ -1,7 +1,7 @@
 import Color
 import GameIDs
 
-public final class TerrainMetadata: GameMetadata {
+public final class TerrainMetadata: GameObjectMetadata {
     public typealias ID = TerrainType
     public let identity: SymbolAssignment<TerrainType>
     public let color: Color

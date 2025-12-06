@@ -91,7 +91,7 @@ extension PopulationReport: PersistentReport {
             guard
             let planet: PlanetContext = snapshot.planets[$0.state.tile.planet],
             let tile: PlanetGrid.Tile = planet.grid.tiles[$0.state.tile.tile],
-            let culture: Culture = snapshot.cultures.state[$0.state.race] else {
+            let culture: Culture = snapshot.rules.pops.cultures[$0.state.race] else {
                 return nil
             }
 
@@ -124,7 +124,7 @@ extension PopulationReport: PersistentReport {
         self.columns.type.updateStops(
             columnSelected: self.columnSelected,
             from: self.pops,
-            on: \.type.descending,
+            on: \.type.occupation.descending,
             as: ColumnControl.type(_:)
         )
         self.columns.race.updateStops(

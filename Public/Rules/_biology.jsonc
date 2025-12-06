@@ -2,21 +2,7 @@
     "_Pet": {
     },
     "Chickens": {
-        "meat": {
-            "Poultry": 6
-        },
-        "diet": {
-            "Water": 1,
-            "Wheat": 6
-        }
     },
     "Cattle": {
-        "meat": {
-            "Beef": 6
-        },
-        "diet": {
-            "Water": 5,
-            "Wheat": 5
-        }
     }
 }

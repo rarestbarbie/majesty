@@ -10,7 +10,7 @@ extension Turn.Jobs {
     }
 }
 extension Turn.Jobs.Hire {
-    subscript(location: Location, type: PopType) -> [PopJobOfferBlock] {
+    subscript(location: Location, type: PopOccupation) -> [PopJobOfferBlock] {
         _read   { yield  self.blocks[Key.init(location: location, type: type), default: []] }
         _modify { yield &self.blocks[Key.init(location: location, type: type), default: []] }
     }
@@ -18,7 +18,7 @@ extension Turn.Jobs.Hire {
 extension Turn.Jobs.Hire {
     mutating func turn(
         _ yield: (Key, inout [PopJobOfferBlock]) -> ()
-    ) -> [(PopType, [PopJobOfferBlock])] {
+    ) -> [(PopOccupation, [PopJobOfferBlock])] {
         var i: Dictionary<Key, [PopJobOfferBlock]>.Index = self.blocks.startIndex
         while i < self.blocks.endIndex {
             let key: Key = self.blocks.keys[i]

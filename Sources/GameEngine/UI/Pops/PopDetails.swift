@@ -53,9 +53,9 @@ extension PopDetails: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
 
-        js[.type_singular] = self.state?.type.singular
-        js[.type_plural] = self.state?.type.plural
-        js[.type] = self.state?.type
+        js[.type_singular] = self.state?.occupation.singular
+        js[.type_plural] = self.state?.occupation.plural
+        js[.type] = self.state?.type.occupation
 
         switch self.open {
         case .Inventory: js[.open] = self.inventory

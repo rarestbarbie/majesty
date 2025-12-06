@@ -4,7 +4,7 @@ import JavaScriptInterop
 import JavaScriptKit
 
 @frozen public struct PopWealth {
-    public let type: PopType
+    public let type: PopOccupation
     public let cash: Int64
     public let race: Symbol?
 }

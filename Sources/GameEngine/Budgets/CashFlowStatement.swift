@@ -31,7 +31,7 @@ extension CashFlowStatement {
     }
 }
 extension CashFlowStatement {
-    func tooltip(rules: GameRules, item: CashFlowItem) -> Tooltip {
+    func tooltip(rules: GameMetadata, item: CashFlowItem) -> Tooltip {
         let (share, total): (share: Int64, total: Int64) = self.costs.reduce(into: (0, 0)) {
             if $1.key == item {
                 $0.share += $1.value
@@ -51,7 +51,7 @@ extension CashFlowStatement {
         }
     }
 
-    func chart(rules: GameRules) -> PieChart<CashFlowItem, PieChartLabel>? {
+    func chart(rules: GameMetadata) -> PieChart<CashFlowItem, PieChartLabel>? {
         if self.costs.isEmpty {
             return nil
         }

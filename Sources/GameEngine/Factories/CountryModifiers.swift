@@ -29,7 +29,7 @@ struct CountryModifiers {
     }
 }
 extension CountryModifiers {
-    static func compute(for country: Country, rules: GameRules) -> Self {
+    static func compute(for country: Country, rules: GameMetadata) -> Self {
         var localMarkets: [Resource: LocalMarket.Shape] = [:]
         for resource: ResourceMetadata in rules.resources.local {
             let min: LocalPriceLevel?
@@ -54,7 +54,7 @@ extension CountryModifiers {
         return modifiers
     }
 
-    private mutating func update(from technologies: [Technology], rules: GameRules) {
+    private mutating func update(from technologies: [Technology], rules: GameMetadata) {
         for id: Technology in technologies {
             guard
             let technology: TechnologyMetadata = rules.technologies[id] else {
@@ -63,7 +63,7 @@ extension CountryModifiers {
             self.update(from: technology, rules: rules)
         }
     }
-    private mutating func update(from technology: TechnologyMetadata, rules: GameRules) {
+    private mutating func update(from technology: TechnologyMetadata, rules: GameMetadata) {
         for effect: Effect in technology.effects {
             let technology: EffectProvenance = .technology(technology)
             switch effect {

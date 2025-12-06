@@ -5,10 +5,9 @@ import GameRules
 extension PopContext {
     struct ComputationPass {
         let player: CountryID
-        let rules: GameRules
+        let rules: GameMetadata
 
         let planets: RuntimeContextTable<PlanetContext>
-        let cultures: RuntimeContextTable<CultureContext>
         let factories: RuntimeStateTable<FactoryContext>
         let mines: RuntimeStateTable<MineContext>
     }

@@ -10,6 +10,7 @@ public struct GameSave {
     var symbols: GameSaveSymbols
     let random: PseudoRandom
     let player: CountryID
+    let cultures: [Culture]
 
     let accounts: OrderedDictionary<LEI, Bank.Account>.Items
     let segmentedMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
@@ -17,7 +18,6 @@ public struct GameSave {
     let date: GameDate
 
     let currencies: [Currency]
-    let cultures: [Culture]
     let countries: [Country]
 
     let buildings: [Building]
@@ -30,6 +30,7 @@ extension GameSave {
         case symbols
         case random
         case player
+        case cultures
 
         case accounts
         case markets_segmented
@@ -39,7 +40,6 @@ extension GameSave {
         // case terrain
         // case planets
         case currencies
-        case cultures
         case countries
         case buildings
         case factories
@@ -55,13 +55,13 @@ extension GameSave: JavaScriptEncodable {
         js[.symbols] = self.symbols
         js[.random] = self.random
         js[.player] = self.player
+        js[.cultures] = self.cultures
         js[.accounts] = self.accounts
         js[.markets_segmented] = self.segmentedMarkets
         js[.markets_tradeable] = self.tradeableMarkets
         js[.date] = self.date
 
         js[.currencies] = self.currencies
-        js[.cultures] = self.cultures
         js[.countries] = self.countries
         js[.buildings] = self.buildings
         js[.factories] = self.factories
@@ -75,12 +75,12 @@ extension GameSave: JavaScriptDecodable {
             symbols: try js[.symbols].decode(),
             random: try js[.random].decode(),
             player: try js[.player].decode(),
+            cultures: try js[.cultures].decode(),
             accounts: try js[.accounts]?.decode() ?? .init(dictionary: [:]),
             segmentedMarkets: try js[.markets_segmented]?.decode() ?? [:],
             tradeableMarkets: try js[.markets_tradeable]?.decode() ?? [:],
             date: try js[.date].decode(),
             currencies: try js[.currencies].decode(),
-            cultures: try js[.cultures].decode(),
             countries: try js[.countries].decode(),
             buildings: try js[.buildings].decode(),
             factories: try js[.factories].decode(),

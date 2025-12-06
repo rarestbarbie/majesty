@@ -10,11 +10,11 @@ extension Turn.Jobs {
     }
 }
 extension Turn.Jobs.Fire {
-    subscript(factory: FactoryID, type: PopType) -> PopJobLayoffBlock? {
+    subscript(factory: FactoryID, type: PopOccupation) -> PopJobLayoffBlock? {
         _read   { yield  self.blocks[.factory(type, factory)] }
         _modify { yield &self.blocks[.factory(type, factory)] }
     }
-    subscript(mine: MineID, type: PopType) -> PopJobLayoffBlock? {
+    subscript(mine: MineID, type: PopOccupation) -> PopJobLayoffBlock? {
         _read   { yield  self.blocks[.mine(type, mine)] }
         _modify { yield &self.blocks[.mine(type, mine)] }
     }

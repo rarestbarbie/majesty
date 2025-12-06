@@ -180,6 +180,7 @@ let package: Package = .init(
             name: "GameIDs",
             dependencies: [
                 .target(name: "Bijection"),
+                .target(name: "Color"),
                 .target(name: "GameStateMacros"),
                 .target(name: "HexGrids"),
             ]

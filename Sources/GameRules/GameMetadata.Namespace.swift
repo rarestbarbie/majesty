@@ -1,14 +1,16 @@
 import JavaScriptKit
 
-extension GameRules {
+extension GameMetadata {
     @frozen public enum Namespace: JSString {
+        case legend
+        case pops
+
         case buildings
         case building_costs
         case factories
         case factory_costs
         case resources
         case mines
-        case pops
         case technologies
 
         case biology

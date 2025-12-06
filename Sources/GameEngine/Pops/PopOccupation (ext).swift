@@ -1,6 +1,6 @@
 import GameIDs
 
-extension PopType {
+extension PopOccupation {
     var earnings: String {
         switch self {
         case .Livestock: "Market earnings"
@@ -58,6 +58,6 @@ extension PopType {
         }
     }
 }
-extension PopType {
-    var descending: PopTypeDescending { .init(rawValue: self) }
+extension PopOccupation {
+    var descending: PopOccupationDescending { .init(rawValue: self) }
 }

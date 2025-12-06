@@ -1,7 +1,7 @@
 import GameEconomy
 import GameIDs
 
-public final class BuildingMetadata: GameMetadata {
+public final class BuildingMetadata: GameObjectMetadata {
     public typealias ID = BuildingType
     public let identity: SymbolAssignment<BuildingType>
     public let operations: ResourceTier

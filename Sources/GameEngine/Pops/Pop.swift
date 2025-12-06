@@ -12,9 +12,8 @@ import OrderedCollections
 
 struct Pop: LegalEntityState, Identifiable {
     let id: PopID
-    let tile: Address
     let type: PopType
-    let race: CultureID
+    let tile: Address
 
     var mothballed: Int64
     var destroyed: Int64
@@ -36,9 +35,8 @@ extension Pop: Sectionable {
     init(id: PopID, section: Section) {
         self.init(
             id: id,
-            tile: section.tile,
             type: section.type,
-            race: section.race,
+            tile: section.tile,
             mothballed: 0,
             destroyed: 0,
             restored: 0,
@@ -54,8 +52,17 @@ extension Pop: Sectionable {
         )
     }
 
-    var section: Section {
-        .init(race: self.race, type: self.type, tile: self.tile)
+    var section: Section { .init(type: self.type, tile: self.tile) }
+}
+extension Pop {
+    var occupation: PopOccupation {
+        self.type.occupation
+    }
+    var gender: Gender {
+        self.type.gender
+    }
+    var race: CultureID {
+        self.type.race
     }
 }
 extension Pop: Deletable {
@@ -105,7 +112,7 @@ extension Pop {
         evaluator: ConditionEvaluator,
         inherit: Fraction?,
         on turn: inout Turn,
-        weight: (PopType) -> Double,
+        weight: (PopOccupation) -> Double,
     ) {
         let rate: Double = evaluator.output
         if  rate <= 0 {
@@ -120,7 +127,7 @@ extension Pop {
         }
 
         /// evaluate this lazily to avoid unnecessary work
-        var targets: [(id: PopType, weight: Double)] = PopType.allCases.compactMap {
+        var targets: [(id: PopOccupation, weight: Double)] = PopOccupation.allCases.compactMap {
             let weight: Double = weight($0)
             return weight > 0 ? (id: $0, weight: weight) : nil
         }
@@ -132,15 +139,18 @@ extension Pop {
             return
         }
 
-        for ((target, _), size): ((id: PopType, Double), Int64) in zip(targets, breakdown)
+        for ((target, _), size): ((id: PopOccupation, Double), Int64) in zip(targets, breakdown)
             where size > 0 {
 
-            if self.type == target {
+            if self.type.occupation == target {
                 // No need to convert to the same type
                 continue
             }
 
-            let section: Section = .init(race: self.race, type: target, tile: self.tile)
+            let section: Section = .init(
+                type: self.type.with(occupation: target),
+                tile: self.tile
+            )
             let inherits: Fraction
             if  size < self.z.active {
                 let fraction: Fraction = size %/ self.z.active
@@ -184,9 +194,10 @@ extension Pop {
 extension Pop {
     enum ObjectKey: JSString, Sendable {
         case id
+        case type_occupation = "J"
+        case type_gender = "G"
+        case type_race = "R"
         case tile = "on"
-        case type
-        case race
 
         case mothballed = "dm"
         case destroyed = "dd"
@@ -214,9 +225,10 @@ extension Pop {
 extension Pop: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
+        js[.type_occupation] = self.type.occupation
+        js[.type_gender] = self.type.gender
+        js[.type_race] = self.type.race
         js[.tile] = self.tile
-        js[.type] = self.type
-        js[.race] = self.race
         js[.mothballed] = self.mothballed == 0 ? nil : self.mothballed
         js[.destroyed] = self.destroyed == 0 ? nil : self.destroyed
         js[.restored] = self.restored == 0 ? nil : self.restored
@@ -242,9 +254,12 @@ extension Pop: JavaScriptDecodable {
         let today: Dimensions = try js[.z]?.decode() ?? .init()
         self.init(
             id: try js[.id]?.decode() ?? 0,
+            type: .init(
+                occupation: try js[.type_occupation].decode(),
+                gender: try js[.type_gender].decode(),
+                race: try js[.type_race].decode()
+            ),
             tile: try js[.tile].decode(),
-            type: try js[.type].decode(),
-            race: try js[.race].decode(),
             mothballed: try js[.mothballed]?.decode() ?? 0,
             destroyed: try js[.destroyed]?.decode() ?? 0,
             restored: try js[.restored]?.decode() ?? 0,

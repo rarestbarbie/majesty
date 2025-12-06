@@ -1,11 +1,11 @@
 import GameEconomy
 import GameIDs
 
-public final class MineMetadata: GameMetadata {
+public final class MineMetadata: GameObjectMetadata {
     public typealias ID = MineType
     public let identity: SymbolAssignment<MineType>
     public let base: ResourceTier
-    public let miner: PopType
+    public let miner: PopOccupation
     public let decay: Bool
     public let scale: Int64
     public let spawn: [GeologicalType: SpawnWeight]
@@ -13,7 +13,7 @@ public final class MineMetadata: GameMetadata {
     init(
         identity: SymbolAssignment<MineType>,
         base: ResourceTier,
-        miner: PopType,
+        miner: PopOccupation,
         decay: Bool,
         scale: Int64,
         spawn: [GeologicalType: SpawnWeight],

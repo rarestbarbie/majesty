@@ -5,7 +5,7 @@ import GameRules
 
 @frozen public struct PopSeed: Identifiable {
     public var id: PopID?
-    public let type: PopType
+    public let type: PopOccupation
     public let race: Symbol
     public let size: Int64
 }

@@ -34,7 +34,7 @@ extension GameWorld {
     var date: GameDate { self.notifications.date }
 }
 extension GameWorld {
-    subscript(settings: GameRules.Settings) -> Turn {
+    subscript(settings: GameMetadata.Settings) -> Turn {
         get {
             .init(
                 random: self.random,

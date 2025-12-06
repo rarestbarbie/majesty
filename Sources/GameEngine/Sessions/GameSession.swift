@@ -20,25 +20,25 @@ public struct GameSession: ~Copyable {
 extension GameSession {
     public static func load(
         _ save: consuming GameSave,
-        rules: borrowing GameRulesDescription,
+        rules: borrowing GameRules,
         map: borrowing TerrainMap,
     ) throws -> Self {
-        let rules: GameRules = try .init(resolving: rules, with: &save.symbols)
-        return try .load(save, rules: rules, map: map)
+        let metadata: GameMetadata = try rules.resolve(symbols: &save.symbols)
+        return try .load(save, rules: metadata, map: map)
     }
     public static func load(
         start: consuming GameStart,
-        rules: borrowing GameRulesDescription,
+        rules: borrowing GameRules,
         map: borrowing TerrainMap,
     ) throws -> Self {
-        let rules: GameRules = try .init(resolving: rules, with: &start.symbols)
-        let save: GameSave = try start.unpack(rules: rules)
-        return try .load(save, rules: rules, map: map)
+        var metadata: GameMetadata = try rules.resolve(symbols: &start.symbols)
+        let save: GameSave = try start.unpack(rules: &metadata)
+        return try .load(save, rules: metadata, map: map)
     }
 
     private static func load(
         _ save: borrowing GameSave,
-        rules: consuming GameRules,
+        rules: consuming GameMetadata,
         map: borrowing TerrainMap,
     ) throws -> Self {
         let world: GameWorld = .init(
@@ -98,7 +98,7 @@ extension GameSession {
         )
     }
 
-    public var rules: GameRules {
+    public var rules: GameMetadata {
         self.context.rules
     }
 

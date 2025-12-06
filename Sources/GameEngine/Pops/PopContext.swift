@@ -13,7 +13,6 @@ struct PopContext: RuntimeContext, LegalEntityContext {
     let type: PopMetadata
     var state: Pop
     private(set) var stats: Pop.Stats
-    private(set) var livestock: CultureMetadata?
     private(set) var region: RegionalAuthority?
     private(set) var equity: Equity<LEI>.Statistics
     private(set) var mines: [MineID: MiningJobConditions]
@@ -25,7 +24,6 @@ struct PopContext: RuntimeContext, LegalEntityContext {
         self.type = type
         self.state = state
         self.stats = .init()
-        self.livestock = nil
         self.region = nil
         self.equity = .init()
         self.mines = [:]
@@ -76,10 +74,7 @@ extension PopContext {
         self.factoryJobPay = [:]
         self.miningJobRank = [:]
 
-        if  case .Livestock = self.state.type {
-            self.livestock = context.cultures[self.state.race]?.type
-        } else if
-            case .Miner = self.state.type {
+        if  case .Miner = self.state.type.occupation {
             // mining yield does not affect Politicians
             for job: MineID in self.state.mines.keys {
                 self.miningJobRank[job] = context.mines[job]?.z.yieldRank
@@ -97,7 +92,7 @@ extension PopContext {
 }
 extension PopContext {
     var l: ResourceTier {
-        self.livestock?.diet ?? self.type.l
+        self.type.l
     }
     var e: ResourceTier {
         self.type.e
@@ -106,7 +101,7 @@ extension PopContext {
         self.type.x
     }
     var output: ResourceTier {
-        self.livestock?.meat ?? self.type.output
+        self.type.output
     }
 }
 extension PopContext: AllocatingContext {
@@ -528,7 +523,7 @@ extension PopContext {
         region: RegionalProperties,
     ) {
         let stats: PopulationStats = region.pops
-        let current: PopType = self.state.type
+        let current: PopOccupation = self.state.occupation
 
         // when demoting, inherit 1 percent
         self.state.egress(
@@ -536,7 +531,7 @@ extension PopContext {
             inherit: 1 %/ 100,
             on: &turn,
         ) {
-            current.demotes(to: $0) ? 0.01 + 0.4 * (stats.type[$0]?.employment ?? 0) : 0
+            current.demotes(to: $0) ? 0.01 + 0.4 * (stats.occupation[$0]?.employment ?? 0) : 0
         }
 
         // when promoting, inherit all
@@ -554,7 +549,7 @@ extension PopContext {
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
-            if self.state.type.aristocratic {
+            if self.state.type.occupation.aristocratic {
                 $0[true] {
                     $0 = -2‰
                 } = { "\(+$0[%]): Pop is \(em: "aristocratic")" }
@@ -709,7 +704,7 @@ extension PopContext {
 
         ul["Mining efficiency"] = mine.factor[%1]
         ul[>] {
-            switch self.state.type {
+            switch self.state.type.occupation {
             case .Politician: self.explainProductionPolitician(&$0, base: base, mine: mine)
             case .Miner: self.explainProductionMiner(&$0, base: base, mine: mine)
             default: break
@@ -816,7 +811,7 @@ extension PopContext {
             $0[>] {
                 let excluded: Int64 = self.state.spending.totalExcludingEquityPurchases
                 $0["Welfare", +] = +?account.s[/3]
-                $0[self.state.type.earnings, +] = +?account.r[/3]
+                $0[self.state.occupation.earnings, +] = +?account.r[/3]
                 $0["Interest and dividends", +] = +?account.i[/3]
 
                 $0["Market spending", +] = +?(account.b - excluded)[/3]

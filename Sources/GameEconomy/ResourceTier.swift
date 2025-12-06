@@ -13,3 +13,8 @@ import OrderedCollections
         self.tradeable = tradeable
     }
 }
+extension ResourceTier {
+    @inlinable public static var empty: Self {
+        .init(segmented: [:], tradeable: [:])
+    }
+}

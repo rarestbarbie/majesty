@@ -1,7 +1,7 @@
 import Color
 import GameIDs
 
-public final class ResourceMetadata: GameMetadata {
+public final class ResourceMetadata: GameObjectMetadata {
     public typealias ID = Resource
     public let identity: SymbolAssignment<Resource>
     public let color: Color

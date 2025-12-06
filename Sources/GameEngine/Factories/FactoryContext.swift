@@ -66,10 +66,10 @@ extension FactoryContext {
     }
 
     mutating func addWorkforceCount(pop: Pop, job: FactoryJob) {
-        if  self.type.workers.unit == pop.type {
+        if  self.type.workers.unit == pop.occupation {
             self.workers?.count(pop: pop.id, job: job)
         } else if
-            self.type.clerks.unit == pop.type {
+            self.type.clerks.unit == pop.occupation {
             self.clerks?.count(pop: pop.id, job: job)
         } else {
             fatalError(
@@ -885,7 +885,7 @@ extension FactoryContext {
 
     func tooltipSummarizeEmployees(_ stratum: PopStratum) -> Tooltip? {
         let workforce: Workforce
-        let type: PopType
+        let type: PopOccupation
 
         if case .Worker = stratum,
             let workers: Workforce = self.workers {

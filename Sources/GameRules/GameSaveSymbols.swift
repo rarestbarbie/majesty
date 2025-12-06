@@ -3,7 +3,8 @@ import JavaScriptInterop
 
 @frozen public struct GameSaveSymbols {
     /// Pop types are not moddable.
-    public let pops: SymbolTable<PopType>
+    public let occupations: SymbolTable<PopOccupation>
+    public let genders: SymbolTable<Gender>
 
     public internal(set) var mines: SymbolTable<MineType>
     public internal(set) var buildings: SymbolTable<BuildingType>
@@ -29,7 +30,7 @@ extension GameSaveSymbols {
     }
 }
 extension GameSaveSymbols: JavaScriptEncodable {
-    public func encode(to js: inout JavaScriptEncoder<GameRules.Namespace>) {
+    public func encode(to js: inout JavaScriptEncoder<GameMetadata.Namespace>) {
         js[.mines] = self.mines
         js[.buildings] = self.buildings
         js[.factories] = self.factories
@@ -41,13 +42,14 @@ extension GameSaveSymbols: JavaScriptEncodable {
     }
 }
 extension GameSaveSymbols: JavaScriptDecodable {
-    public init(from js: borrowing JavaScriptDecoder<GameRules.Namespace>) throws {
+    public init(from js: borrowing JavaScriptDecoder<GameMetadata.Namespace>) throws {
         self.init(
-            pops: .init(
-                index: PopType.allCases.reduce(into: [:]) {
+            occupations: .init(
+                index: PopOccupation.allCases.reduce(into: [:]) {
                     $0[.init(name: $1.singular)] = $1
                 }
             ),
+            genders: .init(index: Gender.allCases.reduce(into: [:]) { $0[$1.code] = $1 }),
             mines: try js[.mines]?.decode() ?? [:],
             buildings: try js[.buildings]?.decode() ?? [:],
             factories: try js[.factories]?.decode() ?? [:],

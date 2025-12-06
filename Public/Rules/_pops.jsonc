@@ -1,5 +1,5 @@
-{
-    "*": {
+[
+    {
         "l": {
             "Appliances": 1,
             "Electricity": 2,
@@ -28,58 +28,79 @@
             "Lingerie": 2
         }
     },
-    "Livestock": {
-        "color": "#8b1e27",
-        "l": {
+
+    {
+        "where": {
+            "biology": "Chickens"
         },
+        "output": {
+            "Poultry": 6
+        },
+        "l": {
+            "Water": 1,
+            "Wheat": 6
+        }
+    },
+    {
+        "where": {
+            "biology": "Cattle"
+        },
+        "output": {
+            "Beef": 6
+        },
+        "l": {
+            "Water": 5,
+            "Wheat": 5
+        }
+    },
+
+    {
+        "where": {
+            "occupation": "Livestock"
+        },
+        "l": {},
         "e": {
             "Hormones": 1,
             "Housing": 1
         },
-        "x": {
-        }
+        "x": {}
     },
-    "Miner": {
-        "color": "#7a7674"
-    },
-    "Editor": {
-        "color": "#502e28"
-    },
-    "Server": {
-        "color": "#1f224b",
+    {
+        "where": {
+            "occupation": "Server"
+        },
         "output": {
             "Services": 8
         }
     },
-    "Driver": {
-        "color": "#71bac7"
-    },
-    "Contractor": {
-        "color": "#ff7a3d",
+    {
+        "where": {
+            "occupation": "Contractor"
+        },
         "output": {
             "Construction": 8
         }
     },
-    "Engineer": {
-        "color": "#e4e4e4"
-    },
-    "Farmer": {
-        "color": "#ff5959"
-    },
-    "Consultant": {
-        "color": "#f7e8b7",
+    {
+        "where": {
+            "occupation": "Consultant"
+        },
         "output": {
             "Advice": 8
         }
     },
-    "Influencer": {
-        "color": "#bf97ff",
+    {
+        "where": {
+            "occupation": "Influencer"
+        },
         "output": {
             "Advertising": 36
         }
     },
-    "Aristocrat": {
-        "color": "#fd6dd2",
+    {
+        "where": {
+            "occupation": "Aristocrat"
+        },
         "l": {
             "Appliances": 2,
             "Electricity": 3,
@@ -110,8 +131,10 @@
             "Services": 12
         }
     },
-    "Politician": {
-        "color": "#401249",
+    {
+        "where": {
+            "occupation": "Politician"
+        },
         "l": {
             "Appliances": 2,
             "Electricity": 3,
@@ -142,4 +165,4 @@
             "Services": 12
         }
     }
-}
+]
