@@ -2,7 +2,7 @@ import GameEconomy
 import JavaScriptKit
 import JavaScriptInterop
 
-struct MarketTableEntry {
+struct MarketTableEntry: Sendable {
     let id: WorldMarket.ID
     let name: String
     let price: Candle<Double>

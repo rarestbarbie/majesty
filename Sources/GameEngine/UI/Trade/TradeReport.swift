@@ -3,7 +3,7 @@ import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 
-public struct TradeReport {
+public struct TradeReport: Sendable {
     private var selection: PersistentSelection<Filter, Void>
 
     private var filters: ([MarketFilterLabel], [MarketFilterLabel])

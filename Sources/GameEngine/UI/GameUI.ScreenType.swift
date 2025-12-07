@@ -2,7 +2,10 @@ import JavaScriptInterop
 import JavaScriptKit
 
 extension GameUI {
-    @frozen public enum ScreenType: JSString, LoadableFromJSValue, ConvertibleToJSValue {
+    @frozen public enum ScreenType: JSString,
+        LoadableFromJSValue,
+        ConvertibleToJSValue,
+        Sendable {
         case Planet
         case Infrastructure
         case Production

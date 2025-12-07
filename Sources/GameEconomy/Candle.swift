@@ -11,6 +11,7 @@
         self.c = c
     }
 }
+extension Candle: Sendable where Price: Sendable {}
 extension Candle {
     @inlinable public static func open(_ price: Price) -> Self {
         .init(o: price, l: price, h: price, c: price)

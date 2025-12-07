@@ -6,7 +6,7 @@ import JavaScriptInterop
 import VectorCharts
 import VectorCharts_JavaScript
 
-struct OwnershipBreakdown<Tab> where Tab: OwnershipTab {
+struct OwnershipBreakdown<Tab>: Sendable where Tab: OwnershipTab {
     private var country: PieChart<CountryID, PieChartLabel>?
     private var culture: PieChart<CultureID, PieChartLabel>?
     private var equity: Equity<LEI>.Statistics?

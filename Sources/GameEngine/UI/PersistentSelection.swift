@@ -12,6 +12,8 @@
         self.filter = nil
     }
 }
+extension PersistentSelection: Sendable
+    where DetailsFocus: Sendable, Filter.Subject.ID: Sendable, Filter: Sendable {}
 extension PersistentSelection {
     subscript<T>(dynamicMember keyPath: WritableKeyPath<DetailsFocus, T>) -> T? {
         get {

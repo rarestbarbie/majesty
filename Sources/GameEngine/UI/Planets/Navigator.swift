@@ -3,7 +3,7 @@ import HexGrids
 import JavaScriptInterop
 import JavaScriptKit
 
-public struct Navigator {
+public struct Navigator: Sendable {
     private var cursor: [PlanetID: HexCoordinate]
 
     private var minimap: Minimap?

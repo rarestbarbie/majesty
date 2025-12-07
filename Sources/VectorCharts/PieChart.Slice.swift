@@ -13,6 +13,7 @@ extension PieChart {
         }
     }
 }
+extension PieChart.Slice: Sendable where Key: Sendable, Value: Sendable {}
 extension PieChart.Slice {
     @inlinable public var share: Double { self.geometry.share }
     @inlinable public var path: String { self.geometry.d }

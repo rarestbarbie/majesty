@@ -9,6 +9,7 @@ extension Equity {
         var sharePrice: Fraction
     }
 }
+extension Equity.Statistics: Sendable where Owner: Sendable {}
 extension Equity.Statistics {
     init() {
         self.init(owners: [], shareCount: 0, sharePrice: 0)

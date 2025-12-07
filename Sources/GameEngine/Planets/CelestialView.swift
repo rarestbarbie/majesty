@@ -3,7 +3,7 @@ import GameTerrain
 import JavaScriptKit
 import JavaScriptInterop
 
-public struct CelestialView {
+public struct CelestialView: Sendable {
     private let subject: PlanetID
     private var bodies: [CelestialBody]
     private var radius: Double

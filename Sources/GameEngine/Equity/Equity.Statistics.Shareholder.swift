@@ -10,3 +10,4 @@ extension Equity.Statistics {
         let culture: CultureID?
     }
 }
+extension Equity.Statistics.Shareholder: Sendable where Owner: Sendable {}

@@ -5,7 +5,7 @@ import JavaScriptInterop
 import JavaScriptKit
 import VectorCharts
 
-struct NavigatorTile {
+struct NavigatorTile: Sendable {
     let id: Address
 
     private var _neighbors: [HexCoordinate]

@@ -1,5 +1,5 @@
 extension InventoryBreakdown {
-    struct Focus {
+    struct Focus: Sendable {
         var tab: Tab
         var needs: ResourceTierIdentifier
     }

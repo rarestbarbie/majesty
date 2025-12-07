@@ -3,7 +3,7 @@ import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 
-public struct GameUI {
+public struct GameUI: Sendable {
     private var player: Country?
     private var date: GameDate
 

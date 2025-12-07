@@ -1,4 +1,4 @@
-protocol PersistentReport<Request> {
+protocol PersistentReport<Request>: Sendable {
     associatedtype Request
 
     init()

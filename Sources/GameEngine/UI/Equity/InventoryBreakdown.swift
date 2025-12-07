@@ -6,7 +6,7 @@ import JavaScriptInterop
 import JavaScriptKit
 import VectorCharts
 
-struct InventoryBreakdown<Tab> where Tab: InventoryTab {
+struct InventoryBreakdown<Tab>: Sendable where Tab: InventoryTab {
     var focus: ResourceTierIdentifier
 
     private var tiers: [ResourceNeedMeter]

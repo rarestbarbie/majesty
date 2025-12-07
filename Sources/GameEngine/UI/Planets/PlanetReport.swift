@@ -3,7 +3,7 @@ import GameState
 import JavaScriptKit
 import JavaScriptInterop
 
-public struct PlanetReport {
+public struct PlanetReport: Sendable {
     private var planet: PlanetDetails?
 
     init() {
