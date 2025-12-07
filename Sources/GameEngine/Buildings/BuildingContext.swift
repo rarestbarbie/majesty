@@ -425,4 +425,38 @@ extension BuildingContext {
             }
         }
     }
+    func tooltipResourceIO(
+        _ line: InventoryLine,
+    ) -> Tooltip? {
+        switch line {
+        case .l(let resource):
+            return self.state.inventory.l.tooltipDemand(
+                resource,
+                tier: self.type.operations,
+                details: self.explainNeeds(_:base:)
+            )
+        case .e(let resource):
+            return self.state.inventory.e.tooltipDemand(
+                resource,
+                tier: self.type.maintenance,
+                details: self.explainNeeds(_:base:)
+            )
+        case .x(let resource):
+            return self.state.inventory.x.tooltipDemand(
+                resource,
+                tier: self.type.development,
+                details: self.explainNeeds(_:base:)
+            )
+
+        case .o(let resource):
+            return self.state.inventory.out.tooltipSupply(
+                resource,
+                tier: self.type.output,
+                details: self.explainProduction(_:base:)
+            )
+
+        case .m:
+            return nil
+        }
+    }
 }

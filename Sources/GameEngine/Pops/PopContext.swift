@@ -951,4 +951,72 @@ extension PopContext {
             }
         }
     }
+    func tooltipOccupation() -> Tooltip? {
+        guard
+        let region: RegionalProperties = self.region?.properties else {
+            return nil
+        }
+
+        let promotion: ConditionBreakdown = self.buildPromotionMatrix(region: region)
+        let demotion: ConditionBreakdown = self.buildDemotionMatrix(region: region)
+
+        let promotions: Int64 = promotion.output > 0
+            ? .init(Double.init(self.state.z.active) * promotion.output * 30)
+            : 0
+        let demotions: Int64 = demotion.output > 0
+            ? .init(Double.init(self.state.z.active) * demotion.output * 30)
+            : 0
+
+        return .conditions(
+            .list(
+                "We expect \(em: promotions) promotion(s) in the next month",
+                breakdown: promotion
+            ),
+            .list(
+                "We expect \(em: demotions) demotion(s) in the next month",
+                breakdown: demotion
+            ),
+        )
+    }
+    func tooltipResourceIO(
+        _ line: InventoryLine,
+    ) -> Tooltip? {
+        switch line {
+        case .l(let resource):
+            return self.state.inventory.l.tooltipDemand(
+                resource,
+                tier: self.l,
+                details: self.explainNeeds(_:l:)
+            )
+        case .e(let resource):
+            return self.state.inventory.e.tooltipDemand(
+                resource,
+                tier: self.e,
+                details: self.explainNeeds(_:e:)
+            )
+        case .x(let resource):
+            return self.state.inventory.x.tooltipDemand(
+                resource,
+                tier: self.x,
+                details: self.explainNeeds(_:x:)
+            )
+        case .o(let resource):
+            return self.state.inventory.out.tooltipSupply(
+                resource,
+                tier: self.output,
+                details: self.explainProduction(_:base:)
+            )
+        case .m(let id):
+            guard
+            let miningConditions: MiningJobConditions = self.mines[id.mine] else {
+                return nil
+            }
+            return self.state.mines[id.mine]?.out.tooltipSupply(
+                id.resource,
+                tier: miningConditions.output,
+            ) {
+                self.explainProduction(&$0, base: $1, mine: miningConditions)
+            }
+        }
+    }
 }

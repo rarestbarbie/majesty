@@ -52,23 +52,6 @@ extension GameSnapshot {
 
         return object.tooltipExplainPrice(line, market: market)
     }
-    private func tooltipStockpile(
-        _ object: some LegalEntityTooltipBearing,
-        _ resource: InventoryLine,
-    ) -> Tooltip? {
-        guard
-        let region: RegionalProperties = object.region?.properties else {
-            return nil
-        }
-
-        switch resource {
-        case .l(let id): return object.state.inventory.l.tooltipStockpile(id, region: region)
-        case .e(let id): return object.state.inventory.e.tooltipStockpile(id, region: region)
-        case .x(let id): return object.state.inventory.x.tooltipStockpile(id, region: region)
-        case .o: return nil
-        case .m: return nil
-        }
-    }
 }
 extension GameSnapshot {
     func tooltipBuildingAccount(_ id: BuildingID) -> Tooltip? {
@@ -84,46 +67,13 @@ extension GameSnapshot {
         _ id: BuildingID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        guard let building: BuildingContext = self.context.buildings[id] else {
-            return nil
-        }
-
-        switch line {
-        case .l(let resource):
-            return building.state.inventory.l.tooltipDemand(
-                resource,
-                tier: building.type.operations,
-                details: building.explainNeeds(_:base:)
-            )
-        case .e(let resource):
-            return building.state.inventory.e.tooltipDemand(
-                resource,
-                tier: building.type.maintenance,
-                details: building.explainNeeds(_:base:)
-            )
-        case .x(let resource):
-            return building.state.inventory.x.tooltipDemand(
-                resource,
-                tier: building.type.development,
-                details: building.explainNeeds(_:base:)
-            )
-
-        case .o(let resource):
-            return building.state.inventory.out.tooltipSupply(
-                resource,
-                tier: building.type.output,
-                details: building.explainProduction(_:base:)
-            )
-
-        case .m:
-            return nil
-        }
+        self.context.buildings[id]?.tooltipResourceIO(line)
     }
     func tooltipBuildingStockpile(
         _ id: BuildingID,
         _ resource: InventoryLine,
     ) -> Tooltip? {
-        self.context.buildings[id].map { self.tooltipStockpile($0, resource) } ?? nil
+        self.context.buildings[id]?.tooltipStockpile(resource)
     }
     func tooltipBuildingExplainPrice(
         _ id: BuildingID,
@@ -207,47 +157,14 @@ extension GameSnapshot {
         _ id: FactoryID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        guard let factory: FactoryContext = self.context.factories[id] else {
-            return nil
-        }
-
-        switch line {
-        case .l(let resource):
-            return factory.state.inventory.l.tooltipDemand(
-                resource,
-                tier: factory.type.materials,
-                details: factory.explainNeeds(_:base:)
-            )
-        case .e(let resource):
-            return factory.state.inventory.e.tooltipDemand(
-                resource,
-                tier: factory.type.corporate,
-                details: factory.explainNeeds(_:base:)
-            )
-        case .x(let resource):
-            return factory.state.inventory.x.tooltipDemand(
-                resource,
-                tier: factory.type.expansion,
-                details: factory.explainNeeds(_:x:)
-            )
-
-        case .o(let resource):
-            return factory.state.inventory.out.tooltipSupply(
-                resource,
-                tier: factory.type.output,
-                details: factory.explainProduction(_:base:)
-            )
-
-        case .m:
-            return nil
-        }
+        self.context.factories[id]?.tooltipResourceIO(line)
     }
 
     func tooltipFactoryStockpile(
         _ id: FactoryID,
         _ resource: InventoryLine,
     ) -> Tooltip? {
-        self.context.factories[id].map { self.tooltipStockpile($0, resource) } ?? nil
+        self.context.factories[id]?.tooltipStockpile(resource)
     }
 
     func tooltipFactoryExplainPrice(
@@ -459,47 +376,7 @@ extension GameSnapshot {
         _ id: PopID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        guard let pop: PopContext = self.context.pops[id] else {
-            return nil
-        }
-
-        switch line {
-        case .l(let resource):
-            return pop.state.inventory.l.tooltipDemand(
-                resource,
-                tier: pop.l,
-                details: pop.explainNeeds(_:l:)
-            )
-        case .e(let resource):
-            return pop.state.inventory.e.tooltipDemand(
-                resource,
-                tier: pop.e,
-                details: pop.explainNeeds(_:e:)
-            )
-        case .x(let resource):
-            return pop.state.inventory.x.tooltipDemand(
-                resource,
-                tier: pop.x,
-                details: pop.explainNeeds(_:x:)
-            )
-        case .o(let resource):
-            return pop.state.inventory.out.tooltipSupply(
-                resource,
-                tier: pop.output,
-                details: pop.explainProduction(_:base:)
-            )
-        case .m(let id):
-            guard
-            let miningConditions: MiningJobConditions = pop.mines[id.mine] else {
-                return nil
-            }
-            return pop.state.mines[id.mine]?.out.tooltipSupply(
-                id.resource,
-                tier: miningConditions.output,
-            ) {
-                pop.explainProduction(&$0, base: $1, mine: miningConditions)
-            }
-        }
+        self.context.pops[id]?.tooltipResourceIO(line)
     }
 
     func tooltipPopResourceOrigin(
@@ -578,7 +455,7 @@ extension GameSnapshot {
         _ id: PopID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        self.context.pops[id].map { self.tooltipStockpile($0, line) } ?? nil
+        self.context.pops[id]?.tooltipStockpile(line)
     }
 
     func tooltipPopExplainPrice(
@@ -591,32 +468,7 @@ extension GameSnapshot {
     func tooltipPopType(
         _ id: PopID,
     ) -> Tooltip? {
-        guard
-        let pop: PopContext = self.context.pops[id],
-        let region: RegionalProperties = pop.region?.properties else {
-            return nil
-        }
-
-        let promotion: ConditionBreakdown = pop.buildPromotionMatrix(region: region)
-        let demotion: ConditionBreakdown = pop.buildDemotionMatrix(region: region)
-
-        let promotions: Int64 = promotion.output > 0
-            ? .init(Double.init(pop.state.z.active) * promotion.output * 30)
-            : 0
-        let demotions: Int64 = demotion.output > 0
-            ? .init(Double.init(pop.state.z.active) * demotion.output * 30)
-            : 0
-
-        return .conditions(
-            .list(
-                "We expect \(em: promotions) promotion(s) in the next month",
-                breakdown: promotion
-            ),
-            .list(
-                "We expect \(em: demotions) demotion(s) in the next month",
-                breakdown: demotion
-            ),
-        )
+        self.context.pops[id]?.tooltipOccupation()
     }
 
     func tooltipPopOwnership(

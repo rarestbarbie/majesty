@@ -674,7 +674,7 @@ extension FactoryContext: LegalEntityTooltipBearing {
     }
 }
 extension FactoryContext {
-    func explainProduction(_ ul: inout TooltipInstructionEncoder, base: Int64) {
+    private func explainProduction(_ ul: inout TooltipInstructionEncoder, base: Int64) {
         let productivity: Double = Double.init(self.productivity)
         let efficiency: Double = self.state.z.eo
         ul["Production per worker"] = (productivity * efficiency * Double.init(base))[..3]
@@ -685,10 +685,10 @@ extension FactoryContext {
         }
     }
 
-    func explainNeeds(_ ul: inout TooltipInstructionEncoder, x: Int64) {
+    private func explainNeeds(_ ul: inout TooltipInstructionEncoder, x: Int64) {
         self.explainNeeds(&ul, base: x, unit: "level")
     }
-    func explainNeeds(_ ul: inout TooltipInstructionEncoder, base: Int64) {
+    private func explainNeeds(_ ul: inout TooltipInstructionEncoder, base: Int64) {
         self.explainNeeds(&ul, base: base, unit: "worker")
     }
     private func explainNeeds(
@@ -858,6 +858,42 @@ extension FactoryContext {
             }
         }
     }
+
+    func tooltipResourceIO(
+        _ line: InventoryLine,
+    ) -> Tooltip? {
+        switch line {
+        case .l(let resource):
+            return self.state.inventory.l.tooltipDemand(
+                resource,
+                tier: self.type.materials,
+                details: self.explainNeeds(_:base:)
+            )
+        case .e(let resource):
+            return self.state.inventory.e.tooltipDemand(
+                resource,
+                tier: self.type.corporate,
+                details: self.explainNeeds(_:base:)
+            )
+        case .x(let resource):
+            return self.state.inventory.x.tooltipDemand(
+                resource,
+                tier: self.type.expansion,
+                details: self.explainNeeds(_:x:)
+            )
+
+        case .o(let resource):
+            return self.state.inventory.out.tooltipSupply(
+                resource,
+                tier: self.type.output,
+                details: self.explainProduction(_:base:)
+            )
+
+        case .m:
+            return nil
+        }
+    }
+
 
     func tooltipSize() -> Tooltip {
         .instructions {
