@@ -11,6 +11,7 @@ extension CountryModifiers {
         }
     }
 }
+extension CountryModifiers.Stack: Sendable where Value: Sendable {}
 extension CountryModifiers.Stack where Value: AdditiveArithmetic {
     static var zero: Self { .init(value: .zero) }
 }
