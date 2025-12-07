@@ -44,7 +44,6 @@ export * from './PersistentReport.js';
 export * from './Pops/PopDetails.js';
 export * from './Pops/PopDetailsTab.js';
 export * from './Pops/PopIcon.js';
-export * from './Pops/PopJobDescription.js';
 export * from './Pops/PopTableEntry.js';
 export * from './Pops/PopTableRow.js';
 export * from './Pops/PopType.js';

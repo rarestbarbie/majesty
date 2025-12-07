@@ -2,6 +2,7 @@ import GameIDs
 import GameTerrain
 import JavaScriptKit
 import JavaScriptInterop
+import OrderedCollections
 
 public struct PopulationReport {
     private var selection: PersistentSelection<Filter, InventoryBreakdown<PopDetailsTab>.Focus>
@@ -104,15 +105,6 @@ extension PopulationReport: PersistentReport {
                 une: 1 - $0.stats.employmentBeforeEgress,
                 yesterday: $0.state.y,
                 today: $0.state.z,
-                jobs: $0.state.factories.values.map {
-                    .init(
-                        name: snapshot.factories[$0.id]?.type.title ?? "Unknown",
-                        size: $0.count,
-                        hire: $0.hired,
-                        fire: $0.fired,
-                        quit: $0.quit,
-                    )
-                },
             )
         } update: {
             $0.update(to: $2, from: snapshot)
