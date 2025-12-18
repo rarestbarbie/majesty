@@ -3,7 +3,7 @@ import GameEconomy
 import GameIDs
 import GameUI
 
-protocol LegalEntitySnapshot<State> {
+protocol LegalEntitySnapshot<State>: Identifiable {
     associatedtype State: LegalEntityState
 
     var region: RegionalProperties { get }
@@ -14,6 +14,9 @@ protocol LegalEntitySnapshot<State> {
         _ line: InventoryLine,
         market: (segmented: LocalMarketSnapshot?, tradeable: WorldMarket.State?)
     ) -> Tooltip?
+}
+extension LegalEntitySnapshot {
+    var id: State.ID { self.state.id }
 }
 extension LegalEntitySnapshot {
     func tooltipStockpile(
@@ -31,7 +34,7 @@ extension LegalEntitySnapshot {
 extension LegalEntitySnapshot {
     func tooltipOwnership(
         culture: CultureID,
-        context: GameContext,
+        context: borrowing GameSnapshot,
     ) -> Tooltip? {
         guard
         let culture: Culture = context.rules.pops.cultures[culture] else {
@@ -40,8 +43,7 @@ extension LegalEntitySnapshot {
         let (share, total): (share: Int64, total: Int64) = self.equity.owners.reduce(
             into: (0, 0)
         ) {
-            if case .pop(let id) = $1.id,
-                let pop: Pop = context.pops.state[id], pop.race == culture.id {
+            if case culture.id? = $1.culture {
                 $0.share += $1.shares
             }
 
@@ -56,7 +58,7 @@ extension LegalEntitySnapshot {
 
     func tooltipOwnership(
         country: CountryID,
-        context: GameContext,
+        context: borrowing GameSnapshot,
     ) -> Tooltip? {
         guard
         let country: Country = context.countries.state[country] else {

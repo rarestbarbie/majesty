@@ -4,8 +4,8 @@ import JavaScriptKit
 import JavaScriptInterop
 
 public struct GameUI: Sendable {
-    private var player: Country?
-    private var date: GameDate
+    var player: Country?
+    var date: GameDate
 
     var navigator: Navigator
     var screen: ScreenType?
@@ -37,24 +37,30 @@ public struct GameUI: Sendable {
     }
 }
 extension GameUI {
-    mutating func sync(with snapshot: borrowing GameSnapshot) throws {
-        self.player = snapshot.playerCountry
-        self.date = snapshot.date
+    mutating func sync(with state: borrowing GameSession.State) throws {
+        self.player = state.snapshot.playerCountry
+        self.date = state.snapshot.date
 
-        self.navigator.update(in: snapshot.context)
+        self.navigator.update(in: state.snapshot, planets: state.context.planets)
 
         // Only update screens that are currently open
         switch self.screen {
-        case .Planet?: self.report.planet.update(from: snapshot)
-        case .Infrastructure?: self.report.infrastructure.update(from: snapshot)
-        case .Production?: self.report.production.update(from: snapshot)
-        case .Population?: self.report.population.update(from: snapshot)
-        case .Trade?: self.report.trade.update(from: snapshot)
-        case nil: break
+        case .Planet?:
+            self.report.planet.update(from: state.snapshot)
+        case .Infrastructure?:
+            self.report.infrastructure.update(from: state.snapshot, buildings: state.context.buildings)
+        case .Production?:
+            self.report.production.update(from: state.snapshot, factories: state.context.factories)
+        case .Population?:
+            self.report.population.update(from: state.snapshot, pops: state.context.pops, mines: state.context.mines)
+        case .Trade?:
+            self.report.trade.update(from: state.snapshot)
+        case nil:
+            break
         }
 
-        try self.views.0?.update(in: snapshot.context)
-        try self.views.1?.update(in: snapshot.context)
+        try self.views.0?.update(in: state.snapshot)
+        try self.views.1?.update(in: state.snapshot)
     }
 }
 extension GameUI {

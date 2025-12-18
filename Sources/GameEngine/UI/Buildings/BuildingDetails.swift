@@ -31,7 +31,7 @@ extension BuildingDetails {
     mutating func update(to building: BuildingContext, from snapshot: borrowing GameSnapshot) {
         switch self.open {
         case .Inventory: self.inventory.update(from: building, in: snapshot)
-        case .Ownership: self.ownership.update(from: building, in: snapshot.context)
+        case .Ownership: self.ownership.update(from: building, in: snapshot)
         }
 
         self.name = building.type.title

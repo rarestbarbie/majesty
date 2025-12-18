@@ -7,14 +7,16 @@ import JavaScriptInterop
 import JavaScriptKit
 
 public struct GameSession: ~Copyable {
-    private var context: GameContext
-    private var world: GameWorld
+    private var state: State
     private var ui: GameUI
 
+    private init(state: consuming State, ui: consuming GameUI) {
+        self.state = state
+        self.ui = ui
+    }
+
     private init(context: GameContext, world: consuming GameWorld) {
-        self.context = context
-        self.world = world
-        self.ui = .init()
+        self.init(state: .init(context: context, world: world), ui: .init())
     }
 }
 extension GameSession {
@@ -41,35 +43,20 @@ extension GameSession {
         rules: consuming GameMetadata,
         map: borrowing TerrainMap,
     ) throws -> Self {
-        let world: GameWorld = .init(
-            notifications: .init(date: save.date),
-            bank: .init(accounts: save.accounts.dictionary),
-            segmentedMarkets: save.segmentedMarkets,
-            tradeableMarkets: save.tradeableMarkets,
-            // placeholder
-            tradeRoutes: [:],
-            random: save.random,
-        )
-
-        var context: GameContext = try .load(save, rules: rules)
-        try context.loadTerrain(map)
-
-        return .init(context: context, world: world)
+        .init(state: try .load(save, rules: rules, map: map), ui: .init())
     }
 
-    public var save: GameSave {
-        self.context.save(self.world)
-    }
+    public var save: GameSave { self.state.save }
 }
 extension GameSession {
     public mutating func loadTerrain(from editor: PlanetTileEditor) throws {
-        try self.context.loadTerrain(from: editor)
+        try self.state.context.loadTerrain(from: editor)
     }
 
     public func editTerrain() -> PlanetTileEditor? {
         guard
         case (_, let current?) = self.ui.navigator.current,
-        let planet: PlanetContext = self.context.planets[current.planet],
+        let planet: PlanetContext = self.state.context.planets[current.planet],
         let tile: PlanetGrid.Tile = planet.grid.tiles[current.tile] else {
             return nil
         }
@@ -80,28 +67,15 @@ extension GameSession {
             size: planet.grid.size,
             name: tile.name,
             terrain: tile.terrain.symbol,
-            terrainChoices: self.context.rules.terrains.values.map(\.symbol),
+            terrainChoices: self.state.context.rules.terrains.values.map(\.symbol),
             geology: tile.geology.symbol,
-            geologyChoices: self.context.rules.geology.values.map(\.symbol)
+            geologyChoices: self.state.context.rules.geology.values.map(\.symbol)
         )
     }
 
-    public func saveTerrain() -> TerrainMap { self.context.saveTerrain() }
+    public func saveTerrain() -> TerrainMap { self.state.context.saveTerrain() }
 }
 extension GameSession {
-    private var snapshot: GameSnapshot {
-        .init(
-            context: self.context,
-            markets: (self.world.tradeableMarkets, self.world.segmentedMarkets),
-            bank: self.world.bank,
-            date: self.world.date
-        )
-    }
-
-    public var rules: GameMetadata {
-        self.context.rules
-    }
-
     public mutating func faster() {
         self.ui.clock.faster()
     }
@@ -113,54 +87,64 @@ extension GameSession {
     }
 
     public mutating func start() throws -> GameUI {
-        try self.context.compute(&self.world)
-        try self.ui.sync(with: self.snapshot)
+        try self.state.sync()
+        try self.ui.sync(with: self.state)
         return self.ui
     }
 
     public mutating func tick() throws -> GameUI {
         if  self.ui.clock.tick() {
-            try self.context.advance(&self.world[self.rules.settings])
-            try self.context.compute(&self.world)
+            try self.state.tick()
         }
 
-        try self.ui.sync(with: self.snapshot)
+        try self.ui.sync(with: self.state)
         return self.ui
     }
 
     public mutating func open(_ screen: GameUI.ScreenType?) {
         self.ui.screen = screen
     }
-
+}
+extension GameSession {
     public mutating func openPlanet(_ request: PlanetReportRequest) throws -> PlanetReport {
         self.ui.screen = .Planet
-        return try self.ui.report.planet.open(request: request, snapshot: self.snapshot)
+        self.ui.report.planet.select(request: request)
+        self.ui.report.planet.update(from: self.state.snapshot)
+        return self.ui.report.planet
     }
 
     public mutating func openInfrastructure(
         _ request: InfrastructureReportRequest
     ) throws -> InfrastructureReport {
         self.ui.screen = .Infrastructure
-        return try self.ui.report.infrastructure.open(request: request, snapshot: self.snapshot)
+        self.ui.report.infrastructure.select(request: request)
+        self.ui.report.infrastructure.update(from: self.state.snapshot, buildings: self.state.context.buildings)
+        return self.ui.report.infrastructure
     }
 
     public mutating func openProduction(
         _ request: ProductionReportRequest
     ) throws -> ProductionReport {
         self.ui.screen = .Production
-        return try self.ui.report.production.open(request: request, snapshot: self.snapshot)
+        self.ui.report.production.select(request: request)
+        self.ui.report.production.update(from: self.state.snapshot, factories: self.state.context.factories)
+        return self.ui.report.production
     }
 
     public mutating func openPopulation(
         _ request: PopulationReportRequest
     ) throws -> PopulationReport {
         self.ui.screen = .Population
-        return try self.ui.report.population.open(request: request, snapshot: self.snapshot)
+        self.ui.report.population.select(request: request)
+        self.ui.report.population.update(from: self.state.snapshot, pops: self.state.context.pops, mines: self.state.context.mines)
+        return self.ui.report.population
     }
 
     public mutating func openTrade(_ request: TradeReportRequest) throws -> TradeReport {
         self.ui.screen = .Trade
-        return try self.ui.report.trade.open(request: request, snapshot: self.snapshot)
+        self.ui.report.trade.select(request: request)
+        self.ui.report.trade.update(from: self.state.snapshot)
+        return self.ui.report.trade
     }
 
     public mutating func minimap(
@@ -169,12 +153,12 @@ extension GameSession {
         cell: HexCoordinate?
     ) -> Navigator {
         self.ui.navigator.select(planet: planet, layer: layer, cell: cell)
-        self.ui.navigator.update(in: self.context)
+        self.ui.navigator.update(in: self.state.snapshot, planets: self.state.context.planets)
         return self.ui.navigator
     }
 
     public mutating func view(_ index: Int, to system: PlanetID) throws -> CelestialView {
-        let view: CelestialView = try .open(subject: system, in: self.context)
+        let view: CelestialView = try .open(subject: system, in: self.state.snapshot)
         switch index as Int {
         case 0: self.ui.views.0 = view
         case 1: self.ui.views.1 = view
@@ -184,7 +168,7 @@ extension GameSession {
     }
 
     public func orbit(_ id: PlanetID) -> JSTypedArray<Float>? {
-        self.context.planets[id]?.motion.global?.rendered()
+        self.state.context.planets[id]?.motion.global?.rendered()
     }
 }
 extension GameSession {
@@ -203,7 +187,37 @@ extension GameSession {
     private mutating func callSwitchToPlayer(
         _ id: CountryID
     ) {
-        self.context.player = id
+        self.state.context.player = id
+    }
+}
+extension GameSession {
+    private var cache: GameUI.Cache {
+        var cache: GameUI.Cache = .init(
+            game: self.state.snapshot,
+            tiles: self.ui.navigator.minimap?.tiles ?? [:]
+        )
+
+        switch self.ui.screen {
+        case .Production?:
+            cache.factories = self.ui.report.production.factories
+
+        case .Infrastructure?:
+            cache.buildings = self.ui.report.infrastructure.buildings
+
+        case .Population?:
+            cache.pops = self.ui.report.population.pops
+
+        case .Trade?:
+            break
+
+        case .Planet?:
+            break
+
+        case nil:
+            break
+        }
+
+        return cache
     }
 }
 extension GameSession {
@@ -213,7 +227,7 @@ extension GameSession {
         _ layer: MinimapLayer,
     ) -> ContextMenu? {
         guard
-        let planet: PlanetContext = self.context.planets[id],
+        let planet: PlanetContext = self.state.context.planets[id],
         let tile: PlanetGrid.Tile = planet.grid.tiles[cell] else {
             return nil
         }
@@ -247,236 +261,236 @@ extension GameSession {
     ) throws -> Tooltip? {
         switch type {
         case .BuildingAccount:
-            return self.snapshot.tooltipBuildingAccount(
+            return self.cache.tooltipBuildingAccount(
                 try arguments[0].decode(),
             )
         case .BuildingActive:
-            return self.snapshot.tooltipBuildingActive(
+            return self.cache.tooltipBuildingActive(
                 try arguments[0].decode(),
             )
         case .BuildingActiveHelp:
-            return self.snapshot.tooltipBuildingActiveHelp(
+            return self.cache.tooltipBuildingActiveHelp(
                 try arguments[0].decode(),
             )
         case .BuildingVacant:
-            return self.snapshot.tooltipBuildingVacant(
+            return self.cache.tooltipBuildingVacant(
                 try arguments[0].decode(),
             )
         case .BuildingVacantHelp:
-            return self.snapshot.tooltipBuildingVacantHelp(
+            return self.cache.tooltipBuildingVacantHelp(
                 try arguments[0].decode(),
             )
         case .BuildingNeeds:
-            return self.snapshot.tooltipBuildingNeeds(
+            return self.cache.tooltipBuildingNeeds(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .BuildingResourceIO:
-            return self.snapshot.tooltipBuildingResourceIO(
+            return self.cache.tooltipBuildingResourceIO(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .BuildingStockpile:
-            return self.snapshot.tooltipBuildingStockpile(
+            return self.cache.tooltipBuildingStockpile(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .BuildingExplainPrice:
-            return self.snapshot.tooltipBuildingExplainPrice(
+            return self.cache.tooltipBuildingExplainPrice(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .BuildingOwnershipCountry:
-            return self.snapshot.tooltipBuildingOwnership(
+            return self.cache.tooltipBuildingOwnership(
                 try arguments[0].decode(),
                 country: try arguments[1].decode(),
             )
         case .BuildingOwnershipCulture:
-            return self.snapshot.tooltipBuildingOwnership(
+            return self.cache.tooltipBuildingOwnership(
                 try arguments[0].decode(),
                 culture: try arguments[1].decode(),
             )
         case .BuildingOwnershipSecurities:
-            return self.snapshot.tooltipBuildingOwnership(
+            return self.cache.tooltipBuildingOwnership(
                 try arguments[0].decode(),
             )
         case .BuildingCashFlowItem:
-            return self.snapshot.tooltipBuildingCashFlowItem(
+            return self.cache.tooltipBuildingCashFlowItem(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .BuildingBudgetItem:
-            return self.snapshot.tooltipBuildingBudgetItem(
+            return self.cache.tooltipBuildingBudgetItem(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .FactoryAccount:
-            return self.snapshot.tooltipFactoryAccount(
+            return self.cache.tooltipFactoryAccount(
                 try arguments[0].decode(),
             )
         case .FactoryClerks:
-            return self.snapshot.tooltipFactoryClerks(
+            return self.cache.tooltipFactoryClerks(
                 try arguments[0].decode(),
             )
         case .FactoryClerksHelp:
-            return self.snapshot.tooltipFactoryClerksHelp(
+            return self.cache.tooltipFactoryClerksHelp(
                 try arguments[0].decode(),
             )
         case .FactoryWorkers:
-            return self.snapshot.tooltipFactoryWorkers(
+            return self.cache.tooltipFactoryWorkers(
                 try arguments[0].decode(),
             )
         case .FactoryWorkersHelp:
-            return self.snapshot.tooltipFactoryWorkersHelp(
+            return self.cache.tooltipFactoryWorkersHelp(
                 try arguments[0].decode(),
             )
         case .FactorySize:
-            return self.snapshot.tooltipFactorySize(
+            return self.cache.tooltipFactorySize(
                 try arguments[0].decode(),
             )
         case .FactoryNeeds:
-            return self.snapshot.tooltipFactoryNeeds(
+            return self.cache.tooltipFactoryNeeds(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .FactoryResourceIO:
-            return self.snapshot.tooltipFactoryResourceIO(
+            return self.cache.tooltipFactoryResourceIO(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .FactoryStockpile:
-            return self.snapshot.tooltipFactoryStockpile(
+            return self.cache.tooltipFactoryStockpile(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .FactoryExplainPrice:
-            return self.snapshot.tooltipFactoryExplainPrice(
+            return self.cache.tooltipFactoryExplainPrice(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .FactorySummarizeEmployees:
-            return self.snapshot.tooltipFactorySummarizeEmployees(
+            return self.cache.tooltipFactorySummarizeEmployees(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .FactoryOwnershipCountry:
-            return self.snapshot.tooltipFactoryOwnership(
+            return self.cache.tooltipFactoryOwnership(
                 try arguments[0].decode(),
                 country: try arguments[1].decode(),
             )
         case .FactoryOwnershipCulture:
-            return self.snapshot.tooltipFactoryOwnership(
+            return self.cache.tooltipFactoryOwnership(
                 try arguments[0].decode(),
                 culture: try arguments[1].decode(),
             )
         case .FactoryOwnershipSecurities:
-            return self.snapshot.tooltipFactoryOwnership(
+            return self.cache.tooltipFactoryOwnership(
                 try arguments[0].decode(),
             )
         case .FactoryCashFlowItem:
-            return self.snapshot.tooltipFactoryCashFlowItem(
+            return self.cache.tooltipFactoryCashFlowItem(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .FactoryBudgetItem:
-            return self.snapshot.tooltipFactoryBudgetItem(
+            return self.cache.tooltipFactoryBudgetItem(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
-            )
-        case .PlanetCell:
-            return self.snapshot.tooltipPlanetCell(
-                try arguments[0].decode(),
-                try arguments[1].decode(),
-                try arguments[2].decode(),
             )
         case .PopAccount:
-            return self.snapshot.tooltipPopAccount(
+            return self.cache.tooltipPopAccount(
                 try arguments[0].decode(),
             )
         case .PopActive:
-            return self.snapshot.tooltipPopActive(
+            return self.cache.tooltipPopActive(
                 try arguments[0].decode(),
             )
         case .PopActiveHelp:
-            return self.snapshot.tooltipPopActiveHelp(
+            return self.cache.tooltipPopActiveHelp(
                 try arguments[0].decode(),
             )
         case .PopVacant:
-            return self.snapshot.tooltipPopVacant(
+            return self.cache.tooltipPopVacant(
                 try arguments[0].decode(),
             )
         case .PopVacantHelp:
-            return self.snapshot.tooltipPopVacantHelp(
+            return self.cache.tooltipPopVacantHelp(
                 try arguments[0].decode(),
             )
         case .PopJobs:
-            return self.snapshot.tooltipPopJobs(
+            return self.cache.tooltipPopJobs(
                 try arguments[0].decode(),
             )
         case .PopResourceIO:
-            return self.snapshot.tooltipPopResourceIO(
+            return self.cache.tooltipPopResourceIO(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .PopResourceOrigin:
-            return self.snapshot.tooltipPopResourceOrigin(
+            return self.cache.tooltipPopResourceOrigin(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .PopStockpile:
-            return self.snapshot.tooltipPopStockpile(
+            return self.cache.tooltipPopStockpile(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .PopExplainPrice:
-            return self.snapshot.tooltipPopExplainPrice(
+            return self.cache.tooltipPopExplainPrice(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .PopNeeds:
-            return self.snapshot.tooltipPopNeeds(
+            return self.cache.tooltipPopNeeds(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .PopType:
-            return self.snapshot.tooltipPopType(
+            return self.cache.tooltipPopType(
                 try arguments[0].decode(),
             )
         case .PopOwnershipCountry:
-            return self.snapshot.tooltipPopOwnership(
+            return self.cache.tooltipPopOwnership(
                 try arguments[0].decode(),
                 country: try arguments[1].decode(),
             )
         case .PopOwnershipCulture:
-            return self.snapshot.tooltipPopOwnership(
+            return self.cache.tooltipPopOwnership(
                 try arguments[0].decode(),
                 culture: try arguments[1].decode(),
             )
         case .PopOwnershipSecurities:
-            return self.snapshot.tooltipPopOwnership(
+            return self.cache.tooltipPopOwnership(
                 try arguments[0].decode(),
             )
         case .PopCashFlowItem:
-            return self.snapshot.tooltipPopCashFlowItem(
+            return self.cache.tooltipPopCashFlowItem(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .PopBudgetItem:
-            return self.snapshot.tooltipPopBudgetItem(
+            return self.cache.tooltipPopBudgetItem(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .MarketLiquidity:
-            return self.snapshot.tooltipMarketLiquidity(
+            return self.cache.tooltipMarketLiquidity(
                 try arguments[0].decode(),
             )
+        case .PlanetCell:
+            return self.cache.tooltipPlanetCell(
+                try arguments[0].decode(),
+                try arguments[1].decode(),
+                try arguments[2].decode(),
+            )
         case .TileCulture:
-            return self.snapshot.tooltipTileCulture(
+            return self.cache.tooltipTileCulture(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
         case .TilePopType:
-            return self.snapshot.tooltipTilePopType(
+            return self.cache.tooltipTilePopType(
                 try arguments[0].decode(),
                 try arguments[1].decode(),
             )
@@ -487,27 +501,17 @@ extension GameSession {
 #if TESTABLE
 extension GameSession {
     public mutating func run(until date: GameDate) throws {
-        try self.context.compute(&self.world)
-        while self.world.date < date {
-            try self.context.advance(&self.world[self.rules.settings])
-            try self.context.compute(&self.world)
-
-            if case (year: let year, month: 1, day: 1) = self.world.date.gregorian {
-                print("Year \(year) has started.")
-            }
-        }
+        try self.state.run(until: date)
     }
 
     public var _hash: Int {
-        var hasher: Hasher = .init()
-        self.context.pops.state.hash(into: &hasher)
-        self.context.factories.state.hash(into: &hasher)
-        return hasher.finalize()
+        self.state._hash
     }
 
     public static func != (a: borrowing Self, b: borrowing Self) -> Bool {
-        a.context.pops.state != b.context.pops.state ||
-        a.context.factories.state != b.context.factories.state
+        a.state != b.state
     }
+
+    public var rules: GameMetadata { self.state.context.rules }
 }
 #endif

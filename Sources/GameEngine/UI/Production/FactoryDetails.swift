@@ -31,7 +31,7 @@ extension FactoryDetails {
     mutating func update(to factory: FactoryContext, from snapshot: borrowing GameSnapshot) {
         switch self.open {
         case .Inventory: self.inventory.update(from: factory, in: snapshot)
-        case .Ownership: self.ownership.update(from: factory, in: snapshot.context)
+        case .Ownership: self.ownership.update(from: factory, in: snapshot)
         }
 
         self.name = factory.type.title

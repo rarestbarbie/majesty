@@ -21,6 +21,16 @@ struct MineContext: RuntimeContext {
     }
 }
 extension MineContext {
+    var snapshot: MineSnapshot {
+        .init(
+            type: self.type,
+            state: self.state,
+            region: self.region?.properties,
+            miners: self.miners
+        )
+    }
+}
+extension MineContext {
     mutating func startIndexCount() {
         self.miners = .empty
     }

@@ -22,7 +22,7 @@ struct OwnershipBreakdown<Tab>: Sendable where Tab: OwnershipTab {
 extension OwnershipBreakdown {
     mutating func update(
         from asset: some LegalEntityContext<Tab.State>,
-        in context: GameContext
+        in context: borrowing GameSnapshot
     ) {
         let equity: Equity<LEI>.Statistics = asset.equity
         let (country, culture): (

@@ -26,7 +26,7 @@ struct NavigatorTile: Sendable {
     }
 }
 extension NavigatorTile {
-    mutating func update(in context: GameContext) {
+    mutating func update(in context: borrowing GameSnapshot) {
         guard
         let planet: PlanetContext = context.planets[self.id.planet],
         let tile: PlanetGrid.Tile = planet.grid.tiles[self.id.tile] else {

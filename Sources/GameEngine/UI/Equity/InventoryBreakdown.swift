@@ -1,6 +1,7 @@
 import D
 import GameEconomy
 import GameIDs
+import GameState
 import GameUI
 import JavaScriptInterop
 import JavaScriptKit
@@ -36,7 +37,7 @@ extension InventoryBreakdown {
         self.sales.reserveCapacity(outputs)
     }
 
-    mutating func update(from pop: PopContext, in snapshot: borrowing GameSnapshot) {
+    mutating func update(from pop: PopContext, in snapshot: borrowing GameSnapshot, mines: DynamicContextTable<MineContext>) {
         guard
         let currency: CurrencyID = pop.region?.properties.currency.id else {
             return
@@ -77,7 +78,7 @@ extension InventoryBreakdown {
             self.update(
                 from: mine.out,
                 mine: mine.id,
-                name: snapshot.mines[mine.id]?.type.title,
+                name: mines[mine.id]?.type.title,
                 currency: currency,
                 location: pop.state.tile,
                 snapshot: snapshot

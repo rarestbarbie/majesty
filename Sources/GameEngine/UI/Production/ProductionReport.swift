@@ -1,5 +1,6 @@
 import GameEconomy
 import GameIDs
+import GameState
 import GameTerrain
 import JavaScriptKit
 import JavaScriptInterop
@@ -11,15 +12,18 @@ public struct ProductionReport {
     >
 
     private var filters: ([FilterLabel], [Never])
-    private var factories: [FactoryTableEntry]
-    private var factory: FactoryDetails?
+    private var entries: [FactoryTableEntry]
+    private var details: FactoryDetails?
+
+    private(set) var factories: [FactoryID: FactorySnapshot]
+
 
     init() {
         self.selection = .init(defaultFocus: .init(tab: .Inventory, needs: .l))
-
         self.filters = ([], [])
-        self.factories = []
-        self.factory = nil
+        self.entries = []
+        self.details = nil
+        self.factories = [:]
     }
 }
 extension ProductionReport: PersistentReport {
@@ -28,20 +32,63 @@ extension ProductionReport: PersistentReport {
         self.selection.tab = request.details
         self.selection.needs = request.detailsTier
     }
+}
+extension ProductionReport {
+    private var sort: Sort {
+        .init()
+    }
 
-    mutating func update(from snapshot: borrowing GameSnapshot) {
+    mutating func update(from snapshot: borrowing GameSnapshot, factories: DynamicContextTable<FactoryContext>) {
         let country: CountryID = snapshot.player
+        self.selection.rebuild(
+            filtering: factories,
+            entries: &self.factories,
+            details: &self.details,
+            default: (factories.first?.state.tile).map(Filter.location(_:)) ?? .all
+        ) {
+            if case country? = $0.region?.bloc {
+                $0.snapshot
+            } else {
+                nil
+            }
+
+        } update: {
+            $0.update(to: $2, from: snapshot) ;
+        }
+    }
+    mutating func update(from snapshot: borrowing GameSnapshot) {
+        self.entries.removeAll(keepingCapacity: true)
+        for factory: FactorySnapshot in self.factories.values {
+            let equity: Equity<LEI>.Statistics = factory.equity
+            let liquidationProgress: Double? = factory.state.liquidation.map {
+                $0.burning == 0 ? 1 : Double(
+                    $0.burning - equity.shareCount
+                ) / Double($0.burning)
+            }
+
+            let entry: FactoryTableEntry = .init(
+                id: factory.state.id,
+                location: factory.region.name,
+                type: factory.type.title,
+                size: factory.state.size,
+                liquidationProgress: liquidationProgress,
+                yesterday: factory.state.y,
+                today: factory.state.z,
+                workers: factory.workers.map(FactoryWorkers.init(aggregate:)),
+                clerks: factory.clerks.map(FactoryWorkers.init(aggregate:))
+            )
+            self.entries.append(entry)
+        }
+        self.entries.sort(by: self.sort.ascending(_:_:))
 
         let filterable: (
             locations: [Address: FilterLabel],
             Never?
-        ) = snapshot.factories.reduce(into: ([:], nil)) {
+        ) = self.factories.values.reduce(into: ([:], nil)) {
             let tile: Address = $1.state.tile
-            if case country? = $1.region?.bloc {
-                {
-                    $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
-                } (&$0.locations[tile])
-            }
+            ; {
+                $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
+            } (&$0.locations[tile])
         }
         let filters: (
             location: [FilterLabel],
@@ -50,43 +97,6 @@ extension ProductionReport: PersistentReport {
             location: filterable.locations.values.sorted(),
             nil
         )
-
-        self.selection.rebuild(
-            filtering: snapshot.factories,
-            entries: &self.factories,
-            details: &self.factory,
-            default: filters.location.first?.id ?? .all
-        ) {
-            guard case country? = $0.region?.bloc else {
-                return nil
-            }
-            guard
-            let planet: PlanetContext = snapshot.planets[$0.state.tile.planet],
-            let tile: PlanetGrid.Tile = planet.grid.tiles[$0.state.tile.tile] else {
-                return nil
-            }
-
-            let equity: Equity<LEI>.Statistics = $0.equity
-            let liquidationProgress: Double? = $0.state.liquidation.map {
-                $0.burning == 0 ? 1 : Double(
-                    $0.burning - equity.shareCount
-                ) / Double($0.burning)
-            }
-
-            return .init(
-                id: $0.state.id,
-                location: tile.name ?? planet.state.name,
-                type: $0.type.title,
-                size: $0.state.size,
-                liquidationProgress: liquidationProgress,
-                yesterday: $0.state.y,
-                today: $0.state.z,
-                workers: $0.workers.map(FactoryWorkers.init(aggregate:)),
-                clerks: $0.clerks.map(FactoryWorkers.init(aggregate:))
-            )
-        } update: {
-            $0.update(to: $2, from: snapshot) ;
-        }
 
         self.filters.0 = [.all] + filters.location
     }
@@ -105,8 +115,8 @@ extension ProductionReport {
 extension ProductionReport: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.type] = GameUI.ScreenType.Production
-        js[.factories] = self.factories
-        js[.factory] = self.factory
+        js[.factories] = self.entries
+        js[.factory] = self.details
 
         js[.filter] = self.selection.filter
 

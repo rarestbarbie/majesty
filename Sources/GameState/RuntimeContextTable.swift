@@ -7,6 +7,7 @@ import OrderedCollections
         self.index = index
     }
 }
+extension RuntimeContextTable: Sendable where ElementContext: Sendable {}
 extension RuntimeContextTable {
     public init(
         states: [ElementContext.State],

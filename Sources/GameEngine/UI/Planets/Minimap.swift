@@ -1,30 +1,37 @@
 import GameIDs
+import GameState
 import HexGrids
 import JavaScriptInterop
 import JavaScriptKit
 
-struct Minimap {
+struct Minimap: Sendable {
     let id: PlanetID
     let layer: MinimapLayer
 
     var name: String
     var grid: [PlanetMapTile]
+    var tiles: [Address: PlanetGrid.TileSnapshot]
 
     init(id: PlanetID, layer: MinimapLayer) {
         self.id = id
         self.layer = layer
         self.name = ""
         self.grid = []
+        self.tiles = [:]
     }
 }
 extension Minimap {
-    mutating func update(in context: GameContext) {
+    mutating func update(
+        in context: borrowing GameSnapshot,
+        planets: RuntimeContextTable<PlanetContext>
+    ) {
         guard
-        let planet: PlanetContext = context.planets[self.id] else {
+        let planet: PlanetContext = planets[self.id] else {
             self.grid = []
             return
         }
 
+        self.tiles = planet.grid.tiles.values.reduce(into: [:]) { $0[$1.id] = $1.snapshot }
         self.name = planet.state.name
 
         switch self.layer {

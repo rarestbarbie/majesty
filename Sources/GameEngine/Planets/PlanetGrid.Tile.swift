@@ -60,6 +60,16 @@ extension PlanetGrid.Tile {
     var occupiedBy: CountryID? { self.authority?.occupiedBy }
 
     var pops: PopulationStats { self.authority?.pops ?? .init() }
+
+    var snapshot: PlanetGrid.TileSnapshot {
+        .init(
+            id: self.id,
+            name: self.name,
+            properties: self.authority?.properties,
+            terrain: self.terrain,
+            geology: self.geology
+        )
+    }
 }
 extension PlanetGrid.Tile {
     mutating func copy(from source: Self) {
@@ -77,6 +87,7 @@ extension PlanetGrid.Tile {
     ) {
         if  let authority: RegionalAuthority = self.authority {
             authority.update(
+                name: self.name ?? "?",
                 governedBy: governedBy,
                 occupiedBy: occupiedBy,
                 suzerain: suzerain,
@@ -85,6 +96,7 @@ extension PlanetGrid.Tile {
         } else {
             self.authority = .init(
                 id: self.id,
+                name: self.name ?? "?",
                 governedBy: governedBy,
                 occupiedBy: occupiedBy,
                 suzerain: suzerain,

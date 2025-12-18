@@ -15,13 +15,13 @@ public struct CelestialView: Sendable {
     }
 }
 extension CelestialView {
-    static func open(subject: PlanetID, in context: GameContext) throws -> Self {
+    static func open(subject: PlanetID, in context: borrowing GameSnapshot) throws -> Self {
         var view: Self = .init(subject: subject)
         try view.update(in: context)
         return view
     }
 
-    mutating func update(in context: GameContext) throws {
+    mutating func update(in context: borrowing GameSnapshot) throws {
         self.bodies.removeAll()
 
         var radius: Double

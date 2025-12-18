@@ -14,7 +14,7 @@ struct PlanetDetails {
     }
 }
 extension PlanetDetails {
-    mutating func update(in context: GameContext) {
+    mutating func update(in context: borrowing GameSnapshot) {
         guard
         let planet: PlanetContext = context.planets[self.id] else {
             return

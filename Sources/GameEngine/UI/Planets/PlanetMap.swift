@@ -12,7 +12,7 @@ struct PlanetMap {
     }
 }
 extension PlanetMap {
-    mutating func update(from planet: PlanetContext, in _: GameContext) {
+    mutating func update(from planet: PlanetContext, in _: borrowing GameSnapshot) {
         self.tiles = planet.grid.color(\.terrain.color)
     }
 }

@@ -1,4 +1,5 @@
 import GameIDs
+import GameState
 import HexGrids
 import JavaScriptInterop
 import JavaScriptKit
@@ -6,7 +7,7 @@ import JavaScriptKit
 public struct Navigator: Sendable {
     private var cursor: [PlanetID: HexCoordinate]
 
-    private var minimap: Minimap?
+    private(set) var minimap: Minimap?
     private var tile: NavigatorTile?
 
     init() {
@@ -33,8 +34,11 @@ extension Navigator {
         }
     }
 
-    mutating func update(in context: GameContext) {
-        self.minimap?.update(in: context)
+    mutating func update(
+        in context: borrowing GameSnapshot,
+        planets: RuntimeContextTable<PlanetContext>
+    ) {
+        self.minimap?.update(in: context, planets: planets)
         self.tile?.update(in: context)
     }
 }
