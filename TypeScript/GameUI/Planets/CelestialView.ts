@@ -165,18 +165,13 @@ export class CelestialView {
         // Check if the press and release were on the same body
         if (id && id === this.mousedown && event.button === 0) {
             event.preventDefault();
-            // If ctrlKey is pressed, switch context
-            if (event.ctrlKey) {
-                this.context.update(Swift.switch(id));
-            } else {
-                // Only open new tab from left pane
-                if (this.id === 0) {
-                    // Clicking on the sun closes the right pane
-                    this.context.view(1, this.system === id ? null : id);
-                }
-
-                this.context.focus(id, null, null);
+            // Only open new tab from left pane
+            if (this.id === 0) {
+                // Clicking on the sun closes the right pane
+                this.context.view(1, this.system === id ? null : id);
             }
+
+            this.context.focus(id, null, null);
         }
 
         // Always reset for the next interaction

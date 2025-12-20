@@ -66,6 +66,8 @@ extension PlanetGrid.Tile {
             id: self.id,
             name: self.name,
             properties: self.authority?.properties,
+            occupiedBy: self.authority?.occupiedBy,
+            governedBy: self.authority?.governedBy,
             terrain: self.terrain,
             geology: self.geology
         )

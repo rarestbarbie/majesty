@@ -74,8 +74,8 @@ export class DeveloperToolsPanel {
         this.node.style.display = this.visible ? 'block' : 'none';
     }
 
-    public refresh(): void {
-        this.tile.update();
+    public async refresh(): Promise<void> {
+        await this.tile.update();
     }
 
     private async exportTerrain(download: boolean): Promise<void> {

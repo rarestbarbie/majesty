@@ -7,22 +7,24 @@ import GameUI
 import HexGrids
 
 extension GameUI {
-    struct Cache: ~Copyable {
-        let game: GameSnapshot
+    @dynamicMemberLookup
+    struct Cache: ~Copyable, Sendable {
+        let context: CacheContext
         var pops: [PopID: PopSnapshot]
         var factories: [FactoryID: FactorySnapshot]
         var buildings: [BuildingID: BuildingSnapshot]
         var mines: [MineID: MineSnapshot]
         var tiles: [Address: PlanetGrid.TileSnapshot]
+
         init(
-            game: consuming GameSnapshot,
+            context: CacheContext,
             pops: [PopID: PopSnapshot] = [:],
             factories: [FactoryID: FactorySnapshot] = [:],
             buildings: [BuildingID: BuildingSnapshot] = [:],
             mines: [MineID: MineSnapshot] = [:],
             tiles: [Address: PlanetGrid.TileSnapshot] = [:]
         ) {
-            self.game = game
+            self.context = context
             self.pops = pops
             self.factories = factories
             self.buildings = buildings
@@ -32,8 +34,33 @@ extension GameUI {
     }
 }
 extension GameUI.Cache {
+    subscript<T>(dynamicMember keyPath: KeyPath<GameUI.CacheContext, T>) -> T {
+        self.context[keyPath: keyPath]
+    }
+}
+extension GameUI.Cache {
+    func contextMenuMinimapTile(
+        _ id: PlanetID,
+        _ cell: HexCoordinate,
+        _ layer: MinimapLayer,
+    ) -> ContextMenu? {
+        guard
+        let tile: PlanetGrid.TileSnapshot = self.tiles[id / cell] else {
+            return nil
+        }
+
+        return .items {
+            $0["Switch to Player"] {
+                if  let country: CountryID = tile.governedBy {
+                    $0[.SwitchToPlayer] = country
+                }
+            }
+        }
+    }
+}
+extension GameUI.Cache {
     func tooltipBuildingAccount(_ id: BuildingID) -> Tooltip? {
-        self.buildings[id]?.tooltipAccount(self.game.bank[account: .building(id)])
+        self.buildings[id]?.tooltipAccount(self.bank[account: .building(id)])
     }
     func tooltipBuildingNeeds(
         _ id: BuildingID,
@@ -57,7 +84,7 @@ extension GameUI.Cache {
         _ id: BuildingID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        (self.buildings[id]).map { self.tooltipExplainPrice($0, line) } ?? nil
+        (self.buildings[id]).map { self.context.tooltipExplainPrice($0, line) } ?? nil
     }
     func tooltipBuildingActive(_ id: BuildingID) -> Tooltip? {
         self.buildings[id]?.tooltipActive()
@@ -75,13 +102,13 @@ extension GameUI.Cache {
         _ id: BuildingID,
         culture: CultureID,
     ) -> Tooltip? {
-        self.buildings[id]?.tooltipOwnership(culture: culture, context: self.game)
+        self.buildings[id]?.tooltipOwnership(culture: culture, context: self.context)
     }
     func tooltipBuildingOwnership(
         _ id: BuildingID,
         country: CountryID,
     ) -> Tooltip? {
-        self.buildings[id]?.tooltipOwnership(country: country, context: self.game)
+        self.buildings[id]?.tooltipOwnership(country: country, context: self.context)
     }
     func tooltipBuildingOwnership(
         _ id: BuildingID,
@@ -92,7 +119,7 @@ extension GameUI.Cache {
         _ id: BuildingID,
         _ item: CashFlowItem,
     ) -> Tooltip? {
-        self.buildings[id]?.stats.cashFlow.tooltip(rules: self.game.rules, item: item)
+        self.buildings[id]?.stats.cashFlow.tooltip(rules: self.rules, item: item)
     }
     func tooltipBuildingBudgetItem(
         _ id: BuildingID,
@@ -107,7 +134,7 @@ extension GameUI.Cache {
 }
 extension GameUI.Cache {
     func tooltipFactoryAccount(_ id: FactoryID) -> Tooltip? {
-        self.factories[id]?.tooltipAccount(self.game.bank[account: .factory(id)])
+        self.factories[id]?.tooltipAccount(self.bank[account: .factory(id)])
     }
 
     func tooltipFactoryWorkers(_ id: FactoryID) -> Tooltip? {
@@ -149,7 +176,7 @@ extension GameUI.Cache {
         _ id: FactoryID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        (self.factories[id]).map { self.tooltipExplainPrice($0, line) } ?? nil
+        (self.factories[id]).map { self.context.tooltipExplainPrice($0, line) } ?? nil
     }
 
     func tooltipFactorySize(_ id: FactoryID) -> Tooltip? {
@@ -167,14 +194,14 @@ extension GameUI.Cache {
         _ id: FactoryID,
         culture: CultureID,
     ) -> Tooltip? {
-        self.factories[id]?.tooltipOwnership(culture: culture, context: self.game)
+        self.factories[id]?.tooltipOwnership(culture: culture, context: self.context)
     }
 
     func tooltipFactoryOwnership(
         _ id: FactoryID,
         country: CountryID,
     ) -> Tooltip? {
-        self.factories[id]?.tooltipOwnership(country: country, context: self.game)
+        self.factories[id]?.tooltipOwnership(country: country, context: self.context)
     }
 
     func tooltipFactoryOwnership(
@@ -187,7 +214,7 @@ extension GameUI.Cache {
         _ id: FactoryID,
         _ item: CashFlowItem,
     ) -> Tooltip? {
-        self.factories[id]?.cashFlow.tooltip(rules: self.game.rules, item: item)
+        self.factories[id]?.cashFlow.tooltip(rules: self.rules, item: item)
     }
 
     func tooltipFactoryBudgetItem(
@@ -206,7 +233,7 @@ extension GameUI.Cache {
 }
 extension GameUI.Cache {
     func tooltipPopAccount(_ id: PopID) -> Tooltip? {
-        self.pops[id]?.tooltipAccount(self.game.bank[account: .pop(id)])
+        self.pops[id]?.tooltipAccount(self.bank[account: .pop(id)])
     }
 
     func tooltipPopActive(_ id: PopID) -> Tooltip? {
@@ -241,7 +268,7 @@ extension GameUI.Cache {
             return .instructions {
                 $0["Total employment"] = employment[/3]
                 for output: ResourceOutput in pop.state.inventory.out.segmented.values {
-                    let name: String = self.game.rules.resources[output.id].title
+                    let name: String = self.rules.resources[output.id].title
                     $0[>] = """
                     Today these \(pop.state.occupation.plural) sold \(
                         output.unitsSold[/3],
@@ -316,7 +343,7 @@ extension GameUI.Cache {
         case .m(let id):
             guard
             let mine: MineSnapshot = self.mines[id.mine],
-            let tile: PlanetGrid.Tile = self.game.planets[mine.state.tile] else {
+            let tile: PlanetGrid.TileSnapshot = self.tiles[mine.state.tile] else {
                 return nil
             }
             return .instructions {
@@ -339,7 +366,7 @@ extension GameUI.Cache {
                             size: mine.state.z.size,
                             yieldRank: yieldRank
                         ),
-                        let miners: PopulationStats.Row = tile.pops.occupation[.Miner],
+                        let miners: PopulationStats.Row = tile.properties?.pops.occupation[.Miner],
                         let fromWorkers: Fraction = miners.mineExpansionFactor {
                         let fromDeposit: Double = .init(
                             mine.type.scale %/ (mine.type.scale + mine.state.z.size)
@@ -383,7 +410,7 @@ extension GameUI.Cache {
         _ pop: PopID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        (self.pops[pop]).map { self.tooltipExplainPrice($0, line) } ?? nil
+        (self.pops[pop]).map { self.context.tooltipExplainPrice($0, line) } ?? nil
     }
 
     func tooltipPopType(
@@ -396,20 +423,14 @@ extension GameUI.Cache {
         _ id: PopID,
         culture: CultureID,
     ) -> Tooltip? {
-        self.pops[id]?.tooltipOwnership(
-            culture: culture,
-            context: self.game
-        )
+        self.pops[id]?.tooltipOwnership(culture: culture, context: self.context)
     }
 
     func tooltipPopOwnership(
         _ id: PopID,
         country: CountryID,
     ) -> Tooltip? {
-        self.pops[id]?.tooltipOwnership(
-            country: country,
-            context: self.game
-        )
+        self.pops[id]?.tooltipOwnership(country: country, context: self.context)
     }
 
     func tooltipPopOwnership(
@@ -422,7 +443,7 @@ extension GameUI.Cache {
         _ id: PopID,
         _ item: CashFlowItem,
     ) -> Tooltip? {
-        self.pops[id]?.stats.cashFlow.tooltip(rules: self.game.rules, item: item)
+        self.pops[id]?.stats.cashFlow.tooltip(rules: self.rules, item: item)
     }
 
     func tooltipPopBudgetItem(
@@ -437,29 +458,13 @@ extension GameUI.Cache {
         }
     }
 }
-extension GameUI.Cache {
-    private func tooltipExplainPrice(
-        _ object: some LegalEntitySnapshot,
-        _ line: InventoryLine,
-    ) -> Tooltip? {
-        let resource: Resource = line.resource
-        let market: (
-            segmented: LocalMarketSnapshot?,
-            tradeable: WorldMarket.State?
-        ) = (
-            self.game.markets.segmented[resource / object.state.tile]?.snapshot(object.region),
-            self.game.markets.tradeable[resource / object.region.currency.id]?.state
-        )
 
-        return object.tooltipExplainPrice(line, market: market)
-    }
-}
 extension GameUI.Cache {
     func tooltipMarketLiquidity(
         _ id: WorldMarket.ID
     ) -> Tooltip? {
         guard
-        let market: WorldMarket.State = self.game.markets.tradeable[id]?.state,
+        let market: WorldMarket.State = self.markets.tradeable[id]?.state,
         let last: Int = market.history.indices.last else {
             return nil
         }
@@ -505,7 +510,7 @@ extension GameUI.Cache {
         _ id: Address,
         _ culture: CultureID,
     ) -> Tooltip? {
-        guard let culture: Culture = self.game.rules.pops.cultures[culture] else {
+        guard let culture: Culture = self.rules.pops.cultures[culture] else {
             return nil
         }
         return self.tiles[id]?.properties?.pops.tooltip(culture: culture)

@@ -3,7 +3,7 @@ import GameUI
 import JavaScriptInterop
 
 extension GameSession {
-    mutating func handle(_ event: PlayerEvent) throws -> GameUI? {
+    func handle(_ event: PlayerEvent) throws -> GameUI? {
         switch event {
         case .faster:
             self.faster()

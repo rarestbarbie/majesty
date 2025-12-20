@@ -68,8 +68,9 @@ async function main(user: Firebase.User): Promise<void> {
         const mp: Socket<any, any> = io('http://localhost:3000');
 
         await init();
+        await window.swift.ready;
 
-        let ui: GameUI | null = Swift.load(await start, await rules, terrain);
+        let ui: GameUI | null = await Swift.load(await start, await rules, terrain);
         if (ui !== null) {
             application.update(ui);
             application.view(0, 10 as GameID);
@@ -101,7 +102,7 @@ async function main(user: Firebase.User): Promise<void> {
                 dialog.remove();
                 setInterval(() => { Application.move({ id: PlayerEventID.Tick }); }, 100);
 
-                Swift.start(application);
+                Swift.bind(application);
             });
         });
         mp.on('admit', (admitted: boolean) => {
@@ -126,11 +127,12 @@ async function main(user: Firebase.User): Promise<void> {
         console.log(`Running in Single Player Mode`);
 
         await init();
+        await window.swift.ready;
 
         console.log(`Launching Game Engine (WebAssembly must be initialized before this!)`);
 
         // Load the game state from the server.
-        let ui: GameUI | null = Swift.load(await start, await rules, terrain);
+        let ui: GameUI | null = await Swift.load(await start, await rules, terrain);
         if (ui !== null) {
             application.update(ui);
             application.view(0, 10 as GameID);
@@ -139,7 +141,7 @@ async function main(user: Firebase.User): Promise<void> {
 
             setInterval(() => { Application.move({ id: PlayerEventID.Tick }); }, 100);
 
-            Swift.start(application);
+            Swift.bind(application);
         } else {
             console.error("Failed to load game");
             return;

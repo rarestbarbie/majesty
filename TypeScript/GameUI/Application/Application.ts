@@ -236,20 +236,20 @@ export class Application {
         }
     }
 
-    public focus(planet: GameID, layer: MinimapLayer | null, cell: string | null) {
+    public async focus(planet: GameID, layer: MinimapLayer | null, cell: string | null) {
         const state: NavigatorState = Swift.minimap(planet, layer, cell);
 
         this.tile.update(state?.tile);
         this.minimap.update(state);
 
-        this.devtools.refresh();
+        await this.devtools.refresh();
 
         for (const view of this.views) {
             view?.select(planet);
         }
     }
 
-    public view(index: number, system: GameID | null) {
+    public async view(index: number, system: GameID | null) {
         this.views[index]?.detach();
 
         if (system === null) {
@@ -257,7 +257,7 @@ export class Application {
         } else {
             const view: CelestialView = new CelestialView(this, index, system);
             view.attach(this.main);
-            view.update(Swift.view(index, system));
+            view.update(await Swift.view(index, system));
             this.views[index] = view;
         }
 

@@ -34,7 +34,7 @@ extension LegalEntitySnapshot {
 extension LegalEntitySnapshot {
     func tooltipOwnership(
         culture: CultureID,
-        context: borrowing GameSnapshot,
+        context: GameUI.CacheContext,
     ) -> Tooltip? {
         guard
         let culture: Culture = context.rules.pops.cultures[culture] else {
@@ -58,10 +58,10 @@ extension LegalEntitySnapshot {
 
     func tooltipOwnership(
         country: CountryID,
-        context: borrowing GameSnapshot,
+        context: GameUI.CacheContext,
     ) -> Tooltip? {
         guard
-        let country: Country = context.countries.state[country] else {
+        let country: Country = context.countries[country] else {
             return nil
         }
 
