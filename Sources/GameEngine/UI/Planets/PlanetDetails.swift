@@ -14,14 +14,14 @@ struct PlanetDetails {
     }
 }
 extension PlanetDetails {
-    mutating func update(in context: borrowing GameSnapshot) {
+    mutating func update(in cache: borrowing GameUI.Cache) {
         guard
-        let planet: PlanetContext = context.planets[self.id] else {
+        let planet: PlanetSnapshot = cache.planets[self.id] else {
             return
         }
 
         switch self.open {
-        case .Grid: self.grid.update(from: planet, in: context)
+        case .Grid: self.grid.update(from: planet, in: cache)
         }
     }
 }

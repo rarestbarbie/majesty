@@ -22,7 +22,7 @@ extension TradeReport: PersistentReport {
         self.selection.select(request.subject, filter: request.filter)
     }
 
-    mutating func update(from snapshot: borrowing GameSnapshot) {
+    mutating func update(from snapshot: borrowing GameUI.Cache) {
         let filterlists: (
             resource: [Resource: ResourceLabel],
             currency: [CurrencyID: CurrencyLabel]
@@ -36,11 +36,15 @@ extension TradeReport: PersistentReport {
             }
         }
 
+        guard let country: Country = snapshot.countries[snapshot.player] else {
+            fatalError("player country does not exist in snapshot!")
+        }
+
         self.selection.rebuild(
             filtering: snapshot.markets.tradeable.values,
             entries: &self.markets,
             details: &self.market,
-            default: .init(rawValue: .fiat(snapshot.playerCountry.currency))
+            default: .init(rawValue: .fiat(country.currency))
         ) {
             guard
             let today: WorldMarket.Interval = $0.state.history.last,

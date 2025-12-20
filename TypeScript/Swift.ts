@@ -54,25 +54,35 @@ export class Swift {
         state: Object,
         rules: Object,
         terrain: Object[]
-    ) => Promise<GameUI | null>;
+    ) => Promise<boolean>;
     declare public static call: (action: string, _: any[]) => void;
     declare public static push: (event: PlayerEvent, i: bigint) => void;
 
     declare public static orbit: (id: GameID) => Float32Array | null;
     declare public static gregorian: (date: GameDate) => GameDateComponents;
 
-    declare public static openPlanet: (request: PlanetReportRequest) => PlanetReport;
-    declare public static openInfrastructure: (request: InfrastructureReportRequest) => InfrastructureReport;
-    declare public static openProduction: (request: ProductionReportRequest) => ProductionReport;
-    declare public static openPopulation: (request: PopulationReportRequest) => PopulationReport;
-    declare public static openTrade: (request: TradeReportRequest) => TradeReport;
-    declare public static closeScreen: () => void;
+    declare public static openPlanet: (
+        request: PlanetReportRequest
+    ) => Promise<PlanetReport | null>;
+    declare public static openInfrastructure: (
+        request: InfrastructureReportRequest
+    ) => Promise<InfrastructureReport>;
+    declare public static openProduction: (
+        request: ProductionReportRequest
+    ) => Promise<ProductionReport>;
+    declare public static openPopulation: (
+        request: PopulationReportRequest
+    ) => Promise<PopulationReport>;
+    declare public static openTrade: (
+        request: TradeReportRequest
+    ) => Promise<TradeReport>;
+    declare public static closeScreen: () => Promise<void>;
 
     declare public static minimap: (
         planet: GameID,
         layer: MinimapLayer | null,
         cell: string | null
-    ) => NavigatorState;
+    ) => Promise<NavigatorState>;
     declare public static view: (index: number, system: GameID) => Promise<CelestialViewState>;
 
     declare public static tooltip: (

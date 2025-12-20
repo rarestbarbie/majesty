@@ -10,56 +10,50 @@ struct Minimap: Sendable {
 
     var name: String
     var grid: [PlanetMapTile]
-    var tiles: [Address: PlanetGrid.TileSnapshot]
 
     init(id: PlanetID, layer: MinimapLayer) {
         self.id = id
         self.layer = layer
         self.name = ""
         self.grid = []
-        self.tiles = [:]
     }
 }
 extension Minimap {
-    mutating func update(
-        in context: borrowing GameSnapshot,
-        planets: RuntimeContextTable<PlanetContext>
-    ) {
+    mutating func update(in cache: borrowing GameUI.Cache) {
         guard
-        let planet: PlanetContext = planets[self.id] else {
+        let tiles: PlanetSnapshot.Tiles = cache[planet: self.id] else {
             self.grid = []
             return
         }
 
-        self.tiles = planet.grid.tiles.values.reduce(into: [:]) { $0[$1.id] = $1.snapshot }
-        self.name = planet.state.name
+        self.name = tiles.planet.state.name
 
         switch self.layer {
         case .Terrain:
-            self.grid = planet.grid.color { $0.terrain.color }
+            self.grid = tiles.color { $0.terrain.color }
 
         case .Population:
             let scale: Double = .init(
-                planet.grid.tiles.values.reduce(0) { max($0, $1.pops.free.total) }
+                tiles.reduce(initial: 0) { max($0, $2.pops.free.total) }
             )
-            self.grid = planet.grid.color {
+            self.grid = tiles.color {
                 scale > 0 ? Double.init($0.pops.free.total) / scale : 0
             }
 
         case .AverageMilitancy:
             let scale: Double = .init(
-                planet.grid.tiles.values.reduce(0) { max($0, $1.pops.free.total) }
+                tiles.reduce(initial: 0) { max($0, $2.pops.free.total) }
             )
-            self.grid = planet.grid.color {
+            self.grid = tiles.color {
                 let (value, population): (Double, of: Double) = $0.pops.free.mil
                 return (0.1 * value, population / scale)
             }
 
         case .AverageConsciousness:
             let scale: Double = .init(
-                planet.grid.tiles.values.reduce(0) { max($0, $1.pops.free.total) }
+                tiles.reduce(initial: 0) { max($0, $2.pops.free.total) }
             )
-            self.grid = planet.grid.color {
+            self.grid = tiles.color {
                 let (value, population): (Double, of: Double) = $0.pops.free.con
                 return (0.1 * value, population / scale)
             }

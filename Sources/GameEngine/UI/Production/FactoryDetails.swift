@@ -28,10 +28,10 @@ extension FactoryDetails: PersistentReportDetails {
     }
 }
 extension FactoryDetails {
-    mutating func update(to factory: FactoryContext, from snapshot: borrowing GameSnapshot) {
+    mutating func update(to factory: FactorySnapshot, cache: borrowing GameUI.Cache) {
         switch self.open {
-        case .Inventory: self.inventory.update(from: factory, in: snapshot)
-        case .Ownership: self.ownership.update(from: factory, in: snapshot)
+        case .Inventory: self.inventory.update(from: factory, in: cache)
+        case .Ownership: self.ownership.update(from: factory, in: cache)
         }
 
         self.name = factory.type.title

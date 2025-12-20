@@ -19,7 +19,7 @@ export default defineConfig({
     },
     server: {
         watch: {
-            ignored: ['/.build/'], // Example for a large directory
+            ignored: ['/swift/majesty/.build/*'], // Example for a large directory
         },
         headers: {
             "Cross-Origin-Opener-Policy": "same-origin",

@@ -1,4 +1,5 @@
 import OrderedCollections
+import GameClock
 import GameEconomy
 import GameIDs
 import GameRules
@@ -13,8 +14,13 @@ extension GameUI {
             tradeable: OrderedDictionary<WorldMarket.ID, WorldMarket>,
             segmented: OrderedDictionary<LocalMarket.ID, LocalMarket>
         )
-        let orbits: OrderedDictionary<PlanetID, CelestialMotion>
+        let planets: OrderedDictionary<PlanetID, PlanetSnapshot>
+        let tiles: [Address: PlanetGrid.TileSnapshot]
         let bank: Bank
+        let date: GameDate
+
+        let player: CountryID
+        let speed: GameSpeed
         let rules: GameMetadata
     }
 }

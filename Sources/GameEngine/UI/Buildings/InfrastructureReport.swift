@@ -15,15 +15,12 @@ public struct InfrastructureReport {
     private var entries: [BuildingTableEntry]
     private var details: BuildingDetails?
 
-    private(set) var buildings: [BuildingID: BuildingSnapshot]
-
     init() {
         self.selection = .init(defaultFocus: .init(tab: .Inventory, needs: .l))
 
         self.filters = ([], [])
         self.entries = []
         self.details = nil
-        self.buildings = [:]
     }
 }
 extension InfrastructureReport: PersistentReport {
@@ -38,45 +35,32 @@ extension InfrastructureReport {
         .init()
     }
 
-    mutating func update(from snapshot: borrowing GameSnapshot, buildings: DynamicContextTable<BuildingContext>) {
-        let country: CountryID = snapshot.player
-
+    mutating func update(from cache: borrowing GameUI.Cache) {
         self.selection.rebuild(
-            filtering: buildings,
-            entries: &self.buildings,
+            filtering: cache.buildings.values,
+            entries: &self.entries,
             details: &self.details,
-            default: (buildings.first?.state.tile).map(Filter.location(_:)) ?? .all
+            default: (cache.buildings.values.first?.state.tile).map(Filter.location(_:)) ?? .all
         ) {
-            if case country? = $0.region?.bloc {
-                $0.snapshot
-            } else {
-                nil
-            }
-        } update: {
-            $0.update(to: $2, from: snapshot) ;
-        }
-    }
-    mutating func update(from snapshot: borrowing GameSnapshot) {
-        self.entries.removeAll(keepingCapacity: true)
-        for building: BuildingSnapshot in self.buildings.values {
             let entry: BuildingTableEntry = .init(
-                id: building.state.id,
-                location: building.region.name,
-                type: building.type.title,
-                state: building.state,
+                id: $0.state.id,
+                location: $0.region.name,
+                type: $0.type.title,
+                state: $0.state,
             )
-            self.entries.append(entry)
+
+            return entry
+        } update: {
+            $0.update(to: $2, cache: cache)
         }
+
         self.entries.sort(by: self.sort.ascending(_:_:))
 
         let filterable: (
             locations: [Address: FilterLabel],
             Never?
-        ) = self.buildings.values.reduce(into: ([:], nil)) {
-            let tile: Address = $1.state.tile
-            ; {
-                $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
-            } (&$0.locations[tile])
+        ) = cache.buildings.values.reduce(into: ([:], nil)) {
+            $0.locations[$1.state.tile] = .location($1.region.name, $1.state.tile)
         }
         let filters: (
             location: [FilterLabel],

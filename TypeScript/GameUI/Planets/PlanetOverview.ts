@@ -21,7 +21,7 @@ export class PlanetOverview extends ScreenContent {
         this.grid = new HexGrid();
     }
 
-    public override attach(root: HTMLElement | null, parameters: URLSearchParams): void {
+    public override async attach(root: HTMLElement | null, parameters: URLSearchParams): Promise<void> {
         const idString: string | null = parameters.get('id');
         if (!idString) {
             console.error("PlanetOverview: No planet ID found in URL parameters.");
@@ -41,7 +41,7 @@ export class PlanetOverview extends ScreenContent {
             root.appendChild(this.dom.panel);
         }
 
-        const state: PlanetReport | null = Swift.openPlanet({ subject: id });
+        const state: PlanetReport | null = await Swift.openPlanet({ subject: id });
         if (!state) {
             console.error(`PlanetOverview: Could not retrieve report for planet ID ${id}.`);
             return;

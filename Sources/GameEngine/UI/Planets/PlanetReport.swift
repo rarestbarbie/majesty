@@ -20,7 +20,7 @@ extension PlanetReport: PersistentReport {
         }
     }
 
-    mutating func update(from snapshot: borrowing GameSnapshot) {
+    mutating func update(from snapshot: borrowing GameUI.Cache) {
         self.planet?.update(in: snapshot)
     }
 }

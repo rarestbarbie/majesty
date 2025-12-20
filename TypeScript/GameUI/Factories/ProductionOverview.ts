@@ -68,9 +68,11 @@ export class ProductionOverview extends ScreenContent {
         );
     }
 
-    public override attach(root: HTMLElement | null, parameters: URLSearchParams): void {
+    public override async attach(
+        root: HTMLElement | null, parameters: URLSearchParams
+    ): Promise<void> {
         const factory: string | null = parameters.get('id');
-        const state: ProductionReport = Swift.openProduction(
+        const state: ProductionReport = await Swift.openProduction(
             {
                 subject: factory ? parseInt(factory) as GameID ?? undefined : undefined,
                 details: parameters.get('details') as FactoryDetailsTab ?? undefined,

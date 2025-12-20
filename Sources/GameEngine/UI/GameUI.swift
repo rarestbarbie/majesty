@@ -17,7 +17,7 @@ public struct GameUI: Sendable {
         trade: TradeReport
     )
     var views: (CelestialView?, CelestialView?)
-    var clock: GameClock
+    var speed: GameSpeed
 
     init() {
         self.player = nil
@@ -33,34 +33,35 @@ public struct GameUI: Sendable {
             .init(),
         )
         self.views = (nil, nil)
-        self.clock = .init()
+        self.speed = .init()
     }
 }
 extension GameUI {
-    mutating func sync(with state: borrowing GameSession.State) throws {
-        self.player = state.snapshot.playerCountry
-        self.date = state.snapshot.date
+    mutating func sync(with state: borrowing Cache) throws {
+        self.player = state.context.countries[state.context.player]
+        self.speed = state.speed
+        self.date = state.date
 
-        self.navigator.update(in: state.snapshot, planets: state.context.planets)
+        self.navigator.update(in: state)
 
         // Only update screens that are currently open
         switch self.screen {
         case .Planet?:
-            self.report.planet.update(from: state.snapshot)
+            self.report.planet.update(from: state)
         case .Infrastructure?:
-            self.report.infrastructure.update(from: state.snapshot, buildings: state.context.buildings)
+            self.report.infrastructure.update(from: state)
         case .Production?:
-            self.report.production.update(from: state.snapshot, factories: state.context.factories)
+            self.report.production.update(from: state)
         case .Population?:
-            self.report.population.update(from: state.snapshot, pops: state.context.pops, mines: state.context.mines)
+            self.report.population.update(from: state)
         case .Trade?:
-            self.report.trade.update(from: state.snapshot)
+            self.report.trade.update(from: state)
         case nil:
             break
         }
 
-        try self.views.0?.update(in: state.snapshot)
-        try self.views.1?.update(in: state.snapshot)
+        try self.views.0?.update(in: state)
+        try self.views.1?.update(in: state)
     }
 }
 extension GameUI {
@@ -91,7 +92,7 @@ extension GameUI: JavaScriptEncodable {
         case nil: break
         }
 
-        js[.speed] = self.clock.speed
+        js[.speed] = self.speed
         js[.views] = [self.views.0, self.views.1]
     }
 }

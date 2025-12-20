@@ -7,14 +7,12 @@ import GameUI
 import HexGrids
 
 extension GameUI {
-    @dynamicMemberLookup
-    struct Cache: ~Copyable, Sendable {
+    @dynamicMemberLookup struct Cache: ~Copyable, Sendable {
         let context: CacheContext
         var pops: [PopID: PopSnapshot]
         var factories: [FactoryID: FactorySnapshot]
         var buildings: [BuildingID: BuildingSnapshot]
         var mines: [MineID: MineSnapshot]
-        var tiles: [Address: PlanetGrid.TileSnapshot]
 
         init(
             context: CacheContext,
@@ -22,20 +20,26 @@ extension GameUI {
             factories: [FactoryID: FactorySnapshot] = [:],
             buildings: [BuildingID: BuildingSnapshot] = [:],
             mines: [MineID: MineSnapshot] = [:],
-            tiles: [Address: PlanetGrid.TileSnapshot] = [:]
         ) {
             self.context = context
             self.pops = pops
             self.factories = factories
             self.buildings = buildings
             self.mines = mines
-            self.tiles = tiles
         }
     }
 }
 extension GameUI.Cache {
     subscript<T>(dynamicMember keyPath: KeyPath<GameUI.CacheContext, T>) -> T {
         self.context[keyPath: keyPath]
+    }
+
+    subscript(planet id: PlanetID) -> PlanetSnapshot.Tiles? {
+        guard let planet: PlanetSnapshot = self.planets[id] else {
+            return nil
+        }
+
+        return .init(planet: planet, cached: self.tiles)
     }
 }
 extension GameUI.Cache {

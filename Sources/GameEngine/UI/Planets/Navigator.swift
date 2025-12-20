@@ -34,12 +34,9 @@ extension Navigator {
         }
     }
 
-    mutating func update(
-        in context: borrowing GameSnapshot,
-        planets: RuntimeContextTable<PlanetContext>
-    ) {
-        self.minimap?.update(in: context, planets: planets)
-        self.tile?.update(in: context)
+    mutating func update(in cache: borrowing GameUI.Cache) {
+        self.minimap?.update(in: cache)
+        self.tile?.update(in: cache)
     }
 }
 extension Navigator: JavaScriptEncodable {

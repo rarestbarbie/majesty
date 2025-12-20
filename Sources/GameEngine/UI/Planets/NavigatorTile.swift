@@ -26,10 +26,10 @@ struct NavigatorTile: Sendable {
     }
 }
 extension NavigatorTile {
-    mutating func update(in context: borrowing GameSnapshot) {
+    mutating func update(in cache: borrowing GameUI.Cache) {
         guard
-        let planet: PlanetContext = context.planets[self.id.planet],
-        let tile: PlanetGrid.Tile = planet.grid.tiles[self.id.tile] else {
+        let planet: PlanetSnapshot = cache.planets[self.id.planet],
+        let tile: PlanetGrid.TileSnapshot = cache.tiles[self.id] else {
             return
         }
 
@@ -41,7 +41,7 @@ extension NavigatorTile {
         let culture: [
             (key: CultureID, (share: Int64, PieChartLabel))
         ] = pops.free.cultures.compactMap {
-            guard let culture: Culture = context.rules.pops.cultures[$0] else {
+            guard let culture: Culture = cache.rules.pops.cultures[$0] else {
                 return nil
             }
             let label: PieChartLabel = .init(color: culture.color, name: culture.name)
@@ -51,7 +51,7 @@ extension NavigatorTile {
             (key: PopOccupation, (share: Int64, PieChartLabel))
         ] = pops.occupation.compactMap {
             guard $0.stratum > .Ward,
-            let key: Legend.Representation = context.rules.legend.occupation[$0] else {
+            let key: Legend.Representation = cache.rules.legend.occupation[$0] else {
                 return nil
             }
 
@@ -59,7 +59,7 @@ extension NavigatorTile {
             return ($0, ($1.count, label))
         }
 
-        self._neighbors = self.id.tile.neighbors(size: planet.grid.size)
+        self._neighbors = self.id.tile.neighbors(size: planet.grid.radius)
 
         self.culture = .init(values: culture.sorted { $0.key < $1.key })
         self.popType = .init(values: popType.sorted { $0.key > $1.key })

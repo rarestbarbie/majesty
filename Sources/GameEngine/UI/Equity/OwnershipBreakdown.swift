@@ -21,8 +21,8 @@ struct OwnershipBreakdown<Tab>: Sendable where Tab: OwnershipTab {
 }
 extension OwnershipBreakdown {
     mutating func update(
-        from asset: some LegalEntityContext<Tab.State>,
-        in context: borrowing GameSnapshot
+        from asset: some LegalEntitySnapshot<Tab.State>,
+        in context: borrowing GameUI.Cache
     ) {
         let equity: Equity<LEI>.Statistics = asset.equity
         let (country, culture): (
@@ -31,7 +31,7 @@ extension OwnershipBreakdown {
         ) = equity.owners.reduce(
             into: ([:], [:])
         ) {
-            if  let country: Country = context.countries.state[$1.country] {
+            if  let country: Country = context.countries[$1.country] {
                 let label: PieChartLabel = .init(
                     color: country.name.color,
                     name: country.name.short

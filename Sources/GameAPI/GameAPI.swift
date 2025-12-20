@@ -21,7 +21,7 @@ typealias DefaultExecutorFactory = JavaScriptEventLoop
 }
 
 @main extension GameAPI {
-    private static var ui: JSValue? = nil
+    private static var application: JSValue? = nil
     private static var game: GameSession? = nil
 
     static func main() async throws {
@@ -30,16 +30,23 @@ typealias DefaultExecutorFactory = JavaScriptEventLoop
     }
 }
 extension GameAPI {
+    private static var ui: GameUI.Model? { self.game?.model }
+
     private func run() async throws {
         let (events, stream): (
             AsyncStream<(PlayerEvent, UInt64)>,
             AsyncStream<(PlayerEvent, UInt64)>.Continuation
         ) = AsyncStream<(PlayerEvent, UInt64)>.makeStream()
 
-        let (frames, render): (
-            AsyncStream<GameUI>,
-            AsyncStream<GameUI>.Continuation
-        ) = AsyncStream<GameUI>.makeStream(bufferingPolicy: .bufferingNewest(0))
+        let (render, renderer): (
+            AsyncStream<Void>,
+            AsyncStream<Void>.Continuation
+        ) = AsyncStream<Void>.makeStream(bufferingPolicy: .bufferingNewest(0))
+
+        let (frames, browser): (
+            AsyncStream<Reference<GameUI>>,
+            AsyncStream<Reference<GameUI>>.Continuation
+        ) = AsyncStream<Reference<GameUI>>.makeStream(bufferingPolicy: .bufferingNewest(0))
 
         let executor: WebWorkerTaskExecutor = try await .init(numberOfThreads: 4)
         defer {
@@ -53,26 +60,30 @@ extension GameAPI {
 
         print("Game engine launched!")
         let _: Task<Void, any Error> = .init(executorPreference: executor) {
-            try await Self.handle(events: events, render: render)
+            try await Self.handle(events: events, renderer: renderer)
+        }
+        let _: Task<Void, any Error> = .init(executorPreference: executor) {
+            try await Self.render(events: render, browser: browser)
         }
 
-        for await frame: GameUI in frames {
+        for await frame: Reference<GameUI> in frames {
             print("Rendering frame...")
-            _ = Self.ui?.update(frame)
+            _ = Self.application?.update(frame.value)
         }
     }
     private func setup(stream: AsyncStream<(PlayerEvent, UInt64)>.Continuation) {
-        self[.bind] = { Self.ui = $0 }
+        self[.bind] = { Self.application = $0 }
         self[.call] = { try Self.game?.call($0, with: .init(array: $1)) }
         self[.save] = { await Self.game?.save }
         self[.load] = {
             do {
                 Self.game = try .load(start: $0, rules: $1, map: $2)
+                try await Self.game?.start()
+                return true
             } catch let error {
                 print("Error loading game: \(error)")
+                return false
             }
-
-            return try await Self.game?.start()
         }
 
         self[.loadTerrain] = { try await Self.game?.loadTerrain(from: $0) }
@@ -81,24 +92,24 @@ extension GameAPI {
 
         self[.push] = { stream.yield(($0, $1)) }
 
-        self[.openPlanet] = { try await Self.game?.openPlanet($0) }
-        self[.openInfrastructure] = { try await Self.game?.openInfrastructure($0) }
-        self[.openProduction] = { try await Self.game?.openProduction($0) }
-        self[.openPopulation] = { try await Self.game?.openPopulation($0) }
-        self[.openTrade] = { try await Self.game?.openTrade($0) }
-        self[.closeScreen] = { await Self.game?.open(nil) }
-        self[.minimap] = { await Self.game?.minimap(planet: $0, layer: $1, cell: $2) }
-        self[.view] = { try await Self.game?.view($0, to: $1) }
+        self[.openPlanet] = { try await Self.ui?.openPlanet($0) }
+        self[.openInfrastructure] = { try await Self.ui?.openInfrastructure($0) }
+        self[.openProduction] = { try await Self.ui?.openProduction($0) }
+        self[.openPopulation] = { try await Self.ui?.openPopulation($0) }
+        self[.openTrade] = { try await Self.ui?.openTrade($0) }
+        self[.closeScreen] = { await Self.ui?.open(nil) }
+        self[.minimap] = { await Self.ui?.minimap(planet: $0, layer: $1, cell: $2) }
+        self[.view] = { try await Self.ui?.view($0, to: $1) }
 
         self[.gregorian] = GameDateComponents.init(_:)
-        self[.contextMenu] = { try Self.game?.contextMenu(type: $0, with: .init(array: $1)) }
-        self[.tooltip] = { try Self.game?.tooltip(type: $0, with: .init(array: $1)) }
-        self[.orbit] = { Self.game?.orbit($0) }
+        self[.contextMenu] = { try Self.ui?.contextMenu(type: $0, with: .init(array: $1)) }
+        self[.tooltip] = { try Self.ui?.tooltip(type: $0, with: .init(array: $1)) }
+        self[.orbit] = { Self.ui?.orbit($0) }
     }
 
     private static func handle(
         events: AsyncStream<(PlayerEvent, UInt64)>,
-        render: AsyncStream<GameUI>.Continuation
+        renderer: AsyncStream<Void>.Continuation
     ) async throws {
         print("Starting game loop...")
 
@@ -110,8 +121,19 @@ extension GameAPI {
                 fatalError("OUT OF SYNC! (seq = \(i), expected = \(next))")
             }
 
-            if  let state: GameUI = try await self.game?.handle(event) {
-                render.yield(state)
+            if  case ()? = try await self.game?.handle(event) {
+                renderer.yield()
+            }
+        }
+    }
+
+    private static func render(
+        events: AsyncStream<Void>,
+        browser: AsyncStream<Reference<GameUI>>.Continuation
+    ) async throws {
+        for await _: () in events {
+            if  let ui: Reference<GameUI> = try await self.ui?.sync() {
+                browser.yield(ui)
             }
         }
     }

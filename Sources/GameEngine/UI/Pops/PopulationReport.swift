@@ -22,8 +22,6 @@ public struct PopulationReport {
     private var entries: [PopTableEntry]
     private var sort: Sort
 
-    private(set) var pops: [PopID: PopSnapshot]
-
     init() {
         self.selection = .init(defaultFocus: .init(tab: .Inventory, needs: .l))
         self.filters = ([], [])
@@ -39,7 +37,6 @@ public struct PopulationReport {
         self.details = nil
         self.entries = []
         self.sort = .init()
-        self.pops = [:]
     }
 }
 extension PopulationReport {
@@ -63,46 +60,34 @@ extension PopulationReport: PersistentReport {
     }
 }
 extension PopulationReport {
-    mutating func update(from snapshot: borrowing GameSnapshot, pops: DynamicContextTable<PopContext>, mines: DynamicContextTable<MineContext>) {
-        let country: CountryID = snapshot.player
+    mutating func update(from cache: borrowing GameUI.Cache) {
         self.selection.rebuild(
-            filtering: pops,
-            entries: &self.pops,
+            filtering: cache.pops.values,
+            entries: &self.entries,
             details: &self.details,
-            default: (pops.first?.state.tile).map(Filter.location(_:)) ?? .all
+            default: (cache.pops.values.first?.state.tile).map(Filter.location(_:)) ?? .all
         ) {
-            if case country? = $0.region?.bloc {
-                $0.snapshot
-            } else {
-                nil
-            }
-        } update: {
-            $0.update(to: $2, from: snapshot, mines: mines)
-        }
-
-        self.update(from: snapshot)
-    }
-
-    private mutating func update(from snapshot: borrowing GameSnapshot) {
-        self.entries.removeAll(keepingCapacity: true)
-        for pop: PopSnapshot in self.pops.values {
             guard
-            let culture: Culture = snapshot.rules.pops.cultures[pop.state.race] else {
-                continue
+            let culture: Culture = cache.rules.pops.cultures[$0.state.race] else {
+                return nil
             }
 
             let entry: PopTableEntry = .init(
-                id: pop.state.id,
-                location: pop.region.name,
-                type: pop.state.type,
+                id: $0.state.id,
+                location: $0.region.name,
+                type: $0.state.type,
                 color: culture.color,
                 nat: culture.name,
-                une: 1 - pop.stats.employmentBeforeEgress,
-                yesterday: pop.state.y,
-                today: pop.state.z,
+                une: 1 - $0.stats.employmentBeforeEgress,
+                yesterday: $0.state.y,
+                today: $0.state.z,
             )
-            self.entries.append(entry)
+
+            return entry
+        } update: {
+            $0.update(to: $2, cache: cache)
         }
+
         self.entries.sort(by: self.sort.ascending(_:_:))
 
         self.columns.type.updateStops(
@@ -121,11 +106,8 @@ extension PopulationReport {
         let filterable: (
             locations: [Address: FilterLabel],
             Never?
-        ) = self.pops.values.reduce(into: ([:], nil)) {
-            let tile: Address = $1.state.tile
-            ; {
-                $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
-            } (&$0.locations[tile])
+        ) = cache.pops.values.reduce(into: ([:], nil)) {
+            $0.locations[$1.state.tile] = .location($1.region.name, $1.state.tile)
         }
         let filters: (
             location: [FilterLabel],

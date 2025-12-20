@@ -15,15 +15,11 @@ public struct ProductionReport {
     private var entries: [FactoryTableEntry]
     private var details: FactoryDetails?
 
-    private(set) var factories: [FactoryID: FactorySnapshot]
-
-
     init() {
         self.selection = .init(defaultFocus: .init(tab: .Inventory, needs: .l))
         self.filters = ([], [])
         self.entries = []
         self.details = nil
-        self.factories = [:]
     }
 }
 extension ProductionReport: PersistentReport {
@@ -38,57 +34,44 @@ extension ProductionReport {
         .init()
     }
 
-    mutating func update(from snapshot: borrowing GameSnapshot, factories: DynamicContextTable<FactoryContext>) {
-        let country: CountryID = snapshot.player
+    mutating func update(from cache: borrowing GameUI.Cache) {
         self.selection.rebuild(
-            filtering: factories,
-            entries: &self.factories,
+            filtering: cache.factories.values,
+            entries: &self.entries,
             details: &self.details,
-            default: (factories.first?.state.tile).map(Filter.location(_:)) ?? .all
+            default: (cache.factories.values.first?.state.tile).map(Filter.location(_:)) ?? .all
         ) {
-            if case country? = $0.region?.bloc {
-                $0.snapshot
-            } else {
-                nil
-            }
-
-        } update: {
-            $0.update(to: $2, from: snapshot) ;
-        }
-    }
-    mutating func update(from snapshot: borrowing GameSnapshot) {
-        self.entries.removeAll(keepingCapacity: true)
-        for factory: FactorySnapshot in self.factories.values {
-            let equity: Equity<LEI>.Statistics = factory.equity
-            let liquidationProgress: Double? = factory.state.liquidation.map {
+            let equity: Equity<LEI>.Statistics = $0.equity
+            let liquidationProgress: Double? = $0.state.liquidation.map {
                 $0.burning == 0 ? 1 : Double(
                     $0.burning - equity.shareCount
                 ) / Double($0.burning)
             }
 
             let entry: FactoryTableEntry = .init(
-                id: factory.state.id,
-                location: factory.region.name,
-                type: factory.type.title,
-                size: factory.state.size,
+                id: $0.state.id,
+                location: $0.region.name,
+                type: $0.type.title,
+                size: $0.state.size,
                 liquidationProgress: liquidationProgress,
-                yesterday: factory.state.y,
-                today: factory.state.z,
-                workers: factory.workers.map(FactoryWorkers.init(aggregate:)),
-                clerks: factory.clerks.map(FactoryWorkers.init(aggregate:))
+                yesterday: $0.state.y,
+                today: $0.state.z,
+                workers: $0.workers.map(FactoryWorkers.init(aggregate:)),
+                clerks: $0.clerks.map(FactoryWorkers.init(aggregate:))
             )
-            self.entries.append(entry)
+
+            return entry
+        } update: {
+            $0.update(to: $2, cache: cache)
         }
+
         self.entries.sort(by: self.sort.ascending(_:_:))
 
         let filterable: (
             locations: [Address: FilterLabel],
             Never?
-        ) = self.factories.values.reduce(into: ([:], nil)) {
-            let tile: Address = $1.state.tile
-            ; {
-                $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
-            } (&$0.locations[tile])
+        ) = cache.factories.values.reduce(into: ([:], nil)) {
+            $0.locations[$1.state.tile] = .location($1.region.name, $1.state.tile)
         }
         let filters: (
             location: [FilterLabel],

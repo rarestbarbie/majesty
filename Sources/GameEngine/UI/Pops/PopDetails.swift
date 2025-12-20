@@ -28,12 +28,12 @@ extension PopDetails: PersistentReportDetails {
     }
 }
 extension PopDetails {
-    mutating func update(to pop: PopContext, from snapshot: borrowing GameSnapshot, mines: DynamicContextTable<MineContext>) {
+    mutating func update(to pop: PopSnapshot, cache: borrowing GameUI.Cache) {
         self.state = pop.state
 
         switch self.open {
-        case .Inventory: self.inventory.update(from: pop, in: snapshot, mines: mines)
-        case .Ownership: self.ownership.update(from: pop, in: snapshot)
+        case .Inventory: self.inventory.update(from: pop, in: cache)
+        case .Ownership: self.ownership.update(from: pop, in: cache)
         }
     }
 }

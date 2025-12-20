@@ -70,9 +70,8 @@ async function main(user: Firebase.User): Promise<void> {
         await init();
         await window.swift.ready;
 
-        let ui: GameUI | null = await Swift.load(await start, await rules, terrain);
-        if (ui !== null) {
-            application.update(ui);
+        const status: boolean = await Swift.load(await start, await rules, terrain);
+        if (status) {
             application.view(0, 10 as GameID);
             application.navigate();
             application.resize();
@@ -132,9 +131,8 @@ async function main(user: Firebase.User): Promise<void> {
         console.log(`Launching Game Engine (WebAssembly must be initialized before this!)`);
 
         // Load the game state from the server.
-        let ui: GameUI | null = await Swift.load(await start, await rules, terrain);
-        if (ui !== null) {
-            application.update(ui);
+        const status: boolean = await Swift.load(await start, await rules, terrain);
+        if (status) {
             application.view(0, 10 as GameID);
             application.navigate();
             application.resize();

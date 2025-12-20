@@ -12,8 +12,8 @@ extension InfrastructureReport.Filter: CustomStringConvertible {}
 extension InfrastructureReport.Filter: LosslessStringConvertible {}
 extension InfrastructureReport.Filter: ConvertibleToJSString, LoadableFromJSString {}
 extension InfrastructureReport.Filter: PersistentSelectionFilter {
-    typealias Subject = BuildingContext
-    static func ~= (self: Self, value: BuildingContext) -> Bool {
+    typealias Subject = BuildingSnapshot
+    static func ~= (self: Self, value: BuildingSnapshot) -> Bool {
         switch self {
         case .all: true
         case .location(let location): location == value.state.tile

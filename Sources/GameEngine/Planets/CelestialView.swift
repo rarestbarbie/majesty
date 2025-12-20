@@ -15,18 +15,18 @@ public struct CelestialView: Sendable {
     }
 }
 extension CelestialView {
-    static func open(subject: PlanetID, in context: borrowing GameSnapshot) throws -> Self {
+    static func open(subject: PlanetID, in context: borrowing GameUI.Cache) throws -> Self {
         var view: Self = .init(subject: subject)
         try view.update(in: context)
         return view
     }
 
-    mutating func update(in context: borrowing GameSnapshot) throws {
+    mutating func update(in cache: borrowing GameUI.Cache) throws {
         self.bodies.removeAll()
 
         var radius: Double
         let scale: Double
-        if  let primary: PlanetContext = context.planets[self.subject] {
+        if  let primary: PlanetSnapshot = cache.planets[self.subject] {
             //  Default view distance begins at 10 times the planet radius.
             radius = primary.state.radius * (10 / AU)
             scale = primary.state.radius
@@ -45,7 +45,7 @@ extension CelestialView {
             throw CelestialViewError.noSuchWorld(self.subject)
         }
 
-        for world: PlanetContext in context.planets {
+        for world: PlanetSnapshot in cache.planets.values {
             guard let orbit: Planet.Orbit = world.state.orbit,
             case self.subject = orbit.orbits else {
                 continue

@@ -15,10 +15,13 @@ extension PlanetGrid {
     }
 }
 extension PlanetGrid.TileSnapshot {
+    var pops: PopulationStats { self.properties?.pops ?? .init() }
+}
+extension PlanetGrid.TileSnapshot {
     func tooltip(
         _ layer: MinimapLayer,
     ) -> Tooltip? {
-        let pops: PopulationStats = self.properties?.pops ?? .init()
+        let pops: PopulationStats = self.pops
         return .instructions(style: .borderless) {
             switch layer {
             case .Terrain:
