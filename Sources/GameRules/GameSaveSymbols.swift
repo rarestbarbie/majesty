@@ -1,7 +1,7 @@
 import GameIDs
 import JavaScriptInterop
 
-@frozen public struct GameSaveSymbols {
+@frozen public struct GameSaveSymbols: Sendable {
     /// Pop types are not moddable.
     public let occupations: SymbolTable<PopOccupation>
     public let genders: SymbolTable<Gender>

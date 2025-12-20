@@ -10,6 +10,7 @@ import OrderedCollections
         self.index = index
     }
 }
+extension SymbolTable: Sendable where Value: Sendable {}
 extension SymbolTable: ExpressibleByDictionaryLiteral {
     @inlinable public init(dictionaryLiteral: (Never, Never)...) {
         self.init(index: [:])

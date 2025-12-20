@@ -8,7 +8,7 @@ import OrderedCollections
 import Random
 
 // should live in GameStarts, but needs ``Culture``
-public struct GameStart {
+public struct GameStart: Sendable {
     let date: GameDate
     let player: CountryID
     let random: PseudoRandom

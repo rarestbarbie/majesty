@@ -6,7 +6,7 @@ import JavaScriptInterop
 import Random
 import OrderedCollections
 
-public struct GameSave {
+public struct GameSave: Sendable {
     var symbols: GameSaveSymbols
     let random: PseudoRandom
     let player: CountryID

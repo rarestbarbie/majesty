@@ -5,7 +5,7 @@ import HexGrids
 import JavaScriptKit
 import JavaScriptInterop
 
-public struct PlanetTileEditor {
+public struct PlanetTileEditor: Sendable {
     let id: Address
 
     let rotate: HexRotation?
