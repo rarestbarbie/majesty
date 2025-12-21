@@ -37,6 +37,7 @@ public struct PopulationReport {
         self.details = nil
         self.entries = []
         self.sort = .init()
+        self.sort.update(column: .type(PopOccupation.Politician.descending))
     }
 }
 extension PopulationReport {
