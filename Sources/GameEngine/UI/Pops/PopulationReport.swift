@@ -61,11 +61,26 @@ extension PopulationReport: PersistentReport {
 }
 extension PopulationReport {
     mutating func update(from cache: borrowing GameUI.Cache) {
+        let filterable: (
+            locations: [Address: FilterLabel],
+            Never?
+        ) = cache.pops.values.reduce(into: ([:], nil)) {
+            $0.locations[$1.state.tile] = .location($1.region.name, $1.state.tile)
+        }
+        let filters: (
+            location: [FilterLabel],
+            Never?
+        ) = (
+            location: filterable.locations.values.sorted(),
+            nil
+        )
+
         self.selection.rebuild(
-            filtering: cache.pops.values,
+            filtering: cache.pops,
             entries: &self.entries,
             details: &self.details,
-            default: (cache.pops.values.first?.state.tile).map(Filter.location(_:)) ?? .all
+            default: filters.location.first?.id ?? .all,
+            sort: self.sort.ascending(_:_:)
         ) {
             guard
             let culture: Culture = cache.rules.pops.cultures[$0.state.race] else {
@@ -88,8 +103,6 @@ extension PopulationReport {
             $0.update(to: $2, cache: cache)
         }
 
-        self.entries.sort(by: self.sort.ascending(_:_:))
-
         self.columns.type.updateStops(
             columnSelected: self.columnSelected,
             from: self.entries,
@@ -103,19 +116,6 @@ extension PopulationReport {
             as: ColumnControl.race(_:)
         )
 
-        let filterable: (
-            locations: [Address: FilterLabel],
-            Never?
-        ) = cache.pops.values.reduce(into: ([:], nil)) {
-            $0.locations[$1.state.tile] = .location($1.region.name, $1.state.tile)
-        }
-        let filters: (
-            location: [FilterLabel],
-            Never?
-        ) = (
-            location: filterable.locations.values.sorted(),
-            nil
-        )
         self.filters.0 = [.all] + filters.location
     }
 }

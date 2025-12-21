@@ -50,76 +50,15 @@ extension PersistentSelection {
 }
 extension PersistentSelection {
     mutating func rebuild<Entry, Details>(
-        filtering objects: some Collection<Filter.Subject>,
-        entries: inout [Entry.ID: Entry],
-        details: inout Details?,
-        default: @autoclosure () -> Filter,
-        _ entry: (Filter.Subject) -> Entry?,
-        update: (inout Details, Entry, Filter.Subject) -> Void
-    ) where Details: PersistentReportDetails<Filter.Subject.ID, DetailsFocus>,
-        Entry: Identifiable {
-        let filter: Filter
-
-        if  let current: Filter = self.filter {
-            filter = current
-        } else {
-            filter = `default`()
-            self.filter(filter)
-        }
-
-        // i wonder if there is a more efficient way to do this
-        if  let selected: Filter.Subject.ID = self.cursor {
-            if  objects.contains(where: { $0.id == selected && filter ~= $0 }) {
-                // if we’ve changed filters, but the old selection is still valid, keep it
-                self.cursors[filter] = selected
-            } else {
-                self.cursor = nil
-            }
-        }
-
-        // if no active selection, `details` will be automatically switched to the first valid
-        // table entry below
-        if  let selected: Filter.Subject.ID = self.cursor {
-            if case selected? = details?.id {
-                // no change
-            } else {
-                details = .init(id: selected, focus: self.details)
-            }
-        } else {
-            details = nil
-        }
-
-        entries.removeAll(keepingCapacity: true)
-
-        for object: Filter.Subject in objects where filter ~= object {
-            guard
-            let entry: Entry = entry(object) else {
-                continue
-            }
-
-            entries[entry.id] = entry
-
-            if  var state: Details = consume details {
-                if  state.id == object.id {
-                    state.refocus(on: self.details)
-                    update(&state, entry, object)
-                }
-                details = state
-            } else {
-                var state: Details = .init(id: object.id, focus: self.details)
-                update(&state, entry, object)
-                details = state
-            }
-        }
-    }
-    mutating func rebuild<Entry, Details>(
-        filtering objects: some Collection<Filter.Subject>,
+        filtering objects: some RandomAccessMapping<Filter.Subject.ID, Filter.Subject>,
         entries: inout [Entry],
         details: inout Details?,
         default: @autoclosure () -> Filter,
+        sort ascending: (_ a: Entry, _ b: Entry) -> Bool,
         _ entry: (Filter.Subject) -> Entry?,
         update: (inout Details, Entry, Filter.Subject) -> Void
-    ) where Details: PersistentReportDetails<Filter.Subject.ID, DetailsFocus> {
+    ) where Details: PersistentReportDetails<Filter.Subject.ID, DetailsFocus>,
+        Entry: Identifiable<Filter.Subject.ID> {
         let filter: Filter
 
         if  let current: Filter = self.filter {
@@ -129,31 +68,10 @@ extension PersistentSelection {
             self.filter(filter)
         }
 
-        // i wonder if there is a more efficient way to do this
-        if  let selected: Filter.Subject.ID = self.cursor {
-            if  objects.contains(where: { $0.id == selected && filter ~= $0 }) {
-                // if we’ve changed filters, but the old selection is still valid, keep it
-                self.cursors[filter] = selected
-            } else {
-                self.cursor = nil
-            }
-        }
-
-        // if no active selection, `details` will be automatically switched to the first valid
-        // table entry below
-        if  let selected: Filter.Subject.ID = self.cursor {
-            if case selected? = details?.id {
-                // no change
-            } else {
-                details = .init(id: selected, focus: self.details)
-            }
-        } else {
-            details = nil
-        }
-
         entries.removeAll(keepingCapacity: true)
 
-        for object: Filter.Subject in objects where filter ~= object {
+        var selected: Entry? = nil
+        for object: Filter.Subject in objects.values where filter ~= object {
             guard
             let entry: Entry = entry(object) else {
                 continue
@@ -161,17 +79,38 @@ extension PersistentSelection {
 
             entries.append(entry)
 
-            if  var state: Details = consume details {
-                if  state.id == object.id {
-                    state.refocus(on: self.details)
-                    update(&state, entry, object)
-                }
-                details = state
-            } else {
-                var state: Details = .init(id: object.id, focus: self.details)
-                update(&state, entry, object)
-                details = state
+            if  case nil = selected,
+                case object.id? = self.cursor {
+                selected = entry
             }
+        }
+
+        entries.sort(by: ascending)
+
+        if case _? = selected {
+            // if we’ve changed filters, but the old selection is still valid, keep it
+            self.cursors[filter] = self.cursor
+        } else {
+            self.cursor = nil
+            selected = entries.first
+        }
+
+        guard
+        let selected: Entry,
+        let object: Filter.Subject = objects[selected.id] else {
+            details = nil
+            return
+        }
+
+        if  var state: Details = consume details,
+                state.id == selected.id {
+            state.refocus(on: self.details)
+            update(&state, selected, object)
+            details = state
+        } else {
+            var state: Details = .init(id: object.id, focus: self.details)
+            update(&state, selected, object)
+            details = state
         }
     }
 }

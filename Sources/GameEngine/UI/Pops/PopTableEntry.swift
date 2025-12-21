@@ -5,7 +5,7 @@ import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 
-struct PopTableEntry {
+struct PopTableEntry: Identifiable {
     let id: PopID
     let location: String
     let type: PopType

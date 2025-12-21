@@ -3,6 +3,7 @@ import JavaScriptKit
 import JavaScriptInterop
 import OrderedCollections
 
+extension OrderedDictionary: RandomAccessMapping {}
 extension OrderedDictionary where Key: ConvertibleToJSValue & LoadableFromJSValue & Sendable,
     Value: ConvertibleToJSValue & LoadableFromJSValue {
     var items: Items { .init(dictionary: self) }

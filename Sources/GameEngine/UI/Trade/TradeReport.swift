@@ -37,10 +37,11 @@ extension TradeReport: PersistentReport {
         }
 
         self.selection.rebuild(
-            filtering: cache.markets.tradeable.values,
+            filtering: cache.markets.tradeable,
             entries: &self.markets,
             details: &self.market,
-            default: .init(rawValue: .fiat(cache.playerCountry.currency))
+            default: .init(rawValue: .fiat(cache.playerCountry.currency)),
+            sort: { $0.name < $1.name }
         ) {
             guard
             let today: WorldMarket.Interval = $0.state.history.last,
