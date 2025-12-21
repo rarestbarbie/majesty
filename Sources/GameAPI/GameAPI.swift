@@ -14,9 +14,27 @@ typealias DefaultExecutorFactory = JavaScriptEventLoop
     private let instance: JSValue
     private let metatype: JSObject
 
+    private nonisolated let heartbeat: (
+        events: AsyncStream<Void>,
+        stream: AsyncStream<Void>.Continuation
+    )
+    private nonisolated let renderer: (
+        events: AsyncStream<Void>,
+        stream: AsyncStream<Void>.Continuation
+    )
+
     init(swift: JSValue) {
         self.instance = swift
         self.metatype = swift.constructor.function!
+
+        (
+            self.heartbeat.events,
+            self.heartbeat.stream
+        ) = AsyncStream<Void>.makeStream(bufferingPolicy: .bufferingOldest(1))
+        (
+            self.renderer.events,
+            self.renderer.stream
+        ) = AsyncStream<Void>.makeStream(bufferingPolicy: .bufferingOldest(1))
     }
 }
 
@@ -38,15 +56,10 @@ extension GameAPI {
             AsyncStream<(PlayerEvent, UInt64)>.Continuation
         ) = AsyncStream<(PlayerEvent, UInt64)>.makeStream()
 
-        let (render, renderer): (
-            AsyncStream<Void>,
-            AsyncStream<Void>.Continuation
-        ) = AsyncStream<Void>.makeStream(bufferingPolicy: .bufferingNewest(0))
-
         let (frames, browser): (
             AsyncStream<Reference<GameUI>>,
             AsyncStream<Reference<GameUI>>.Continuation
-        ) = AsyncStream<Reference<GameUI>>.makeStream(bufferingPolicy: .bufferingNewest(0))
+        ) = AsyncStream<Reference<GameUI>>.makeStream(bufferingPolicy: .bufferingNewest(1))
 
         let executor: WebWorkerTaskExecutor = try await .init(numberOfThreads: 4)
         defer {
@@ -60,11 +73,14 @@ extension GameAPI {
 
         print("Game engine launched!")
         let _: Task<Void, any Error> = .init(executorPreference: executor) {
-            try await self.handle(events: events, renderer: renderer)
+            try await self.handle(events: events)
         }
         let _: Task<Void, any Error> = .init(executorPreference: executor) {
-            try await Self.render(events: render, browser: browser)
+            try await self.render(browser: browser)
         }
+
+        async
+        let _: Void = self.heartbeats()
 
         for await frame: Reference<GameUI> in frames {
             print("Rendering frame...")
@@ -76,6 +92,11 @@ extension GameAPI {
         self[.call] = { try Self.game?.call($0, with: .init(array: $1)) }
         self[.save] = { await Self.game?.save }
         self[.load] = {
+            guard case nil = Self.game else {
+                print("A game is already loaded!")
+                return false
+            }
+
             do {
                 Self.game = try .load(start: $0, rules: $1, map: $2)
                 try await Self.game?.start()
@@ -107,12 +128,19 @@ extension GameAPI {
         self[.orbit] = { Self.ui?.orbit($0) }
     }
 
-    private func handle(
+    private func heartbeats() async throws {
+        for await _: () in self.heartbeat.events {
+            _ = self.instance.tick()
+            try await Task.sleep(for: .milliseconds(100))
+        }
+    }
+
+    private nonisolated func handle(
         events: AsyncStream<(PlayerEvent, UInt64)>,
-        renderer: AsyncStream<Void>.Continuation
     ) async throws {
         print("Starting game loop...")
 
+        var game: GameSession? = nil
         var next: UInt64 = 1
         for await (event, i): (PlayerEvent, UInt64) in events {
             if  next == i || i == 0 {
@@ -121,30 +149,43 @@ extension GameAPI {
                 fatalError("OUT OF SYNC! (seq = \(i), expected = \(next))")
             }
 
-            switch event {
-            case .faster:
-                await Self.game?.faster()
-            case .slower:
-                await Self.game?.slower()
-            case .pause:
-                await Self.game?.pause()
-            case .tick:
-                try await Self.game?.tick()
-                _ = self.instance.tickProcessed()
+            // avoid awaiting on main actor if game has already been loaded
+            if case nil = game {
+                game = await Self.game
             }
 
-            renderer.yield()
+            switch event {
+            case .faster:
+                await game?.faster()
+            case .slower:
+                await game?.slower()
+            case .pause:
+                await game?.pause()
+            case .tick:
+                try await game?.tick()
+                // we must yield to the heartbeat stream even if game is not yet loaded,
+                // otherwise we won’t get a new heartbeat to continue the loop
+                self.heartbeat.stream.yield()
+            }
+
+            self.renderer.stream.yield()
         }
     }
 
-    private static func render(
-        events: AsyncStream<Void>,
+    private nonisolated func render(
         browser: AsyncStream<Reference<GameUI>>.Continuation
     ) async throws {
-        for await _: () in events {
-            if  let ui: Reference<GameUI> = try await self.ui?.sync() {
-                browser.yield(ui)
+        var ui: GameUI.Model? = nil
+        for await _: () in self.renderer.events {
+            if case nil = ui {
+                ui = await Self.ui
             }
+            guard
+            let ui: GameUI.Model else {
+                continue
+            }
+
+            browser.yield(try await ui.sync())
         }
     }
 }

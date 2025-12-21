@@ -99,7 +99,7 @@ async function main(user: Firebase.User): Promise<void> {
             button.addEventListener('click', () => {
                 dialog.close();
                 dialog.remove();
-                setInterval(() => { window.swift.tick(); }, 100);
+                window.swift.tick();
 
                 Swift.bind(application);
             });
@@ -137,7 +137,7 @@ async function main(user: Firebase.User): Promise<void> {
             application.navigate();
             application.resize();
 
-            setInterval(() => { window.swift.tick(); }, 100);
+            window.swift.tick();
 
             Swift.bind(application);
         } else {
