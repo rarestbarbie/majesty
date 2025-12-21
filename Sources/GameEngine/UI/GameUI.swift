@@ -38,7 +38,7 @@ public struct GameUI: Sendable {
 }
 extension GameUI {
     mutating func sync(with state: borrowing Cache) throws {
-        self.player = state.context.countries[state.context.player]
+        self.player = state.context.playerCountry
         self.speed = state.speed
         self.date = state.date
 

@@ -1,9 +1,9 @@
-import GameEngine
+@_spi(testable) import GameEngine
 import GameRules
 import GameTerrain
 import JavaScriptKit
 
-extension GameSession {
+extension GameSession.State {
     static func reload() throws -> Self {
         let terrain: TerrainMap = try .load(from: JSObject.global["terrain"])
         let start: GameStart = try .load(from: JSObject.global["start"])

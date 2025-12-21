@@ -25,6 +25,15 @@ extension GameUI {
     }
 }
 extension GameUI.CacheContext {
+    var playerCountry: Country {
+        guard
+        let player: Country = self.countries[self.player] else {
+            fatalError("player country does not exist in snapshot!")
+        }
+        return player
+    }
+}
+extension GameUI.CacheContext {
     func tooltipExplainPrice(
         _ object: some LegalEntitySnapshot,
         _ line: InventoryLine,

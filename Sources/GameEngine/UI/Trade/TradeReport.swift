@@ -22,39 +22,35 @@ extension TradeReport: PersistentReport {
         self.selection.select(request.subject, filter: request.filter)
     }
 
-    mutating func update(from snapshot: borrowing GameUI.Cache) {
+    mutating func update(from cache: borrowing GameUI.Cache) {
         let filterlists: (
             resource: [Resource: ResourceLabel],
             currency: [CurrencyID: CurrencyLabel]
-        ) = snapshot.markets.tradeable.values.reduce(into: ([:], [:])) {
+        ) = cache.markets.tradeable.values.reduce(into: ([:], [:])) {
             if  case .good(let id) = $1.id.x {
-                $0.resource[id] = snapshot.rules.resources[id].label
+                $0.resource[id] = cache.rules.resources[id].label
             }
             if  case .fiat(let id) = $1.id.y,
-                let currency: Currency = snapshot.currencies[id] {
+                let currency: Currency = cache.currencies[id] {
                 $0.currency[id] = currency.label
             }
         }
 
-        guard let country: Country = snapshot.countries[snapshot.player] else {
-            fatalError("player country does not exist in snapshot!")
-        }
-
         self.selection.rebuild(
-            filtering: snapshot.markets.tradeable.values,
+            filtering: cache.markets.tradeable.values,
             entries: &self.markets,
             details: &self.market,
-            default: .init(rawValue: .fiat(country.currency))
+            default: .init(rawValue: .fiat(cache.playerCountry.currency))
         ) {
             guard
             let today: WorldMarket.Interval = $0.state.history.last,
             case .good(let good) = $0.id.x,
             case .fiat(let fiat) = $0.id.y,
-            let currency: Currency = snapshot.currencies[fiat] else {
+            let currency: Currency = cache.currencies[fiat] else {
                 return nil
             }
 
-            let resource: ResourceLabel = snapshot.rules.resources[good].label
+            let resource: ResourceLabel = cache.rules.resources[good].label
 
             return .init(
                 id: $0.id,
@@ -63,7 +59,7 @@ extension TradeReport: PersistentReport {
                 volume: today.volume.base.total
             )
         } update: {
-            $0.update(from: $2.state, date: snapshot.date)
+            $0.update(from: $2.state, date: cache.date)
         }
 
         self.filters.0 = filterlists.resource.values.map(MarketFilterLabel.resource(_:))

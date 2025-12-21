@@ -27,7 +27,7 @@ extension GameSession {
         let context: GameUI.CacheContext = .init(
             currencies: self.state.context.currencies,
             countries: self.state.context.countries.state.reduce(into: [:]) { $0[$1.id] = $1 },
-            markets: self.state.snapshot.markets,
+            markets: (self.state.world.tradeableMarkets, self.state.world.segmentedMarkets),
             planets: self.state.context.planets.reduce(into: [:]) {
                 $0[$1.state.id] = $1.snapshot
             },
@@ -43,27 +43,27 @@ extension GameSession {
             rules: self.state.context.rules
         )
 
-        let bloc: CountryID = context.countries[context.player]?.suzerain ?? context.player
+        let bloc: CountryID = context.playerCountry.suzerain ?? context.player
 
         let cache: GameUI.Cache = .init(
             context: context,
             pops: self.state.context.pops.reduce(into: [:]) {
-                if  case bloc? = $1.region?.suzerain {
+                if  case bloc? = $1.region?.bloc {
                     $0[$1.id] = $1.snapshot
                 }
             },
             factories: self.state.context.factories.reduce(into: [:]) {
-                if  case bloc? = $1.region?.suzerain {
+                if  case bloc? = $1.region?.bloc {
                     $0[$1.id] = $1.snapshot
                 }
             },
             buildings: self.state.context.buildings.reduce(into: [:]) {
-                if  case bloc? = $1.region?.suzerain {
+                if  case bloc? = $1.region?.bloc {
                     $0[$1.id] = $1.snapshot
                 }
             },
             mines: self.state.context.mines.reduce(into: [:]) {
-                if  case bloc? = $1.region?.suzerain {
+                if  case bloc? = $1.region?.bloc {
                     $0[$1.state.id] = $1.snapshot
                 }
             }
@@ -79,25 +79,15 @@ extension GameSession {
         rules: borrowing GameRules,
         map: borrowing TerrainMap,
     ) throws -> Self {
-        let metadata: GameMetadata = try rules.resolve(symbols: &save.symbols)
-        return try .load(save, rules: metadata, map: map)
+        .init(state: try .load(save, rules: rules, map: map))
     }
+
     public static func load(
         start: consuming GameStart,
         rules: borrowing GameRules,
         map: borrowing TerrainMap,
     ) throws -> Self {
-        var metadata: GameMetadata = try rules.resolve(symbols: &start.symbols)
-        let save: GameSave = try start.unpack(rules: &metadata)
-        return try .load(save, rules: metadata, map: map)
-    }
-
-    private static func load(
-        _ save: sending GameSave,
-        rules: consuming sending GameMetadata,
-        map: borrowing TerrainMap,
-    ) throws -> Self {
-        .init(state: try .load(save, rules: rules, map: map))
+        .init(state: try .load(start: start, rules: rules, map: map))
     }
 
     public var save: GameSave { self.state.save }

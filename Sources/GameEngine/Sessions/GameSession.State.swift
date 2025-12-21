@@ -3,7 +3,7 @@ import GameRules
 import GameTerrain
 
 extension GameSession {
-    struct State: ~Copyable {
+    @_spi(testable) public struct State: ~Copyable {
         var context: GameContext
         var world: GameWorld
 
@@ -14,8 +14,27 @@ extension GameSession {
     }
 }
 extension GameSession.State {
-    static func load(
-        _ save: GameSave,
+    @_spi(testable) public static func load(
+        _ save: consuming GameSave,
+        rules: borrowing GameRules,
+        map: borrowing TerrainMap,
+    ) throws -> Self {
+        let metadata: GameMetadata = try rules.resolve(symbols: &save.symbols)
+        return try .load(save, rules: metadata, map: map)
+    }
+
+    @_spi(testable) public static func load(
+        start: consuming GameStart,
+        rules: borrowing GameRules,
+        map: borrowing TerrainMap,
+    ) throws -> Self {
+        var metadata: GameMetadata = try rules.resolve(symbols: &start.symbols)
+        let save: GameSave = try start.unpack(rules: &metadata)
+        return try .load(save, rules: metadata, map: map)
+    }
+
+    private static func load(
+        _ save: consuming GameSave,
         rules: consuming GameMetadata,
         map: borrowing TerrainMap,
     ) throws -> Self {
@@ -34,7 +53,8 @@ extension GameSession.State {
 
         return .init(context: context, world: world)
     }
-
+}
+extension GameSession.State {
     mutating func tick() throws {
         try self.context.advance(&self.world[self.context.rules.settings])
         try self.sync()
@@ -44,28 +64,14 @@ extension GameSession.State {
         try self.context.compute(&self.world)
     }
 
-    var save: GameSave {
+    @_spi(testable) public var save: GameSave {
         self.context.save(self.world)
     }
 }
 
-extension GameSession.State {
-    var snapshot: GameSnapshot {
-        .init(
-            player: self.context.player,
-            currencies: self.context.currencies,
-            countries: self.context.countries,
-            planets: self.context.planets,
-            rules: self.context.rules,
-            markets: (self.world.tradeableMarkets, self.world.segmentedMarkets),
-            bank: self.world.bank,
-            date: self.world.date
-        )
-    }
-}
 #if TESTABLE
 extension GameSession.State {
-    mutating func run(until date: GameDate) throws {
+    @_spi(testable) public mutating func run(until date: GameDate) throws {
         try self.context.compute(&self.world)
         while self.world.date < date {
             try self.context.advance(&self.world[self.context.rules.settings])
@@ -77,14 +83,18 @@ extension GameSession.State {
         }
     }
 
-    var _hash: Int {
+    @_spi(testable) public var rules: GameMetadata {
+        self.context.rules
+    }
+
+    @_spi(testable) public var _hash: Int {
         var hasher: Hasher = .init()
         self.context.pops.state.hash(into: &hasher)
         self.context.factories.state.hash(into: &hasher)
         return hasher.finalize()
     }
 
-    static func != (a: borrowing Self, b: borrowing Self) -> Bool {
+    @_spi(testable) public static func != (a: borrowing Self, b: borrowing Self) -> Bool {
         a.context.pops.state != b.context.pops.state ||
         a.context.factories.state != b.context.factories.state
     }
