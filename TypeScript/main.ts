@@ -56,8 +56,7 @@ async function main(user: Firebase.User): Promise<void> {
         return;
     }
 
-    window.swift = new Swift();
-    const application: Application = new Application(persistence, await sprites);
+    window.swift = new Swift(new Application(persistence, await sprites));
 
     // Parse path components to determine the current page
     const path: string[] = window.location.pathname.split('/').filter(Boolean);
@@ -72,9 +71,7 @@ async function main(user: Firebase.User): Promise<void> {
 
         const status: boolean = await Swift.load(await start, await rules, terrain);
         if (status) {
-            application.view(0, 10 as GameID);
-            application.navigate();
-            application.resize();
+            window.swift.loaded();
         } else {
             console.error("Failed to load game");
             return;
@@ -99,9 +96,7 @@ async function main(user: Firebase.User): Promise<void> {
             button.addEventListener('click', () => {
                 dialog.close();
                 dialog.remove();
-                window.swift.tick();
-
-                Swift.bind(application);
+                window.swift.start();
             });
         });
         mp.on('admit', (admitted: boolean) => {
@@ -133,13 +128,8 @@ async function main(user: Firebase.User): Promise<void> {
         // Load the game state from the server.
         const status: boolean = await Swift.load(await start, await rules, terrain);
         if (status) {
-            application.view(0, 10 as GameID);
-            application.navigate();
-            application.resize();
-
-            window.swift.tick();
-
-            Swift.bind(application);
+            window.swift.loaded();
+            window.swift.start();
         } else {
             console.error("Failed to load game");
             return;

@@ -29,13 +29,19 @@ import {
 import { PlayerEvent, PlayerEventID } from './Multiplayer/exports.js';
 
 export class Swift {
+    private readonly application: Application
+    private master: boolean;
+
     // these are used by the WebAssembly to signal when API methods are ready
     readonly success: (value: void | PromiseLike<void>) => void;
     readonly failure: (reason?: any) => void;
 
     public readonly ready: Promise<void>;
 
-    constructor() {
+    constructor(application: Application) {
+        this.application = application;
+        this.master = false;
+
         let success: (value: void | PromiseLike<void>) => void;
         let failure: (reason?: any) => void;
 
@@ -48,12 +54,30 @@ export class Swift {
         this.failure = failure!;
     }
 
-    public tick(): void {
+    public loaded(): void {
+        this.application.view(0, 10 as GameID);
+        this.application.navigate();
+        this.application.resize();
+    }
+
+    public start(): void {
+        this.master = true;
         Application.move({ id: PlayerEventID.Tick });
     }
 
+    public tick(): void {
+        if (!this.master) {
+            return;
+        }
+
+        Application.move({ id: PlayerEventID.Tick });
+    }
+
+    public draw(ui: GameUI): void {
+        this.application.update(ui);
+    }
+
     // Will be added by Swift WebAssembly
-    declare public static bind: (ui: Application) => void;
     declare public static load: (
         state: Object,
         rules: Object,

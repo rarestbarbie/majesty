@@ -1,6 +1,5 @@
 extension GameAPI {
     enum Symbol: String {
-        case bind
         case save
         /// Load the game state from a file.
         case load

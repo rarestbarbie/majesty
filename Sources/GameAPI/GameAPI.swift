@@ -11,8 +11,12 @@ import RealModule
 typealias DefaultExecutorFactory = JavaScriptEventLoop
 
 @MainActor struct GameAPI {
-    private let instance: JSValue
+    private static var game: GameSession? = nil
+
     private let metatype: JSObject
+    private let success: ((any ConvertibleToJSValue...) -> JSValue)
+    private let tick: ((any ConvertibleToJSValue...) -> JSValue)
+    private let draw: ((any ConvertibleToJSValue...) -> JSValue)
 
     private nonisolated let heartbeat: (
         events: AsyncStream<Void>,
@@ -24,8 +28,22 @@ typealias DefaultExecutorFactory = JavaScriptEventLoop
     )
 
     init(swift: JSValue) {
-        self.instance = swift
-        self.metatype = swift.constructor.function!
+        guard case .object(let instance) = swift else {
+            fatalError("Missing binding for 'window.swift'")
+        }
+
+        guard
+        let metatype: JSObject = instance.constructor.function,
+        let success: ((any ConvertibleToJSValue...) -> JSValue) = instance.success,
+        let tick: ((any ConvertibleToJSValue...) -> JSValue) = instance.tick,
+        let draw: ((any ConvertibleToJSValue...) -> JSValue) = instance.draw else {
+            fatalError("Missing binding in 'window.swift'")
+        }
+
+        self.metatype = metatype
+        self.success = success
+        self.tick = tick
+        self.draw = draw
 
         (
             self.heartbeat.events,
@@ -39,9 +57,6 @@ typealias DefaultExecutorFactory = JavaScriptEventLoop
 }
 
 @main extension GameAPI {
-    private static var application: JSValue? = nil
-    private static var game: GameSession? = nil
-
     static func main() async throws {
         let main: Self = .init(swift: JSObject.global["swift"])
         try await main.run()
@@ -69,7 +84,7 @@ extension GameAPI {
         self.setup(stream: stream)
 
         print("Game engine initialized!")
-        _ = self.instance.success()
+        _ = self.success()
 
         print("Game engine launched!")
         let _: Task<Void, any Error> = .init(executorPreference: executor) {
@@ -83,12 +98,10 @@ extension GameAPI {
         let _: Void = self.heartbeats()
 
         for await frame: Reference<GameUI> in frames {
-            print("Rendering frame...")
-            _ = Self.application?.update(frame.value)
+            _ = self.draw(frame.value)
         }
     }
     private func setup(stream: AsyncStream<(PlayerEvent, UInt64)>.Continuation) {
-        self[.bind] = { Self.application = $0 }
         self[.call] = { try Self.game?.call($0, with: .init(array: $1)) }
         self[.save] = { await Self.game?.save }
         self[.load] = {
@@ -130,7 +143,7 @@ extension GameAPI {
 
     private func heartbeats() async throws {
         for await _: () in self.heartbeat.events {
-            _ = self.instance.tick()
+            _ = self.tick()
             try await Task.sleep(for: .milliseconds(100))
         }
     }
@@ -163,7 +176,7 @@ extension GameAPI {
                 await game?.pause()
             case .tick:
                 try await game?.tick()
-                // we must yield to the heartbeat stream even if game is not yet loaded,
+                // we must yield to the heartbeat stream even if the game is not yet loaded,
                 // otherwise we won’t get a new heartbeat to continue the loop
                 self.heartbeat.stream.yield()
             }
