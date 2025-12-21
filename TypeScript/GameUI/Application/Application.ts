@@ -32,7 +32,6 @@ import {
 export class Application {
     public static mp?: Socket<any, any>;
 
-
     private readonly tile: NavigatorTile;
     private readonly minimap: Minimap;
     private readonly screen: Screen;

@@ -60,7 +60,7 @@ extension GameAPI {
 
         print("Game engine launched!")
         let _: Task<Void, any Error> = .init(executorPreference: executor) {
-            try await Self.handle(events: events, renderer: renderer)
+            try await self.handle(events: events, renderer: renderer)
         }
         let _: Task<Void, any Error> = .init(executorPreference: executor) {
             try await Self.render(events: render, browser: browser)
@@ -107,7 +107,7 @@ extension GameAPI {
         self[.orbit] = { Self.ui?.orbit($0) }
     }
 
-    private static func handle(
+    private func handle(
         events: AsyncStream<(PlayerEvent, UInt64)>,
         renderer: AsyncStream<Void>.Continuation
     ) async throws {
@@ -121,9 +121,19 @@ extension GameAPI {
                 fatalError("OUT OF SYNC! (seq = \(i), expected = \(next))")
             }
 
-            if  case ()? = try await self.game?.handle(event) {
-                renderer.yield()
+            switch event {
+            case .faster:
+                await Self.game?.faster()
+            case .slower:
+                await Self.game?.slower()
+            case .pause:
+                await Self.game?.pause()
+            case .tick:
+                try await Self.game?.tick()
+                _ = self.instance.tickProcessed()
             }
+
+            renderer.yield()
         }
     }
 

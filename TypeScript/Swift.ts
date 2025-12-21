@@ -26,7 +26,7 @@ import {
     TooltipType,
     GameUI,
 } from './GameUI/exports.js';
-import { PlayerEvent } from './Multiplayer/exports.js';
+import { PlayerEvent, PlayerEventID } from './Multiplayer/exports.js';
 
 export class Swift {
     // these are used by the WebAssembly to signal when API methods are ready
@@ -34,6 +34,7 @@ export class Swift {
     readonly failure: (reason?: any) => void;
 
     public readonly ready: Promise<void>;
+    public ticksPending: number;
 
     constructor() {
         let success: (value: void | PromiseLike<void>) => void;
@@ -46,6 +47,22 @@ export class Swift {
 
         this.success = success!;
         this.failure = failure!;
+        this.ticksPending = 0;
+    }
+
+    public tick(): void {
+        if (this.ticksPending >= 1) {
+            console.warn("Engine lagging, throttling tick generation...");
+        } else {
+            this.ticksPending += 1;
+            Application.move({ id: PlayerEventID.Tick });
+        }
+    }
+
+    public tickProcessed(): void {
+        if (this.ticksPending > 0) {
+            this.ticksPending -= 1;
+        }
     }
 
     // Will be added by Swift WebAssembly
