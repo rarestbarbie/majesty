@@ -3,7 +3,7 @@ import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 
-struct FactoryTableEntry {
+struct FactoryTableEntry: Identifiable {
     let id: FactoryID
     let location: String
     let type: String

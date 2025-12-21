@@ -35,11 +35,26 @@ extension ProductionReport {
     }
 
     mutating func update(from cache: borrowing GameUI.Cache) {
+        let filterable: (
+            locations: [Address: FilterLabel],
+            Never?
+        ) = cache.factories.values.reduce(into: ([:], nil)) {
+            $0.locations[$1.state.tile] = .location($1.region.name, $1.state.tile)
+        }
+        let filters: (
+            location: [FilterLabel],
+            Never?
+        ) = (
+            location: filterable.locations.values.sorted(),
+            nil
+        )
+
         self.selection.rebuild(
-            filtering: cache.factories.values,
+            filtering: cache.factories,
             entries: &self.entries,
             details: &self.details,
-            default: (cache.factories.values.first?.state.tile).map(Filter.location(_:)) ?? .all
+            default: filters.location.first?.id ?? .all,
+            sort: self.sort.ascending(_:_:)
         ) {
             let equity: Equity<LEI>.Statistics = $0.equity
             let liquidationProgress: Double? = $0.state.liquidation.map {
@@ -64,22 +79,6 @@ extension ProductionReport {
         } update: {
             $0.update(to: $2, cache: cache)
         }
-
-        self.entries.sort(by: self.sort.ascending(_:_:))
-
-        let filterable: (
-            locations: [Address: FilterLabel],
-            Never?
-        ) = cache.factories.values.reduce(into: ([:], nil)) {
-            $0.locations[$1.state.tile] = .location($1.region.name, $1.state.tile)
-        }
-        let filters: (
-            location: [FilterLabel],
-            Never?
-        ) = (
-            location: filterable.locations.values.sorted(),
-            nil
-        )
 
         self.filters.0 = [.all] + filters.location
     }

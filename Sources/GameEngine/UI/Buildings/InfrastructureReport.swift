@@ -36,26 +36,6 @@ extension InfrastructureReport {
     }
 
     mutating func update(from cache: borrowing GameUI.Cache) {
-        self.selection.rebuild(
-            filtering: cache.buildings.values,
-            entries: &self.entries,
-            details: &self.details,
-            default: (cache.buildings.values.first?.state.tile).map(Filter.location(_:)) ?? .all
-        ) {
-            let entry: BuildingTableEntry = .init(
-                id: $0.state.id,
-                location: $0.region.name,
-                type: $0.type.title,
-                state: $0.state,
-            )
-
-            return entry
-        } update: {
-            $0.update(to: $2, cache: cache)
-        }
-
-        self.entries.sort(by: self.sort.ascending(_:_:))
-
         let filterable: (
             locations: [Address: FilterLabel],
             Never?
@@ -69,6 +49,25 @@ extension InfrastructureReport {
             location: filterable.locations.values.sorted(),
             nil
         )
+
+        self.selection.rebuild(
+            filtering: cache.buildings,
+            entries: &self.entries,
+            details: &self.details,
+            default: filters.location.first?.id ?? .all,
+            sort: self.sort.ascending(_:_:)
+        ) {
+            let entry: BuildingTableEntry = .init(
+                id: $0.state.id,
+                location: $0.region.name,
+                type: $0.type.title,
+                state: $0.state,
+            )
+
+            return entry
+        } update: {
+            $0.update(to: $2, cache: cache)
+        }
 
         self.filters.0 = [.all] + filters.location
     }

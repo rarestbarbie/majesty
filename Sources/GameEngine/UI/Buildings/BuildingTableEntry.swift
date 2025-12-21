@@ -3,7 +3,7 @@ import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 
-struct BuildingTableEntry {
+struct BuildingTableEntry: Identifiable {
     let id: BuildingID
     let location: String
     let type: String
