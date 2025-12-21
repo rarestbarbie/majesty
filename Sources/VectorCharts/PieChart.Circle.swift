@@ -9,3 +9,4 @@ extension PieChart {
         }
     }
 }
+extension PieChart.Circle: Sendable where Key: Sendable, Value: Sendable {}

@@ -28,10 +28,10 @@ extension BuildingDetails: PersistentReportDetails {
     }
 }
 extension BuildingDetails {
-    mutating func update(to building: BuildingContext, from snapshot: borrowing GameSnapshot) {
+    mutating func update(to building: BuildingSnapshot, cache: borrowing GameUI.Cache) {
         switch self.open {
-        case .Inventory: self.inventory.update(from: building, in: snapshot)
-        case .Ownership: self.ownership.update(from: building, in: snapshot.context)
+        case .Inventory: self.inventory.update(from: building, in: cache)
+        case .Ownership: self.ownership.update(from: building, in: cache)
         }
 
         self.name = building.type.title

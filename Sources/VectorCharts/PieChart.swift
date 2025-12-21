@@ -4,6 +4,7 @@ import Vector
     case circle(Circle)
     case slices([Slice])
 }
+extension PieChart: Sendable where Key: Sendable, Value: Sendable {}
 extension PieChart: RandomAccessCollection {
     @inlinable public var startIndex: Int {
         switch self {

@@ -83,25 +83,25 @@ export class Screen {
         this.dom = undefined;
     }
 
-    public close() {
+    public async close(): Promise<void> {
         if (!this.dom) {
             return;
         }
 
         this.dom.element.removeAttribute('data-screen');
 
-        this.state?.content.close();
+        await this.state?.content.close();
         this.state?.content.detach();
         this.state = undefined
     }
 
-    public open(screen: ScreenType, parameters: URLSearchParams) {
+    public async open(screen: ScreenType, parameters: URLSearchParams): Promise<void> {
         if (!this.dom) {
             return;
         }
 
         if (this.state?.type === screen) {
-            this.state.content.attach(null, parameters);
+            await this.state.content.attach(null, parameters);
         } else {
             this.state?.content.close();
             this.state?.content.detach();
@@ -147,7 +147,7 @@ export class Screen {
             this.dom.content.setAttribute('data-screen-layout', layout);
 
             this.state = { content: uninitialized, type: screen };
-            this.state.content.attach(this.dom.content, parameters);
+            await this.state.content.attach(this.dom.content, parameters);
         }
     }
 

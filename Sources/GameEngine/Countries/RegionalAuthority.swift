@@ -2,6 +2,7 @@ import GameIDs
 
 final class RegionalAuthority: Identifiable {
     let id: Address
+    private(set) var name: String
     private(set) var governedBy: CountryID
     private(set) var occupiedBy: CountryID
     private(set) var suzerain: CountryID?
@@ -10,12 +11,14 @@ final class RegionalAuthority: Identifiable {
 
     init(
         id: Address,
+        name: String,
         governedBy: CountryID,
         occupiedBy: CountryID,
         suzerain: CountryID?,
         country: CountryProperties,
     ) {
         self.id = id
+        self.name = name
         self.governedBy = governedBy
         self.occupiedBy = occupiedBy
         self.suzerain = suzerain
@@ -26,16 +29,18 @@ final class RegionalAuthority: Identifiable {
 extension RegionalAuthority {
     var bloc: CountryID { self.suzerain ?? self.governedBy }
     var properties: RegionalProperties {
-        .init(id: self.id, pops: self.pops, country: self.country)
+        .init(id: self.id, name: self.name, pops: self.pops, country: self.country)
     }
 }
 extension RegionalAuthority {
     func update(
+        name: String,
         governedBy: CountryID,
         occupiedBy: CountryID,
         suzerain: CountryID?,
         country: CountryProperties,
     ) {
+        self.name = name
         self.governedBy = governedBy
         self.occupiedBy = occupiedBy
         self.suzerain = suzerain

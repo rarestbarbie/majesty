@@ -32,7 +32,6 @@ import {
 export class Application {
     public static mp?: Socket<any, any>;
 
-
     private readonly tile: NavigatorTile;
     private readonly minimap: Minimap;
     private readonly screen: Screen;
@@ -157,32 +156,32 @@ export class Application {
         animate();
     }
 
-    public navigate() {
+    public async navigate(): Promise<void> {
         const action: URLSearchParams = new URLSearchParams(window.location.hash.substring(1));
 
         const screen: string | null = action.get('screen');
         if (screen !== null) {
             switch (screen) {
             case ScreenType.Planet:
-                this.screen.open(ScreenType.Planet, action);
+                await this.screen.open(ScreenType.Planet, action);
                 break;
             case ScreenType.Infrastructure:
-                this.screen.open(ScreenType.Infrastructure, action);
+                await this.screen.open(ScreenType.Infrastructure, action);
                 break;
             case ScreenType.Production:
-                this.screen.open(ScreenType.Production, action);
+                await this.screen.open(ScreenType.Production, action);
                 break;
             case ScreenType.Population:
-                this.screen.open(ScreenType.Population, action);
+                await this.screen.open(ScreenType.Population, action);
                 break;
             case ScreenType.Budget:
-                this.screen.open(ScreenType.Budget, action);
+                await this.screen.open(ScreenType.Budget, action);
                 break;
             case ScreenType.Trade:
-                this.screen.open(ScreenType.Trade, action);
+                await this.screen.open(ScreenType.Trade, action);
                 break;
             case '_close':
-                this.screen.close();
+                await this.screen.close();
                 break;
             }
 
@@ -191,7 +190,7 @@ export class Application {
 
         const planet: GameID | null = parseInt(action.get('planet') ?? '', 10) as GameID | null;
         if (planet) {
-            this.focus(
+            await this.focus(
                 planet,
                 action.get('layer') as MinimapLayer | null,
                 action.get('cell'),
@@ -236,20 +235,24 @@ export class Application {
         }
     }
 
-    public focus(planet: GameID, layer: MinimapLayer | null, cell: string | null) {
-        const state: NavigatorState = Swift.minimap(planet, layer, cell);
+    public async focus(
+        planet: GameID,
+        layer: MinimapLayer | null,
+        cell: string | null
+    ): Promise<void> {
+        const state: NavigatorState = await Swift.minimap(planet, layer, cell);
 
         this.tile.update(state?.tile);
         this.minimap.update(state);
 
-        this.devtools.refresh();
+        await this.devtools.refresh();
 
         for (const view of this.views) {
             view?.select(planet);
         }
     }
 
-    public view(index: number, system: GameID | null) {
+    public async view(index: number, system: GameID | null) {
         this.views[index]?.detach();
 
         if (system === null) {
@@ -257,7 +260,7 @@ export class Application {
         } else {
             const view: CelestialView = new CelestialView(this, index, system);
             view.attach(this.main);
-            view.update(Swift.view(index, system));
+            view.update(await Swift.view(index, system));
             this.views[index] = view;
         }
 

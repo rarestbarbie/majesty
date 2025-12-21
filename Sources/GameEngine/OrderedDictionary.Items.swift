@@ -9,6 +9,7 @@ extension OrderedDictionary {
         let dictionary: OrderedDictionary<Key, Value>
     }
 }
+extension OrderedDictionary.Items: Sendable where Key: Sendable, Value: Sendable {}
 extension OrderedDictionary.Items: RandomAccessCollection {
     var startIndex: Int { self.dictionary.elements.startIndex }
     var endIndex: Int { self.dictionary.elements.endIndex }

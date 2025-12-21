@@ -1,5 +1,6 @@
 import GameEconomy
 import GameIDs
+import GameState
 import JavaScriptKit
 import JavaScriptInterop
 import VectorCharts
@@ -27,12 +28,12 @@ extension PopDetails: PersistentReportDetails {
     }
 }
 extension PopDetails {
-    mutating func update(to pop: PopContext, from snapshot: borrowing GameSnapshot) {
+    mutating func update(to pop: PopSnapshot, cache: borrowing GameUI.Cache) {
         self.state = pop.state
 
         switch self.open {
-        case .Inventory: self.inventory.update(from: pop, in: snapshot)
-        case .Ownership: self.ownership.update(from: pop, in: snapshot.context)
+        case .Inventory: self.inventory.update(from: pop, in: cache)
+        case .Ownership: self.ownership.update(from: pop, in: cache)
         }
     }
 }

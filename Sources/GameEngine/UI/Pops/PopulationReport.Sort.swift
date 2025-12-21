@@ -24,6 +24,6 @@ extension PopulationReport.Sort {
                 return comparison
             }
         }
-        return false
+        return a.id < b.id
     }
 }

@@ -1,7 +1,9 @@
 import GameIDs
+import GameState
 import GameTerrain
 import JavaScriptKit
 import JavaScriptInterop
+import OrderedCollections
 
 public struct PopulationReport {
     private var selection: PersistentSelection<Filter, InventoryBreakdown<PopDetailsTab>.Focus>
@@ -16,9 +18,9 @@ public struct PopulationReport {
         TableColumnMetadata<ColumnControl>,
         TableColumnMetadata<ColumnControl>
     )
+    private var details: PopDetails?
+    private var entries: [PopTableEntry]
     private var sort: Sort
-    private var pops: [PopTableEntry]
-    private var pop: PopDetails?
 
     init() {
         self.selection = .init(defaultFocus: .init(tab: .Inventory, needs: .l))
@@ -32,9 +34,9 @@ public struct PopulationReport {
             .init(id: 5, name: "Consciousness"),
             .init(id: 6, name: "Needs"),
         )
+        self.details = nil
+        self.entries = []
         self.sort = .init()
-        self.pops = []
-        self.pop = nil
     }
 }
 extension PopulationReport {
@@ -56,20 +58,56 @@ extension PopulationReport: PersistentReport {
             self.sort.update(column: column)
         }
     }
+}
+extension PopulationReport {
+    mutating func update(from cache: borrowing GameUI.Cache) {
+        self.selection.rebuild(
+            filtering: cache.pops.values,
+            entries: &self.entries,
+            details: &self.details,
+            default: (cache.pops.values.first?.state.tile).map(Filter.location(_:)) ?? .all
+        ) {
+            guard
+            let culture: Culture = cache.rules.pops.cultures[$0.state.race] else {
+                return nil
+            }
 
-    mutating func update(from snapshot: borrowing GameSnapshot) {
-        let country: CountryID = snapshot.player
+            let entry: PopTableEntry = .init(
+                id: $0.state.id,
+                location: $0.region.name,
+                type: $0.state.type,
+                color: culture.color,
+                nat: culture.name,
+                une: 1 - $0.stats.employmentBeforeEgress,
+                yesterday: $0.state.y,
+                today: $0.state.z,
+            )
+
+            return entry
+        } update: {
+            $0.update(to: $2, cache: cache)
+        }
+
+        self.entries.sort(by: self.sort.ascending(_:_:))
+
+        self.columns.type.updateStops(
+            columnSelected: self.columnSelected,
+            from: self.entries,
+            on: \.type.occupation.descending,
+            as: ColumnControl.type(_:)
+        )
+        self.columns.race.updateStops(
+            columnSelected: self.columnSelected,
+            from: self.entries,
+            on: \.nat,
+            as: ColumnControl.race(_:)
+        )
 
         let filterable: (
             locations: [Address: FilterLabel],
             Never?
-        ) = snapshot.pops.reduce(into: ([:], nil)) {
-            let tile: Address = $1.state.tile
-            if case country? = $1.region?.bloc {
-                {
-                    $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
-                } (&$0.locations[tile])
-            }
+        ) = cache.pops.values.reduce(into: ([:], nil)) {
+            $0.locations[$1.state.tile] = .location($1.region.name, $1.state.tile)
         }
         let filters: (
             location: [FilterLabel],
@@ -78,61 +116,7 @@ extension PopulationReport: PersistentReport {
             location: filterable.locations.values.sorted(),
             nil
         )
-
-        self.selection.rebuild(
-            filtering: snapshot.pops,
-            entries: &self.pops,
-            details: &self.pop,
-            default: filters.location.first?.id ?? .all
-        ) {
-            guard case country? = $0.region?.bloc else {
-                return nil
-            }
-            guard
-            let planet: PlanetContext = snapshot.planets[$0.state.tile.planet],
-            let tile: PlanetGrid.Tile = planet.grid.tiles[$0.state.tile.tile],
-            let culture: Culture = snapshot.rules.pops.cultures[$0.state.race] else {
-                return nil
-            }
-
-            return PopTableEntry.init(
-                id: $0.state.id,
-                location: tile.name ?? planet.state.name,
-                type: $0.state.type,
-                color: culture.color,
-                nat: culture.name,
-                une: 1 - $0.stats.employmentBeforeEgress,
-                yesterday: $0.state.y,
-                today: $0.state.z,
-                jobs: $0.state.factories.values.map {
-                    .init(
-                        name: snapshot.factories[$0.id]?.type.title ?? "Unknown",
-                        size: $0.count,
-                        hire: $0.hired,
-                        fire: $0.fired,
-                        quit: $0.quit,
-                    )
-                },
-            )
-        } update: {
-            $0.update(to: $2, from: snapshot)
-        }
-
-        self.pops.sort(by: self.sort.ascending)
-
         self.filters.0 = [.all] + filters.location
-        self.columns.type.updateStops(
-            columnSelected: self.columnSelected,
-            from: self.pops,
-            on: \.type.occupation.descending,
-            as: ColumnControl.type(_:)
-        )
-        self.columns.race.updateStops(
-            columnSelected: self.columnSelected,
-            from: self.pops,
-            on: \.nat,
-            as: ColumnControl.race(_:)
-        )
     }
 }
 extension PopulationReport {
@@ -164,8 +148,8 @@ extension PopulationReport: JavaScriptEncodable {
             self.columns.6,
         ]
 
-        js[.pops] = self.pops
-        js[.pop] = self.pop
+        js[.pops] = self.entries
+        js[.pop] = self.details
 
         js[.filter] = self.selection.filter
 

@@ -1,12 +1,13 @@
 import D
 import GameEconomy
 import GameIDs
+import GameState
 import GameUI
 import JavaScriptInterop
 import JavaScriptKit
 import VectorCharts
 
-struct InventoryBreakdown<Tab> where Tab: InventoryTab {
+struct InventoryBreakdown<Tab>: Sendable where Tab: InventoryTab {
     var focus: ResourceTierIdentifier
 
     private var tiers: [ResourceNeedMeter]
@@ -36,12 +37,8 @@ extension InventoryBreakdown {
         self.sales.reserveCapacity(outputs)
     }
 
-    mutating func update(from pop: PopContext, in snapshot: borrowing GameSnapshot) {
-        guard
-        let currency: CurrencyID = pop.region?.properties.currency.id else {
-            return
-        }
-
+    mutating func update(from pop: PopSnapshot, in cache: borrowing GameUI.Cache) {
+        let currency: CurrencyID = pop.region.currency.id
         self.tiers = [
             .init(id: .l, label: "Subsistence", value: pop.state.z.fl),
             .init(id: .e, label: "Everyday", value: pop.state.z.fe),
@@ -62,7 +59,7 @@ extension InventoryBreakdown {
             tier: self.focus,
             currency: currency,
             location: pop.state.tile,
-            snapshot: snapshot
+            cache: cache
         )
 
         self.reset(outputs: pop.state.inventory.out.count)
@@ -70,17 +67,17 @@ extension InventoryBreakdown {
             from: pop.state.inventory.out,
             currency: currency,
             location: pop.state.tile,
-            snapshot: snapshot
+            cache: cache
         )
 
         for mine: MiningJob in pop.state.mines.values {
             self.update(
                 from: mine.out,
                 mine: mine.id,
-                name: snapshot.mines[mine.id]?.type.title,
+                name: cache.mines[mine.id]?.type.title,
                 currency: currency,
                 location: pop.state.tile,
-                snapshot: snapshot
+                cache: cache
             )
         }
 
@@ -95,7 +92,7 @@ extension InventoryBreakdown {
             $0[.buildingsVacant, -, tooltip: .PopVacant, help: .PopVacantHelp] = Δ.vacant[/3]
         }
 
-        self.costs = pop.stats.cashFlow.chart(rules: snapshot.rules)
+        self.costs = pop.stats.cashFlow.chart(rules: cache.rules)
         if  let budget: Pop.Budget = pop.state.budget {
             let statement: CashAllocationStatement = .init(from: budget)
             self.budget = statement.chart()
@@ -104,11 +101,8 @@ extension InventoryBreakdown {
         }
     }
 
-    mutating func update(from factory: FactoryContext, in snapshot: borrowing GameSnapshot) {
-        guard
-        let currency: CurrencyID = factory.region?.properties.currency.id else {
-            return
-        }
+    mutating func update(from factory: FactorySnapshot, in cache: borrowing GameUI.Cache) {
+        let currency: CurrencyID = factory.region.currency.id
 
         self.tiers = [
             .init(id: .l, label: "Materials", value: factory.state.z.fl),
@@ -130,7 +124,7 @@ extension InventoryBreakdown {
             tier: self.focus,
             currency: currency,
             location: factory.state.tile,
-            snapshot: snapshot
+            cache: cache
         )
 
         self.reset(outputs: factory.state.inventory.out.count)
@@ -138,7 +132,7 @@ extension InventoryBreakdown {
             from: factory.state.inventory.out,
             currency: currency,
             location: factory.state.tile,
-            snapshot: snapshot
+            cache: cache
         )
 
         self.terms = Term.list {
@@ -161,7 +155,7 @@ extension InventoryBreakdown {
             }
         }
 
-        self.costs = factory.cashFlow.chart(rules: snapshot.rules)
+        self.costs = factory.cashFlow.chart(rules: cache.rules)
 
 
         switch factory.state.budget {
@@ -174,12 +168,8 @@ extension InventoryBreakdown {
         }
     }
 
-    mutating func update(from building: BuildingContext, in snapshot: borrowing GameSnapshot) {
-        guard
-        let currency: CurrencyID = building.region?.properties.currency.id else {
-            return
-        }
-
+    mutating func update(from building: BuildingSnapshot, in cache: borrowing GameUI.Cache) {
+        let currency: CurrencyID = building.region.currency.id
         self.tiers = [
             .init(id: .l, label: "Operations", value: building.state.z.fl),
             .init(id: .e, label: "Maintenance", value: building.state.z.fe),
@@ -200,7 +190,7 @@ extension InventoryBreakdown {
             tier: self.focus,
             currency: currency,
             location: building.state.tile,
-            snapshot: snapshot
+            cache: cache
         )
 
         self.reset(outputs: building.state.inventory.out.count)
@@ -208,7 +198,7 @@ extension InventoryBreakdown {
             from: building.state.inventory.out,
             currency: currency,
             location: building.state.tile,
-            snapshot: snapshot
+            cache: cache
         )
 
         self.terms = Term.list {
@@ -217,7 +207,7 @@ extension InventoryBreakdown {
             $0[.buildingsVacant, -, tooltip: .BuildingVacant, help: .BuildingVacantHelp] = Δ.vacant[/3]
         }
 
-        self.costs = building.stats.cashFlow.chart(rules: snapshot.rules)
+        self.costs = building.stats.cashFlow.chart(rules: cache.rules)
         self.budget = building.state.budget.map {
             let statement: CashAllocationStatement = .init(from: $0)
             return statement.chart()
@@ -230,13 +220,13 @@ extension InventoryBreakdown {
         tier: ResourceTierIdentifier,
         currency: CurrencyID,
         location: Address,
-        snapshot: borrowing GameSnapshot,
+        cache: borrowing GameUI.Cache,
     ) {
         for (id, input): (Resource, ResourceInput) in inputs.tradeable {
-            let market: WorldMarket.State? = snapshot.markets.tradeable[id / currency]?.state
+            let market: WorldMarket.State? = cache.markets.tradeable[id / currency]?.state
             self.needs.append(
                 ResourceNeed.init(
-                    label: snapshot.rules.resources[id].label,
+                    label: cache.rules.resources[id].label,
                     tier: tier,
                     stockpile: input.units.total,
                     filled: input.unitsConsumed,
@@ -246,10 +236,10 @@ extension InventoryBreakdown {
             )
         }
         for (id, input): (Resource, ResourceInput) in inputs.segmented {
-            let market: LocalMarket? = snapshot.markets.segmented[id / location]
+            let market: LocalMarket? = cache.markets.segmented[id / location]
             self.needs.append(
                 ResourceNeed.init(
-                    label: snapshot.rules.resources[id].label,
+                    label: cache.rules.resources[id].label,
                     tier: tier,
                     stockpile: input.units.total,
                     filled: input.units.added,
@@ -266,13 +256,13 @@ extension InventoryBreakdown {
         name: String? = nil,
         currency: CurrencyID,
         location: Address,
-        snapshot: borrowing GameSnapshot,
+        cache: borrowing GameUI.Cache,
     ) {
         for (id, output): (Resource, ResourceOutput) in outputs.tradeable {
-            let market: WorldMarket.State? = snapshot.markets.tradeable[id / currency]?.state
+            let market: WorldMarket.State? = cache.markets.tradeable[id / currency]?.state
             self.sales.append(
                 ResourceSale.init(
-                    label: snapshot.rules.resources[output.id].label,
+                    label: cache.rules.resources[output.id].label,
                     mine: mine,
                     name: name,
                     unitsSold: output.unitsSold,
@@ -281,10 +271,10 @@ extension InventoryBreakdown {
             )
         }
         for (id, output): (Resource, ResourceOutput) in outputs.segmented {
-            let market: LocalMarket? = snapshot.markets.segmented[id / location]
+            let market: LocalMarket? = cache.markets.segmented[id / location]
             self.sales.append(
                 ResourceSale.init(
-                    label: snapshot.rules.resources[output.id].label,
+                    label: cache.rules.resources[output.id].label,
                     mine: mine,
                     name: name,
                     unitsSold: output.unitsSold,

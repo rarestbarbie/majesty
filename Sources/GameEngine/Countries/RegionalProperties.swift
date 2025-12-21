@@ -2,11 +2,13 @@ import GameIDs
 
 struct RegionalProperties {
     let id: Address
+    let name: String
     let pops: PopulationStats
     private let country: CountryProperties
 
-    init(id: Address, pops: PopulationStats, country: CountryProperties) {
+    init(id: Address, name: String, pops: PopulationStats, country: CountryProperties) {
         self.id = id
+        self.name = name
         self.pops = pops
         self.country = country
     }

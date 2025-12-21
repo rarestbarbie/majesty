@@ -68,9 +68,11 @@ export class InfrastructureOverview extends ScreenContent {
         );
     }
 
-    public override attach(root: HTMLElement | null, parameters: URLSearchParams): void {
+    public override async attach(
+        root: HTMLElement | null, parameters: URLSearchParams
+    ): Promise<void> {
         const building: string | null = parameters.get('id');
-        const state: InfrastructureReport = Swift.openInfrastructure(
+        const state: InfrastructureReport = await Swift.openInfrastructure(
             {
                 subject: building ? parseInt(building) as GameID ?? undefined : undefined,
                 details: parameters.get('details') as BuildingDetailsTab ?? undefined,

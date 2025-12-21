@@ -1,5 +1,5 @@
 import { Color, GameID } from '../../GameEngine/exports.js';
-import { PopJobDescription, PopType } from '../exports.js';
+import { PopType } from '../exports.js';
 
 export interface PopTableEntry {
     readonly id: GameID;
@@ -24,6 +24,4 @@ export interface PopTableEntry {
     readonly t_fe: number;
     readonly t_fx: number;
     readonly t_px: number;
-
-    readonly jobs: PopJobDescription[];
 }

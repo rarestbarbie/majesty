@@ -1,7 +1,7 @@
 import Vector
 
 extension Vector2 {
-    @frozen @usableFromInline struct ArcGeometry {
+    @frozen @usableFromInline struct ArcGeometry: Sendable {
         @usableFromInline let share: Double
         @usableFromInline let startArc: Vector2
         @usableFromInline let endArc: Vector2

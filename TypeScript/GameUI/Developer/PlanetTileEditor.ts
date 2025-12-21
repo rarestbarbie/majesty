@@ -68,8 +68,8 @@ export class PlanetTileEditor {
         this.node.style.display = 'none';
     }
 
-    public update(): void {
-        const state: PlanetTileEditorState | null = Swift.editTerrain();
+    public async update(): Promise<void> {
+        const state: PlanetTileEditorState | null = await Swift.editTerrain();
 
         if (state) {
             this.show();

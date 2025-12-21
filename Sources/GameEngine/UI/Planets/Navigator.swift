@@ -1,12 +1,13 @@
 import GameIDs
+import GameState
 import HexGrids
 import JavaScriptInterop
 import JavaScriptKit
 
-public struct Navigator {
+public struct Navigator: Sendable {
     private var cursor: [PlanetID: HexCoordinate]
 
-    private var minimap: Minimap?
+    private(set) var minimap: Minimap?
     private var tile: NavigatorTile?
 
     init() {
@@ -33,9 +34,9 @@ extension Navigator {
         }
     }
 
-    mutating func update(in context: GameContext) {
-        self.minimap?.update(in: context)
-        self.tile?.update(in: context)
+    mutating func update(in cache: borrowing GameUI.Cache) {
+        self.minimap?.update(in: cache)
+        self.tile?.update(in: cache)
     }
 }
 extension Navigator: JavaScriptEncodable {

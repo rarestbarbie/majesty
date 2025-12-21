@@ -12,8 +12,8 @@ extension PopulationReport.Filter: CustomStringConvertible {}
 extension PopulationReport.Filter: LosslessStringConvertible {}
 extension PopulationReport.Filter: ConvertibleToJSString, LoadableFromJSString {}
 extension PopulationReport.Filter: PersistentSelectionFilter {
-    typealias Subject = PopContext
-    static func ~= (self: Self, value: PopContext) -> Bool {
+    typealias Subject = PopSnapshot
+    static func ~= (self: Self, value: PopSnapshot) -> Bool {
         switch self {
         case .all: true
         case .location(let location): location == value.state.tile

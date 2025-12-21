@@ -1,6 +1,5 @@
 extension GameAPI {
     enum Symbol: String {
-        case start
         case save
         /// Load the game state from a file.
         case load
@@ -34,8 +33,6 @@ extension GameAPI {
         case minimap
         /// Open a celestial view and return its initial state.
         case view
-
-        case `switch`
 
         case contextMenu
         case tooltip

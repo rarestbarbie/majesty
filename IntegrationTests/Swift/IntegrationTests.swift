@@ -1,4 +1,4 @@
-import GameEngine
+@_spi(testable) import GameEngine
 import GameIDs
 import JavaScriptInterop
 import JavaScriptKit
@@ -73,8 +73,8 @@ extension IntegrationTestFile: JavaScriptDecodable {
 }
 extension IntegrationTests {
     static func HashRules() throws {
-        let s1: GameSession = try .reload()
-        let s2: GameSession = try .reload()
+        let s1: GameSession.State = try .reload()
+        let s2: GameSession.State = try .reload()
 
         print("GameSession 1 rules hash: \(s1.rules.hash)")
         print("GameSession 2 rules hash: \(s2.rules.hash)")
@@ -86,8 +86,8 @@ extension IntegrationTests {
         }
     }
     static func HashGameState(target: GameDate) throws -> GameSave {
-        var s1: GameSession = try .reload()
-        var s2: GameSession = try .reload()
+        var s1: GameSession.State = try .reload()
+        var s2: GameSession.State = try .reload()
 
         let started: SuspendingClock.Instant = .now
 

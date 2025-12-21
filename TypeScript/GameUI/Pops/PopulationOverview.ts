@@ -69,9 +69,11 @@ export class PopulationOverview extends ScreenContent {
         );
     }
 
-    public override attach(root: HTMLElement | null, parameters: URLSearchParams): void {
+    public override async attach(
+        root: HTMLElement | null, parameters: URLSearchParams
+    ): Promise<void> {
         let subject: string | null = parameters.get('id');
-        let state: PopulationReport = Swift.openPopulation(
+        let state: PopulationReport = await Swift.openPopulation(
             {
                 subject: subject ? parseInt(subject) as GameID : undefined,
                 details: parameters.get('details') as PopDetailsTab ?? undefined,

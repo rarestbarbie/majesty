@@ -1,5 +1,6 @@
 import GameEconomy
 import GameIDs
+import GameState
 import GameTerrain
 import JavaScriptKit
 import JavaScriptInterop
@@ -11,15 +12,15 @@ public struct InfrastructureReport {
     >
 
     private var filters: ([FilterLabel], [Never])
-    private var buildings: [BuildingTableEntry]
-    private var building: BuildingDetails?
+    private var entries: [BuildingTableEntry]
+    private var details: BuildingDetails?
 
     init() {
         self.selection = .init(defaultFocus: .init(tab: .Inventory, needs: .l))
 
         self.filters = ([], [])
-        self.buildings = []
-        self.building = nil
+        self.entries = []
+        self.details = nil
     }
 }
 extension InfrastructureReport: PersistentReport {
@@ -28,20 +29,38 @@ extension InfrastructureReport: PersistentReport {
         self.selection.tab = request.details
         self.selection.needs = request.detailsTier
     }
+}
+extension InfrastructureReport {
+    private var sort: Sort {
+        .init()
+    }
 
-    mutating func update(from snapshot: borrowing GameSnapshot) {
-        let country: CountryID = snapshot.player
+    mutating func update(from cache: borrowing GameUI.Cache) {
+        self.selection.rebuild(
+            filtering: cache.buildings.values,
+            entries: &self.entries,
+            details: &self.details,
+            default: (cache.buildings.values.first?.state.tile).map(Filter.location(_:)) ?? .all
+        ) {
+            let entry: BuildingTableEntry = .init(
+                id: $0.state.id,
+                location: $0.region.name,
+                type: $0.type.title,
+                state: $0.state,
+            )
+
+            return entry
+        } update: {
+            $0.update(to: $2, cache: cache)
+        }
+
+        self.entries.sort(by: self.sort.ascending(_:_:))
 
         let filterable: (
             locations: [Address: FilterLabel],
             Never?
-        ) = snapshot.buildings.reduce(into: ([:], nil)) {
-            let tile: Address = $1.state.tile
-            if case country? = $1.region?.bloc {
-                {
-                    $0 = $0 ?? snapshot.planets[tile].map { .location($0.name ?? "?", tile) }
-                } (&$0.locations[tile])
-            }
+        ) = cache.buildings.values.reduce(into: ([:], nil)) {
+            $0.locations[$1.state.tile] = .location($1.region.name, $1.state.tile)
         }
         let filters: (
             location: [FilterLabel],
@@ -50,31 +69,6 @@ extension InfrastructureReport: PersistentReport {
             location: filterable.locations.values.sorted(),
             nil
         )
-
-        self.selection.rebuild(
-            filtering: snapshot.buildings,
-            entries: &self.buildings,
-            details: &self.building,
-            default: filters.location.first?.id ?? .all
-        ) {
-            guard case country? = $0.region?.bloc else {
-                return nil
-            }
-            guard
-            let planet: PlanetContext = snapshot.planets[$0.state.tile.planet],
-            let tile: PlanetGrid.Tile = planet.grid.tiles[$0.state.tile.tile] else {
-                return nil
-            }
-
-            return .init(
-                id: $0.state.id,
-                location: tile.name ?? planet.state.name,
-                type: $0.type.title,
-                state: $0.state,
-            )
-        } update: {
-            $0.update(to: $2, from: snapshot) ;
-        }
 
         self.filters.0 = [.all] + filters.location
     }
@@ -93,8 +87,8 @@ extension InfrastructureReport {
 extension InfrastructureReport: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.type] = GameUI.ScreenType.Infrastructure
-        js[.buildings] = self.buildings
-        js[.building] = self.building
+        js[.buildings] = self.entries
+        js[.building] = self.details
 
         js[.filter] = self.selection.filter
 

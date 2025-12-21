@@ -1,7 +1,8 @@
 import JavaScriptKit
 import JavaScriptInterop
 
-struct TableColumnMetadata<Stop>: Identifiable where Stop: ConvertibleToJSValue {
+struct TableColumnMetadata<Stop>: Identifiable, Sendable
+    where Stop: ConvertibleToJSValue & Sendable {
     let id: Int32
     let name: String
     var next: Stop?

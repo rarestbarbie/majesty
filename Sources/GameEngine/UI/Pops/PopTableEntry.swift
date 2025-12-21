@@ -14,7 +14,6 @@ struct PopTableEntry {
     let une: Double
     let yesterday: Pop.Dimensions
     let today: Pop.Dimensions
-    let jobs: [PopJobDescription]
 }
 extension PopTableEntry: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
@@ -41,8 +40,6 @@ extension PopTableEntry: JavaScriptEncodable {
         case today_fe = "t_fe"
         case today_fx = "t_fx"
         case today_px = "t_px"
-
-        case jobs
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
@@ -69,7 +66,5 @@ extension PopTableEntry: JavaScriptEncodable {
         js[.today_fe] = self.today.fe
         js[.today_fx] = self.today.fx
         js[.today_px] = self.today.px
-
-        js[.jobs] = self.jobs
     }
 }

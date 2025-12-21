@@ -43,8 +43,10 @@ export class TradeOverview extends ScreenContent {
         this.markets.table('Markets', MarketTableRow.columns);
     }
 
-    public override attach(root: HTMLElement | null, parameters: URLSearchParams): void {
-        let state: TradeReport = Swift.openTrade(
+    public override async attach(
+        root: HTMLElement | null, parameters: URLSearchParams
+    ): Promise<void> {
+        let state: TradeReport = await Swift.openTrade(
             {
                 subject: parameters.get('id') ?? undefined,
                 filter: parameters.get('filter') ?? undefined,

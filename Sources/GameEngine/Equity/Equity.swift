@@ -27,6 +27,7 @@ struct Equity<Owner> where Owner: Hashable & ConvertibleToJSValue & LoadableFrom
         self.issued = issued
     }
 }
+extension Equity: Sendable where Owner: Sendable {}
 extension Equity: ExpressibleByDictionaryLiteral {
     init(dictionaryLiteral: (Never, Never)...) { self.init(shares: [:]) }
 }

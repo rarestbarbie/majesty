@@ -56,8 +56,7 @@ async function main(user: Firebase.User): Promise<void> {
         return;
     }
 
-    window.swift = new Swift();
-    const application: Application = new Application(persistence, await sprites);
+    window.swift = new Swift(new Application(persistence, await sprites));
 
     // Parse path components to determine the current page
     const path: string[] = window.location.pathname.split('/').filter(Boolean);
@@ -68,13 +67,11 @@ async function main(user: Firebase.User): Promise<void> {
         const mp: Socket<any, any> = io('http://localhost:3000');
 
         await init();
+        await window.swift.ready;
 
-        let ui: GameUI | null = Swift.load(await start, await rules, terrain);
-        if (ui !== null) {
-            application.update(ui);
-            application.view(0, 10 as GameID);
-            application.navigate();
-            application.resize();
+        const status: boolean = await Swift.load(await start, await rules, terrain);
+        if (status) {
+            window.swift.loaded();
         } else {
             console.error("Failed to load game");
             return;
@@ -99,9 +96,7 @@ async function main(user: Firebase.User): Promise<void> {
             button.addEventListener('click', () => {
                 dialog.close();
                 dialog.remove();
-                setInterval(() => { Application.move({ id: PlayerEventID.Tick }); }, 100);
-
-                Swift.start(application);
+                window.swift.start();
             });
         });
         mp.on('admit', (admitted: boolean) => {
@@ -126,20 +121,15 @@ async function main(user: Firebase.User): Promise<void> {
         console.log(`Running in Single Player Mode`);
 
         await init();
+        await window.swift.ready;
 
         console.log(`Launching Game Engine (WebAssembly must be initialized before this!)`);
 
         // Load the game state from the server.
-        let ui: GameUI | null = Swift.load(await start, await rules, terrain);
-        if (ui !== null) {
-            application.update(ui);
-            application.view(0, 10 as GameID);
-            application.navigate();
-            application.resize();
-
-            setInterval(() => { Application.move({ id: PlayerEventID.Tick }); }, 100);
-
-            Swift.start(application);
+        const status: boolean = await Swift.load(await start, await rules, terrain);
+        if (status) {
+            window.swift.loaded();
+            window.swift.start();
         } else {
             console.error("Failed to load game");
             return;

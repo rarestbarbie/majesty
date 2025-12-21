@@ -1,3 +1,3 @@
-final class _NoMetadata {
+final class _NoMetadata: Sendable {
     init() {}
 }

@@ -4,13 +4,13 @@ export class ScreenContent {
     constructor() {
     }
 
-    public attach(root: HTMLElement | null, parameters: URLSearchParams): void {
+    public async attach(root: HTMLElement | null, parameters: URLSearchParams): Promise<void> {
     }
 
     public detach(): void {
     }
 
-    public close(): void {
-        Swift.closeScreen();
+    public async close(): Promise<void> {
+        await Swift.closeScreen();
     }
 }

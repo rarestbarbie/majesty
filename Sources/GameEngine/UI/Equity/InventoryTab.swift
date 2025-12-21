@@ -1,5 +1,5 @@
 import JavaScriptKit
 
-protocol InventoryTab: ConvertibleToJSValue {
+protocol InventoryTab: ConvertibleToJSValue, Sendable {
     static var Inventory: Self { get }
 }

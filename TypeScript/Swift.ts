@@ -26,37 +26,92 @@ import {
     TooltipType,
     GameUI,
 } from './GameUI/exports.js';
-import { PlayerEvent } from './Multiplayer/exports.js';
+import { PlayerEvent, PlayerEventID } from './Multiplayer/exports.js';
 
 export class Swift {
+    private readonly application: Application
+    private master: boolean;
+
+    // these are used by the WebAssembly to signal when API methods are ready
+    readonly success: (value: void | PromiseLike<void>) => void;
+    readonly failure: (reason?: any) => void;
+
+    public readonly ready: Promise<void>;
+
+    constructor(application: Application) {
+        this.application = application;
+        this.master = false;
+
+        let success: (value: void | PromiseLike<void>) => void;
+        let failure: (reason?: any) => void;
+
+        this.ready = new Promise<void>((resolve, reject) => {
+            success = resolve;
+            failure = reject;
+        });
+
+        this.success = success!;
+        this.failure = failure!;
+    }
+
+    public loaded(): void {
+        this.application.view(0, 10 as GameID);
+        this.application.navigate();
+        this.application.resize();
+    }
+
+    public start(): void {
+        this.master = true;
+        Application.move({ id: PlayerEventID.Tick });
+    }
+
+    public tick(): void {
+        if (!this.master) {
+            return;
+        }
+
+        Application.move({ id: PlayerEventID.Tick });
+    }
+
+    public draw(ui: GameUI): void {
+        this.application.update(ui);
+    }
+
     // Will be added by Swift WebAssembly
-    declare public static start: (ui: Application) => void;
     declare public static load: (
         state: Object,
         rules: Object,
         terrain: Object[]
-    ) => GameUI | null;
+    ) => Promise<boolean>;
     declare public static call: (action: string, _: any[]) => void;
     declare public static push: (event: PlayerEvent, i: bigint) => void;
 
     declare public static orbit: (id: GameID) => Float32Array | null;
     declare public static gregorian: (date: GameDate) => GameDateComponents;
 
-    declare public static openPlanet: (request: PlanetReportRequest) => PlanetReport;
-    declare public static openInfrastructure: (request: InfrastructureReportRequest) => InfrastructureReport;
-    declare public static openProduction: (request: ProductionReportRequest) => ProductionReport;
-    declare public static openPopulation: (request: PopulationReportRequest) => PopulationReport;
-    declare public static openTrade: (request: TradeReportRequest) => TradeReport;
-    declare public static closeScreen: () => void;
-
-    declare public static switch: (planet: GameID) => GameUI;
+    declare public static openPlanet: (
+        request: PlanetReportRequest
+    ) => Promise<PlanetReport | null>;
+    declare public static openInfrastructure: (
+        request: InfrastructureReportRequest
+    ) => Promise<InfrastructureReport>;
+    declare public static openProduction: (
+        request: ProductionReportRequest
+    ) => Promise<ProductionReport>;
+    declare public static openPopulation: (
+        request: PopulationReportRequest
+    ) => Promise<PopulationReport>;
+    declare public static openTrade: (
+        request: TradeReportRequest
+    ) => Promise<TradeReport>;
+    declare public static closeScreen: () => Promise<void>;
 
     declare public static minimap: (
         planet: GameID,
         layer: MinimapLayer | null,
         cell: string | null
-    ) => NavigatorState;
-    declare public static view: (index: number, system: GameID) => CelestialViewState;
+    ) => Promise<NavigatorState>;
+    declare public static view: (index: number, system: GameID) => Promise<CelestialViewState>;
 
     declare public static tooltip: (
         type: TooltipType,
@@ -65,7 +120,7 @@ export class Swift {
 
     declare public static contextMenu: (type: ContextMenuType, argumentList: any[]) => ContextMenuState;
 
-    declare public static editTerrain: () => PlanetTileEditorState | null;
+    declare public static editTerrain: () => Promise<PlanetTileEditorState | null>;
     declare public static loadTerrain: (from: PlanetTileEditorState) => void;
     declare public static saveTerrain: () => any[] | null;
 }

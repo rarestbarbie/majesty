@@ -1,7 +1,7 @@
 import GameIDs
 import OrderedCollections
 
-@frozen public struct GameMetadata {
+@frozen public struct GameMetadata: Sendable {
     public let settings: Settings
     public let legend: Legend
 

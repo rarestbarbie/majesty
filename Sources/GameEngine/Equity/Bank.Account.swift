@@ -5,7 +5,7 @@ import JavaScriptInterop
 import JavaScriptKit
 
 extension Bank {
-    struct Account: Equatable {
+    struct Account: Equatable, Sendable {
         var settled: Int64
 
         /// Spending, excluding equity purchases. Negative if funds are spent.

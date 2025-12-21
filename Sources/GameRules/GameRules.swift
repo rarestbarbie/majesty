@@ -1,7 +1,7 @@
 import GameEconomy
 import JavaScriptInterop
 
-public struct GameRules {
+public struct GameRules: Sendable {
     let legend: Legend.Description
     let pops: [PopAttributesDescription]
 

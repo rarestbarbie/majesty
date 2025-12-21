@@ -46,11 +46,12 @@ extension LocalPrice {
     @inline(__always) @inlinable static var high: Int64 { 9999 }
     @inline(__always) @inlinable static var low: Int64 { 1000 }
 
-    consuming func scaled(by factor: Double, rounding mode: FloatingPointRoundingRule) -> Self {
-        self.value.units = Int64.init(
-            (Double.init(self.value.units) * factor).rounded(mode)
+    /* consuming */ func scaled(by factor: Double, rounding mode: FloatingPointRoundingRule) -> Self {
+        var scaled = self
+        scaled.value.units = Int64.init(
+            (Double.init(scaled.value.units) * factor).rounded(mode)
         )
-        return self
+        return scaled
     }
 
     consuming func tickedUp(rate: TickRate) -> Self {

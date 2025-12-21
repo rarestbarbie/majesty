@@ -27,6 +27,15 @@ struct PlanetContext: RuntimeContext {
     }
 }
 extension PlanetContext {
+    var snapshot: PlanetSnapshot {
+        .init(
+            state: self.state,
+            motion: (self.motion.global, self.motion.local),
+            position: (self.position.global, self.position.local),
+            grid: .init(radius: self.grid.size)
+        )
+    }
+
     subscript(tile: Int) -> PlanetGrid.Tile {
         _read   { yield  self.grid.tiles.values[tile] }
         _modify { yield &self.grid.tiles.values[tile] }

@@ -9,6 +9,7 @@ import JavaScriptInterop
     public var bought: Int64
     public var sold: Int64
 }
+extension EquityStake: Sendable where ID: Sendable {}
 extension EquityStake {
     init(id: ID) {
         self.init(id: id, shares: 0, bought: 0, sold: 0)

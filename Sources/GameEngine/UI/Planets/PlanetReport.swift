@@ -3,7 +3,7 @@ import GameState
 import JavaScriptKit
 import JavaScriptInterop
 
-public struct PlanetReport {
+public struct PlanetReport: Sendable {
     private var planet: PlanetDetails?
 
     init() {
@@ -20,8 +20,8 @@ extension PlanetReport: PersistentReport {
         }
     }
 
-    mutating func update(from snapshot: borrowing GameSnapshot) {
-        self.planet?.update(in: snapshot.context)
+    mutating func update(from snapshot: borrowing GameUI.Cache) {
+        self.planet?.update(in: snapshot)
     }
 }
 extension PlanetReport {
