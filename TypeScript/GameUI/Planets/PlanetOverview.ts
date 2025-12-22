@@ -21,7 +21,7 @@ export class PlanetOverview extends ScreenContent {
         this.grid = new HexGrid();
     }
 
-    public override async attach(root: HTMLElement | null, parameters: URLSearchParams): Promise<void> {
+    public override async open(parameters: URLSearchParams): Promise<void> {
         const idString: string | null = parameters.get('id');
         if (!idString) {
             console.error("PlanetOverview: No planet ID found in URL parameters.");
@@ -29,16 +29,12 @@ export class PlanetOverview extends ScreenContent {
         }
         const id: GameID = parseInt(idString) as GameID;
 
-        if (!this.dom) {
+        if (this.dom === undefined) {
             this.dom = {
                 panel: document.createElement('div'),
             };
             this.dom.panel.classList.add('planet-overview');
             this.dom.panel.appendChild(this.grid.node);
-        }
-
-        if (root) {
-            root.appendChild(this.dom.panel);
         }
 
         const state: PlanetReport | null = await Swift.openPlanet({ subject: id });
@@ -50,16 +46,20 @@ export class PlanetOverview extends ScreenContent {
         this.update(state);
     }
 
-    public override detach(): void {
-        if (!this.dom) {
-            return;
+    public override attach(root: HTMLElement): void {
+        if (this.dom !== undefined) {
+            root.appendChild(this.dom.panel);
         }
-        this.dom.panel.remove();
-        this.dom = undefined;
+    }
+    public override detach(): void {
+        if (this.dom !== undefined) {
+            this.dom.panel.remove();
+            this.dom = undefined;
+        }
     }
 
     public update(state: PlanetReport): void {
-        if (!this.dom) {
+        if (this.dom === undefined) {
             return;
         }
 

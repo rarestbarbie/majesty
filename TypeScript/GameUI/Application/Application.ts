@@ -218,7 +218,10 @@ export class Application {
         this.clock.update(state);
         this.tile.update(state.navigator?.tile);
         this.minimap.update(state.navigator);
-        this.screen.update(state.screen);
+
+        if (state.screen !== undefined) {
+            this.screen.update(state.screen);
+        }
 
         for (const i of [0, 1]) {
             const view: CelestialViewState | null = state.views[i];

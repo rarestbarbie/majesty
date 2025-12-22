@@ -43,9 +43,7 @@ export class TradeOverview extends ScreenContent {
         this.markets.table('Markets', MarketTableRow.columns);
     }
 
-    public override async attach(
-        root: HTMLElement | null, parameters: URLSearchParams
-    ): Promise<void> {
+    public override async open(parameters: URLSearchParams): Promise<void> {
         let state: TradeReport = await Swift.openTrade(
             {
                 subject: parameters.get('id') ?? undefined,
@@ -53,7 +51,7 @@ export class TradeOverview extends ScreenContent {
             }
         );
 
-        if (!this.dom) {
+        if (this.dom === undefined) {
             this.dom = {
                 index: new FilterTabs(this.filters),
                 panel: document.createElement('div'),
@@ -68,28 +66,28 @@ export class TradeOverview extends ScreenContent {
             this.dom.panel.classList.add('panel');
         }
 
-        if (root) {
-            root.appendChild(this.dom.index.node);
-            root.appendChild(this.dom.panel);
-        }
-
         this.dom.index.tabs[state.filterlist ?? 0].checked = true;
         this.update(state);
     }
 
+    public override attach(root: HTMLElement): void {
+        if (this.dom !== undefined) {
+            root.appendChild(this.dom.index.node);
+            root.appendChild(this.dom.panel);
+        }
+    }
     public override detach(): void {
-        if (!this.dom) {
+        if (this.dom !== undefined) {
+            this.dom.index.node.remove();
+            this.dom.panel.remove();
+            this.dom = undefined;
+        } else {
             throw new Error('TradeOverview not attached');
         }
-
-        //this.dom.controller.abort();
-        this.dom.index.node.remove();
-        this.dom.panel.remove();
-        this.dom = undefined;
     }
 
     public update(state: TradeReport): void {
-        if (!this.dom || state.markets.length == 0) {
+        if (this.dom === undefined || state.markets.length == 0) {
             return;
         }
 
