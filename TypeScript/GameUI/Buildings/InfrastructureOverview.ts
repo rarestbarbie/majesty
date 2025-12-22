@@ -16,8 +16,6 @@ import {
     MarketFilter,
     OwnershipBreakdown,
     InfrastructureReport,
-    ResourceNeed,
-    ResourceNeedRow,
     ResourceSale,
     ResourceSaleBox,
     ScreenType,
@@ -68,9 +66,7 @@ export class InfrastructureOverview extends ScreenContent {
         );
     }
 
-    public override async attach(
-        root: HTMLElement | null, parameters: URLSearchParams
-    ): Promise<void> {
+    public override async open(parameters: URLSearchParams): Promise<void> {
         const building: string | null = parameters.get('id');
         const state: InfrastructureReport = await Swift.openInfrastructure(
             {
@@ -84,7 +80,7 @@ export class InfrastructureOverview extends ScreenContent {
         this.sales.clear();
         this.sales.node.classList.add('sales');
 
-        if (!this.dom) {
+        if (this.dom === undefined) {
             this.dom = {
                 index: new FilterTabs(this.filters),
                 panel: document.createElement('div'),
@@ -141,27 +137,28 @@ export class InfrastructureOverview extends ScreenContent {
             break;
         }
 
-        if (root) {
-            root.appendChild(this.dom.index.node);
-            root.appendChild(this.dom.panel);
-        }
-
         this.dom.index.tabs[state.filterlist ?? 0].checked = true;
         this.update(state);
     }
 
+    public override attach(root: HTMLElement): void {
+        if (this.dom !== undefined) {
+            root.appendChild(this.dom.index.node);
+            root.appendChild(this.dom.panel);
+        }
+    }
     public override detach(): void {
-        if (!this.dom) {
+        if (this.dom !== undefined) {
+            this.dom.index.node.remove();
+            this.dom.panel.remove();
+            this.dom = undefined;
+        } else {
             throw new Error('InfrastructureOverview not attached');
         }
-
-        this.dom.index.node.remove();
-        this.dom.panel.remove();
-        this.dom = undefined;
     }
 
     public update(state: InfrastructureReport): void {
-        if (!this.dom) {
+        if (this.dom === undefined) {
             return;
         }
 

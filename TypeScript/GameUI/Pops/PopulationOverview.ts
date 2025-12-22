@@ -69,9 +69,7 @@ export class PopulationOverview extends ScreenContent {
         );
     }
 
-    public override async attach(
-        root: HTMLElement | null, parameters: URLSearchParams
-    ): Promise<void> {
+    public override async open(parameters: URLSearchParams): Promise<void> {
         let subject: string | null = parameters.get('id');
         let state: PopulationReport = await Swift.openPopulation(
             {
@@ -83,24 +81,30 @@ export class PopulationOverview extends ScreenContent {
             }
         );
 
-        this.switch(state, root);
+        this.switch(state);
     }
 
+    public override attach(root: HTMLElement): void {
+        if (this.dom !== undefined) {
+            root.appendChild(this.dom.index.node);
+            root.appendChild(this.dom.panel);
+        }
+    }
     public override detach(): void {
-        if (!this.dom) {
+        if (this.dom !== undefined) {
+            this.dom.index.node.remove();
+            this.dom.panel.remove();
+            this.dom = undefined;
+        } else {
             throw new Error('PopulationOverview not attached');
         }
-
-        this.dom.index.node.remove();
-        this.dom.panel.remove();
-        this.dom = undefined;
     }
 
-    public switch(state: PopulationReport, root: HTMLElement | null = null): void {
+    private switch(state: PopulationReport): void {
         this.sales.clear();
         this.sales.node.classList.add('sales');
 
-        if (!this.dom) {
+        if (this.dom === undefined) {
             this.dom = {
                 index: new FilterTabs(this.filters),
                 panel: document.createElement('div'),
@@ -159,17 +163,12 @@ export class PopulationOverview extends ScreenContent {
             break;
         }
 
-        if (root) {
-            root.appendChild(this.dom.index.node);
-            root.appendChild(this.dom.panel);
-        }
-
         this.dom.index.tabs[state.filterlist ?? 0].checked = true;
         this.update(state);
     }
 
     public update(state: PopulationReport): void {
-        if (!this.dom) {
+        if (this.dom === undefined) {
             return;
         }
 

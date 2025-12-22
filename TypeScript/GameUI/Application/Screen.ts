@@ -1,6 +1,7 @@
 import {
     InfrastructureOverview,
     PersistentReport,
+    PersistentOverviewType,
     PlanetOverview,
     PopulationOverview,
     ProductionOverview,
@@ -96,19 +97,13 @@ export class Screen {
     }
 
     public async open(screen: ScreenType, parameters: URLSearchParams): Promise<void> {
-        if (!this.dom) {
+        if (this.dom === undefined) {
             return;
         }
 
         if (this.state?.type === screen) {
-            await this.state.content.attach(null, parameters);
+            await this.state.content.open(parameters);
         } else {
-            this.state?.content.close();
-            this.state?.content.detach();
-
-            this.dom.element.setAttribute('data-screen', screen);
-            this.dom.heading.textContent = screen;
-
             let uninitialized: ScreenContent;
             let layout: ScreenLayout;
 
@@ -144,47 +139,62 @@ export class Screen {
                 break;
             }
 
+            await this.state?.content.close();
+
+            this.state?.content.detach();
+            this.state = undefined;
+
+            await uninitialized.open(parameters);
+
             this.dom.content.setAttribute('data-screen-layout', layout);
+            this.dom.element.setAttribute('data-screen', screen);
+            this.dom.heading.textContent = screen;
 
             this.state = { content: uninitialized, type: screen };
-            await this.state.content.attach(this.dom.content, parameters);
+            this.state.content.attach(this.dom.content);
         }
     }
 
-    public update(state: PersistentReport | undefined): void {
-        if (!this.state?.content) {
-            if (state) {
-                throw new Error(`Unexpected update of type '${state.type}'!`);
-            }
-        } else if (this.state.content instanceof InfrastructureOverview) {
-            if (state?.type !== ScreenType.Infrastructure) {
-                throw new Error(
-                    `Unexpected update of type '${state?.type}', expected 'Infrastructure'!`
-                );
-            }
-            this.state.content.update(state);
-        } else if (this.state.content instanceof ProductionOverview) {
-            if (state?.type !== ScreenType.Production) {
-                throw new Error(
-                    `Unexpected update of type '${state?.type}', expected 'Production'!`
-                );
-            }
-            this.state.content.update(state);
-        } else if (this.state.content instanceof PopulationOverview) {
-            if (state?.type !== ScreenType.Population) {
-                throw new Error(
-                    `Unexpected update of type '${state?.type}', expected 'Population'!`
-                );
-            }
-            this.state.content.update(state);
-        } else if (this.state.content instanceof TradeOverview) {
-            if (state?.type !== ScreenType.Trade) {
-                throw new Error(
-                    `Unexpected update of type '${state?.type}', expected 'Trade'!`
-                );
-            }
-            this.state.content.update(state);
+    public update(state: PersistentReport): void {
+        if (this.state === undefined) {
+            console.warn(`Unexpected update of type '${state.type}'!`);
+            return;
         }
+
+        switch (state.type) {
+        case ScreenType.Infrastructure:
+            if (this.state.content instanceof InfrastructureOverview) {
+                this.state.content.update(state);
+                return;
+            } else {
+                break;
+            }
+        case ScreenType.Production:
+            if (this.state.content instanceof ProductionOverview) {
+                this.state.content.update(state);
+                return;
+            } else {
+                break;
+            }
+        case ScreenType.Population:
+            if (this.state.content instanceof PopulationOverview) {
+                this.state.content.update(state);
+                return;
+            } else {
+                break;
+            }
+        case ScreenType.Trade:
+            if (this.state.content instanceof TradeOverview) {
+                this.state.content.update(state);
+                return;
+            } else {
+                break;
+            }
+        }
+
+        throw new Error(
+            `Unexpected update of type '${state.type}' for screen '${this.state.type}'!`
+        );
     }
 
     /**
