@@ -1,4 +1,4 @@
-@frozen public enum Sex: Int8 {
+@frozen public enum Sex {
     case F
     case X
     case M

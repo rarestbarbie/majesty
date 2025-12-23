@@ -8,9 +8,11 @@ import {
 export interface PopDetails {
     readonly id: GameID;
 
-    readonly type_singular?: string;
-    readonly type_plural?: string;
-    readonly type?: string;
+    readonly occupation_singular?: string;
+    readonly occupation_plural?: string;
+    readonly occupation?: string;
+    readonly gender?: string;
+    readonly cis?: boolean;
 
     readonly open:
         InventoryBreakdownState<PopDetailsTab.Inventory> |

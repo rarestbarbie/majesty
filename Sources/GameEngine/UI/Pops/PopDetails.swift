@@ -42,9 +42,11 @@ extension PopDetails: JavaScriptEncodable {
         case id
         case open
 
-        case type_singular
-        case type_plural
-        case type
+        case occupation_singular
+        case occupation_plural
+        case occupation
+        case gender
+        case cis
 
         case needs
         case sales
@@ -54,9 +56,13 @@ extension PopDetails: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
 
-        js[.type_singular] = self.state?.occupation.singular
-        js[.type_plural] = self.state?.occupation.plural
-        js[.type] = self.state?.type.occupation
+        if  let type: PopType = self.state?.type {
+            js[.occupation_singular] = type.occupation.singular
+            js[.occupation_plural] = type.occupation.plural
+            js[.occupation] = type.occupation
+            js[.gender] = type.gender.glyphs
+            js[.cis] = type.gender.transgender ? nil : true
+        }
 
         switch self.open {
         case .Inventory: js[.open] = self.inventory

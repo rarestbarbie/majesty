@@ -6,24 +6,32 @@ import {
 } from '../exports.js';
 
 export class PopIcon {
-    readonly node: HTMLDivElement;
-    readonly icon: HTMLSpanElement;
+    readonly occupation: HTMLDivElement;
+    readonly gender: HTMLDivElement;
 
     constructor() {
-        this.node = document.createElement('div');
-        this.icon = document.createElement('span');
-        this.node.appendChild(this.icon);
+        const occupation: HTMLSpanElement = document.createElement('span');
+        this.occupation = document.createElement('div');
+        this.occupation.appendChild(occupation);
 
-        this.node.setAttribute('data-tooltip-type', TooltipType.PopType);
+        this.occupation.setAttribute('data-tooltip-type', TooltipType.PopType);
+
+        this.gender = document.createElement('div');
     }
 
-    public set(pop: {id: GameID, type: string} | null): void {
+    public set(
+        pop: {id: GameID, occupation: string, gender: string, cis: boolean} | null
+    ): void {
         if (pop !== null) {
-            this.node.setAttribute('data-pop-type', pop.type);
-            this.node.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
+            this.occupation.setAttribute('data-pop-type', pop.occupation);
+            this.occupation.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
+            this.gender.setAttribute('data-gender', pop.gender);
+            this.gender.setAttribute('data-gender-type', pop.cis ? 'cis' : 'trans');
         } else {
-            this.node.removeAttribute('data-pop-type');
-            this.node.removeAttribute('data-tooltip-arguments');
+            this.occupation.removeAttribute('data-pop-type');
+            this.occupation.removeAttribute('data-tooltip-arguments');
+            this.gender.removeAttribute('data-gender');
+            this.gender.removeAttribute('data-gender-type');
         }
     }
 }
