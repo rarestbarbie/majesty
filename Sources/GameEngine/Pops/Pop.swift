@@ -184,7 +184,11 @@ extension Pop {
 
     var needsScalePerCapita: (l: Double, e: Double, x: Double) {
         let decadence: Double = self.decadence
-        return (
+        return self.type.stratum <= .Ward ? (
+            l: 1,
+            e: 1,
+            x: 1 + decadence
+        ) : (
             l: 1 + decadence,
             e: 1 + decadence * 2,
             x: 1 + decadence * 3
