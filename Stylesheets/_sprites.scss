@@ -1,4 +1,5 @@
 @use 'sass:map';
+@use 'generated/_gender';
 @use 'generated/_sprite-list';
 @use 'generated/_sprite-url';
 
@@ -15,6 +16,106 @@
             calc(#{$y} + var(--sprite-offset-y, 0px));
     } @else {
         @warn "Sprite `#{$name}` not found in $sprites map.";
+    }
+}
+
+[data-gender='FF'],
+[data-gender='FM'] {
+    &[data-gender-type='trans'] {
+        --gender-glyph-l-color: var(--color-fg-ft);
+        --gender-glyph-r-color: var(--color-bg-ft);
+    }
+    &[data-gender-type='cis'] {
+        --gender-glyph-l-color: var(--color-fg-fc);
+        --gender-glyph-r-color: var(--color-bg-fc);
+    }
+
+}
+[data-gender='XF'],
+[data-gender='XX'],
+[data-gender='XM'] {
+    &[data-gender-type='trans'] {
+        --gender-glyph-l-color: var(--color-xt);
+    }
+    &[data-gender-type='cis'] {
+        --gender-glyph-l-color: var(--color-xc);
+    }
+
+    --gender-glyph-r-color: var(--color-x);
+}
+[data-gender='MF'],
+[data-gender='MM'] {
+    &[data-gender-type='trans'] {
+        --gender-glyph-l-color: var(--color-fg-mt);
+        --gender-glyph-r-color: var(--color-bg-mt);
+    }
+    &[data-gender-type='cis'] {
+        --gender-glyph-l-color: var(--color-fg-mc);
+        --gender-glyph-r-color: var(--color-bg-mc);
+    }
+}
+
+
+[data-gender='FF'] {
+    --gender-glyph-l: var(--icon-ff-l);
+    --gender-glyph-r: var(--icon-ff-r);
+}
+[data-gender='FM'] {
+    --gender-glyph-l: var(--icon-fm-l);
+    --gender-glyph-r: var(--icon-fm-r);
+}
+[data-gender='XF'] {
+    --gender-glyph-l: var(--icon-xf-l);
+    --gender-glyph-r: var(--icon-xf-r);
+}
+[data-gender='XX'] {
+    --gender-glyph-l: var(--icon-xx-l);
+    --gender-glyph-r: var(--icon-xx-r);
+}
+[data-gender='XM'] {
+    --gender-glyph-l: var(--icon-xm-l);
+    --gender-glyph-r: var(--icon-xm-r);
+}
+[data-gender='MF'] {
+    --gender-glyph-l: var(--icon-mf-l);
+    --gender-glyph-r: var(--icon-mf-r);
+}
+[data-gender='MM'] {
+    --gender-glyph-l: var(--icon-mm-l);
+    --gender-glyph-r: var(--icon-mm-r);
+}
+[data-gender] {
+    position: relative;
+    display: inline-block;
+    min-width: 20px;
+    height: 30px;
+
+    &::before,
+    &::after {
+        display: block;
+        content: '';
+
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+
+        -webkit-mask-size: contain;
+        mask-size: contain;
+        -webkit-mask-repeat: no-repeat;
+        mask-repeat: no-repeat;
+        -webkit-mask-position: center;
+        mask-position: center;
+
+    }
+    &::before {
+        -webkit-mask-image: var(--gender-glyph-r); mask-image: var(--gender-glyph-r);
+        background-color: var(--gender-glyph-r-color);
+    }
+    &::after {
+        -webkit-mask-image: var(--gender-glyph-l); mask-image: var(--gender-glyph-l);
+        background-color: var(--gender-glyph-l-color);
     }
 }
 

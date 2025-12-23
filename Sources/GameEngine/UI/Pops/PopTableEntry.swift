@@ -19,8 +19,10 @@ extension PopTableEntry: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
         case id
         case location
-        case type
+        case occupation = "occ"
         case gender
+        case cis
+
         case color
         case nat
         case une
@@ -45,8 +47,10 @@ extension PopTableEntry: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.location] = self.location
-        js[.type] = self.type.occupation
-        js[.gender] = self.type.gender
+        js[.occupation] = self.type.occupation
+        js[.gender] = self.type.gender.glyphs
+        js[.cis] = self.type.gender.transgender ? nil : true
+
         js[.color] = self.color
         js[.nat] = self.nat
         js[.une] = self.une

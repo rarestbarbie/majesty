@@ -46,8 +46,6 @@ export * from './Pops/PopDetailsTab.js';
 export * from './Pops/PopIcon.js';
 export * from './Pops/PopTableEntry.js';
 export * from './Pops/PopTableRow.js';
-export * from './Pops/PopType.js';
-export * from './Pops/PopType.js';
 export * from './Pops/PopulationReportRequest.js';
 export * from './Pops/PopulationReport.js';
 export * from './Pops/PopulationOverview.js';

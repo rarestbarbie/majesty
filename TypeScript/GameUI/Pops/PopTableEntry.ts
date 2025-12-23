@@ -1,10 +1,11 @@
 import { Color, GameID } from '../../GameEngine/exports.js';
-import { PopType } from '../exports.js';
 
 export interface PopTableEntry {
     readonly id: GameID;
     readonly location: string;
-    readonly type: PopType;
+    readonly occ: string;
+    readonly cis?: boolean;
+    readonly gender: string;
     readonly color: Color;
     readonly nat: string;
     readonly une: number;

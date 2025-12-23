@@ -19,7 +19,9 @@ extension PopulationReport.ColumnControl {
         case .type(let first):
             return Self.order(a.type.occupation.descending, b.type.occupation.descending, around: first)
         case .race(let first):
-            return Self.order(a.nat, b.nat, around: first)
+            return Self.order(a.nat, b.nat, around: first) ?? (
+                a.type.gender == b.type.gender ? nil : a.type.gender < b.type.gender
+            )
         }
     }
 

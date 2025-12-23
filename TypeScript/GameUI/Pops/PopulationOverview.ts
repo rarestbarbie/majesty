@@ -115,8 +115,9 @@ export class PopulationOverview extends ScreenContent {
                 nav: document.createElement('nav'),
             }
 
-            this.dom.title.appendChild(this.dom.titleIcon.node);
+            this.dom.title.appendChild(this.dom.titleIcon.occupation);
             this.dom.title.appendChild(this.dom.titleName);
+            this.dom.title.appendChild(this.dom.titleIcon.gender);
             this.dom.title.appendChild(this.dom.nav);
 
             const upper: HTMLDivElement = document.createElement('div');
@@ -204,8 +205,22 @@ export class PopulationOverview extends ScreenContent {
             return;
         }
 
-        UpdateText(this.dom.titleName, state.pop.type_singular ?? '');
-        this.dom.titleIcon.set({ id: state.pop.id, type: state.pop.type ?? '' });
+        if (state.pop.occupation_singular !== undefined &&
+            state.pop.occupation !== undefined &&
+            state.pop.gender !== undefined) {
+            UpdateText(this.dom.titleName, state.pop.occupation_singular);
+            this.dom.titleIcon.set(
+                {
+                    id: state.pop.id,
+                    occupation: state.pop.occupation,
+                    gender: state.pop.gender,
+                    cis: state.pop.cis ?? false,
+                }
+            );
+        } else {
+            UpdateText(this.dom.titleName, '');
+            this.dom.titleIcon.set(null);
+        }
 
         switch (state.pop.open.type) {
         case PopDetailsTab.Inventory:
@@ -222,10 +237,6 @@ export class PopulationOverview extends ScreenContent {
         case PopDetailsTab.Ownership:
             this.ownership.update(state.pop.id, state.pop.open);
             break;
-
-        case undefined:
-            UpdateText(this.dom.titleName, '');
-            this.dom.titleIcon.set(null);
         }
     }
 }
