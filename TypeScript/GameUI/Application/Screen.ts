@@ -1,3 +1,4 @@
+import { ConsoleStdout } from '@bjorn3/browser_wasi_shim';
 import {
     InfrastructureOverview,
     PersistentReport,
@@ -192,7 +193,7 @@ export class Screen {
             }
         }
 
-        throw new Error(
+        console.warn(
             `Unexpected update of type '${state.type}' for screen '${this.state.type}'!`
         );
     }

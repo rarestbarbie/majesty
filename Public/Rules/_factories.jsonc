@@ -115,7 +115,6 @@
     "Chicken Plant": {
         "materials": {
             "Machine Parts": 1,
-            "Appliances": 1,
             "Poultry": 100,
             "Water": 20
         },

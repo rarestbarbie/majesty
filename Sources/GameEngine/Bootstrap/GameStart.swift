@@ -114,29 +114,53 @@ extension GameStart {
         var pops: [Pop] = []
         var pop: PopID = Self.highest(in: self.pops.lazy.map(\.pops).joined())
 
+        // some pops are not sapient enough to be transgender
+        func pNonsapient(gender: Gender) -> Int64 {
+            switch gender {
+            case .FT: return 0
+            case .FTS: return 0
+            case .FC: return 4_000
+            case .FCS: return 46_000
+            case .XTL: return 0
+            case .XT: return 0
+            case .XTG: return 0
+            case .XCL: return 0_550
+            case .XC: return 0_550
+            case .XCG: return 0_550
+            case .MT: return 0
+            case .MTS: return 0
+            case .MC: return 2_000
+            case .MCS: return 48_000
+            }
+        }
         func p(gender: Gender) -> Int64 {
             switch gender {
-            case .FT: return 0_15
-            case .FTS: return 0_15
-            case .FC: return 4_00
-            case .FCS: return 45_00
-            case .XTL: return 0_40
-            case .XT: return 0_40
-            case .XTG: return 0_20
-            case .XCL: return 0_05
-            case .XC: return 0_05
-            case .XCG: return 0_05
-            case .MT: return 0_20
-            case .MTS: return 0_20
-            case .MC: return 2_00
-            case .MCS: return 48_00
+            case .FT: return 0_150
+            case .FTS: return 0_150
+            case .FC: return 4_000
+            case .FCS: return 45_000
+            case .XTL: return 0_400
+            case .XT: return 0_400
+            case .XTG: return 0_200
+            case .XCL: return 0_006
+            case .XC: return 0_006
+            case .XCG: return 0_006
+            case .MT: return 0_200
+            case .MTS: return 0_200
+            case .MC: return 2_000
+            case .MCS: return 48_000
             }
         }
         for group: PopSeedGroup in self.pops {
             for seed: PopSeed in group.pops {
                 let genders: [Gender] = Gender.allCases.shuffled(using: &random.generator)
                 guard
-                let sizes: [Int64] = genders.distribute(seed.size, share: p(gender:)) else {
+                let sizes: [Int64] = genders.distribute(
+                    seed.size,
+                    share: seed.type.stratum <= .Ward
+                        ? pNonsapient(gender:)
+                        : p(gender:)
+                ) else {
                     continue
                 }
                 for (gender, size): (Gender, Int64) in zip(genders, sizes) {

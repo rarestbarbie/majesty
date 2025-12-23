@@ -7,7 +7,7 @@
             "Medical Equipment": 1,
             "Groceries": 2,
             "Vehicles": 1,
-            "Housing": 1
+            "Housing": 4
         },
         "e": {
             "Electronics": 1,
@@ -58,12 +58,10 @@
         "where": {
             "occupation": "Livestock"
         },
-        "l": {},
         "e": {
             "Hormones": 1,
             "Housing": 1
-        },
-        "x": {}
+        }
     },
     {
         "where": {
@@ -108,7 +106,7 @@
             "Medical Equipment": 2,
             "Groceries": 2,
             "Vehicles": 4,
-            "Housing": 3
+            "Housing": 12
         },
         "e": {
             "Electronics": 2,
@@ -142,7 +140,7 @@
             "Medical Equipment": 2,
             "Groceries": 2,
             "Vehicles": 4,
-            "Housing": 3
+            "Housing": 12
         },
         "e": {
             "Electronics": 2,
