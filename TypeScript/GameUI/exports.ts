@@ -42,6 +42,7 @@ export * from './Factories/ProductionReport.js';
 export * from './PersistentOverviewType.js';
 export * from './PersistentReport.js';
 
+export * from './Pops/GenderFilter.js';
 export * from './Pops/PopDetails.js';
 export * from './Pops/PopDetailsTab.js';
 export * from './Pops/PopIcon.js';

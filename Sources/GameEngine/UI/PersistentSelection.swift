@@ -1,21 +1,21 @@
 import OrderedCollections
 
-@dynamicMemberLookup struct PersistentSelection<Filter, DetailsFocus>
-    where Filter: PersistentSelectionFilter {
-    private var details: DetailsFocus
-    private var cursors: [Filter: Filter.Subject.ID]
-    private var cursor: Filter.Subject.ID?
-    private(set) var filter: Filter?
+@dynamicMemberLookup struct PersistentSelection<Filters, DetailsFocus>
+    where Filters: PersistentSelectionFilter {
+    private(set) var details: DetailsFocus
+    private(set) var filters: Filters
+    private(set) var cursors: [Filters: Filters.Subject.ID]
+    private(set) var cursor: Filters.Subject.ID?
 
     init(defaultFocus: DetailsFocus) {
         self.details = defaultFocus
         self.cursors = [:]
+        self.filters = .all
         self.cursor = nil
-        self.filter = nil
     }
 }
 extension PersistentSelection: Sendable
-    where DetailsFocus: Sendable, Filter.Subject.ID: Sendable, Filter: Sendable {}
+    where DetailsFocus: Sendable, Filters.Subject.ID: Sendable, Filters: Sendable {}
 extension PersistentSelection {
     subscript<T>(dynamicMember keyPath: WritableKeyPath<DetailsFocus, T>) -> T? {
         get {
@@ -31,47 +31,44 @@ extension PersistentSelection {
 }
 extension PersistentSelection {
     /// Sets the currently selected item and records it for stickiness.
-    mutating func select(_ selected: Filter.Subject.ID?, filter: Filter?) {
-        if  let selected: Filter.Subject.ID,
-            let filter: Filter = self.filter {
+    mutating func select(_ selected: Filters.Subject.ID?, filter: Filters.Layer?) {
+        if  let selected: Filters.Subject.ID,
+            self.filters != .all {
             self.cursor = selected
-            self.cursors[filter] = selected
+            self.cursors[self.filters] = selected
         }
-        if  let filter: Filter {
-            self.filter(filter)
+        if  let filter: Filters.Layer {
+            self.filters += filter
+            self.restore()
         }
     }
 
-    /// Changes the active filter.
-    private mutating func filter(_ filter: Filter) {
-        self.filter = filter
-        self.cursor = self.cursors[filter] ?? self.cursor
+    /// Restore cursor state
+    private mutating func restore() {
+        self.cursor = self.cursors[self.filters] ?? self.cursor
     }
 }
 extension PersistentSelection {
     mutating func rebuild<Entry, Details>(
-        filtering objects: some RandomAccessMapping<Filter.Subject.ID, Filter.Subject>,
+        filtering objects: some RandomAccessMapping<Filters.Subject.ID, Filters.Subject>,
         entries: inout [Entry],
         details: inout Details?,
-        default: @autoclosure () -> Filter,
+        default: @autoclosure () -> Filters,
         sort ascending: (_ a: Entry, _ b: Entry) -> Bool,
-        _ entry: (Filter.Subject) -> Entry?,
-        update: (inout Details, Entry, Filter.Subject) -> Void
-    ) where Details: PersistentReportDetails<Filter.Subject.ID, DetailsFocus>,
-        Entry: Identifiable<Filter.Subject.ID> {
-        let filter: Filter
+        _ entry: (Filters.Subject) -> Entry?,
+        update: (inout Details, Entry, Filters.Subject) -> Void
+    ) where Details: PersistentReportDetails<Filters.Subject.ID, DetailsFocus>,
+        Entry: Identifiable<Filters.Subject.ID> {
 
-        if  let current: Filter = self.filter {
-            filter = current
-        } else {
-            filter = `default`()
-            self.filter(filter)
+        if  self.filters == .all {
+            self.filters = `default`()
+            self.restore()
         }
 
         entries.removeAll(keepingCapacity: true)
 
         var selected: Entry? = nil
-        for object: Filter.Subject in objects.values where filter ~= object {
+        for object: Filters.Subject in objects.values where self.filters ~= object {
             guard
             let entry: Entry = entry(object) else {
                 continue
@@ -89,7 +86,7 @@ extension PersistentSelection {
 
         if case _? = selected {
             // if we’ve changed filters, but the old selection is still valid, keep it
-            self.cursors[filter] = self.cursor
+            self.cursors[self.filters] = self.cursor
         } else {
             self.cursor = nil
             selected = entries.first
@@ -97,7 +94,7 @@ extension PersistentSelection {
 
         guard
         let selected: Entry,
-        let object: Filter.Subject = objects[selected.id] else {
+        let object: Filters.Subject = objects[selected.id] else {
             details = nil
             return
         }

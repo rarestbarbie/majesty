@@ -4,7 +4,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 public struct TradeReport: Sendable {
-    private var selection: PersistentSelection<Filter, Void>
+    private var selection: PersistentSelection<Filters, Void>
 
     private var filters: ([MarketFilterLabel], [MarketFilterLabel])
     private var markets: [MarketTableEntry]
@@ -40,7 +40,7 @@ extension TradeReport: PersistentReport {
             filtering: cache.markets.tradeable,
             entries: &self.markets,
             details: &self.market,
-            default: .init(rawValue: .fiat(cache.playerCountry.currency)),
+            default: .init(asset: .fiat(cache.playerCountry.currency)),
             sort: { $0.name < $1.name }
         ) {
             guard
@@ -86,12 +86,12 @@ extension TradeReport: JavaScriptEncodable {
         js[.type] = GameUI.ScreenType.Trade
         js[.markets] = self.markets
         js[.market] = self.market
-        js[.filter] = self.selection.filter
+        js[.filter] = self.selection.filters.asset.map(Filter.asset(_:))
 
-        switch self.selection.filter?.rawValue {
-        case .good?:    js[.filterlist] = 0
-        case .fiat?:    js[.filterlist] = 1
-        case nil:       break
+        switch self.selection.filters.asset {
+        case .good?: js[.filterlist] = 0
+        case .fiat?: js[.filterlist] = 1
+        case nil: break
         }
 
         js[.filterlists] = [self.filters.0, self.filters.1]

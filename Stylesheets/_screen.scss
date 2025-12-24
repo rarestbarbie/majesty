@@ -101,6 +101,7 @@
             > div.upper {
                 flex: 1 0 57%;
 
+                position: relative;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-between;
@@ -187,6 +188,94 @@
     }
 }
 
+#screen[data-screen='Population'] {
+    div.filters {
+        position: absolute;
+        bottom: 0.5rem;
+        right: 1rem;
+
+        ul {
+            display: flex;
+            gap: 0.5em;
+
+            list-style: none;
+            padding: 0;
+            margin: 0;
+
+            > li {
+                [data-gender-icon] {
+                    min-width: 30px;
+                    height: 45px;
+
+                    &::before,
+                    &::after {
+                        content: '';
+
+                        background-image: linear-gradient(
+                            135deg in hsl,
+                            var(--accent-a),
+                            var(--accent-b),
+                        );
+                    }
+
+                    &::before {
+                        display: none;
+                        border-radius: 0.1rem;
+                    }
+                    &::after {
+                        mask-size: cover;
+                        mask-repeat: no-repeat;
+                        mask-position: center;
+                        mask-image: var(--gender-glyph);
+                        mask-position: 2px 0px;
+                    }
+                }
+                [data-gender-icon='SF'] {
+                    --accent-a: rgb(255, 72, 157);
+                    --accent-b: rgb(188, 88, 255);
+                }
+                [data-gender-icon='SX'] {
+                    --accent-a: rgb(255, 102, 0);
+                    --accent-b: rgb(255, 208, 0);
+                }
+                [data-gender-icon='SM'] {
+                    --accent-a: rgb(0, 255, 255);
+                    --accent-b: rgb(0, 119, 255);
+
+                    &::after {
+                        // mars sign looks better with smaller offset
+                        mask-position: 1px 0px;
+                    }
+                }
+            }
+            > li:hover:not(.selected) {
+                [data-gender-icon] {
+                    &::before {
+                        height: 2px;
+                        top: auto;
+                        bottom: 0;
+                    }
+                }
+            }
+            > li.selected {
+                [data-gender-icon] {
+                    &::after {
+                        background-color: white;
+                        background-image: none;
+                    }
+                }
+            }
+            > li:hover,
+            > li.selected {
+                [data-gender-icon] {
+                    &::before {
+                        display: block;
+                    }
+                }
+            }
+        }
+    }
+}
 #screen[data-screen='Planet'] {
     width: 50rem;
     height: 30rem;

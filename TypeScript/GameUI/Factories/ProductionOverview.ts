@@ -138,7 +138,7 @@ export class ProductionOverview extends ScreenContent {
             break;
         }
 
-        this.dom.index.tabs[state.filterlist ?? 0].checked = true;
+        this.dom.index.tabs[state.filterlist].checked = true;
         this.update(state);
     }
 
