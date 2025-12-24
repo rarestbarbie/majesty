@@ -8,7 +8,6 @@ import { GameID } from '../../GameEngine/GameID.js';
 import { ScreenContent } from '../Application/ScreenContent.js';
 import { Swift } from '../../Swift.js';
 import {
-    ConsumptionBreakdown,
     BuildingTableEntry,
     BuildingTableRow,
     BuildingDetailsTab,
@@ -16,8 +15,8 @@ import {
     MarketFilter,
     OwnershipBreakdown,
     InfrastructureReport,
-    ResourceSale,
-    ResourceSaleBox,
+    InventoryBreakdown,
+    InventoryCharts,
     ScreenType,
     TooltipType,
 } from '../exports.js';
@@ -25,9 +24,9 @@ import {
 export class InfrastructureOverview extends ScreenContent {
     private readonly filters: FilterList<MarketFilter, string>[];
     private readonly buildings: StaticList<BuildingTableRow, GameID>;
-    private readonly sales: StaticList<ResourceSaleBox, string>;
 
-    private readonly consumption: ConsumptionBreakdown;
+    private readonly inventoryCharts: InventoryCharts;
+    private readonly inventory: InventoryBreakdown;
     private readonly ownership: OwnershipBreakdown;
 
     private dom?: {
@@ -57,9 +56,8 @@ export class InfrastructureOverview extends ScreenContent {
         this.buildings = new StaticList<BuildingTableRow, GameID>(document.createElement('div'));
         this.buildings.table('Buildings', BuildingTableRow.columns);
 
-        this.sales = new StaticList<ResourceSaleBox, string>(document.createElement('div'));
-
-        this.consumption = new ConsumptionBreakdown(InfrastructureOverview);
+        this.inventoryCharts = new InventoryCharts(InfrastructureOverview);
+        this.inventory = new InventoryBreakdown();
         this.ownership = new OwnershipBreakdown(
             TooltipType.BuildingOwnershipCountry,
             TooltipType.BuildingOwnershipCulture,
@@ -77,8 +75,7 @@ export class InfrastructureOverview extends ScreenContent {
             }
         );
 
-        this.sales.clear();
-        this.sales.node.classList.add('sales');
+        this.inventory.clear();
 
         if (this.dom === undefined) {
             this.dom = {
@@ -127,8 +124,8 @@ export class InfrastructureOverview extends ScreenContent {
         switch (state.building?.open.type) {
         case BuildingDetailsTab.Inventory:
             this.dom.stats.setAttribute('data-subscreen', 'Inventory');
-            this.dom.stats.appendChild(this.consumption.node);
-            this.dom.stats.appendChild(this.sales.node);
+            this.dom.stats.appendChild(this.inventory.node);
+            this.dom.stats.appendChild(this.inventoryCharts.node);
             break;
 
         case BuildingDetailsTab.Ownership:
@@ -191,21 +188,15 @@ export class InfrastructureOverview extends ScreenContent {
 
         UpdateText(this.dom.titleName, state.building.type ?? '');
 
+        let id: GameID = state.building.id;
         switch (state.building.open.type) {
         case BuildingDetailsTab.Inventory:
-            let id: GameID = state.building.id;
-
-            this.consumption.update(id, state.building.open, InfrastructureOverview);
-            this.sales.update(
-                state.building.open.sales,
-                (sale: ResourceSale) => new ResourceSaleBox(sale, id, InfrastructureOverview),
-                (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale, id),
-            );
-
+            this.inventory.update(id, state.building.open, InfrastructureOverview);
+            this.inventoryCharts.update(id, state.building.open);
             break;
 
         case BuildingDetailsTab.Ownership:
-            this.ownership.update(state.building.id, state.building.open);
+            this.ownership.update(id, state.building.open);
             break;
         }
     }

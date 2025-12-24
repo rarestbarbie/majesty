@@ -15,21 +15,19 @@ import {
     PopDetailsTab,
     PopTableEntry,
     PopTableRow,
-    ResourceSale,
-    ResourceSaleBox,
-    Resource,
     ScreenType,
     TooltipType,
     PopIcon,
-    ConsumptionBreakdown,
+    InventoryBreakdown,
+    InventoryCharts,
     OwnershipBreakdown,
 } from '../exports.js';
 
 export class PopulationOverview extends ScreenContent {
     private filters: FilterList<MarketFilter, string>[];
-    private sales: StaticList<ResourceSaleBox, string>;
 
-    private readonly consumption: ConsumptionBreakdown;
+    private readonly inventoryCharts: InventoryCharts;
+    private readonly inventory: InventoryBreakdown;
     private readonly ownership: OwnershipBreakdown;
 
     private pops: Table<PopTableRow, GameID>;
@@ -60,9 +58,9 @@ export class PopulationOverview extends ScreenContent {
         ];
 
         this.pops = new Table<PopTableRow, GameID>('Pops');
-        this.sales = new StaticList<ResourceSaleBox, string>(document.createElement('div'));
 
-        this.consumption = new ConsumptionBreakdown(PopulationOverview);
+        this.inventoryCharts = new InventoryCharts(PopulationOverview);
+        this.inventory = new InventoryBreakdown();
         this.ownership = new OwnershipBreakdown(
             TooltipType.PopOwnershipCountry,
             TooltipType.PopOwnershipCulture,
@@ -101,8 +99,7 @@ export class PopulationOverview extends ScreenContent {
     }
 
     private switch(state: PopulationReport): void {
-        this.sales.clear();
-        this.sales.node.classList.add('sales');
+        this.inventory.clear();
 
         if (this.dom === undefined) {
             this.dom = {
@@ -154,8 +151,8 @@ export class PopulationOverview extends ScreenContent {
         switch (state.pop?.open.type) {
         case PopDetailsTab.Inventory:
             this.dom.stats.setAttribute('data-subscreen', 'Inventory');
-            this.dom.stats.appendChild(this.consumption.node);
-            this.dom.stats.appendChild(this.sales.node);
+            this.dom.stats.appendChild(this.inventory.node);
+            this.dom.stats.appendChild(this.inventoryCharts.node);
             break;
 
         case PopDetailsTab.Ownership:
@@ -222,20 +219,15 @@ export class PopulationOverview extends ScreenContent {
             this.dom.titleIcon.set(null);
         }
 
+        const id: GameID = state.pop.id;
         switch (state.pop.open.type) {
         case PopDetailsTab.Inventory:
-            const id: GameID = state.pop.id;
-
-            this.consumption.update(id, state.pop.open, PopulationOverview);
-            this.sales.update(
-                state.pop.open.sales,
-                (sale: ResourceSale) => new ResourceSaleBox(sale, id, PopulationOverview),
-                (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale, id),
-            );
+            this.inventory.update(id, state.pop.open, PopulationOverview);
+            this.inventoryCharts.update(id, state.pop.open);
             break;
 
         case PopDetailsTab.Ownership:
-            this.ownership.update(state.pop.id, state.pop.open);
+            this.ownership.update(id, state.pop.open);
             break;
         }
     }
