@@ -72,9 +72,9 @@ extension GameAPI {
         ) = AsyncStream<(PlayerEvent, UInt64)>.makeStream()
 
         let (frames, browser): (
-            AsyncStream<Reference<GameUI>>,
-            AsyncStream<Reference<GameUI>>.Continuation
-        ) = AsyncStream<Reference<GameUI>>.makeStream(bufferingPolicy: .bufferingNewest(1))
+            AsyncStream<Void>,
+            AsyncStream<Void>.Continuation
+        ) = AsyncStream<Void>.makeStream(bufferingPolicy: .bufferingOldest(1))
 
         let executor: WebWorkerTaskExecutor = try await .init(numberOfThreads: 4)
         defer {
@@ -97,8 +97,10 @@ extension GameAPI {
         async
         let _: Void = self.heartbeats()
 
-        for await frame: Reference<GameUI> in frames {
-            _ = self.draw(frame.value)
+        for await _: Void in frames {
+            if  let frame: Reference<GameUI> = Self.ui?.state {
+                _ = self.draw(frame.value)
+            }
         }
     }
     private func setup(stream: AsyncStream<(PlayerEvent, UInt64)>.Continuation) {
@@ -186,7 +188,7 @@ extension GameAPI {
     }
 
     private nonisolated func render(
-        browser: AsyncStream<Reference<GameUI>>.Continuation
+        browser: AsyncStream<Void>.Continuation
     ) async throws {
         var ui: GameUI.Model? = nil
         for await _: () in self.renderer.events {
@@ -198,7 +200,8 @@ extension GameAPI {
                 continue
             }
 
-            browser.yield(try await ui.sync())
+            try await ui.sync()
+            browser.yield()
         }
     }
 }

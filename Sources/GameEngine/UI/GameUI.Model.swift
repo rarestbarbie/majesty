@@ -9,15 +9,26 @@ import Synchronization
 extension GameUI {
     public actor Model {
         nonisolated let cachePointer: Mutex<Reference<GameUI.Cache>?>
+        nonisolated let statePointer: Mutex<Reference<GameUI>?>
         var ui: GameUI
 
         public init(ui: consuming GameUI) {
             self.cachePointer = .init(nil)
+            self.statePointer = .init(nil)
             self.ui = ui
         }
     }
 }
 extension GameUI.Model {
+    public nonisolated var state: Reference<GameUI>? {
+        self.statePointer.withLock { $0 }
+    }
+
+    private func publish() {
+        let state: Reference<GameUI> = .init(value: self.ui)
+        self.statePointer.withLock { $0 = state }
+    }
+
     private nonisolated func cache<T>(
         yield: (borrowing GameUI.Cache) throws -> T?
     ) rethrows -> T? {
@@ -28,11 +39,12 @@ extension GameUI.Model {
         }
     }
 
-    public func sync() throws -> Reference<GameUI> {
+    public func sync() throws {
         try self.cache {
             try self.ui.sync(with: $0)
         }
-        return .init(value: self.ui)
+
+        self.publish()
     }
 }
 extension GameUI.Model {
@@ -46,6 +58,7 @@ extension GameUI.Model {
         self.ui.screen = .Planet
         self.ui.report.planet.select(request: request)
         self.cache { self.ui.report.planet.update(from: $0) }
+        self.publish()
         return self.ui.report.planet
     }
 
@@ -55,6 +68,7 @@ extension GameUI.Model {
         self.ui.screen = .Infrastructure
         self.ui.report.infrastructure.select(request: request)
         self.cache { self.ui.report.infrastructure.update(from: $0) }
+        self.publish()
         return self.ui.report.infrastructure
     }
 
@@ -64,6 +78,7 @@ extension GameUI.Model {
         self.ui.screen = .Production
         self.ui.report.production.select(request: request)
         self.cache { self.ui.report.production.update(from: $0) }
+        self.publish()
         return self.ui.report.production
     }
 
@@ -73,6 +88,7 @@ extension GameUI.Model {
         self.ui.screen = .Population
         self.ui.report.population.select(request: request)
         self.cache { self.ui.report.population.update(from: $0) }
+        self.publish()
         return self.ui.report.population
     }
 
@@ -82,6 +98,7 @@ extension GameUI.Model {
         self.ui.screen = .Trade
         self.ui.report.trade.select(request: request)
         self.cache { self.ui.report.trade.update(from: $0) }
+        self.publish()
         return self.ui.report.trade
     }
 
@@ -92,19 +109,21 @@ extension GameUI.Model {
     ) async -> Navigator {
         self.ui.navigator.select(planet: planet, layer: layer, cell: cell)
         self.cache { self.ui.navigator.update(in: $0) }
+        self.publish()
         return self.ui.navigator
     }
 
     public func view(_ index: Int, to system: PlanetID) throws -> CelestialView? {
-        try self.cache {
-            let view: CelestialView = try .open(subject: system, in: $0)
-            switch index as Int {
-            case 0: self.ui.views.0 = view
-            case 1: self.ui.views.1 = view
-            default: break
-            }
-            return view
+        let view: CelestialView? = try self.cache {
+            try .open(subject: system, in: $0)
         }
+        switch index as Int {
+        case 0: self.ui.views.0 = view
+        case 1: self.ui.views.1 = view
+        default: break
+        }
+        self.publish()
+        return view
     }
 }
 extension GameUI.Model {
