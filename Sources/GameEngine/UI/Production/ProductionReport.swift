@@ -60,7 +60,6 @@ extension ProductionReport {
             filtering: cache.factories,
             entries: &self.entries,
             details: &self.details,
-            default: .init(location: defaultTile),
             sort: self.sort.ascending(_:_:)
         ) {
             let equity: Equity<LEI>.Statistics = $0.equity
@@ -83,6 +82,8 @@ extension ProductionReport {
             )
 
             return entry
+        } filter: {
+            $0.location = $0.location ?? defaultTile
         } update: {
             $0.update(to: $2, cache: cache)
         }

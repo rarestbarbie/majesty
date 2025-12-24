@@ -88,7 +88,6 @@ extension PopulationReport {
             filtering: cache.pops,
             entries: &self.entries,
             details: &self.details,
-            default: .init(location: defaultTile, sex: .F),
             sort: self.sort.ascending(_:_:)
         ) {
             guard
@@ -107,6 +106,9 @@ extension PopulationReport {
             )
 
             return entry
+        } filter: {
+            $0.location = $0.location ?? defaultTile
+            $0.sex = $0.sex ?? .F
         } update: {
             $0.update(to: $2, cache: cache)
         }

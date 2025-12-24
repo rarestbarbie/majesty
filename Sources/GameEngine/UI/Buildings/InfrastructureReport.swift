@@ -61,7 +61,6 @@ extension InfrastructureReport {
             filtering: cache.buildings,
             entries: &self.entries,
             details: &self.details,
-            default: .init(location: defaultTile),
             sort: self.sort.ascending(_:_:)
         ) {
             let entry: BuildingTableEntry = .init(
@@ -72,6 +71,8 @@ extension InfrastructureReport {
             )
 
             return entry
+        } filter: {
+            $0.location = $0.location ?? defaultTile
         } update: {
             $0.update(to: $2, cache: cache)
         }

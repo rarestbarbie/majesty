@@ -53,15 +53,15 @@ extension PersistentSelection {
         filtering objects: some RandomAccessMapping<Filters.Subject.ID, Filters.Subject>,
         entries: inout [Entry],
         details: inout Details?,
-        default: @autoclosure () -> Filters,
         sort ascending: (_ a: Entry, _ b: Entry) -> Bool,
         _ entry: (Filters.Subject) -> Entry?,
-        update: (inout Details, Entry, Filters.Subject) -> Void
+        filter: (inout Filters) -> (),
+        update: (inout Details, Entry, Filters.Subject) -> ()
     ) where Details: PersistentReportDetails<Filters.Subject.ID, DetailsFocus>,
         Entry: Identifiable<Filters.Subject.ID> {
-
-        if  self.filters == .all {
-            self.filters = `default`()
+        var filters: Filters = self.filters ; filter(&filters)
+        if  filters != self.filters {
+            self.filters = filters
             self.restore()
         }
 

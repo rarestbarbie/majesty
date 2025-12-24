@@ -40,7 +40,6 @@ extension TradeReport: PersistentReport {
             filtering: cache.markets.tradeable,
             entries: &self.markets,
             details: &self.market,
-            default: .init(asset: .fiat(cache.playerCountry.currency)),
             sort: { $0.name < $1.name }
         ) {
             guard
@@ -59,6 +58,8 @@ extension TradeReport: PersistentReport {
                 price: today.prices,
                 volume: today.volume.base.total
             )
+        } filter: {
+            $0.asset = $0.asset ?? .fiat(cache.playerCountry.currency)
         } update: {
             $0.update(from: $2.state, date: cache.date)
         }
