@@ -29,15 +29,16 @@ public struct PopulationReport {
             .init(id: 0, name: "Size"),
             .init(id: 1, name: "Type"),
             .init(id: 2, name: "Race"),
-            .init(id: 3, name: "Location"),
-            .init(id: 4, name: "Militancy"),
-            .init(id: 5, name: "Consciousness"),
+            .init(id: 3, name: "Militancy"),
+            .init(id: 4, name: "Consciousness"),
+            .init(id: 5, name: "Jobs"),
             .init(id: 6, name: "Needs"),
         )
         self.details = nil
         self.entries = []
         self.sort = .init()
         self.sort.update(column: .type(PopOccupation.Politician.descending))
+        self.sort.update(column: .race(""))
     }
 }
 extension PopulationReport {
@@ -90,7 +91,6 @@ extension PopulationReport {
 
             let entry: PopTableEntry = .init(
                 id: $0.state.id,
-                location: $0.region.name,
                 type: $0.state.type,
                 color: culture.color,
                 nat: culture.name,

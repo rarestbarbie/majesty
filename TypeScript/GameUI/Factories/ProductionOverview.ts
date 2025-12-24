@@ -8,12 +8,13 @@ import { GameID } from '../../GameEngine/GameID.js';
 import { ScreenContent } from '../Application/ScreenContent.js';
 import { Swift } from '../../Swift.js';
 import {
-    ConsumptionBreakdown,
     FactoryTableEntry,
     FactoryTableRow,
     FactoryDetailsTab,
     LegalEntityFilterLabel,
     MarketFilter,
+    InventoryBreakdown,
+    InventoryCharts,
     OwnershipBreakdown,
     ProductionReport,
     ResourceNeed,
@@ -27,9 +28,9 @@ import {
 export class ProductionOverview extends ScreenContent {
     private readonly filters: FilterList<MarketFilter, string>[];
     private readonly factories: StaticList<FactoryTableRow, GameID>;
-    private readonly sales: StaticList<ResourceSaleBox, string>;
 
-    private readonly consumption: ConsumptionBreakdown;
+    private readonly inventoryCharts: InventoryCharts;
+    private readonly inventory: InventoryBreakdown;
     private readonly ownership: OwnershipBreakdown;
 
     private dom?: {
@@ -59,9 +60,8 @@ export class ProductionOverview extends ScreenContent {
         this.factories = new StaticList<FactoryTableRow, GameID>(document.createElement('div'));
         this.factories.table('Factories', FactoryTableRow.columns);
 
-        this.sales = new StaticList<ResourceSaleBox, string>(document.createElement('div'));
-
-        this.consumption = new ConsumptionBreakdown(ProductionOverview);
+        this.inventoryCharts = new InventoryCharts(ProductionOverview);
+        this.inventory = new InventoryBreakdown();
         this.ownership = new OwnershipBreakdown(
             TooltipType.FactoryOwnershipCountry,
             TooltipType.FactoryOwnershipCulture,
@@ -79,8 +79,7 @@ export class ProductionOverview extends ScreenContent {
             }
         );
 
-        this.sales.clear();
-        this.sales.node.classList.add('sales');
+        this.inventory.clear();
 
         if (this.dom === undefined) {
             this.dom = {
@@ -129,8 +128,8 @@ export class ProductionOverview extends ScreenContent {
         switch (state.factory?.open.type) {
         case FactoryDetailsTab.Inventory:
             this.dom.stats.setAttribute('data-subscreen', 'Inventory');
-            this.dom.stats.appendChild(this.consumption.node);
-            this.dom.stats.appendChild(this.sales.node);
+            this.dom.stats.appendChild(this.inventory.node);
+            this.dom.stats.appendChild(this.inventoryCharts.node);
             break;
 
         case FactoryDetailsTab.Ownership:
@@ -193,21 +192,16 @@ export class ProductionOverview extends ScreenContent {
 
         UpdateText(this.dom.titleName, state.factory.type ?? '');
 
+        let id: GameID = state.factory.id;
+
         switch (state.factory.open.type) {
         case FactoryDetailsTab.Inventory:
-            let id: GameID = state.factory.id;
-
-            this.consumption.update(id, state.factory.open, ProductionOverview);
-            this.sales.update(
-                state.factory.open.sales,
-                (sale: ResourceSale) => new ResourceSaleBox(sale, id, ProductionOverview),
-                (sale: ResourceSale, box: ResourceSaleBox) => box.update(sale, id),
-            );
-
+            this.inventory.update(id, state.factory.open, ProductionOverview);
+            this.inventoryCharts.update(id, state.factory.open);
             break;
 
         case FactoryDetailsTab.Ownership:
-            this.ownership.update(state.factory.id, state.factory.open);
+            this.ownership.update(id, state.factory.open);
             break;
         }
     }

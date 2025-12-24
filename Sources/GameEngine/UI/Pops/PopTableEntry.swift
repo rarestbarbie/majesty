@@ -7,7 +7,6 @@ import JavaScriptInterop
 
 struct PopTableEntry: Identifiable {
     let id: PopID
-    let location: String
     let type: PopType
     let color: Color
     let nat: String
@@ -46,7 +45,6 @@ extension PopTableEntry: JavaScriptEncodable {
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
-        js[.location] = self.location
         js[.occupation] = self.type.occupation
         js[.gender] = self.type.gender.glyphs
         js[.cis] = self.type.gender.transgender ? nil : true

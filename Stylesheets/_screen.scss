@@ -99,7 +99,7 @@
 
             // Panel upper half
             > div.upper {
-                flex: 1 0 58%;
+                flex: 1 0 57%;
 
                 display: flex;
                 flex-direction: column;
@@ -107,7 +107,8 @@
 
                 // Header
                 > header {
-                    min-height: 3rem;
+                    // for consistency with pop headers
+                    min-height: 56px;
 
                     display: flex;
                     position: relative;
@@ -180,7 +181,7 @@
             }
 
             > div[data-table] {
-                flex: 0 1 42%;
+                flex: 0 1 43%;
             }
         }
     }

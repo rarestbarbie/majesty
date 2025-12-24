@@ -1,11 +1,11 @@
 ul.terms {
-    margin: 1rem 0 0 1rem;
+    margin: 0;
     padding: 0;
     list-style: none;
 
     display: flex;
     flex-direction: column;
-
+    justify-content: center;
 
     > li {
         min-height: 2rem;

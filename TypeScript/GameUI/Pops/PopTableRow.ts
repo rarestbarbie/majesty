@@ -23,11 +23,10 @@ export class PopTableRow implements DiffableListElement<GameID> {
     private readonly size: Ticker;
     private readonly icon: PopIcon;
 
-    /// Location cell doubles as the background for the unemployment meter
-    private readonly location: ProgressCell;
     private readonly culture: HTMLElement;
     private readonly mil: Ticker;
     private readonly con: Ticker;
+    private readonly jobs: ProgressCell;
     private readonly needs: ProgressTriad;
 
     constructor(pop: PopTableEntry) {
@@ -44,12 +43,12 @@ export class PopTableRow implements DiffableListElement<GameID> {
         race.appendChild(this.culture);
         race.appendChild(this.icon.gender);
 
-        this.location = new ProgressCell();
-        this.location.node.setAttribute('data-tooltip-type', TooltipType.PopJobs);
-        this.location.node.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
-
         this.mil = new Ticker(Fortune.Malus);
         this.con = new Ticker(Fortune.Malus);
+
+        this.jobs = new ProgressCell();
+        this.jobs.node.setAttribute('data-tooltip-type', TooltipType.PopJobs);
+        this.jobs.node.setAttribute('data-tooltip-arguments', JSON.stringify([pop.id]));
 
         this.needs = new ProgressTriad(pop.id, TooltipType.PopNeeds);
 
@@ -57,9 +56,9 @@ export class PopTableRow implements DiffableListElement<GameID> {
         this.node.appendChild(this.size.outer);
         this.node.appendChild(this.icon.occupation);
         this.node.appendChild(race); // Comes before location!
-        this.node.appendChild(this.location.node);
         this.node.appendChild(this.mil.outer);
         this.node.appendChild(this.con.outer);
+        this.node.appendChild(this.jobs.node);
         this.node.appendChild(this.needs.node);
     }
 
@@ -73,8 +72,9 @@ export class PopTableRow implements DiffableListElement<GameID> {
 
         UpdateText(this.culture, pop.nat);
 
-        UpdateText(this.location.summary, pop.location);
-        this.location.set(pop.une * 100);
+        const unemployment = pop.une * 100;
+        UpdateDecimal(this.jobs.summary, unemployment, 1);
+        this.jobs.set(unemployment);
 
         this.mil.updatePriceChange(pop.y_mil, pop.t_mil);
         this.con.updatePriceChange(pop.y_con, pop.t_con);

@@ -12,8 +12,8 @@ export class ResourceSaleBox implements DiffableListElement<string> {
     public readonly id: string;
     public readonly node: HTMLAnchorElement;
 
-    private readonly units: HTMLElement;
     private readonly price: Ticker;
+    private readonly units: HTMLElement;
     private readonly subtitle: HTMLElement;
 
     private owner: GameID;
@@ -26,11 +26,16 @@ export class ResourceSaleBox implements DiffableListElement<string> {
         this.id = state.id;
         this.node = document.createElement('a');
 
-        const icon: HTMLDivElement = document.createElement('div');
-        const resource: HTMLDivElement = document.createElement('div');
+        this.price = new Ticker(Fortune.Bonus);
+        this.price.outer.classList.add('price');
+        this.price.outer.setAttribute('data-tooltip-type', type.tooltipExplainPrice);
 
+        const icon: HTMLDivElement = document.createElement('div');
         icon.textContent = state.icon;
-        resource.textContent = state.name;
+        icon.classList.add('icon');
+
+        const header: HTMLElement = document.createElement('header');
+        header.textContent = state.name;
 
         this.units = document.createElement('div');
         this.units.classList.add('units-sold');
@@ -40,10 +45,10 @@ export class ResourceSaleBox implements DiffableListElement<string> {
             JSON.stringify([owner, state.id]),
         );
 
-        // this.value = document.createElement('div');
-        this.price = new Ticker(Fortune.Bonus);
-        this.price.outer.classList.add('price');
-        this.price.outer.setAttribute('data-tooltip-type', type.tooltipExplainPrice);
+        const tickers: HTMLDivElement = document.createElement('div');
+        tickers.appendChild(this.price.outer);
+        tickers.appendChild(this.units);
+        tickers.classList.add('tickers');
 
         this.subtitle = document.createElement('div');
         this.subtitle.classList.add('subtitle');
@@ -52,9 +57,8 @@ export class ResourceSaleBox implements DiffableListElement<string> {
         }
 
         this.node.appendChild(icon);
-        this.node.appendChild(resource);
-        this.node.appendChild(this.price.outer);
-        this.node.appendChild(this.units);
+        this.node.appendChild(header);
+        this.node.appendChild(tickers);
         this.node.appendChild(this.subtitle);
 
         this.owner = owner;

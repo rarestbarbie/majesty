@@ -10,8 +10,9 @@ export * from './Developer/PlanetTileEditor.js';
 export * from './Developer/PlanetTileEditorState.js';
 
 export * from './LegalEntityFilterLabel.js';
-export * from './ConsumptionBreakdown.js';
+export * from './InventoryBreakdown.js';
 export * from './InventoryBreakdownState.js';
+export * from './InventoryCharts.js';
 export * from './OwnershipBreakdown.js';
 export * from './OwnershipBreakdownState.js';
 
