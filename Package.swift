@@ -11,11 +11,12 @@ let package: Package = .init(
         .executable(name: "integration-tests", targets: ["GameIntegrationTests"]),
     ],
     dependencies: [
-        .package(url: "https://github.com/swiftlang/swift-syntax", from: "601.0.0"),
+        .package(url: "https://github.com/swiftlang/swift-syntax", from: "602.0.0"),
         // .package(url: "https://github.com/swiftwasm/JavaScriptKit", from: "0.36.0"),
         .package(url: "https://github.com/swiftwasm/JavaScriptKit", branch: "main"),
         .package(url: "https://github.com/apple/swift-numerics", from: "1.0.3"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.2.1"),
+        .package(url: "https://github.com/ordo-one/bijection", from: "0.1.7"),
         .package(url: "https://github.com/ordo-one/package-distributions", from: "0.2.0"),
         .package(url: "https://github.com/tayloraswift/dollup", from: "0.5.0"),
         .package(url: "https://github.com/tayloraswift/d", from: "0.4.3"),
@@ -76,22 +77,6 @@ let package: Package = .init(
         .target(
             name: "Assert",
             dependencies: ["AssertMacro"]
-        ),
-
-        .macro(
-            name: "BijectionMacro",
-            dependencies: [
-                .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
-                .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
-            ]
-        ),
-        .target(
-            name: "Bijection",
-            dependencies: ["BijectionMacro"]
-        ),
-        .testTarget(
-            name: "BijectionTests",
-            dependencies: ["Bijection"]
         ),
 
         .target(
@@ -179,10 +164,10 @@ let package: Package = .init(
         .target(
             name: "GameIDs",
             dependencies: [
-                .target(name: "Bijection"),
                 .target(name: "Color"),
                 .target(name: "GameStateMacros"),
                 .target(name: "HexGrids"),
+                .product(name: "Bijection", package: "bijection"),
             ]
         ),
 
@@ -240,11 +225,11 @@ let package: Package = .init(
         .target(
             name: "GameUI",
             dependencies: [
-                .target(name: "Bijection"),
                 .target(name: "ColorText"),
                 .target(name: "GameIDs"),
                 .target(name: "JavaScriptInterop"),
                 .product(name: "D", package: "d"),
+                .product(name: "Bijection", package: "bijection"),
             ]
         ),
 
