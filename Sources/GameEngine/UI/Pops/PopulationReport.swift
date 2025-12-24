@@ -91,7 +91,6 @@ extension PopulationReport {
 
             let entry: PopTableEntry = .init(
                 id: $0.state.id,
-                location: $0.region.name,
                 type: $0.state.type,
                 color: culture.color,
                 nat: culture.name,
