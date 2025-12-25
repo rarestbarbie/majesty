@@ -195,10 +195,16 @@ extension ResourceInput {
         ) / Double.init(denominator)
     }
 
-    @inlinable public var fulfilled: Double {
+    var fulfilled: Double {
         let denominator: Int64 = self.unitsDemanded
         return denominator == 0 ? 0 : Double.init(
             self.unitsConsumed + self.units.total
+        ) / Double.init(denominator)
+    }
+    var fulfilledAfterReservation: Double {
+        let denominator: Int64 = self.unitsDemanded
+        return denominator == 0 ? 0 : Double.init(
+            self.unitsConsumed
         ) / Double.init(denominator)
     }
 }

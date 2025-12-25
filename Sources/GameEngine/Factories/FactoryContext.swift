@@ -7,7 +7,7 @@ import GameState
 import OrderedCollections
 import Random
 
-struct FactoryContext: LegalEntityContext, RuntimeContext {
+struct FactoryContext: RuntimeContext {
     let type: FactoryMetadata
     var state: Factory
 
@@ -36,9 +36,10 @@ struct FactoryContext: LegalEntityContext, RuntimeContext {
 extension FactoryContext: Identifiable {
     var id: FactoryID { self.state.id }
 }
+extension FactoryContext: LegalEntityContext {
+    static var stockpileDaysRange: ClosedRange<Int64> { 4 ... 8 }
+}
 extension FactoryContext {
-    private static var stockpileDays: ClosedRange<Int64> { 3 ... 7 }
-
     static var efficiencyBonusFromCorporate: Double { 0.3 }
     static var efficiencyBonusFromClerks: Double { 0.3 }
 
@@ -224,7 +225,7 @@ extension FactoryContext: TransactingContext {
                 weights: weights,
                 state: self.state.z,
                 type: self.type,
-                stockpileMaxDays: Self.stockpileDays.upperBound,
+                stockpileMaxDays: Self.stockpileDaysMax,
                 workers: workers,
                 clerks: clerks,
                 invest: utilization * max(0, self.state.z.profitability),
@@ -257,7 +258,7 @@ extension FactoryContext: TransactingContext {
                 weights: weights,
                 state: self.state.z,
                 type: self.type,
-                stockpileMaxDays: Self.stockpileDays.upperBound,
+                stockpileMaxDays: Self.stockpileDaysMax,
                 workers: nil,
                 clerks: nil,
                 invest: 1,
@@ -297,10 +298,7 @@ extension FactoryContext: TransactingContext {
             return
         }
 
-        let stockpileTarget: ResourceStockpileTarget = .random(
-            in: Self.stockpileDays,
-            using: &turn.random,
-        )
+        let stockpileDays: ResourceStockpileTarget = self.stockpileTarget(&turn.random)
 
         switch budget {
         case .constructing(let budget):
@@ -308,7 +306,7 @@ extension FactoryContext: TransactingContext {
             self.construct(
                 region: region,
                 budget: budget.l,
-                stockpileTarget: stockpileTarget,
+                stockpileTarget: stockpileDays,
                 turn: &turn
             )
 
@@ -362,7 +360,7 @@ extension FactoryContext: TransactingContext {
                     workers: workers,
                     region: region,
                     budget: budget,
-                    stockpileTarget: stockpileTarget,
+                    stockpileTarget: stockpileDays,
                     turn: &turn
                 )
 
@@ -487,7 +485,7 @@ extension FactoryContext: TransactingContext {
             self.construct(
                 region: region,
                 budget: budget.x,
-                stockpileTarget: stockpileTarget,
+                stockpileTarget: stockpileDays,
                 turn: &turn
             )
 
@@ -553,14 +551,16 @@ extension FactoryContext {
         }
 
         let growthFactor: Int64 = self.productivity * (self.state.size.level + 1)
-        if  self.state.inventory.x.consumeAvailable(
-                from: self.type.expansion,
-                scalingFactor: (growthFactor, self.state.z.ei)
-            ) {
+        let growth: Bool
+
+        (self.state.z.fx, growth) = self.state.inventory.x.consumeAvailable(
+            from: self.type.expansion,
+            scalingFactor: (growthFactor, self.state.z.ei)
+        )
+
+        if  growth {
             self.state.size.grow()
         }
-
-        self.state.z.fx = self.state.inventory.x.fulfilled
     }
 
     private mutating func liquidate(
@@ -652,11 +652,11 @@ extension FactoryContext {
         /// the amount of currency that was sunk into purchasing inputs, and subtract the
         /// approximate value of the inputs consumed today.
         let throughput: Int64 = self.productivity * update.workersPaid
-        self.state.inventory.l.consumeAmortized(
+        let fl: Double = self.state.inventory.l.consumeAmortized(
             from: self.type.materials,
             scalingFactor: (throughput, self.state.z.ei)
         )
-        self.state.inventory.e.consumeAmortized(
+        let fe: Double = self.state.inventory.e.consumeAmortized(
             from: self.type.corporate,
             scalingFactor: (throughput, self.state.z.ei * budget.fe)
         )
@@ -666,10 +666,10 @@ extension FactoryContext {
             scalingFactor: (throughput, self.state.z.eo)
         )
 
-        self.state.z.fl = self.state.inventory.l.fulfilled
+        self.state.z.fl = fl
         // `fulfilled` counts stockpiled resources that were saved for the next day,
         // so to compute the actual usage today we need `min` it with the consumption fraction
-        self.state.z.fe = min(self.state.inventory.e.fulfilled, budget.fe)
+        self.state.z.fe = min(fe, budget.fe)
 
         return update
     }

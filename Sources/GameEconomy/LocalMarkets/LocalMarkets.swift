@@ -84,37 +84,81 @@ extension LocalMarkets {
     }
 }
 extension LocalMarkets {
+    private mutating func trade(
+        selling: OrderedDictionary<Resource, ResourceOutput>,
+        weights: SegmentedWeights<InelasticDemand>,
+        budget: (l: Int64, e: Int64, x: Int64),
+        as lei: LEI,
+        in tile: Address,
+        progressive: (l: Bool, e: Bool, x: Bool)
+    ) {
+        self.trade(
+            selling: selling,
+            weights: weights,
+            budget: budget,
+            as: lei,
+            in: tile,
+            progressive: progressive
+        ) {
+            // no keypath, compiler optimization bug
+            $0.distribute($1, share: { $0.weight })
+        }
+    }
+    private mutating func trade(
+        selling: OrderedDictionary<Resource, ResourceOutput>,
+        weights: SegmentedWeights<ElasticDemand>,
+        budget: (l: Int64, e: Int64, x: Int64),
+        as lei: LEI,
+        in tile: Address,
+        progressive: (l: Bool, e: Bool, x: Bool)
+    ) {
+        self.trade(
+            selling: selling,
+            weights: weights,
+            budget: budget,
+            as: lei,
+            in: tile,
+            progressive: progressive
+        ) {
+            // no keypath, compiler optimization bug
+            $0.distribute($1, share: { $0.weight })
+        }
+    }
     private mutating func trade<Demand>(
         selling: OrderedDictionary<Resource, ResourceOutput>,
         weights: SegmentedWeights<Demand>,
         budget: (l: Int64, e: Int64, x: Int64),
         as lei: LEI,
         in tile: Address,
-        progressive: (l: Bool, e: Bool, x: Bool)
-    ) {
+        progressive: (l: Bool, e: Bool, x: Bool),
+        distribute: ([Demand], Int64) -> [Int64]?
+    ) where Demand: SegmentedDemand {
         self.buy(
             budget: budget.0,
             entity: lei,
             memo: .tier(0),
             tile: tile,
-            weights: weights.l,
-            progressive: progressive.0
+            demands: weights.l.demands,
+            progressive: progressive.0,
+            distribute: distribute
         )
         self.buy(
             budget: budget.1,
             entity: lei,
             memo: .tier(1),
             tile: tile,
-            weights: weights.e,
-            progressive: progressive.1
+            demands: weights.e.demands,
+            progressive: progressive.1,
+            distribute: distribute
         )
         self.buy(
             budget: budget.2,
             entity: lei,
             memo: .tier(2),
             tile: tile,
-            weights: weights.x,
-            progressive: progressive.2
+            demands: weights.x.demands,
+            progressive: progressive.2,
+            distribute: distribute
         )
         self.sell(supply: selling, entity: lei, tile: tile)
     }
@@ -124,19 +168,16 @@ extension LocalMarkets {
         entity: LEI,
         memo: LocalMarket.Memo? = nil,
         tile: Address,
-        weights: SegmentedWeights<Demand>.Tier,
+        demands: [Demand],
         progressive: Bool,
-    ) {
+        distribute: ([Demand], Int64) -> [Int64]?
+    ) where Demand: SegmentedDemand {
         guard budgetTotal > 0,
-        let budgets: [Int64] = weights.demands.distribute(
-            budgetTotal,
-            // no keypath, compiler optimization bug
-            share: { $0.value }
-        ) else {
+        let budgets: [Int64] = distribute(demands, budgetTotal) else {
             return
         }
 
-        for (budget, demand): (Int64, Demand) in zip(budgets, weights.demands) {
+        for (budget, demand): (Int64, Demand) in zip(budgets, demands) {
             if budget > 0, demand.unitsToPurchase > 0 {
                 self[demand.id / tile].buy(
                     budget: budget,

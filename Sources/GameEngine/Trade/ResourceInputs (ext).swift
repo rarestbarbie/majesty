@@ -7,13 +7,6 @@ import JavaScriptInterop
 import OrderedCollections
 
 extension ResourceInputs {
-    var fulfilled: Double {
-        min(
-            self.segmented.values.reduce(1) { min($0, $1.fulfilled) },
-            self.tradeable.values.reduce(1) { min($0, $1.fulfilled) },
-        )
-    }
-
     var valueConsumed: Int64 {
         self.segmented.values.reduce(0) { $0 + $1.valueConsumed } +
         self.tradeable.values.reduce(0) { $0 + $1.valueConsumed }
@@ -44,7 +37,7 @@ extension ResourceInputs {
                     resource.width(
                         base: amount,
                         efficiency: efficiency,
-                        reservedDays: self.tradeableDaysSupply
+                        reservedDays: self.tradeableDaysReserve
                     )
                 )
             }
@@ -127,10 +120,10 @@ extension ResourceInputs {
                 $0["Returned today", +] = +?unitsReturned[/3]
             }
 
-            if  tradeableResource, self.tradeableDaysSupply > 0 {
+            if  tradeableResource, self.tradeableDaysReserve > 0 {
                 $0[>] = """
-                Their next purchase is expected in \(em: self.tradeableDaysSupply) \
-                \(self.tradeableDaysSupply == 1 ? "day" : "days")
+                Their next purchase is expected in \(em: self.tradeableDaysReserve) \
+                \(self.tradeableDaysReserve == 1 ? "day" : "days")
                 """
             }
         }
@@ -231,14 +224,14 @@ extension ResourceInputs {
     @frozen public enum ObjectKey: JSString, Sendable {
         case segmented = "s"
         case tradeable = "t"
-        case tradeableDaysSupply = "d"
+        case tradeableDaysReserve = "d"
     }
 }
 extension ResourceInputs: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.segmented] = self.segmented
         js[.tradeable] = self.tradeable
-        js[.tradeableDaysSupply] = self.tradeableDaysSupply
+        js[.tradeableDaysReserve] = self.tradeableDaysReserve
     }
 }
 extension ResourceInputs: JavaScriptDecodable {
@@ -246,7 +239,7 @@ extension ResourceInputs: JavaScriptDecodable {
         self.init(
             segmented: try js[.segmented].decode(),
             tradeable: try js[.tradeable].decode(),
-            tradeableDaysSupply: try js[.tradeableDaysSupply].decode()
+            tradeableDaysReserve: try js[.tradeableDaysReserve].decode()
         )
     }
 }

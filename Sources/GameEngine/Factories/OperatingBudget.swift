@@ -81,10 +81,10 @@ extension OperatingBudget {
         let v: Int64 = state.vl + state.ve
         let basis: Int64 = CashAllocationBasis.adjust(liquidity: account.settled, assets: v)
 
-        /// These are the minimum theoretical balances the factory would need to purchase 100%
-        /// of its needs in that tier on any particular day.
-        let bl: Int64 = (totalCostPerDay.l + workersCostPerDay) * d.l
-        let be: Int64 = .init(
+        /// These are the minimum theoretical balances the factory would need to fill its
+        /// stockpile for that tier all the way to maximum capacity
+        let bl: Int64 = stockpileMaxDays * (totalCostPerDay.l + workersCostPerDay) * d.l
+        let be: Int64 = stockpileMaxDays * Int64.init(
             (
                 Double.init(totalCostPerDay.e * d.e) * corporateOptimal +
                 Double.init(clerksCostPerDay * d.e) * clerksOptimal
