@@ -59,7 +59,8 @@ extension InventoryBreakdown {
             tier: self.focus,
             currency: currency,
             location: pop.state.tile,
-            cache: cache
+            cache: cache,
+            progressive: false
         )
 
         self.reset(outputs: pop.state.inventory.out.count)
@@ -110,12 +111,13 @@ extension InventoryBreakdown {
             .init(id: .x, label: "Expansion", value: factory.state.z.fx),
         ]
 
+        let progressive: Bool
         let inputs: ResourceInputs
 
         switch self.focus {
-        case .l: inputs = factory.state.inventory.l
-        case .e: inputs = factory.state.inventory.e
-        case .x: inputs = factory.state.inventory.x
+        case .l: (inputs, progressive) = (factory.state.inventory.l, false)
+        case .e: (inputs, progressive) = (factory.state.inventory.e, false)
+        case .x: (inputs, progressive) = (factory.state.inventory.x, true)
         }
 
         self.reset(inputs: inputs.count)
@@ -124,7 +126,8 @@ extension InventoryBreakdown {
             tier: self.focus,
             currency: currency,
             location: factory.state.tile,
-            cache: cache
+            cache: cache,
+            progressive: progressive
         )
 
         self.reset(outputs: factory.state.inventory.out.count)
@@ -176,12 +179,13 @@ extension InventoryBreakdown {
             .init(id: .x, label: "Development", value: building.state.z.fx),
         ]
 
+        let progressive: Bool
         let inputs: ResourceInputs
 
         switch self.focus {
-        case .l: inputs = building.state.inventory.l
-        case .e: inputs = building.state.inventory.e
-        case .x: inputs = building.state.inventory.x
+        case .l: (inputs, progressive) = (building.state.inventory.l, false)
+        case .e: (inputs, progressive) = (building.state.inventory.e, false)
+        case .x: (inputs, progressive) = (building.state.inventory.x, true)
         }
 
         self.reset(inputs: inputs.count)
@@ -190,7 +194,8 @@ extension InventoryBreakdown {
             tier: self.focus,
             currency: currency,
             location: building.state.tile,
-            cache: cache
+            cache: cache,
+            progressive: progressive
         )
 
         self.reset(outputs: building.state.inventory.out.count)
@@ -221,16 +226,20 @@ extension InventoryBreakdown {
         currency: CurrencyID,
         location: Address,
         cache: borrowing GameUI.Cache,
+        progressive: Bool
     ) {
         for (id, input): (Resource, ResourceInput) in inputs.tradeable {
             let market: WorldMarket.State? = cache.markets.tradeable[id / currency]?.state
             self.needs.append(
-                ResourceNeed.init(
+                progressive ? .progressive(
                     label: cache.rules.resources[id].label,
                     tier: tier,
-                    stockpile: input.units.total,
-                    filled: input.unitsConsumed,
-                    demand: input.unitsDemanded,
+                    input: input,
+                    price: market?.history.last?.prices,
+                ) : .continuous(
+                    label: cache.rules.resources[id].label,
+                    tier: tier,
+                    input: input,
                     price: market?.history.last?.prices,
                 )
             )
@@ -238,12 +247,15 @@ extension InventoryBreakdown {
         for (id, input): (Resource, ResourceInput) in inputs.segmented {
             let market: LocalMarket? = cache.markets.segmented[id / location]
             self.needs.append(
-                ResourceNeed.init(
+                progressive ? .progressive(
                     label: cache.rules.resources[id].label,
                     tier: tier,
-                    stockpile: input.units.total,
-                    filled: input.units.added,
-                    demand: input.unitsDemanded,
+                    input: input,
+                    price: market?.price,
+                ) : .continuous(
+                    label: cache.rules.resources[id].label,
+                    tier: tier,
+                    input: input,
                     price: market?.price,
                 )
             )

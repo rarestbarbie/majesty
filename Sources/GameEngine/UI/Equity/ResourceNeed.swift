@@ -7,10 +7,72 @@ struct ResourceNeed {
     let label: ResourceLabel
     let tier: ResourceTierIdentifier
 
-    let stockpile: Int64?
-    let filled: Int64
-    let demand: Int64
+    let demanded: Int64
+    let acquired: Int64
+    let fulfilled: Double
+    let stockpile: Double?
+
     let price: Candle<Double>?
+}
+extension ResourceNeed {
+    static func progressive(
+        label: ResourceLabel,
+        tier: ResourceTierIdentifier,
+        input: ResourceInput,
+        price: Candle<Double>?,
+    ) -> Self {
+        let fulfilled: Double
+        let stockpile: Double
+        if  input.unitsDemanded > 0 {
+            let denominator: Double = Double.init(input.unitsDemanded)
+            fulfilled = input.units.added < input.unitsDemanded
+                ? Double.init(input.units.added) / denominator
+                : 1
+            stockpile = input.units.total < input.unitsDemanded
+                ? Double.init(input.units.total) / denominator
+                : 1
+        } else {
+            fulfilled = 0
+            stockpile = 0
+        }
+
+        return .init(
+            label: label,
+            tier: tier,
+            demanded: input.unitsDemanded,
+            acquired: input.units.total,
+            fulfilled: fulfilled,
+            stockpile: stockpile,
+            price: price
+        )
+    }
+
+    static func continuous(
+        label: ResourceLabel,
+        tier: ResourceTierIdentifier,
+        input: ResourceInput,
+        price: Candle<Double>?,
+    ) -> Self {
+        let fulfilled: Double
+        if  input.unitsDemanded > 0 {
+            let unitsConsumed: Int64 = input.unitsConsumed
+            fulfilled = unitsConsumed < input.unitsDemanded
+                ? Double.init(unitsConsumed) / Double.init(input.unitsDemanded)
+                : 1
+        } else {
+            fulfilled = 0
+        }
+
+        return .init(
+            label: label,
+            tier: tier,
+            demanded: input.unitsDemanded,
+            acquired: input.units.total,
+            fulfilled: fulfilled,
+            stockpile: nil,
+            price: price
+        )
+    }
 }
 extension ResourceNeed: Identifiable {
     var id: InventoryLine {
@@ -27,9 +89,10 @@ extension ResourceNeed: JavaScriptEncodable {
         case name
         case icon
         case tier
+        case demanded
+        case acquired
+        case fulfilled
         case stockpile
-        case filled
-        case demand
         case price
     }
 
@@ -38,9 +101,10 @@ extension ResourceNeed: JavaScriptEncodable {
         js[.name] = self.label.title
         js[.icon] = self.label.icon
         js[.tier] = self.tier
+        js[.demanded] = self.demanded
+        js[.acquired] = self.acquired
+        js[.fulfilled] = self.fulfilled
         js[.stockpile] = self.stockpile
-        js[.filled] = self.filled
-        js[.demand] = self.demand
         js[.price] = self.price
     }
 }

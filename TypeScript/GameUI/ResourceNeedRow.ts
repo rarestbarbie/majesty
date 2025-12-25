@@ -17,8 +17,8 @@ export class ResourceNeedRow implements DiffableListElement<string> {
     public readonly id: string;
     public readonly node: HTMLAnchorElement;
 
-    private readonly demand: ProgressCell;
-    private readonly stockpile: HTMLElement;
+    private readonly demanded: ProgressCell;
+    private readonly acquired: ProgressCell;
     private readonly price: Ticker;
 
     private owner: GameID;
@@ -34,18 +34,18 @@ export class ResourceNeedRow implements DiffableListElement<string> {
         const label: HTMLDivElement = document.createElement('div');
         label.textContent = `${state.icon} ${state.name}`;
 
-        this.demand = new ProgressCell();
-        this.demand.node.setAttribute('data-tooltip-type', type.tooltipResourceIO);
+        this.demanded = new ProgressCell();
+        this.demanded.node.setAttribute('data-tooltip-type', type.tooltipResourceIO);
 
-        this.stockpile = document.createElement('div');
-        this.stockpile.setAttribute('data-tooltip-type', type.tooltipStockpile);
+        this.acquired = new ProgressCell();
+        this.acquired.node.setAttribute('data-tooltip-type', type.tooltipStockpile);
 
         this.price = new Ticker(Fortune.Malus);
         this.price.outer.setAttribute('data-tooltip-type', type.tooltipExplainPrice);
 
         this.node.appendChild(label);
-        this.node.appendChild(this.demand.node);
-        this.node.appendChild(this.stockpile);
+        this.node.appendChild(this.demanded.node);
+        this.node.appendChild(this.acquired.node);
         this.node.appendChild(this.price.outer);
         this.node.dataset['tier'] = state.tier;
 
@@ -59,29 +59,18 @@ export class ResourceNeedRow implements DiffableListElement<string> {
             this.configure();
         }
 
-        UpdateBigInt(this.demand.summary, state.demand);
+        UpdateBigInt(this.demanded.summary, state.demanded);
+        this.demanded.set(state.fulfilled * 100);
 
-        let fraction: number;
-        if (state.demand === 0n) {
-            fraction = 0; // Avoid division by zero
-        } else if (state.filled > state.demand) {
-            fraction = 1;
-        } else {
-            fraction = Number(state.filled) / Number(state.demand);
-        }
-
-        this.demand.set(fraction * 100);
+        UpdateBigInt(this.acquired.summary, state.acquired);
 
         if (state.stockpile !== undefined) {
-            UpdateBigInt(this.stockpile, state.stockpile);
+            this.acquired.node.classList.remove(CellStyle.Bloody);
+            this.acquired.set(state.stockpile * 100);
+        } else if (state.fulfilled < 1) {
+            this.acquired.node.classList.add(CellStyle.Bloody);
         } else {
-            UpdateText(this.stockpile, '');
-        }
-
-        if (state.filled < state.demand) {
-            this.stockpile.classList.add(CellStyle.Bloody);
-        } else {
-            this.stockpile.classList.remove(CellStyle.Bloody);
+            this.acquired.node.classList.remove(CellStyle.Bloody);
         }
 
         if (state.price !== undefined) {
@@ -90,11 +79,11 @@ export class ResourceNeedRow implements DiffableListElement<string> {
     }
 
     private configure(): void {
-        this.demand.node.setAttribute(
+        this.demanded.node.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([this.owner, this.id]),
         );
-        this.stockpile.setAttribute(
+        this.acquired.node.setAttribute(
             'data-tooltip-arguments',
             JSON.stringify([this.owner, this.id]),
         );
