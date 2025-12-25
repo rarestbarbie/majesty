@@ -89,9 +89,7 @@ extension LiquidityPool.Assets {
 
         let q: Int64
 
-        if  n.high > t.high {
-            q = limit
-        } else if n.high == t.high, n.low >= t.low {
+        if (n.high, n.low) >= (t.high, t.low) {
             q = limit
         } else {
             if !d.overflow, n.high == 0 {
