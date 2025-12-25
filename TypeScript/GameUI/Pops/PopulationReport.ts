@@ -16,7 +16,10 @@ export interface PopulationReport {
     readonly pops: PopTableEntry[];
     readonly pop?: PopDetails;
 
+    readonly sex?: string;
+    readonly sexes: string[];
+
     readonly filter?: string;
-    readonly filterlist?: number;
+    readonly filterlist: number;
     readonly filterlists: LegalEntityFilterLabel[][];
 }

@@ -11,6 +11,6 @@ export interface ProductionReport {
     readonly factory?: FactoryDetails;
 
     readonly filter?: string;
-    readonly filterlist?: number;
+    readonly filterlist: number;
     readonly filterlists: LegalEntityFilterLabel[][];
 }

@@ -7,7 +7,7 @@ import JavaScriptInterop
 
 public struct ProductionReport {
     private var selection: PersistentSelection<
-        Filter,
+        Filters,
         InventoryBreakdown<FactoryDetailsTab>.Focus
     >
 
@@ -49,11 +49,17 @@ extension ProductionReport {
             nil
         )
 
+        /// TODO: return a better default here
+        let defaultTile: Address? = filters.location.first.map {
+            switch $0 {
+            case .location(_, let address): address
+            }
+        }
+
         self.selection.rebuild(
             filtering: cache.factories,
             entries: &self.entries,
             details: &self.details,
-            default: filters.location.first?.id ?? .all,
             sort: self.sort.ascending(_:_:)
         ) {
             let equity: Equity<LEI>.Statistics = $0.equity
@@ -76,11 +82,13 @@ extension ProductionReport {
             )
 
             return entry
+        } filter: {
+            $0.location = $0.location ?? defaultTile
         } update: {
             $0.update(to: $2, cache: cache)
         }
 
-        self.filters.0 = [.all] + filters.location
+        self.filters.0 = filters.location
     }
 }
 extension ProductionReport {
@@ -100,14 +108,9 @@ extension ProductionReport: JavaScriptEncodable {
         js[.factories] = self.entries
         js[.factory] = self.details
 
-        js[.filter] = self.selection.filter
-
-        switch self.selection.filter {
-        case nil: break
-        case .all?: js[.filterlist] = 0
-        case .location?: js[.filterlist] = 0
-        }
-
+        // currently there is only one filterlist in the sidebar
+        js[.filter] = self.selection.filters.location.map(Filter.location(_:))
+        js[.filterlist] = 0
         js[.filterlists] = [self.filters.0]
     }
 }

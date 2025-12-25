@@ -11,6 +11,6 @@ export interface InfrastructureReport {
     readonly building?: BuildingDetails;
 
     readonly filter?: string;
-    readonly filterlist?: number;
+    readonly filterlist: number;
     readonly filterlists: LegalEntityFilterLabel[][];
 }

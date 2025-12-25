@@ -7,7 +7,7 @@ export class ManagedList<T extends ManagedListElement<ID>, ID> extends DiffableL
         update: (state: U, element: T) => void,
         selected: ID | undefined = undefined,
     ): void {
-        super.apply(
+        super.updateObservable(
             states,
             create,
             update,

@@ -6,7 +6,7 @@ import JavaScriptInterop
 import OrderedCollections
 
 public struct PopulationReport {
-    private var selection: PersistentSelection<Filter, InventoryBreakdown<PopDetailsTab>.Focus>
+    private var selection: PersistentSelection<Filters, InventoryBreakdown<PopDetailsTab>.Focus>
 
     private var filters: ([FilterLabel], [Never])
     private var columns: (
@@ -37,8 +37,8 @@ public struct PopulationReport {
         self.details = nil
         self.entries = []
         self.sort = .init()
-        self.sort.update(column: .type(PopOccupation.Politician.descending))
         self.sort.update(column: .race(""))
+        self.sort.update(column: .type(PopOccupation.Politician.descending))
     }
 }
 extension PopulationReport {
@@ -77,11 +77,17 @@ extension PopulationReport {
             nil
         )
 
+        /// TODO: return a better default here
+        let defaultTile: Address? = filters.location.first.map {
+            switch $0 {
+            case .location(_, let address): address
+            }
+        }
+
         self.selection.rebuild(
             filtering: cache.pops,
             entries: &self.entries,
             details: &self.details,
-            default: filters.location.first?.id ?? .all,
             sort: self.sort.ascending(_:_:)
         ) {
             guard
@@ -100,6 +106,9 @@ extension PopulationReport {
             )
 
             return entry
+        } filter: {
+            $0.location = $0.location ?? defaultTile
+            $0.sex = $0.sex ?? .F
         } update: {
             $0.update(to: $2, cache: cache)
         }
@@ -117,7 +126,7 @@ extension PopulationReport {
             as: ColumnControl.race(_:)
         )
 
-        self.filters.0 = [.all] + filters.location
+        self.filters.0 = filters.location
     }
 }
 extension PopulationReport {
@@ -128,6 +137,8 @@ extension PopulationReport {
         case column
         case pops
         case pop
+        case sex
+        case sexes
 
         case filter
         case filterlist
@@ -152,14 +163,12 @@ extension PopulationReport: JavaScriptEncodable {
         js[.pops] = self.entries
         js[.pop] = self.details
 
-        js[.filter] = self.selection.filter
+        js[.sex] = self.selection.filters.sex.map(Filter.sex(_:))
+        js[.sexes] = Sex.allCases.map(Filter.sex(_:))
 
-        switch self.selection.filter {
-        case nil: break
-        case .all?: js[.filterlist] = 0
-        case .location?: js[.filterlist] = 0
-        }
-
+        // currently there is only one filterlist in the sidebar
+        js[.filter] = self.selection.filters.location.map(Filter.location(_:))
+        js[.filterlist] = 0
         js[.filterlists] = [self.filters.0]
     }
 }

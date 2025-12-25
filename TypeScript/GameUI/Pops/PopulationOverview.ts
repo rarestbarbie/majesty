@@ -9,22 +9,24 @@ import { GameID } from '../../GameEngine/GameID.js';
 import { ScreenContent } from '../Application/ScreenContent.js';
 import { Swift } from '../../Swift.js';
 import {
+    GenderFilter,
+    InventoryBreakdown,
+    InventoryCharts,
     LegalEntityFilterLabel,
     MarketFilter,
+    OwnershipBreakdown,
     PopulationReport,
     PopDetailsTab,
+    PopIcon,
     PopTableEntry,
     PopTableRow,
     ScreenType,
     TooltipType,
-    PopIcon,
-    InventoryBreakdown,
-    InventoryCharts,
-    OwnershipBreakdown,
 } from '../exports.js';
 
 export class PopulationOverview extends ScreenContent {
-    private filters: FilterList<MarketFilter, string>[];
+    private regions: FilterList<MarketFilter, string>[];
+    private sexes: StaticList<GenderFilter, string>;
 
     private readonly inventoryCharts: InventoryCharts;
     private readonly inventory: InventoryBreakdown;
@@ -53,10 +55,10 @@ export class PopulationOverview extends ScreenContent {
     constructor() {
         super();
 
-        this.filters = [
+        this.regions = [
             new FilterList<MarketFilter, string>('🌐'),
         ];
-
+        this.sexes = new StaticList<GenderFilter, string>(document.createElement('ul'));
         this.pops = new Table<PopTableRow, GameID>('Pops');
 
         this.inventoryCharts = new InventoryCharts(PopulationOverview);
@@ -103,7 +105,7 @@ export class PopulationOverview extends ScreenContent {
 
         if (this.dom === undefined) {
             this.dom = {
-                index: new FilterTabs(this.filters),
+                index: new FilterTabs(this.regions),
                 panel: document.createElement('div'),
                 title: document.createElement('header'),
                 titleIcon: new PopIcon(),
@@ -117,10 +119,15 @@ export class PopulationOverview extends ScreenContent {
             this.dom.title.appendChild(this.dom.titleIcon.gender);
             this.dom.title.appendChild(this.dom.nav);
 
+            const filters: HTMLDivElement = document.createElement('div');
+            filters.classList.add('filters');
+            filters.appendChild(this.sexes.node);
+
             const upper: HTMLDivElement = document.createElement('div');
             upper.classList.add('upper');
             upper.appendChild(this.dom.title);
             upper.appendChild(this.dom.stats);
+            upper.appendChild(filters);
 
             this.dom.panel.appendChild(upper);
             this.dom.panel.appendChild(this.pops.node);
@@ -161,7 +168,7 @@ export class PopulationOverview extends ScreenContent {
             break;
         }
 
-        this.dom.index.tabs[state.filterlist ?? 0].checked = true;
+        this.dom.index.tabs[state.filterlist].checked = true;
         this.update(state);
     }
 
@@ -183,7 +190,7 @@ export class PopulationOverview extends ScreenContent {
         );
 
         for (let i: number = 0; i < this.dom.index.tabs.length; i++) {
-            this.filters[i].update(
+            this.regions[i].update(
                 state.filterlists[i],
                 (label: LegalEntityFilterLabel) => new MarketFilter(
                     {
@@ -197,6 +204,11 @@ export class PopulationOverview extends ScreenContent {
                 state.filter
             );
         }
+        this.sexes.allocate(
+            state.sexes,
+            (code: string) => new GenderFilter(code, ScreenType.Population),
+            state.sex
+        );
 
         if (state.pop === undefined) {
             return;

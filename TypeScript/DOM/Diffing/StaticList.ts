@@ -1,13 +1,26 @@
 import { Identifiable, DiffableList, DiffableListElement } from '../exports.js';
 
 export class StaticList<T extends DiffableListElement<ID>, ID> extends DiffableList<T, ID> {
+    public allocate(
+        elements: ID[],
+        create: (id: ID) => T,
+        selected: ID | undefined = undefined,
+    ): void {
+        super.allocateObservable(
+            elements,
+            create,
+            (_: T) => {},
+            selected
+        );
+    }
+
     public update<U extends Identifiable<ID>>(
         states: U[],
         create: (state: U) => T,
         update: (state: U, element: T) => void,
         selected: ID | undefined = undefined,
     ): void {
-        super.apply(
+        super.updateObservable(
             states,
             create,
             update,

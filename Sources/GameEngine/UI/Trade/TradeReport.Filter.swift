@@ -1,19 +1,12 @@
 import GameEconomy
+import GameIDs
 import JavaScriptInterop
 import JavaScriptKit
 
 extension TradeReport {
-    @frozen public struct Filter: RawRepresentable, Equatable, Hashable {
-        public let rawValue: WorldMarket.Asset
-        @inlinable public init(rawValue: WorldMarket.Asset) {
-            self.rawValue = rawValue
-        }
+    @StringUnion @frozen public enum Filter: Equatable, Hashable, Comparable {
+        @tag("A") case asset(WorldMarket.Asset)
     }
 }
-extension TradeReport.Filter: ConvertibleToJSValue, LoadableFromJSValue {}
-extension TradeReport.Filter: PersistentSelectionFilter {
-    typealias Subject = WorldMarket
-    static func ~= (self: Self, value: WorldMarket) -> Bool {
-        self.rawValue == value.id.x || self.rawValue == value.id.y
-    }
-}
+extension TradeReport.Filter: CustomStringConvertible, LosslessStringConvertible {}
+extension TradeReport.Filter: ConvertibleToJSString, LoadableFromJSString {}
