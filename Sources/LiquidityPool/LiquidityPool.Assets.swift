@@ -54,9 +54,7 @@ extension LiquidityPool.Assets {
         } else {
             // fallback to Int128
             n.full = Int128.init(n.low) | Int128.init(n.high) << 64
-            d.full = d.overflow
-                ? Int128.init(self.base) + Int128.init(base)
-                : Int128.init(d.low)
+            d.full = Int128.init(UInt64.init(bitPattern: d.low))
             q = Int64.init(n.full / d.full)
         }
 
@@ -76,7 +74,9 @@ extension LiquidityPool.Assets {
         let t: (high: Int64, low: UInt64)
         if  d.overflow {
             // this is rare, since we expect `base` to be much smaller than `self.base`
-            let denominator: Int128 = Int128.init(self.base) + Int128.init(base)
+            // we can just extract the `UInt64` bit pattern, since the result of adding two
+            // non-negative `Int64`s will never overflow more than one bit
+            let denominator: Int128 = .init(UInt64.init(bitPattern: d.low))
             let threshold: Int128 = denominator * Int128.init(limit)
 
             t.high = Int64.init(truncatingIfNeeded: threshold >> 64)
