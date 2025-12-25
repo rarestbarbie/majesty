@@ -2,7 +2,7 @@ import LiquidityPool
 import Testing
 
 @Suite struct LiquidityPoolTests {
-    @Test static func illiquid() {
+    @Test static func Illiquid() {
         var A: LiquidityPool = .init(liquidity: (1, 2))
         var B: LiquidityPool = .init(liquidity: (1, 1))
         var C: LiquidityPool = .init(liquidity: (2, 1))
@@ -26,7 +26,7 @@ import Testing
         #expect(b == 1_000_000)
     }
 
-    @Test static func buy() {
+    @Test static func Buy() {
         var A: LiquidityPool = .init(liquidity: (2, 2))
         var B: LiquidityPool = .init(liquidity: (3, 2))
         var C: LiquidityPool = .init(liquidity: (4, 1))
@@ -36,7 +36,7 @@ import Testing
         #expect(C.buy(2) == (bought: 2, for: 1))
     }
 
-    @Test static func sell() {
+    @Test static func Sell() {
         var A: LiquidityPool = .init(liquidity: (1, 4))
         var B: LiquidityPool = .init(liquidity: (2, 3))
         var C: LiquidityPool = .init(liquidity: (2, 2))
@@ -46,7 +46,7 @@ import Testing
         #expect(C.sell(2) == (sold: 2, for: 1))
     }
 
-    @Test static func overbuy() {
+    @Test static func Overbuy() {
         var A: LiquidityPool = .init(liquidity: (2, 2))
         var B: LiquidityPool = .init(liquidity: (3, 2))
         var C: LiquidityPool = .init(liquidity: (4, 1))
@@ -56,7 +56,7 @@ import Testing
         #expect(C.buy(.max) == (bought: 3, for: 3))
     }
 
-    @Test static func oversell() {
+    @Test static func Oversell() {
         var A: LiquidityPool = .init(liquidity: (1, 4))
         var B: LiquidityPool = .init(liquidity: (2, 3))
         var C: LiquidityPool = .init(liquidity: (2, 2))
@@ -66,7 +66,7 @@ import Testing
         #expect(C.sell(.max) == (sold: 2, for: 1))
     }
 
-    @Test static func swaps() {
+    @Test static func Swaps() {
         var x: LiquidityPool = .init(liquidity: (base: 100, quote: 1000))
 
         // Selling 10 `x` should push down its price in `y`.
@@ -84,7 +84,7 @@ import Testing
         #expect(y.volume.base.total == 165)
     }
 
-    @Test static func purchases() {
+    @Test static func Purchases() {
         do {
             var pool: LiquidityPool = .init(liquidity: (base: 100, quote: 1000))
             var x: Int64 = 1_000_000
@@ -119,5 +119,79 @@ import Testing
             #expect(pool.conjugated.swap(&y, limit: 1_000_000) == 1000 - 90 - 75 - 1)
             #expect(y == 899_900)
         }
+    }
+
+    /// Tests Path 1 (Numerator Overflow) & Path 3 (Cost Calculation Overflow)
+    /// Scenario: Reserves are 10 Trillion. User swaps 10 Trillion.
+    /// Math:
+    ///   Numerator = 10T * 10T = 100e24 (Overflows 64-bit)
+    ///   Denominator = 10T + 10T = 20T
+    ///   q = 100e24 / 20T = 5T
+    /// Cost Check:
+    ///   CostNum = 10T * 5T = 50e24 (Overflows 64-bit)
+    ///   CostDen = 10T - 5T = 5T
+    ///   Cost = 50e24 / 5T = 10T
+    @Test static func WhaleTradeOverflow() {
+        // 10 Trillion (1e13)
+        let x: Int64 = 10_000_000_000_000
+        let pool: LiquidityPool = .init(liquidity: (base: x, quote: x))
+
+        // This call triggers `n.high != 0` in `quote(_ base)`
+        // AND `m.high != 0` in `quote(cost:)`
+        let result: (cost: Int64, amount: Int64) = pool.assets.quote(x)
+
+        #expect(result.amount == 5_000_000_000_000)
+        #expect(result.cost == 10_000_000_000_000)
+    }
+
+    /// Tests Path 2 (Denominator Overflow)
+    /// Scenario: Base reserve is near Int64.max.
+    /// Math:
+    ///   Base = Int64.max - 100
+    ///   Input = 200
+    ///   Denominator = (Max - 100) + 200 = Max + 100 (Overflows 64-bit signed)
+    ///   Numerator = 1000 * 200 = 200,000
+    ///   q = 200,000 / (Max + 100) = 0
+    @Test static func DenominatorOverflow() {
+        let x: Int64 = Int64.max - 100
+        let pool: LiquidityPool = .init(liquidity: (base: x, quote: 1000))
+
+        // This triggers `d.overflow == true` but `n.high == 0`
+        let result: (cost: Int64, amount: Int64) = pool.assets.quote(200)
+
+        #expect(result.amount == 0)
+        #expect(result.cost == 0)
+    }
+
+    /// Tests Path 4 (Limit Threshold Overflow)
+    /// Scenario: Denominator overflows, forcing the Limit check to use 128-bit math.
+    @Test static func limitCheckOverflow() {
+        let x: Int64 = Int64.max - 100
+        let pool: LiquidityPool = .init(liquidity: (base: x, quote: 1000))
+
+        // Swap 200. Denominator overflows.
+        // We set a limit of 1.
+        // Threshold Check:
+        //   Denominator (approx 9e18) * Limit (1) = 9e18
+        //   Numerator (200,000)
+        //   Numerator < Threshold, so Limit is NOT hit.
+        //   Proceeds to calculate q = 0.
+        let result: (cost: Int64, amount: Int64) = pool.assets.quote(200, limit: 1)
+        #expect(result.amount == 0)
+    }
+
+    /// Tests Mixed Path: Numerator Fits, Denominator Fits (Fast Path)
+    /// Ensures the optimization didn't break standard large-but-safe numbers.
+    @Test static func largeNumbersFastPath() {
+        // 1 Billion. Product is 1e18 (Fits in 64-bit, barely).
+        // 1,000,000,000 * 1,000,000,000 = 1,000,000,000,000,000,000
+        // UInt64.max is ~18,446,000,000,000,000,000.
+        let x: Int64 = 1_000_000_000
+        let pool: LiquidityPool = .init(liquidity: (base: x, quote: x))
+
+        let result: (cost: Int64, amount: Int64) = pool.assets.quote(x)
+
+        // q = 1e18 / 2e9 = 500,000,000
+        #expect(result.amount == 500_000_000)
     }
 }
