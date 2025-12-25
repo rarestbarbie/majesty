@@ -555,12 +555,14 @@ extension FactoryContext {
         let growthFactor: Int64 = self.productivity * (self.state.size.level + 1)
         if  self.state.inventory.x.full {
             self.state.size.grow()
-            self.state.inventory.x.consume(
+            self.state.inventory.x.consumeAvailable(
                 from: self.type.expansion,
                 scalingFactor: (growthFactor, self.state.z.ei)
             )
         }
 
+        // we need to reset this, or we won’t buy any tomorrow
+        self.state.inventory.x.tradeableDaysSupply = 0
         self.state.z.fx = self.state.inventory.x.fulfilled
     }
 
@@ -653,11 +655,11 @@ extension FactoryContext {
         /// the amount of currency that was sunk into purchasing inputs, and subtract the
         /// approximate value of the inputs consumed today.
         let throughput: Int64 = self.productivity * update.workersPaid
-        self.state.inventory.l.consume(
+        self.state.inventory.l.consumeAmortized(
             from: self.type.materials,
             scalingFactor: (throughput, self.state.z.ei)
         )
-        self.state.inventory.e.consume(
+        self.state.inventory.e.consumeAmortized(
             from: self.type.corporate,
             scalingFactor: (throughput, self.state.z.ei * budget.fe)
         )

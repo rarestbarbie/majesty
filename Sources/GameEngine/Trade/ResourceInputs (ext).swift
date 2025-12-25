@@ -38,11 +38,25 @@ extension ResourceInputs {
         min(
             zip(self.segmented.values, tier.segmented).reduce(limit) {
                 let (resource, (_, amount)): (ResourceInput, (Resource, Int64)) = $1
-                return min($0, resource.width(base: amount, efficiency: efficiency))
+                return min(
+                    $0,
+                    resource.width(
+                        base: amount,
+                        efficiency: efficiency,
+                        reservedDays: 1
+                    )
+                )
             },
             zip(self.tradeable.values, tier.tradeable).reduce(limit) {
                 let (resource, (_, amount)): (ResourceInput, (Resource, Int64)) = $1
-                return min($0, resource.width(base: amount, efficiency: efficiency))
+                return min(
+                    $0,
+                    resource.width(
+                        base: amount,
+                        efficiency: efficiency,
+                        reservedDays: self.tradeableDaysSupply
+                    )
+                )
             }
         )
     }
@@ -88,7 +102,10 @@ extension ResourceInputs {
         let unitsReturned: Int64
         let supplyDays: Double?
 
+        let tradeableResource: Bool
+
         if  let input: ResourceInput = self.tradeable[id] {
+            tradeableResource = true
             units = input.units
             value = input.value
             unitsReturned = input.unitsReturned
@@ -97,6 +114,7 @@ extension ResourceInputs {
             )
         } else if
             let input: ResourceInput = self.segmented[id] {
+            tradeableResource = false
             units = input.units
             value = input.value
             unitsReturned = input.unitsReturned
@@ -117,6 +135,13 @@ extension ResourceInputs {
                 }
             } else if unitsReturned > 0 {
                 $0["Returned today", +] = +?unitsReturned[/3]
+            }
+
+            if  tradeableResource, self.tradeableDaysSupply > 0 {
+                $0[>] = """
+                Their next purchase is expected in \(em: self.tradeableDaysSupply) \
+                \(self.tradeableDaysSupply == 1 ? "day" : "days")
+                """
             }
         }
     }
@@ -139,7 +164,7 @@ extension ResourceInputs {
 
                 $0[>] = actual == price.c ? nil : """
                 Due to their position in line, and the available liquidity on the market, the \
-                average price they actually paid today was \(em: actual[..2])
+                average price they actually paid was \(em: actual[..2])
                 """
                 $0[>] = actual <= price.l ? nil : """
                 The luckiest buyers paid \(em: price.l[..2]) today
@@ -216,12 +241,14 @@ extension ResourceInputs {
     @frozen public enum ObjectKey: JSString, Sendable {
         case segmented = "s"
         case tradeable = "t"
+        case tradeableDaysSupply = "d"
     }
 }
 extension ResourceInputs: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.segmented] = self.segmented
         js[.tradeable] = self.tradeable
+        js[.tradeableDaysSupply] = self.tradeableDaysSupply
     }
 }
 extension ResourceInputs: JavaScriptDecodable {
@@ -229,6 +256,7 @@ extension ResourceInputs: JavaScriptDecodable {
         self.init(
             segmented: try js[.segmented].decode(),
             tradeable: try js[.tradeable].decode(),
+            tradeableDaysSupply: try js[.tradeableDaysSupply].decode()
         )
     }
 }

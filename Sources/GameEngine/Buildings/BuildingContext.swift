@@ -220,11 +220,11 @@ extension BuildingContext: TransactingContext {
             from: self.type.output,
             scalingFactor: (self.state.z.active, 1)
         )
-        self.state.inventory.l.consume(
+        self.state.inventory.l.consumeAmortized(
             from: self.type.operations,
             scalingFactor: (self.state.z.active, self.state.z.ei)
         )
-        self.state.inventory.e.consume(
+        self.state.inventory.e.consumeAmortized(
             from: self.type.maintenance,
             scalingFactor: (self.state.z.total, self.state.z.ei)
         )
@@ -233,7 +233,7 @@ extension BuildingContext: TransactingContext {
             let created: Int64 = max(1, self.state.z.total / 256)
             self.state.created += created
             self.state.z.active += created
-            self.state.inventory.x.consume(
+            self.state.inventory.x.consumeAmortized(
                 from: self.type.development,
                 scalingFactor: (self.state.z.total, self.state.z.ei)
             )

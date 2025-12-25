@@ -5,15 +5,20 @@ import OrderedCollections
 @frozen public struct ResourceInputs {
     public var segmented: OrderedDictionary<Resource, ResourceInput>
     public var tradeable: OrderedDictionary<Resource, ResourceInput>
+    public var tradeableDaysSupply: Int64
 
     @inlinable public init(
         segmented: OrderedDictionary<Resource, ResourceInput>,
         tradeable: OrderedDictionary<Resource, ResourceInput>,
+        tradeableDaysSupply: Int64
     ) {
         self.segmented = segmented
         self.tradeable = tradeable
+        self.tradeableDaysSupply = tradeableDaysSupply
     }
-    @inlinable public static var empty: Self { .init(segmented: [:], tradeable: [:]) }
+    @inlinable public static var empty: Self {
+        .init(segmented: [:], tradeable: [:], tradeableDaysSupply: 0)
+    }
 }
 extension ResourceInputs {
     @inlinable public var count: Int { self.segmented.count + self.tradeable.count }
@@ -30,15 +35,49 @@ extension ResourceInputs {
             $1.turn(unitsDemanded: $0 * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }
-    public mutating func consume(
+
+    /// This function ignores `tradeableDaysSupply` and consumes all available resources up to
+    /// the specified quantity. If this is being called, it’s highly probable that it is not
+    /// being called on every turn, which makes it advisable to reset `self.tradeableDaysSupply`
+    /// to zero, in order to encourage more of the resources to be purchased on the next turn.
+    public mutating func consumeAvailable(
         from resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
+        self.consume(from: resourceTier, scalingFactor: scalingFactor, reservingDays: 1)
+    }
+    public mutating func consumeAmortized(
+        from resourceTier: ResourceTier,
+        scalingFactor: (x: Int64, z: Double),
+    ) {
+        self.consume(
+            from: resourceTier,
+            scalingFactor: scalingFactor,
+            reservingDays: self.tradeableDaysSupply
+        )
+        if  self.tradeableDaysSupply > 0 {
+            self.tradeableDaysSupply -= 1
+        }
+    }
+
+    private mutating func consume(
+        from resourceTier: ResourceTier,
+        scalingFactor: (x: Int64, z: Double),
+        reservingDays: Int64
+    ) {
         for (id, amount): (Resource, Int64) in resourceTier.segmented {
-            self.segmented[id].consume(amount * scalingFactor.x, efficiency: scalingFactor.z)
+            self.segmented[id].consume(
+                amount * scalingFactor.x,
+                efficiency: scalingFactor.z,
+                reservedDays: 1
+            )
         }
         for (id, amount): (Resource, Int64) in resourceTier.tradeable {
-            self.tradeable[id].consume(amount * scalingFactor.x, efficiency: scalingFactor.z)
+            self.tradeable[id].consume(
+                amount * scalingFactor.x,
+                efficiency: scalingFactor.z,
+                reservedDays: reservingDays
+            )
         }
     }
 }
@@ -55,6 +94,10 @@ extension ResourceInputs {
         in currency: CurrencyID,
         on exchange: inout WorldMarkets,
     ) -> TradeProceeds {
+        if  self.tradeableDaysSupply > 0 {
+            return .zero
+        }
+
         let weights: [Double] = self.tradeable.values.map {
             Double.init(
                 $0.needed($0.unitsDemanded * target.lower)
@@ -62,7 +105,8 @@ extension ResourceInputs {
         }
 
         return self.trade(
-            stockpileDays: target.today ... target.upper,
+            stockpileDaysTarget: target.today,
+            stockpileDaysReturn: target.upper,
             spendingLimit: budget,
             in: currency,
             on: &exchange,
@@ -75,6 +119,10 @@ extension ResourceInputs {
         in currency: CurrencyID,
         on exchange: inout WorldMarkets,
     ) -> TradeProceeds {
+        if  self.tradeableDaysSupply > 0 {
+            return .zero
+        }
+
         let weights: [Double] = self.tradeable.values.map {
             Double.init(
                 $0.needed($0.unitsDemanded * target.lower)
@@ -82,7 +130,8 @@ extension ResourceInputs {
         }
 
         return self.trade(
-            stockpileDays: target.today ... target.upper,
+            stockpileDaysTarget: target.today,
+            stockpileDaysReturn: target.upper,
             spendingLimit: budget,
             in: currency,
             on: &exchange,
@@ -92,7 +141,8 @@ extension ResourceInputs {
 
     /// Loss is negative, Gain is positive.
     private mutating func trade(
-        stockpileDays: ClosedRange<Int64>,
+        stockpileDaysTarget: Int64,
+        stockpileDaysReturn: Int64,
         spendingLimit: Int64,
         in currency: CurrencyID,
         on exchange: inout WorldMarkets,
@@ -112,7 +162,8 @@ extension ResourceInputs {
                 budgeted += 1
             }
             let value: Int64 = self.tradeable.values[i].trade(
-                stockpileDays: stockpileDays,
+                stockpileDaysTarget: stockpileDaysTarget,
+                stockpileDaysReturn: stockpileDaysReturn,
                 budget: budgeted,
                 in: currency,
                 on: &exchange
@@ -132,6 +183,8 @@ extension ResourceInputs {
             Budget: \(budget ?? [])
             """
         )
+
+        self.tradeableDaysSupply = stockpileDaysTarget
 
         return .init(gain: gain, loss: loss)
     }

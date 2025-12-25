@@ -7,3 +7,8 @@
         self.loss = loss
     }
 }
+extension TradeProceeds {
+    @inlinable public static var zero: Self {
+        .init(gain: 0, loss: 0)
+    }
+}

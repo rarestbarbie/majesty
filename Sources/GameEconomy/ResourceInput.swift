@@ -104,14 +104,15 @@ extension ResourceInput {
 extension ResourceInput {
     /// Returns the amount of funds actually spent.
     mutating func trade(
-        stockpileDays: ClosedRange<Int64>,
+        stockpileDaysTarget: Int64,
+        stockpileDaysReturn: Int64,
         budget: Int64,
         in currency: CurrencyID,
         on exchange: inout WorldMarkets
     ) -> Int64 {
         {
-            let target: Int64 = self.unitsDemanded * stockpileDays.lowerBound
-            let limit: Int64 = self.unitsDemanded * stockpileDays.upperBound
+            let target: Int64 = self.unitsDemanded * stockpileDaysTarget
+            let limit: Int64 = self.unitsDemanded * stockpileDaysReturn
 
             if  limit < self.units.total {
                 // We actually have too much of the resource, and need to sell some off.
@@ -163,10 +164,10 @@ extension ResourceInput {
     }
 }
 extension ResourceInput {
-    mutating func consume(_ amount: Int64, efficiency: Double) {
+    mutating func consume(_ amount: Int64, efficiency: Double, reservedDays: Int64) {
         let unitsConsumed: Int64 = min(
             Int64.init((Double.init(amount) * efficiency).rounded(.up)),
-            self.units.total
+            reservedDays <= 1 ? self.units.total : self.units.total / reservedDays
         )
 
         let valueConsumed: Int64 = self.units.total != 0

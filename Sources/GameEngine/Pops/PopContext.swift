@@ -333,7 +333,7 @@ extension PopContext: TransactingContext {
             }
 
             self.state.z.fl = self.state.inventory.l.fulfilled
-            self.state.inventory.l.consume(
+            self.state.inventory.l.consumeAmortized(
                 from: self.l,
                 scalingFactor: (self.state.z.active, z.l)
             )
@@ -353,7 +353,7 @@ extension PopContext: TransactingContext {
             }
 
             self.state.z.fe = self.state.inventory.e.fulfilled
-            self.state.inventory.e.consume(
+            self.state.inventory.e.consumeAmortized(
                 from: self.e,
                 scalingFactor: (self.state.z.total, z.e)
             )
@@ -373,7 +373,7 @@ extension PopContext: TransactingContext {
             }
 
             self.state.z.fx = self.state.inventory.x.fulfilled
-            self.state.inventory.x.consume(
+            self.state.inventory.x.consumeAmortized(
                 from: self.x,
                 scalingFactor: (self.state.z.active, z.x)
             )
