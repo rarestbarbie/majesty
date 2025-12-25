@@ -89,15 +89,18 @@ extension IntegrationTests {
         var s1: GameSession.State = try .reload()
         var s2: GameSession.State = try .reload()
 
-        let started: SuspendingClock.Instant = .now
+        let clock: SuspendingClock = .init()
+        let t1: Duration = try clock.measure {
+            try s1.run(until: target)
+        }
 
-        try s1.run(until: target)
+        print("GameSession took \(t1) to run until \(target)")
 
-        let elapsed: Duration = .now - started
+        let t2: Duration = try clock.measure {
+            try s2.run(until: target)
+        }
 
-        print("GameSession took \(elapsed) to run until \(target)")
-
-        try s2.run(until: target)
+        print("GameSession took \(t2) to run until \(target)")
 
         if  s1._hash != s2._hash {
             throw """
