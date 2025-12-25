@@ -1,7 +1,7 @@
 import GameIDs
 
 extension Turn.Jobs {
-    struct Hire<Location> where Location: Hashable {
+    struct Hire<Market> where Market: Hashable {
         private var blocks: [Key: [PopJobOfferBlock]]
 
         init() {
@@ -10,9 +10,9 @@ extension Turn.Jobs {
     }
 }
 extension Turn.Jobs.Hire {
-    subscript(location: Location, type: PopOccupation) -> [PopJobOfferBlock] {
-        _read   { yield  self.blocks[Key.init(location: location, type: type), default: []] }
-        _modify { yield &self.blocks[Key.init(location: location, type: type), default: []] }
+    subscript(market: Market, type: PopOccupation) -> [PopJobOfferBlock] {
+        _read   { yield  self.blocks[Key.init(market: market, type: type), default: []] }
+        _modify { yield &self.blocks[Key.init(market: market, type: type), default: []] }
     }
 }
 extension Turn.Jobs.Hire {

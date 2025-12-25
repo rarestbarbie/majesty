@@ -501,39 +501,44 @@ extension GameContext {
         [(PopOccupation, [PopJobOfferBlock])]
     ) {
         let offers: (
-            remote: [Turn.Jobs.Hire<PlanetID>.Key: [(Int, Int64)]],
+            remote: [Turn.Jobs.Hire<PlanetaryMarket>.Key: [(Int, Int64)]],
             local: [Turn.Jobs.Hire<Address>.Key: [(Int, Int64)]]
         ) = order.residents.reduce(into: ([:], [:])) {
             guard case .pop(let i) = $1 else {
                 return
             }
 
-            let pop: Pop = self.pops.state[i]
+            let pop: PopContext = self.pops[i]
 
             guard
-            let jobMode: PopJobMode = pop.occupation.jobMode else {
+            let currency: CurrencyID = pop.region?.properties.currency.id else {
                 return
             }
 
-            let unemployed: Int64 = pop.z.active - pop.employed()
+            guard
+            let jobMode: PopJobMode = pop.state.occupation.jobMode else {
+                return
+            }
+
+            let unemployed: Int64 = pop.state.z.active - pop.state.employed()
             if  unemployed <= 0 {
                 return
             }
 
             switch jobMode {
-            case .hourly, .mining:
-                let key: Turn.Jobs.Hire<Address>.Key = .init(
-                    location: pop.tile,
-                    type: pop.occupation
-                )
-                $0.local[key, default: []].append((i, unemployed))
-
             case .remote:
-                let key: Turn.Jobs.Hire<PlanetID>.Key = .init(
-                    location: pop.tile.planet,
-                    type: pop.occupation
+                let key: Turn.Jobs.Hire<PlanetaryMarket>.Key = .init(
+                    market: .init(planet: pop.state.tile.planet, medium: currency),
+                    type: pop.state.occupation
                 )
                 $0.remote[key, default: []].append((i, unemployed))
+
+            case .hourly, .mining:
+                let key: Turn.Jobs.Hire<Address>.Key = .init(
+                    market: pop.state.tile,
+                    type: pop.state.occupation
+                )
+                $0.local[key, default: []].append((i, unemployed))
             }
         }
 
