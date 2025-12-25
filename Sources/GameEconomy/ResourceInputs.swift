@@ -161,12 +161,17 @@ extension ResourceInputs {
 
         let supplyDaysTarget: Int64 = Self.stockpileDaysFactor * stockpileDays.lower
         let weights: [Double] = self.tradeable.values.map {
-            /// theoretical cost of one day’s worth of this resource
-            let cost: Double = Double.init($0.unitsDemanded) * exchange.price(
-                of: $0.id,
-                in: currency
+            /// w = deficit / demanded * sqrt(demanded * price)
+            ///   = deficit / demanded * sqrt(demanded) * sqrt(price)
+            ///   = deficit / sqrt(demanded) * sqrt(price)
+            ///   = deficit * sqrt(price / demanded)
+            ///
+            /// this can be a little counterintuitive, unless you remember that the deficit
+            /// itself is proportional to demand, which makes the weight scale with the
+            /// square root of demand and the square root of price.
+            return Double.init($0.needed($0.unitsDemanded * supplyDaysTarget)) * .sqrt(
+                exchange.price(of: $0.id, in: currency) / Double.init($0.unitsDemanded)
             )
-            return Double.init($0.needed($0.unitsDemanded * supplyDaysTarget)) * .sqrt(cost)
         }
 
         return self.trade(
