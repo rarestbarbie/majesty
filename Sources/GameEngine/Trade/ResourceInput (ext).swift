@@ -3,9 +3,11 @@ import JavaScriptKit
 import JavaScriptInterop
 
 extension ResourceInput {
-    func width(base: Int64, efficiency: Double) -> Int64 {
+    func width(base: Int64, efficiency: Double, reservedDays: Int64) -> Int64 {
         Int64.init(
-            Double.init(self.units.total) / (Double.init(base) * efficiency)
+            Double.init(self.units.total) / (
+                Double.init(base * max(1, reservedDays)) * efficiency
+            )
         )
     }
 }

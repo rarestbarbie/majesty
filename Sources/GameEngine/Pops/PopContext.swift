@@ -8,7 +8,7 @@ import GameRules
 import GameState
 import Random
 
-struct PopContext: RuntimeContext, LegalEntityContext {
+struct PopContext: RuntimeContext {
     let type: PopMetadata
     var state: Pop
     private(set) var stats: Pop.Stats
@@ -33,9 +33,10 @@ struct PopContext: RuntimeContext, LegalEntityContext {
 extension PopContext: Identifiable {
     var id: PopID { self.state.id }
 }
+extension PopContext: LegalEntityContext {
+    static var stockpileDaysRange: ClosedRange<Int64> { 4 ... 8 }
+}
 extension PopContext {
-    private static var stockpileDays: ClosedRange<Int64> { 3 ... 7 }
-
     var snapshot: PopSnapshot? {
         guard let region: RegionalAuthority = self.region else {
             return nil
@@ -194,7 +195,7 @@ extension PopContext: AllocatingContext {
                 account: turn.bank[account: self.lei],
                 weights: weights,
                 state: self.state.z,
-                stockpileMaxDays: Self.stockpileDays.upperBound,
+                stockpileMaxDays: Self.stockpileDaysMax,
             )
 
             // Align share price
@@ -241,7 +242,7 @@ extension PopContext: AllocatingContext {
                 account: turn.bank[account: self.lei],
                 weights: weights,
                 state: self.state.z,
-                stockpileMaxDays: Self.stockpileDays.upperBound,
+                stockpileMaxDays: Self.stockpileDaysMax,
                 investor: self.state.type.stratum == .Owner
             )
 
@@ -312,48 +313,43 @@ extension PopContext: TransactingContext {
                 } (&self.state.mines.values[j])
             }
 
-            let target: ResourceStockpileTarget = .random(
-                in: Self.stockpileDays,
-                using: &turn.random
-            )
+            let stockpileDays: ResourceStockpileTarget = self.stockpileTarget(&turn.random)
             let z: (l: Double, e: Double, x: Double) = self.state.needsScalePerCapita
 
             if  budget.l.tradeable > 0 {
                 account += enslaved ? self.state.inventory.l.tradeAsBusiness(
-                    stockpileDays: target,
+                    stockpileDays: stockpileDays,
                     spendingLimit: budget.l.tradeable,
                     in: region.currency.id,
                     on: &turn.worldMarkets,
                 ) : self.state.inventory.l.tradeAsConsumer(
-                    stockpileDays: target,
+                    stockpileDays: stockpileDays,
                     spendingLimit: budget.l.tradeable,
                     in: region.currency.id,
                     on: &turn.worldMarkets,
                 )
             }
 
-            self.state.z.fl = self.state.inventory.l.fulfilled
-            self.state.inventory.l.consume(
+            self.state.z.fl = self.state.inventory.l.consumeAmortized(
                 from: self.l,
                 scalingFactor: (self.state.z.active, z.l)
             )
 
             if  budget.e.tradeable > 0 {
                 account += enslaved ? self.state.inventory.e.tradeAsBusiness(
-                    stockpileDays: target,
+                    stockpileDays: stockpileDays,
                     spendingLimit: budget.e.tradeable,
                     in: region.currency.id,
                     on: &turn.worldMarkets,
                 ) : self.state.inventory.e.tradeAsConsumer(
-                    stockpileDays: target,
+                    stockpileDays: stockpileDays,
                     spendingLimit: budget.e.tradeable,
                     in: region.currency.id,
                     on: &turn.worldMarkets,
                 )
             }
 
-            self.state.z.fe = self.state.inventory.e.fulfilled
-            self.state.inventory.e.consume(
+            self.state.z.fe = self.state.inventory.e.consumeAmortized(
                 from: self.e,
                 scalingFactor: (self.state.z.total, z.e)
             )
@@ -365,15 +361,14 @@ extension PopContext: TransactingContext {
 
             if  budget.x.tradeable > 0 {
                 account += self.state.inventory.x.tradeAsConsumer(
-                    stockpileDays: target,
+                    stockpileDays: stockpileDays,
                     spendingLimit: budget.x.tradeable,
                     in: region.currency.id,
                     on: &turn.worldMarkets,
                 )
             }
 
-            self.state.z.fx = self.state.inventory.x.fulfilled
-            self.state.inventory.x.consume(
+            self.state.z.fx = self.state.inventory.x.consumeAmortized(
                 from: self.x,
                 scalingFactor: (self.state.z.active, z.x)
             )

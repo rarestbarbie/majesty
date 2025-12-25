@@ -5,8 +5,9 @@ export interface ResourceNeed {
     readonly name: string;
     readonly icon: string;
     readonly tier: 'l' | 'e' | 'x';
-    readonly stockpile?: bigint
-    readonly filled: bigint
-    readonly demand: bigint
+    readonly demanded: bigint
+    readonly acquired: bigint
+    readonly fulfilled: number
+    readonly stockpile?: number
     readonly price?: Candle<number>;
 }

@@ -67,7 +67,8 @@
         "factories": {
             "Hydroelectric Dam": 1,
             "Supermarket": 1,
-            "Appliance Factory": 1
+            "Appliance Factory": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -91,20 +92,25 @@
         "tile": "399N-1,4",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Clothing Workshop": 1
+            "Clothing Workshop": 1,
+            "Fossil Power Plant": 1
         }
     },
 
     // Caribbean Sea
     {
-        "tile": "399N0,3"
+        "tile": "399N0,3",
+        "factories": {
+            "Fossil Power Plant": 1
+        }
     },
 
     // Panama
     {
         "tile": "399E5",
         "factories": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -113,7 +119,8 @@
         "tile": "399N1,3",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Clothing Workshop": 1
+            "Clothing Workshop": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -121,7 +128,8 @@
     {
         "tile": "399S0,3",
         "factories": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -146,7 +154,8 @@
     {
         "tile": "399S1,2",
         "factories": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -154,7 +163,8 @@
     {
         "tile": "399S0,2",
         "factories": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -215,7 +225,8 @@
     {
         "tile": "399N3,-2",
         "factories": {
-            "Supermarket": 1
+            "Supermarket": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -224,7 +235,8 @@
         "tile": "399N2,-1",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Supermarket": 1
+            "Supermarket": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -233,7 +245,8 @@
         "tile": "399N3,-3",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Supermarket": 1
+            "Supermarket": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -241,7 +254,8 @@
     {
         "tile": "399N2,-3",
         "factories": {
-            "Hydroelectric Dam": 1
+            "Hydroelectric Dam": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -282,7 +296,8 @@
         "tile": "399S-1,-2",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Supermarket": 1
+            "Supermarket": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -291,7 +306,8 @@
         "tile": "399S-2,-1",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Supermarket": 1
+            "Supermarket": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -300,7 +316,8 @@
         "tile": "399N-2,-1",
         "factories": {
             "Desalination Plant": 1,
-            "Supermarket": 1
+            "Supermarket": 1,
+            "Fossil Power Plant": 1
         }
     },
 
@@ -310,7 +327,8 @@
         "factories": {
             "Desalination Plant": 1,
             "Supermarket": 1,
-            "Semiconductor Foundry": 1
+            "Semiconductor Foundry": 1,
+            "Fossil Power Plant": 1
         }
     }
 ]

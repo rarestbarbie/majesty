@@ -5,7 +5,7 @@ import GameState
 import GameIDs
 import Random
 
-struct BuildingContext: LegalEntityContext, RuntimeContext {
+struct BuildingContext: RuntimeContext {
     let type: BuildingMetadata
     var state: Building
     private(set) var stats: Building.Stats
@@ -25,9 +25,11 @@ struct BuildingContext: LegalEntityContext, RuntimeContext {
 extension BuildingContext: Identifiable {
     var id: BuildingID { self.state.id }
 }
+extension BuildingContext: LegalEntityContext {
+    static var stockpileDaysRange: ClosedRange<Int64> { 4 ... 8 }
+}
 extension BuildingContext {
     typealias ComputationPass = FactoryContext.ComputationPass
-    private static var stockpileDays: ClosedRange<Int64> { 3 ... 7 }
     private static var utilizationThreshold: Double { 0.99 }
 
     var snapshot: BuildingSnapshot? {
@@ -136,7 +138,7 @@ extension BuildingContext: TransactingContext {
             account: turn.bank[account: self.lei],
             weights: weights,
             state: self.state.z,
-            stockpileMaxDays: Self.stockpileDays.upperBound,
+            stockpileMaxDays: Self.stockpileDaysMax,
             invest: self.state.developmentRate(utilization: self.stats.utilization)
         )
 
@@ -172,14 +174,11 @@ extension BuildingContext: TransactingContext {
         }
 
         {
-            let stockpileTarget: ResourceStockpileTarget = .random(
-                in: Self.stockpileDays,
-                using: &turn.random,
-            )
+            let stockpileDays: ResourceStockpileTarget = self.stockpileTarget(&turn.random)
 
             if  budget.l.tradeable > 0 {
                 $0 += self.state.inventory.l.tradeAsBusiness(
-                    stockpileDays: stockpileTarget,
+                    stockpileDays: stockpileDays,
                     spendingLimit: budget.l.tradeable,
                     in: region.currency.id,
                     on: &turn.worldMarkets,
@@ -187,7 +186,7 @@ extension BuildingContext: TransactingContext {
             }
             if  budget.e.tradeable > 0 {
                 $0 += self.state.inventory.e.tradeAsBusiness(
-                    stockpileDays: stockpileTarget,
+                    stockpileDays: stockpileDays,
                     spendingLimit: budget.e.tradeable,
                     in: region.currency.id,
                     on: &turn.worldMarkets,
@@ -195,7 +194,7 @@ extension BuildingContext: TransactingContext {
             }
             if  budget.x.tradeable > 0 {
                 $0 += self.state.inventory.x.tradeAsBusiness(
-                    stockpileDays: stockpileTarget,
+                    stockpileDays: stockpileDays,
                     spendingLimit: budget.x.tradeable,
                     in: region.currency.id,
                     on: &turn.worldMarkets,
@@ -220,28 +219,28 @@ extension BuildingContext: TransactingContext {
             from: self.type.output,
             scalingFactor: (self.state.z.active, 1)
         )
-        self.state.inventory.l.consume(
+        self.state.z.fl = self.state.inventory.l.consumeAmortized(
             from: self.type.operations,
             scalingFactor: (self.state.z.active, self.state.z.ei)
         )
-        self.state.inventory.e.consume(
+        self.state.z.fe = self.state.inventory.e.consumeAmortized(
             from: self.type.maintenance,
             scalingFactor: (self.state.z.total, self.state.z.ei)
         )
-        if  self.state.inventory.x.full {
+
+        let growth: Bool
+
+        (self.state.z.fx, growth) = self.state.inventory.x.consumeAvailable(
+            from: self.type.development,
+            scalingFactor: (self.state.z.total, self.state.z.ei)
+        )
+
+        if  growth {
             // in this situation, `active` is usually close to or equal to `total`
             let created: Int64 = max(1, self.state.z.total / 256)
             self.state.created += created
             self.state.z.active += created
-            self.state.inventory.x.consume(
-                from: self.type.development,
-                scalingFactor: (self.state.z.total, self.state.z.ei)
-            )
         }
-
-        self.state.z.fl = self.state.inventory.l.fulfilled
-        self.state.z.fe = self.state.inventory.e.fulfilled
-        self.state.z.fx = self.state.inventory.x.fulfilled
 
         self.state.spending.buybacks += turn.bank.buyback(
             security: self.security,

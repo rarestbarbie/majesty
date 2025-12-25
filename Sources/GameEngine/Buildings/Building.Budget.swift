@@ -41,8 +41,8 @@ extension Building.Budget {
         let v: Int64 = state.vl + state.ve
         let basis: Int64 = CashAllocationBasis.adjust(liquidity: account.settled, assets: v)
 
-        let bl: Int64 = totalCostPerDay.l * d.l
-        let be: Int64 = totalCostPerDay.e * d.e
+        let bl: Int64 = stockpileMaxDays * d.l * totalCostPerDay.l
+        let be: Int64 = stockpileMaxDays * d.e * totalCostPerDay.e
 
         self.dividend = max(0, (basis - bl - be) / (10 * d.y))
         self.buybacks = max(0, (basis - bl - be - self.dividend) / d.y)

@@ -33,8 +33,8 @@ extension Pop.Budget {
         let v: Int64 = state.vl + state.ve
         let basis: Int64 = CashAllocationBasis.adjust(liquidity: account.settled, assets: v)
 
-        let bl: Int64 = totalCostPerDay.l * d.l
-        let be: Int64 = totalCostPerDay.e * d.e
+        let bl: Int64 = d.l * stockpileMaxDays * totalCostPerDay.l
+        let be: Int64 = d.e * stockpileMaxDays * totalCostPerDay.e
 
         var l: ResourceBudgetTier = .init()
         var e: ResourceBudgetTier = .init()
@@ -84,10 +84,8 @@ extension Pop.Budget {
         let v: Int64 = state.vl + state.ve
         let basis: Int64 = CashAllocationBasis.adjust(liquidity: account.settled, assets: v)
 
-        /// These are the minimum theoretical balances the pop would need to purchase 100% of
-        /// its needs in that tier on any particular day.
-        let bl: Int64 = totalCostPerDay.l * d.l
-        let be: Int64 = totalCostPerDay.e * d.e
+        let bl: Int64 = stockpileMaxDays * d.l * totalCostPerDay.l
+        let be: Int64 = stockpileMaxDays * d.e * totalCostPerDay.e
 
         var l: ResourceBudgetTier = .init()
         var e: ResourceBudgetTier = .init()
