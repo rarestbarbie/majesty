@@ -38,55 +38,90 @@ extension LiquidityPool.Assets {
 }
 extension LiquidityPool.Assets {
     @inlinable public func quote(_ base: Int64) -> (cost: Int64, amount: Int64) {
-        let bl: Int128 = .init(self.base)
-        let ql: Int128 = .init(self.quote)
+        /// Formula: q = (ql * base) / (bl + base)
+        /// where `q` is the amount that we could receive if we spent all of `base`
+        let n: (full: Int128, high: Int64, low: UInt64)
+        let d: (full: Int128, overflow: Bool, low: Int64)
 
-        let base: Int128 = .init(base)
-        /// This is the amount that we could receive if we spent all of `base`.
-        let q: Int128 = (ql * base) / (bl + base)
-        let (b, r): (Int128, Int128) = (bl * q).quotientAndRemainder(dividingBy: ql - q)
-        return (r > 0 ? Int64.init(b) + 1 : Int64.init(b), Int64.init(q))
+        (n.high, n.low) = self.quote.multipliedFullWidth(by: base)
+        (d.low, d.overflow) = self.base.addingReportingOverflow(base)
+
+        let q: Int64
+
+        if !d.overflow, n.high == 0 {
+            // if components fit in 64 bits, use native division
+            q = Int64.init(n.low / UInt64.init(d.low))
+        } else {
+            // fallback to Int128
+            n.full = Int128.init(n.low) | Int128.init(n.high) << 64
+            d.full = d.overflow
+                ? Int128.init(self.base) + Int128.init(base)
+                : Int128.init(d.low)
+            q = Int64.init(n.full / d.full)
+        }
+
+        return self.quote(cost: q)
     }
 
     @inlinable public func quote(_ base: Int64, limit: Int64) -> (cost: Int64, amount: Int64) {
         // callers check for zeros quite frequently, so we don’t bother including a
         // short-circuit for zeros here
+        let n: (full: Int128, high: Int64, low: UInt64)
+        let d: (full: Int128?, overflow: Bool, low: Int64)
 
-        // not sure if the optimization below is effective in practice
-
-        // If inputs are < 2^32, their product fits in 2^64 (Int64), avoiding Int128 completely.
-        // 4,294,967,295 is Int32.max.
-        // if  Int32.max > base,
-        //     Int32.max > self.base,
-        //     Int32.max > self.quote {
-        //     return self.quote64(base, limit: limit)
-        // }
-
-        let bl: Int128 = .init(self.base)
-        let ql: Int128 = .init(self.quote)
-
-        let limit: Int128 = .init(limit)
-        let base: Int128 = .init(base)
-
-        let n: Int128 = ql * base
-        let d: Int128 = bl + base
+        (n.high, n.low) = self.quote.multipliedFullWidth(by: base)
+        (d.low, d.overflow) = self.base.addingReportingOverflow(base)
 
         // 128-bit integer division is slow, check limit using multiplication to avoid it
-        let q: Int128 = n >= limit * d ? limit : n / d
-        let (b, r): (Int128, Int128) = (bl * q).quotientAndRemainder(dividingBy: ql - q)
-        return (r > 0 ? Int64.init(b) + 1 : Int64.init(b), Int64.init(q))
+        let t: (high: Int64, low: UInt64)
+        if  d.overflow {
+            // this is rare, since we expect `base` to be much smaller than `self.base`
+            let denominator: Int128 = Int128.init(self.base) + Int128.init(base)
+            let threshold: Int128 = denominator * Int128.init(limit)
+
+            t.high = Int64.init(truncatingIfNeeded: threshold >> 64)
+            t.low = UInt64.init(truncatingIfNeeded: threshold)
+            d.full = denominator
+        } else {
+            t = limit.multipliedFullWidth(by: d.low)
+            d.full = nil
+        }
+
+        let q: Int64
+
+        if  n.high > t.high {
+            q = limit
+        } else if n.high == t.high, n.low >= t.low {
+            q = limit
+        } else {
+            if !d.overflow, n.high == 0 {
+                // if components fit in 64 bits, use native division
+                q = Int64.init(n.low / UInt64.init(d.low))
+            } else {
+                // fallback to Int128
+                n.full = Int128.init(n.low) | Int128.init(n.high) << 64
+                q = Int64.init(n.full / (d.full ?? Int128.init(d.low)))
+            }
+        }
+
+        return self.quote(cost: q)
     }
 
-    @inlinable func quote64(_ base: Int64, limit: Int64) -> (cost: Int64, amount: Int64) {
-        let bl: Int64 = self.base
-        let ql: Int64 = self.quote
-
-        let n: Int64 = ql * base
-        let d: Int64 = bl + base
-        let q: Int64 = n >= limit * d ? limit : n / d
-
-        let (b, r): (Int64, Int64) = (bl * q).quotientAndRemainder(dividingBy: ql - q)
-        return (r > 0 ? b + 1 : b, q)
+    @inlinable func quote(cost q: Int64) -> (cost: Int64, amount: Int64) {
+        // optimization for `(b, r) = (bl * q) / (ql - q)`
+        let p: Int64 = self.quote - q
+        let m: (high: Int64, low: UInt64) = self.base.multipliedFullWidth(by: q)
+        if  m.high == 0 {
+            // if the high bits are 0, the result fits entirely in a 64-bit register,
+            // and this could be much faster
+            let m: UInt64 = m.low
+            let (b, r): (UInt64, UInt64) = m.quotientAndRemainder(dividingBy: UInt64.init(p))
+            return (r > 0 ? Int64.init(b) + 1 : Int64.init(b), q)
+        } else {
+            let m: Int128 = Int128.init(m.low) | Int128.init(m.high) << 64
+            let (b, r): (Int128, Int128) = m.quotientAndRemainder(dividingBy: Int128.init(p))
+            return (r > 0 ? Int64.init(b) + 1 : Int64.init(b), q)
+        }
     }
 
     mutating func swap(base: Int64, for quote: Int64) {
