@@ -15,7 +15,7 @@ struct Turn: ~Copyable {
     var conversions: [Pop.Conversion]
     var jobs: (
         hire: (
-            remote: Jobs.Hire<PlanetID>,
+            remote: Jobs.Hire<PlanetaryMarket>,
             local: Jobs.Hire<Address>
         ),
         fire: Jobs.Fire

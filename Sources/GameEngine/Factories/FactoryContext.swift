@@ -451,13 +451,16 @@ extension FactoryContext: TransactingContext {
                         self.state.z.cn += 1
                     }
 
-                    let scope: PlanetID = self.state.tile.planet
+                    let market: PlanetaryMarket = .init(
+                        planet: self.state.tile.planet,
+                        medium: region.currency.id
+                    )
                     let hire: PopJobOfferBlock = .init(
                         job: .factory(self.state.id),
                         bid: self.state.z.cn,
                         size: hireToday.clerks
                     )
-                    turn.jobs.hire.remote[scope, self.type.clerks.unit].append(hire)
+                    turn.jobs.hire.remote[market, self.type.clerks.unit].append(hire)
                 }
             }
 
