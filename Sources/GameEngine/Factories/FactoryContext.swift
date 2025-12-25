@@ -553,16 +553,13 @@ extension FactoryContext {
         }
 
         let growthFactor: Int64 = self.productivity * (self.state.size.level + 1)
-        if  self.state.inventory.x.full {
-            self.state.size.grow()
-            self.state.inventory.x.consumeAvailable(
+        if  self.state.inventory.x.consumeAvailable(
                 from: self.type.expansion,
                 scalingFactor: (growthFactor, self.state.z.ei)
-            )
+            ) {
+            self.state.size.grow()
         }
 
-        // we need to reset this, or we won’t buy any tomorrow
-        self.state.inventory.x.tradeableDaysSupply = 0
         self.state.z.fx = self.state.inventory.x.fulfilled
     }
 

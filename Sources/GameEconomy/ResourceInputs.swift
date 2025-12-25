@@ -22,6 +22,16 @@ import OrderedCollections
 }
 extension ResourceInputs {
     @inlinable public var count: Int { self.segmented.count + self.tradeable.count }
+
+    private var full: Bool {
+        for input: ResourceInput in self.segmented.values where input.units.total < input.unitsDemanded {
+            return false
+        }
+        for input: ResourceInput in self.tradeable.values where input.units.total < input.unitsDemanded {
+            return false
+        }
+        return true
+    }
 }
 extension ResourceInputs {
     public mutating func sync(
@@ -43,9 +53,19 @@ extension ResourceInputs {
     public mutating func consumeAvailable(
         from resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
-    ) {
-        self.consume(from: resourceTier, scalingFactor: scalingFactor, reservingDays: 1)
+    ) -> Bool {
+        // we need to reset this, or we won’t buy any tomorrow
+        defer {
+            self.tradeableDaysSupply = 0
+        }
+        if  self.full {
+            self.consume(from: resourceTier, scalingFactor: scalingFactor, reservingDays: 1)
+            return true
+        } else {
+            return false
+        }
     }
+
     public mutating func consumeAmortized(
         from resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),

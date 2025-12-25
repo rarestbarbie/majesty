@@ -24,16 +24,6 @@ extension ResourceInputs {
         self.tradeable.values.reduce(0) { $0 + $1.value.total }
     }
 
-    var full: Bool {
-        for input: ResourceInput in self.segmented.values where input.units.total < input.unitsDemanded {
-            return false
-        }
-        for input: ResourceInput in self.tradeable.values where input.units.total < input.unitsDemanded {
-            return false
-        }
-        return true
-    }
-
     func width(limit: Int64, tier: ResourceTier, efficiency: Double) -> Int64 {
         min(
             zip(self.segmented.values, tier.segmented).reduce(limit) {

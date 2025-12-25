@@ -228,15 +228,15 @@ extension BuildingContext: TransactingContext {
             from: self.type.maintenance,
             scalingFactor: (self.state.z.total, self.state.z.ei)
         )
-        if  self.state.inventory.x.full {
+        if  self.state.inventory.x.consumeAvailable(
+                from: self.type.development,
+                scalingFactor: (self.state.z.total, self.state.z.ei)
+            ) {
             // in this situation, `active` is usually close to or equal to `total`
             let created: Int64 = max(1, self.state.z.total / 256)
             self.state.created += created
             self.state.z.active += created
-            self.state.inventory.x.consumeAmortized(
-                from: self.type.development,
-                scalingFactor: (self.state.z.total, self.state.z.ei)
-            )
+
         }
 
         self.state.z.fl = self.state.inventory.l.fulfilled
