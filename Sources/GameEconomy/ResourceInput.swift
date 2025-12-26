@@ -170,6 +170,8 @@ extension ResourceInput {
             reservedDays <= 1 ? self.units.total : self.units.total / reservedDays
         )
 
+        /// the precise (integral) formula is
+        /// Δv = floor((Δu %/ u) * v)
         let valueConsumed: Int64 = self.units.total != 0
             ? (unitsConsumed %/ self.units.total) <> self.value.total
             : 0
