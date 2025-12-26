@@ -10,7 +10,7 @@ import JavaScriptInterop
 import Random
 import OrderedCollections
 
-struct Pop: LegalEntityState, Identifiable {
+struct Pop: PopProperties, LegalEntityState, Identifiable {
     let id: PopID
     let type: PopType
     let tile: Address
@@ -54,17 +54,6 @@ extension Pop: Sectionable {
 
     var section: Section { .init(type: self.type, tile: self.tile) }
 }
-extension Pop {
-    var occupation: PopOccupation {
-        self.type.occupation
-    }
-    var gender: Gender {
-        self.type.gender
-    }
-    var race: CultureID {
-        self.type.race
-    }
-}
 extension Pop: Deletable {
     var dead: Bool {
         self.z.total <= 0
@@ -99,15 +88,12 @@ extension Pop: Turnable {
         self.equity.turn()
     }
 }
-extension Pop: Backgroundable {
-    static var mothballing: Double { -0.1 }
-    static var restoration: Double { 0.04 }
-    // slave culling is determined by technology, so setting attrition to 200% scales the
-    // input parameter to the range [0, 1], since we are multiplying it by the actual rate later
-    static var attrition: Double { 2 }
-    static var vertex: Double { 0.5 }
-}
 extension Pop {
+    func employed() -> Int64 {
+        self.factories.values.reduce(0) { $0 + $1.count } +
+        self.mines.values.reduce(0) { $0 + $1.count }
+    }
+
     mutating func egress(
         evaluator: ConditionEvaluator,
         inherit: Fraction?,
@@ -169,29 +155,6 @@ extension Pop {
         #assert(
             self.z.active >= 0,
             "Pop (id = \(self.id)) has negative size (\(self.z.active))!"
-        )
-    }
-}
-extension Pop {
-    func employed() -> Int64 {
-        self.factories.values.reduce(0) { $0 + $1.count } +
-        self.mines.values.reduce(0) { $0 + $1.count }
-    }
-
-    var decadence: Double {
-        0.1 * self.y.con
-    }
-
-    var needsScalePerCapita: (l: Double, e: Double, x: Double) {
-        let decadence: Double = self.decadence
-        return self.type.stratum <= .Ward ? (
-            l: 1,
-            e: 1,
-            x: 1 + decadence
-        ) : (
-            l: 1 + decadence,
-            e: 1 + decadence * 2,
-            x: 1 + decadence * 3
         )
     }
 }

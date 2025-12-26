@@ -509,14 +509,19 @@ extension GameContext {
             }
 
             let pop: PopContext = self.pops[i]
+            let mode: PopOccupation.Mode = pop.state.occupation.mode
 
-            guard
-            let currency: CurrencyID = pop.region?.properties.currency.id else {
-                return
+            // early exit for pops that do not participate in hiring
+            switch mode {
+            case .aristocratic: return
+            case .livestock: return
+            case .remote: break
+            case .hourly: break
+            case .mining: break
             }
 
             guard
-            let jobMode: PopJobMode = pop.state.occupation.jobMode else {
+            let currency: CurrencyID = pop.region?.properties.currency.id else {
                 return
             }
 
@@ -525,15 +530,13 @@ extension GameContext {
                 return
             }
 
-            switch jobMode {
-            case .remote:
+            if case .remote = mode {
                 let key: Turn.Jobs.Hire<PlanetaryMarket>.Key = .init(
                     market: .init(planet: pop.state.tile.planet, medium: currency),
                     type: pop.state.occupation
                 )
                 $0.remote[key, default: []].append((i, unemployed))
-
-            case .hourly, .mining:
+            } else {
                 let key: Turn.Jobs.Hire<Address>.Key = .init(
                     market: pop.state.tile,
                     type: pop.state.occupation

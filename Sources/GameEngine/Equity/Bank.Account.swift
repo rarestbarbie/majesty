@@ -42,7 +42,7 @@ extension Bank.Account {
     }
 }
 extension Bank.Account {
-    var Δ: TurnDelta<Int64> {
+    var Δ: Delta<Int64> {
         .init(y: self.settled, z: self.balance)
     }
 

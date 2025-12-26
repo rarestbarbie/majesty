@@ -70,12 +70,6 @@ extension Building: Turnable {
         self.equity.turn()
     }
 }
-extension Building: Backgroundable {
-    static var mothballing: Double { -0.1 }
-    static var restoration: Double { 0.04 }
-    static var attrition: Double { 0.01 }
-    static var vertex: Double { 0.5 }
-}
 extension Building {
     enum ObjectKey: JSString, Sendable {
         case id

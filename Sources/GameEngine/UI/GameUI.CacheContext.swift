@@ -4,7 +4,6 @@ import GameEconomy
 import GameIDs
 import GameRules
 import GameState
-import GameUI
 
 extension GameUI {
     struct CacheContext {
@@ -31,22 +30,5 @@ extension GameUI.CacheContext {
             fatalError("player country does not exist in snapshot!")
         }
         return player
-    }
-}
-extension GameUI.CacheContext {
-    func tooltipExplainPrice(
-        _ object: some LegalEntitySnapshot,
-        _ line: InventoryLine,
-    ) -> Tooltip? {
-        let resource: Resource = line.resource
-        let market: (
-            segmented: LocalMarketSnapshot?,
-            tradeable: WorldMarket.State?
-        ) = (
-            self.markets.segmented[resource / object.state.tile]?.snapshot(object.region),
-            self.markets.tradeable[resource / object.region.currency.id]?.state
-        )
-
-        return object.tooltipExplainPrice(line, market: market)
     }
 }

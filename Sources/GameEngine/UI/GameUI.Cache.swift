@@ -88,7 +88,7 @@ extension GameUI.Cache {
         _ id: BuildingID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        (self.buildings[id]).map { self.context.tooltipExplainPrice($0, line) } ?? nil
+        self.buildings[id]?.tooltipExplainPrice(line, context: self.context)
     }
     func tooltipBuildingActive(_ id: BuildingID) -> Tooltip? {
         self.buildings[id]?.tooltipActive()
@@ -129,7 +129,7 @@ extension GameUI.Cache {
         _ id: BuildingID,
         _ item: CashAllocationItem,
     ) -> Tooltip? {
-        guard let budget: Building.Budget = self.buildings[id]?.state.budget else {
+        guard let budget: Building.Budget = self.buildings[id]?.budget else {
             return nil
         }
         let statement: CashAllocationStatement = .init(from: budget)
@@ -180,7 +180,7 @@ extension GameUI.Cache {
         _ id: FactoryID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        (self.factories[id]).map { self.context.tooltipExplainPrice($0, line) } ?? nil
+        self.factories[id]?.tooltipExplainPrice(line, context: self.context)
     }
 
     func tooltipFactorySize(_ id: FactoryID) -> Tooltip? {
@@ -218,14 +218,14 @@ extension GameUI.Cache {
         _ id: FactoryID,
         _ item: CashFlowItem,
     ) -> Tooltip? {
-        self.factories[id]?.cashFlow.tooltip(rules: self.rules, item: item)
+        self.factories[id]?.stats.cashFlow.tooltip(rules: self.rules, item: item)
     }
 
     func tooltipFactoryBudgetItem(
         _ id: FactoryID,
         _ item: CashAllocationItem,
     ) -> Tooltip? {
-        switch self.factories[id]?.state.budget {
+        switch self.factories[id]?.budget {
         case .active(let budget)?:
             let statement: CashAllocationStatement = .init(from: budget)
             return statement.tooltip(item: item)
@@ -252,71 +252,13 @@ extension GameUI.Cache {
     func tooltipPopVacantHelp(_ id: PopID) -> Tooltip? {
         self.pops[id]?.tooltipVacantHelp()
     }
-
     func tooltipPopJobs(_ id: PopID) -> Tooltip? {
-        guard let pop: PopSnapshot = self.pops[id] else {
-            return nil
-        }
-
-        if !pop.state.factories.isEmpty {
-            return self.tooltipPopJobs(list: pop.state.factories.values.elements) {
-                self.factories[$0]?.type.title ?? "Unknown"
-            }
-        }
-        if !pop.state.mines.isEmpty {
-            return self.tooltipPopJobs(list: pop.state.mines.values.elements) {
-                self.mines[$0]?.type.title ?? "Unknown"
-            }
-        } else {
-            let employment: Int64 = pop.stats.employedBeforeEgress
-            return .instructions {
-                $0["Total employment"] = employment[/3]
-                for output: ResourceOutput in pop.state.inventory.out.segmented.values {
-                    let name: String = self.rules.resources[output.id].title
-                    $0[>] = """
-                    Today these \(pop.state.occupation.plural) sold \(
-                        output.unitsSold[/3],
-                        style: output.unitsSold < output.units.added ? .neg : .pos
-                    ) of \
-                    \(em: output.units.added[/3]) \(name) produced
-                    """
-                }
-            }
-        }
+        self.pops[id]?.tooltipJobs(
+            factories: self.factories,
+            mines: self.mines,
+            rules: self.rules
+        )
     }
-    private func tooltipPopJobs<Job>(
-        list: [Job],
-        name: (Job.ID) -> String
-    ) -> Tooltip where Job: PopJob {
-        let total: (
-            count: Int64,
-            hired: Int64,
-            fired: Int64,
-            quit: Int64
-        ) = list.reduce(into: (0, 0, 0, 0)) {
-            $0.count += $1.count
-            $0.hired += $1.hired
-            $0.fired += $1.fired
-            $0.quit += $1.quit
-        }
-
-        return .instructions {
-            $0["Total employment"] = total.count[/3]
-            $0[>] {
-                for job: Job in list {
-                    let change: Int64 = job.hired - job.fired - job.quit
-                    $0[name(job.id), +] = job.count[/3] <- job.count - change
-                }
-            }
-            $0["Today’s change", +] = +?(total.hired - total.fired - total.quit)[/3]
-            $0[>] {
-                $0["Hired today", +] = +?total.hired[/3]
-                $0["Fired today", +] = ??(-total.fired)[/3]
-                $0["Quit today", +] = ??(-total.quit)[/3]
-            }
-        }
-    }
-
     func tooltipPopNeeds(
         _ id: PopID,
         _ tier: ResourceTierIdentifier
@@ -351,7 +293,7 @@ extension GameUI.Cache {
                 return nil
             }
             return .instructions {
-                $0[mine.type.miner.plural, +] = mine.miners.count[/3] / mine.miners.limit
+                $0[mine.metadata.miner.plural, +] = mine.miners.count[/3] / mine.miners.limit
                 $0["Today’s change", +] = mine.miners.count[/3] <- mine.miners.before
                 $0[>] {
                     // only elide fired, it’s annoying when the lines below jump around
@@ -359,13 +301,13 @@ extension GameUI.Cache {
                     $0["Fired", -] = +?mine.miners.fired[/3]
                     $0["Quit", -] = +mine.miners.quit[/3]
                 }
-                if  mine.type.decay {
+                if  mine.metadata.decay {
                     $0["Estimated deposits"] = mine.state.Δ.size[/3]
                     $0[>] {
                         $0["Estimated yield", (+)] = mine.state.Δ.yield[..2]
                     }
                     if  let yieldRank: Int = mine.state.z.yieldRank,
-                        let (chance, spawn): (Fraction, SpawnWeight) = mine.type.chance(
+                        let (chance, spawn): (Fraction, SpawnWeight) = mine.metadata.chance(
                             tile: tile.geology.id,
                             size: mine.state.z.size,
                             yieldRank: yieldRank
@@ -373,7 +315,7 @@ extension GameUI.Cache {
                         let miners: PopulationStats.Row = tile.properties?.pops.occupation[.Miner],
                         let fromWorkers: Fraction = miners.mineExpansionFactor {
                         let fromDeposit: Double = .init(
-                            mine.type.scale %/ (mine.type.scale + mine.state.z.size)
+                            mine.metadata.scale %/ (mine.metadata.scale + mine.state.z.size)
                         )
                         let fromWorkers: Double = .init(fromWorkers)
                         let fromRank: Double = MineMetadata.yieldRankExpansionFactor(
@@ -398,7 +340,7 @@ extension GameUI.Cache {
                     }
                 }
 
-                $0[>] = "\(mine.type.title)"
+                $0[>] = "\(mine.metadata.title)"
             }
         }
     }
@@ -414,7 +356,7 @@ extension GameUI.Cache {
         _ pop: PopID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        (self.pops[pop]).map { self.context.tooltipExplainPrice($0, line) } ?? nil
+        self.pops[pop]?.tooltipExplainPrice(line, context: self.context)
     }
 
     func tooltipPopType(
@@ -454,7 +396,7 @@ extension GameUI.Cache {
         _ id: PopID,
         _ item: CashAllocationItem,
     ) -> Tooltip? {
-        if  let budget: Pop.Budget = self.pops[id]?.state.budget {
+        if  let budget: Pop.Budget = self.pops[id]?.budget {
             let statement: CashAllocationStatement = .init(from: budget)
             return statement.tooltip(item: item)
         } else {

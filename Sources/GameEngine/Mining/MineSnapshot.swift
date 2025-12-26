@@ -7,7 +7,7 @@ import GameState
 import Random
 
 struct MineSnapshot: Sendable {
-    let type: MineMetadata
+    let metadata: MineMetadata
     let state: Mine
     let region: RegionalProperties?
     let miners: Workforce

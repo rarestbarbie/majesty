@@ -2,33 +2,70 @@ import D
 import GameEconomy
 import GameIDs
 import GameUI
+import ColorText
 
-protocol LegalEntitySnapshot<State>: Identifiable {
-    associatedtype State: LegalEntityState
+protocol LegalEntitySnapshot<ID>: Differentiable, Identifiable
+    where Dimensions: LegalEntityMetrics {
+    var tile: Address { get }
 
     var region: RegionalProperties { get }
-    var equity: Equity<LEI>.Statistics { get }
-    var state: State { get }
-
-    func tooltipExplainPrice(
-        _ line: InventoryLine,
-        market: (segmented: LocalMarketSnapshot?, tradeable: WorldMarket.State?)
-    ) -> Tooltip?
-}
-extension LegalEntitySnapshot {
-    var id: State.ID { self.state.id }
+    var equity: Equity<LEI>.Snapshot { get }
+    var inventory: InventorySnapshot { get }
 }
 extension LegalEntitySnapshot {
     func tooltipStockpile(
-        _ resource: InventoryLine,
+        _ line: InventoryLine,
     ) -> Tooltip? {
-        switch resource {
-        case .l(let id): self.state.inventory.l.tooltipStockpile(id, region: self.region)
-        case .e(let id): self.state.inventory.e.tooltipStockpile(id, region: self.region)
-        case .x(let id): self.state.inventory.x.tooltipStockpile(id, region: self.region)
-        case .o: nil
-        case .m: nil
+        if  case .consumed(let id) = line.query {
+            return self.inventory[id]?.tooltipStockpile(region: self.region)
+        } else {
+            return nil
         }
+    }
+
+    func tooltipExplainPrice(
+        _ line: InventoryLine,
+        context: GameUI.CacheContext,
+    ) -> Tooltip? {
+
+        let resource: Resource = line.resource
+        let market: (
+            segmented: LocalMarketSnapshot?,
+            tradeable: WorldMarket.State?
+        ) = (
+            context.markets.segmented[resource / self.tile]?.snapshot(self.region),
+            context.markets.tradeable[resource / self.region.currency.id]?.state
+        )
+
+        switch line.query {
+        case .consumed(let id):
+            guard let consumed: InventorySnapshot.Consumed = self.inventory[id] else {
+                return nil
+            }
+
+            if  consumed.tradeable,
+                let tradeable: WorldMarket.State = market.tradeable {
+                return consumed.tooltipExplainPriceTradeable(market: tradeable)
+            } else if
+                let segmented: LocalMarketSnapshot = market.segmented {
+                return consumed.tooltipExplainPriceSegmented(market: segmented)
+            }
+
+        case .produced(let id):
+            guard let produced: InventorySnapshot.Produced = self.inventory[id] else {
+                return nil
+            }
+
+            if  produced.tradeable,
+                let tradeable: WorldMarket.State = market.tradeable {
+                return produced.tooltipExplainPriceTradeable(market: tradeable)
+            } else if
+                let segmented: LocalMarketSnapshot = market.segmented {
+                return produced.tooltipExplainPriceSegmented(market: segmented)
+            }
+        }
+
+        return nil
     }
 }
 extension LegalEntitySnapshot {
@@ -82,47 +119,35 @@ extension LegalEntitySnapshot {
     }
 
     func tooltipOwnership() -> Tooltip {
-        let equity: Equity<LEI> = self.state.equity
+        let equity: Equity<LEI>.Snapshot = self.equity
         return .instructions {
-            $0["Shares outstanding", (-)] = self.equity.shareCount[/3] ^^ equity.issued
+            $0["Shares outstanding", (-)] = equity.shareCount[/3] ^^ equity.issued
             $0[>] {
                 $0["Today’s trading volume"] = equity.traded[/3]
             }
-            if  let last: EquitySplit = equity.splits.last {
-                let factor: EquitySplit.Factor = last.factor
+            if  let splitLast: EquitySplit = equity.splitLast {
+                let factor: EquitySplit.Factor = splitLast.factor
+                let color: ColorText.Style
                 switch factor {
                 case .reverse:
                     $0[>] = """
                     This stock most recently underwent \(factor.articleIndefinite) \
-                    \(neg: factor) reverse split on \(em: last.date[.phrasal_US])
+                    \(neg: factor) reverse split on \(em: splitLast.date[.phrasal_US])
                     """
 
-                    var times: Int = 0
-                    for split: EquitySplit in equity.splits.reversed() {
-                        guard case .reverse = split.factor else {
-                            break
-                        }
-                        times += 1
-                    }
-                    if  times > 1 {
-                        $0[>] = "It has split \(neg: times) times"
-                    }
+                    color = .neg
+
                 case .forward:
                     $0[>] = """
                     This stock most recently underwent \(factor.articleIndefinite) \
-                    \(pos: factor) stock split on \(em: last.date[.phrasal_US])
+                    \(pos: factor) stock split on \(em: splitLast.date[.phrasal_US])
                     """
 
-                    var times: Int = 0
-                    for split: EquitySplit in equity.splits.reversed() {
-                        guard case .forward = split.factor else {
-                            break
-                        }
-                        times += 1
-                    }
-                    if  times > 1 {
-                        $0[>] = "It has split \(pos: times) times"
-                    }
+                    color = .pos
+                }
+
+                if  self.equity.splits > 1 {
+                    $0[>] = "It has split \(self.equity.splits, style: color) times"
                 }
             }
         }

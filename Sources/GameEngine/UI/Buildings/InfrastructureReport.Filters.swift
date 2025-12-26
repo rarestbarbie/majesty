@@ -20,7 +20,7 @@ extension InfrastructureReport.Filters: PersistentSelectionFilter {
     }
 
     static func ~= (self: Self, value: BuildingSnapshot) -> Bool {
-        if  let location: Address = self.location, location != value.state.tile {
+        if  let location: Address = self.location, location != value.tile {
             return false
         }
 

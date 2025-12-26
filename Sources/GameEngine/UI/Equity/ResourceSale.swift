@@ -15,7 +15,7 @@ struct ResourceSale {
 extension ResourceSale: Identifiable {
     var id: InventoryLine {
         if let mine: MineID = self.mine {
-            return .m(MineVein.init(mine: mine, resource: self.label.id))
+            return .m(mine / self.label.id)
         } else {
             return .o(self.label.id)
         }

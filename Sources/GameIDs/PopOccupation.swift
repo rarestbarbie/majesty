@@ -64,15 +64,6 @@ extension PopOccupation: LosslessStringConvertible {
     }
 }
 extension PopOccupation {
-    @inlinable public var aristocratic: Bool {
-        switch self {
-        case .Influencer: true
-        case .Consultant: true
-        case .Aristocrat: true
-        default: false
-        }
-    }
-
     @inlinable public var stratum: PopStratum {
         switch self {
         case .Livestock:    .Ward

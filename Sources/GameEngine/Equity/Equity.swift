@@ -9,6 +9,7 @@ import Random
 
 struct Equity<Owner> where Owner: Hashable & ConvertibleToJSValue & LoadableFromJSValue {
     private(set) var shares: OrderedDictionary<Owner, EquityStake<Owner>>
+    // FIXME: consider capping the number of splits stored
     private(set) var splits: [EquitySplit]
     /// Total volume traded on the market today.
     private(set) var traded: Int64
@@ -57,13 +58,23 @@ extension Equity {
             for i: Int in self.shares.values.indices {
                 self.shares.values[i].shares *= factor
             }
+            if  case .forward? = self.splits.last?.factor {
+                self.splits.append(split)
+            } else {
+                // clear history
+                self.splits = [split]
+            }
+
         case .reverse(let factor):
             for i: Int in self.shares.values.indices {
                 self.shares.values[i].shares /= factor
             }
+            if  case .reverse? = self.splits.last?.factor {
+                self.splits.append(split)
+            } else {
+                self.splits = [split]
+            }
         }
-
-        self.splits.append(split)
     }
 
     mutating func split(

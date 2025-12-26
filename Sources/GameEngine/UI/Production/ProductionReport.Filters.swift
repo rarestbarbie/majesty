@@ -20,7 +20,7 @@ extension ProductionReport.Filters: PersistentSelectionFilter {
     }
 
     static func ~= (self: Self, value: FactorySnapshot) -> Bool {
-        if  let location: Address = self.location, location != value.state.tile {
+        if  let location: Address = self.location, location != value.tile {
             return false
         }
 

@@ -1,10 +1,12 @@
 import Assert
+import GameIDs
 
 extension Pop {
     struct Stats {
         private(set) var employmentBeforeEgress: Double
         private(set) var employedBeforeEgress: Int64
         private(set) var cashFlow: CashFlowStatement
+        private(set) var profit: ProfitMargins
     }
 }
 extension Pop.Stats {
@@ -12,7 +14,8 @@ extension Pop.Stats {
         self.init(
             employmentBeforeEgress: 0,
             employedBeforeEgress: 0,
-            cashFlow: .init()
+            cashFlow: .init(),
+            profit: .undefined,
         )
     }
 }
@@ -47,5 +50,7 @@ extension Pop.Stats {
         self.cashFlow.update(with: pop.inventory.l)
         self.cashFlow.update(with: pop.inventory.e)
         self.cashFlow.update(with: pop.inventory.x)
+
+        self.profit = .compute(asset: pop)
     }
 }

@@ -18,22 +18,26 @@ extension PopOccupation {
         }
     }
 
-    var jobMode: PopJobMode? {
+    var mode: Mode {
         switch self {
-        case .Livestock: nil
+        // politicians are miners, they mine a finite pool of regional influence
+        case .Politician: .mining
+        case .Aristocrat: .aristocratic
+
+        case .Consultant: .aristocratic
+        case .Influencer: .aristocratic
+        case .Engineer: .remote
+        case .Farmer: .remote
+
         case .Driver: .hourly
         case .Editor: .hourly
         case .Miner: .mining
-        case .Server: nil
-        case .Contractor: nil
+        // yes, servers and contractors are technically livestock,
+        // as they do not participate in the job market
+        case .Server: .livestock
+        case .Contractor: .livestock
 
-        case .Engineer: .remote
-        case .Farmer: .remote
-        case .Consultant: .remote
-        case .Influencer: nil
-
-        case .Aristocrat: nil
-        case .Politician: .mining
+        case .Livestock: .livestock
         }
     }
 

@@ -34,7 +34,7 @@ extension FactoryDetails {
         case .Ownership: self.ownership.update(from: factory, in: cache)
         }
 
-        self.name = factory.type.title
+        self.name = factory.metadata.title
     }
 }
 extension FactoryDetails: JavaScriptEncodable {

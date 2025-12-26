@@ -7,7 +7,7 @@ extension OrderedDictionary where Key == Resource, Value: ResourceStockpile {
         _modify { yield &self[resource, default: .init(id: resource)] }
     }
 
-    @inlinable public mutating func sync(
+    mutating func sync(
         with coefficients: OrderedDictionary<Resource, Int64>,
         sync: (Int64, inout Value) -> Void
     ) {
