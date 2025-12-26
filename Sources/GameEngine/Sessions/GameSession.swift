@@ -29,10 +29,10 @@ extension GameSession {
             countries: self.state.context.countries.state.reduce(into: [:]) { $0[$1.id] = $1 },
             markets: (self.state.world.tradeableMarkets, self.state.world.segmentedMarkets),
             planets: self.state.context.planets.reduce(into: [:]) {
-                $0[$1.state.id] = $1.snapshot
+                $0[$1.context.state.id] = $1.context.snapshot
             },
             tiles: self.state.context.planets.reduce(into: [:]) {
-                for tile: PlanetGrid.Tile in $1.grid.tiles.values {
+                for tile: PlanetGrid.Tile in $1.context.grid.tiles.values {
                     $0[tile.id] = tile.snapshot
                 }
             },
@@ -48,23 +48,23 @@ extension GameSession {
         let cache: GameUI.Cache = .init(
             context: context,
             pops: self.state.context.pops.reduce(into: [:]) {
-                if  case bloc? = $1.region?.bloc {
-                    $0[$1.id] = $1.snapshot
+                if  case bloc? = $1.context.region?.bloc {
+                    $0[$1.context.id] = $1.context.snapshot
                 }
             },
             factories: self.state.context.factories.reduce(into: [:]) {
-                if  case bloc? = $1.region?.bloc {
-                    $0[$1.id] = $1.snapshot
+                if  case bloc? = $1.context.region?.bloc {
+                    $0[$1.context.id] = $1.context.snapshot
                 }
             },
             buildings: self.state.context.buildings.reduce(into: [:]) {
-                if  case bloc? = $1.region?.bloc {
-                    $0[$1.id] = $1.snapshot
+                if  case bloc? = $1.context.region?.bloc {
+                    $0[$1.context.id] = $1.context.snapshot
                 }
             },
             mines: self.state.context.mines.reduce(into: [:]) {
-                if  case bloc? = $1.region?.bloc {
-                    $0[$1.state.id] = $1.snapshot
+                if  case bloc? = $1.context.region?.bloc {
+                    $0[$1.context.state.id] = $1.context.snapshot
                 }
             }
         )
@@ -123,7 +123,7 @@ extension GameSession {
     public func editTerrain() async -> PlanetTileEditor? {
         guard
         case (_, let current?) = await self.model.ui.navigator.current,
-        let planet: PlanetContext = self.state.context.planets[current.planet],
+        let planet: PlanetContext = self.state.context.planets[current.planet]?.context,
         let tile: PlanetGrid.Tile = planet.grid.tiles[current.tile] else {
             return nil
         }

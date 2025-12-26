@@ -1,4 +1,4 @@
-public protocol RuntimeContext<State> {
+public protocol RuntimeContext<State>: ~Copyable {
     associatedtype Metadata: AnyObject
     associatedtype State: Identifiable where State.ID: Comparable & Sendable
 

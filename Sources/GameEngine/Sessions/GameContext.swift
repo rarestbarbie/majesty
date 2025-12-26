@@ -79,7 +79,7 @@ extension GameContext {
             terrain: terrain,
             geology: geology
         )
-        self.planets[editor.id.planet]?.grid.resurface(
+        self.planets[editor.id.planet]?.context.grid.resurface(
             planet: editor.id.planet,
             rotate: editor.rotate,
             size: editor.size,
@@ -113,18 +113,18 @@ extension GameContext {
                     terrainDefault: terrainDefault,
                     geologyDefault: geologyDefault
                 )
-            } (&self.planets[i])
+            } (&self.planets[_i: i])
         }
     }
 
     func saveTerrain() -> TerrainMap {
         .init(
-            planets: self.planets.map(\.state),
+            planets: self.planets.map(\.context.state),
             planetSurfaces: self.planets.map {
                 PlanetSurface.init(
-                    id: $0.state.id,
-                    size: $0.grid.size,
-                    grid: $0.grid.tiles.values.map(PlanetSurface.Tile.init(from:))
+                    id: $0.context.state.id,
+                    size: $0.context.grid.size,
+                    grid: $0.context.grid.tiles.values.map(PlanetSurface.Tile.init(from:))
                 )
             }
         )
@@ -205,13 +205,13 @@ extension GameContext {
         world.bank.prune(in: retain)
 
         for i: Int in self.buildings.indices {
-            self.buildings[i].state.prune(in: retain)
+            self.buildings[_i: i].state.prune(in: retain)
         }
         for i: Int in self.factories.indices {
-            self.factories[i].state.prune(in: retain)
+            self.factories[_i: i].state.prune(in: retain)
         }
         for i: Int in self.pops.indices {
-            self.pops[i].state.prune(in: retain)
+            self.pops[_i: i].state.prune(in: retain)
         }
     }
     private mutating func index(world: borrowing GameWorld) throws {
@@ -229,24 +229,24 @@ extension GameContext {
         }
 
         for i: Int in self.planets.indices {
-            self.planets[i].startIndexCount()
+            self.planets[_i: i].startIndexCount()
         }
 
         for i: Int in self.buildings.indices {
-            self.buildings[i].startIndexCount()
+            self.buildings[_i: i].startIndexCount()
         }
         for i: Int in self.factories.indices {
-            self.factories[i].startIndexCount()
+            self.factories[_i: i].startIndexCount()
         }
         for i: Int in self.mines.indices {
-            self.mines[i].startIndexCount()
+            self.mines[_i: i].startIndexCount()
         }
         for i: Int in self.pops.indices {
-            self.pops[i].startIndexCount()
+            self.pops[_i: i].startIndexCount()
         }
         for i: Int in self.pops.indices {
             /// avoid copy-on-write
-            let (pop, stats): (Pop, Pop.Stats) = { ($0.state, $0.stats) } (self.pops[i])
+            let (pop, stats): (Pop, Pop.Stats) = { ($0.state, $0.stats) } (self.pops[_i: i])
             let counted: ()? = self.planets[pop.tile]?.addResidentCount(pop, stats)
 
             #assert(counted != nil, "Pop \(pop.id) has no home tile!!!")
@@ -266,7 +266,7 @@ extension GameContext {
                 assets: world.bank[account: pop.id.lei],
                 in: self.residentPass
             )
-            self.pops[i].update(equityStatistics: equity)
+            self.pops[_i: i].update(equityStatistics: equity)
             self.count(asset: pop.id.lei, equity: pop.equity)
         }
         for i: Int in self.factories.indices {
@@ -280,7 +280,7 @@ extension GameContext {
                 assets: world.bank[account: factory.id.lei],
                 in: self.residentPass
             )
-            self.factories[i].update(equityStatistics: equity)
+            self.factories[_i: i].update(equityStatistics: equity)
             self.count(asset: factory.id.lei, equity: factory.equity)
         }
         for i: Int in self.buildings.indices {
@@ -294,7 +294,7 @@ extension GameContext {
                 assets: world.bank[account: building.id.lei],
                 in: self.residentPass
             )
-            self.buildings[i].update(equityStatistics: equity)
+            self.buildings[_i: i].update(equityStatistics: equity)
             self.count(asset: building.id.lei, equity: building.equity)
         }
         for i: Int in self.mines.indices {
@@ -311,10 +311,10 @@ extension GameContext {
         turn.bank.turn()
 
         for i: Int in self.planets.indices {
-            try self.planets[i].advance(turn: &turn, context: self)
+            try self.planets[_i: i].advance(turn: &turn, context: self)
         }
         for i: Int in self.countries.indices {
-            try self.countries[i].advance(turn: &turn, context: self)
+            try self.countries[_i: i].advance(turn: &turn, context: self)
         }
 
         // need to call this first, to update prices before trading
@@ -379,9 +379,9 @@ extension GameContext {
 
         for i: Resident in shuffled.residents {
             switch i {
-            case .building(let i): self.buildings[i].transact(turn: &turn)
-            case .factory(let i): self.factories[i].transact(turn: &turn)
-            case .pop(let i): self.pops[i].transact(turn: &turn)
+            case .building(let i): self.buildings[_i: i].transact(turn: &turn)
+            case .factory(let i): self.factories[_i: i].transact(turn: &turn)
+            case .pop(let i): self.pops[_i: i].transact(turn: &turn)
             }
         }
 
@@ -411,20 +411,20 @@ extension GameContext {
         try self.index(world: world)
 
         for i: Int in self.planets.indices {
-            try self.planets[i].afterIndexCount(world: world, context: self.territoryPass)
+            try self.planets[_i: i].afterIndexCount(world: world, context: self.territoryPass)
         }
 
         for i: Int in self.buildings.indices {
-            try self.buildings[i].afterIndexCount(world: world, context: self.buildingPass)
+            try self.buildings[_i: i].afterIndexCount(world: world, context: self.buildingPass)
         }
         for i: Int in self.factories.indices {
-            try self.factories[i].afterIndexCount(world: world, context: self.factoryPass)
+            try self.factories[_i: i].afterIndexCount(world: world, context: self.factoryPass)
         }
         for i: Int in self.mines.indices {
-            try self.mines[i].afterIndexCount(world: world, context: self.minePass)
+            try self.mines[_i: i].afterIndexCount(world: world, context: self.minePass)
         }
         for i: Int in self.pops.indices {
-            try self.pops[i].afterIndexCount(world: world, context: self.popPass)
+            try self.pops[_i: i].afterIndexCount(world: world, context: self.popPass)
         }
     }
 }
@@ -503,46 +503,48 @@ extension GameContext {
         let offers: (
             remote: [Turn.Jobs.Hire<PlanetaryMarket>.Key: [(Int, Int64)]],
             local: [Turn.Jobs.Hire<Address>.Key: [(Int, Int64)]]
-        ) = order.residents.reduce(into: ([:], [:])) {
-            guard case .pop(let i) = $1 else {
+        ) = order.residents.reduce(into: ([:], [:])) { (_offers, i) in
+            guard case .pop(let i) = i else {
                 return
             }
+            {
+                (pop: borrowing PopContext) in
 
-            let pop: PopContext = self.pops[i]
-            let mode: PopOccupation.Mode = pop.state.occupation.mode
+                let mode: PopOccupation.Mode = pop.state.occupation.mode
 
-            // early exit for pops that do not participate in hiring
-            switch mode {
-            case .aristocratic: return
-            case .livestock: return
-            case .remote: break
-            case .hourly: break
-            case .mining: break
-            }
+                // early exit for pops that do not participate in hiring
+                switch mode {
+                case .aristocratic: return
+                case .livestock: return
+                case .remote: break
+                case .hourly: break
+                case .mining: break
+                }
 
-            guard
-            let currency: CurrencyID = pop.region?.properties.currency.id else {
-                return
-            }
+                guard
+                let currency: CurrencyID = pop.region?.properties.currency.id else {
+                    return
+                }
 
-            let unemployed: Int64 = pop.state.z.active - pop.state.employed()
-            if  unemployed <= 0 {
-                return
-            }
+                let unemployed: Int64 = pop.state.z.active - pop.state.employed()
+                if  unemployed <= 0 {
+                    return
+                }
 
-            if case .remote = mode {
-                let key: Turn.Jobs.Hire<PlanetaryMarket>.Key = .init(
-                    market: .init(planet: pop.state.tile.planet, medium: currency),
-                    type: pop.state.occupation
-                )
-                $0.remote[key, default: []].append((i, unemployed))
-            } else {
-                let key: Turn.Jobs.Hire<Address>.Key = .init(
-                    market: pop.state.tile,
-                    type: pop.state.occupation
-                )
-                $0.local[key, default: []].append((i, unemployed))
-            }
+                if case .remote = mode {
+                    let key: Turn.Jobs.Hire<PlanetaryMarket>.Key = .init(
+                        market: .init(planet: pop.state.tile.planet, medium: currency),
+                        type: pop.state.occupation
+                    )
+                    _offers.remote[key, default: []].append((i, unemployed))
+                } else {
+                    let key: Turn.Jobs.Hire<Address>.Key = .init(
+                        market: pop.state.tile,
+                        type: pop.state.occupation
+                    )
+                    _offers.local[key, default: []].append((i, unemployed))
+                }
+            } (self.pops[_i: i])
         }
 
         let workersUnavailable: [(PopOccupation, [PopJobOfferBlock])] = turn.jobs.hire.local.turn {
@@ -591,9 +593,9 @@ extension GameContext {
 
             switch block.job {
             case .factory(let id):
-                self.pops[pop].state.factories[id, default: .init(id: id)].hire(count)
+                self.pops[_i: pop].state.factories[id, default: .init(id: id)].hire(count)
             case .mine(let id):
-                self.pops[pop].state.mines[id, default: .init(id: id)].hire(count)
+                self.pops[_i: pop].state.mines[id, default: .init(id: id)].hire(count)
             }
         }
     }
@@ -638,17 +640,19 @@ extension GameContext {
     }
     private mutating func awardRanksToMines() {
         for i: Int in self.planets.indices {
-            for tile: PlanetGrid.Tile in self.planets[i].grid.tiles.values {
+            for tile: PlanetGrid.Tile in self.planets[_i: i].grid.tiles.values {
                 var ranks: [PopOccupation: [(id: MineID, yield: Double)]] = [:]
                 for mine: MineID in tile.mines {
                     guard
-                    let mine: MineContext = self.mines[mine] else {
+                    let mine: Object<MineContext> = self.mines[mine] else {
                         continue
                     }
 
-                    ranks[mine.type.miner, default: []].append(
-                        (id: mine.state.id, yield: mine.state.z.yield)
-                    )
+                    { (mine: borrowing MineContext) in
+                        ranks[mine.type.miner, default: []].append(
+                            (id: mine.state.id, yield: mine.state.z.yield)
+                        )
+                    } (mine.context)
                 }
                 for var mines: [(id: MineID, yield: Double)] in ranks.values {
                     mines.sort { $0.yield > $1.yield }
@@ -721,7 +725,7 @@ extension GameContext {
     }
     private mutating func executeConstructions(_ turn: inout Turn) throws {
         for i: Int in self.planets.indices {
-            for j: Int in self.planets[i].grid.tiles.values.indices {
+            for j: Int in self.planets[_i: i].grid.tiles.values.indices {
                 let (building, factory, mine, tile): (
                     BuildingMetadata?,
                     FactoryMetadata?,
@@ -741,7 +745,7 @@ extension GameContext {
                         turn: &turn
                     )
                     return (building, factory, mine, tile: $0.id)
-                } (&self.planets[i][j])
+                } (&self.planets[_i: i][j])
 
                 if  let type: BuildingMetadata = building {
                     let building: Building.Section = .init(type: type.id, tile: tile)

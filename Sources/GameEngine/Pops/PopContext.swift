@@ -8,7 +8,8 @@ import GameRules
 import GameState
 import Random
 
-struct PopContext: RuntimeContext {
+// copyable suppression crashes the compiler
+struct PopContext: /* ~Copyable, */ RuntimeContext {
     let type: PopMetadata
     var state: Pop
     private(set) var stats: Pop.Stats
@@ -30,7 +31,7 @@ struct PopContext: RuntimeContext {
         self.factoryJobPay = [:]
     }
 }
-extension PopContext: Identifiable {
+extension PopContext {
     var id: PopID { self.state.id }
 }
 extension PopContext: LegalEntityContext {

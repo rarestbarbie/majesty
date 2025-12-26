@@ -3,13 +3,13 @@ import GameIDs
 import GameState
 import Random
 
-protocol LegalEntityContext<State>: RuntimeContext where State: LegalEntityState {
+protocol LegalEntityContext<State>: ~Copyable, RuntimeContext where State: LegalEntityState {
     var region: RegionalAuthority? { get }
     var equity: Equity<LEI>.Statistics { get }
 
     static var stockpileDaysRange: ClosedRange<Int64> { get }
 }
-extension LegalEntityContext {
+extension LegalEntityContext where Self: ~Copyable {
     static var stockpileDaysMax: Int64 {
         ResourceInputs.stockpileDaysFactor * Self.stockpileDaysRange.upperBound
     }

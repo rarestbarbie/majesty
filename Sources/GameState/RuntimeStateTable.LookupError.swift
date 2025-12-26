@@ -1,4 +1,4 @@
-extension RuntimeStateTable {
+extension RuntimeStateTable where ElementContext: ~Copyable {
     @frozen public enum LookupError: Error {
         case undefined(_ id: ElementContext.State.ID)
     }

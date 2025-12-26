@@ -1,9 +1,9 @@
 import GameState
 
-protocol AllocatingContext: RuntimeContext where State: Turnable {
+protocol AllocatingContext: ~Copyable, RuntimeContext where State: Turnable {
     mutating func allocate(turn: inout Turn)
 }
-extension AllocatingContext where State: Turnable {
+extension AllocatingContext where Self: ~Copyable, State: Turnable {
     mutating func turn(on turn: inout Turn) {
         self.state.turnToNextDay()
         self.allocate(turn: &turn)

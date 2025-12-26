@@ -2,7 +2,7 @@ import GameIDs
 import OrderedCollections
 
 @frozen public struct DynamicContextTable<ElementContext>
-    where ElementContext: RuntimeContext, ElementContext.State: Sectionable & Deletable {
+    where ElementContext: RuntimeContext & ~Copyable, ElementContext.State: Sectionable & Deletable {
 
     @usableFromInline var contexts: RuntimeContextTable<ElementContext>
     @usableFromInline var indices: [ElementContext.State.Section: Int]
@@ -20,7 +20,7 @@ import OrderedCollections
         self.highest = highest
     }
 }
-extension DynamicContextTable {
+extension DynamicContextTable where ElementContext: ~Copyable {
     @inlinable public init(
         states: [ElementContext.State],
         metadata: (ElementContext.State) -> ElementContext.Metadata?
@@ -30,13 +30,15 @@ extension DynamicContextTable {
             metadata: metadata
         )
         let indices: [ElementContext.State.Section: Int] = contexts.indices.reduce(into: [:]) {
-            $0[contexts[$1].state.section] = $1
+            $0[contexts[$1].context.state.section] = $1
         }
-        let highest: ElementContext.State.ID = contexts.reduce(0) { Swift.max($0, $1.state.id) }
+        let highest: ElementContext.State.ID = contexts.reduce(0) {
+            Swift.max($0, $1.context.state.id)
+        }
         self.init(contexts: contexts, indices: indices, highest: highest)
     }
 }
-extension DynamicContextTable {
+extension DynamicContextTable where ElementContext: ~Copyable {
     @inlinable public var state: RuntimeStateTable<ElementContext> {
         .init(index: self.contexts.index)
     }
@@ -44,11 +46,11 @@ extension DynamicContextTable {
 
     @inlinable public mutating func turn(by turn: (inout ElementContext) -> Void) {
         for i: Int in self.contexts.index.values.indices {
-            turn(&self.contexts.index.values[i])
+            turn(&self.contexts.index.values[i].context)
         }
     }
 }
-extension DynamicContextTable: Collection {
+extension DynamicContextTable: Collection where ElementContext: ~Copyable {
     @inlinable public var startIndex: Int {
         self.contexts.index.values.startIndex
     }
@@ -61,38 +63,42 @@ extension DynamicContextTable: Collection {
         self.contexts.index.values.index(after: i)
     }
 
-    @inlinable public subscript(position: Int) -> ElementContext {
-        get { self.contexts.index.values[position] }
-        set { self.contexts.index.values[position] = newValue }
-        _modify { yield &self.contexts.index.values[position] }
+    @inlinable public subscript(position: Int) -> Object<ElementContext> {
+        _read { yield self.contexts.index.values[position] }
     }
 }
-extension DynamicContextTable {
+extension DynamicContextTable where ElementContext: ~Copyable {
+    @inlinable public subscript(_i position: Int) -> ElementContext {
+        _read   { yield  self.contexts.index.values[position].context }
+        _modify { yield &self.contexts.index.values[position].context }
+    }
+}
+extension DynamicContextTable where ElementContext: ~Copyable {
     @inlinable public mutating func lint() {
-        let rebuild: Bool = self.contexts.index.update { !$0.state.dead }
+        let rebuild: Bool = self.contexts.index.update { !$0.context.state.dead }
         if  rebuild {
             self.indices = self.contexts.indices.reduce(into: [:]) {
-                $0[self.contexts[$1].state.section] = $1
+                $0[self.contexts[$1].context.state.section] = $1
             }
         }
     }
 
-    @inlinable public subscript(id: ElementContext.State.ID) -> ElementContext? {
-        self.contexts.index[id]
+    @inlinable public subscript(id: ElementContext.State.ID) -> Object<ElementContext>? {
+        _read { yield self.contexts.index[id] }
     }
 
     @inlinable public subscript(modifying id: ElementContext.State.ID) -> ElementContext {
         _read   {
-            guard let i: Int = self.contexts.index.index(forKey: id) else {
+            guard let object: Object<ElementContext> = self.contexts.index[id] else {
                 fatalError("no element with id = \(id) exists!")
             }
-            yield self.contexts.index.values[i]
+            yield object.context
         }
         _modify {
-            guard let i: Int = self.contexts.index.index(forKey: id) else {
+            guard let object: Object<ElementContext> = self.contexts.index[id] else {
                 fatalError("no element with id = \(id) exists!")
             }
-            yield &self.contexts.index.values[i]
+            yield &object.context
         }
     }
 
@@ -105,9 +111,9 @@ extension DynamicContextTable {
             let result: T
             var new: ElementContext
 
-            if let index: Int = self.indices[section] {
-                let type: ElementContext.Metadata = self.contexts[index].type
-                return try update(type, &self.contexts[index].state)
+            if  let index: Int = self.indices[section] {
+                let object: Object<ElementContext> = self.contexts[index]
+                return try update(object.context.type, &object.context.state)
             } else {
                 /// Important: `incremented`, not `increment`
                 let state: ElementContext.State = .init(
@@ -122,9 +128,8 @@ extension DynamicContextTable {
                 result = try update(type, &new.state)
             }
 
-            let index: Int = self.contexts.append(new)
-
             self.highest = new.state.id
+            let index: Int = self.contexts.append(new)
             self.indices[section] = index
 
             return result

@@ -1,3 +1,3 @@
-protocol TransactingContext: AllocatingContext {
+protocol TransactingContext: ~Copyable, AllocatingContext {
     mutating func transact(turn: inout Turn)
 }

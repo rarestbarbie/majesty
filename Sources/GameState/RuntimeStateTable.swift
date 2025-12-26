@@ -2,24 +2,24 @@ import OrderedCollections
 
 /// A read-only view of ``RuntimeContextTable``, which only permits access to the state of
 /// each object.
-@frozen public struct RuntimeStateTable<ElementContext> where ElementContext: RuntimeContext {
-    @usableFromInline let index: OrderedDictionary<ElementContext.State.ID, ElementContext>
+@frozen public struct RuntimeStateTable<ElementContext> where ElementContext: ~Copyable & RuntimeContext {
+    @usableFromInline let index: OrderedDictionary<ElementContext.State.ID, Object<ElementContext>>
 
-    @inlinable init(index: OrderedDictionary<ElementContext.State.ID, ElementContext>) {
+    @inlinable init(index: OrderedDictionary<ElementContext.State.ID, Object<ElementContext>>) {
         self.index = index
     }
 }
-extension RuntimeStateTable: Equatable where ElementContext.State: Equatable {
+extension RuntimeStateTable: Equatable where ElementContext: ~Copyable, ElementContext.State: Equatable {
     @inlinable public static func == (a: Self, b: Self) -> Bool { a.elementsEqual(b) }
 }
-extension RuntimeStateTable: Hashable where ElementContext.State: Hashable {
+extension RuntimeStateTable: Hashable where ElementContext: ~Copyable, ElementContext.State: Hashable {
     @inlinable public func hash(into hasher: inout Hasher) {
         for state: ElementContext.State in self {
             state.hash(into: &hasher)
         }
     }
 }
-extension RuntimeStateTable: Collection {
+extension RuntimeStateTable: Collection where ElementContext: ~Copyable {
     @inlinable public var startIndex: Int {
         self.index.values.startIndex
     }
@@ -33,20 +33,20 @@ extension RuntimeStateTable: Collection {
     }
 
     @inlinable public subscript(position: Int) -> ElementContext.State {
-        self.index.values[position].state
+        self.index.values[position].context.state
     }
 }
-extension RuntimeStateTable {
+extension RuntimeStateTable where ElementContext: ~Copyable  {
     @inlinable public subscript(id: ElementContext.State.ID) -> ElementContext.State? {
-        self.index[id]?.state
+        self.index[id]?.context.state
     }
     @inlinable public subscript(id: ElementContext.State.ID) -> (
         state: ElementContext.State,
         type: ElementContext.Metadata
     ) {
         get throws(LookupError) {
-            if  let context: ElementContext = self.index[id] {
-                return (context.state, context.type)
+            if  let object: Object<ElementContext> = self.index[id] {
+                return (object.context.state, object.context.type)
             } else {
                 throw LookupError.undefined(id)
             }

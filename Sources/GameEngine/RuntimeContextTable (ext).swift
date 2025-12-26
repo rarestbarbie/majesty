@@ -3,10 +3,10 @@ import GameState
 
 extension RuntimeContextTable<PlanetContext> {
     subscript(address: Address) -> PlanetGrid.Tile? {
-        _read { yield self[address.planet]?.grid.tiles[address.tile] }
+        _read { yield self[address.planet]?.context.grid.tiles[address.tile] }
         _modify {
-            if  let i: Int = self.find(id: address.planet) {
-                yield &self[i].grid.tiles[address.tile]
+            if  let object: Object<PlanetContext> = self[address.planet] {
+                yield &object.context.grid.tiles[address.tile]
             } else {
                 var discard: PlanetGrid.Tile? = nil
                 yield &discard

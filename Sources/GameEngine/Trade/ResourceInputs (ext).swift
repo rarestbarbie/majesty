@@ -5,7 +5,7 @@ import JavaScriptInterop
 import OrderedCollections
 
 extension ResourceInputs {
-    @inline(__always) func snapshot<ID>(into table: inout [ID: InventorySnapshot.Consumed.Value], as id: (Resource) -> ID) {
+    func snapshot<ID>(into table: inout [ID: InventorySnapshot.Consumed.Value], as id: (Resource) -> ID) {
         for (resource, input): (Resource, ResourceInput) in self.segmented {
             table[id(resource)] = .init(
                 input: input,

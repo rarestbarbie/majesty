@@ -4,7 +4,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 extension ResourceOutputs {
-    @inline(__always) func snapshot<ID>(
+    func snapshot<ID>(
         into table: inout [ID: InventorySnapshot.Produced.Value],
         as id: (Resource) -> ID
     ) {
