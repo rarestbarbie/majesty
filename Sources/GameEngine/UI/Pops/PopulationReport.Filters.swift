@@ -22,10 +22,10 @@ extension PopulationReport.Filters: PersistentSelectionFilter {
     }
 
     static func ~= (self: Self, value: PopSnapshot) -> Bool {
-        if  let location: Address = self.location, location != value.state.tile {
+        if  let location: Address = self.location, location != value.tile {
             return false
         }
-        if  let sex: Sex = self.sex, sex != value.state.type.gender.sex {
+        if  let sex: Sex = self.sex, sex != value.type.gender.sex {
             return false
         }
 

@@ -9,7 +9,7 @@ import VectorCharts_JavaScript
 struct OwnershipBreakdown<Tab>: Sendable where Tab: OwnershipTab {
     private var country: PieChart<CountryID, PieChartLabel>?
     private var culture: PieChart<CultureID, PieChartLabel>?
-    private var equity: Equity<LEI>.Statistics?
+    private var equity: Equity<LEI>.Snapshot?
     private var terms: [Term]
 
     init() {
@@ -21,10 +21,10 @@ struct OwnershipBreakdown<Tab>: Sendable where Tab: OwnershipTab {
 }
 extension OwnershipBreakdown {
     mutating func update(
-        from asset: some LegalEntitySnapshot<Tab.State>,
+        from asset: some LegalEntitySnapshot<Tab.State.ID>,
         in context: borrowing GameUI.Cache
     ) {
-        let equity: Equity<LEI>.Statistics = asset.equity
+        let equity: Equity<LEI>.Snapshot = asset.equity
         let (country, culture): (
             country: [CountryID: (share: Int64, PieChartLabel)],
             culture: [CultureID: (share: Int64, PieChartLabel)]
@@ -53,12 +53,11 @@ extension OwnershipBreakdown {
         )
 
         self.terms = Term.list {
-            let shares: TooltipInstruction.Ticker = equity.shareCount[/3]
-                ^^ asset.state.equity.issued
+            let shares: TooltipInstruction.Ticker = equity.shareCount[/3] ^^ equity.issued
 
             $0[.shares, (-), tooltip: Tab.tooltipShares] = shares
-            $0[.stockPrice, (+)] = asset.state.Δ.px[..3]
-            $0[.stockAttraction, (+)] = asset.state.Δ.profitability[%1]
+            $0[.stockPrice, (+)] = asset.Δ.px[..3]
+            $0[.stockAttraction, (+)] = asset.Δ.profitability[%1]
         }
 
         self.equity = equity

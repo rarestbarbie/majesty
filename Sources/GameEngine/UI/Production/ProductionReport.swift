@@ -39,7 +39,7 @@ extension ProductionReport {
             locations: [Address: FilterLabel],
             Never?
         ) = cache.factories.values.reduce(into: ([:], nil)) {
-            $0.locations[$1.state.tile] = .location($1.region.name, $1.state.tile)
+            $0.locations[$1.tile] = .location($1.region.name, $1.tile)
         }
         let filters: (
             location: [FilterLabel],
@@ -62,21 +62,21 @@ extension ProductionReport {
             details: &self.details,
             sort: self.sort.ascending(_:_:)
         ) {
-            let equity: Equity<LEI>.Statistics = $0.equity
-            let liquidationProgress: Double? = $0.state.liquidation.map {
+            let equity: Equity<LEI>.Snapshot = $0.equity
+            let liquidationProgress: Double? = $0.liquidation.map {
                 $0.burning == 0 ? 1 : Double(
                     $0.burning - equity.shareCount
                 ) / Double($0.burning)
             }
 
             let entry: FactoryTableEntry = .init(
-                id: $0.state.id,
+                id: $0.id,
                 location: $0.region.name,
-                type: $0.type.title,
-                size: $0.state.size,
+                type: $0.metadata.title,
+                size: $0.size,
                 liquidationProgress: liquidationProgress,
-                yesterday: $0.state.y,
-                today: $0.state.z,
+                yesterday: $0.y,
+                today: $0.z,
                 workers: $0.workers.map(FactoryWorkers.init(aggregate:)),
                 clerks: $0.clerks.map(FactoryWorkers.init(aggregate:))
             )

@@ -2,7 +2,7 @@ import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 
-@StringUnion public enum InventoryLine: Equatable, Hashable {
+@StringUnion @frozen public enum InventoryLine: Equatable, Hashable {
     @tag("l") case l(Resource)
     @tag("e") case e(Resource)
     @tag("x") case x(Resource)
@@ -10,6 +10,16 @@ import JavaScriptInterop
     @tag("m") case m(MineVein)
 }
 extension InventoryLine {
+    var query: InventorySnapshot.Query {
+        switch self {
+        case .l(let id): .consumed(.l(id))
+        case .e(let id): .consumed(.e(id))
+        case .x(let id): .consumed(.x(id))
+        case .o(let id): .produced(.o(id))
+        case .m(let id): .produced(.m(id))
+        }
+    }
+
     var resource: Resource {
         switch self {
         case .l(let resource): resource

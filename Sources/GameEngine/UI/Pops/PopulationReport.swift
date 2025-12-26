@@ -67,7 +67,7 @@ extension PopulationReport {
             locations: [Address: FilterLabel],
             Never?
         ) = cache.pops.values.reduce(into: ([:], nil)) {
-            $0.locations[$1.state.tile] = .location($1.region.name, $1.state.tile)
+            $0.locations[$1.tile] = .location($1.region.name, $1.tile)
         }
         let filters: (
             location: [FilterLabel],
@@ -91,18 +91,18 @@ extension PopulationReport {
             sort: self.sort.ascending(_:_:)
         ) {
             guard
-            let culture: Culture = cache.rules.pops.cultures[$0.state.race] else {
+            let culture: Culture = cache.rules.pops.cultures[$0.race] else {
                 return nil
             }
 
             let entry: PopTableEntry = .init(
-                id: $0.state.id,
-                type: $0.state.type,
+                id: $0.id,
+                type: $0.type,
                 color: culture.color,
                 nat: culture.name,
                 une: 1 - $0.stats.employmentBeforeEgress,
-                yesterday: $0.state.y,
-                today: $0.state.z,
+                yesterday: $0.y,
+                today: $0.z,
             )
 
             return entry

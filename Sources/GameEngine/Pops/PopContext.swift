@@ -42,12 +42,12 @@ extension PopContext {
             return nil
         }
         return .init(
-            type: self.type,
-            state: self.state,
+            metadata: self.type,
             stats: self.stats,
             region: region.properties,
             equity: self.equity,
             mines: self.mines,
+            state: state,
         )
     }
 }
@@ -170,7 +170,9 @@ extension PopContext: AllocatingContext {
 
         let budget: Pop.Budget
 
-        if case .Ward = self.state.type.stratum {
+        if  case .Ward = self.state.type.stratum {
+            self.state.z.mix(profitability: self.stats.profit.marginalProfitability)
+
             let weights: (
                 segmented: SegmentedWeights<InelasticDemand>,
                 tradeable: AggregateWeights
@@ -378,8 +380,6 @@ extension PopContext: TransactingContext {
         } (&turn.bank[account: self.lei])
 
         if  enslaved {
-            self.state.z.mix(profitability: self.state.profit.marginalProfitability)
-
             // Pay dividends to shareholders, if any.
             self.state.spending.dividend += turn.bank.transfer(
                 budget: budget.dividend,

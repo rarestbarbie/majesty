@@ -1,6 +1,11 @@
 import Fraction
 
 protocol BackgroundableMetrics: LegalEntityMetrics {
+    static var mothballing: Double { get }
+    static var restoration: Double { get }
+    static var attrition: Double { get }
+    static var vertex: Double { get }
+
     var active: Int64 { get set }
     var vacant: Int64 { get set }
 }

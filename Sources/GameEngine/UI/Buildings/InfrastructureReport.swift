@@ -40,7 +40,7 @@ extension InfrastructureReport {
             locations: [Address: FilterLabel],
             Never?
         ) = cache.buildings.values.reduce(into: ([:], nil)) {
-            $0.locations[$1.state.tile] = .location($1.region.name, $1.state.tile)
+            $0.locations[$1.tile] = .location($1.region.name, $1.tile)
         }
         let filters: (
             location: [FilterLabel],
@@ -64,10 +64,11 @@ extension InfrastructureReport {
             sort: self.sort.ascending(_:_:)
         ) {
             let entry: BuildingTableEntry = .init(
-                id: $0.state.id,
+                id: $0.id,
                 location: $0.region.name,
-                type: $0.type.title,
-                state: $0.state,
+                type: $0.metadata.title,
+                y: $0.y,
+                z: $0.z
             )
 
             return entry

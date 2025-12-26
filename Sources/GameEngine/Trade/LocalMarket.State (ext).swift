@@ -3,7 +3,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 extension LocalMarket.State {
-    var Δ: TurnDelta<LocalMarket.Interval> {
+    var Δ: Delta<LocalMarket.Interval> {
         .init(y: self.yesterday, z: self.today)
     }
 }

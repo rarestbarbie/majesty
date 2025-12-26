@@ -71,18 +71,6 @@ extension Factory: Turnable {
     }
 }
 extension Factory {
-    var profit: ProfitMargins {
-        // for Factories, compliance costs scale with number of workers, so all compliance costs
-        // are treated as operating costs
-        .init(
-            materialsCosts: self.inventory.l.valueConsumed + self.spending.wages,
-            operatingCosts: self.inventory.e.valueConsumed + self.spending.salariesUsed,
-            carryingCosts: self.spending.salariesIdle,
-            revenue: self.inventory.out.valueSold
-        )
-    }
-}
-extension Factory {
     enum ObjectKey: JSString, Sendable {
         case id
         case tile = "on"

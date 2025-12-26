@@ -6,13 +6,14 @@ import GameIDs
 import GameRules
 import GameState
 import GameUI
+import OrderedCollections
 
 extension PopSnapshot {
     func buildDemotionMatrix<Matrix>(
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
-            if self.state.type.occupation.aristocratic {
+            if case .aristocratic = self.occupation.mode {
                 $0[true] {
                     $0 = -2‰
                 } = { "\(+$0[%]): Pop is \(em: "aristocratic")" }
@@ -25,7 +26,7 @@ extension PopSnapshot {
                 } = { "\(+$0[%]): Unemployment is above \(em: $1[%0])" }
             }
 
-            $0[self.state.y.fl] {
+            $0[self.y.fl] {
                 $0[$1 < 1.00] = +1‰
                 $0[$1 < 0.75] = +5‰
                 $0[$1 < 0.50] = +2‰
@@ -33,15 +34,15 @@ extension PopSnapshot {
             } = { "\(+$0[%]): Getting less than \(em: $1[%0]) of Life Needs" }
 
         } factors: {
-            $0[self.state.y.fx] {
+            $0[self.y.fx] {
                 $0[$1 > 0.25] = -90%
             } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Luxury Needs" }
-            $0[self.state.y.fe] {
+            $0[self.y.fe] {
                 $0[$1 > 0.75] = -50%
                 $0[$1 > 0.5] = -25%
             } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Everyday Needs" }
 
-            $0[self.state.y.mil] {
+            $0[self.y.mil] {
                 $0[$1 >= 1.0] = -10%
                 $0[$1 >= 2.0] = -10%
                 $0[$1 >= 3.0] = -10%
@@ -54,11 +55,11 @@ extension PopSnapshot {
             } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
 
             let culture: Culture = self.region.culturePreferred
-            if case .Ward = self.state.type.stratum {
+            if case .Ward = self.type.stratum {
                 $0[true] {
                     $0 = -100%
                 } = { "\(+$0[%]): Pop is \(em: "enslaved")" }
-            } else if self.state.race == culture.id {
+            } else if self.race == culture.id {
                 $0[true] {
                     $0 = -5%
                 } = { "\(+$0[%]): Culture is \(em: culture.name)" }
@@ -74,16 +75,16 @@ extension PopSnapshot {
         type: Matrix.Type = Matrix.self,
     ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
         .init(base: 0%) {
-            $0[self.state.y.mil] {
+            $0[self.y.mil] {
                 $0[$1 >= 3.0] = -2‱
                 $0[$1 >= 5.0] = -2‱
                 $0[$1 >= 7.0] = -3‱
                 $0[$1 >= 9.0] = -3‱
             } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
 
-            switch self.state.type.stratum {
+            switch self.type.stratum {
             case .Owner:
-                $0[self.state.y.fx] {
+                $0[self.y.fx] {
                     $0[$1 >= 0.25] = +3‰
                     $0[$1 >= 0.50] = +3‰
                     $0[$1 >= 0.75] = +3‰
@@ -93,7 +94,7 @@ extension PopSnapshot {
                 break
             }
 
-            $0[self.state.y.con] {
+            $0[self.y.con] {
                 $0[$1 >= 1.0] = +1‱
                 $0[$1 >= 2.0] = +1‱
                 $0[$1 >= 3.0] = +1‱
@@ -106,11 +107,11 @@ extension PopSnapshot {
             } = { "\(+$0[%]): Consciousness is above \(em: $1[..1])" }
 
         } factors: {
-            $0[self.state.y.fl] {
+            $0[self.y.fl] {
                 $0[$1 < 1.00] = -100%
             } = { "\(+$0[%]): Getting less than \(em: $1[%0]) of Life Needs" }
 
-            $0[self.state.y.fe] {
+            $0[self.y.fe] {
                 $0[$1 >= 0.1] = -10%
                 $0[$1 >= 0.2] = -10%
                 $0[$1 >= 0.3] = -10%
@@ -122,7 +123,7 @@ extension PopSnapshot {
                 $0[$1 >= 0.9] = -10%
             } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Everyday Needs" }
 
-            $0[self.state.y.mil] {
+            $0[self.y.mil] {
                 $0[$1 >= 2.0] = -20%
                 $0[$1 >= 4.0] = -10%
                 $0[$1 >= 6.0] = -10%
@@ -130,11 +131,11 @@ extension PopSnapshot {
             } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
 
             let culture: Culture = self.region.culturePreferred
-            if case .Ward = self.state.type.stratum {
+            if case .Ward = self.type.stratum {
                 $0[true] {
                     $0 = -100%
                 } = { "\(+$0[%]): Pop is \(em: "enslaved")" }
-            } else if self.state.race == culture.id {
+            } else if self.race == culture.id {
                 $0[true] {
                     $0 = +5%
                 } = { "\(+$0[%]): Culture is \(em: culture.name)" }
@@ -147,14 +148,66 @@ extension PopSnapshot {
     }
 }
 
-struct PopSnapshot: Sendable {
-    let type: PopMetadata
-    let state: Pop
+struct PopSnapshot: PopProperties, Sendable {
+    let metadata: PopMetadata
     let stats: Pop.Stats
     let region: RegionalProperties
-    let equity: Equity<LEI>.Statistics
     let mines: [MineID: MiningJobConditions]
+
+    let id: PopID
+    let type: PopType
+    let tile: Address
+
+    let mothballed: Int64
+    let destroyed: Int64
+    let restored: Int64
+    let created: Int64
+
+    let inventory: InventorySnapshot
+    let spending: Pop.Spending
+    let budget: Pop.Budget?
+    let y: Pop.Dimensions
+    let z: Pop.Dimensions
+
+    let equity: Equity<LEI>.Snapshot
+
+    // TODO; these should probably not be here
+    let _factories: OrderedDictionary<FactoryID, FactoryJob>
+    let _mines: OrderedDictionary<MineID, MiningJob>
 }
+extension PopSnapshot {
+    init(
+        metadata: PopMetadata,
+        stats: Pop.Stats,
+        region: RegionalProperties,
+        equity: Equity<LEI>.Statistics,
+        mines: [MineID: MiningJobConditions],
+        state: Pop,
+    ) {
+        self.init(
+            metadata: metadata,
+            stats: stats,
+            region: region,
+            mines: mines,
+            id: state.id,
+            type: state.type,
+            tile: state.tile,
+            mothballed: state.mothballed,
+            destroyed: state.destroyed,
+            restored: state.restored,
+            created: state.created,
+            inventory: .pop(state),
+            spending: state.spending,
+            budget: state.budget,
+            y: state.y,
+            z: state.z,
+            equity: .init(equity: state.equity, stats: equity),
+            _factories: state.factories,
+            _mines: state.mines
+        )
+    }
+}
+extension PopSnapshot: LegalEntitySnapshot {}
 extension PopSnapshot {
     private func explainProduction(_ ul: inout TooltipInstructionEncoder, base: Int64) {
         ul["Production per worker"] = Double.init(base)[..3]
@@ -175,7 +228,7 @@ extension PopSnapshot {
 
         ul["Mining efficiency"] = mine.factor[%1]
         ul[>] {
-            switch self.state.type.occupation {
+            switch self.type.occupation {
             case .Politician: self.explainProductionPolitician(&$0, base: base, mine: mine)
             case .Miner: self.explainProductionMiner(&$0, base: base, mine: mine)
             default: break
@@ -213,13 +266,13 @@ extension PopSnapshot {
     }
 
     private func explainNeeds(_ ul: inout TooltipInstructionEncoder, l: Int64) {
-        self.explainNeeds(&ul, base: l, needsScalePerCapita: self.state.needsScalePerCapita.l)
+        self.explainNeeds(&ul, base: l, needsScalePerCapita: self.needsScalePerCapita.l)
     }
     private func explainNeeds(_ ul: inout TooltipInstructionEncoder, e: Int64) {
-        self.explainNeeds(&ul, base: e, needsScalePerCapita: self.state.needsScalePerCapita.e)
+        self.explainNeeds(&ul, base: e, needsScalePerCapita: self.needsScalePerCapita.e)
     }
     private func explainNeeds(_ ul: inout TooltipInstructionEncoder, x: Int64) {
-        self.explainNeeds(&ul, base: x, needsScalePerCapita: self.state.needsScalePerCapita.x)
+        self.explainNeeds(&ul, base: x, needsScalePerCapita: self.needsScalePerCapita.x)
     }
     private func explainNeeds(
         _ ul: inout TooltipInstructionEncoder,
@@ -233,34 +286,15 @@ extension PopSnapshot {
         }
     }
 }
-extension PopSnapshot: LegalEntitySnapshot {
-    func tooltipExplainPrice(
-        _ line: InventoryLine,
-        market: (segmented: LocalMarketSnapshot?, tradeable: WorldMarket.State?)
-    ) -> Tooltip? {
-        switch line {
-        case .l(let id):
-            return self.state.inventory.l.tooltipExplainPrice(id, market)
-        case .e(let id):
-            return self.state.inventory.e.tooltipExplainPrice(id, market)
-        case .x(let id):
-            return self.state.inventory.x.tooltipExplainPrice(id, market)
-        case .o(let id):
-            return self.state.inventory.out.tooltipExplainPrice(id, market)
-        case .m(let id):
-            return self.state.mines[id.mine]?.out.tooltipExplainPrice(id.resource, market)
-        }
-    }
-}
 extension PopSnapshot {
     func tooltipAccount(_ account: Bank.Account) -> Tooltip? {
-        let liquid: TurnDelta<Int64> = account.Δ
-        let assets: TurnDelta<Int64> = self.state.Δ.vl + self.state.Δ.ve + self.state.Δ.vx
-        let valuation: TurnDelta<Int64> = liquid + assets
+        let liquid: Delta<Int64> = account.Δ
+        let assets: Delta<Int64> = self.Δ.vl + self.Δ.ve + self.Δ.vx
+        let valuation: Delta<Int64> = liquid + assets
 
         return .instructions {
-            if case .Ward = self.state.type.stratum {
-                let profit: ProfitMargins = self.state.profit
+            if case .Ward = self.type.stratum {
+                let profit: ProfitMargins = self.stats.profit
                 $0["Total valuation", +] = valuation[/3]
                 $0[>] {
                     $0["Today’s profit", +] = +profit.operating[/3]
@@ -276,14 +310,14 @@ extension PopSnapshot {
             $0["Illiquid assets", +] = assets[/3]
             $0["Liquid assets", +] = liquid[/3]
             $0[>] {
-                let excluded: Int64 = self.state.spending.totalExcludingEquityPurchases
+                let excluded: Int64 = self.spending.totalExcludingEquityPurchases
                 $0["Welfare", +] = +?account.s[/3]
-                $0[self.state.occupation.earnings, +] = +?account.r[/3]
+                $0[self.occupation.earnings, +] = +?account.r[/3]
                 $0["Interest and dividends", +] = +?account.i[/3]
 
                 $0["Market spending", +] = +?(account.b - excluded)[/3]
                 $0["Stock sales", +] = +?account.j[/3]
-                if case .Ward = self.state.type.stratum {
+                if case .Ward = self.type.stratum {
                     $0["Loans taken", +] = +?account.e[/3]
                 } else {
                     $0["Investments", +] = +?account.e[/3]
@@ -295,11 +329,11 @@ extension PopSnapshot {
     }
     func tooltipActive() -> Tooltip? {
         .instructions {
-            $0["Active slaves", +] = self.state.Δ.active[/3]
+            $0["Active slaves", +] = self.Δ.active[/3]
             $0[>] {
-                $0["Backgrounding", +] = +?(-self.state.mothballed)[/3]
-                $0["Rehabilitation", +] = +?self.state.restored[/3]
-                $0["Breeding", +] = +?self.state.created[/3]
+                $0["Backgrounding", +] = +?(-self.mothballed)[/3]
+                $0["Rehabilitation", +] = +?self.restored[/3]
+                $0["Breeding", +] = +?self.created[/3]
             }
         }
     }
@@ -309,13 +343,13 @@ extension PopSnapshot {
                 + self.region.modifiers.livestockBreedingEfficiency.value
             let slaveBreedingRate: Double = Double.init(
                 slaveBreedingEfficiency
-            ) * self.state.developmentRate(utilization: 1)
+            ) * self.developmentRate(utilization: 1)
 
             $0["Breeding rate", +] = slaveBreedingRate[%2]
             $0[>] {
-                $0["Profitability", +] = max(0, self.state.z.profitability)[%1]
+                $0["Profitability", +] = max(0, self.z.profitability)[%1]
                 $0["Background population", +] = +?(
-                    self.state.developmentRateVacancyFactor - 1
+                    self.developmentRateVacancyFactor - 1
                 )[%2]
             }
             $0["Breeding efficiency", +] = slaveBreedingEfficiency[%]
@@ -327,7 +361,7 @@ extension PopSnapshot {
                 }
             }
 
-            let total: Int64 = self.state.z.total
+            let total: Int64 = self.z.total
             $0[>] = """
             There \(total == 1 ? "is" : "are") \(em: total[/3]) total \
             \(total == 1 ? "slave" : "slaves") of this type in this region
@@ -336,17 +370,17 @@ extension PopSnapshot {
     }
     func tooltipVacant() -> Tooltip? {
         .instructions {
-            $0["Backgrounded slaves", -] = self.state.Δ.vacant[/3]
+            $0["Backgrounded slaves", -] = self.Δ.vacant[/3]
             $0[>] {
-                $0["Backgrounding", -] = +?self.state.mothballed[/3]
-                $0["Rehabilitation", -] = +?(-self.state.restored)[/3]
-                $0["Attrition", +] = +?(-self.state.destroyed)[/3]
+                $0["Backgrounding", -] = +?self.mothballed[/3]
+                $0["Rehabilitation", -] = +?(-self.restored)[/3]
+                $0["Attrition", +] = +?(-self.destroyed)[/3]
             }
         }
     }
     func tooltipVacantHelp() -> Tooltip? {
         .instructions {
-            let attrition: Double = self.state.attrition ?? 0
+            let attrition: Double = self.attrition ?? 0
 
             let slaveCullingEfficiency: Decimal = PopContext.slaveCullingBase
                 + self.region.modifiers.livestockCullingEfficiency.value
@@ -375,35 +409,33 @@ extension PopSnapshot {
         }
     }
     func tooltipNeeds(_ tier: ResourceTierIdentifier) -> Tooltip? {
-        .instructions {
+        return .instructions {
+            let valueConsumed: Int64 = self.inventory.valueConsumed(tier: tier)
             switch tier {
             case .l:
-                let inputs: ResourceInputs = self.state.inventory.l
-                $0["Life needs fulfilled"] = self.state.z.fl[%2]
+                $0["Life needs fulfilled"] = self.z.fl[%2]
                 $0[>] {
-                    $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
-                    $0["Militancy", -] = +?PopContext.mil(fl: self.state.z.fl)[..3]
-                    $0["Consciousness", -] = +?PopContext.con(fl: self.state.z.fl)[..3]
+                    $0["Market spending (amortized)", +] = valueConsumed[/3]
+                    $0["Militancy", -] = +?PopContext.mil(fl: self.z.fl)[..3]
+                    $0["Consciousness", -] = +?PopContext.con(fl: self.z.fl)[..3]
                 }
             case .e:
-                let inputs: ResourceInputs = self.state.inventory.e
-                $0["Everyday needs fulfilled"] = self.state.z.fe[%2]
+                $0["Everyday needs fulfilled"] = self.z.fe[%2]
                 $0[>] {
-                    $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
-                    $0["Militancy", -] = +?PopContext.mil(fe: self.state.z.fe)[..3]
-                    $0["Consciousness", -] = +?PopContext.con(fe: self.state.z.fe)[..3]
+                    $0["Market spending (amortized)", +] = valueConsumed[/3]
+                    $0["Militancy", -] = +?PopContext.mil(fe: self.z.fe)[..3]
+                    $0["Consciousness", -] = +?PopContext.con(fe: self.z.fe)[..3]
                 }
             case .x:
-                let inputs: ResourceInputs = self.state.inventory.x
-                $0["Luxury needs fulfilled"] = self.state.z.fx[%2]
+                $0["Luxury needs fulfilled"] = self.z.fx[%2]
                 $0[>] {
-                    $0["Market spending (amortized)", +] = inputs.valueConsumed[/3]
-                    if let budget: Pop.Budget = self.state.budget, budget.investment > 0 {
+                    $0["Market spending (amortized)", +] = valueConsumed[/3]
+                    if let budget: Pop.Budget = self.budget, budget.investment > 0 {
                             $0["Investment budget", +] = budget.investment[/3]
                     }
 
-                    $0["Militancy", -] = +?PopContext.mil(fx: self.state.z.fx)[..3]
-                    $0["Consciousness", -] = +?PopContext.con(fx: self.state.z.fx)[..3]
+                    $0["Militancy", -] = +?PopContext.mil(fx: self.z.fx)[..3]
+                    $0["Consciousness", -] = +?PopContext.con(fx: self.z.fx)[..3]
                 }
             }
         }
@@ -413,10 +445,10 @@ extension PopSnapshot {
         let demotion: ConditionBreakdown = self.buildDemotionMatrix()
 
         let promotions: Int64 = promotion.output > 0
-            ? .init(Double.init(self.state.z.active) * promotion.output * 30)
+            ? .init(Double.init(self.z.active) * promotion.output * 30)
             : 0
         let demotions: Int64 = demotion.output > 0
-            ? .init(Double.init(self.state.z.active) * demotion.output * 30)
+            ? .init(Double.init(self.z.active) * demotion.output * 30)
             : 0
 
         return .conditions(
@@ -435,27 +467,23 @@ extension PopSnapshot {
     ) -> Tooltip? {
         switch line {
         case .l(let resource):
-            return self.state.inventory.l.tooltipDemand(
-                resource,
-                tier: self.type.l,
+            return self.inventory[.l(resource)]?.tooltipDemand(
+                tier: self.metadata.l,
                 details: self.explainNeeds(_:l:)
             )
         case .e(let resource):
-            return self.state.inventory.e.tooltipDemand(
-                resource,
-                tier: self.type.e,
+            return self.inventory[.e(resource)]?.tooltipDemand(
+                tier: self.metadata.e,
                 details: self.explainNeeds(_:e:)
             )
         case .x(let resource):
-            return self.state.inventory.x.tooltipDemand(
-                resource,
-                tier: self.type.x,
+            return self.inventory[.x(resource)]?.tooltipDemand(
+                tier: self.metadata.x,
                 details: self.explainNeeds(_:x:)
             )
         case .o(let resource):
-            return self.state.inventory.out.tooltipSupply(
-                resource,
-                tier: self.type.output,
+            return self.inventory[.o(resource)]?.tooltipSupply(
+                tier: self.metadata.output,
                 details: self.explainProduction(_:base:)
             )
         case .m(let id):
@@ -463,11 +491,75 @@ extension PopSnapshot {
             let miningConditions: MiningJobConditions = self.mines[id.mine] else {
                 return nil
             }
-            return self.state.mines[id.mine]?.out.tooltipSupply(
-                id.resource,
-                tier: miningConditions.output,
-            ) {
+            return self.inventory[.m(id)]?.tooltipSupply(tier: miningConditions.output) {
                 self.explainProduction(&$0, base: $1, mine: miningConditions)
+            }
+        }
+    }
+}
+extension PopSnapshot {
+    func tooltipJobs(
+        factories: [FactoryID: FactorySnapshot],
+        mines: [MineID: MineSnapshot],
+        rules: GameMetadata,
+    ) -> Tooltip? {
+        switch self.occupation.mode {
+        case .mining:
+            return self.tooltipPopJobs(list: self._mines.values.elements) {
+                mines[$0]?.metadata.title ?? "Unknown"
+            }
+
+        case .remote, .hourly:
+            return self.tooltipPopJobs(list: self._factories.values.elements) {
+                factories[$0]?.metadata.title ?? "Unknown"
+            }
+
+        case .aristocratic, .livestock:
+            return .instructions {
+                $0["Total employment"] = self.stats.employedBeforeEgress[/3]
+                for produced: InventorySnapshot.Produced in self.inventory.production() {
+                    let output: ResourceOutput = produced.output
+                    let name: String = rules.resources[output.id].title
+                    $0[>] = """
+                    Today these \(self.occupation.plural) sold \(
+                        output.unitsSold[/3],
+                        style: output.unitsSold < output.units.added ? .neg : .pos
+                    ) of \
+                    \(em: output.units.added[/3]) \(name) produced
+                    """
+                }
+            }
+        }
+    }
+    private func tooltipPopJobs<Job>(
+        list: [Job],
+        name: (Job.ID) -> String
+    ) -> Tooltip where Job: PopJob {
+        let total: (
+            count: Int64,
+            hired: Int64,
+            fired: Int64,
+            quit: Int64
+        ) = list.reduce(into: (0, 0, 0, 0)) {
+            $0.count += $1.count
+            $0.hired += $1.hired
+            $0.fired += $1.fired
+            $0.quit += $1.quit
+        }
+
+        return .instructions {
+            $0["Total employment"] = total.count[/3]
+            $0[>] {
+                for job: Job in list {
+                    let change: Int64 = job.hired - job.fired - job.quit
+                    $0[name(job.id), +] = job.count[/3] <- job.count - change
+                }
+            }
+            $0["Today’s change", +] = +?(total.hired - total.fired - total.quit)[/3]
+            $0[>] {
+                $0["Hired today", +] = +?total.hired[/3]
+                $0["Fired today", +] = ??(-total.fired)[/3]
+                $0["Quit today", +] = ??(-total.quit)[/3]
             }
         }
     }

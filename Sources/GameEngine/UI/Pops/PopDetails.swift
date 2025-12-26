@@ -11,14 +11,14 @@ struct PopDetails {
     private var inventory: InventoryBreakdown<PopDetailsTab>
     private var ownership: OwnershipBreakdown<PopDetailsTab>
 
-    private var state: Pop?
+    private var pop: PopSnapshot?
 
     init(id: PopID, focus: InventoryBreakdown<PopDetailsTab>.Focus) {
         self.id = id
         self.open = focus.tab
         self.inventory = .init(focus: focus.needs)
         self.ownership = .init()
-        self.state = nil
+        self.pop = nil
     }
 }
 extension PopDetails: PersistentReportDetails {
@@ -29,12 +29,12 @@ extension PopDetails: PersistentReportDetails {
 }
 extension PopDetails {
     mutating func update(to pop: PopSnapshot, cache: borrowing GameUI.Cache) {
-        self.state = pop.state
-
         switch self.open {
         case .Inventory: self.inventory.update(from: pop, in: cache)
         case .Ownership: self.ownership.update(from: pop, in: cache)
         }
+
+        self.pop = pop
     }
 }
 extension PopDetails: JavaScriptEncodable {
@@ -56,7 +56,7 @@ extension PopDetails: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
 
-        if  let type: PopType = self.state?.type {
+        if  let type: PopType = self.pop?.type {
             js[.occupation_singular] = type.occupation.singular
             js[.occupation_plural] = type.occupation.plural
             js[.occupation] = type.occupation

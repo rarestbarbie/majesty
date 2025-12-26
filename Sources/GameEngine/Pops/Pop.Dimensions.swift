@@ -2,7 +2,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 extension Pop {
-    struct Dimensions: BackgroundableMetrics, LegalEntityMetrics {
+    struct Dimensions: LegalEntityMetrics {
         var active: Int64
         var vacant: Int64
         var mil: Double
@@ -17,6 +17,14 @@ extension Pop {
         /// A number between -1 and 1.
         var profitability: Double
     }
+}
+extension Pop.Dimensions: BackgroundableMetrics {
+    static var mothballing: Double { -0.1 }
+    static var restoration: Double { 0.04 }
+    // slave culling is determined by technology, so setting attrition to 200% scales the
+    // input parameter to the range [0, 1], since we are multiplying it by the actual rate later
+    static var attrition: Double { 2 }
+    static var vertex: Double { 0.5 }
 }
 extension Pop.Dimensions {
     init() {

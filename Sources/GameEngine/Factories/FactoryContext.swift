@@ -10,27 +10,23 @@ import Random
 struct FactoryContext: RuntimeContext {
     let type: FactoryMetadata
     var state: Factory
+    private(set) var stats: Factory.Stats
 
     private(set) var region: RegionalAuthority?
-
-    private(set) var productivity: Int64
 
     private(set) var workers: Workforce?
     private(set) var clerks: Workforce?
     private(set) var equity: Equity<LEI>.Statistics
-    private(set) var cashFlow: CashFlowStatement
 
     init(type: FactoryMetadata, state: Factory) {
         self.type = type
         self.state = state
-
-        self.productivity = 0
+        self.stats = .init()
         self.region = nil
 
         self.workers = nil
         self.clerks = nil
         self.equity = .init()
-        self.cashFlow = .init()
     }
 }
 extension FactoryContext: Identifiable {
@@ -57,14 +53,13 @@ extension FactoryContext {
             return nil
         }
         return .init(
-            type: self.type,
-            state: self.state,
+            metadata: self.type,
+            stats: self.stats,
             region: region.properties,
-            productivity: self.productivity,
             workers: self.workers,
             clerks: self.clerks,
             equity: self.equity,
-            cashFlow: self.cashFlow
+            state: self.state,
         )
     }
 }
@@ -122,13 +117,7 @@ extension FactoryContext {
             return
         }
 
-        self.productivity = region.modifiers.factoryProductivity[self.state.type]?.value ?? 1
-
-        self.cashFlow.reset()
-        self.cashFlow.update(with: self.state.inventory.l)
-        self.cashFlow.update(with: self.state.inventory.e)
-        self.cashFlow[.workers] = self.state.spending.wages
-        self.cashFlow[.clerks] = self.state.spending.salaries
+        self.stats.update(from: self.state, in: region)
     }
 }
 extension FactoryContext: TransactingContext {
@@ -160,7 +149,7 @@ extension FactoryContext: TransactingContext {
         self.state.z.cf = nil
 
         let throughput: Int64 = self.workers.map {
-            self.productivity * min($0.limit, $0.count + 1)
+            self.stats.productivity * min($0.limit, $0.count + 1)
         } ?? 0
 
         self.state.inventory.out.sync(with: self.type.output, releasing: 1 %/ 4)
@@ -175,7 +164,7 @@ extension FactoryContext: TransactingContext {
         self.state.inventory.x.sync(
             with: self.type.expansion,
             scalingFactor: (
-                self.productivity * (self.state.size.level + 1),
+                self.stats.productivity * (self.state.size.level + 1),
                 self.state.z.ei
             ),
         )
@@ -188,7 +177,9 @@ extension FactoryContext: TransactingContext {
             self.equity = .init()
         }
 
-        if case _? = self.state.liquidation {
+        if  case _? = self.state.liquidation {
+            // set profitability to -1 to deter investment in bankrupt factories
+            self.state.z.profitability = -1
             self.state.budget = .liquidating(
                 account: turn.bank[account: self.lei],
                 sharePrice: self.equity.sharePrice
@@ -204,6 +195,9 @@ extension FactoryContext: TransactingContext {
             let clerks: Workforce = self.clerks {
             #assert(workers.limit > 0, "active factory has zero worker limit?!?!")
             let utilization: Double = min(1, Double.init(workers.count %/ workers.limit))
+
+            // update profitability based on yesterday’s profit margins
+            self.state.z.mix(profitability: self.stats.profit.marginalProfitability)
 
             weights.segmented = .business(
                 l: self.state.inventory.l,
@@ -241,6 +235,9 @@ extension FactoryContext: TransactingContext {
             self.state.budget = .active(budget)
         } else {
             #assert(self.state.size.level == 0, "factory with no workers has `level > 0`?!")
+
+            // profitability for factory under construction is always 1, to attract investment
+            self.state.z.profitability = 1
 
             weights.segmented = .businessNew(
                 x: self.state.inventory.x,
@@ -302,7 +299,6 @@ extension FactoryContext: TransactingContext {
 
         switch budget {
         case .constructing(let budget):
-            self.state.z.profitability = 1
             self.construct(
                 region: region,
                 budget: budget.l,
@@ -312,8 +308,6 @@ extension FactoryContext: TransactingContext {
 
         case .liquidating(let budget):
             self.liquidate(region: region, budget: budget, turn: &turn)
-
-            self.state.z.profitability = -1
             self.state.spending.buybacks += turn.bank.buyback(
                 security: self.security,
                 budget: budget.buybacks,
@@ -332,8 +326,6 @@ extension FactoryContext: TransactingContext {
 
             let hireToday: (clerks: Int64, workers: Int64)
             let hireLater: (clerks: Int64, workers: Int64)
-
-            let profit: ProfitMargins
 
             if  let workers: Workforce = self.workers,
                 let clerks: Workforce = self.clerks {
@@ -364,14 +356,13 @@ extension FactoryContext: TransactingContext {
                     turn: &turn
                 )
 
-                // this is expensive to compute, so do it only once
-                profit = self.state.profit
-
-                if  workers.count > 0, profit.contribution < 0 {
+                //  note that this is yesterday’s profit, since profit for today has not yet
+                //  been computed, but hopefully this is still responsive enough
+                if  workers.count > 0, self.stats.profit.contribution < 0 {
                     let fire: Int64
                     if  workers.count == 1, self.clerks?.count ?? 0 == 0 {
                         // the other branch would never fire the last worker
-                        if  turn.random.roll(1, profit.gross < 0 ? 7 : 30) {
+                        if  turn.random.roll(1, self.stats.profit.gross < 0 ? 7 : 30) {
                             fire = 1
                         } else {
                             fire = 0
@@ -379,9 +370,9 @@ extension FactoryContext: TransactingContext {
                     } else {
                         /// Fire up to 40% of workers based on marginal profitability.
                         /// If gross profit is also negative, this happens more quickly.
-                        let l: Double = max(0, -0.4 * profit.marginalProfitability)
+                        let l: Double = max(0, -0.4 * self.stats.profit.marginalProfitability)
                         let firable: Int64 = .init(l * Double.init(workers.count))
-                        if  firable > 0, profit.gross < 0 || turn.random.roll(1, 3) {
+                        if  firable > 0, self.stats.profit.gross < 0 || turn.random.roll(1, 3) {
                             fire = .random(in: 0 ... firable, using: &turn.random.generator)
                         } else {
                             fire = 0
@@ -413,8 +404,6 @@ extension FactoryContext: TransactingContext {
                 fireLater.workers = 0
                 hireToday.workers = 0
                 hireLater.workers = 0
-
-                profit = self.state.profit
             }
 
             let fire: (clerks: Int64, workers: Int64)
@@ -503,8 +492,6 @@ extension FactoryContext: TransactingContext {
                     using: &turn.random.generator
                 )
             )
-
-            self.state.z.mix(profitability: profit.marginalProfitability)
         }
     }
 
@@ -550,7 +537,7 @@ extension FactoryContext {
             } (&turn.bank[account: self.lei])
         }
 
-        let growthFactor: Int64 = self.productivity * (self.state.size.level + 1)
+        let growthFactor: Int64 = self.stats.productivity * (self.state.size.level + 1)
         let growth: Bool
 
         (self.state.z.fx, growth) = self.state.inventory.x.consumeAvailable(
@@ -651,7 +638,7 @@ extension FactoryContext {
         /// estimate of the factory’s profitability, we need to credit the day’s balance with
         /// the amount of currency that was sunk into purchasing inputs, and subtract the
         /// approximate value of the inputs consumed today.
-        let throughput: Int64 = self.productivity * update.workersPaid
+        let throughput: Int64 = self.stats.productivity * update.workersPaid
         let fl: Double = self.state.inventory.l.consumeAmortized(
             from: self.type.materials,
             scalingFactor: (throughput, self.state.z.ei)

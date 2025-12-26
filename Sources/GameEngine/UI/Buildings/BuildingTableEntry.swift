@@ -7,7 +7,8 @@ struct BuildingTableEntry: Identifiable {
     let id: BuildingID
     let location: String
     let type: String
-    let state: Building
+    let y: Building.Dimensions
+    let z: Building.Dimensions
 }
 extension BuildingTableEntry: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
@@ -27,10 +28,10 @@ extension BuildingTableEntry: JavaScriptEncodable {
         js[.id] = self.id
         js[.location] = self.location
         js[.type] = self.type
-        js[.y_active] = self.state.y.active
-        js[.y_vacant] = self.state.y.vacant
-        js[.z_active] = self.state.z.active
-        js[.z_vacant] = self.state.z.vacant
-        js[.progress] = self.state.z.fl
+        js[.y_active] = self.y.active
+        js[.y_vacant] = self.y.vacant
+        js[.z_active] = self.z.active
+        js[.z_vacant] = self.z.vacant
+        js[.progress] = self.z.fl
     }
 }

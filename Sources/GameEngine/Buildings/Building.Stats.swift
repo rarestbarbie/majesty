@@ -4,11 +4,12 @@ extension Building {
     struct Stats {
         private(set) var utilization: Double
         private(set) var cashFlow: CashFlowStatement
+        private(set) var profit: ProfitMargins
     }
 }
 extension Building.Stats {
     init() {
-        self.init(utilization: 0, cashFlow: .init())
+        self.init(utilization: 0, cashFlow: .init(), profit: .undefined)
     }
 }
 extension Building.Stats {
@@ -24,5 +25,7 @@ extension Building.Stats {
         self.cashFlow.reset()
         self.cashFlow.update(with: state.inventory.l)
         self.cashFlow.update(with: state.inventory.e)
+
+        self.profit = .compute(asset: state)
     }
 }

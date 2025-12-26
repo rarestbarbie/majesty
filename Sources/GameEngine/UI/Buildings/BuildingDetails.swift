@@ -34,7 +34,7 @@ extension BuildingDetails {
         case .Ownership: self.ownership.update(from: building, in: cache)
         }
 
-        self.name = building.type.title
+        self.name = building.metadata.title
     }
 }
 extension BuildingDetails: JavaScriptEncodable {

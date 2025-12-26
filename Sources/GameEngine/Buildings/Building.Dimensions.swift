@@ -3,7 +3,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 extension Building {
-    struct Dimensions: BackgroundableMetrics, LegalEntityMetrics {
+    struct Dimensions: LegalEntityMetrics {
         var active: Int64
         var vacant: Int64
         var vl: Int64
@@ -20,6 +20,12 @@ extension Building {
         /// A number between -1 and 1.
         var profitability: Double
     }
+}
+extension Building.Dimensions: BackgroundableMetrics {
+    static var mothballing: Double { -0.1 }
+    static var restoration: Double { 0.04 }
+    static var attrition: Double { 0.01 }
+    static var vertex: Double { 0.5 }
 }
 extension Building.Dimensions {
     init() {

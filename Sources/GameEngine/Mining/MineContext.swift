@@ -23,7 +23,7 @@ struct MineContext: RuntimeContext {
 extension MineContext {
     var snapshot: MineSnapshot {
         .init(
-            type: self.type,
+            metadata: self.type,
             state: self.state,
             region: self.region?.properties,
             miners: self.miners

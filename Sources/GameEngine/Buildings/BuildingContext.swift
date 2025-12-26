@@ -37,11 +37,11 @@ extension BuildingContext {
             return nil
         }
         return .init(
-            type: self.type,
-            state: self.state,
+            metadata: self.type,
             stats: self.stats,
             region: region.properties,
-            equity: self.equity
+            equity: self.equity,
+            state: self.state,
         )
     }
 }
@@ -256,8 +256,7 @@ extension BuildingContext: TransactingContext {
             )
         )
 
-        let profit: ProfitMargins = self.state.profit
-        self.state.z.mix(profitability: profit.marginalProfitability)
+        self.state.z.mix(profitability: self.stats.profit.marginalProfitability)
     }
 
     mutating func advance(turn: inout Turn) {
