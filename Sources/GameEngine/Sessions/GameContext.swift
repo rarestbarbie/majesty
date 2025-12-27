@@ -324,7 +324,9 @@ extension GameContext {
                 fatalError("LocalMarket \($0.id) exists in a tile with no authority!!!")
             }
 
-            $0.turn(shape: region.properties.modifiers.localMarkets[$0.id.resource] ?? .default)
+            $0.turn(
+                policy: region.properties.modifiers.localMarkets[$0.id.resource] ?? .default
+            )
         }
 
         self.buildings.turn { $0.turn(on: &turn) }

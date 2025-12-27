@@ -80,20 +80,20 @@ extension InventorySnapshot.Produced {
         .instructions {
             // Show the ask price here, because the bid price is what they actually
             // received, and that is shown several lines below
-            $0["Today’s local price", +] = market.state.Δ.ask.value[..]
+            $0["Today’s local price", +] = market.Δ.ask.value[..]
             $0[>] {
-                $0["Supply in this tile", -] = market.state.Δ.supply[/3]
-                $0["Demand in this tile", +] = market.state.Δ.demand[/3]
+                $0["Supply in this tile", -] = market.Δ.supply[/3]
+                $0["Demand in this tile", +] = market.Δ.demand[/3]
             }
 
-            $0["Local stockpile", -] = market.state.stockpile[/3]
+            $0["Local stockpile", -] = market.stockpile[/3]
             $0[>] {
-                $0["Stabilization fund value", +] = market.state.stabilizationFund[/3]
+                $0["Stabilization fund value", +] = market.stabilizationFund[/3]
             }
 
             if  let average: Double = self.output.price,
-                let _: Int64 = market.shape.storage {
-                let spread: Double = market.state.today.spread
+                let _: Int64 = market.policy.storage {
+                let spread: Double = market.z.spread
                 $0[>] = """
                 Due to the local bid-ask spread of \(
                     spread[%2], style: .spread(spread)
@@ -101,8 +101,8 @@ extension InventorySnapshot.Produced {
                 today was \(em: average[..2])
                 """
 
-                if case .reduced = market.state.today.priceIncrement(
-                        stockpile: market.state.stockpile
+                if case .reduced = market.z.priceIncrement(
+                        stockpile: market.stockpile
                     ) {
                     $0[>] = """
                     We are \(em: "dispensing") from the stabilization fund, which is \
@@ -112,22 +112,22 @@ extension InventorySnapshot.Produced {
                 }
             }
 
-            if market.state.today.supply <= market.state.today.demand {
+            if market.z.supply <= market.z.demand {
                 $0[>] = """
                 There are not enough producers in this region, and the price will increase \
                 if the situation persists
                 """
             } else if
-                let floor: LocalPriceLevel = market.shape.limit.min,
-                    floor.price >= market.state.today.bid {
+                let floor: LocalPriceLevel = market.policy.limit.min,
+                    floor.price >= market.z.bid {
                 $0[>] = """
                 There are not enough buyers in this region, but the price is not allowed \
                 to decline due to their \(floor.label) of \
                 \(em: floor.price.value[..])
                 """
             } else if
-                let cap: LocalPriceLevel = market.shape.limit.max,
-                    cap.price <= market.state.today.ask {
+                let cap: LocalPriceLevel = market.policy.limit.max,
+                    cap.price <= market.z.ask {
                 $0[>] = """
                 There are not enough producers in this region, but the price is not
                 allowed to increase due to their \(cap.label) of \(em: cap.price.value[..])

@@ -53,7 +53,7 @@ extension SymbolTable {
     }
 }
 extension SymbolTable<Exact> {
-    func quantities<T>(keys: SymbolTable<T>) throws -> [(T, Exact)]
+    @inlinable public func quantities<T>(keys: SymbolTable<T>) throws -> [(T, Exact)]
         where T: Hashable, T: Comparable {
         try self.map(keys: keys).sorted { $0.key < $1.key }
     }

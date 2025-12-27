@@ -1,3 +1,5 @@
+import D
+import Fraction
 import GameEconomy
 import GameIDs
 import GameRules
@@ -22,6 +24,8 @@ public struct GameStart: Sendable {
     let factories: [FactorySeedGroup]
     let popWealth: [PopWealth]
     let pops: [PopSeedGroup]
+
+    let prices: SymbolTable<Exact>
 
     var symbols: GameSaveSymbols
 }
@@ -196,14 +200,73 @@ extension GameStart {
             }
         }
 
+        var tradeable: WorldMarkets = .init(settings: rules.settings.exchange)
+        var segmented: LocalMarkets = .init()
+        /// ordering is important for determinism
+        let prices: [(Resource, Exact)] = try self.prices.quantities(
+            keys: symbols.static.resources
+        )
+
+        for (resource, exact): (Resource, Exact) in prices {
+            let (n, d): (Int64, denominator: Int64?) = exact.value.fraction
+            let resource: ResourceMetadata = rules.resources[resource]
+            if  resource.local {
+                for country: Country in countries {
+                    let fraction: Fraction = (n * country.minwage) %/ (d ?? 1)
+                    if  fraction < 1 {
+                        // we probably do not want local prices to start below 1 currency unit
+                        continue
+                    }
+
+                    let price: LocalPrice = .init(fraction)
+                    for tile: Address in country.tilesControlled {
+                        {
+                            $0.today.bid = price
+                            $0.today.ask = price
+                            $0.yesterday = $0.today
+                        } (&segmented[resource.id / tile])
+                    }
+                }
+            } else {
+                let l: Double = rules.settings.exchange.capital.liquidity
+                let n: Double = Double.init(n)
+                let d: Double = Double.init(d ?? 1)
+                for currency: Currency in self.currencies {
+                    // we want to satisfy:
+                    //
+                    // 1.   q / b = n / d
+                    // 2.   sqrt(q * b) = l
+                    //
+                    // which gives us:
+                    //      q = l² / b
+                    //      b = l² / q
+                    //
+                    //      q² / l² = n / d
+                    //      q² = n / d * l²
+                    //      q = l * sqrt(n / d)
+                    //
+                    //      b = l² / (sqrt(n / d) * l)
+                    //      b = l / sqrt(n / d)
+                    //      b = l * sqrt(d / n)
+                    {
+                        let q: Double = l * Double.sqrt(n / d)
+                        let b: Double = l * Double.sqrt(d / n)
+                        $0.assets.quote = max(2, Int64.init(q.rounded()))
+                        $0.assets.base = max(2, Int64.init(b.rounded()))
+
+                    } (&tradeable[resource.id / currency.id])
+                }
+            }
+        }
+
         return .init(
             symbols: symbols.static,
             random: random,
             player: self.player,
             cultures: cultures,
             accounts: accounts.items,
-            segmentedMarkets: [:],
-            tradeableMarkets: [:],
+            segmentedMarkets: segmented.markets,
+            tradeableMarkets: tradeable.markets,
             date: self.date,
             currencies: self.currencies,
             countries: countries,
@@ -228,6 +291,8 @@ extension GameStart {
         case pops
         case currencies
 
+        case prices
+
         case symbols
     }
 }
@@ -244,6 +309,7 @@ extension GameStart: JavaScriptDecodable {
             factories: try js[.factories].decode(),
             popWealth: try js[.pop_wealth].decode(),
             pops: try js[.pops].decode(),
+            prices: try js[.prices].decode(),
             symbols: try js[.symbols].decode()
         )
     }

@@ -3,11 +3,6 @@ import JavaScriptKit
 import JavaScriptInterop
 
 extension LocalMarket.State {
-    var Δ: Delta<LocalMarket.Interval> {
-        .init(y: self.yesterday, z: self.today)
-    }
-}
-extension LocalMarket.State {
     @frozen public enum ObjectKey: JSString, Sendable {
         case id
         case f

@@ -6,7 +6,7 @@ extension LocalMarket {
     func snapshot(_ region: RegionalProperties) -> LocalMarketSnapshot {
         .init(
             state: self.state,
-            shape: region.modifiers.localMarkets[self.id.resource] ?? .default
+            policy: region.modifiers.localMarkets[self.id.resource] ?? .default
         )
     }
 }
