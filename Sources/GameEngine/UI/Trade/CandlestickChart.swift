@@ -1,4 +1,3 @@
-import DequeModule
 import GameEconomy
 import GameIDs
 import JavaScriptKit

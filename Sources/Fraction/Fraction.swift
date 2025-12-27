@@ -44,13 +44,26 @@ extension Fraction {
 extension Fraction {
     /// Multiply the operand by this fraction, rounding away from zero.
     @inlinable public static func >< (self: Self, a: Int64) -> Int64 {
-        let (d, r): (Int64, Int64) = self.d.dividingFullWidth(self.n.multipliedFullWidth(by: a))
+        let n: (high: Int64, low: UInt64) = self.n.multipliedFullWidth(by: a)
+        let d: Int64
+        let r: Int64
+        if  n.high == 0, Int64.init(bitPattern: n.low) >= 0 {
+            let n: Int64 = Int64.init(bitPattern: n.low)
+            (d, remainder: r) = n.quotientAndRemainder(dividingBy: self.d)
+        } else {
+            (d, remainder: r) = self.d.dividingFullWidth(n)
+        }
         return r > 0 ? d + 1 : (r == 0 ? d : d - 1)
     }
     /// Multiply the operand by this fraction, rounding toward zero.
     @inlinable public static func <> (self: Self, a: Int64) -> Int64 {
-        let (d, _): (Int64, Int64) = self.d.dividingFullWidth(self.n.multipliedFullWidth(by: a))
-        return d
+        let n: (high: Int64, low: UInt64) = self.n.multipliedFullWidth(by: a)
+        if  n.high == 0, Int64.init(bitPattern: n.low) >= 0 {
+            return Int64.init(bitPattern: n.low) / self.d
+        } else {
+            let (d, _): (Int64, remainder: Int64) = self.d.dividingFullWidth(n)
+            return d
+        }
     }
 
     @inlinable public var roundedDown: Int64 {
