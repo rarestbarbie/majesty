@@ -232,9 +232,10 @@ extension ResourceInputs {
 
         var gain: Int64 = 0
         var loss: Int64 = 0
-
-        for i: Int in self.tradeable.indices {
-            var budgeted: Int64 = budget?[i] ?? 0
+        /// the budget is a regular array, so we need to index it from zero, not whatever the
+        /// slice of weights starts at
+        for (i, j): (Int, Int) in zip(self.tradeable.indices, 0...) {
+            var budgeted: Int64 = budget?[j] ?? 0
             if  reserved > 0 {
                 reserved -= 1
                 budgeted += 1
