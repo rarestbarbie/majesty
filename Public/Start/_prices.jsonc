@@ -1,0 +1,14 @@
+{
+    // artificially boost initial prices for some critical goods, to encourage
+    // factories to produce them and speed up early game convergence
+    "Appliances": "15",
+    "Instruments": "15",
+    "Vehicles": "65",
+    "Electronics": "10",
+    "Semiconductor Devices": "5",
+    "Machine Parts": "3",
+    "Medical Equipment": "4",
+    // these scale with local minimum wage
+    "Groceries": "0.1",
+    "Housing": "1"
+}

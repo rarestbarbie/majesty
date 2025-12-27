@@ -85,9 +85,7 @@ extension WorldMarket {
         let interval: Interval = .init(
             prices: self.current,
             volume: self.pool.volume,
-            liquidity: .sqrt(
-                Double.init(self.pool.assets.quote) * Double.init(self.pool.assets.base)
-            )
+            liquidity: self.pool.assets.liquidity
         )
 
         self.current = .open(self.pool.price)

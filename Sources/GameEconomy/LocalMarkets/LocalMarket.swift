@@ -133,6 +133,13 @@ extension LocalMarket {
         return min(quotient, limit)
     }
 
+    private var inactive: Bool {
+        self.today.supply == 0 &&
+        self.today.demand == 0 &&
+        self.yesterday.supply == 0 &&
+        self.yesterday.demand == 0
+    }
+
     private var spreadTarget: Double? {
         guard let storageDays: Int64 = self.shape?.storage else {
             return nil
@@ -148,22 +155,29 @@ extension LocalMarket {
     }
 }
 extension LocalMarket {
-    public mutating func turn(shape: Shape) {
+    public mutating func turn(policy: Policy) {
         #assert(self.shape == nil, "LocalMarket \(self.id) shape is already set for this turn!")
 
-        self.yesterday = self.today
-        self.shape = shape
-
-        self.today.update(
-            rate: shape.storage != nil
-                ? self.today.priceIncrement(stockpile: self.stockpile)
-                : .nominal,
-            limit: (
-                min: shape.limit.min?.price ?? Self.minDefault,
-                max: shape.limit.max?.price ?? Self.maxDefault,
-            ),
-            spread: self.spreadTarget,
+        let limits: (min: LocalPrice, max: LocalPrice) = (
+            min: policy.limit.min?.price ?? Self.minDefault,
+            max: policy.limit.max?.price ?? Self.maxDefault,
         )
+
+        self.shape = policy.shape
+
+        if  self.inactive {
+            self.yesterday = self.today
+            self.today.reset(to: max(.init(), limits.min))
+        } else {
+            self.yesterday = self.today
+            self.today.update(
+                rate: policy.storage != nil
+                    ? self.today.priceIncrement(stockpile: self.stockpile)
+                    : .nominal,
+                limits: limits,
+                spread: self.spreadTarget,
+            )
+        }
 
         self.stabilizationFund.turn()
         self.stockpile.turn()

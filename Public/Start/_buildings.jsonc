@@ -3,7 +3,7 @@
     {
         "tile": "399N-2,1",
         "buildings": {
-            "High Density Housing": 200
+            "High Density Housing": 2000
         }
     },
 
@@ -11,7 +11,7 @@
     {
         "tile": "399N-2,2",
         "buildings": {
-            "High Density Housing": 600
+            "High Density Housing": 6000
         }
     },
 
@@ -19,7 +19,7 @@
     {
         "tile": "399N-2,3",
         "buildings": {
-            "High Density Housing": 600
+            "High Density Housing": 6000
         }
     },
 
@@ -27,7 +27,7 @@
     {
         "tile": "399N-1,2",
         "buildings": {
-            "High Density Housing": 1600
+            "High Density Housing": 8000
         }
     },
 
@@ -35,7 +35,7 @@
     {
         "tile": "399N0,2",
         "buildings": {
-            "High Density Housing": 900
+            "High Density Housing": 9000
         }
     },
 
@@ -43,7 +43,7 @@
     {
         "tile": "399N0,1",
         "buildings": {
-            "High Density Housing": 400
+            "High Density Housing": 4000
         }
     },
 
@@ -51,7 +51,7 @@
     {
         "tile": "399N1,1",
         "buildings": {
-            "High Density Housing": 50
+            "High Density Housing": 500
         }
     },
 
@@ -59,7 +59,7 @@
     {
         "tile": "399N-2,4",
         "buildings": {
-            "High Density Housing": 200
+            "High Density Housing": 2000
         }
     },
 
@@ -67,7 +67,7 @@
     {
         "tile": "399N-1,4",
         "buildings": {
-            "High Density Housing": 200
+            "High Density Housing": 2000
         }
     },
 
@@ -75,7 +75,7 @@
     {
         "tile": "399N0,3",
         "buildings": {
-            "High Density Housing": 100
+            "High Density Housing": 1000
         }
     },
 
@@ -83,7 +83,7 @@
     {
         "tile": "399E5",
         "buildings": {
-            "High Density Housing": 200
+            "High Density Housing": 2000
         }
     },
 
@@ -91,7 +91,7 @@
     {
         "tile": "399N1,3",
         "buildings": {
-            "High Density Housing": 400
+            "High Density Housing": 4000
         }
     },
 
@@ -99,7 +99,7 @@
     {
         "tile": "399S0,3",
         "buildings": {
-            "High Density Housing": 200
+            "High Density Housing": 2000
         }
     },
 
@@ -107,7 +107,7 @@
     {
         "tile": "399S1,3",
         "buildings": {
-            "High Density Housing": 100
+            "High Density Housing": 1000
         }
     },
 
@@ -115,7 +115,7 @@
     {
         "tile": "399S2,2",
         "buildings": {
-            "High Density Housing": 400
+            "High Density Housing": 4000
         }
     },
 
@@ -123,7 +123,7 @@
     {
         "tile": "399S1,2",
         "buildings": {
-            "High Density Housing": 400
+            "High Density Housing": 4000
         }
     },
 
@@ -131,7 +131,7 @@
     {
         "tile": "399S0,2",
         "buildings": {
-            "High Density Housing": 100
+            "High Density Housing": 1000
         }
     },
 
@@ -139,7 +139,7 @@
     {
         "tile": "399S0,1",
         "buildings": {
-            "High Density Housing": 40
+            "High Density Housing": 400
         }
     },
 
@@ -147,7 +147,7 @@
     {
         "tile": "399S1,0",
         "buildings": {
-            "High Density Housing": 30
+            "High Density Housing": 300
         }
     },
 
@@ -155,7 +155,7 @@
     {
         "tile": "399S1,-1",
         "buildings": {
-            "High Density Housing": 10
+            "High Density Housing": 100
         }
     },
 
@@ -163,7 +163,7 @@
     {
         "tile": "399N2,0",
         "buildings": {
-            "High Density Housing": 800
+            "High Density Housing": 8000
         }
     },
 
@@ -171,7 +171,7 @@
     {
         "tile": "399N3,0",
         "buildings": {
-            "High Density Housing": 700
+            "High Density Housing": 7000
         }
     },
 
@@ -179,7 +179,7 @@
     {
         "tile": "399N3,-1",
         "buildings": {
-            "High Density Housing": 400
+            "High Density Housing": 4000
         }
     },
 
@@ -187,7 +187,7 @@
     {
         "tile": "399N3,-2",
         "buildings": {
-            "High Density Housing": 400
+            "High Density Housing": 4000
         }
     },
 
@@ -195,7 +195,7 @@
     {
         "tile": "399N2,-1",
         "buildings": {
-            "High Density Housing": 400
+            "High Density Housing": 4000
         }
     },
 
@@ -203,7 +203,7 @@
     {
         "tile": "399N3,-3",
         "buildings": {
-            "High Density Housing": 600
+            "High Density Housing": 6000
         }
     },
 
@@ -211,7 +211,7 @@
     {
         "tile": "399N2,-3",
         "buildings": {
-            "High Density Housing": 400
+            "High Density Housing": 4000
         }
     },
 
@@ -219,14 +219,14 @@
     {
         "tile": "399N0,-2",
         "buildings": {
-            "High Density Housing": 1200
+            "High Density Housing": 12000
         }
     },
     // Northern China
     {
         "tile": "399N-1,-1",
         "buildings": {
-            "High Density Housing": 1200
+            "High Density Housing": 12000
         }
     },
 
@@ -234,7 +234,7 @@
     {
         "tile": "399S-1,-2",
         "buildings": {
-            "High Density Housing": 400
+            "High Density Housing": 4000
         }
     },
 
@@ -242,7 +242,7 @@
     {
         "tile": "399S-2,-1",
         "buildings": {
-            "High Density Housing": 400
+            "High Density Housing": 4000
         }
     },
 
@@ -250,7 +250,7 @@
     {
         "tile": "399N-2,-1",
         "buildings": {
-            "High Density Housing": 500
+            "High Density Housing": 5000
         }
     },
 
@@ -258,7 +258,7 @@
     {
         "tile": "399N-1,-2",
         "buildings": {
-            "High Density Housing": 400
+            "High Density Housing": 4000
         }
     }
 ]

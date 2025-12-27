@@ -15,9 +15,9 @@ struct CountryModifiers {
     private(set) var livestockBreedingEfficiency: Stack<Decimal>
     private(set) var livestockCullingEfficiency: Stack<Decimal>
 
-    let localMarkets: [Resource: LocalMarket.Shape]
+    let localMarkets: [Resource: LocalMarket.Policy]
 
-    private init(localMarkets: [Resource: LocalMarket.Shape]) {
+    private init(localMarkets: [Resource: LocalMarket.Policy]) {
         self.factoryProductivity = [:]
         self.miningEfficiency = [:]
         self.miningWidth = [:]
@@ -30,7 +30,7 @@ struct CountryModifiers {
 }
 extension CountryModifiers {
     static func compute(for country: Country, rules: GameMetadata) -> Self {
-        var localMarkets: [Resource: LocalMarket.Shape] = [:]
+        var localMarkets: [Resource: LocalMarket.Policy] = [:]
         for resource: ResourceMetadata in rules.resources.local {
             let min: LocalPriceLevel?
 

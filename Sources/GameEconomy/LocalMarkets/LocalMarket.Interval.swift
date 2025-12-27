@@ -53,9 +53,16 @@ extension LocalMarket.Interval {
     var prices: (bid: LocalPrice, ask: LocalPrice) { (self.bid, self.ask) }
 }
 extension LocalMarket.Interval {
+    mutating func reset(to price: LocalPrice) {
+        self.bid = price
+        self.ask = price
+        self.supply = 0
+        self.demand = 0
+    }
+
     mutating func update(
         rate: LocalPrice.TickRate,
-        limit: (min: LocalPrice, max: LocalPrice),
+        limits: (min: LocalPrice, max: LocalPrice),
         spread: Double?,
     ) {
         defer {
@@ -63,16 +70,10 @@ extension LocalMarket.Interval {
             self.demand = 0
         }
 
-        if  self.supply == 0, self.demand == 0 {
-            self.bid = max(.init(), limit.min)
-            self.ask = self.bid
-            return
-        }
-
         guard
         let (bid, ask): (bid: LocalPrice, ask: LocalPrice) = self.updated(
             rate: rate,
-            limit: limit,
+            limits: limits,
             spread: spread,
         ) else {
             return
@@ -84,27 +85,27 @@ extension LocalMarket.Interval {
 
     private func updated(
         rate: LocalPrice.TickRate,
-        limit: (min: LocalPrice, max: LocalPrice),
+        limits: (min: LocalPrice, max: LocalPrice),
         spread: Double?,
     ) -> (bid: LocalPrice, ask: LocalPrice)? {
-        if  self.bid < limit.min {
-            return (bid: limit.min, ask: max(limit.min, self.ask))
+        if  self.bid < limits.min {
+            return (bid: limits.min, ask: max(limits.min, self.ask))
         } else if
-            self.ask > limit.max {
-            return (bid: min(limit.max, self.bid), ask: limit.max)
+            self.ask > limits.max {
+            return (bid: min(limits.max, self.bid), ask: limits.max)
         }
 
         if  self.supply < self.demand {
             if self.supply == 0 {
-                return self.tickedUp(rate: rate, limit: limit.max, spread: spread)
+                return self.tickedUp(rate: rate, limit: limits.max, spread: spread)
             }
             if (self.demand %/ self.supply) > (LocalPrice.cent %/ (LocalPrice.cent - 1)) {
-                return self.tickedUp(rate: rate, limit: limit.max, spread: spread)
+                return self.tickedUp(rate: rate, limit: limits.max, spread: spread)
             }
         } else if self.bid.value.units > 0,
             self.supply > self.demand {
             if (self.demand %/ self.supply) < ((LocalPrice.cent - 1) %/ LocalPrice.cent) {
-                return self.tickedDown(rate: rate, limit: limit.min, spread: spread)
+                return self.tickedDown(rate: rate, limit: limits.min, spread: spread)
             }
         }
 
