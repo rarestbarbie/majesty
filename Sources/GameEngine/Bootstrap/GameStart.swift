@@ -224,6 +224,12 @@ extension GameStart {
                             $0.today.bid = price
                             $0.today.ask = price
                             $0.yesterday = $0.today
+                            // important! we need to pretend there was some activity yesterday
+                            // or the price will reset instantly on the first game day
+                            $0.yesterday.supply = 1
+                            $0.yesterday.demand = 1
+                            // this is okay because we don’t have any invariants on the previous
+                            // day’s trading volume
                         } (&segmented[resource.id / tile])
                     }
                 }
