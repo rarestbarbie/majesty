@@ -8,18 +8,17 @@ extension ResourceOutputs {
         into table: inout [ID: InventorySnapshot.Produced.Value],
         as id: (Resource) -> ID
     ) {
-        for (resource, output): (Resource, ResourceOutput) in self.segmented {
-            table[id(resource)] = .init(output: output, tradeable: false)
+        for output: ResourceOutput in self.segmented {
+            table[id(output.id)] = .init(output: output, tradeable: false)
         }
-        for (resource, output): (Resource, ResourceOutput) in self.tradeable {
-            table[id(resource)] = .init(output: output, tradeable: true)
+        for output: ResourceOutput in self.tradeable {
+            table[id(output.id)] = .init(output: output, tradeable: true)
         }
     }
 }
 extension ResourceOutputs {
     var valueSold: Int64 {
-        self.segmented.values.reduce(0) { $0 + $1.valueSold } +
-        self.tradeable.values.reduce(0) { $0 + $1.valueSold }
+        self.all.reduce(0) { $0 + $1.valueSold }
     }
 }
 extension ResourceOutputs {

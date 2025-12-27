@@ -47,7 +47,7 @@ extension Inventory {
         units: Int64,
         value: Int64,
     ) {
-        self.out.segmented[resource]?.report(unitsSold: units, valueSold: value)
+        self.out[resource]?.report(unitsSold: units, valueSold: value)
     }
 
     private mutating func report(
@@ -61,29 +61,29 @@ extension Inventory {
 
         switch tier {
         case 0?:
-            self.l.segmented[resource]?.report(
+            self.l[resource]?.report(
                 unitsPurchased: units,
                 valuePurchased: value,
             )
         case 1?:
-            self.l.segmented[resource]?.capture(
+            self.l[resource]?.capture(
                 unitsPurchased: &units,
                 valuePurchased: &value,
             )
-            self.e.segmented[resource]?.report(
+            self.e[resource]?.report(
                 unitsPurchased: units,
                 valuePurchased: value,
             )
         case 2?:
-            self.l.segmented[resource]?.capture(
+            self.l[resource]?.capture(
                 unitsPurchased: &units,
                 valuePurchased: &value,
             )
-            self.e.segmented[resource]?.capture(
+            self.e[resource]?.capture(
                 unitsPurchased: &units,
                 valuePurchased: &value,
             )
-            self.x.segmented[resource]?.report(
+            self.x[resource]?.report(
                 unitsPurchased: units,
                 valuePurchased: value,
             )

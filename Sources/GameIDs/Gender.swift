@@ -87,3 +87,138 @@ extension Gender {
         }
     }
 }
+extension Gender {
+    @inlinable public static func sequestration(
+        of population: Sex,
+        by authority: GenderAuthority,
+        plurality: Double
+    ) -> Double {
+        switch authority {
+        case .F:
+            switch population {
+            case .F: 0
+            case .X: 0
+            case .M: 1 - plurality
+            }
+        case .XL:
+            switch population {
+            case .F: 1 - plurality
+            case .X: 0
+            case .M: 0
+            }
+        case .X:
+            switch population {
+            case .F: 1 - plurality
+            case .X: 0
+            case .M: 1 - plurality
+            }
+        case .XG:
+            switch population {
+            case .F: 0
+            case .X: 0
+            case .M: 1 - plurality
+            }
+        case .M:
+            switch population {
+            case .F: 1 - plurality
+            case .X: 1 - plurality
+            case .M: 0
+            }
+        }
+    }
+
+    @inlinable public static func patronage(
+        patron: GenderGroup,
+        target: GenderGroup,
+        plurality: Double
+    ) -> Double {
+        switch patron {
+        case .F:
+            switch target {
+            case .F: return 1
+            case .FS: return 0
+
+            case .XL: return plurality
+            case .X: return plurality
+            case .XG: return 0
+
+            case .M: return 0
+            case .MS: return 0
+            }
+        case .FS:
+            switch target {
+            case .F: return 0
+            case .FS: return 0
+
+            case .XL: return plurality
+            case .X: return plurality
+            case .XG: return 0
+
+            case .M: return 0
+            case .MS: return 1 - plurality
+            }
+
+        case .XL:
+            switch target {
+            case .F: return 1
+            case .FS: return 0
+
+            case .XL: return 1
+            case .X: return plurality
+            case .XG: return 0
+
+            case .M: return 0
+            case .MS: return 0
+            }
+        case .X:
+            switch target {
+            case .F: return plurality
+            case .FS: return 0
+
+            case .XL: return 0
+            case .X: return 1
+            case .XG: return 0
+
+            case .M: return plurality
+            case .MS: return 0
+            }
+        case .XG:
+            switch target {
+            case .F: return 0
+            case .FS: return 0
+
+            case .XL: return 0
+            case .X: return plurality
+            case .XG: return 1
+
+            case .M: return 1
+            case .MS: return 0
+            }
+
+        case .M:
+            switch target {
+            case .F: return 0
+            case .FS: return 0
+
+            case .XL: return 0
+            case .X: return plurality
+            case .XG: return plurality
+
+            case .M: return 1
+            case .MS: return 0
+            }
+        case .MS:
+            switch target {
+            case .F: return 0
+            case .FS: return 1 - plurality
+
+            case .XL: return 0
+            case .X: return 0
+            case .XG: return 0
+
+            case .M: return 0
+            case .MS: return 0
+            }
+        }
+    }
+}

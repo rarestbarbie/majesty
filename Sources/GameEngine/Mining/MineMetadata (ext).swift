@@ -92,11 +92,11 @@ extension MineMetadata {
         }
 
         var yieldBeforeScaling: Double = 0
-        for (id, amount): (Resource, Int64) in self.base.segmented {
+        for (id, amount): (Resource, Int64) in self.base.segmented.x {
             let price: Double = .init(turn.localMarkets[id / tile.id].today.bid.value)
             yieldBeforeScaling += price * Double.init(amount)
         }
-        for (id, amount): (Resource, Int64) in self.base.tradeable {
+        for (id, amount): (Resource, Int64) in self.base.tradeable.x {
             let price: Double = turn.worldMarkets.price(of: id, in: tile.currency.id)
             yieldBeforeScaling += price * Double.init(amount)
         }

@@ -16,11 +16,7 @@ extension CashFlowStatement {
         self.costs.removeAll(keepingCapacity: true)
     }
     mutating func update(with inputs: ResourceInputs) {
-        self.update(with: inputs.tradeable.values.elements)
-        self.update(with: inputs.segmented.values.elements)
-    }
-    private mutating func update(with inputs: [ResourceInput]) {
-        for input: ResourceInput in inputs where input.valueConsumed > 0 {
+        for input: ResourceInput in inputs.all where input.valueConsumed > 0 {
             self.costs[.resource(input.id), default: 0] += input.valueConsumed
         }
     }

@@ -7,16 +7,17 @@ extension ResourceTier {
         metadata: OrderedDictionary<Resource, ResourceMetadata>,
         quantity: [Quantity<Resource>],
     ) {
-        var segmented: OrderedDictionary<Resource, Int64> = [:]
-        var tradeable: OrderedDictionary<Resource, Int64> = [:]
-        for resource: Quantity<Resource> in quantity {
-            if case true? = metadata[resource.unit]?.local {
-                segmented[resource.unit] = resource.amount
+        let x: (
+            segmented: [(Resource, Int64)],
+            tradeable: [(Resource, Int64)],
+        ) = quantity.reduce(into: ([], [])) {
+            if case true? = metadata[$1.unit]?.local {
+                $0.segmented.append(($1.unit, $1.amount))
             } else {
-                tradeable[resource.unit] = resource.amount
+                $0.tradeable.append(($1.unit, $1.amount))
             }
         }
 
-        self.init(segmented: segmented, tradeable: tradeable)
+        self.init(segmented: x.segmented, tradeable: x.tradeable)
     }
 }

@@ -466,7 +466,7 @@ extension GameContext {
         case .pop(let id):
             if  case .sell = side,
                 case .mine(let mine)? = fill.memo {
-                self.pops[modifying: id].state.mines[mine]?.out.segmented[resource]?.report(
+                self.pops[modifying: id].state.mines[mine]?.out[resource]?.report(
                     unitsSold: fill.filled,
                     valueSold: fill.value,
                 )

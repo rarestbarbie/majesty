@@ -37,7 +37,7 @@ extension LocalMarkets {
 }
 extension LocalMarkets {
     public mutating func tradeAsConsumer(
-        selling supply: OrderedDictionary<Resource, ResourceOutput>,
+        selling supply: ArraySlice<ResourceOutput>,
         buying demands: SegmentedWeights<ElasticDemand>,
         budget: (l: Int64, e: Int64, x: Int64),
         as lei: LEI,
@@ -53,7 +53,7 @@ extension LocalMarkets {
         )
     }
     public mutating func tradeAsBusiness(
-        selling supply: OrderedDictionary<Resource, ResourceOutput>,
+        selling supply: ArraySlice<ResourceOutput>,
         buying demands: SegmentedWeights<InelasticDemand>,
         budget: (l: Int64, e: Int64, x: Int64),
         as lei: LEI,
@@ -70,22 +70,22 @@ extension LocalMarkets {
     }
 
     public mutating func sell(
-        supply: OrderedDictionary<Resource, ResourceOutput>,
+        supply: ArraySlice<ResourceOutput>,
         entity: LEI,
         memo: LocalMarket.Memo? = nil,
         tile: Address,
     ) {
-        for (id, output): (Resource, ResourceOutput) in supply {
+        for output: ResourceOutput in supply {
             let units: Int64 = output.unitsReleased
             if  units > 0 {
-                self[id / tile].sell(amount: units, entity: entity, memo: memo)
+                self[output.id / tile].sell(amount: units, entity: entity, memo: memo)
             }
         }
     }
 }
 extension LocalMarkets {
     private mutating func trade(
-        selling: OrderedDictionary<Resource, ResourceOutput>,
+        selling: ArraySlice<ResourceOutput>,
         weights: SegmentedWeights<InelasticDemand>,
         budget: (l: Int64, e: Int64, x: Int64),
         as lei: LEI,
@@ -105,7 +105,7 @@ extension LocalMarkets {
         }
     }
     private mutating func trade(
-        selling: OrderedDictionary<Resource, ResourceOutput>,
+        selling: ArraySlice<ResourceOutput>,
         weights: SegmentedWeights<ElasticDemand>,
         budget: (l: Int64, e: Int64, x: Int64),
         as lei: LEI,
@@ -125,7 +125,7 @@ extension LocalMarkets {
         }
     }
     private mutating func trade<Demand>(
-        selling: OrderedDictionary<Resource, ResourceOutput>,
+        selling: ArraySlice<ResourceOutput>,
         weights: SegmentedWeights<Demand>,
         budget: (l: Int64, e: Int64, x: Int64),
         as lei: LEI,

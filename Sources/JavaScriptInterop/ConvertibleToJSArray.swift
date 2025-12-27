@@ -10,6 +10,7 @@ extension ConvertibleToJSArray {
 }
 extension ConvertibleToJSArray where Self: Sequence, Element: ConvertibleToJSValue {
     @inlinable public func encode(to js: inout JavaScriptEncoder<JavaScriptArrayKey>) {
+        // TODO: consider preallocating the array size if known
         for element: Element in self {
             js.push(element)
         }
