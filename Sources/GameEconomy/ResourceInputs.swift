@@ -88,6 +88,7 @@ extension ResourceInputs {
         with resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
+        self.inputsPartition = resourceTier.i
         self.inputs.sync(with: resourceTier.x) {
             $1.turn(unitsDemanded: $0 * scalingFactor.x, efficiency: scalingFactor.z)
         }

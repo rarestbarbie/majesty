@@ -7,6 +7,9 @@ extension OrderedDictionary where Key == Resource, Value: ResourceStockpile {
         _modify { yield &self[resource, default: .init(id: resource)] }
     }
 
+    /// Synchronizes the entries in this dictionary with keys derived from the given array of
+    /// coefficients. After this function returns, the dictionary is guaranteed to contain
+    /// the same keys as the coefficients, and in the same order.
     mutating func sync(
         with coefficients: [Quantity<Resource>],
         sync: (Int64, inout Value) -> Void

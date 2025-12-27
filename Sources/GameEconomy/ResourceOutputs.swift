@@ -76,6 +76,7 @@ extension ResourceOutputs {
         with resourceTier: ResourceTier,
         releasing fraction: Fraction
     ) {
+        self.outputsPartition = resourceTier.i
         self.outputs.sync(with: resourceTier.x) {
             $1.turn(releasing: fraction)
         }
