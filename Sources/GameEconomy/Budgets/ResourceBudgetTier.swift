@@ -15,18 +15,16 @@ extension ResourceBudgetTier {
 extension ResourceBudgetTier {
     public mutating func distributeAsConsumer(
         funds available: Int64,
-        segmented: Int64,
-        tradeable: Int64,
+        limit totalCost: Int64,
+        weights: (segmented: Double, tradeable: Double),
     ) {
         guard available > 0 else {
             return
         }
 
-        let totalCost: Int64 = tradeable + segmented
-        let items: [Int64]? = [
-            Double.sqrt(Double.init(tradeable)),
-            Double.sqrt(Double.init(segmented))
-        ].distribute(min(totalCost, available))
+        let items: [Int64]? = [weights.tradeable, weights.segmented].distribute(
+            min(totalCost, available)
+        )
 
         if  let items: [Int64] {
             self.tradeable += items[0]

@@ -33,7 +33,10 @@ extension SegmentedWeights.Tier {
         )
     }
 
-    @inlinable public var total: Int64 {
-        self.demands.reduce(into: 0) { $0 += $1.value }
+    @inlinable public var value: Int64 {
+        self.demands.reduce(into: .zero) { $0 += $1.value }
+    }
+    @inlinable public var weight: Demand.Weight {
+        self.demands.reduce(into: .zero) { $0 += $1.weight }
     }
 }

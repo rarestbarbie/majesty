@@ -175,7 +175,7 @@ extension PopContext: AllocatingContext {
 
             let weights: (
                 segmented: SegmentedWeights<InelasticDemand>,
-                tradeable: AggregateWeights
+                tradeable: AggregateWeights<InelasticDemand>
             ) = (
                 segmented: .business(
                     l: self.state.inventory.l,
@@ -222,7 +222,7 @@ extension PopContext: AllocatingContext {
         } else {
             let weights: (
                 segmented: SegmentedWeights<ElasticDemand>,
-                tradeable: AggregateWeights
+                tradeable: AggregateWeights<ElasticDemand>
             ) = (
                 segmented: .consumer(
                     l: self.state.inventory.l,

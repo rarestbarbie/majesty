@@ -12,11 +12,11 @@ import GameIDs
     }
 }
 extension SegmentedWeights {
-    @inlinable public var total: (l: Int64, e: Int64, x: Int64) {
+    @inlinable public var value: (l: Int64, e: Int64, x: Int64) {
         (
-            l: self.l.total,
-            e: self.e.total,
-            x: self.x.total,
+            l: self.l.value,
+            e: self.e.value,
+            x: self.x.value,
         )
     }
 }

@@ -187,7 +187,10 @@ extension FactoryContext: TransactingContext {
             return
         }
 
-        let weights: (segmented: SegmentedWeights<InelasticDemand>, tradeable: AggregateWeights)
+        let weights: (
+            segmented: SegmentedWeights<InelasticDemand>,
+            tradeable: AggregateWeights<InelasticDemand>
+        )
         let budget: OperatingBudget
         let sharesToIssue: Int64
 

@@ -1,7 +1,8 @@
 import GameIDs
 
 public protocol SegmentedDemand: Identifiable<Resource> {
-    associatedtype Weight
+    associatedtype Weight: AdditiveArithmetic
+
     var id: Resource { get }
     var unitsToPurchase: Int64 { get }
     var units: Int64 { get }

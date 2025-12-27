@@ -116,7 +116,7 @@ extension BuildingContext: TransactingContext {
 
         let weights: (
             segmented: SegmentedWeights<InelasticDemand>,
-            tradeable: AggregateWeights
+            tradeable: AggregateWeights<InelasticDemand>
         ) = (
             segmented: .business(
                 l: self.state.inventory.l,

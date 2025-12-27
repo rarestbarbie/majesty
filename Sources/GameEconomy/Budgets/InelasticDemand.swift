@@ -18,6 +18,7 @@ import GameIDs
         self.value = value
     }
 }
+extension InelasticDemand: AggregateDemand {}
 extension InelasticDemand: SegmentedDemand {
     @inlinable public var weight: Int64 { self.value }
 }
