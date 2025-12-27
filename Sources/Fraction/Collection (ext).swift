@@ -10,7 +10,7 @@ extension Collection<Int64> {
         self.distribute(funds) { $0 }
     }
 }
-extension Collection where Element: BinaryFloatingPoint {
+extension Collection<Double> {
     @inlinable public func distribute(_ funds: Int64) -> [Int64]? {
         self.distribute(funds) { $0 }
     }
@@ -21,7 +21,7 @@ extension Collection {
     }
     @inlinable public func distribute(
         _ funds: Int64,
-        share: (Element) -> some BinaryFloatingPoint
+        share: (Element) -> Double
     ) -> [Int64]? {
         self.distribute(share: share) { _ in funds }
     }
@@ -61,11 +61,11 @@ extension Collection {
 
     /// Distributes funds proportionately among shareholders based on their holdings,
     /// using floating-point weights.
-    @inlinable func distribute<Share>(
-        share: (Element) -> Share,
-        funds: (Share) -> Int64,
-    ) -> [Int64]? where Share: BinaryFloatingPoint {
-        let shares: Share = self.reduce(0) { $0 + share($1) }
+    @inlinable func distribute(
+        share: (Element) -> Double,
+        funds: (Double) -> Int64,
+    ) -> [Int64]? {
+        let shares: Double = self.reduce(0) { $0 + share($1) }
         if shares <= 0 {
             return nil
         }
@@ -109,15 +109,15 @@ extension Collection {
         return allocations
     }
 
-    @inlinable func distribute<Share>(
+    @inlinable func distribute(
         _ funds: Int64,
-        shares: Share,
-        share: (Element) -> Share
-    ) -> [Int64] where Share: BinaryFloatingPoint {
+        shares: Double,
+        share: (Element) -> Double
+    ) -> [Int64] {
         // Initialize allocation array
         var allocations: [Int64] = .init(repeating: 0, count: self.count)
         var allocated: Int64 = 0
-        let dividend: Share = .init(funds)
+        let dividend: Double = .init(funds)
 
         // First pass: calculate the floor of proportional distribution
         for (i, element): (Int, Element) in zip(allocations.indices, self) {
