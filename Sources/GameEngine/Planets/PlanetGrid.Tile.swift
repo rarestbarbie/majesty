@@ -233,7 +233,7 @@ extension PlanetGrid.Tile {
         let choices: [FactoryMetadata]
 
         if  let priority: Resource {
-            choices = self.filter(factories: factories) { $0.output.x.keys.contains(priority) }
+            choices = self.filter(factories: factories) { $0.output.contains(priority) }
         } else {
             choices = self.filter(factories: factories) { _ in true }
         }

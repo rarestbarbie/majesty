@@ -1,50 +1,45 @@
 import GameIDs
-import OrderedCollections
-import RealModule
 
 @frozen public struct ResourceTier: Equatable, Hashable {
-    public let x: OrderedDictionary<Resource, Int64>
-    /// Concavity weight factors, cached for performance.
-    public let u: [Double]
+    @usableFromInline let table: [Resource: Int64]
+    public let x: [Quantity<Resource>]
     public let i: Int
 
-    @inlinable public init(
-        x: OrderedDictionary<Resource, Int64>,
-        u: [Double],
-        i: Int
-    ) {
-        self.u = u
+    @inlinable init(table: [Resource: Int64], x: [Quantity<Resource>], i: Int) {
+        self.table = table
         self.x = x
         self.i = i
     }
 }
 extension ResourceTier {
-    @inlinable public static var empty: Self { .init(x: [:], u: [], i: 0) }
+    @inlinable public static var empty: Self { .init(table: [:], x: [], i: 0) }
 
-    @inlinable public init(segmented: [(Resource, Int64)], tradeable: [(Resource, Int64)]) {
-        let count: Int = segmented.count + tradeable.count
-        var x: OrderedDictionary<Resource, Int64> = .init(minimumCapacity: count)
+    @inlinable public init(segmented: [Quantity<Resource>], tradeable: [Quantity<Resource>]) {
+        let array: [Quantity<Resource>] = segmented + tradeable
+        let table: [Resource: Int64] = .init(
+            uniqueKeysWithValues: array.lazy.map { ($0.unit, $0.amount) }
+        )
 
-        for (id, amount): (Resource, Int64) in segmented {
-            x[id] = amount
-        }
+        self.init(table: table, x: array, i: segmented.count)
+    }
+}
+extension ResourceTier: RandomAccessCollection {
+    @inlinable public var startIndex: Int { self.x.startIndex }
+    @inlinable public var endIndex: Int { self.x.endIndex }
 
-        let i: Int = x.elements.endIndex
-
-        for (id, amount): (Resource, Int64) in tradeable {
-            x[id] = amount
-        }
-
-        let u: [Double] = x.values.map { Double.sqrt(Double.init($0)) }
-
-        self.init(x: x, u: u, i: i)
+    @inlinable public subscript(index: Int) -> (id: Resource, amount: Int64) {
+        let x: Quantity<Resource> = self.x[index]
+        return (x.unit, x.amount)
     }
 }
 extension ResourceTier {
-    @inlinable public var segmented: Coefficients {
-        .init(all: self.x.elements, u: self.u[..<self.i])
+    @inlinable public var segmented: Coefficients { .init(x: self.x[..<self.i]) }
+    @inlinable public var tradeable: Coefficients { .init(x: self.x[self.i...]) }
+
+    @inlinable public func contains(_ resource: Resource) -> Bool {
+        self.table.keys.contains(resource)
     }
-    @inlinable public var tradeable: Coefficients {
-        .init(all: self.x.elements, u: self.u[self.i...])
+    @inlinable public subscript(id: Resource) -> Int64? {
+        self.table[id]
     }
 }

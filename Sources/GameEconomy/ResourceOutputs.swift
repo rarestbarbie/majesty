@@ -84,7 +84,7 @@ extension ResourceOutputs {
         from resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
-        for (id, amount): (Resource, Int64) in resourceTier.x {
+        for (id, amount): (Resource, Int64) in resourceTier {
             self.outputs[id].deposit(amount * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }

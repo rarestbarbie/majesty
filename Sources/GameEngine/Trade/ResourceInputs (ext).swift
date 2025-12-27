@@ -33,23 +33,23 @@ extension ResourceInputs {
 
     func width(limit: Int64, tier: ResourceTier, efficiency: Double) -> Int64 {
         min(
-            zip(self.segmented, tier.segmented.x.values).reduce(limit) {
-                let (resource, amount): (ResourceInput, Int64) = $1
+            zip(self.segmented, tier.segmented.x).reduce(limit) {
+                let (input, resource): (ResourceInput, Quantity<Resource>) = $1
                 return min(
                     $0,
-                    resource.width(
-                        base: amount,
+                    input.width(
+                        base: resource.amount,
                         efficiency: efficiency,
                         reservedDays: 1
                     )
                 )
             },
-            zip(self.tradeable, tier.tradeable.x.values).reduce(limit) {
-                let (resource, amount): (ResourceInput, Int64) = $1
+            zip(self.tradeable, tier.tradeable.x).reduce(limit) {
+                let (input, resource): (ResourceInput, Quantity<Resource>) = $1
                 return min(
                     $0,
-                    resource.width(
-                        base: amount,
+                    input.width(
+                        base: resource.amount,
                         efficiency: efficiency,
                         reservedDays: self.tradeableDaysReserve
                     )

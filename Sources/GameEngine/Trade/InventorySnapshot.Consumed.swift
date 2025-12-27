@@ -23,7 +23,7 @@ extension InventorySnapshot.Consumed {
         tier: ResourceTier,
         details: (inout TooltipInstructionEncoder, Int64) -> () = { _, _ in }
     ) -> Tooltip? {
-        guard let amount: Int64 = tier.x[self.input.id] else {
+        guard let amount: Int64 = tier[self.input.id] else {
             return nil
         }
 

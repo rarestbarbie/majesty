@@ -8,13 +8,13 @@ extension ResourceTier {
         quantity: [Quantity<Resource>],
     ) {
         let x: (
-            segmented: [(Resource, Int64)],
-            tradeable: [(Resource, Int64)],
+            segmented: [Quantity<Resource>],
+            tradeable: [Quantity<Resource>],
         ) = quantity.reduce(into: ([], [])) {
             if case true? = metadata[$1.unit]?.local {
-                $0.segmented.append(($1.unit, $1.amount))
+                $0.segmented.append($1)
             } else {
-                $0.tradeable.append(($1.unit, $1.amount))
+                $0.tradeable.append($1)
             }
         }
 
