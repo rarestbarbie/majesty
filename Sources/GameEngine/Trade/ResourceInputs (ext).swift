@@ -6,15 +6,15 @@ import OrderedCollections
 
 extension ResourceInputs {
     func snapshot<ID>(into table: inout [ID: InventorySnapshot.Consumed.Value], as id: (Resource) -> ID) {
-        for (resource, input): (Resource, ResourceInput) in self.segmented {
-            table[id(resource)] = .init(
+        for input: ResourceInput in self.segmented {
+            table[id(input.id)] = .init(
                 input: input,
                 tradeable: false,
                 tradeableDaysReserve: self.tradeableDaysReserve
             )
         }
-        for (resource, input): (Resource, ResourceInput) in self.tradeable {
-            table[id(resource)] = .init(
+        for input: ResourceInput in self.tradeable {
+            table[id(input.id)] = .init(
                 input: input,
                 tradeable: true,
                 tradeableDaysReserve: self.tradeableDaysReserve
@@ -24,19 +24,17 @@ extension ResourceInputs {
 }
 extension ResourceInputs {
     var valueConsumed: Int64 {
-        self.segmented.values.reduce(0) { $0 + $1.valueConsumed } +
-        self.tradeable.values.reduce(0) { $0 + $1.valueConsumed }
+        self.all.reduce(0) { $0 + $1.valueConsumed }
     }
 
     var valueAcquired: Int64 {
-        self.segmented.values.reduce(0) { $0 + $1.value.total } +
-        self.tradeable.values.reduce(0) { $0 + $1.value.total }
+        self.all.reduce(0) { $0 + $1.value.total }
     }
 
     func width(limit: Int64, tier: ResourceTier, efficiency: Double) -> Int64 {
         min(
-            zip(self.segmented.values, tier.segmented).reduce(limit) {
-                let (resource, (_, amount)): (ResourceInput, (Resource, Int64)) = $1
+            zip(self.segmented, tier.segmented.x.values).reduce(limit) {
+                let (resource, amount): (ResourceInput, Int64) = $1
                 return min(
                     $0,
                     resource.width(
@@ -46,8 +44,8 @@ extension ResourceInputs {
                     )
                 )
             },
-            zip(self.tradeable.values, tier.tradeable).reduce(limit) {
-                let (resource, (_, amount)): (ResourceInput, (Resource, Int64)) = $1
+            zip(self.tradeable, tier.tradeable.x.values).reduce(limit) {
+                let (resource, amount): (ResourceInput, Int64) = $1
                 return min(
                     $0,
                     resource.width(
@@ -76,6 +74,8 @@ extension ResourceInputs: JavaScriptEncodable {
 }
 extension ResourceInputs: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+        // this is slower to decode than the combined form, but we don’t have to validate the
+        // partition index this way, and also we only serialize on game start and save anyway
         self.init(
             segmented: try js[.segmented].decode(),
             tradeable: try js[.tradeable].decode(),

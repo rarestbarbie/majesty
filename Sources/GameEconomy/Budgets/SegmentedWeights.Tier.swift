@@ -17,17 +17,17 @@ extension SegmentedWeights.Tier {
 }
 extension SegmentedWeights.Tier {
     static func compute(
-        demands: OrderedDictionary<Resource, ResourceInput>,
+        demands: ArraySlice<ResourceInput>,
         markets: borrowing LocalMarkets,
         address: Address,
     ) -> Self {
         .init(
             demands: demands.map {
                 .init(
-                    id: $0,
-                    unitsToPurchase: $1.needed($1.unitsDemanded),
-                    units: $1.unitsDemanded,
-                    value: $1.unitsDemanded >< markets[$0 / address].yesterday.ask.value
+                    id: $0.id,
+                    unitsToPurchase: $0.needed($0.unitsDemanded),
+                    units: $0.unitsDemanded,
+                    value: $0.unitsDemanded >< markets[$0.id / address].yesterday.ask.value
                 )
             }
         )

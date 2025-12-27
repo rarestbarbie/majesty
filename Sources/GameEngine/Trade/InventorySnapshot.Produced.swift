@@ -23,14 +23,7 @@ extension InventorySnapshot.Produced {
         tier: ResourceTier,
         details: (inout TooltipInstructionEncoder, Int64) -> () = { _, _ in }
     ) -> Tooltip? {
-        let amount: Int64
-
-        if  let tradeable: Int64 = tier.tradeable[self.output.id] {
-            amount = tradeable
-        } else if
-            let segmented: Int64 = tier.segmented[self.output.id] {
-            amount = segmented
-        } else {
+        guard let amount: Int64 = tier.x[self.output.id] else {
             return nil
         }
 

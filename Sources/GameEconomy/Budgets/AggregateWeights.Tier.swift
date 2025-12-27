@@ -11,14 +11,14 @@ extension AggregateWeights {
 extension AggregateWeights.Tier {
     static var empty: Self { .init(total: 0) }
     static func compute(
-        demands: OrderedDictionary<Resource, ResourceInput>,
+        demands: ArraySlice<ResourceInput>,
         markets: borrowing WorldMarkets,
         currency: CurrencyID
     ) -> Self {
         .init(
             total: demands.reduce(0) {
-                let units: Int64 = $1.value.unitsDemanded
-                return $0 + Double.init(units) * markets.price(of: $1.key, in: currency)
+                let units: Int64 = $1.unitsDemanded
+                return $0 + Double.init(units) * markets.price(of: $1.id, in: currency)
             }
         )
     }

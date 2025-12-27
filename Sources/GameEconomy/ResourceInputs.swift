@@ -3,48 +3,84 @@ import GameIDs
 import OrderedCollections
 
 @frozen public struct ResourceInputs {
-    public var segmented: OrderedDictionary<Resource, ResourceInput>
-    public var tradeable: OrderedDictionary<Resource, ResourceInput>
     public var tradeableDaysReserve: Int64
+    @usableFromInline var inputs: OrderedDictionary<Resource, ResourceInput>
+    /// The index of the first **tradeable** resource in ``inputs``, which may be the end
+    /// index if there are no tradeable resources.
+    @usableFromInline var inputsPartition: Int
 
     @inlinable public init(
-        segmented: OrderedDictionary<Resource, ResourceInput>,
-        tradeable: OrderedDictionary<Resource, ResourceInput>,
+        tradeableDaysReserve: Int64,
+        inputs: OrderedDictionary<Resource, ResourceInput>,
+        inputsPartition: Int
+    ) {
+        self.tradeableDaysReserve = tradeableDaysReserve
+        self.inputs = inputs
+        self.inputsPartition = inputsPartition
+    }
+}
+extension ResourceInputs {
+    @inlinable public static var empty: Self {
+        .init(tradeableDaysReserve: 0, inputs: [:], inputsPartition: 0)
+    }
+
+    @inlinable public init(
+        segmented: [ResourceInput],
+        tradeable: [ResourceInput],
         tradeableDaysReserve: Int64
     ) {
-        self.segmented = segmented
-        self.tradeable = tradeable
-        self.tradeableDaysReserve = tradeableDaysReserve
-    }
-    @inlinable public static var empty: Self {
-        .init(segmented: [:], tradeable: [:], tradeableDaysReserve: 0)
+        var combined: OrderedDictionary<Resource, ResourceInput> = .init(
+            minimumCapacity: segmented.count + tradeable.count
+        )
+        for input: ResourceInput in segmented {
+            combined[input.id] = input
+        }
+        let inputsPartition: Int = combined.elements.endIndex
+        for input: ResourceInput in tradeable {
+            combined[input.id] = input
+        }
+        self.init(
+            tradeableDaysReserve: tradeableDaysReserve,
+            inputs: combined,
+            inputsPartition: inputsPartition
+        )
     }
 }
 extension ResourceInputs {
     @inlinable public static var stockpileDaysFactor: Int64 { 2 }
-    @inlinable public var count: Int { self.segmented.count + self.tradeable.count }
+
+    @inlinable public var count: Int { self.inputs.count }
+    @inlinable public var all: [ResourceInput] { self.inputs.values.elements }
+
+    @inlinable public var segmented: ArraySlice<ResourceInput> {
+        self.inputs.values.elements[..<self.inputsPartition]
+    }
+    @inlinable public var tradeable: ArraySlice<ResourceInput> {
+        self.inputs.values.elements[self.inputsPartition...]
+    }
 
     private var fulfilled: Double {
-        min(
-            self.segmented.values.reduce(1) { min($0, $1.fulfilled) },
-            self.tradeable.values.reduce(1) { min($0, $1.fulfilled) },
-        )
+        self.inputs.values.reduce(1) { min($0, $1.fulfilled) }
     }
     private var fulfilledAfterReservation: Double {
         min(
-            self.segmented.values.reduce(1) { min($0, $1.fulfilled) },
-            self.tradeable.values.reduce(1) { min($0, $1.fulfilledAfterReservation) },
+            self.segmented.reduce(1) { min($0, $1.fulfilled) },
+            self.tradeable.reduce(1) { min($0, $1.fulfilledAfterReservation) },
         )
     }
 
     private var full: Bool {
-        for input: ResourceInput in self.segmented.values where input.units.total < input.unitsDemanded {
-            return false
-        }
-        for input: ResourceInput in self.tradeable.values where input.units.total < input.unitsDemanded {
+        for input: ResourceInput in self.inputs.values where
+            input.units.total < input.unitsDemanded {
             return false
         }
         return true
+    }
+}
+extension ResourceInputs {
+    @inlinable public subscript(id: Resource) -> ResourceInput? {
+        _read   { yield  self.inputs[id] }
+        _modify { yield &self.inputs[id] }
     }
 }
 extension ResourceInputs {
@@ -52,10 +88,7 @@ extension ResourceInputs {
         with resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
-        self.segmented.sync(with: resourceTier.segmented) {
-            $1.turn(unitsDemanded: $0 * scalingFactor.x, efficiency: scalingFactor.z)
-        }
-        self.tradeable.sync(with: resourceTier.tradeable) {
+        self.inputs.sync(with: resourceTier.x) {
             $1.turn(unitsDemanded: $0 * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }
@@ -100,15 +133,15 @@ extension ResourceInputs {
         scalingFactor: (x: Int64, z: Double),
         reservingDays: Int64
     ) {
-        for (id, amount): (Resource, Int64) in resourceTier.segmented {
-            self.segmented[id].consume(
+        for (id, amount): (Resource, Int64) in resourceTier.segmented.x {
+            self.inputs[id].consume(
                 amount * scalingFactor.x,
                 efficiency: scalingFactor.z,
                 reservedDays: 1
             )
         }
-        for (id, amount): (Resource, Int64) in resourceTier.tradeable {
-            self.tradeable[id].consume(
+        for (id, amount): (Resource, Int64) in resourceTier.tradeable.x {
+            self.inputs[id].consume(
                 amount * scalingFactor.x,
                 efficiency: scalingFactor.z,
                 reservedDays: reservingDays
@@ -134,7 +167,7 @@ extension ResourceInputs {
         }
 
         let supplyDaysTarget: Int64 = Self.stockpileDaysFactor * stockpileDays.lower
-        let weights: [Double] = self.tradeable.values.map {
+        let weights: [Double] = self.tradeable.map {
             Double.init(
                 $0.needed($0.unitsDemanded * supplyDaysTarget)
             ) * exchange.price(of: $0.id, in: currency)
@@ -160,7 +193,7 @@ extension ResourceInputs {
         }
 
         let supplyDaysTarget: Int64 = Self.stockpileDaysFactor * stockpileDays.lower
-        let weights: [Double] = self.tradeable.values.map {
+        let weights: [Double] = self.tradeable.map {
             /// w = deficit / demanded * sqrt(demanded * price)
             ///   = deficit / demanded * sqrt(demanded) * sqrt(price)
             ///   = deficit / sqrt(demanded) * sqrt(price)
@@ -200,13 +233,13 @@ extension ResourceInputs {
         var gain: Int64 = 0
         var loss: Int64 = 0
 
-        for i: Int in self.tradeable.values.indices {
+        for i: Int in self.tradeable.indices {
             var budgeted: Int64 = budget?[i] ?? 0
             if  reserved > 0 {
                 reserved -= 1
                 budgeted += 1
             }
-            let value: Int64 = self.tradeable.values[i].trade(
+            let value: Int64 = self.inputs.values[i].trade(
                 stockpileDaysTarget: Self.stockpileDaysFactor * stockpileDaysTarget,
                 stockpileDaysReturn: Self.stockpileDaysFactor * stockpileDaysReturn,
                 budget: budgeted,
