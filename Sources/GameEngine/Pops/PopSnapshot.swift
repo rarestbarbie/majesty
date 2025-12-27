@@ -8,146 +8,6 @@ import GameState
 import GameUI
 import OrderedCollections
 
-extension PopSnapshot {
-    func buildDemotionMatrix<Matrix>(
-        type: Matrix.Type = Matrix.self,
-    ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
-        .init(base: 0%) {
-            if case .aristocratic = self.occupation.mode {
-                $0[true] {
-                    $0 = -2‰
-                } = { "\(+$0[%]): Pop is \(em: "aristocratic")" }
-            } else {
-                $0[1 - self.stats.employmentBeforeEgress] {
-                    $0[$1 >= 0.1] = +2‱
-                    $0[$1 >= 0.2] = +1‱
-                    $0[$1 >= 0.3] = +1‱
-                    $0[$1 >= 0.4] = +1‱
-                } = { "\(+$0[%]): Unemployment is above \(em: $1[%0])" }
-            }
-
-            $0[self.y.fl] {
-                $0[$1 < 1.00] = +1‰
-                $0[$1 < 0.75] = +5‰
-                $0[$1 < 0.50] = +2‰
-                $0[$1 < 0.25] = +2‰
-            } = { "\(+$0[%]): Getting less than \(em: $1[%0]) of Life Needs" }
-
-        } factors: {
-            $0[self.y.fx] {
-                $0[$1 > 0.25] = -90%
-            } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Luxury Needs" }
-            $0[self.y.fe] {
-                $0[$1 > 0.75] = -50%
-                $0[$1 > 0.5] = -25%
-            } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Everyday Needs" }
-
-            $0[self.y.mil] {
-                $0[$1 >= 1.0] = -10%
-                $0[$1 >= 2.0] = -10%
-                $0[$1 >= 3.0] = -10%
-                $0[$1 >= 4.0] = -10%
-                $0[$1 >= 5.0] = -10%
-                $0[$1 >= 6.0] = -10%
-                $0[$1 >= 7.0] = -10%
-                $0[$1 >= 8.0] = -10%
-                $0[$1 >= 9.0] = -10%
-            } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
-
-            let culture: Culture = self.region.culturePreferred
-            if case .Ward = self.type.stratum {
-                $0[true] {
-                    $0 = -100%
-                } = { "\(+$0[%]): Pop is \(em: "enslaved")" }
-            } else if self.race == culture.id {
-                $0[true] {
-                    $0 = -5%
-                } = { "\(+$0[%]): Culture is \(em: culture.name)" }
-            } else {
-                $0[true] {
-                    $0 = +100%
-                } = { "\(+$0[%]): Culture is not \(em: culture.name)" }
-            }
-        }
-    }
-
-    func buildPromotionMatrix<Matrix>(
-        type: Matrix.Type = Matrix.self,
-    ) -> Matrix where Matrix: ConditionMatrix<Decimal, Double> {
-        .init(base: 0%) {
-            $0[self.y.mil] {
-                $0[$1 >= 3.0] = -2‱
-                $0[$1 >= 5.0] = -2‱
-                $0[$1 >= 7.0] = -3‱
-                $0[$1 >= 9.0] = -3‱
-            } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
-
-            switch self.type.stratum {
-            case .Owner:
-                $0[self.y.fx] {
-                    $0[$1 >= 0.25] = +3‰
-                    $0[$1 >= 0.50] = +3‰
-                    $0[$1 >= 0.75] = +3‰
-                } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Luxury Needs" }
-
-            case _:
-                break
-            }
-
-            $0[self.y.con] {
-                $0[$1 >= 1.0] = +1‱
-                $0[$1 >= 2.0] = +1‱
-                $0[$1 >= 3.0] = +1‱
-                $0[$1 >= 4.0] = +1‱
-                $0[$1 >= 5.0] = +1‱
-                $0[$1 >= 6.0] = +1‱
-                $0[$1 >= 7.0] = +1‱
-                $0[$1 >= 8.0] = +1‱
-                $0[$1 >= 9.0] = +1‱
-            } = { "\(+$0[%]): Consciousness is above \(em: $1[..1])" }
-
-        } factors: {
-            $0[self.y.fl] {
-                $0[$1 < 1.00] = -100%
-            } = { "\(+$0[%]): Getting less than \(em: $1[%0]) of Life Needs" }
-
-            $0[self.y.fe] {
-                $0[$1 >= 0.1] = -10%
-                $0[$1 >= 0.2] = -10%
-                $0[$1 >= 0.3] = -10%
-                $0[$1 >= 0.4] = -10%
-                $0[$1 >= 0.5] = -10%
-                $0[$1 >= 0.6] = -10%
-                $0[$1 >= 0.7] = -10%
-                $0[$1 >= 0.8] = -10%
-                $0[$1 >= 0.9] = -10%
-            } = { "\(+$0[%]): Getting more than \(em: $1[%0]) of Everyday Needs" }
-
-            $0[self.y.mil] {
-                $0[$1 >= 2.0] = -20%
-                $0[$1 >= 4.0] = -10%
-                $0[$1 >= 6.0] = -10%
-                $0[$1 >= 8.0] = -10%
-            } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
-
-            let culture: Culture = self.region.culturePreferred
-            if case .Ward = self.type.stratum {
-                $0[true] {
-                    $0 = -100%
-                } = { "\(+$0[%]): Pop is \(em: "enslaved")" }
-            } else if self.race == culture.id {
-                $0[true] {
-                    $0 = +5%
-                } = { "\(+$0[%]): Culture is \(em: culture.name)" }
-            } else {
-                $0[true] {
-                    $0 = -75%
-                } = { "\(+$0[%]): Culture is not \(em: culture.name)" }
-            }
-        }
-    }
-}
-
 struct PopSnapshot: PopProperties, Sendable {
     let metadata: PopMetadata
     let stats: Pop.Stats
@@ -206,6 +66,9 @@ extension PopSnapshot {
             _mines: state.mines
         )
     }
+}
+extension PopSnapshot: PopFactors {
+    typealias Matrix = ConditionBreakdown
 }
 extension PopSnapshot: LegalEntitySnapshot {}
 extension PopSnapshot {
@@ -441,8 +304,8 @@ extension PopSnapshot {
         }
     }
     func tooltipOccupation() -> Tooltip? {
-        let promotion: ConditionBreakdown = self.buildPromotionMatrix()
-        let demotion: ConditionBreakdown = self.buildDemotionMatrix()
+        let promotion: ConditionBreakdown = self.promotion
+        let demotion: ConditionBreakdown = self.demotion
 
         let promotions: Int64 = promotion.output > 0
             ? .init(Double.init(self.z.active) * promotion.output * 30)

@@ -527,23 +527,31 @@ extension PopContext {
 }
 extension PopContext {
     private mutating func convert(turn: inout Turn) {
-        let evaluatePromotions: ConditionEvaluator
-        let evaluateDemotions: ConditionEvaluator
+        let promotion: ConditionEvaluator
+        let demotion: ConditionEvaluator
         let stats: PopulationStats
 
-        if  let snapshot: PopSnapshot = self.snapshot {
-            evaluatePromotions = snapshot.buildPromotionMatrix()
-            evaluateDemotions = snapshot.buildDemotionMatrix()
-            stats = snapshot.region.pops
+        if  let region: RegionalProperties = self.region?.properties {
+            let converter: Converter  = .init(
+                region: region,
+                stats: self.stats,
+                type: self.state.type,
+                y: self.state.y,
+                z: self.state.z
+            )
+
+            promotion = converter.promotion
+            demotion = converter.demotion
+            stats = region.pops
         } else {
-            fatalError("unreachable")
+            fatalError("missing region for pop '\(self.state.id)'!!!")
         }
 
         let current: PopOccupation = self.state.occupation
 
         // when demoting, inherit 1 percent
         self.state.egress(
-            evaluator: evaluateDemotions,
+            evaluator: demotion,
             inherit: 1 %/ 100,
             on: &turn,
         ) {
@@ -552,7 +560,7 @@ extension PopContext {
 
         // when promoting, inherit all
         self.state.egress(
-            evaluator: evaluatePromotions,
+            evaluator: promotion,
             inherit: nil,
             on: &turn,
         ) {
