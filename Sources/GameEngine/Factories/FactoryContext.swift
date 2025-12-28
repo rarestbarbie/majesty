@@ -46,6 +46,7 @@ extension FactoryContext {
         Self.efficiencyBonusFromClerks * .sqrt(fk)
     }
 
+    static var utilizationThreshold: Double { 0.99 }
     static var pr: Int { 8 }
 
     var snapshot: FactorySnapshot? {
@@ -361,7 +362,9 @@ extension FactoryContext: TransactingContext {
 
                 //  note that this is yesterday’s profit, since profit for today has not yet
                 //  been computed, but hopefully this is still responsive enough
-                if  workers.count > 0, self.stats.profit.contribution < 0 {
+                if  workers.count > 0,
+                    self.stats.profit.contribution < 0 ||
+                    self.stats.utilization < Self.utilizationThreshold {
                     let fire: Int64
                     if  workers.count == 1, self.clerks?.count ?? 0 == 0 {
                         // the other branch would never fire the last worker
@@ -373,7 +376,9 @@ extension FactoryContext: TransactingContext {
                     } else {
                         /// Fire up to 40% of workers based on marginal profitability.
                         /// If gross profit is also negative, this happens more quickly.
-                        let l: Double = max(0, -0.4 * self.stats.profit.marginalProfitability)
+                        let p: Double = -0.4 * self.stats.profit.marginalProfitability
+                        let q: Double = 1 - self.stats.utilization
+                        let l: Double = max(0, p, q)
                         let firable: Int64 = .init(l * Double.init(workers.count))
                         if  firable > 0, self.stats.profit.gross < 0 || turn.random.roll(1, 3) {
                             fire = .random(in: 0 ... firable, using: &turn.random.generator)

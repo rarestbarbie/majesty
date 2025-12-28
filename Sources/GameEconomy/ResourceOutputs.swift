@@ -57,7 +57,7 @@ extension ResourceOutputs {
             let sold: Double
             if  $1.unitsSold < $1.units.removed {
                 // implies `units.removed > 0`
-                sold = Double.init($1.unitsSold) / Double.init($1.units.removed)
+                sold = Double.init($1.unitsSold %/ $1.units.removed)
             } else {
                 sold = 1
             }
