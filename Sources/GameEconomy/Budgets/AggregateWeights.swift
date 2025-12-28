@@ -1,6 +1,6 @@
 import GameIDs
 
-@frozen public struct AggregateWeights {
+@frozen public struct AggregateWeights<Demand> where Demand: AggregateDemand {
     public let l: Tier
     public let e: Tier
     public let x: Tier
@@ -11,16 +11,22 @@ import GameIDs
         self.x = x
     }
 }
-extension AggregateWeights {
-    @inlinable public var total: (l: Int64, e: Int64, x: Int64) {
+extension AggregateWeights where Demand.Column: AggregateDemandColumn {
+    @inlinable var valueColumns: (l: Int64, e: Int64, x: Int64) {
         (
-            l: Int64.init(self.l.total.rounded(.up)),
-            e: Int64.init(self.e.total.rounded(.up)),
-            x: Int64.init(self.x.total.rounded(.up)),
+            l: Int64.init(self.l.total.value.rounded(.up)),
+            e: Int64.init(self.e.total.value.rounded(.up)),
+            x: Int64.init(self.x.total.value.rounded(.up)),
         )
     }
 }
-extension AggregateWeights {
+extension AggregateWeights<InelasticDemand> {
+    @inlinable public var value: (l: Int64, e: Int64, x: Int64) { self.valueColumns }
+}
+extension AggregateWeights<ElasticDemand> {
+    @inlinable public var value: (l: Int64, e: Int64, x: Int64) { self.valueColumns }
+}
+extension AggregateWeights<InelasticDemand> {
     public static func businessNew(
         x: ResourceInputs,
         markets: borrowing WorldMarkets,
@@ -43,7 +49,7 @@ extension AggregateWeights {
         )
     }
 }
-extension AggregateWeights {
+extension AggregateWeights<ElasticDemand> {
     public static func consumer(
         l: ResourceInputs,
         e: ResourceInputs,

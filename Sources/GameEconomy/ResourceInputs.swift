@@ -88,6 +88,7 @@ extension ResourceInputs {
         with resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
+        self.inputsPartition = resourceTier.i
         self.inputs.sync(with: resourceTier.x) {
             $1.turn(unitsDemanded: $0 * scalingFactor.x, efficiency: scalingFactor.z)
         }
@@ -133,14 +134,14 @@ extension ResourceInputs {
         scalingFactor: (x: Int64, z: Double),
         reservingDays: Int64
     ) {
-        for (id, amount): (Resource, Int64) in resourceTier.segmented.x {
+        for (id, amount): (Resource, Int64) in resourceTier.segmented {
             self.inputs[id].consume(
                 amount * scalingFactor.x,
                 efficiency: scalingFactor.z,
                 reservedDays: 1
             )
         }
-        for (id, amount): (Resource, Int64) in resourceTier.tradeable.x {
+        for (id, amount): (Resource, Int64) in resourceTier.tradeable {
             self.inputs[id].consume(
                 amount * scalingFactor.x,
                 efficiency: scalingFactor.z,
@@ -195,14 +196,13 @@ extension ResourceInputs {
         let supplyDaysTarget: Int64 = Self.stockpileDaysFactor * stockpileDays.lower
         let weights: [Double] = self.tradeable.map {
             /// w = deficit / demanded * sqrt(demanded * price)
-            ///   = deficit / demanded * sqrt(demanded) * sqrt(price)
-            ///   = deficit / sqrt(demanded) * sqrt(price)
-            ///   = deficit * sqrt(price / demanded)
+            ///   = deficit / sqrt(price * demanded / demanded²)
+            ///   = deficit / sqrt(price / demanded)
             ///
             /// this can be a little counterintuitive, unless you remember that the deficit
             /// itself is proportional to demand, which makes the weight scale with the
             /// square root of demand and the square root of price.
-            return Double.init($0.needed($0.unitsDemanded * supplyDaysTarget)) * .sqrt(
+            Double.init($0.needed($0.unitsDemanded * supplyDaysTarget)) * .sqrt(
                 exchange.price(of: $0.id, in: currency) / Double.init($0.unitsDemanded)
             )
         }
@@ -232,9 +232,10 @@ extension ResourceInputs {
 
         var gain: Int64 = 0
         var loss: Int64 = 0
-
-        for i: Int in self.tradeable.indices {
-            var budgeted: Int64 = budget?[i] ?? 0
+        /// the budget is a regular array, so we need to index it from zero, not whatever the
+        /// slice of weights starts at
+        for (i, j): (Int, Int) in zip(self.tradeable.indices, 0...) {
+            var budgeted: Int64 = budget?[j] ?? 0
             if  reserved > 0 {
                 reserved -= 1
                 budgeted += 1

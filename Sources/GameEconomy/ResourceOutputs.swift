@@ -76,6 +76,7 @@ extension ResourceOutputs {
         with resourceTier: ResourceTier,
         releasing fraction: Fraction
     ) {
+        self.outputsPartition = resourceTier.i
         self.outputs.sync(with: resourceTier.x) {
             $1.turn(releasing: fraction)
         }
@@ -84,7 +85,7 @@ extension ResourceOutputs {
         from resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) {
-        for (id, amount): (Resource, Int64) in resourceTier.x {
+        for (id, amount): (Resource, Int64) in resourceTier {
             self.outputs[id].deposit(amount * scalingFactor.x, efficiency: scalingFactor.z)
         }
     }

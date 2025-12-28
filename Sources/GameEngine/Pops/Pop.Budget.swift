@@ -17,13 +17,13 @@ extension Pop.Budget {
         account: Bank.Account,
         weights: __shared (
             segmented: SegmentedWeights<InelasticDemand>,
-            tradeable: AggregateWeights
+            tradeable: AggregateWeights<InelasticDemand>
         ),
         state: Pop.Dimensions,
         stockpileMaxDays: Int64,
     ) -> Self {
-        let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.total
-        let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.total
+        let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.value
+        let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.value
         let totalCostPerDay: (l: Int64, e: Int64) = (
             l: tradeableCostPerDay.l + segmentedCostPerDay.l,
             e: tradeableCostPerDay.e + segmentedCostPerDay.e,
@@ -67,17 +67,18 @@ extension Pop.Budget {
         account: Bank.Account,
         weights: __shared (
             segmented: SegmentedWeights<ElasticDemand>,
-            tradeable: AggregateWeights
+            tradeable: AggregateWeights<ElasticDemand>
         ),
         state: Pop.Dimensions,
         stockpileMaxDays: Int64,
         investor: Bool
     ) -> Self {
-        let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.total
-        let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.total
-        let totalCostPerDay: (l: Int64, e: Int64) = (
+        let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.value
+        let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.value
+        let totalCostPerDay: (l: Int64, e: Int64, x: Int64) = (
             l: tradeableCostPerDay.l + segmentedCostPerDay.l,
             e: tradeableCostPerDay.e + segmentedCostPerDay.e,
+            x: tradeableCostPerDay.x + segmentedCostPerDay.x,
         )
 
         let d: CashAllocationBasis = .consumer
@@ -93,20 +94,29 @@ extension Pop.Budget {
 
         l.distributeAsConsumer(
             funds: basis / d.l,
-            segmented: segmentedCostPerDay.l * stockpileMaxDays,
-            tradeable: tradeableCostPerDay.l * stockpileMaxDays,
+            limit: totalCostPerDay.l * stockpileMaxDays,
+            weights: (
+                segmented: weights.segmented.l.weight,
+                tradeable: weights.tradeable.l.weight
+            )
         )
 
         e.distributeAsConsumer(
             funds: (basis - bl) / d.e,
-            segmented: segmentedCostPerDay.e * stockpileMaxDays,
-            tradeable: tradeableCostPerDay.e * stockpileMaxDays,
+            limit: totalCostPerDay.e * stockpileMaxDays,
+            weights: (
+                segmented: weights.segmented.e.weight,
+                tradeable: weights.tradeable.e.weight
+            )
         )
 
         x.distributeAsConsumer(
             funds: (basis - bl - be) / d.x,
-            segmented: segmentedCostPerDay.x * stockpileMaxDays,
-            tradeable: tradeableCostPerDay.x * stockpileMaxDays,
+            limit: totalCostPerDay.x * stockpileMaxDays,
+            weights: (
+                segmented: weights.segmented.x.weight,
+                tradeable: weights.tradeable.x.weight
+            )
         )
 
         return .init(

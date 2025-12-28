@@ -5,21 +5,20 @@ import OrderedCollections
 /// Therefore, we only track the total value of all resources across the tier.
 extension AggregateWeights {
     @frozen public struct Tier {
-        public let total: Double
+        @usableFromInline let total: Demand.Column
     }
 }
-extension AggregateWeights.Tier {
-    static var empty: Self { .init(total: 0) }
+extension AggregateWeights.Tier where Demand.Column: AggregateDemandColumn {
+    static var empty: Self { .init(total: .zero) }
+
     static func compute(
         demands: ArraySlice<ResourceInput>,
         markets: borrowing WorldMarkets,
         currency: CurrencyID
     ) -> Self {
-        .init(
-            total: demands.reduce(0) {
-                let units: Int64 = $1.unitsDemanded
-                return $0 + Double.init(units) * markets.price(of: $1.id, in: currency)
-            }
-        )
+        .init(total: .aggregate(demands: demands, markets: markets, currency: currency))
     }
+}
+extension AggregateWeights<ElasticDemand>.Tier {
+    @inlinable public var weight: Demand.Weight { self.total.weight }
 }

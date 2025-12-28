@@ -23,7 +23,7 @@ extension OperatingBudget {
         account: Bank.Account,
         weights: (
             segmented: SegmentedWeights<InelasticDemand>,
-            tradeable: AggregateWeights
+            tradeable: AggregateWeights<InelasticDemand>
         ),
         state: Factory.Dimensions,
         type: FactoryMetadata,
@@ -37,8 +37,8 @@ extension OperatingBudget {
         var e: ResourceBudgetTier = .init()
         var x: ResourceBudgetTier = .init()
 
-        let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.total
-        let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.total
+        let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.value
+        let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.value
         let totalCostPerDay: (l: Int64, e: Int64, x: Int64) = (
             l: tradeableCostPerDay.l + segmentedCostPerDay.l,
             e: tradeableCostPerDay.e + segmentedCostPerDay.e,

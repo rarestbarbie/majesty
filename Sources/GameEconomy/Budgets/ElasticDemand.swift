@@ -1,7 +1,7 @@
 import GameIDs
 import RealModule
 
-@frozen public struct ElasticDemand: SegmentedDemand {
+@frozen public struct ElasticDemand: AggregateDemand, SegmentedDemand {
     public let id: Resource
     public let unitsToPurchase: Int64
     public let units: Int64
