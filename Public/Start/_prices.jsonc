@@ -10,5 +10,5 @@
     "Medical Equipment": "4",
     // these scale with local minimum wage
     "Groceries": "0.1",
-    "Housing": "1"
+    "Housing": "0.3"
 }
