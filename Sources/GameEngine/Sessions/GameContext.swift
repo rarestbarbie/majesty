@@ -502,7 +502,7 @@ extension GameContext {
         [(PopOccupation, [PopJobOfferBlock])],
         [(PopOccupation, [PopJobOfferBlock])]
     ) {
-        let offers: (
+        let supply: (
             remote: [Turn.Jobs.Hire<PlanetaryMarket>.Key: [(Int, Int64)]],
             local: [Turn.Jobs.Hire<Address>.Key: [(Int, Int64)]]
         ) = order.residents.reduce(into: ([:], [:])) {
@@ -548,13 +548,13 @@ extension GameContext {
         }
 
         let workersUnavailable: [(PopOccupation, [PopJobOfferBlock])] = turn.jobs.hire.local.turn {
-            if var pops: [(index: Int, unemployed: Int64)] = offers.local[$0] {
-                self.postPopHirings(matching: &pops, with: &$1)
+            if  let pops: [(index: Int, unemployed: Int64)] = supply.local[$0] {
+                self.postPopHirings(matching: pops, with: &$1)
             }
         }
         let clerksUnavailable: [(PopOccupation, [PopJobOfferBlock])] = turn.jobs.hire.remote.turn {
-            if var pops: [(index: Int, unemployed: Int64)] = offers.remote[$0] {
-                self.postPopHirings(matching: &pops, with: &$1)
+            if  let pops: [(index: Int, unemployed: Int64)] = supply.remote[$0] {
+                self.postPopHirings(matching: pops, with: &$1)
             }
         }
 
@@ -562,7 +562,7 @@ extension GameContext {
     }
 
     private mutating func postPopHirings(
-        matching pops: inout [(index: Int, unemployed: Int64)],
+        matching pops: consuming [(index: Int, unemployed: Int64)],
         with offers: inout [PopJobOfferBlock]
     ) {
         /// We iterate through the pops for as many times as there are job offers. This
@@ -605,36 +605,19 @@ extension GameContext {
         _ types: some Sequence<(PopOccupation, [PopJobOfferBlock])>
     ) {
         for (type, unfilled): (PopOccupation, [PopJobOfferBlock]) in types {
-            /// The last `q` factories will always raise wages. The next factory after the first
-            /// `q` will raise wages with probability `r / 8`.
-            let (q, r): (Int, remainder: Int) = unfilled.count.quotientAndRemainder(
-                dividingBy: FactoryContext.pr
-            )
-            for (position, block): (Int, PopJobOfferBlock) in unfilled.enumerated() {
-                let probability: Int
-
-                switch position {
-                case 0 ..< q:
-                    probability = FactoryContext.pr
-                case q:
-                    probability = r
-                case _:
-                    probability = 0
+            let raise: Workforce.RaiseEvaluator = .init(employers: unfilled.count)
+            for (i, block): (Int, PopJobOfferBlock) in unfilled.enumerated() {
+                guard case .factory(let id) = block.job else {
+                    continue
                 }
-
-                switch block.job {
-                case .factory(let id):
-                    {
-                        if type.stratum <= .Worker {
-                            $0.wf = probability
-                        } else {
-                            $0.cf = probability
-                        }
-                    } (&self.factories[modifying: id].state.z)
-
-                case .mine:
-                    break
-                }
+                {
+                    let pf: Int = raise.pf(position: i)
+                    if type.stratum <= .Worker {
+                        $0.wf = pf
+                    } else {
+                        $0.cf = pf
+                    }
+                } (&self.factories[modifying: id].state.z)
             }
         }
     }
