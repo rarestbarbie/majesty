@@ -47,7 +47,6 @@ extension FactoryContext {
     }
 
     static var utilizationThreshold: Double { 0.99 }
-    static var pr: Int { 8 }
 
     var snapshot: FactorySnapshot? {
         guard let region: RegionalAuthority = self.region else {
@@ -144,10 +143,6 @@ extension FactoryContext: TransactingContext {
                 - Self.efficiencyBonusFromCorporate(fe: self.state.y.fe)
                 - Self.efficiencyBonusFromClerks(fk: self.state.y.fk)
         }
-
-        // Reset fill positions, since they are copied from yesterday’s positions by default.
-        self.state.z.wf = nil
-        self.state.z.cf = nil
 
         let throughput: Int64 = self.workers.map {
             self.stats.productivity * min($0.limit, $0.count + 1)
@@ -428,21 +423,18 @@ extension FactoryContext: TransactingContext {
                 fire.workers = fireToday.workers
             }
 
+            self.state.spending.oc = hireToday.clerks + hireLater.clerks
+            self.state.spending.ow = hireToday.workers + hireLater.workers
+
             if  let clerks: Workforce = self.clerks {
                 if  let fire: PopJobLayoffBlock = .init(size: fire.clerks) {
                     turn.jobs.fire[self.state.id, self.type.clerks.unit] = fire
                     // clerk salaries are not sticky, but will never fall below worker wage
                     self.state.z.cn = max(self.state.z.wn, self.state.z.cn - 1)
                 } else if hireToday.clerks > 0 {
-                    //  raise wages if
-                    //  -   tried and failed to hire employees yesterday
-                    //  -   current number of employees is less than number of employees we are
-                    //      looking to hire
-                    //  -   position in line was far enough back that the reason for not hiring
-                    //      was probably low wages
-                    if  let p: Int = self.state.y.cf,
-                        clerks.count < hireToday.clerks + hireLater.clerks,
-                        turn.random.roll(Int64.init(p), Int64.init(FactoryContext.pr)) {
+                    if  let pf: Int = self.state.y.cf,
+                        let p: Fraction = clerks.raise(pf: pf, open: self.state.spending.oc),
+                        turn.random.roll(p.n, p.d) {
                         self.state.z.cn += 1
                     }
 
@@ -463,10 +455,9 @@ extension FactoryContext: TransactingContext {
                 if  let fire: PopJobLayoffBlock = .init(size: fire.workers) {
                     turn.jobs.fire[self.state.id, self.type.workers.unit] = fire
                 } else if hireToday.workers > 0 {
-                    // see above
-                    if  let p: Int = self.state.y.wf,
-                        workers.count < hireToday.workers + hireLater.workers,
-                        turn.random.roll(Int64.init(p), Int64.init(FactoryContext.pr)) {
+                    if  let pf: Int = self.state.y.wf,
+                        let p: Fraction = workers.raise(pf: pf, open: self.state.spending.ow),
+                        turn.random.roll(p.n, p.d) {
                         self.state.z.wn += 1
                     }
 

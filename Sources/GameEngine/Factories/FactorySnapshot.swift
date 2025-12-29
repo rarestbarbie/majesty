@@ -142,10 +142,18 @@ extension FactorySnapshot {
     func tooltipWorkersHelp() -> Tooltip? {
         return .instructions {
             $0["Current wage"] = self.Δ.wn[/3]
-            if  let _: Int = self.z.wf {
+            $0[>] {
+                $0["Open positions"] = self.spending.ow[/3]
+            }
+            if  let pf: Int = self.z.wf,
+                let p: Fraction = self.workers?.raise(pf: pf, open: self.spending.ow) {
                 $0[>] = """
                 This factory does not offer a \(em: "competitive wage"), which is causing it \
                 to have difficulty hiring workers
+                """
+                $0[>] = """
+                It has a \(Double.init(p)[%1], style: pf > 0 ? .em : .neg) chance of \
+                increasing its pay rate tomorrow
                 """
             } else {
                 $0[>] = """
@@ -180,6 +188,9 @@ extension FactorySnapshot {
         }
         return .instructions {
             $0["Current salary"] = self.Δ.wn[/3]
+            $0[>] {
+                $0["Open positions"] = self.spending.oc[/3]
+            }
 
             let clerkHorizon: Int64 = self.metadata.clerkHorizon(for: workers.count)
             if case .active(let budget)? = self.budget, budget.fk < 1 {

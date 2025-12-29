@@ -68,6 +68,10 @@ extension Factory: Turnable {
         self.spending = .zero
         self.budget = nil
         self.equity.turn()
+
+        // Reset fill positions, since they are copied from yesterday’s positions by default.
+        self.z.wf = nil
+        self.z.cf = nil
     }
 }
 extension Factory {
@@ -89,6 +93,8 @@ extension Factory {
         case spending_salariesUsed = "sC"
         case spending_salariesIdle = "sD"
         case spending_wages = "sW"
+        case spending_oc = "sOC"
+        case spending_ow = "sOW"
 
         case budget_liquidation = "bL"
         case budget_operating = "bO"
@@ -118,6 +124,8 @@ extension Factory: JavaScriptEncodable {
         js[.spending_salariesUsed] = self.spending.salariesUsed
         js[.spending_salariesIdle] = self.spending.salariesIdle
         js[.spending_wages] = self.spending.wages
+        js[.spending_oc] = self.spending.oc
+        js[.spending_ow] = self.spending.ow
 
         switch self.budget {
         case .constructing(let value)?: js[.budget_operating] = value
@@ -168,7 +176,9 @@ extension Factory: JavaScriptDecodable {
                 dividend: try js[.spending_dividend]?.decode() ?? 0,
                 salariesUsed: try js[.spending_salariesUsed]?.decode() ?? 0,
                 salariesIdle: try js[.spending_salariesIdle]?.decode() ?? 0,
-                wages: try js[.spending_wages]?.decode() ?? 0
+                wages: try js[.spending_wages]?.decode() ?? 0,
+                oc: try js[.spending_oc]?.decode() ?? 0,
+                ow: try js[.spending_ow]?.decode() ?? 0
             ),
             budget: budget,
             y: try js[.y]?.decode() ?? today,
