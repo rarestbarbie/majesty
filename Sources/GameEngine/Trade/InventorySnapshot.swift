@@ -43,10 +43,12 @@ extension InventorySnapshot {
         _ out: ResourceOutputs,
         mines: OrderedDictionary<MineID, MiningJob>
     ) -> [Produced.ID: Produced.Value] {
-        var production: [Produced.ID: Produced.Value] = .init(minimumCapacity: out.count)
+        var production: [Produced.ID: Produced.Value] = .init(
+            minimumCapacity: mines.values.reduce(out.count) { $0 + $1.out.count }
+        )
         out.snapshot(into: &production, as: Produced.ID.o(_:))
         for mine: MiningJob in mines.values {
-            out.snapshot(into: &production) { .m(mine.id / $0) }
+            mine.out.snapshot(into: &production) { .m(mine.id / $0) }
         }
         return production
     }
