@@ -438,16 +438,17 @@ extension FactoryContext: TransactingContext {
                         self.state.z.cn += 1
                     }
 
-                    let market: PlanetaryMarket = .init(
-                        planet: self.state.tile.planet,
-                        medium: region.currency.id
+                    let market: LaborMarket.Planetwide = .init(
+                        id: self.state.tile.planet,
+                        bloc: region.currency.id,
+                        type: self.type.clerks.unit
                     )
                     let hire: PopJobOfferBlock = .init(
                         job: .factory(self.state.id),
                         bid: self.state.z.cn,
                         size: hireToday.clerks
                     )
-                    turn.jobs.hire.remote[market, self.type.clerks.unit].append(hire)
+                    turn.jobs.hire.planet[market].append(hire)
                 }
             }
 
@@ -461,12 +462,16 @@ extension FactoryContext: TransactingContext {
                         self.state.z.wn += 1
                     }
 
+                    let market: LaborMarket.Regionwide = .init(
+                        id: self.state.tile,
+                        type: self.type.workers.unit
+                    )
                     let hire: PopJobOfferBlock = .init(
                         job: .factory(self.state.id),
                         bid: self.state.z.wn,
                         size: hireToday.workers
                     )
-                    turn.jobs.hire.local[self.state.tile, self.type.workers.unit].append(hire)
+                    turn.jobs.hire.region[market].append(hire)
                 }
             }
 

@@ -30,7 +30,8 @@
             "Creator Studio": 1,
             "Machine Parts Factory": 1,
             "Polypropylene Plant": 1,
-            "Fossil Power Plant": 1
+            "Fossil Power Plant": 1,
+            "Slaughterhouse": 1
         }
     },
 
@@ -45,7 +46,8 @@
             "Automotive Assembly Plant": 1,
             "Appliance Factory": 1,
             "Nuclear Power Plant": 0,
-            "Fossil Power Plant": 3
+            "Fossil Power Plant": 3,
+            "Chicken Plant": 1
         }
     },
 
@@ -85,7 +87,8 @@
             "Hydroelectric Dam": 1,
             "Clothing Workshop": 1,
             "Fossil Power Plant": 1,
-            "Automotive Assembly Plant": 1
+            "Automotive Assembly Plant": 1,
+            "Slaughterhouse": 1
         }
     },
 
@@ -122,7 +125,8 @@
         "factories": {
             "Hydroelectric Dam": 1,
             "Clothing Workshop": 1,
-            "Fossil Power Plant": 1
+            "Fossil Power Plant": 1,
+            "Chicken Plant": 1
         }
     },
 
@@ -148,7 +152,8 @@
         "tile": "399S2,2",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Fossil Power Plant": 1
+            "Fossil Power Plant": 1,
+            "Slaughterhouse": 1
         }
     },
 
@@ -157,7 +162,8 @@
         "tile": "399S1,2",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Fossil Power Plant": 1
+            "Fossil Power Plant": 1,
+            "Slaughterhouse": 1
         }
     },
 
@@ -260,7 +266,8 @@
         "tile": "399N2,-3",
         "factories": {
             "Hydroelectric Dam": 1,
-            "Fossil Power Plant": 1
+            "Fossil Power Plant": 1,
+            "Chicken Plant": 1
         }
     },
 
@@ -293,7 +300,8 @@
             "Clothing Workshop": 4,
             "Machine Parts Factory": 1,
             "Electronics Factory": 1,
-            "Automotive Assembly Plant": 1
+            "Automotive Assembly Plant": 1,
+            "Chicken Plant": 1
         }
     },
 
@@ -314,7 +322,8 @@
         "factories": {
             "Hydroelectric Dam": 1,
             "Supermarket": 1,
-            "Fossil Power Plant": 1
+            "Fossil Power Plant": 1,
+            "Chicken Plant": 1
         }
     },
 

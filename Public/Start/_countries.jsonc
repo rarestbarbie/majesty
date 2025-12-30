@@ -24,7 +24,7 @@
             // Midway
             "399N-4,1"
         ],
-        "minwage": 50,
+        "minwage": 15,
         "researched": [
         ]
     },
@@ -45,7 +45,7 @@
             // Hudson Bay
             "399N-1,1"
         ],
-        "minwage": 50
+        "minwage": 15
     },
 
     {
@@ -69,7 +69,7 @@
             // Caucasus
             "399N2,-2"
         ],
-        "minwage": 25
+        "minwage": 15
     },
     {
         "name": {
@@ -88,7 +88,7 @@
             // Alaska
             "399N-2,1"
         ],
-        "minwage": 30
+        "minwage": 15
     },
 
     // all countries below set to US suzerain due to lack of foreign currency implementation
@@ -107,7 +107,7 @@
             // Greenland
             "399N1,1"
         ],
-        "minwage": 50
+        "minwage": 15
     },
     {
         "name": {
@@ -124,7 +124,7 @@
             // Mexico
             "399N-2,4"
         ],
-        "minwage": 35
+        "minwage": 15
     },
     {
         "name": {
@@ -242,7 +242,7 @@
             // East Antarctica
             "399S1,0"
         ],
-        "minwage": 35
+        "minwage": 15
     },
     {
         "name": {
@@ -269,7 +269,7 @@
             // Queen Maud Land
             "399S1,-1"
         ],
-        "minwage": 50
+        "minwage": 15
     },
     {
         "name": {
@@ -286,7 +286,7 @@
             // Holy Land
             "399N3,-3"
         ],
-        "minwage": 30
+        "minwage": 15
     },
     {
         "name": {
@@ -323,7 +323,7 @@
             // Taiwan
             "399N-1,-2"
         ],
-        "minwage": 25
+        "minwage": 15
     },
     {
         "name": {
@@ -345,7 +345,7 @@
             // New Territories
             "399S0,-1"
         ],
-        "minwage": 50
+        "minwage": 15
     },
     {
         "name": {
@@ -362,7 +362,7 @@
             // New Zealand
             "399S-2,0"
         ],
-        "minwage": 50
+        "minwage": 15
     },
     {
         "name": {
@@ -379,7 +379,7 @@
             // Japan
             "399N-2,-1"
         ],
-        "minwage": 50
+        "minwage": 15
     },
 
     // countries without suzerain set
@@ -399,7 +399,7 @@
             // Bay of Bengal
             "399S2,-4"
         ],
-        "minwage": 35
+        "minwage": 15
     },
     {
         "name": {
@@ -415,7 +415,7 @@
             // Thailand
             "399N0,-3"
         ],
-        "minwage": 35
+        "minwage": 15
     },
     {
         "name": {
@@ -433,7 +433,7 @@
             // Congo
             "399S4,-2"
         ],
-        "minwage": 35
+        "minwage": 15
     },
     {
         "name": {
@@ -449,6 +449,6 @@
             // Ethiopia
             "399N4,-3"
         ],
-        "minwage": 35
+        "minwage": 15
     }
 ]

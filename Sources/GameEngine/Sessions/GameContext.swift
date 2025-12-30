@@ -502,100 +502,18 @@ extension GameContext {
         [(PopOccupation, [PopJobOfferBlock])],
         [(PopOccupation, [PopJobOfferBlock])]
     ) {
-        let supply: (
-            remote: [Turn.Jobs.Hire<PlanetaryMarket>.Key: [(Int, Int64)]],
-            local: [Turn.Jobs.Hire<Address>.Key: [(Int, Int64)]]
-        ) = order.residents.reduce(into: ([:], [:])) {
-            guard case .pop(let i) = $1 else {
-                return
-            }
-
-            let pop: PopContext = self.pops[i]
-            let mode: PopOccupation.Mode = pop.state.occupation.mode
-
-            // early exit for pops that do not participate in hiring
-            switch mode {
-            case .aristocratic: return
-            case .livestock: return
-            case .remote: break
-            case .hourly: break
-            case .mining: break
-            }
-
-            guard
-            let currency: CurrencyID = pop.region?.properties.currency.id else {
-                return
-            }
-
-            let unemployed: Int64 = pop.state.z.active - pop.state.employed()
-            if  unemployed <= 0 {
-                return
-            }
-
-            if case .remote = mode {
-                let key: Turn.Jobs.Hire<PlanetaryMarket>.Key = .init(
-                    market: .init(planet: pop.state.tile.planet, medium: currency),
-                    type: pop.state.occupation
-                )
-                $0.remote[key, default: []].append((i, unemployed))
-            } else {
-                let key: Turn.Jobs.Hire<Address>.Key = .init(
-                    market: pop.state.tile,
-                    type: pop.state.occupation
-                )
-                $0.local[key, default: []].append((i, unemployed))
-            }
-        }
-
-        let workersUnavailable: [(PopOccupation, [PopJobOfferBlock])] = turn.jobs.hire.local.turn {
-            if  let pops: [(index: Int, unemployed: Int64)] = supply.local[$0] {
-                self.postPopHirings(matching: pops, with: &$1)
-            }
-        }
-        let clerksUnavailable: [(PopOccupation, [PopJobOfferBlock])] = turn.jobs.hire.remote.turn {
-            if  let pops: [(index: Int, unemployed: Int64)] = supply.remote[$0] {
-                self.postPopHirings(matching: pops, with: &$1)
-            }
-        }
-
-        return (workersUnavailable, clerksUnavailable)
-    }
-
-    private mutating func postPopHirings(
-        matching pops: consuming [(index: Int, unemployed: Int64)],
-        with offers: inout [PopJobOfferBlock]
-    ) {
-        /// We iterate through the pops for as many times as there are job offers. This
-        /// means pops near the front of the list are more likely to be visited multiple
-        /// times. However, since the pop index array is shuffled, this is fair over time.
-        let candidates: Int = pops.count
-        let iterations: Int = offers.count
-        var iteration: Int = 0
-        while let i: Int = offers.indices.last, iteration < iterations {
-            let block: PopJobOfferBlock = offers[i]
-            let match: (id: Int, (count: Int64, remaining: PopJobOfferBlock?))? = {
-                $0.unemployed > 0 ? ($0.index, block.matched(with: &$0.unemployed)) : nil
-            } (&pops[iteration % candidates])
-
-            iteration += 1
-
-            guard
-            let (pop, (count, remaining)): (Int, (Int64, PopJobOfferBlock?)) = match else {
-                // Pop has no more unemployed members.
-                continue
-            }
-
-            if  let remaining: PopJobOfferBlock {
-                offers[i] = remaining
-            } else {
-                offers.removeLast()
-            }
-
-            switch block.job {
+        let supply: LaborMarket = .index(pops: self.pops, in: order)
+        return supply.match(
+            region: &turn.jobs.hire.region,
+            planet: &turn.jobs.hire.planet,
+            random: turn.random,
+            mode: .MajorityPreference
+        ) {
+            switch $0 {
             case .factory(let id):
-                self.pops[pop].state.factories[id, default: .init(id: id)].hire(count)
+                self.pops[$1].state.factories[id, default: .init(id: id)].hire($2)
             case .mine(let id):
-                self.pops[pop].state.mines[id, default: .init(id: id)].hire(count)
+                self.pops[$1].state.mines[id, default: .init(id: id)].hire($2)
             }
         }
     }
