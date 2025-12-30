@@ -86,7 +86,11 @@ extension MineContext {
             )
 
             if  bid.size > 0 {
-                turn.jobs.hire.local[self.state.tile, self.type.miner].append(bid)
+                let market: LaborMarket.Regionwide = .init(
+                    id: self.state.tile,
+                    type: self.type.miner
+                )
+                turn.jobs.hire.region[market].append(bid)
             }
         } else {
             if  let layoff: PopJobLayoffBlock = .init(size: -minersToHire) {

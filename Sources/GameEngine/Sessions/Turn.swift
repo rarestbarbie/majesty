@@ -15,8 +15,8 @@ struct Turn: ~Copyable {
     var conversions: [Pop.Conversion]
     var jobs: (
         hire: (
-            remote: Jobs.Hire<PlanetaryMarket>,
-            local: Jobs.Hire<Address>
+            planet: LaborMarket.Demand<LaborMarket.Planetwide>,
+            region: LaborMarket.Demand<LaborMarket.Regionwide>
         ),
         fire: Jobs.Fire
     )
@@ -38,7 +38,7 @@ extension Turn {
         self.tradeRoutes = tradeRoutes
         self.stockMarkets = .init()
         self.conversions = []
-        self.jobs = ((.init(), .init()), .init())
+        self.jobs = (([:], [:]), .init())
     }
 }
 
