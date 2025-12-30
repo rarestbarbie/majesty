@@ -66,21 +66,22 @@ extension LaborMarket {
     consuming func match(
         region: inout LaborMarket.Demand<LaborMarket.Regionwide>,
         planet: inout LaborMarket.Demand<LaborMarket.Planetwide>,
-        random: inout PseudoRandom,
+        random: PseudoRandom,
         mode: LaborMarketPolicy,
         post: (PopJobOffer, Int, Int64) -> ()
     ) -> (
         [(PopOccupation, [PopJobOfferBlock])],
         [(PopOccupation, [PopJobOfferBlock])]
     ) {
+        // iteration order is non-deterministic, so we need to use a local RNG
         let workersUnavailable: [(PopOccupation, [PopJobOfferBlock])] = region.turn {
             if  let pops: LaborMarket.Sampler = self.region.pull($0) {
-                pops.match(offers: &$1, random: &random, mode: mode, post: post)
+                pops.match(offers: &$1, random: random, mode: mode, post: post)
             }
         }
         let clerksUnavailable: [(PopOccupation, [PopJobOfferBlock])] = planet.turn {
             if  let pops: LaborMarket.Sampler = self.planet.pull($0) {
-                pops.match(offers: &$1, random: &random, mode: mode, post: post)
+                pops.match(offers: &$1, random: random, mode: mode, post: post)
             }
         }
         return (workersUnavailable, clerksUnavailable)

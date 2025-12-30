@@ -55,7 +55,7 @@ extension LaborMarket.Sampler {
 extension LaborMarket.Sampler {
     consuming func match(
         offers: inout [PopJobOfferBlock],
-        random: inout PseudoRandom,
+        random: consuming PseudoRandom,
         mode: LaborMarketPolicy,
         post: (PopJobOffer, Int, Int64) -> ()
     ) {

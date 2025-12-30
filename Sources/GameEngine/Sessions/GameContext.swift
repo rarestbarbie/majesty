@@ -506,7 +506,7 @@ extension GameContext {
         return supply.match(
             region: &turn.jobs.hire.region,
             planet: &turn.jobs.hire.planet,
-            random: &turn.random,
+            random: turn.random,
             mode: .MajorityPreference
         ) {
             switch $0 {
