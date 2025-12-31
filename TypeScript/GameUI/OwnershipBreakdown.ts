@@ -14,21 +14,25 @@ export class OwnershipBreakdown {
 
     private readonly byCountry: PieChart<GameID>;
     private readonly byCulture: PieChart<GameID>;
+    private readonly byGender: PieChart<string>;
 
     private readonly terms: StaticList<Term, string>;
 
     constructor(
         tooltipCountry: TooltipType,
         tooltipCulture: TooltipType,
+        tooltipGender: TooltipType,
     ) {
         this.byCountry = new PieChart<GameID>(tooltipCountry);
         this.byCulture = new PieChart<GameID>(tooltipCulture);
+        this.byGender = new PieChart<string>(tooltipGender);
 
         const left: HTMLDivElement = document.createElement('div');
 
         const charts: [PieChart<any>, string][] = [
             [this.byCountry, 'Country'],
             [this.byCulture, 'Culture'],
+            [this.byGender, 'Gender'],
         ];
 
         for (const [chart, label] of charts) {
@@ -54,6 +58,7 @@ export class OwnershipBreakdown {
     public update(id: GameID, state: OwnershipBreakdownState<any>): void {
         this.byCountry.update([id], state.country ?? []);
         this.byCulture.update([id], state.culture ?? []);
+        this.byGender.update([id], state.gender ?? []);
 
         this.terms.update(
             state.terms ?? [],

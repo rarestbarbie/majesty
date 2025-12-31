@@ -66,6 +66,7 @@ export class PopulationOverview extends ScreenContent {
         this.ownership = new OwnershipBreakdown(
             TooltipType.PopOwnershipCountry,
             TooltipType.PopOwnershipCulture,
+            TooltipType.PopOwnershipGender
         );
     }
 

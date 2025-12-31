@@ -14,6 +14,7 @@ export enum TooltipType {
     PopBudgetItem = 'PopBudgetItem',
     PopOwnershipCountry = 'PopOwnershipCountry',
     PopOwnershipCulture = 'PopOwnershipCulture',
+    PopOwnershipGender = 'PopOwnershipGender',
     PopOwnershipSecurities = 'PopOwnershipSecurities',
 
     // Factory Tooltips
@@ -26,6 +27,7 @@ export enum TooltipType {
     FactoryNeeds = 'FactoryNeeds',
     FactoryOwnershipCountry = 'FactoryOwnershipCountry',
     FactoryOwnershipCulture = 'FactoryOwnershipCulture',
+    FactoryOwnershipGender = 'FactoryOwnershipGender',
     FactoryOwnershipSecurities = 'FactoryOwnershipSecurities',
     FactoryCashFlowItem = 'FactoryCashFlowItem',
     FactoryBudgetItem = 'FactoryBudgetItem',
@@ -40,6 +42,7 @@ export enum TooltipType {
     BuildingNeeds = 'BuildingNeeds',
     BuildingOwnershipCountry = 'BuildingOwnershipCountry',
     BuildingOwnershipCulture = 'BuildingOwnershipCulture',
+    BuildingOwnershipGender = 'BuildingOwnershipGender',
     BuildingOwnershipSecurities = 'BuildingOwnershipSecurities',
     BuildingCashFlowItem = 'BuildingCashFlowItem',
     BuildingBudgetItem = 'BuildingBudgetItem',

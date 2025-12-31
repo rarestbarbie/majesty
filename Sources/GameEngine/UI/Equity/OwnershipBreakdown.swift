@@ -9,13 +9,13 @@ import VectorCharts_JavaScript
 struct OwnershipBreakdown<Tab>: Sendable where Tab: OwnershipTab {
     private var country: PieChart<CountryID, PieChartLabel>?
     private var culture: PieChart<CultureID, PieChartLabel>?
-    private var equity: Equity<LEI>.Snapshot?
+    private var gender: PieChart<Gender, PieChartLabel>?
     private var terms: [Term]
 
     init() {
         self.country = nil
         self.culture = nil
-        self.equity = nil
+        self.gender = nil
         self.terms = []
     }
 }
@@ -25,11 +25,12 @@ extension OwnershipBreakdown {
         in context: borrowing GameUI.Cache
     ) {
         let equity: Equity<LEI>.Snapshot = asset.equity
-        let (country, culture): (
+        let (country, culture, gender): (
             country: [CountryID: (share: Int64, PieChartLabel)],
-            culture: [CultureID: (share: Int64, PieChartLabel)]
+            culture: [CultureID: (share: Int64, PieChartLabel)],
+            gender: [Gender: (share: Int64, PieChartLabel)]
         ) = equity.owners.reduce(
-            into: ([:], [:])
+            into: ([:], [:], [:])
         ) {
             if  let country: Country = context.countries[$1.country] {
                 let label: PieChartLabel = .init(
@@ -43,6 +44,13 @@ extension OwnershipBreakdown {
                 let label: PieChartLabel = .init(color: culture.color, name: culture.name)
                 $0.culture[culture.id, default: (0, label)].share += $1.shares
             }
+            if  let gender: Gender = $1.gender {
+                let label: PieChartLabel = .init(
+                    style: gender.code.name,
+                    name: gender.singularTabular
+                )
+                $0.gender[gender, default: (0, label)].share += $1.shares
+            }
         }
 
         self.country = .init(
@@ -50,6 +58,9 @@ extension OwnershipBreakdown {
         )
         self.culture = .init(
             values: culture.sorted { $0.key < $1.key }
+        )
+        self.gender = .init(
+            values: gender.sorted { $0.key.sortingRadially < $1.key.sortingRadially }
         )
 
         self.terms = Term.list {
@@ -59,8 +70,6 @@ extension OwnershipBreakdown {
             $0[.stockPrice, (+)] = asset.Δ.px[..3]
             $0[.stockAttraction, (+)] = asset.Δ.profitability[%1]
         }
-
-        self.equity = equity
     }
 }
 extension OwnershipBreakdown: JavaScriptEncodable {
@@ -68,6 +77,7 @@ extension OwnershipBreakdown: JavaScriptEncodable {
         case type
         case country
         case culture
+        case gender
         case terms
     }
 
@@ -75,6 +85,7 @@ extension OwnershipBreakdown: JavaScriptEncodable {
         js[.type] = Tab.Ownership
         js[.country] = self.country
         js[.culture] = self.culture
+        js[.gender] = self.gender
         js[.terms] = self.terms
     }
 }

@@ -118,6 +118,26 @@ extension LegalEntitySnapshot {
         }
     }
 
+    func tooltipOwnership(
+        gender: Gender,
+        context: GameUI.CacheContext,
+    ) -> Tooltip? {
+        let (share, total): (share: Int64, total: Int64) = self.equity.owners.reduce(
+            into: (0, 0)
+        ) {
+            if case gender? = $1.gender {
+                $0.share += $1.shares
+            }
+
+            $0.total += $1.shares
+        }
+
+        return .instructions(style: .borderless) {
+            $0[gender.singularTabular] = (Double.init(share) / Double.init(total))[%3]
+            $0[>] = "\(em: gender.pluralShort) own \(em: share[/3]) shares"
+        }
+    }
+
     func tooltipOwnership() -> Tooltip {
         let equity: Equity<LEI>.Snapshot = self.equity
         return .instructions {

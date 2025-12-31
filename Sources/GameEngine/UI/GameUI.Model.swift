@@ -203,6 +203,11 @@ extension GameUI.Model {
                     try arguments[0].decode(),
                     culture: try arguments[1].decode(),
                 )
+            case .BuildingOwnershipGender:
+                return $0.tooltipBuildingOwnership(
+                    try arguments[0].decode(),
+                    gender: try arguments[1].decode(),
+                )
             case .BuildingOwnershipSecurities:
                 return $0.tooltipBuildingOwnership(
                     try arguments[0].decode(),
@@ -275,6 +280,11 @@ extension GameUI.Model {
                 return $0.tooltipFactoryOwnership(
                     try arguments[0].decode(),
                     culture: try arguments[1].decode(),
+                )
+            case .FactoryOwnershipGender:
+                return $0.tooltipFactoryOwnership(
+                    try arguments[0].decode(),
+                    gender: try arguments[1].decode(),
                 )
             case .FactoryOwnershipSecurities:
                 return $0.tooltipFactoryOwnership(
@@ -352,6 +362,11 @@ extension GameUI.Model {
                 return $0.tooltipPopOwnership(
                     try arguments[0].decode(),
                     culture: try arguments[1].decode(),
+                )
+            case .PopOwnershipGender:
+                return $0.tooltipPopOwnership(
+                    try arguments[0].decode(),
+                    gender: try arguments[1].decode(),
                 )
             case .PopOwnershipSecurities:
                 return $0.tooltipPopOwnership(

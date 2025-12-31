@@ -40,7 +40,7 @@ extension Gender {
         }
     }
 
-    @inlinable public var plural: String {
+    @inlinable public var pluralLong: String {
         switch self {
         case .FT: "Transgender Women"
         case .FTS: "Transgender Straight Women"
@@ -56,6 +56,25 @@ extension Gender {
         case .MTS: "Transgender Straight Men"
         case .MC: "Cisgender Men"
         case .MCS: "Cisgender Straight Men"
+        }
+    }
+
+    @inlinable public var pluralShort: String {
+        switch self {
+        case .FT: "Binary trans lesbians"
+        case .FTS: "Straight trans women"
+        case .FC: "Binary cis lesbians"
+        case .FCS: "Straight cis women"
+        case .XTL: "Nonbinary trans lesbians"
+        case .XT: "Nonbinary isosexual trans people"
+        case .XTG: "Nonbinary achillean trans people"
+        case .XCL: "Nonbinary intersex lesbians"
+        case .XC: "Nonbinary isosexual intersex people"
+        case .XCG: "Nonbinary achillean intersex people"
+        case .MT: "Binary gay trans men"
+        case .MTS: "Straight trans men"
+        case .MC: "Binary gay cis men"
+        case .MCS: "Straight cis men"
         }
     }
 

@@ -19,7 +19,7 @@ extension Equity<LEI>.Statistics {
     static func compute(
         equity: Equity<LEI>,
         assets: Bank.Account,
-        in context: GameContext.ResidentPass,
+        in context: GameContext.LegalPass,
     ) -> Self {
         let shareCount: Int64 = equity.shares.reduce(into: 0) { $0 += $1.value.shares }
 
@@ -34,41 +34,43 @@ extension Equity<LEI>.Statistics {
 
         return .init(
             owners: equity.shares.values.reduce(into: []) {
-                let location: Address
+                let country: CountryID
                 let culture: CultureID?
+                let gender: Gender?
 
                 switch $1.id {
                 case .building(let id):
                     guard
-                    let building: Building = context.buildings[id] else {
+                    let building: BuildingContext = context.buildings[id],
+                    let region: RegionalProperties = building.region else {
                         return
                     }
 
-                    location = building.tile
+                    country = region.occupiedBy
                     culture = nil
+                    gender = nil
 
                 case .factory(let id):
                     guard
-                    let factory: Factory = context.factories[id] else {
+                    let factory: FactoryContext = context.factories[id],
+                    let region: RegionalProperties = factory.region else {
                         return
                     }
 
-                    location = factory.tile
+                    country = region.occupiedBy
                     culture = nil
+                    gender = nil
 
                 case .pop(let id):
                     guard
-                    let pop: Pop = context.pops[id] else {
+                    let pop: PopContext = context.pops[id],
+                    let region: RegionalProperties = pop.region else {
                         return
                     }
 
-                    location = pop.tile
-                    culture = pop.race
-                }
-
-                guard
-                let region: RegionalAuthority = context.planets[location]?.authority else {
-                    return
+                    country = region.occupiedBy
+                    culture = pop.state.race
+                    gender = pop.state.gender
                 }
 
                 $0.append(
@@ -77,8 +79,9 @@ extension Equity<LEI>.Statistics {
                         shares: $1.shares,
                         bought: $1.bought,
                         sold: $1.sold,
-                        country: region.governedBy,
-                        culture: culture
+                        country: country,
+                        culture: culture,
+                        gender: gender
                     )
                 )
             },
