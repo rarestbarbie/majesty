@@ -112,7 +112,7 @@ extension PlanetGrid.Tile {
     }
 
     mutating func addResidentCount(_ pop: Pop, _ stats: Pop.Stats) {
-        self.stats.addResidentCount(pop, stats)
+        self.stats.pops.addResidentCount(pop, stats)
     }
     mutating func addResidentCount(_ building: Building) {
         self.buildings.append(building.id)
