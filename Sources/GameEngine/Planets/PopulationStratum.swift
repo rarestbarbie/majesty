@@ -26,9 +26,18 @@ extension PopulationStratum {
 }
 extension PopulationStratum {
     mutating func startIndexCount() {
-        self.all.removeAll(keepingCapacity: true)
+        // use the previous day’s counts to allocate capacity
+        let all: Int = self.all.count
+        let cultures: Int = self.cultures.count
+
+        self.all = []
+        self.all.reserveCapacity(all)
+
         self.total = 0
-        self.cultures.removeAll(keepingCapacity: true)
+
+        self.cultures = [:]
+        self.cultures.reserveCapacity(cultures)
+
         self.weighted = .zero
     }
 

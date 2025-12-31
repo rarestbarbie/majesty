@@ -12,7 +12,7 @@ struct FactoryContext: RuntimeContext {
     var state: Factory
     private(set) var stats: Factory.Stats
 
-    private(set) var region: RegionalAuthority?
+    private(set) var region: RegionalProperties?
 
     private(set) var workers: Workforce?
     private(set) var clerks: Workforce?
@@ -49,13 +49,13 @@ extension FactoryContext {
     static var utilizationThreshold: Double { 0.99 }
 
     var snapshot: FactorySnapshot? {
-        guard let region: RegionalAuthority = self.region else {
+        guard let region: RegionalProperties = self.region else {
             return nil
         }
         return .init(
             metadata: self.type,
             stats: self.stats,
-            region: region.properties,
+            region: region,
             workers: self.workers,
             clerks: self.clerks,
             equity: self.equity,
@@ -110,10 +110,10 @@ extension FactoryContext {
             self.clerks?.limit = area * self.type.clerks.amount
         }
 
-        self.region = context.planets[self.state.tile]?.authority
+        self.region = context.planets[self.state.tile]?.properties
 
         guard
-        let region: RegionalProperties = self.region?.properties else {
+        let region: RegionalProperties = self.region else {
             return
         }
 
@@ -123,7 +123,7 @@ extension FactoryContext {
 extension FactoryContext: TransactingContext {
     mutating func allocate(turn: inout Turn) {
         guard
-        let region: RegionalProperties = self.region?.properties else {
+        let region: RegionalProperties = self.region else {
             return
         }
 
@@ -289,7 +289,7 @@ extension FactoryContext: TransactingContext {
 
     mutating func transact(turn: inout Turn) {
         guard
-        let region: RegionalProperties = self.region?.properties,
+        let region: RegionalProperties = self.region,
         let budget: Factory.Budget = self.state.budget else {
             return
         }

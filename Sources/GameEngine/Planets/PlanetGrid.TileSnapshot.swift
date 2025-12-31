@@ -8,8 +8,6 @@ extension PlanetGrid {
         let id: Address
         let name: String?
         let properties: RegionalProperties?
-        let occupiedBy: CountryID?
-        let governedBy: CountryID?
         let terrain: TerrainMetadata
         let geology: GeologicalMetadata
     }
