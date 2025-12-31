@@ -10,7 +10,9 @@ import Random
 extension PlanetGrid {
     struct Tile: Identifiable {
         let id: Address
+        private(set) var properties: RegionalProperties?
         private(set) var authority: RegionalAuthority?
+        private var stats: RegionalStats
 
         var name: String?
         var terrain: TerrainMetadata
@@ -35,7 +37,9 @@ extension PlanetGrid {
             geology: GeologicalMetadata,
         ) {
             self.id = id
+            self.properties = nil
             self.authority = nil
+            self.stats = .init()
 
             self.name = name
             self.terrain = terrain
@@ -59,15 +63,13 @@ extension PlanetGrid.Tile {
     var governedBy: CountryID? { self.authority?.governedBy }
     var occupiedBy: CountryID? { self.authority?.occupiedBy }
 
-    var pops: PopulationStats { self.authority?.pops ?? .init() }
+    var pops: PopulationStats { self.stats.pops }
 
     var snapshot: PlanetGrid.TileSnapshot {
         .init(
             id: self.id,
             name: self.name,
-            properties: self.authority?.properties,
-            occupiedBy: self.authority?.occupiedBy,
-            governedBy: self.authority?.governedBy,
+            properties: self.properties,
             terrain: self.terrain,
             geology: self.geology
         )
@@ -87,24 +89,12 @@ extension PlanetGrid.Tile {
         suzerain: CountryID?,
         properties: CountryProperties,
     ) {
-        if  let authority: RegionalAuthority = self.authority {
-            authority.update(
-                name: self.name ?? "?",
-                governedBy: governedBy,
-                occupiedBy: occupiedBy,
-                suzerain: suzerain,
-                country: properties
-            )
-        } else {
-            self.authority = .init(
-                id: self.id,
-                name: self.name ?? "?",
-                governedBy: governedBy,
-                occupiedBy: occupiedBy,
-                suzerain: suzerain,
-                country: properties
-            )
-        }
+        self.authority = .init(
+            governedBy: governedBy,
+            occupiedBy: occupiedBy,
+            suzerain: suzerain,
+            country: properties
+        )
     }
 
     mutating func startIndexCount() {
@@ -118,11 +108,11 @@ extension PlanetGrid.Tile {
         self.minesAlreadyPresent.removeAll(keepingCapacity: true)
         self.mines.removeAll(keepingCapacity: true)
 
-        self.authority?.startIndexCount()
+        self.stats.startIndexCount()
     }
 
     mutating func addResidentCount(_ pop: Pop, _ stats: Pop.Stats) {
-        self.authority?.addResidentCount(pop, stats)
+        self.stats.addResidentCount(pop, stats)
     }
     mutating func addResidentCount(_ building: Building) {
         self.buildings.append(building.id)
@@ -146,7 +136,17 @@ extension PlanetGrid.Tile {
             return
         }
 
-        self.criticalShortages = region.properties.criticalResources.filter {
+        self.properties = .init(
+            id: self.id,
+            name: self.name ?? "",
+            pops: self.stats.pops,
+            occupiedBy: region.occupiedBy,
+            governedBy: region.governedBy,
+            suzerain: region.suzerain,
+            country: region.country,
+        )
+
+        self.criticalShortages = region.country.criticalResources.filter {
             if  let localMarket: LocalMarket = world.segmentedMarkets[$0 / self.id],
                     localMarket.today.supply == 0,
                     localMarket.today.demand > 0 {
@@ -196,9 +196,7 @@ extension PlanetGrid.Tile {
         among factories: OrderedDictionary<FactoryType, FactoryMetadata>,
         using random: inout PseudoRandom,
     ) -> FactoryMetadata? {
-        guard let pops: PopulationStats = self.authority?.pops else {
-            return nil
-        }
+        let pops: PopulationStats = self.stats.pops
 
         let chance: Int64
         switch pops.free.total {
@@ -254,7 +252,7 @@ extension PlanetGrid.Tile {
         }
 
         guard
-        let region: RegionalProperties = self.authority?.properties,
+        let region: RegionalProperties = self.properties,
         let factor: Fraction = region.pops.occupation[.Miner]?.mineExpansionFactor else {
             return nil
         }

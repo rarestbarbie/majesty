@@ -325,7 +325,7 @@ extension GameContext {
             }
 
             $0.turn(
-                policy: region.properties.modifiers.localMarkets[$0.id.resource] ?? .default
+                policy: region.country.modifiers.localMarkets[$0.id.resource] ?? .default
             )
         }
 

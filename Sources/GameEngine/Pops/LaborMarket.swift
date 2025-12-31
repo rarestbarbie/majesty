@@ -32,7 +32,7 @@ extension LaborMarket {
             }
 
             guard
-            let currency: CurrencyID = pop.region?.properties.currency.id else {
+            let currency: CurrencyID = pop.region?.currency.id else {
                 return
             }
 

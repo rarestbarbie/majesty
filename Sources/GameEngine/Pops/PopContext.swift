@@ -12,7 +12,7 @@ struct PopContext: RuntimeContext {
     let type: PopMetadata
     var state: Pop
     private(set) var stats: Pop.Stats
-    private(set) var region: RegionalAuthority?
+    private(set) var region: RegionalProperties?
     private(set) var equity: Equity<LEI>.Statistics
     private(set) var mines: [MineID: MiningJobConditions]
 
@@ -38,13 +38,13 @@ extension PopContext: LegalEntityContext {
 }
 extension PopContext {
     var snapshot: PopSnapshot? {
-        guard let region: RegionalAuthority = self.region else {
+        guard let region: RegionalProperties = self.region else {
             return nil
         }
         return .init(
             metadata: self.type,
             stats: self.stats,
-            region: region.properties,
+            region: region,
             equity: self.equity,
             mines: self.mines,
             state: state,
@@ -73,7 +73,7 @@ extension PopContext {
         world _: borrowing GameWorld,
         context: ComputationPass
     ) throws {
-        self.region = context.planets[self.state.tile]?.authority
+        self.region = context.planets[self.state.tile]?.properties
 
         self.mines.removeAll(keepingCapacity: true)
         for job: MiningJob in self.state.mines.values {
@@ -120,7 +120,7 @@ extension PopContext {
 }
 extension PopContext: AllocatingContext {
     mutating func allocate(turn: inout Turn) {
-        guard let region: RegionalProperties = self.region?.properties else {
+        guard let region: RegionalProperties = self.region else {
             return
         }
 
@@ -283,7 +283,7 @@ extension PopContext: TransactingContext {
         let enslaved: Bool = self.state.type.stratum == .Ward
 
         guard
-        let region: RegionalProperties = self.region?.properties,
+        let region: RegionalProperties = self.region,
         let budget: Pop.Budget = self.state.budget else {
             return
         }
@@ -416,11 +416,9 @@ extension PopContext {
         self.state.z.vx = self.state.inventory.x.valueAcquired
 
         guard
-        let authority: RegionalAuthority = self.region else {
+        let region: RegionalProperties = self.region else {
             return
         }
-
-        let region: RegionalProperties = authority.properties
 
         self.state.z.mil += Self.mil(fl: self.state.z.fl)
         self.state.z.mil += Self.mil(fe: self.state.z.fe)
@@ -467,7 +465,7 @@ extension PopContext {
             self.state.equity.split(
                 price: self.state.z.px,
                 turn: &turn,
-                notifying: [authority.occupiedBy]
+                notifying: [region.occupiedBy]
             )
         } else {
             self.convert(turn: &turn)
@@ -531,7 +529,7 @@ extension PopContext {
         let demotion: ConditionEvaluator
         let stats: PopulationStats
 
-        if  let region: RegionalProperties = self.region?.properties {
+        if  let region: RegionalProperties = self.region {
             let converter: Converter  = .init(
                 region: region,
                 stats: self.stats,

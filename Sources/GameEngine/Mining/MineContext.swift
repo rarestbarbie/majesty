@@ -10,7 +10,7 @@ struct MineContext: RuntimeContext {
     let type: MineMetadata
     var state: Mine
 
-    private(set) var region: RegionalAuthority?
+    private(set) var region: RegionalProperties?
     private(set) var miners: Workforce
 
     init(type: MineMetadata, state: Mine) {
@@ -21,11 +21,15 @@ struct MineContext: RuntimeContext {
     }
 }
 extension MineContext {
-    var snapshot: MineSnapshot {
-        .init(
+    var snapshot: MineSnapshot? {
+        guard let region: RegionalProperties = self.region else {
+            return nil
+        }
+
+        return .init(
             metadata: self.type,
             state: self.state,
-            region: self.region?.properties,
+            region: region,
             miners: self.miners
         )
     }
@@ -44,10 +48,10 @@ extension MineContext {
         world _: borrowing GameWorld,
         context: ComputationPass
     ) throws {
-        self.region = context.planets[self.state.tile]?.authority
+        self.region = context.planets[self.state.tile]?.properties
 
         guard
-        let region: RegionalProperties = self.region?.properties else {
+        let region: RegionalProperties = self.region else {
             return
         }
 
@@ -56,7 +60,7 @@ extension MineContext {
 }
 extension MineContext: AllocatingContext {
     mutating func allocate(turn: inout Turn) {
-        guard let region: RegionalProperties = self.region?.properties else {
+        guard let region: RegionalProperties = self.region else {
             return
         }
 
@@ -70,7 +74,7 @@ extension MineContext: AllocatingContext {
 }
 extension MineContext {
     mutating func advance(turn: inout Turn) {
-        guard let _: RegionalProperties = self.region?.properties else {
+        guard let _: RegionalProperties = self.region else {
             return
         }
 

@@ -10,7 +10,7 @@ struct BuildingContext: RuntimeContext {
     var state: Building
     private(set) var stats: Building.Stats
 
-    private(set) var region: RegionalAuthority?
+    private(set) var region: RegionalProperties?
     private(set) var equity: Equity<LEI>.Statistics
 
     init(type: BuildingMetadata, state: Building) {
@@ -33,13 +33,13 @@ extension BuildingContext {
     private static var utilizationThreshold: Double { 0.99 }
 
     var snapshot: BuildingSnapshot? {
-        guard let region: RegionalAuthority = self.region else {
+        guard let region: RegionalProperties = self.region else {
             return nil
         }
         return .init(
             metadata: self.type,
             stats: self.stats,
-            region: region.properties,
+            region: region,
             equity: self.equity,
             state: self.state,
         )
@@ -60,13 +60,13 @@ extension BuildingContext {
         world _: borrowing GameWorld,
         context: ComputationPass
     ) throws {
-        self.region = context.planets[self.state.tile]?.authority
+        self.region = context.planets[self.state.tile]?.properties
     }
 }
 extension BuildingContext: TransactingContext {
     mutating func allocate(turn: inout Turn) {
         guard
-        let region: RegionalProperties = self.region?.properties else {
+        let region: RegionalProperties = self.region else {
             return
         }
 
@@ -168,7 +168,7 @@ extension BuildingContext: TransactingContext {
 
     mutating func transact(turn: inout Turn) {
         guard
-        let region: RegionalProperties = self.region?.properties,
+        let region: RegionalProperties = self.region,
         let budget: Building.Budget = self.state.budget else {
             return
         }

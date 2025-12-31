@@ -4,7 +4,7 @@ import GameState
 import Random
 
 protocol LegalEntityContext<State>: RuntimeContext where State: LegalEntityState {
-    var region: RegionalAuthority? { get }
+    var region: RegionalProperties? { get }
     var equity: Equity<LEI>.Statistics { get }
 
     static var stockpileDaysRange: ClosedRange<Int64> { get }

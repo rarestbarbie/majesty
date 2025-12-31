@@ -55,7 +55,7 @@ extension GameUI.Cache {
 
         return .items {
             $0["Switch to Player"] {
-                if  let country: CountryID = tile.governedBy {
+                if  let country: CountryID = tile.properties?.governedBy {
                     $0[.SwitchToPlayer] = country
                 }
             }
