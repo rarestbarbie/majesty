@@ -13,6 +13,7 @@ import JavaScriptKit
     case BuildingNeeds
     case BuildingOwnershipCountry
     case BuildingOwnershipCulture
+    case BuildingOwnershipGender
     case BuildingOwnershipSecurities
     case BuildingCashFlowItem
     case BuildingBudgetItem
@@ -29,6 +30,7 @@ import JavaScriptKit
     case FactoryNeeds
     case FactoryOwnershipCountry
     case FactoryOwnershipCulture
+    case FactoryOwnershipGender
     case FactoryOwnershipSecurities
     case FactorySummarizeEmployees
     case FactoryCashFlowItem
@@ -50,6 +52,7 @@ import JavaScriptKit
     case PopType
     case PopOwnershipCountry
     case PopOwnershipCulture
+    case PopOwnershipGender
     case PopOwnershipSecurities
     case PopCashFlowItem
     case PopBudgetItem

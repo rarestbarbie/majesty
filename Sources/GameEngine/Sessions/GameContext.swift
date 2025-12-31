@@ -152,6 +152,14 @@ extension GameContext {
         )
     }
 
+    private var legalPass: LegalPass {
+        .init(
+            buildings: self.buildings,
+            factories: self.factories,
+            pops: self.pops,
+        )
+    }
+
     private var residentPass: ResidentPass {
         .init(
             player: self.player,
@@ -264,7 +272,7 @@ extension GameContext {
             let equity: Equity<LEI>.Statistics = .compute(
                 equity: pop.equity,
                 assets: world.bank[account: pop.id.lei],
-                in: self.residentPass
+                in: self.legalPass
             )
             self.pops[i].update(equityStatistics: equity)
             self.count(asset: pop.id.lei, equity: pop.equity)
@@ -278,7 +286,7 @@ extension GameContext {
             let equity: Equity<LEI>.Statistics = .compute(
                 equity: factory.equity,
                 assets: world.bank[account: factory.id.lei],
-                in: self.residentPass
+                in: self.legalPass
             )
             self.factories[i].update(equityStatistics: equity)
             self.count(asset: factory.id.lei, equity: factory.equity)
@@ -292,7 +300,7 @@ extension GameContext {
             let equity: Equity<LEI>.Statistics = .compute(
                 equity: building.equity,
                 assets: world.bank[account: building.id.lei],
-                in: self.residentPass
+                in: self.legalPass
             )
             self.buildings[i].update(equityStatistics: equity)
             self.count(asset: building.id.lei, equity: building.equity)

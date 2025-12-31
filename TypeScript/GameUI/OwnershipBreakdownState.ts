@@ -6,5 +6,6 @@ export interface OwnershipBreakdownState<Type extends string> {
     readonly type: Type;
     readonly culture?: PieChartSector<GameID>[];
     readonly country?: PieChartSector<GameID>[];
+    readonly gender?: PieChartSector<string>[];
     readonly terms?: TermState[];
 }

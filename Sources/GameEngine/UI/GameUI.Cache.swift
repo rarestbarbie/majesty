@@ -116,6 +116,12 @@ extension GameUI.Cache {
     }
     func tooltipBuildingOwnership(
         _ id: BuildingID,
+        gender: Gender
+    ) -> Tooltip? {
+        self.buildings[id]?.tooltipOwnership(gender: gender, context: self.context)
+    }
+    func tooltipBuildingOwnership(
+        _ id: BuildingID,
     ) -> Tooltip? {
         self.buildings[id]?.tooltipOwnership()
     }
@@ -200,12 +206,17 @@ extension GameUI.Cache {
     ) -> Tooltip? {
         self.factories[id]?.tooltipOwnership(culture: culture, context: self.context)
     }
-
     func tooltipFactoryOwnership(
         _ id: FactoryID,
         country: CountryID,
     ) -> Tooltip? {
         self.factories[id]?.tooltipOwnership(country: country, context: self.context)
+    }
+    func tooltipFactoryOwnership(
+        _ id: FactoryID,
+        gender: Gender
+    ) -> Tooltip? {
+        self.factories[id]?.tooltipOwnership(gender: gender, context: self.context)
     }
 
     func tooltipFactoryOwnership(
@@ -371,12 +382,17 @@ extension GameUI.Cache {
     ) -> Tooltip? {
         self.pops[id]?.tooltipOwnership(culture: culture, context: self.context)
     }
-
     func tooltipPopOwnership(
         _ id: PopID,
         country: CountryID,
     ) -> Tooltip? {
         self.pops[id]?.tooltipOwnership(country: country, context: self.context)
+    }
+    func tooltipPopOwnership(
+        _ id: PopID,
+        gender: Gender
+    ) -> Tooltip? {
+        self.pops[id]?.tooltipOwnership(gender: gender, context: self.context)
     }
 
     func tooltipPopOwnership(

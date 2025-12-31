@@ -87,6 +87,55 @@ div.pie-chart {
             fill: #ff4e89;
         }
     }
+    g[data-tooltip-type$='OwnershipGender'] {
+        .FCS {
+            fill: #9900ff;
+        }
+        .FTS {
+            fill: #e83aff;
+        }
+        .FC {
+            fill: #dd009b;
+        }
+        .FT {
+            fill: #ff2c84;
+        }
+
+        .XTL {
+            fill: #ff5f5f;
+        }
+        .XCL {
+            fill: #ff7d49;
+        }
+
+        .XT {
+            fill: #ffb36c;
+        }
+        .XC {
+            fill: #ffe498;
+        }
+
+        .XCG {
+            fill: #49ffb9;
+        }
+        .XTG {
+            fill: #2fd5ff;
+        }
+
+        .MT {
+            fill: #ff82d5;
+        }
+        .MC {
+            fill: #ff15b9;
+        }
+
+        .MTS {
+            fill: #004bd6;
+        }
+        .MCS {
+            fill: #192983;
+        }
+    }
 }
 #screen[data-screen='Infrastructure'] {
     --color-bg-e: rgb(0, 255, 255);

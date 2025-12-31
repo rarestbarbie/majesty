@@ -8,6 +8,7 @@ extension Equity.Statistics {
         let sold: Int64
         let country: CountryID
         let culture: CultureID?
+        let gender: Gender?
     }
 }
 extension Equity.Statistics.Shareholder: Sendable where Owner: Sendable {}
