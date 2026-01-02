@@ -240,6 +240,8 @@ extension GameContext {
             self.planets[i].startIndexCount()
         }
 
+        var economy: EconomicLedger = .init()
+
         for i: Int in self.buildings.indices {
             self.buildings[i].startIndexCount()
         }
@@ -253,11 +255,17 @@ extension GameContext {
             self.pops[i].startIndexCount()
         }
         for i: Int in self.pops.indices {
-            /// avoid copy-on-write
+            /// avoid copy-on-write. note that we should not be accessing `PopContext.region`
+            /// here — that will be stale as it is not updated until after indexing is complete
             let (pop, stats): (Pop, Pop.Stats) = { ($0.state, $0.stats) } (self.pops[i])
-            let counted: ()? = self.planets[pop.tile]?.addResidentCount(pop, stats)
 
-            #assert(counted != nil, "Pop \(pop.id) has no home tile!!!")
+            guard
+            let region: RegionalAuthority = self.planets[pop.tile]?.addResidentCount(
+                pop,
+                stats
+            ) else {
+                fatalError("Pop \(pop.id) has no home tile!!!")
+            }
 
             for job: FactoryJob in pop.factories.values {
                 self.factories[modifying: job.id].addWorkforceCount(pop: pop, job: job)
@@ -274,36 +282,45 @@ extension GameContext {
                 assets: world.bank[account: pop.id.lei],
                 in: self.legalPass
             )
-            self.pops[i].update(equityStatistics: equity)
+            economy.count(output: pop.inventory.out, equity: equity, region: region)
             self.count(asset: pop.id.lei, equity: pop.equity)
+            self.pops[i].update(equityStatistics: equity)
         }
         for i: Int in self.factories.indices {
             let factory: Factory = self.factories.state[i]
-            let counted: ()? = self.planets[factory.tile]?.addResidentCount(factory)
-
-            #assert(counted != nil, "Factory \(factory.id) has no home tile!!!")
+            guard
+            let region: RegionalAuthority = self.planets[factory.tile]?.addResidentCount(
+                factory
+            ) else {
+                fatalError("Factory \(factory.id) has no home tile!!!")
+            }
 
             let equity: Equity<LEI>.Statistics = .compute(
                 equity: factory.equity,
                 assets: world.bank[account: factory.id.lei],
                 in: self.legalPass
             )
-            self.factories[i].update(equityStatistics: equity)
+            economy.count(output: factory.inventory.out, equity: equity, region: region)
             self.count(asset: factory.id.lei, equity: factory.equity)
+            self.factories[i].update(equityStatistics: equity)
         }
         for i: Int in self.buildings.indices {
             let building: Building = self.buildings.state[i]
-            let counted: ()? = self.planets[building.tile]?.addResidentCount(building)
-
-            #assert(counted != nil, "Building \(building.id) has no home tile!!!")
+            guard
+            let region: RegionalAuthority = self.planets[building.tile]?.addResidentCount(
+                building
+            ) else {
+                fatalError("Building \(building.id) has no home tile!!!")
+            }
 
             let equity: Equity<LEI>.Statistics = .compute(
                 equity: building.equity,
                 assets: world.bank[account: building.id.lei],
                 in: self.legalPass
             )
-            self.buildings[i].update(equityStatistics: equity)
+            economy.count(output: building.inventory.out, equity: equity, region: region)
             self.count(asset: building.id.lei, equity: building.equity)
+            self.buildings[i].update(equityStatistics: equity)
         }
         for i: Int in self.mines.indices {
             let mine: Mine = self.mines.state[i]
