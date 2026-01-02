@@ -58,6 +58,9 @@ extension ResourceInputs {
     @inlinable public var tradeable: ArraySlice<ResourceInput> {
         self.inputs.values.elements[self.inputsPartition...]
     }
+    @inlinable public var joined: ResourceStockpileCollection<ResourceInput> {
+        .init(elements: self.all, elementsPartition: self.inputsPartition)
+    }
 
     private var fulfilled: Double {
         self.inputs.values.reduce(1) { min($0, $1.fulfilled) }

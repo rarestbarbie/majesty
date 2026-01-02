@@ -47,6 +47,9 @@ extension ResourceOutputs {
     @inlinable public var tradeable: ArraySlice<ResourceOutput> {
         self.outputs.values.elements[self.outputsPartition...]
     }
+    @inlinable public var joined: ResourceStockpileCollection<ResourceOutput> {
+        .init(elements: self.all, elementsPartition: self.outputsPartition)
+    }
     /// Returns the utilization of the most utilized **segmented** resource output, or `nil` if
     /// there are no segmented outputs.
     ///

@@ -90,6 +90,7 @@ extension PlanetGrid.Tile {
         properties: CountryProperties,
     ) {
         self.authority = .init(
+            id: self.id,
             governedBy: governedBy,
             occupiedBy: occupiedBy,
             suzerain: suzerain,
@@ -111,20 +112,25 @@ extension PlanetGrid.Tile {
         self.stats.startIndexCount()
     }
 
-    mutating func addResidentCount(_ pop: Pop, _ stats: Pop.Stats) {
+    mutating func addResidentCount(_ pop: Pop, _ stats: Pop.Stats) -> RegionalAuthority? {
         self.stats.pops.addResidentCount(pop, stats)
+        // this should not return the ``RegionalProperties``, that has not been published yet
+        return self.authority
     }
-    mutating func addResidentCount(_ building: Building) {
+    mutating func addResidentCount(_ building: Building) -> RegionalAuthority? {
         self.buildings.append(building.id)
         self.buildingsAlreadyPresent.insert(building.type)
+        return self.authority
     }
-    mutating func addResidentCount(_ factory: Factory) {
+    mutating func addResidentCount(_ factory: Factory) -> RegionalAuthority? {
         self.factories.append(factory.id)
         self.factoriesAlreadyPresent.insert(factory.type)
 
         if factory.size.level == 0 {
             self.factoriesUnderConstruction += 1
         }
+
+        return self.authority
     }
     mutating func addResidentCount(_ mine: Mine) {
         self.mines.append(mine.id)
@@ -162,6 +168,10 @@ extension PlanetGrid.Tile {
         among buildings: OrderedDictionary<BuildingType, BuildingMetadata>,
         using random: inout PseudoRandom,
     ) -> BuildingMetadata? {
+        guard case _? = self.properties else {
+            // do not build on uninhabited tiles
+            return nil
+        }
         // TODO: enforce terrain restrictions...
         // mandatory buildings
         for building: BuildingMetadata in buildings.values where building.required {
@@ -196,7 +206,11 @@ extension PlanetGrid.Tile {
         among factories: OrderedDictionary<FactoryType, FactoryMetadata>,
         using random: inout PseudoRandom,
     ) -> FactoryMetadata? {
-        let pops: PopulationStats = self.stats.pops
+        guard
+        let region: RegionalProperties = self.properties else {
+            return nil
+        }
+        let pops: PopulationStats = region.pops
 
         let chance: Int64
         switch pops.free.total {
