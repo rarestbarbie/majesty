@@ -168,6 +168,10 @@ extension PlanetGrid.Tile {
         among buildings: OrderedDictionary<BuildingType, BuildingMetadata>,
         using random: inout PseudoRandom,
     ) -> BuildingMetadata? {
+        guard case _? = self.properties else {
+            // do not build on uninhabited tiles
+            return nil
+        }
         // TODO: enforce terrain restrictions...
         // mandatory buildings
         for building: BuildingMetadata in buildings.values where building.required {
@@ -202,7 +206,11 @@ extension PlanetGrid.Tile {
         among factories: OrderedDictionary<FactoryType, FactoryMetadata>,
         using random: inout PseudoRandom,
     ) -> FactoryMetadata? {
-        let pops: PopulationStats = self.stats.pops
+        guard
+        let region: RegionalProperties = self.properties else {
+            return nil
+        }
+        let pops: PopulationStats = region.pops
 
         let chance: Int64
         switch pops.free.total {
