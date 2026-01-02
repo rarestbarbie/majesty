@@ -10,7 +10,7 @@
 extension ResourceStockpileCollection: RandomAccessCollection {
     @inlinable public var startIndex: Int { self.elements.startIndex }
     @inlinable public var endIndex: Int { self.elements.endIndex }
-    @inlinable public subscript(i: Int) -> (tradeable: Bool, output: Element) {
+    @inlinable public subscript(i: Int) -> (tradeable: Bool, stockpile: Element) {
         (i >= self.elementsPartition, self.elements[i])
     }
 }
