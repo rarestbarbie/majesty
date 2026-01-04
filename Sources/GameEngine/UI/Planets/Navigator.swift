@@ -23,15 +23,15 @@ extension Navigator {
     }
 }
 extension Navigator {
-    mutating func select(planet: PlanetID, layer: MinimapLayer?, cell: HexCoordinate?) {
+    mutating func select(planet: PlanetID, layer: MinimapLayer?) {
         self.minimap = .init(id: planet, layer: layer ?? self.minimap?.layer ?? .Terrain)
-
-        if let cell: HexCoordinate {
-            self.cursor[planet] = cell
-            self.tile = .init(id: planet / cell)
-        } else if let saved: HexCoordinate = self.cursor[planet] {
+        if let saved: HexCoordinate = self.cursor[planet] {
             self.tile = .init(id: planet / saved)
         }
+    }
+    mutating func select(detail: Address) {
+        self.cursor[detail.planet] = detail.tile
+        self.tile = .init(id: detail)
     }
 
     mutating func update(in cache: borrowing GameUI.Cache) {

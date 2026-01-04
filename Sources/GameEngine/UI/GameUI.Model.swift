@@ -105,9 +105,17 @@ extension GameUI.Model {
     public func minimap(
         planet: PlanetID,
         layer: MinimapLayer?,
-        cell: HexCoordinate?
     ) async -> Navigator {
-        self.ui.navigator.select(planet: planet, layer: layer, cell: cell)
+        self.ui.navigator.select(planet: planet, layer: layer)
+        self.cache { self.ui.navigator.update(in: $0) }
+        self.publish()
+        return self.ui.navigator
+    }
+
+    public func minimapTile(
+        _ id: Address
+    ) async -> Navigator {
+        self.ui.navigator.select(detail: id)
         self.cache { self.ui.navigator.update(in: $0) }
         self.publish()
         return self.ui.navigator
@@ -387,10 +395,9 @@ extension GameUI.Model {
                     try arguments[0].decode(),
                 )
             case .PlanetCell:
-                return $0.tooltipPlanetCell(
+                return $0.tooltipPlanetTile(
                     try arguments[0].decode(),
                     try arguments[1].decode(),
-                    try arguments[2].decode(),
                 )
             case .TileCulture:
                 return $0.tooltipTileCulture(

@@ -107,36 +107,43 @@ export class Screen {
         } else {
             let uninitialized: ScreenContent;
             let layout: ScreenLayout;
+            let title: string;
 
             switch (screen) {
-            case ScreenType.Planet:
-                uninitialized = new PlanetOverview();
-                layout = ScreenLayout.Planet;
-                break;
-
             case ScreenType.Infrastructure:
                 uninitialized = new InfrastructureOverview();
                 layout = ScreenLayout.Explorer;
+                title = 'Infrastructure';
                 break;
 
             case ScreenType.Production:
                 uninitialized = new ProductionOverview();
                 layout = ScreenLayout.Explorer;
+                title = 'Production';
                 break;
 
             case ScreenType.Population:
                 uninitialized = new PopulationOverview();
                 layout = ScreenLayout.Explorer;
+                title = 'Population';
                 break;
 
             case ScreenType.Budget:
                 uninitialized = new ScreenContent();
                 layout = ScreenLayout.Explorer;
+                title = 'Budget';
+                break;
+
+            case ScreenType.Planet:
+                uninitialized = new PlanetOverview();
+                layout = ScreenLayout.Planet;
+                title = 'Planets';
                 break;
 
             case ScreenType.Trade:
                 uninitialized = new TradeOverview();
                 layout = ScreenLayout.Explorer;
+                title = 'Trade';
                 break;
             }
 
@@ -149,7 +156,7 @@ export class Screen {
 
             this.dom.content.setAttribute('data-screen-layout', layout);
             this.dom.element.setAttribute('data-screen', screen);
-            this.dom.heading.textContent = screen;
+            this.dom.heading.textContent = title;
 
             this.state = { content: uninitialized, type: screen };
             this.state.content.attach(this.dom.content);
@@ -179,6 +186,13 @@ export class Screen {
             }
         case ScreenType.Population:
             if (this.state.content instanceof PopulationOverview) {
+                this.state.content.update(state);
+                return;
+            } else {
+                break;
+            }
+        case ScreenType.Planet:
+            if (this.state.content instanceof PlanetOverview) {
                 this.state.content.update(state);
                 return;
             } else {

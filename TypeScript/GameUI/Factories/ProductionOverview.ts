@@ -12,21 +12,17 @@ import {
     FactoryTableRow,
     FactoryDetailsTab,
     LegalEntityFilterLabel,
-    MarketFilter,
+    LegalEntityFilter,
     InventoryBreakdown,
     InventoryCharts,
     OwnershipBreakdown,
     ProductionReport,
-    ResourceNeed,
-    ResourceNeedRow,
-    ResourceSale,
-    ResourceSaleBox,
     ScreenType,
     TooltipType,
 } from '../exports.js';
 
 export class ProductionOverview extends ScreenContent {
-    private readonly filters: FilterList<MarketFilter, string>[];
+    private readonly filters: FilterList<LegalEntityFilter, string>[];
     private readonly factories: StaticList<FactoryTableRow, GameID>;
 
     private readonly inventoryCharts: InventoryCharts;
@@ -54,7 +50,7 @@ export class ProductionOverview extends ScreenContent {
         super();
 
         this.filters = [
-            new FilterList<MarketFilter, string>('🌐'),
+            new FilterList<LegalEntityFilter, string>('🌐'),
         ];
 
         this.factories = new StaticList<FactoryTableRow, GameID>(document.createElement('div'));
@@ -174,12 +170,8 @@ export class ProductionOverview extends ScreenContent {
         for (let i: number = 0; i < this.dom.index.tabs.length; i++) {
             this.filters[i].update(
                 state.filterlists[i],
-                (label: LegalEntityFilterLabel) => new MarketFilter(
-                    {
-                        id: label.id,
-                        name: label.name,
-                        icon: '',
-                    },
+                (label: LegalEntityFilterLabel) => new LegalEntityFilter(
+                    label,
                     ScreenType.Production
                 ),
                 () => {},

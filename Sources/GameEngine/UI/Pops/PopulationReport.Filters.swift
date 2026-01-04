@@ -6,7 +6,7 @@ extension PopulationReport {
         var sex: Sex?
     }
 }
-extension PopulationReport.Filters: PersistentSelectionFilter {
+extension PopulationReport.Filters: PersistentLayeredSelectionFilter {
     typealias Subject = PopSnapshot
     typealias Layer = PopulationReport.Filter
 

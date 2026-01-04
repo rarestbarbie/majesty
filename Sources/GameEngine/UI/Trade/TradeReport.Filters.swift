@@ -7,7 +7,7 @@ extension TradeReport {
         var asset: WorldMarket.Asset?
     }
 }
-extension TradeReport.Filters: PersistentSelectionFilter {
+extension TradeReport.Filters: PersistentLayeredSelectionFilter {
     typealias Subject = WorldMarket
     typealias Layer = TradeReport.Filter
 

@@ -33,39 +33,7 @@
         @include blur.background;
 
         background-color: var(--bg);
-    }
 
-    article[data-screen-layout='planet'] {
-        display: flex;
-        justify-content: center;
-
-        div.planet-overview {
-            display: flex;
-            flex-direction: row;
-
-            div.hex-grid-chart {
-                width: 50rem;
-
-                svg {
-                    g.cells {
-                        pointer-events: none;
-                    }
-                    g.lines {
-                        path {
-                            fill: transparent;
-
-                            &:hover {
-                                stroke: red;
-                                stroke-width: 0.06px;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    article[data-screen-layout='explorer'] {
         > div.tabs {
             min-width: 10rem;
             height: 100%;
@@ -89,6 +57,39 @@
                 }
             }
         }
+    }
+
+    article[data-screen-layout='planet'] {
+        display: flex;
+        justify-content: center;
+
+        div.planet-overview {
+            display: flex;
+            flex-direction: row;
+
+            div.hex-grid {
+                width: 30rem;
+
+                svg {
+                    g.cells {
+                        pointer-events: none;
+                    }
+                    g.lines {
+                        path {
+                            fill: transparent;
+
+                            &:hover {
+                                stroke: red;
+                                stroke-width: 0.06px;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    article[data-screen-layout='explorer'] {
         // Panel
         > div.panel {
             padding-left: 0.5rem;
@@ -277,8 +278,7 @@
     }
 }
 #screen[data-screen='Planet'] {
-    width: 50rem;
-    height: 30rem;
+    height: 40rem;
 }
 
 #screen-close {

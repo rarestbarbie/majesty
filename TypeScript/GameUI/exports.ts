@@ -9,6 +9,7 @@ export * from './Developer/PlanetTile.js';
 export * from './Developer/PlanetTileEditor.js';
 export * from './Developer/PlanetTileEditorState.js';
 
+export * from './LegalEntityFilter.js';
 export * from './LegalEntityFilterLabel.js';
 export * from './InventoryBreakdown.js';
 export * from './InventoryBreakdownState.js';
@@ -83,7 +84,8 @@ export * from './Planets/HexGridCell.js';
 export * from './Planets/HexGridCellBackground.js';
 export * from './Planets/PlanetDetails.js';
 export * from './Planets/PlanetDetailsTab.js';
-export * from './Planets/PlanetMapState.js';
+export * from './Planets/PlanetFilter.js';
+export * from './Planets/PlanetFilterLabel.js';
 export * from './Planets/PlanetMapTileState.js';
 export * from './Planets/PlanetReportRequest.js';
 export * from './Planets/PlanetReport.js';

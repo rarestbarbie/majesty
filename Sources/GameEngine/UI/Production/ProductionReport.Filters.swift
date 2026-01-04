@@ -5,7 +5,7 @@ extension ProductionReport {
         var location: Address?
     }
 }
-extension ProductionReport.Filters: PersistentSelectionFilter {
+extension ProductionReport.Filters: PersistentLayeredSelectionFilter {
     typealias Subject = FactorySnapshot
     typealias Layer = ProductionReport.Filter
 

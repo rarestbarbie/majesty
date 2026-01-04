@@ -461,12 +461,11 @@ extension GameUI.Cache {
     }
 }
 extension GameUI.Cache {
-    func tooltipPlanetCell(
-        _ id: PlanetID,
-        _ cell: HexCoordinate,
+    func tooltipPlanetTile(
+        _ id: Address,
         _ layer: MinimapLayer,
     ) -> Tooltip? {
-        self.tiles[id / cell]?.tooltip(layer)
+        self.tiles[id]?.tooltip(layer)
     }
     func tooltipTileCulture(
         _ id: Address,

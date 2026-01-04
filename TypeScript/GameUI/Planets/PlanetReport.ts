@@ -1,6 +1,15 @@
-import { ScreenType, PlanetDetails } from '../exports.js';
+import {
+    ScreenType,
+    LegalEntityFilterLabel,
+    PlanetDetails,
+    PlanetMapTileState
+} from '../exports.js';
 
 export interface PlanetReport {
     readonly type: ScreenType.Planet;
-    readonly planet: PlanetDetails;
+    readonly details?: PlanetDetails;
+    readonly entries: PlanetMapTileState[];
+    readonly filter?: string;
+    readonly filterlist: number;
+    readonly filterlists: LegalEntityFilterLabel[][];
 }

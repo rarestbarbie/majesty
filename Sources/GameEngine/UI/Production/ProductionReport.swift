@@ -6,9 +6,9 @@ import JavaScriptKit
 import JavaScriptInterop
 
 public struct ProductionReport {
-    private var selection: PersistentSelection<
+    private var selection: PersistentLayeredSelection<
         Filters,
-        InventoryBreakdown<FactoryDetailsTab>.Focus
+        LegalEntityFocus<FactoryDetailsTab>
     >
 
     private var filters: ([FilterLabel], [Never])

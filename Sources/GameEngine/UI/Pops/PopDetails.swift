@@ -13,7 +13,7 @@ struct PopDetails {
 
     private var pop: PopSnapshot?
 
-    init(id: PopID, focus: InventoryBreakdown<PopDetailsTab>.Focus) {
+    init(id: PopID, focus: LegalEntityFocus<PopDetailsTab>) {
         self.id = id
         self.open = focus.tab
         self.inventory = .init(focus: focus.needs)
@@ -22,7 +22,7 @@ struct PopDetails {
     }
 }
 extension PopDetails: PersistentReportDetails {
-    mutating func refocus(on focus: InventoryBreakdown<PopDetailsTab>.Focus) {
+    mutating func refocus(on focus: LegalEntityFocus<PopDetailsTab>) {
         self.open = focus.tab
         self.inventory.focus = focus.needs
     }

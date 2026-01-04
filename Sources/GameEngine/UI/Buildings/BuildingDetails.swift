@@ -11,7 +11,7 @@ struct BuildingDetails {
 
     private var name: String?
 
-    init(id: BuildingID, focus: InventoryBreakdown<BuildingDetailsTab>.Focus) {
+    init(id: BuildingID, focus: LegalEntityFocus<BuildingDetailsTab>) {
         self.id = id
         self.open = focus.tab
 
@@ -22,7 +22,7 @@ struct BuildingDetails {
     }
 }
 extension BuildingDetails: PersistentReportDetails {
-    mutating func refocus(on focus: InventoryBreakdown<BuildingDetailsTab>.Focus) {
+    mutating func refocus(on focus: LegalEntityFocus<BuildingDetailsTab>) {
         self.open = focus.tab
         self.inventory.focus = focus.needs
     }

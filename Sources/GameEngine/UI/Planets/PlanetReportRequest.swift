@@ -3,19 +3,15 @@ import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public struct PlanetReportRequest {
-    @usableFromInline let subject: PlanetID?
+    @usableFromInline let subject: Address?
     @usableFromInline let details: PlanetDetailsTab?
+    @usableFromInline let filter: PlanetID?
 }
 extension PlanetReportRequest {
     @frozen public enum ObjectKey: JSString, Sendable {
         case subject
         case details
-    }
-}
-extension PlanetReportRequest: JavaScriptEncodable {
-    public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.subject] = self.subject
-        js[.details] = self.details
+        case filter
     }
 }
 extension PlanetReportRequest: JavaScriptDecodable {
@@ -23,6 +19,7 @@ extension PlanetReportRequest: JavaScriptDecodable {
         self.init(
             subject: try js[.subject]?.decode(),
             details: try js[.details]?.decode(),
+            filter: try js[.filter]?.decode()
         )
     }
 }

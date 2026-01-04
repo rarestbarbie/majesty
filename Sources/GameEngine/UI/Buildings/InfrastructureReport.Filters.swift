@@ -5,7 +5,7 @@ extension InfrastructureReport {
         var location: Address?
     }
 }
-extension InfrastructureReport.Filters: PersistentSelectionFilter {
+extension InfrastructureReport.Filters: PersistentLayeredSelectionFilter {
     typealias Subject = BuildingSnapshot
     typealias Layer = InfrastructureReport.Filter
 

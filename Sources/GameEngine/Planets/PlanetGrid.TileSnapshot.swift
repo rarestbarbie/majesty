@@ -4,7 +4,7 @@ import GameRules
 import GameUI
 
 extension PlanetGrid {
-    struct TileSnapshot: Sendable {
+    struct TileSnapshot: Identifiable, Sendable {
         let id: Address
         let name: String?
         let properties: RegionalProperties?
