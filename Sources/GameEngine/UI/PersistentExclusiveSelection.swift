@@ -1,4 +1,4 @@
-@dynamicMemberLookup struct PersistentExclusiveSelection<Filter, DetailsFocus> 
+@dynamicMemberLookup struct PersistentExclusiveSelection<Filter, DetailsFocus>
     where Filter: PersistentExclusiveSelectionFilter {
     private(set) var details: DetailsFocus
     private(set) var filter: Filter?
@@ -55,10 +55,8 @@ extension PersistentExclusiveSelection {
             return
         }
 
-        if  filter != self.filter {
-            self.filter = filter
-            self.restore()
-        }
+        self.filter = filter
+        self.restore()
     }
 
     mutating func update<Entry, Details>(
@@ -73,7 +71,7 @@ extension PersistentExclusiveSelection {
         var selected: Entry? = nil
         if  let cursor: Filter.Subject.ID = self.cursor {
             selected = entries.first { cursor == $0.id }
-        } 
+        }
 
         if case _? = selected,
             let filter: Filter = self.filter {
