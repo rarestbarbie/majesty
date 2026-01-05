@@ -23,7 +23,7 @@ extension Navigator {
     }
 }
 extension Navigator {
-    mutating func select(planet: PlanetID, layer: MinimapLayer?) {
+    mutating func select(planet: PlanetID, layer: PlanetMapLayer?) {
         self.minimap = .init(id: planet, layer: layer ?? self.minimap?.layer ?? .Terrain)
         if let saved: HexCoordinate = self.cursor[planet] {
             self.tile = .init(id: planet / saved)

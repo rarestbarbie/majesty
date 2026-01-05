@@ -44,12 +44,11 @@ extension GameUI.Cache {
 }
 extension GameUI.Cache {
     func contextMenuMinimapTile(
-        _ id: PlanetID,
-        _ cell: HexCoordinate,
-        _ layer: MinimapLayer,
+        _ id: Address,
+        _ layer: PlanetMapLayer,
     ) -> ContextMenu? {
         guard
-        let tile: PlanetGrid.TileSnapshot = self.tiles[id / cell] else {
+        let tile: PlanetGrid.TileSnapshot = self.tiles[id] else {
             return nil
         }
 
@@ -463,7 +462,7 @@ extension GameUI.Cache {
 extension GameUI.Cache {
     func tooltipPlanetTile(
         _ id: Address,
-        _ layer: MinimapLayer,
+        _ layer: PlanetMapLayer,
     ) -> Tooltip? {
         self.tiles[id]?.tooltip(layer)
     }

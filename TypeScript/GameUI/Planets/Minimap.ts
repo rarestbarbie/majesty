@@ -6,7 +6,7 @@ export class Minimap {
     private readonly name: HTMLElement;
     private readonly grid: HexGrid;
     private readonly layers: HTMLElement;
-    private layerShown?: MinimapLayer;
+    private layerShown?: string;
     private id?: GameID;
 
     constructor() {
@@ -64,9 +64,10 @@ export class Minimap {
         );
     }
 
-    private updateLayerControls(planet: GameID, selected: MinimapLayer): void {
+    private updateLayerControls(planet: GameID, selected: string): void {
         this.layers.replaceChildren(); // Clear existing icons
 
+        // TODO: stop hardcoding layers
         const icons: Record<MinimapLayer, string> = {
             [MinimapLayer.Terrain]: '🗺️',
             [MinimapLayer.Population]: '🧑‍🤝‍🧑',

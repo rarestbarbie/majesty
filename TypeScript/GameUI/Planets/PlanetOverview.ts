@@ -1,6 +1,7 @@
 import {
     FilterList,
     FilterTabs,
+    UpdateText,
 } from '../../DOM/exports.js';
 import {
     ScreenContent,
@@ -21,8 +22,9 @@ export class PlanetOverview extends ScreenContent {
     private dom?: {
         readonly index: FilterTabs;
         readonly panel: HTMLDivElement;
-        readonly title: HTMLElement;
-        readonly titleName: HTMLHeadingElement;
+        readonly header: HTMLElement;
+        readonly titleUpper: HTMLHeadingElement;
+        readonly titleLower: HTMLHeadingElement;
         readonly stats: HTMLDivElement;
         readonly nav: HTMLElement;
     };
@@ -37,9 +39,11 @@ export class PlanetOverview extends ScreenContent {
 
     public override async open(parameters: URLSearchParams): Promise<void> {
         const id: string | null = parameters.get('id');
+        const filter: string | null = parameters.get('id');
         const state: PlanetReport = await Swift.openPlanet(
             {
-                subject: id !== null ? parseInt(id) as GameID ?? undefined : undefined
+                subject: id !== null ? id : undefined,
+                filter: filter !== null ? parseInt(filter) as GameID ?? undefined : undefined
             }
         );
 
@@ -47,24 +51,21 @@ export class PlanetOverview extends ScreenContent {
             this.dom = {
                 index: new FilterTabs(this.filters),
                 panel: document.createElement('div'),
-                title: document.createElement('header'),
-                titleName: document.createElement('h3'),
+                header: document.createElement('heading'),
+                titleUpper: document.createElement('h3'),
+                titleLower: document.createElement('h3'),
                 stats: document.createElement('div'),
                 nav: document.createElement('nav'),
             };
 
-            this.dom.title.appendChild(this.dom.titleName);
-            this.dom.title.appendChild(this.dom.nav);
+            this.dom.header.appendChild(this.dom.titleUpper);
 
-            const upper: HTMLDivElement = document.createElement('div');
-            upper.classList.add('upper');
-            upper.appendChild(this.dom.title);
-            upper.appendChild(this.dom.stats);
-
-            this.dom.panel.appendChild(upper);
+            this.dom.panel.appendChild(this.dom.header);
             this.dom.panel.appendChild(this.grid.node);
+            this.dom.panel.appendChild(this.dom.titleLower);
+            this.dom.panel.appendChild(this.dom.nav);
+            this.dom.panel.appendChild(this.dom.stats);
             this.dom.panel.classList.add('panel');
-            this.dom.panel.classList.add('planet-overview');
 
             this.dom.stats.classList.add('stats');
         } else {
@@ -109,6 +110,18 @@ export class PlanetOverview extends ScreenContent {
             );
         }
 
-        this.grid.update(state.entries, MinimapLayer.Terrain);
+        UpdateText(this.dom.titleLower, state.name ?? '');
+
+        if (state.details === undefined) {
+            return;
+        }
+
+        UpdateText(this.dom.titleUpper, state.details.name ?? '');
+        this.grid.update(
+            state.entries,
+            state.details.open,
+            (id: string) => `#screen=Planet&id=${id}`
+        );
+
     }
 }

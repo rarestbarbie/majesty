@@ -4,7 +4,7 @@ import JavaScriptInterop
 
 @frozen public struct PlanetReportRequest {
     @usableFromInline let subject: Address?
-    @usableFromInline let details: PlanetDetailsTab?
+    @usableFromInline let details: PlanetMapLayer?
     @usableFromInline let filter: PlanetID?
 }
 extension PlanetReportRequest {

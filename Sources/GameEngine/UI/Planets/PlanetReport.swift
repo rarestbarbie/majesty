@@ -9,17 +9,21 @@ public struct PlanetReport: Sendable {
     private var entries: [PlanetMapTile]
     private var filters: ([FilterLabel], [Never])
 
+    private var planet: PlanetSnapshot?
+
     init() {
-        self.selection = .init(defaultFocus: .init(tab: .Terrain))
+        self.selection = .init(defaultFocus: .init(layer: .Terrain))
         self.details = nil
         self.filters = ([], [])
         self.entries = []
+
+        self.planet = nil
     }
 }
 extension PlanetReport: PersistentReport {
     mutating func select(request: PlanetReportRequest) {
         self.selection.select(request.subject, filter: request.filter)
-        self.selection.tab = request.details
+        self.selection.layer = request.details
     }
 
     mutating func update(from cache: borrowing GameUI.Cache) {
@@ -48,12 +52,12 @@ extension PlanetReport: PersistentReport {
         }
         guard
         let id: PlanetID = self.selection.filter,
-        // let _: PlanetSnapshot = cache.planets[id],
         let tiles: PlanetSnapshot.Tiles = cache[planet: id] else {
             return
         }
 
         self.entries = tiles.color(\.terrain.color)
+        self.planet = cache.planets[id]
 
         self.selection.update(
             objects: cache.tiles,
@@ -73,6 +77,8 @@ extension PlanetReport {
         case filter
         case filterlist
         case filterlists
+
+        case name
     }
 }
 extension PlanetReport: JavaScriptEncodable {
@@ -84,5 +90,7 @@ extension PlanetReport: JavaScriptEncodable {
         js[.filter] = self.selection.filter
         js[.filterlist] = 0
         js[.filterlists] = [self.filters.0]
+
+        js[.name] = self.planet?.state.name
     }
 }

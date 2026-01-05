@@ -104,7 +104,7 @@ extension GameUI.Model {
 
     public func minimap(
         planet: PlanetID,
-        layer: MinimapLayer?,
+        layer: PlanetMapLayer?,
     ) async -> Navigator {
         self.ui.navigator.select(planet: planet, layer: layer)
         self.cache { self.ui.navigator.update(in: $0) }
@@ -145,7 +145,6 @@ extension GameUI.Model {
                 return $0.contextMenuMinimapTile(
                     try arguments[0].decode(),
                     try arguments[1].decode(),
-                    try arguments[2].decode(),
                 )
             }
         }

@@ -6,7 +6,7 @@ import {
 } from '../exports.js';
 
 export interface PlanetReportRequest {
-    subject?: GameID,
+    subject?: string,
     details?: PlanetDetailsTab,
-    filter?: string,
+    filter?: GameID,
 }

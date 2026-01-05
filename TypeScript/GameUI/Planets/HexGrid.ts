@@ -3,7 +3,6 @@ import {
     ContextMenuType,
     HexGridCell,
     HexGridCellBackground,
-    MinimapLayer,
     PlanetMapTileState,
     TooltipType,
 } from '../exports.js';
@@ -46,7 +45,7 @@ export class HexGrid {
 
     public update(
         tiles: PlanetMapTileState[],
-        layer: MinimapLayer,
+        layer: string,
         target: (id: string) => string | null = (_: string) => null,
         selected?: string,
         neighbors?: Map<string, number>,

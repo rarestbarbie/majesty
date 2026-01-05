@@ -19,7 +19,6 @@ import {
     Minimap,
     NavigatorTile,
     NavigatorState,
-    MinimapLayer,
 } from '../exports.js';
 import { Swift } from '../../Swift.js';
 import { Socket } from "socket.io-client";
@@ -194,7 +193,7 @@ export class Application {
         const planet: string | null = action.get('planet');
         if (planet !== null) {
             const id: GameID | null = parseInt(planet, 10) as GameID | null;
-            const layer: MinimapLayer | null = action.get('layer') as MinimapLayer | null;
+            const layer: string | null = action.get('layer');
 
             if (id === null) {
                 console.error(`Invalid planet ID: ${planet}`);
@@ -256,7 +255,7 @@ export class Application {
         }
     }
 
-    public async focus(planet: GameID, layer: MinimapLayer | null): Promise<void> {
+    public async focus(planet: GameID, layer: string | null): Promise<void> {
         const state: NavigatorState = await Swift.minimap(planet, layer);
         await this.updateMinimap(state);
         for (const view of this.views) {

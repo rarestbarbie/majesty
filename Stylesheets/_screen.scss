@@ -63,12 +63,32 @@
         display: flex;
         justify-content: center;
 
-        div.planet-overview {
-            display: flex;
-            flex-direction: row;
+        div.panel {
+            flex: 1 1 auto;
 
-            div.hex-grid {
-                width: 30rem;
+            display: flex;
+            flex-direction: column;
+
+            h3 {
+                font-size: 1.1rem;
+                font-weight: normal;
+                margin: 0;
+            }
+
+            > heading {
+                margin: 1rem 0 0.5rem 0;
+            }
+
+            > heading,
+            > h3 {
+                display: flex;
+                justify-content: space-around;
+            }
+
+            > div.hex-grid {
+                width: 32rem;
+                margin-left: auto;
+                margin-right: auto;
 
                 svg {
                     g.cells {

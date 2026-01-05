@@ -12,4 +12,6 @@ export interface PlanetReport {
     readonly filter?: string;
     readonly filterlist: number;
     readonly filterlists: LegalEntityFilterLabel[][];
+
+    readonly name?: string;
 }

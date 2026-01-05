@@ -17,7 +17,7 @@ extension PlanetGrid.TileSnapshot {
 }
 extension PlanetGrid.TileSnapshot {
     func tooltip(
-        _ layer: MinimapLayer,
+        _ layer: PlanetMapLayer,
     ) -> Tooltip? {
         let pops: PopulationStats = self.pops
         return .instructions(style: .borderless) {

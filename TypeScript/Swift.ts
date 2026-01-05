@@ -8,10 +8,8 @@ import {
     Application,
     CelestialViewState,
     ContextMenuType,
-    FactoryDetailsTab,
     InfrastructureReportRequest,
     InfrastructureReport,
-    MinimapLayer,
     NavigatorState,
     PlanetReportRequest,
     PlanetReport,
@@ -20,7 +18,6 @@ import {
     ProductionReport,
     PopulationReportRequest,
     PopulationReport,
-    PopDetailsTab,
     TradeReportRequest,
     TradeReport,
     TooltipType,
@@ -109,7 +106,7 @@ export class Swift {
     declare public static minimapTile: (id: string) => Promise<NavigatorState>;
     declare public static minimap: (
         planet: GameID,
-        layer: MinimapLayer | null,
+        layer: string | null,
     ) => Promise<NavigatorState>;
     declare public static view: (index: number, system: GameID) => Promise<CelestialViewState>;
 
