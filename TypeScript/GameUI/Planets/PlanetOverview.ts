@@ -39,7 +39,7 @@ export class PlanetOverview extends ScreenContent {
 
     public override async open(parameters: URLSearchParams): Promise<void> {
         const id: string | null = parameters.get('id');
-        const filter: string | null = parameters.get('id');
+        const filter: string | null = parameters.get('filter');
         const state: PlanetReport = await Swift.openPlanet(
             {
                 subject: id !== null ? id : undefined,
