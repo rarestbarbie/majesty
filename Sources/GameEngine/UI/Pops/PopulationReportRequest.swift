@@ -9,17 +9,16 @@ import JavaScriptInterop
     @usableFromInline let column: PopulationReport.ColumnControl?
     @usableFromInline let filter: PopulationReport.Filter?
 }
-extension PopulationReportRequest {
-    @frozen public enum ObjectKey: JSString, Sendable {
-        case subject
+extension PopulationReportRequest: QueryParameterDecodable {
+    @frozen public enum QueryKey: JSString, Sendable {
+        case subject = "id"
         case details
         case detailsTier
         case column
         case filter
     }
-}
-extension PopulationReportRequest: JavaScriptDecodable {
-    public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+
+    public init(from js: borrowing QueryParameterDecoder<QueryKey>) throws {
         self.init(
             subject: try js[.subject]?.decode(),
             details: try js[.details]?.decode(),

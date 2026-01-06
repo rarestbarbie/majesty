@@ -71,17 +71,7 @@ export class PopulationOverview extends ScreenContent {
     }
 
     public override async open(parameters: URLSearchParams): Promise<void> {
-        let subject: string | null = parameters.get('id');
-        let state: PopulationReport = await Swift.openPopulation(
-            {
-                subject: subject ? parseInt(subject) as GameID : undefined,
-                details: parameters.get('details') as PopDetailsTab ?? undefined,
-                detailsTier: parameters.get('detailsTier') ?? undefined,
-                column: parameters.get('column') ?? undefined,
-                filter: parameters.get('filter') ?? undefined,
-            }
-        );
-
+        let state: PopulationReport = await Swift.openPopulation(parameters);
         this.switch(state);
     }
 

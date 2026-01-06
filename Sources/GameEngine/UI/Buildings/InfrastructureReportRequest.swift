@@ -8,16 +8,15 @@ import JavaScriptInterop
     @usableFromInline let detailsTier: ResourceTierIdentifier?
     @usableFromInline let filter: InfrastructureReport.Filter?
 }
-extension InfrastructureReportRequest {
-    @frozen public enum ObjectKey: JSString, Sendable {
-        case subject
+extension InfrastructureReportRequest: QueryParameterDecodable {
+    @frozen public enum QueryKey: JSString, Sendable {
+        case subject = "id"
         case details
         case detailsTier
         case filter
     }
-}
-extension InfrastructureReportRequest: JavaScriptDecodable {
-    public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+
+    public init(from js: borrowing QueryParameterDecoder<QueryKey>) throws {
         self.init(
             subject: try js[.subject]?.decode(),
             details: try js[.details]?.decode(),

@@ -7,15 +7,14 @@ import JavaScriptInterop
     @usableFromInline let details: PlanetMapLayer?
     @usableFromInline let filter: PlanetID?
 }
-extension PlanetReportRequest {
-    @frozen public enum ObjectKey: JSString, Sendable {
-        case subject
+extension PlanetReportRequest: QueryParameterDecodable {
+    @frozen public enum QueryKey: JSString, Sendable {
+        case subject = "id"
         case details
         case filter
     }
-}
-extension PlanetReportRequest: JavaScriptDecodable {
-    public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+
+    public init(from js: borrowing QueryParameterDecoder<QueryKey>) throws {
         self.init(
             subject: try js[.subject]?.decode(),
             details: try js[.details]?.decode(),

@@ -7,20 +7,13 @@ import JavaScriptInterop
     @usableFromInline let subject: WorldMarket.ID?
     @usableFromInline let filter: TradeReport.Filter?
 }
-extension TradeReportRequest {
-    @frozen public enum ObjectKey: JSString, Sendable {
-        case subject
+extension TradeReportRequest: QueryParameterDecodable {
+    @frozen public enum QueryKey: JSString, Sendable {
+        case subject = "id"
         case filter
     }
-}
-extension TradeReportRequest: JavaScriptEncodable {
-    public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.subject] = self.subject
-        js[.filter] = self.filter
-    }
-}
-extension TradeReportRequest: JavaScriptDecodable {
-    public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
+
+    public init(from js: borrowing QueryParameterDecoder<QueryKey>) throws {
         self.init(
             subject: try js[.subject]?.decode(),
             filter: try js[.filter]?.decode()

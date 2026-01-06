@@ -1,8 +1,9 @@
 import JavaScriptKit
 
 @frozen @usableFromInline enum JavaScriptClass: JSString, Sendable {
-    case Object
     case Array
+    case Object
+    case URLSearchParams
 }
 extension JavaScriptClass {
     @inlinable var constructor: JSObject {
