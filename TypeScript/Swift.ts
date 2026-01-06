@@ -8,17 +8,12 @@ import {
     Application,
     CelestialViewState,
     ContextMenuType,
-    InfrastructureReportRequest,
     InfrastructureReport,
     NavigatorState,
-    PlanetReportRequest,
     PlanetReport,
     PlanetTileEditorState,
-    ProductionReportRequest,
     ProductionReport,
-    PopulationReportRequest,
     PopulationReport,
-    TradeReportRequest,
     TradeReport,
     TooltipType,
     GameUI,
@@ -87,19 +82,19 @@ export class Swift {
     declare public static gregorian: (date: GameDate) => GameDateComponents;
 
     declare public static openPlanet: (
-        request: PlanetReportRequest
+        request: URLSearchParams
     ) => Promise<PlanetReport>;
     declare public static openInfrastructure: (
-        request: InfrastructureReportRequest
+        request: URLSearchParams
     ) => Promise<InfrastructureReport>;
     declare public static openProduction: (
-        request: ProductionReportRequest
+        request: URLSearchParams
     ) => Promise<ProductionReport>;
     declare public static openPopulation: (
-        request: PopulationReportRequest
+        request: URLSearchParams
     ) => Promise<PopulationReport>;
     declare public static openTrade: (
-        request: TradeReportRequest
+        request: URLSearchParams
     ) => Promise<TradeReport>;
     declare public static closeScreen: () => Promise<void>;
 

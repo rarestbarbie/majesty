@@ -44,12 +44,7 @@ export class TradeOverview extends ScreenContent {
     }
 
     public override async open(parameters: URLSearchParams): Promise<void> {
-        let state: TradeReport = await Swift.openTrade(
-            {
-                subject: parameters.get('id') ?? undefined,
-                filter: parameters.get('filter') ?? undefined,
-            }
-        );
+        let state: TradeReport = await Swift.openTrade(parameters);
 
         if (this.dom === undefined) {
             this.dom = {

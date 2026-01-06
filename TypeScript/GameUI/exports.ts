@@ -28,7 +28,6 @@ export * from './Buildings/BuildingDetailsTab.js';
 export * from './Buildings/BuildingTableEntry.js';
 export * from './Buildings/BuildingTableRow.js';
 export * from './Buildings/InfrastructureOverview.js';
-export * from './Buildings/InfrastructureReportRequest.js';
 export * from './Buildings/InfrastructureReport.js';
 
 export * from './Factories/FactoryDetails.js';
@@ -38,7 +37,6 @@ export * from './Factories/FactoryTableRow.js';
 export * from './Factories/FactoryWorkers.js';
 export * from './Factories/FactoryWorkersCell.js';
 export * from './Factories/ProductionOverview.js';
-export * from './Factories/ProductionReportRequest.js';
 export * from './Factories/ProductionReport.js';
 export * from './PersistentOverviewType.js';
 export * from './PersistentReport.js';
@@ -49,7 +47,6 @@ export * from './Pops/PopDetailsTab.js';
 export * from './Pops/PopIcon.js';
 export * from './Pops/PopTableEntry.js';
 export * from './Pops/PopTableRow.js';
-export * from './Pops/PopulationReportRequest.js';
 export * from './Pops/PopulationReport.js';
 export * from './Pops/PopulationOverview.js';
 
@@ -67,7 +64,6 @@ export * from './Markets/MarketFilter.js';
 export * from './Markets/MarketFilterLabel.js';
 export * from './Markets/MarketTableEntry.js';
 export * from './Markets/MarketTableRow.js';
-export * from './Markets/TradeReportRequest.js';
 export * from './Markets/TradeReport.js';
 export * from './Markets/TradeOverview.js';
 
@@ -87,7 +83,6 @@ export * from './Planets/PlanetDetailsTab.js';
 export * from './Planets/PlanetFilter.js';
 export * from './Planets/PlanetFilterLabel.js';
 export * from './Planets/PlanetMapTileState.js';
-export * from './Planets/PlanetReportRequest.js';
 export * from './Planets/PlanetReport.js';
 export * from './Planets/PlanetOverview.js';
 

@@ -66,15 +66,7 @@ export class ProductionOverview extends ScreenContent {
     }
 
     public override async open(parameters: URLSearchParams): Promise<void> {
-        const factory: string | null = parameters.get('id');
-        const state: ProductionReport = await Swift.openProduction(
-            {
-                subject: factory ? parseInt(factory) as GameID ?? undefined : undefined,
-                details: parameters.get('details') as FactoryDetailsTab ?? undefined,
-                detailsTier: parameters.get('detailsTier') ?? undefined,
-                filter: parameters.get('filter') ?? undefined
-            }
-        );
+        const state: ProductionReport = await Swift.openProduction(parameters);
 
         this.inventory.clear();
 

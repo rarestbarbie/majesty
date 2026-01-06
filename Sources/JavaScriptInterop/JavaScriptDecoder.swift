@@ -48,7 +48,11 @@ extension JavaScriptDecoder {
     @inlinable public func values<Value>(
         as _: Value.Type
     ) throws -> [ObjectKey: Value] where Value: LoadableFromJSValue {
-        try self.values(storage: [ObjectKey: Value].init(minimumCapacity:)) { $0[$1] = $2 }
+        try self.values {
+            [ObjectKey: Value].init(minimumCapacity: $0)
+        } combine: {
+            $0[$1] = $2
+        }
     }
 
     @inlinable public func values<T, Value>(

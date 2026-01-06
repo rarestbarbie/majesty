@@ -66,15 +66,7 @@ export class InfrastructureOverview extends ScreenContent {
     }
 
     public override async open(parameters: URLSearchParams): Promise<void> {
-        const building: string | null = parameters.get('id');
-        const state: InfrastructureReport = await Swift.openInfrastructure(
-            {
-                subject: building ? parseInt(building) as GameID ?? undefined : undefined,
-                details: parameters.get('details') as BuildingDetailsTab ?? undefined,
-                detailsTier: parameters.get('detailsTier') ?? undefined,
-                filter: parameters.get('filter') ?? undefined
-            }
-        );
+        const state: InfrastructureReport = await Swift.openInfrastructure(parameters);
 
         this.inventory.clear();
 
