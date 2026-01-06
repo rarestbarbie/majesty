@@ -5,5 +5,6 @@ export interface MinimapState {
     id: GameID;
     name: string;
     grid: PlanetMapTileState[];
+    layers: string[];
     layer: string;
 }

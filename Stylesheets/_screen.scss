@@ -85,22 +85,56 @@
                 justify-content: space-around;
             }
 
-            > div.hex-grid {
-                width: 32rem;
-                margin-left: auto;
-                margin-right: auto;
+            > div.panorama {
+                position: relative;
 
-                svg {
-                    g.cells {
-                        pointer-events: none;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+
+                > nav {
+                    position: absolute;
+                    left: 0;
+
+                    ul {
+                        list-style: none;
+                        margin: 0;
+
+                        display: flex;
+                        flex-direction: column;
+
+                        > li.selected {
+                            background-color: rgba(255, 255, 255, 0.1);
+                        }
+                        > li {
+                            border-radius: 0.25rem;
+
+                            a {
+                                display: block;
+                                padding: 0.25rem 0.5rem;
+                            }
+                            a::before {
+                                content: var(--text-icon, '?');
+                            }
+                        }
                     }
-                    g.lines {
-                        path {
-                            fill: transparent;
+                }
 
-                            &:hover {
-                                stroke: red;
-                                stroke-width: 0.06px;
+                div.hex-grid {
+                    width: 32rem;
+
+                    svg {
+                        g.cells {
+                            pointer-events: none;
+                        }
+                        g.lines {
+                            path {
+                                fill: transparent;
+
+                                &:hover {
+                                    stroke: red;
+                                    stroke-width: 0.06px;
+                                }
                             }
                         }
                     }

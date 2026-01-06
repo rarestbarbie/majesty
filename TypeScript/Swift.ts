@@ -98,10 +98,8 @@ export class Swift {
     ) => Promise<TradeReport>;
     declare public static closeScreen: () => Promise<void>;
 
-    declare public static minimapTile: (id: string) => Promise<NavigatorState>;
     declare public static minimap: (
-        planet: GameID,
-        layer: string | null,
+        request: URLSearchParams
     ) => Promise<NavigatorState>;
     declare public static view: (index: number, system: GameID) => Promise<CelestialViewState>;
 

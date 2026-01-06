@@ -103,19 +103,9 @@ extension GameUI.Model {
     }
 
     public func minimap(
-        planet: PlanetID,
-        layer: PlanetMapLayer?,
+        _ request: NavigatorRequest
     ) async -> Navigator {
-        self.ui.navigator.select(planet: planet, layer: layer)
-        self.cache { self.ui.navigator.update(in: $0) }
-        self.publish()
-        return self.ui.navigator
-    }
-
-    public func minimapTile(
-        _ id: Address
-    ) async -> Navigator {
-        self.ui.navigator.select(detail: id)
+        self.ui.navigator.select(request: request)
         self.cache { self.ui.navigator.update(in: $0) }
         self.publish()
         return self.ui.navigator

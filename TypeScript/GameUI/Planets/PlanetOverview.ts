@@ -1,39 +1,42 @@
 import {
     FilterList,
     FilterTabs,
+    StaticList,
     UpdateText,
 } from '../../DOM/exports.js';
 import {
     ScreenContent,
     HexGrid,
-    MinimapLayer,
     PlanetReport,
     PlanetFilter,
     PlanetFilterLabel,
+    PlanetMapLayerSelector,
     ScreenType,
 } from '../exports.js';
 import { Swift } from '../../Swift.js';
-import { GameID } from '../../GameEngine/exports.js';
 
 export class PlanetOverview extends ScreenContent {
     private readonly filters: FilterList<PlanetFilter, string>[];
+    private readonly layers: StaticList<PlanetMapLayerSelector, string>;
     private readonly grid: HexGrid;
 
+    private layerShown?: string;
     private dom?: {
         readonly index: FilterTabs;
         readonly panel: HTMLDivElement;
         readonly header: HTMLElement;
+        readonly layers: HTMLElement;
         readonly titleUpper: HTMLHeadingElement;
         readonly titleLower: HTMLHeadingElement;
         readonly stats: HTMLDivElement;
-        readonly nav: HTMLElement;
     };
 
     constructor() {
         super();
-        this.filters = [
-            new FilterList<PlanetFilter, string>('🪐'),
-        ];
+        this.filters = [new FilterList<PlanetFilter, string>('🪐')];
+        this.layers = new StaticList<PlanetMapLayerSelector, string>(
+            document.createElement('ul')
+        );
         this.grid = new HexGrid();
     }
 
@@ -45,25 +48,30 @@ export class PlanetOverview extends ScreenContent {
                 index: new FilterTabs(this.filters),
                 panel: document.createElement('div'),
                 header: document.createElement('heading'),
+                layers: document.createElement('nav'),
                 titleUpper: document.createElement('h3'),
                 titleLower: document.createElement('h3'),
                 stats: document.createElement('div'),
-                nav: document.createElement('nav'),
             };
 
+            const panorama: HTMLElement = document.createElement('div');
+            panorama.classList.add('panorama');
+            panorama.appendChild(this.dom.layers);
+            panorama.appendChild(this.grid.node);
+
             this.dom.header.appendChild(this.dom.titleUpper);
+            this.dom.layers.appendChild(this.layers.node);
 
             this.dom.panel.appendChild(this.dom.header);
-            this.dom.panel.appendChild(this.grid.node);
+            this.dom.panel.appendChild(panorama);
             this.dom.panel.appendChild(this.dom.titleLower);
-            this.dom.panel.appendChild(this.dom.nav);
             this.dom.panel.appendChild(this.dom.stats);
             this.dom.panel.classList.add('panel');
 
             this.dom.stats.classList.add('stats');
+
         } else {
             this.dom.stats.replaceChildren();
-            this.dom.nav.replaceChildren();
         }
 
         this.dom.index.tabs[state.filterlist].checked = true;
@@ -110,11 +118,20 @@ export class PlanetOverview extends ScreenContent {
         }
 
         UpdateText(this.dom.titleUpper, state.details.name ?? '');
+        if (this.layerShown !== state.details.open) {
+            this.layerShown = state.details.open;
+            this.grid.switch();
+        }
         this.grid.update(
             state.entries,
             state.details.open,
-            (id: string) => `#screen=Planet&id=${id}`
+            (id: string) => `#screen=${ScreenType.Planet}&id=${id}`
         );
 
+        this.layers.allocate(
+            state.layers,
+            (layer: string) => new PlanetMapLayerSelector(layer, ScreenType.Planet),
+            state.details.open
+        );
     }
 }

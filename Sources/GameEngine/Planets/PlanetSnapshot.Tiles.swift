@@ -10,6 +10,40 @@ extension PlanetSnapshot {
     }
 }
 extension PlanetSnapshot.Tiles {
+    func color(layer: PlanetMapLayer) -> [PlanetMapTile] {
+        switch layer {
+        case .Terrain:
+            return self.color { $0.terrain.color }
+
+        case .Population:
+            let scale: Double = .init(
+                self.reduce(initial: 0) { max($0, $2.pops.free.total) }
+            )
+            return self.color {
+                scale > 0 ? Double.init($0.pops.free.total) / scale : 0
+            }
+
+        case .AverageMilitancy:
+            let scale: Double = .init(
+                self.reduce(initial: 0) { max($0, $2.pops.free.total) }
+            )
+            return self.color {
+                let (value, population): (Double, of: Double) = $0.pops.free.mil
+                return (0.1 * value, population / scale)
+            }
+
+        case .AverageConsciousness:
+            let scale: Double = .init(
+                self.reduce(initial: 0) { max($0, $2.pops.free.total) }
+            )
+            return self.color {
+                let (value, population): (Double, of: Double) = $0.pops.free.con
+                return (0.1 * value, population / scale)
+            }
+        }
+    }
+}
+extension PlanetSnapshot.Tiles {
     func color(_ color: (PlanetGrid.TileSnapshot) -> Color) -> [PlanetMapTile] {
         self.color { (color($0), nil, nil, nil) }
     }
