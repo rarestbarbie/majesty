@@ -4,7 +4,7 @@ import JavaScriptKit
 import JavaScriptInterop
 
 public struct TradeReport: Sendable {
-    private var selection: PersistentSelection<Filters, Void>
+    private var selection: PersistentLayeredSelection<Filters, Void>
 
     private var filters: ([MarketFilterLabel], [MarketFilterLabel])
     private var markets: [MarketTableEntry]

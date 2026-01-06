@@ -11,7 +11,7 @@ struct FactoryDetails {
 
     private var name: String?
 
-    init(id: FactoryID, focus: InventoryBreakdown<FactoryDetailsTab>.Focus) {
+    init(id: FactoryID, focus: LegalEntityFocus<FactoryDetailsTab>) {
         self.id = id
         self.open = focus.tab
 
@@ -22,7 +22,7 @@ struct FactoryDetails {
     }
 }
 extension FactoryDetails: PersistentReportDetails {
-    mutating func refocus(on focus: InventoryBreakdown<FactoryDetailsTab>.Focus) {
+    mutating func refocus(on focus: LegalEntityFocus<FactoryDetailsTab>) {
         self.open = focus.tab
         self.inventory.focus = focus.needs
     }

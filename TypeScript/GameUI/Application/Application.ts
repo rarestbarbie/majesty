@@ -19,7 +19,6 @@ import {
     Minimap,
     NavigatorTile,
     NavigatorState,
-    MinimapLayer,
 } from '../exports.js';
 import { Swift } from '../../Swift.js';
 import { Socket } from "socket.io-client";
@@ -41,6 +40,7 @@ export class Application {
         infrastructure: HTMLElement;
         population: HTMLElement;
         budget: HTMLElement;
+        planet: HTMLElement;
         trade: HTMLElement;
     };
     private readonly main: HTMLElement;
@@ -55,11 +55,11 @@ export class Application {
     public readonly renderer: WebGLRenderer;
     public readonly sprites: Texture;
 
-    private static _tab(type: ScreenType, id: string): HTMLElement {
+    private static _tab(type: ScreenType, name: string, id: string): HTMLElement {
         const tab: HTMLAnchorElement = document.createElement('a');
-        const name: HTMLElement = document.createElement('div');
-        name.innerText = type;
-        tab.appendChild(name);
+        const label: HTMLElement = document.createElement('div');
+        label.innerText = name ?? type;
+        tab.appendChild(label);
         tab.href = `#screen=${type}`
         tab.id = id;
         return tab;
@@ -82,11 +82,12 @@ export class Application {
         this.minimap = new Minimap();
         this.screen = new Screen();
         this.tabs = {
-            production: Application._tab(ScreenType.Production, 'production-tab'),
-            infrastructure: Application._tab(ScreenType.Infrastructure, 'infrastructure-tab'),
-            population: Application._tab(ScreenType.Population, 'population-tab'),
-            budget: Application._tab(ScreenType.Budget, 'budget-tab'),
-            trade: Application._tab(ScreenType.Trade, 'trade-tab')
+            production: Application._tab(ScreenType.Production, 'Production', 'production-tab'),
+            infrastructure: Application._tab(ScreenType.Infrastructure, 'Infrastructure', 'infrastructure-tab'),
+            population: Application._tab(ScreenType.Population, 'Population', 'population-tab'),
+            budget: Application._tab(ScreenType.Budget, 'Budget', 'budget-tab'),
+            planet: Application._tab(ScreenType.Planet, 'Planets', 'planets-tab'),
+            trade: Application._tab(ScreenType.Trade, 'Trade', 'trade-tab')
         };
 
         this.main = document.createElement('main');
@@ -107,6 +108,7 @@ export class Application {
         header.appendChild(this.tabs.infrastructure);
         header.appendChild(this.tabs.population);
         header.appendChild(this.tabs.budget);
+        header.appendChild(this.tabs.planet);
         header.appendChild(this.tabs.trade);
 
         const devtools: HTMLButtonElement = document.createElement('button');
@@ -162,9 +164,6 @@ export class Application {
         const screen: string | null = action.get('screen');
         if (screen !== null) {
             switch (screen) {
-            case ScreenType.Planet:
-                await this.screen.open(ScreenType.Planet, action);
-                break;
             case ScreenType.Infrastructure:
                 await this.screen.open(ScreenType.Infrastructure, action);
                 break;
@@ -177,6 +176,9 @@ export class Application {
             case ScreenType.Budget:
                 await this.screen.open(ScreenType.Budget, action);
                 break;
+            case ScreenType.Planet:
+                await this.screen.open(ScreenType.Planet, action);
+                break;
             case ScreenType.Trade:
                 await this.screen.open(ScreenType.Trade, action);
                 break;
@@ -188,13 +190,23 @@ export class Application {
             return;
         }
 
-        const planet: GameID | null = parseInt(action.get('planet') ?? '', 10) as GameID | null;
-        if (planet) {
-            await this.focus(
-                planet,
-                action.get('layer') as MinimapLayer | null,
-                action.get('cell'),
-            );
+        const planet: string | null = action.get('planet');
+        if (planet !== null) {
+            const id: GameID | null = parseInt(planet, 10) as GameID | null;
+            const layer: string | null = action.get('layer');
+
+            if (id === null) {
+                console.error(`Invalid planet ID: ${planet}`);
+                return;
+            }
+
+            await this.focus(id, layer);
+            return;
+        }
+
+        const cell: string | null = action.get('cell');
+        if (cell !== null) {
+            await this.focusTile(cell);
             return;
         }
     }
@@ -214,6 +226,11 @@ export class Application {
         }
     };
 
+    private async updateMinimap(state: NavigatorState): Promise<void> {
+        this.tile.update(state.tile);
+        this.minimap.update(state);
+        await this.devtools.refresh();
+    }
     public update(state: GameUI) {
         this.clock.update(state);
         this.tile.update(state.navigator?.tile);
@@ -238,21 +255,16 @@ export class Application {
         }
     }
 
-    public async focus(
-        planet: GameID,
-        layer: MinimapLayer | null,
-        cell: string | null
-    ): Promise<void> {
-        const state: NavigatorState = await Swift.minimap(planet, layer, cell);
-
-        this.tile.update(state?.tile);
-        this.minimap.update(state);
-
-        await this.devtools.refresh();
-
+    public async focus(planet: GameID, layer: string | null): Promise<void> {
+        const state: NavigatorState = await Swift.minimap(planet, layer);
+        await this.updateMinimap(state);
         for (const view of this.views) {
             view?.select(planet);
         }
+    }
+    public async focusTile(id: string): Promise<void> {
+        const state: NavigatorState = await Swift.minimapTile(id);
+        await this.updateMinimap(state);
     }
 
     public async view(index: number, system: GameID | null) {

@@ -6,12 +6,12 @@ import JavaScriptKit
 
 struct Minimap: Sendable {
     let id: PlanetID
-    let layer: MinimapLayer
+    let layer: PlanetMapLayer
 
     var name: String
     var grid: [PlanetMapTile]
 
-    init(id: PlanetID, layer: MinimapLayer) {
+    init(id: PlanetID, layer: PlanetMapLayer) {
         self.id = id
         self.layer = layer
         self.name = ""

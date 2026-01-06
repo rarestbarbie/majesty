@@ -3,39 +3,38 @@ import JavaScriptKit
 import JavaScriptInterop
 
 struct PlanetDetails {
-    let id: PlanetID
-    var open: PlanetDetailsTab
-    var grid: PlanetMap
+    let id: Address
+    var open: PlanetMapLayer
 
-    init(id: PlanetID, open: PlanetDetailsTab) {
+    private var tile: PlanetGrid.TileSnapshot?
+
+    init(id: Address, focus: Focus) {
         self.id = id
-        self.open = open
-        self.grid = .init()
+        self.open = focus.layer
+        self.tile = nil
+    }
+}
+extension PlanetDetails: PersistentReportDetails {
+    mutating func refocus(on focus: Focus) {
+        self.open = focus.layer
     }
 }
 extension PlanetDetails {
-    mutating func update(in cache: borrowing GameUI.Cache) {
-        guard
-        let planet: PlanetSnapshot = cache.planets[self.id] else {
-            return
-        }
-
-        switch self.open {
-        case .Grid: self.grid.update(from: planet, in: cache)
-        }
+    mutating func update(from tile: PlanetGrid.TileSnapshot, in _: borrowing GameUI.Cache) {
+        self.tile = tile
     }
 }
 extension PlanetDetails: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
         case id
         case open
+
+        case name
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
-
-        switch self.open {
-        case .Grid: js[.open] = self.grid
-        }
+        js[.open] = self.open
+        js[.name] = self.tile?.name
     }
 }

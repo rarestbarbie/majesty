@@ -1,7 +1,5 @@
-import OrderedCollections
-
-@dynamicMemberLookup struct PersistentSelection<Filters, DetailsFocus>
-    where Filters: PersistentSelectionFilter {
+@dynamicMemberLookup struct PersistentLayeredSelection<Filters, DetailsFocus>
+    where Filters: PersistentLayeredSelectionFilter {
     private(set) var details: DetailsFocus
     private(set) var filters: Filters
     private(set) var cursors: [Filters: Filters.Subject.ID]
@@ -14,9 +12,9 @@ import OrderedCollections
         self.cursor = nil
     }
 }
-extension PersistentSelection: Sendable
+extension PersistentLayeredSelection: Sendable
     where DetailsFocus: Sendable, Filters.Subject.ID: Sendable, Filters: Sendable {}
-extension PersistentSelection {
+extension PersistentLayeredSelection {
     subscript<T>(dynamicMember keyPath: WritableKeyPath<DetailsFocus, T>) -> T? {
         get {
             self.details[keyPath: keyPath]
@@ -29,7 +27,13 @@ extension PersistentSelection {
         }
     }
 }
-extension PersistentSelection {
+extension PersistentLayeredSelection {
+    /// Restore cursor state
+    private mutating func restore() {
+        self.cursor = self.cursors[self.filters] ?? self.cursor
+    }
+}
+extension PersistentLayeredSelection {
     /// Sets the currently selected item and records it for stickiness.
     mutating func select(_ selected: Filters.Subject.ID?, filter: Filters.Layer?) {
         if  let selected: Filters.Subject.ID,
@@ -43,12 +47,6 @@ extension PersistentSelection {
         }
     }
 
-    /// Restore cursor state
-    private mutating func restore() {
-        self.cursor = self.cursors[self.filters] ?? self.cursor
-    }
-}
-extension PersistentSelection {
     mutating func rebuild<Entry, Details>(
         filtering objects: some RandomAccessMapping<Filters.Subject.ID, Filters.Subject>,
         entries: inout [Entry],

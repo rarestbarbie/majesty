@@ -134,7 +134,8 @@ extension GameAPI {
         self[.openPopulation] = { try await Self.ui?.openPopulation($0) }
         self[.openTrade] = { try await Self.ui?.openTrade($0) }
         self[.closeScreen] = { await Self.ui?.open(nil) }
-        self[.minimap] = { await Self.ui?.minimap(planet: $0, layer: $1, cell: $2) }
+        self[.minimap] = { await Self.ui?.minimap(planet: $0, layer: $1) }
+        self[.minimapTile] = { await Self.ui?.minimapTile($0) }
         self[.view] = { try await Self.ui?.view($0, to: $1) }
 
         self[.gregorian] = GameDateComponents.init(_:)

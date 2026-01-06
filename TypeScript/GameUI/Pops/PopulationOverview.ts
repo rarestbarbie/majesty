@@ -13,7 +13,7 @@ import {
     InventoryBreakdown,
     InventoryCharts,
     LegalEntityFilterLabel,
-    MarketFilter,
+    LegalEntityFilter,
     OwnershipBreakdown,
     PopulationReport,
     PopDetailsTab,
@@ -25,7 +25,7 @@ import {
 } from '../exports.js';
 
 export class PopulationOverview extends ScreenContent {
-    private regions: FilterList<MarketFilter, string>[];
+    private regions: FilterList<LegalEntityFilter, string>[];
     private sexes: StaticList<GenderFilter, string>;
 
     private readonly inventoryCharts: InventoryCharts;
@@ -56,7 +56,7 @@ export class PopulationOverview extends ScreenContent {
         super();
 
         this.regions = [
-            new FilterList<MarketFilter, string>('🌐'),
+            new FilterList<LegalEntityFilter, string>('🌐'),
         ];
         this.sexes = new StaticList<GenderFilter, string>(document.createElement('ul'));
         this.pops = new Table<PopTableRow, GameID>('Pops');
@@ -193,12 +193,8 @@ export class PopulationOverview extends ScreenContent {
         for (let i: number = 0; i < this.dom.index.tabs.length; i++) {
             this.regions[i].update(
                 state.filterlists[i],
-                (label: LegalEntityFilterLabel) => new MarketFilter(
-                    {
-                        id: label.id,
-                        name: label.name,
-                        icon: '',
-                    },
+                (label: LegalEntityFilterLabel) => new LegalEntityFilter(
+                    label,
                     ScreenType.Population
                 ),
                 () => {},

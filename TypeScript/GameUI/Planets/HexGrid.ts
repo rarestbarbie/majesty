@@ -3,7 +3,6 @@ import {
     ContextMenuType,
     HexGridCell,
     HexGridCellBackground,
-    MinimapLayer,
     PlanetMapTileState,
     TooltipType,
 } from '../exports.js';
@@ -46,8 +45,7 @@ export class HexGrid {
 
     public update(
         tiles: PlanetMapTileState[],
-        layer: MinimapLayer,
-        prefix: any[],
+        layer: string,
         target: (id: string) => string | null = (_: string) => null,
         selected?: string,
         neighbors?: Map<string, number>,
@@ -72,7 +70,7 @@ export class HexGrid {
                     cell.node.setAttribute('href', href);
                 }
 
-                const path: string = JSON.stringify([...prefix, tile.id, layer]);
+                const path: string = JSON.stringify([tile.id, layer]);
 
                 cell.node.setAttribute('data-tooltip-type', TooltipType.PlanetCell);
                 cell.node.setAttribute('data-tooltip-arguments', path);

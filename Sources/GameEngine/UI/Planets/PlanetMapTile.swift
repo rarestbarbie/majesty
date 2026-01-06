@@ -1,11 +1,11 @@
 import Color
+import GameIDs
 import HexGrids
 import JavaScriptKit
 import JavaScriptInterop
-import VectorCharts
 
-@frozen @usableFromInline struct PlanetMapTile {
-    let id: HexCoordinate
+struct PlanetMapTile: Identifiable {
+    let id: Address
     let shape: (HexagonPath, HexagonPath?)
     let color: Color?
     let x: Double?
@@ -13,7 +13,7 @@ import VectorCharts
     let z: Double?
 }
 extension PlanetMapTile {
-    @frozen @usableFromInline enum ObjectKey: JSString, Sendable {
+    enum ObjectKey: JSString, Sendable {
         case id
         case d0
         case d1

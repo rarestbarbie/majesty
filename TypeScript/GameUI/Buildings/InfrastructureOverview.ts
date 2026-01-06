@@ -12,7 +12,7 @@ import {
     BuildingTableRow,
     BuildingDetailsTab,
     LegalEntityFilterLabel,
-    MarketFilter,
+    LegalEntityFilter,
     OwnershipBreakdown,
     InfrastructureReport,
     InventoryBreakdown,
@@ -22,7 +22,7 @@ import {
 } from '../exports.js';
 
 export class InfrastructureOverview extends ScreenContent {
-    private readonly filters: FilterList<MarketFilter, string>[];
+    private readonly filters: FilterList<LegalEntityFilter, string>[];
     private readonly buildings: StaticList<BuildingTableRow, GameID>;
 
     private readonly inventoryCharts: InventoryCharts;
@@ -50,7 +50,7 @@ export class InfrastructureOverview extends ScreenContent {
         super();
 
         this.filters = [
-            new FilterList<MarketFilter, string>('🌐'),
+            new FilterList<LegalEntityFilter, string>('🌐'),
         ];
 
         this.buildings = new StaticList<BuildingTableRow, GameID>(document.createElement('div'));
@@ -170,12 +170,8 @@ export class InfrastructureOverview extends ScreenContent {
         for (let i: number = 0; i < this.dom.index.tabs.length; i++) {
             this.filters[i].update(
                 state.filterlists[i],
-                (label: LegalEntityFilterLabel) => new MarketFilter(
-                    {
-                        id: label.id,
-                        name: label.name,
-                        icon: '',
-                    },
+                (label: LegalEntityFilterLabel) => new LegalEntityFilter(
+                    label,
                     ScreenType.Infrastructure
                 ),
                 () => {},

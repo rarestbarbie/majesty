@@ -6,7 +6,10 @@ import JavaScriptInterop
 import OrderedCollections
 
 public struct PopulationReport {
-    private var selection: PersistentSelection<Filters, InventoryBreakdown<PopDetailsTab>.Focus>
+    private var selection: PersistentLayeredSelection<
+        Filters,
+        LegalEntityFocus<PopDetailsTab>
+    >
 
     private var filters: ([FilterLabel], [Never])
     private var columns: (

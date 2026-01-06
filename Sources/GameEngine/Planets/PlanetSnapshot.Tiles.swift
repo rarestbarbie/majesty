@@ -69,7 +69,7 @@ extension PlanetSnapshot.Tiles {
 
             $0.append(
                 PlanetMapTile.init(
-                    id: $1,
+                    id: self.planet.state.id / $1,
                     shape: shape,
                     color: color,
                     x: x,

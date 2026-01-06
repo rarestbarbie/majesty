@@ -1,6 +1,6 @@
 import * as GameEngine from '../../GameEngine/exports.js';
 import { DiffableListElement } from '../../DOM/exports.js';
-import { MinimapLayer, PlanetMapTileState } from '../exports.js';
+import { PlanetMapTileState } from '../exports.js';
 
 export class HexGridCellBackground implements DiffableListElement<string> {
     public readonly id: string;
