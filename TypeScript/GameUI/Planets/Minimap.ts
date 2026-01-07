@@ -1,24 +1,36 @@
+import { StaticList } from '../../DOM/exports.js';
 import { GameID } from '../../GameEngine/exports.js';
-import { NavigatorState, HexGrid, MinimapState, MinimapLayer } from '../exports.js';
+import {
+    ActionType,
+    NavigatorState,
+    HexGrid,
+    MinimapState,
+    PlanetMapLayerSelector,
+} from '../exports.js';
 
 export class Minimap {
     readonly node: HTMLDivElement;
     private readonly name: HTMLElement;
     private readonly grid: HexGrid;
-    private readonly layers: HTMLElement;
+    private readonly layers: StaticList<PlanetMapLayerSelector, string>;
     private layerShown?: string;
     private id?: GameID;
 
     constructor() {
         this.name = document.createElement('header');
         this.grid = new HexGrid();
-        this.layers = document.createElement('nav');
+        this.layers = new StaticList<PlanetMapLayerSelector, string>(
+            document.createElement('ul')
+        );
+
+        const nav: HTMLElement = document.createElement('nav');
+        nav.appendChild(this.layers.node);
 
         this.node = document.createElement('div');
         this.node.id = 'minimap';
         this.node.appendChild(this.name);
         this.node.appendChild(this.grid.node);
-        this.node.appendChild(this.layers);
+        this.node.appendChild(nav);
     }
 
     public update(navigator: NavigatorState): void {
@@ -27,26 +39,8 @@ export class Minimap {
         }
 
         const minimap: MinimapState = navigator.minimap;
-        if (this.layerShown !== minimap.layer) {
-            this.layerShown = minimap.layer;
-            this.grid.switch();
-        }
 
         this.name.innerText = minimap.name;
-
-        const id: GameID = minimap.id;
-
-        if (this.id !== id) {
-            this.id = id;
-            this.grid.switch();
-            this.updateLayerControls(minimap.id, minimap.layer);
-        } else {
-            // Highlight the active layer
-            for (const child of this.layers.children) {
-                const link = child as HTMLAnchorElement;
-                link.classList.toggle('selected', link.dataset.layer === minimap.layer);
-            }
-        }
         // Tile ID is the cell ID with numeric prefix removed.
         // E.g. "399N1,1" -> "N1,1"
 
@@ -55,33 +49,22 @@ export class Minimap {
         //     ? new Map(navigator.tile._neighbors.map((id, index) => [id, index]))
         //     : undefined;
 
+        if (this.layerShown !== minimap.layer || this.id !== minimap.id) {
+            this.layerShown = minimap.layer;
+            this.id = minimap.id;
+            this.grid.switch();
+        }
         this.grid.update(
             minimap.grid,
             minimap.layer,
-            (cell: string) => `#cell=${cell}`,
+            (id: string) => `#action=${ActionType.Minimap}&planetTile=${id}`,
             navigator.tile?.id,
             // neighbors
         );
-    }
-
-    private updateLayerControls(planet: GameID, selected: string): void {
-        this.layers.replaceChildren(); // Clear existing icons
-
-        // TODO: stop hardcoding layers
-        const icons: Record<MinimapLayer, string> = {
-            [MinimapLayer.Terrain]: '🗺️',
-            [MinimapLayer.Population]: '🧑‍🤝‍🧑',
-            [MinimapLayer.AverageMilitancy]: '😠',
-            [MinimapLayer.AverageConsciousness]: '🤔',
-        };
-
-        for (const layer of Object.values(MinimapLayer)) {
-            const link: HTMLAnchorElement = document.createElement('a');
-            link.href = `#planet=${planet}&layer=${layer}`;
-            link.dataset.layer = layer;
-            link.textContent = icons[layer];
-            link.classList.toggle('selected', layer === selected);
-            this.layers.appendChild(link);
-        }
+        this.layers.allocate(
+            minimap.layers,
+            (layer: string) => new PlanetMapLayerSelector(layer),
+            minimap.layer
+        );
     }
 }

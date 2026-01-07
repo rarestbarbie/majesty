@@ -7,6 +7,7 @@ import { Persistence } from '../../DB/exports.js';
 import { GameID } from '../../GameEngine/exports.js';
 import { PlayerEvent, PlayerEventID } from '../../Multiplayer/exports.js';
 import {
+    ActionType,
     CelestialView,
     CelestialViewState,
     ContextMenuType,
@@ -159,28 +160,30 @@ export class Application {
     }
 
     public async navigate(): Promise<void> {
-        const action: URLSearchParams = new URLSearchParams(window.location.hash.substring(1));
+        const parameters: URLSearchParams = new URLSearchParams(
+            window.location.hash.substring(1)
+        );
 
-        const screen: string | null = action.get('screen');
+        const screen: string | null = parameters.get('screen');
         if (screen !== null) {
             switch (screen) {
             case ScreenType.Infrastructure:
-                await this.screen.open(ScreenType.Infrastructure, action);
+                await this.screen.open(ScreenType.Infrastructure, parameters);
                 break;
             case ScreenType.Production:
-                await this.screen.open(ScreenType.Production, action);
+                await this.screen.open(ScreenType.Production, parameters);
                 break;
             case ScreenType.Population:
-                await this.screen.open(ScreenType.Population, action);
+                await this.screen.open(ScreenType.Population, parameters);
                 break;
             case ScreenType.Budget:
-                await this.screen.open(ScreenType.Budget, action);
+                await this.screen.open(ScreenType.Budget, parameters);
                 break;
             case ScreenType.Planet:
-                await this.screen.open(ScreenType.Planet, action);
+                await this.screen.open(ScreenType.Planet, parameters);
                 break;
             case ScreenType.Trade:
-                await this.screen.open(ScreenType.Trade, action);
+                await this.screen.open(ScreenType.Trade, parameters);
                 break;
             case '_close':
                 await this.screen.close();
@@ -190,24 +193,11 @@ export class Application {
             return;
         }
 
-        const planet: string | null = action.get('planet');
-        if (planet !== null) {
-            const id: GameID | null = parseInt(planet, 10) as GameID | null;
-            const layer: string | null = action.get('layer');
-
-            if (id === null) {
-                console.error(`Invalid planet ID: ${planet}`);
-                return;
-            }
-
-            await this.focus(id, layer);
-            return;
-        }
-
-        const cell: string | null = action.get('cell');
-        if (cell !== null) {
-            await this.focusTile(cell);
-            return;
+        const action: string | null = parameters.get('action');
+        switch (action) {
+        case ActionType.Minimap:
+            await this.focus(parameters);
+            break;
         }
     }
 
@@ -226,11 +216,6 @@ export class Application {
         }
     };
 
-    private async updateMinimap(state: NavigatorState): Promise<void> {
-        this.tile.update(state.tile);
-        this.minimap.update(state);
-        await this.devtools.refresh();
-    }
     public update(state: GameUI) {
         this.clock.update(state);
         this.tile.update(state.navigator?.tile);
@@ -255,16 +240,20 @@ export class Application {
         }
     }
 
-    public async focus(planet: GameID, layer: string | null): Promise<void> {
-        const state: NavigatorState = await Swift.minimap(planet, layer);
-        await this.updateMinimap(state);
-        for (const view of this.views) {
-            view?.select(planet);
+    public async focus(request: URLSearchParams): Promise<void> {
+        const state: NavigatorState = await Swift.minimap(request);
+
+        this.tile.update(state.tile);
+        this.minimap.update(state);
+
+        if (state.minimap !== undefined) {
+            const selected: GameID = state.minimap.id;
+            for (const view of this.views) {
+                view?.select(selected);
+            }
         }
-    }
-    public async focusTile(id: string): Promise<void> {
-        const state: NavigatorState = await Swift.minimapTile(id);
-        await this.updateMinimap(state);
+
+        await this.devtools.refresh();
     }
 
     public async view(index: number, system: GameID | null) {

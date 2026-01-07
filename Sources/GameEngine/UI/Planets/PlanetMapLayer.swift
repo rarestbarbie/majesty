@@ -2,7 +2,7 @@ import Bijection
 import JavaScriptInterop
 import JavaScriptKit
 
-@frozen public enum PlanetMapLayer {
+@frozen public enum PlanetMapLayer: CaseIterable {
     case Terrain
     case Population
     case AverageMilitancy

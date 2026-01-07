@@ -56,7 +56,7 @@ extension PlanetReport: PersistentReport {
             return
         }
 
-        self.entries = tiles.color(\.terrain.color)
+        self.entries = tiles.color(layer: self.selection.layer)
         self.planet = cache.planets[id]
 
         self.selection.update(
@@ -79,6 +79,7 @@ extension PlanetReport {
         case filterlists
 
         case name
+        case layers
     }
 }
 extension PlanetReport: JavaScriptEncodable {
@@ -92,5 +93,6 @@ extension PlanetReport: JavaScriptEncodable {
         js[.filterlists] = [self.filters.0]
 
         js[.name] = self.planet?.state.name
+        js[.layers] = PlanetMapLayer.allCases
     }
 }

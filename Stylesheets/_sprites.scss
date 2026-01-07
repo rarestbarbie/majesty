@@ -229,3 +229,16 @@
         transparent 75%,
     );
 }
+
+[data-map-layer='Terrain'] {
+    --text-icon: '🌳';
+}
+[data-map-layer='Population'] {
+    --text-icon: '👥';
+}
+[data-map-layer='AverageMilitancy'] {
+    --text-icon: '💥';
+}
+[data-map-layer='AverageConsciousness'] {
+    --text-icon: '💭';
+}

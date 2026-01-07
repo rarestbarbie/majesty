@@ -15,6 +15,9 @@
 extension PersistentLayeredSelection: Sendable
     where DetailsFocus: Sendable, Filters.Subject.ID: Sendable, Filters: Sendable {}
 extension PersistentLayeredSelection {
+    subscript<T>(dynamicMember keyPath: KeyPath<DetailsFocus, T>) -> T {
+        self.details[keyPath: keyPath]
+    }
     subscript<T>(dynamicMember keyPath: WritableKeyPath<DetailsFocus, T>) -> T? {
         get {
             self.details[keyPath: keyPath]

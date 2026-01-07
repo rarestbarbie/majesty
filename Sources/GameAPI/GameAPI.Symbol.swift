@@ -31,7 +31,6 @@ extension GameAPI {
         case closeScreen
 
         case minimap
-        case minimapTile
         /// Open a celestial view and return its initial state.
         case view
 

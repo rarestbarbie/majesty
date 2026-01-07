@@ -15,6 +15,9 @@
 extension PersistentExclusiveSelection: Sendable
     where DetailsFocus: Sendable, Filter.Subject.ID: Sendable, Filter: Sendable {}
 extension PersistentExclusiveSelection {
+    subscript<T>(dynamicMember keyPath: KeyPath<DetailsFocus, T>) -> T {
+        self.details[keyPath: keyPath]
+    }
     subscript<T>(dynamicMember keyPath: WritableKeyPath<DetailsFocus, T>) -> T? {
         get {
             self.details[keyPath: keyPath]

@@ -171,7 +171,11 @@ export class CelestialView {
                 this.context.view(1, this.system === id ? null : id);
             }
 
-            this.context.focus(id, null, null);
+            const parameters: URLSearchParams = new URLSearchParams(
+                { planet: id.toString() }
+            );
+
+            this.context.focus(parameters);
         }
 
         // Always reset for the next interaction

@@ -29,11 +29,6 @@ export class StaticList<T extends DiffableListElement<ID>, ID> extends DiffableL
         );
     }
 
-    public boxes(type: string): void {
-        this.clear();
-        this.node.dataset['boxes'] = type;
-    }
-
     /// Reinitializes the list as a table with the given type and columns.
     /// All existing content will be removed.
     public table(type: string, columns: string[]): void {

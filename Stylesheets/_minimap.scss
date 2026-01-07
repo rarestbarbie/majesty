@@ -111,7 +111,38 @@ $gradients: (
         @include blur.background;
     }
 
+    nav {
+        position: absolute;
+        top: 2.5rem; // Position below the header
+        left: -2.5rem;
 
+        ul {
+            list-style: none;
+            margin: 0;
+            padding: 0;
+
+            display: flex;
+            flex-direction: column;
+
+            > li.selected {
+                background-color: rgba(255, 255, 255, 0.1);
+            }
+            > li {
+                border-radius: 0.25rem;
+
+                a {
+                    display: block;
+                    padding: 0.25rem 0.5rem;
+                }
+                a::before {
+                    content: var(--text-icon, '?');
+                }
+            }
+        }
+    }
+}
+
+div.hex-grid {
     svg {
         // height: 15.5rem;
 
@@ -192,32 +223,6 @@ $gradients: (
                 rgb(20, 20, 20),
                 var(--gradient-color) calc(sqrt(var(--value-y)) * 100%)
             );
-        }
-    }
-
-    nav {
-        position: absolute;
-        top: 2.5rem; // Position below the header
-        left: -2.5rem;
-        display: flex;
-        flex-direction: column;
-        gap: 0.5rem;
-
-        a {
-            font-size: 1.5rem;
-            padding: 0.25rem;
-            border-radius: 4px;
-            background-color: rgba(0, 0, 0, 0.3);
-            transition: background-color 0.2s ease-in-out;
-
-            &:hover {
-                background-color: rgba(255, 255, 255, 0.1);
-            }
-
-            &.selected {
-                background-color: rgba(255, 255, 255, 0.2);
-                box-shadow: inset 0 0 5px rgba(255, 255, 255, 0.5);
-            }
         }
     }
 }
