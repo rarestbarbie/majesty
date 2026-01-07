@@ -398,6 +398,9 @@ extension GameUI.Model {
                     try arguments[0].decode(),
                     try arguments[1].decode(),
                 )
+            case .TileGDP:
+                // TODO: Implement Tile GDP tooltip
+                return nil
             }
         }
     }

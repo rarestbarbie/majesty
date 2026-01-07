@@ -4,6 +4,8 @@ final class RegionalProperties: Sendable {
     let id: Address
     let name: String
     let pops: PopulationStats
+    /// TODO: group with other economic stats
+    let _gdp: Double
 
     let occupiedBy: CountryID
     let governedBy: CountryID
@@ -14,6 +16,7 @@ final class RegionalProperties: Sendable {
         id: Address,
         name: String,
         pops: PopulationStats,
+        _gdp: Double,
         occupiedBy: CountryID,
         governedBy: CountryID,
         suzerain: CountryID?,
@@ -22,6 +25,7 @@ final class RegionalProperties: Sendable {
         self.id = id
         self.name = name
         self.pops = pops
+        self._gdp = _gdp
         self.occupiedBy = occupiedBy
         self.governedBy = governedBy
         self.suzerain = suzerain

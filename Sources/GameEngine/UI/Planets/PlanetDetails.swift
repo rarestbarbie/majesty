@@ -1,4 +1,6 @@
+import D
 import GameIDs
+import GameUI
 import JavaScriptKit
 import JavaScriptInterop
 
@@ -7,11 +9,13 @@ struct PlanetDetails {
     var open: PlanetMapLayer
 
     private var tile: PlanetGrid.TileSnapshot?
+    private var terms: [Term]
 
     init(id: Address, focus: Focus) {
         self.id = id
         self.open = focus.layer
         self.tile = nil
+        self.terms = []
     }
 }
 extension PlanetDetails: PersistentReportDetails {
@@ -22,6 +26,9 @@ extension PlanetDetails: PersistentReportDetails {
 extension PlanetDetails {
     mutating func update(from tile: PlanetGrid.TileSnapshot, in _: borrowing GameUI.Cache) {
         self.tile = tile
+        self.terms = Term.list {
+            $0[.gdp, (+), tooltip: .TileGDP] = tile.properties?._gdp[..2]
+        }
     }
 }
 extension PlanetDetails: JavaScriptEncodable {
@@ -30,11 +37,13 @@ extension PlanetDetails: JavaScriptEncodable {
         case open
 
         case name
+        case terms
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.open] = self.open
         js[.name] = self.tile?.name
+        js[.terms] = self.terms
     }
 }

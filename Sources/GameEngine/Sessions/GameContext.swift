@@ -240,7 +240,7 @@ extension GameContext {
             self.planets[i].startIndexCount()
         }
 
-        var economy: EconomicLedger = .init()
+        var economy: EconomicAggregator = .init()
 
         for i: Int in self.buildings.indices {
             self.buildings[i].startIndexCount()
@@ -334,6 +334,13 @@ extension GameContext {
 
             #assert(counted != nil, "Mine \(mine.id) has no home tile!!!")
         }
+
+        self.count(
+            aggregating: economy.aggregate(
+                localMarkets: world.localMarkets,
+                worldMarkets: world.worldMarkets,
+            )
+        )
     }
 }
 extension GameContext {
@@ -474,6 +481,14 @@ extension GameContext {
             case .pop(let id):
                 self.pops[modifying: id].addPosition(asset: asset, value: stake.shares)
             }
+        }
+    }
+    private mutating func count(aggregating economy: EconomicLedger) {
+        let gdp: [Address: Double] = economy.produced.reduce(into: [:]) {
+            $0[$1.key.location, default: 0] += $1.value.value
+        }
+        for (id, gdp): (Address, Double) in gdp {
+            self.planets[id]?.update(gdp: gdp)
         }
     }
     private mutating func report(

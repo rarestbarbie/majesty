@@ -1,7 +1,8 @@
-import { GameID } from '../../GameEngine/exports.js';
+import { TermState } from '../../DOM/exports.js';
 
 export interface PlanetDetails {
-    readonly id: GameID;
+    readonly id: string;
     readonly open: string;
     readonly name?: string;
+    readonly terms: TermState[];
 }

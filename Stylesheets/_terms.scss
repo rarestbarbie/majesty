@@ -26,7 +26,8 @@ ul.terms {
             }
         }
         &[data-term-id^='e'],
-        &[data-term-id^='b'] {
+        &[data-term-id^='b'],
+        &[data-term-id^='t'] {
             > span.label::before {
                 content: var(--term-icon);
             }
@@ -50,6 +51,9 @@ ul.terms {
                 // filter: grayscale(100%) brightness(50%);
                 filter: grayscale(50%) hue-rotate(180deg) brightness(50%);
             }
+        }
+        &[data-term-id='tD'] {
+            --term-icon: '⛁';
         }
     }
 }
