@@ -2,6 +2,8 @@ import {
     FilterList,
     FilterTabs,
     StaticList,
+    Term,
+    TermState,
     UpdateText,
 } from '../../DOM/exports.js';
 import {
@@ -19,6 +21,8 @@ export class PlanetOverview extends ScreenContent {
     private readonly filters: FilterList<PlanetFilter, string>[];
     private readonly layers: StaticList<PlanetMapLayerSelector, string>;
     private readonly grid: HexGrid;
+
+    private readonly terms: StaticList<Term, string>;
 
     private layerShown?: string;
     private dom?: {
@@ -38,6 +42,9 @@ export class PlanetOverview extends ScreenContent {
             document.createElement('ul')
         );
         this.grid = new HexGrid();
+
+        this.terms = new StaticList<Term, string>(document.createElement('ul'));
+        this.terms.node.classList.add('terms');
     }
 
     public override async open(parameters: URLSearchParams): Promise<void> {
@@ -73,6 +80,8 @@ export class PlanetOverview extends ScreenContent {
         } else {
             this.dom.stats.replaceChildren();
         }
+
+        this.dom.stats.appendChild(this.terms.node);
 
         this.dom.index.tabs[state.filterlist].checked = true;
         this.update(state);
@@ -122,16 +131,24 @@ export class PlanetOverview extends ScreenContent {
             this.layerShown = state.details.open;
             this.grid.switch();
         }
+        const id: string = state.details.id;
         this.grid.update(
             state.entries,
             state.details.open,
-            (id: string) => `#screen=${ScreenType.Planet}&id=${id}`
+            (id: string) => `#screen=${ScreenType.Planet}&id=${id}`,
+            id
         );
 
         this.layers.allocate(
             state.layers,
             (layer: string) => new PlanetMapLayerSelector(layer, ScreenType.Planet),
             state.details.open
+        );
+
+        this.terms.update(
+            state.details.terms,
+            (term: TermState) => new Term(term),
+            (term: TermState, item: Term) => item.update(term, [id]),
         );
     }
 }

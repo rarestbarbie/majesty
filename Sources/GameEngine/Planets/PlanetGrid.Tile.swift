@@ -137,6 +137,10 @@ extension PlanetGrid.Tile {
         self.minesAlreadyPresent[mine.type] = (mine.z.size, mine.z.yieldRank)
     }
 
+    mutating func update(gdp: Double) {
+        self.stats.gdp = gdp
+    }
+
     mutating func afterIndexCount(world: borrowing GameWorld) {
         guard let region: RegionalAuthority = self.authority else {
             return
@@ -146,6 +150,7 @@ extension PlanetGrid.Tile {
             id: self.id,
             name: self.name ?? "",
             pops: self.stats.pops,
+            _gdp: self.stats.gdp,
             occupiedBy: region.occupiedBy,
             governedBy: region.governedBy,
             suzerain: region.suzerain,
