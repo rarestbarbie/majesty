@@ -18,18 +18,53 @@ struct EconomicLedger {
     }
 }
 extension EconomicLedger {
-    mutating func count(
-        output: ResourceOutputs,
-        equity: Equity<LEI>.Statistics,
+    private mutating func countRegional(
+        output: ResourceOutput,
         region: RegionalAuthority,
+        tradeable: Bool
     ) {
-        for (tradeable, output): (tradeable: Bool, ResourceOutput) in output.joined {
-            let regionalKey: Regional = .init(
+        let regionalKey: Regional = .init(
                 resource: output.id,
                 location: region.id
             )
-            let currency: CurrencyID? = tradeable ? region.country.currency.id : nil
-            self.produced[regionalKey, default: (0, currency)].units += output.units.added
+        let currency: CurrencyID? = tradeable ? region.country.currency.id : nil
+        self.produced[regionalKey, default: (0, currency)].units += output.units.added
+    }
+    private mutating func countNational(
+        output: ResourceOutput,
+        region: RegionalAuthority,
+        tradeable: Bool,
+        country: CountryID,
+        profile: PopType
+    ) {
+        let produced: Double = .init(output.units.added)
+        let location: Address? = tradeable ? nil : region.id
+
+        let cultureKey: National<CultureID> = .init(
+            resource: output.id,
+            location: location,
+            country: country,
+            owner: profile.race
+        )
+        self.cultural[cultureKey, default: 0] += produced
+        let genderKey: National<Gender> = .init(
+            resource: output.id,
+            location: location,
+            country: country,
+            owner: profile.gender
+        )
+        self.gendered[genderKey, default: 0] += produced
+    }
+}
+extension EconomicLedger {
+    mutating func count(
+        output: ResourceOutputs,
+        region: RegionalAuthority,
+        equity: Equity<LEI>.Statistics,
+    ) {
+        let country: CountryID = region.occupiedBy
+        for (tradeable, output): (tradeable: Bool, ResourceOutput) in output.joined {
+            self.countRegional(output: output, region: region, tradeable: tradeable)
 
             let share: Double = Double.init(output.units.added %/ equity.shareCount)
             for owner: Equity<LEI>.Statistics.Shareholder in equity.owners {
@@ -40,7 +75,7 @@ extension EconomicLedger {
                     let cultureKey: National<CultureID> = .init(
                         resource: output.id,
                         location: location,
-                        country: region.occupiedBy,
+                        country: country,
                         owner: culture
                     )
                     self.cultural[cultureKey, default: 0] += owned
@@ -49,11 +84,48 @@ extension EconomicLedger {
                     let genderKey: National<Gender> = .init(
                         resource: output.id,
                         location: location,
-                        country: region.occupiedBy,
+                        country: country,
                         owner: gender
                     )
                     self.gendered[genderKey, default: 0] += owned
                 }
+            }
+        }
+    }
+    /// Miners are never enslaved, so no equity breakdown is necessary.
+    mutating func count(
+        output pop: Pop,
+        region: RegionalAuthority,
+    ) {
+        let country: CountryID = region.occupiedBy
+        for (tradeable, output): (tradeable: Bool, ResourceOutput) in pop.inventory.out.joined {
+            self.countRegional(
+                output: output,
+                region: region,
+                tradeable: tradeable
+            )
+            self.countNational(
+                output: output,
+                region: region,
+                tradeable: tradeable,
+                country: country,
+                profile: pop.type
+            )
+        }
+        for mining: MiningJob in pop.mines.values {
+            for (tradeable, output): (tradeable: Bool, ResourceOutput) in mining.out.joined {
+                self.countRegional(
+                    output: output,
+                    region: region,
+                    tradeable: tradeable
+                )
+                self.countNational(
+                    output: output,
+                    region: region,
+                    tradeable: tradeable,
+                    country: country,
+                    profile: pop.type
+                )
             }
         }
     }
