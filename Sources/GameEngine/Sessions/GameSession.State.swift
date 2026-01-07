@@ -97,8 +97,10 @@ extension GameSession.State {
     }
 
     @_spi(testable) public static func != (a: borrowing Self, b: borrowing Self) -> Bool {
+        a.context.buildings.state != b.context.buildings.state ||
+        a.context.factories.state != b.context.factories.state ||
         a.context.pops.state != b.context.pops.state ||
-        a.context.factories.state != b.context.factories.state
+        a.context.mines.state != b.context.mines.state
     }
 }
 #endif
