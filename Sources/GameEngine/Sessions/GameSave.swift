@@ -13,8 +13,8 @@ public struct GameSave: Sendable {
     let cultures: [Culture]
 
     let accounts: OrderedDictionary<LEI, Bank.Account>.Items
-    let segmentedMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
-    let tradeableMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>
+    let localMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
+    let worldMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>
     let date: GameDate
 
     let currencies: [Currency]
@@ -33,8 +33,8 @@ extension GameSave {
         case cultures
 
         case accounts
-        case markets_segmented
-        case markets_tradeable
+        case markets_local
+        case markets_world
         case date
 
         // case terrain
@@ -57,8 +57,8 @@ extension GameSave: JavaScriptEncodable {
         js[.player] = self.player
         js[.cultures] = self.cultures
         js[.accounts] = self.accounts
-        js[.markets_segmented] = self.segmentedMarkets
-        js[.markets_tradeable] = self.tradeableMarkets
+        js[.markets_local] = self.localMarkets
+        js[.markets_world] = self.worldMarkets
         js[.date] = self.date
 
         js[.currencies] = self.currencies
@@ -77,8 +77,8 @@ extension GameSave: JavaScriptDecodable {
             player: try js[.player].decode(),
             cultures: try js[.cultures].decode(),
             accounts: try js[.accounts]?.decode() ?? .init(dictionary: [:]),
-            segmentedMarkets: try js[.markets_segmented]?.decode() ?? [:],
-            tradeableMarkets: try js[.markets_tradeable]?.decode() ?? [:],
+            localMarkets: try js[.markets_local]?.decode() ?? [:],
+            worldMarkets: try js[.markets_world]?.decode() ?? [:],
             date: try js[.date].decode(),
             currencies: try js[.currencies].decode(),
             countries: try js[.countries].decode(),

@@ -425,7 +425,7 @@ extension GameUI.Cache {
         _ id: WorldMarket.ID
     ) -> Tooltip? {
         guard
-        let market: WorldMarket.State = self.markets.tradeable[id]?.state,
+        let market: WorldMarket.State = self.worldMarkets[id]?.state,
         let last: Int = market.history.indices.last else {
             return nil
         }

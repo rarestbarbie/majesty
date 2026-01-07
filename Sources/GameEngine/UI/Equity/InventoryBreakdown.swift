@@ -194,10 +194,10 @@ extension InventoryBreakdown {
             let id: Resource = consumed.input.id
             let price: Candle<Double>?
             if  consumed.tradeable {
-                let market: WorldMarket.State? = cache.markets.tradeable[id / currency]?.state
+                let market: WorldMarket.State? = cache.worldMarkets[id / currency]?.state
                 price = market?.history.last?.prices
             } else {
-                let market: LocalMarket? = cache.markets.segmented[id / location]
+                let market: LocalMarket? = cache.localMarkets[id / location]
                 price = market?.price
             }
 
@@ -231,10 +231,10 @@ extension InventoryBreakdown {
             let id: Resource = produced.output.id
             let price: Candle<Double>?
             if  produced.tradeable {
-                let market: WorldMarket.State? = cache.markets.tradeable[id / currency]?.state
+                let market: WorldMarket.State? = cache.worldMarkets[id / currency]?.state
                 price = market?.history.last?.prices
             } else {
-                let market: LocalMarket? = cache.markets.segmented[id / location]
+                let market: LocalMarket? = cache.localMarkets[id / location]
                 price = market?.price
             }
             self.sales.append(

@@ -51,8 +51,8 @@ extension GameContext {
             player: self.player,
             cultures: self.rules.pops.cultures.values.sorted { $0.id < $1.id },
             accounts: world.bank.accounts.items,
-            segmentedMarkets: world.segmentedMarkets,
-            tradeableMarkets: world.tradeableMarkets,
+            localMarkets: world.localMarkets,
+            worldMarkets: world.worldMarkets,
             date: world.date,
             currencies: self.currencies.values.elements,
             countries: [_].init(self.countries.state),
@@ -273,6 +273,12 @@ extension GameContext {
             for job: MiningJob in pop.mines.values {
                 self.mines[modifying: job.id].addWorkforceCount(pop: pop, job: job)
             }
+
+            guard pop.type.stratum <= .Ward else {
+                // free pops do not have shareholders
+                economy.count(output: pop, region: region)
+                continue
+            }
             /// We compute this here, and not in `PopContext.compute`, so that its global
             /// context can exclude the pop table itself, allowing us to mutate `PopContext`
             /// in-place there without individually retaining and releasing every `PopContext`
@@ -282,7 +288,7 @@ extension GameContext {
                 assets: world.bank[account: pop.id.lei],
                 in: self.legalPass
             )
-            economy.count(output: pop.inventory.out, equity: equity, region: region)
+            economy.count(output: pop.inventory.out, region: region, equity: equity)
             self.count(asset: pop.id.lei, equity: pop.equity)
             self.pops[i].update(equityStatistics: equity)
         }
@@ -300,7 +306,7 @@ extension GameContext {
                 assets: world.bank[account: factory.id.lei],
                 in: self.legalPass
             )
-            economy.count(output: factory.inventory.out, equity: equity, region: region)
+            economy.count(output: factory.inventory.out, region: region, equity: equity)
             self.count(asset: factory.id.lei, equity: factory.equity)
             self.factories[i].update(equityStatistics: equity)
         }
@@ -318,7 +324,7 @@ extension GameContext {
                 assets: world.bank[account: building.id.lei],
                 in: self.legalPass
             )
-            economy.count(output: building.inventory.out, equity: equity, region: region)
+            economy.count(output: building.inventory.out, region: region, equity: equity)
             self.count(asset: building.id.lei, equity: building.equity)
             self.buildings[i].update(equityStatistics: equity)
         }

@@ -33,8 +33,8 @@ extension LegalEntitySnapshot {
             segmented: LocalMarketSnapshot?,
             tradeable: WorldMarket.State?
         ) = (
-            context.markets.segmented[resource / self.tile]?.snapshot(self.region),
-            context.markets.tradeable[resource / self.region.currency.id]?.state
+            context.localMarkets[resource / self.tile]?.snapshot(self.region),
+            context.worldMarkets[resource / self.region.currency.id]?.state
         )
 
         switch line.query {

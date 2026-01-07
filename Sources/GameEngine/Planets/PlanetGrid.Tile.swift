@@ -153,7 +153,7 @@ extension PlanetGrid.Tile {
         )
 
         self.criticalShortages = region.country.criticalResources.filter {
-            if  let localMarket: LocalMarket = world.segmentedMarkets[$0 / self.id],
+            if  let localMarket: LocalMarket = world.localMarkets[$0 / self.id],
                     localMarket.today.supply == 0,
                     localMarket.today.demand > 0 {
                 return true

@@ -26,7 +26,7 @@ extension TradeReport: PersistentReport {
         let filterlists: (
             resource: [Resource: ResourceLabel],
             currency: [CurrencyID: CurrencyLabel]
-        ) = cache.markets.tradeable.values.reduce(into: ([:], [:])) {
+        ) = cache.worldMarkets.values.reduce(into: ([:], [:])) {
             if  case .good(let id) = $1.id.x {
                 $0.resource[id] = cache.rules.resources[id].label
             }
@@ -37,7 +37,7 @@ extension TradeReport: PersistentReport {
         }
 
         self.selection.rebuild(
-            filtering: cache.markets.tradeable,
+            filtering: cache.worldMarkets,
             entries: &self.markets,
             details: &self.market,
             sort: { $0.name < $1.name }

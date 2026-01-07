@@ -41,8 +41,8 @@ extension GameSession.State {
         let world: GameWorld = .init(
             notifications: .init(date: save.date),
             bank: .init(accounts: save.accounts.dictionary),
-            segmentedMarkets: save.segmentedMarkets,
-            tradeableMarkets: save.tradeableMarkets,
+            localMarkets: save.localMarkets,
+            worldMarkets: save.worldMarkets,
             // placeholder
             tradeRoutes: [:],
             random: save.random,
@@ -89,14 +89,18 @@ extension GameSession.State {
 
     @_spi(testable) public var _hash: Int {
         var hasher: Hasher = .init()
-        self.context.pops.state.hash(into: &hasher)
+        self.context.buildings.state.hash(into: &hasher)
         self.context.factories.state.hash(into: &hasher)
+        self.context.pops.state.hash(into: &hasher)
+        self.context.mines.state.hash(into: &hasher)
         return hasher.finalize()
     }
 
     @_spi(testable) public static func != (a: borrowing Self, b: borrowing Self) -> Bool {
+        a.context.buildings.state != b.context.buildings.state ||
+        a.context.factories.state != b.context.factories.state ||
         a.context.pops.state != b.context.pops.state ||
-        a.context.factories.state != b.context.factories.state
+        a.context.mines.state != b.context.mines.state
     }
 }
 #endif
