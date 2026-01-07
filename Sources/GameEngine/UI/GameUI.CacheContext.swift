@@ -9,10 +9,8 @@ extension GameUI {
     struct CacheContext {
         let currencies: OrderedDictionary<CurrencyID, Currency>
         let countries: OrderedDictionary<CountryID, Country>
-        let markets: (
-            tradeable: OrderedDictionary<WorldMarket.ID, WorldMarket>,
-            segmented: OrderedDictionary<LocalMarket.ID, LocalMarket>
-        )
+        let localMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
+        let worldMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>
         let planets: OrderedDictionary<PlanetID, PlanetSnapshot>
         let tiles: [Address: PlanetGrid.TileSnapshot]
         let bank: Bank

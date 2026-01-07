@@ -41,8 +41,8 @@ extension GameSession.State {
         let world: GameWorld = .init(
             notifications: .init(date: save.date),
             bank: .init(accounts: save.accounts.dictionary),
-            segmentedMarkets: save.segmentedMarkets,
-            tradeableMarkets: save.tradeableMarkets,
+            localMarkets: save.localMarkets,
+            worldMarkets: save.worldMarkets,
             // placeholder
             tradeRoutes: [:],
             random: save.random,

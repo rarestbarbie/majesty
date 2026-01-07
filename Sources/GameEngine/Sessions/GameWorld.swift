@@ -9,24 +9,24 @@ struct GameWorld: ~Copyable {
 
     var notifications: Notifications
     var bank: Bank
-    var segmentedMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
-    var tradeableMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>
+    var localMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
+    var worldMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>
     var tradeRoutes: OrderedDictionary<CurrencyID, TradeRoutes>
 }
 extension GameWorld {
     init(
         notifications: Notifications,
         bank: Bank,
-        segmentedMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>,
-        tradeableMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>,
+        localMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>,
+        worldMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>,
         tradeRoutes: OrderedDictionary<CurrencyID, TradeRoutes>,
         random: PseudoRandom,
     ) {
         self.random = random
         self.notifications = notifications
         self.bank = bank
-        self.tradeableMarkets = tradeableMarkets
-        self.segmentedMarkets = segmentedMarkets
+        self.worldMarkets = worldMarkets
+        self.localMarkets = localMarkets
         self.tradeRoutes = tradeRoutes
     }
 }
@@ -42,10 +42,10 @@ extension GameWorld {
                 bank: self.bank,
                 worldMarkets: .init(
                     settings: settings.exchange,
-                    table: self.tradeableMarkets
+                    table: self.worldMarkets
                 ),
                 localMarkets: .init(
-                    table: self.segmentedMarkets
+                    table: self.localMarkets
                 ),
                 tradeRoutes: self.tradeRoutes
             )
@@ -56,8 +56,8 @@ extension GameWorld {
                 self = .init(
                     notifications: .init(date: .min),
                     bank: .init(accounts: [:]),
-                    segmentedMarkets: [:],
-                    tradeableMarkets: [:],
+                    localMarkets: [:],
+                    worldMarkets: [:],
                     tradeRoutes: [:],
                     random: .init(seed: 0),
                 )
@@ -66,8 +66,8 @@ extension GameWorld {
                 self = .init(
                     notifications: turn.notifications,
                     bank: turn.bank,
-                    segmentedMarkets: turn.localMarkets.markets,
-                    tradeableMarkets: turn.worldMarkets.markets,
+                    localMarkets: turn.localMarkets.all,
+                    worldMarkets: turn.worldMarkets.all,
                     tradeRoutes: turn.tradeRoutes,
                     random: turn.random,
                 )

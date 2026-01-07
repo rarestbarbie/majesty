@@ -15,7 +15,7 @@ import OrderedCollections
     }
 }
 extension LocalMarkets {
-    @inlinable public var markets: OrderedDictionary<LocalMarket.ID, LocalMarket> {
+    @inlinable public var all: OrderedDictionary<LocalMarket.ID, LocalMarket> {
         self.table
     }
 

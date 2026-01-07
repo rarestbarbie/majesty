@@ -70,9 +70,7 @@ extension WorldMarkets {
     }
 }
 extension WorldMarkets {
-    @inlinable public var markets: OrderedDictionary<WorldMarket.ID, WorldMarket> {
-        self.table
-    }
+    @inlinable public var all: OrderedDictionary<WorldMarket.ID, WorldMarket> { self.table }
 }
 extension WorldMarkets {
     /// This has O(n²) complexity, where n is the number of trading partners.
