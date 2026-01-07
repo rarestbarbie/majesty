@@ -164,17 +164,3 @@ extension GameSession {
         }
     }
 }
-
-#if TESTABLE
-extension GameSession {
-    public func run(until date: GameDate) throws {
-        try self.state.run(until: date)
-    }
-
-    public var _hash: Int {
-        self.state._hash
-    }
-
-    public var rules: GameMetadata { self.state.context.rules }
-}
-#endif

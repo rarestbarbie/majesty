@@ -89,8 +89,10 @@ extension GameSession.State {
 
     @_spi(testable) public var _hash: Int {
         var hasher: Hasher = .init()
-        self.context.pops.state.hash(into: &hasher)
+        self.context.buildings.state.hash(into: &hasher)
         self.context.factories.state.hash(into: &hasher)
+        self.context.pops.state.hash(into: &hasher)
+        self.context.mines.state.hash(into: &hasher)
         return hasher.finalize()
     }
 

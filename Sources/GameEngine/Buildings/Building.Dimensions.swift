@@ -91,3 +91,7 @@ extension Building.Dimensions: JavaScriptDecodable {
         )
     }
 }
+
+#if TESTABLE
+extension Building.Dimensions: Equatable, Hashable {}
+#endif

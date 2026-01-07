@@ -150,3 +150,7 @@ extension Building: JavaScriptDecodable {
         )
     }
 }
+
+#if TESTABLE
+extension Building: Equatable, Hashable {}
+#endif
