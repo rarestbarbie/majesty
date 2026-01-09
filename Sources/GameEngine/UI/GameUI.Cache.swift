@@ -472,12 +472,22 @@ extension GameUI.Cache {
         guard let culture: Culture = self.rules.pops.cultures[culture] else {
             return nil
         }
-        return self.tiles[id]?.properties?.pops.tooltip(culture: culture)
+        return self.tiles[id]?.properties?.tooltip(culture: culture)
     }
     func tooltipTilePopType(
         _ id: Address,
         _ occupation: PopOccupation,
     ) -> Tooltip? {
-        self.tiles[id]?.properties?.pops.tooltip(occupation: occupation)
+        self.tiles[id]?.properties?.tooltip(occupation: occupation)
+    }
+
+    func tooltipTileEconomyContribution(
+        _ id: Address,
+        _ resource: Resource,
+    ) -> Tooltip? {
+        self.tiles[id]?.properties?.tooltipEconomyContribution(
+            resource: resource,
+            context: self.context
+        )
     }
 }

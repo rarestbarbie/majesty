@@ -23,12 +23,8 @@ extension EconomicAggregator {
         region: RegionalAuthority,
         tradeable: Bool
     ) {
-        let regionalKey: EconomicLedger.Regional = .init(
-                resource: output.id,
-                location: region.id
-            )
         let currency: CurrencyID? = tradeable ? region.country.currency.id : nil
-        self.produced[regionalKey, default: (0, currency)].units += output.units.added
+        self.produced[region.id / output.id, default: (0, currency)].units += output.units.added
     }
     private mutating func countNational(
         output: ResourceOutput,

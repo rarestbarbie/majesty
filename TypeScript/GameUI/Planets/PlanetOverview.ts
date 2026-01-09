@@ -7,6 +7,9 @@ import {
     UpdateText,
 } from '../../DOM/exports.js';
 import {
+    GameID
+} from '../../GameEngine/exports.js';
+import {
     ScreenContent,
     HexGrid,
     PlanetReport,
@@ -14,6 +17,8 @@ import {
     PlanetFilterLabel,
     PlanetMapLayerSelector,
     ScreenType,
+    PieChart,
+    TooltipType,
 } from '../exports.js';
 import { Swift } from '../../Swift.js';
 
@@ -23,6 +28,7 @@ export class PlanetOverview extends ScreenContent {
     private readonly grid: HexGrid;
 
     private readonly terms: StaticList<Term, string>;
+    private readonly gdp: PieChart<GameID>;
 
     private layerShown?: string;
     private dom?: {
@@ -45,6 +51,8 @@ export class PlanetOverview extends ScreenContent {
 
         this.terms = new StaticList<Term, string>(document.createElement('ul'));
         this.terms.node.classList.add('terms');
+
+        this.gdp = new PieChart<GameID>(TooltipType.TileEconomyContribution);
     }
 
     public override async open(parameters: URLSearchParams): Promise<void> {
@@ -81,7 +89,26 @@ export class PlanetOverview extends ScreenContent {
             this.dom.stats.replaceChildren();
         }
 
+
+        const charts: [PieChart<any>, string][] = [
+            [this.gdp, 'GDP Contribution'],
+        ];
+
+        const figures: HTMLDivElement = document.createElement('div');
+        figures.classList.add('pie-charts');
+
+        for (const [chart, label] of charts) {
+            const container: HTMLElement = document.createElement('figure');
+            const caption: HTMLElement = document.createElement('figcaption');
+            caption.textContent = label;
+            container.appendChild(caption);
+            container.appendChild(chart.node);
+            figures.appendChild(container);
+        }
+
         this.dom.stats.appendChild(this.terms.node);
+        this.dom.stats.appendChild(figures);
+        this.dom.stats.setAttribute('data-subscreen', 'Region');
 
         this.dom.index.tabs[state.filterlist].checked = true;
         this.update(state);
@@ -150,5 +177,7 @@ export class PlanetOverview extends ScreenContent {
             (term: TermState) => new Term(term),
             (term: TermState, item: Term) => item.update(term, [id]),
         );
+
+        this.gdp.update([id], state.details.gdp ?? []);
     }
 }

@@ -20,6 +20,8 @@ struct Turn: ~Copyable {
         ),
         fire: Jobs.Fire
     )
+
+    let ledger: EconomicLedger
 }
 extension Turn {
     init(
@@ -29,6 +31,7 @@ extension Turn {
         worldMarkets: consuming WorldMarkets,
         localMarkets: consuming LocalMarkets,
         tradeRoutes: OrderedDictionary<CurrencyID, TradeRoutes>,
+        ledger: EconomicLedger,
     ) {
         self.random = random
         self.notifications = notifications
@@ -39,6 +42,8 @@ extension Turn {
         self.stockMarkets = .init()
         self.conversions = []
         self.jobs = (([:], [:]), .init())
+
+        self.ledger = ledger
     }
 }
 

@@ -222,7 +222,7 @@ extension GameContext {
             self.pops[i].state.prune(in: retain)
         }
     }
-    private mutating func index(world: borrowing GameWorld) throws {
+    private mutating func index(world: borrowing GameWorld) throws -> EconomicLedger {
         for i: Int in self.countries.indices {
             let country: Country = self.countries.state[i]
             let properties: CountryProperties = try .compute(for: country, in: self)
@@ -335,11 +335,9 @@ extension GameContext {
             #assert(counted != nil, "Mine \(mine.id) has no home tile!!!")
         }
 
-        self.count(
-            aggregating: economy.aggregate(
-                localMarkets: world.localMarkets,
-                worldMarkets: world.worldMarkets,
-            )
+        return economy.aggregate(
+            localMarkets: world.localMarkets,
+            worldMarkets: world.worldMarkets,
         )
     }
 }
@@ -448,7 +446,9 @@ extension GameContext {
 
     mutating func compute(_ world: inout GameWorld) throws {
         self.prune(world: &world)
-        try self.index(world: world)
+
+        world.ledger = try self.index(world: world)
+        self.count(aggregating: world.ledger)
 
         for i: Int in self.planets.indices {
             try self.planets[i].afterIndexCount(world: world, context: self.territoryPass)

@@ -9,3 +9,4 @@ extension EconomicLedger {
         let owner: Owner
     }
 }
+extension EconomicLedger.National: Sendable where Owner: Sendable {}

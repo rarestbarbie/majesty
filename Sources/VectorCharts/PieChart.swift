@@ -35,32 +35,40 @@ extension PieChart: RandomAccessCollection {
     }
 }
 extension PieChart {
-    @inlinable public init(
-        values: some Sequence<(Key, (share: Int64, Value))>,
-    ) {
-        let sectors: [(Key, (share: Int64, Value))] = values.filter { $1.share > 0 }
+    @inlinable public init(values: some Sequence<(Key, (share: Double, Value))>) {
+        self.init(values: values) { $0 }
+    }
+    @inlinable public init(values: some Sequence<(Key, (share: Int64, Value))>) {
+        self.init(values: values) { Double.init($0) }
+    }
+
+    @inlinable init<Share>(
+        values: some Sequence<(Key, (share: Share, Value))>,
+        double: (Share) -> Double
+    ) where Share: AdditiveArithmetic & Comparable {
+        let sectors: [(Key, (share: Share, Value))] = values.filter { $1.share > .zero }
 
         guard sectors.startIndex < sectors.endIndex else {
             self = .slices([])
             return
         }
 
-        let divisor: Double = .init(sectors.reduce(into: 0) { $0 += $1.1.share })
+        let divisor: Double = double(sectors.reduce(into: .zero) { $0 += $1.1.share })
         let last: Int = sectors.index(before: sectors.endIndex)
 
         var start: Vector2 = .init(1, 0)
-        var w: Int64 = 0
+        var w: Share = .zero
 
         var slices: [Slice] = []
         ;   slices.reserveCapacity(sectors.count)
 
-        for (id, (share, value)): (Key, (Int64, Value)) in sectors[..<last] {
+        for (id, (share, value)): (Key, (Share, Value)) in sectors[..<last] {
             w += share
 
-            let f: Double = Double.init(w) / divisor
+            let f: Double = double(w) / divisor
             let r: Double = 2 * Double.pi * f
 
-            let share: Double = Double.init(share) / divisor
+            let share: Double = double(share) / divisor
             let slice: Slice = .init(
                 id: id,
                 value: value,
@@ -71,10 +79,10 @@ extension PieChart {
             slices.append(slice)
         }
 
-        let (id, (share, value)): (Key, (Int64, Value)) = sectors[last]
+        let (id, (share, value)): (Key, (Share, Value)) = sectors[last]
 
-        if w > 0 {
-            let share: Double = Double.init(share) / divisor
+        if w > .zero {
+            let share: Double = double(share) / divisor
             let slice: Slice = .init(
                 id: id,
                 value: value,

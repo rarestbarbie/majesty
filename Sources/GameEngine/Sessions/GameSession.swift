@@ -27,8 +27,6 @@ extension GameSession {
         let context: GameUI.CacheContext = .init(
             currencies: self.state.context.currencies,
             countries: self.state.context.countries.state.reduce(into: [:]) { $0[$1.id] = $1 },
-            localMarkets: self.state.world.localMarkets,
-            worldMarkets: self.state.world.worldMarkets,
             planets: self.state.context.planets.reduce(into: [:]) {
                 $0[$1.state.id] = $1.snapshot
             },
@@ -37,6 +35,9 @@ extension GameSession {
                     $0[tile.id] = tile.snapshot
                 }
             },
+            localMarkets: self.state.world.localMarkets,
+            worldMarkets: self.state.world.worldMarkets,
+            ledger: self.state.world.ledger,
             bank: self.state.world.bank,
             date: self.state.world.date,
             player: self.state.context.player,

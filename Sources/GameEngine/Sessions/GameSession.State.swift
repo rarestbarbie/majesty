@@ -45,6 +45,8 @@ extension GameSession.State {
             worldMarkets: save.worldMarkets,
             // placeholder
             tradeRoutes: [:],
+            // placeholder
+            ledger: .init(),
             random: save.random,
         )
 

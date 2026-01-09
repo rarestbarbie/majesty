@@ -401,6 +401,11 @@ extension GameUI.Model {
             case .TileGDP:
                 // TODO: Implement Tile GDP tooltip
                 return nil
+            case .TileEconomyContribution:
+                return $0.tooltipTileEconomyContribution(
+                    try arguments[0].decode(),
+                    try arguments[1].decode(),
+                )
             }
         }
     }
