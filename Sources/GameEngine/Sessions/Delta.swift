@@ -25,9 +25,9 @@ extension Delta where Dimensions: AdditiveArithmetic & DecimalFormattable {
         where Format: DecimalFormat {
         self.z[format] <- self.y
     }
-    subscript<Format>(
-        format: (Decimal.NaturalPrecision<Format>) -> ()
-    ) -> TooltipInstruction.Ticker where Format: DecimalFormat {
+    subscript<Power>(
+        format: (Decimal.NaturalPrecision<Power>) -> ()
+    ) -> TooltipInstruction.Ticker where Power: DecimalPower {
         self.z[format] <- self.y
     }
 }

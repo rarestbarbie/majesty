@@ -27,7 +27,7 @@ extension PlanetDetails {
     mutating func update(from tile: PlanetGrid.TileSnapshot, in _: borrowing GameUI.Cache) {
         self.tile = tile
         self.terms = Term.list {
-            $0[.gdp, (+), tooltip: .TileGDP] = tile.properties?._gdp[..2]
+            $0[.gdp, (+), tooltip: .TileGDP] = tile.properties?._gdp[/3..2]
         }
     }
 }

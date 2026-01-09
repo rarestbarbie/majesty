@@ -430,15 +430,14 @@ extension GameUI.Cache {
             return nil
         }
 
-        let interval: (WorldMarket.Interval, WorldMarket.Interval)
-        interval.1 = market.history[last]
-        interval.0 = last != market.history.startIndex
+        let z: WorldMarket.Interval = market.history[last]
+        let y: WorldMarket.Interval = last != market.history.startIndex
             ? market.history[market.history.index(before: last)]
-            : interval.1
-
+            : z
+        let Δ: Delta<WorldMarket.Interval> = .init(y: y, z: z)
         let flow: (quote: Int64, base: Int64) = (
-            interval.1.volume.quote.i - interval.1.volume.quote.o,
-            interval.1.volume.base.i - interval.1.volume.base.o
+            z.volume.quote.i - z.volume.quote.o,
+            z.volume.base.i - z.volume.base.o
         )
 
         let today: (quote: Int64, base: Int64)
@@ -451,7 +450,7 @@ extension GameUI.Cache {
         yesterday.base = today.base - flow.base
 
         return .instructions {
-            $0["Available liquidity", +] = interval.1.liquidity[..3] <- interval.0.liquidity
+            $0["Available liquidity", +] = Δ.liquidity[/3..2]
             $0[>] {
                 $0["Base instrument", -] = today.base[/3] <- yesterday.base
                 $0["Quote instrument", +] = today.quote[/3] <- yesterday.quote
