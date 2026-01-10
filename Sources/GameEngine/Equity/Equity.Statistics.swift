@@ -28,9 +28,7 @@ extension Equity<LEI>.Statistics {
             "Outstanding shares (\(shareCount)) cannot be negative!!!"
         )
 
-        // This formulation means that if there are no outstanding shares, the price is equal
-        // to the valuation. In other words, you can buy the entire company for its valuation.
-        let sharePrice: Fraction = shareCount > 1 ? assets %/ shareCount : 1
+        let sharePrice: Fraction = shareCount > 0 ? assets %/ shareCount : 1
 
         return .init(
             owners: equity.shares.values.reduce(into: []) {
