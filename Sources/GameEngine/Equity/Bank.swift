@@ -30,6 +30,19 @@ extension Bank {
     }
 }
 extension Bank {
+    func valuation(
+        of entity: some LegalEntityState,
+        in context: GameContext.LegalPass,
+    ) -> Equity<LEI>.Statistics {
+        .compute(
+            equity: entity.equity,
+            // inventory, not assets, to avoid cratering stock price when expanding factory
+            assets: self[account: entity.id.lei].balance + entity.z.vv,
+            context: context
+        )
+    }
+}
+extension Bank {
     mutating func transfer(
         budget: Int64,
         source: LEI,

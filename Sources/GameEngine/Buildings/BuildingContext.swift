@@ -214,19 +214,21 @@ extension BuildingContext: TransactingContext {
                 """
             )
 
-            if  budget.liquidate || turn.random.wait(
-                    self.state.inventory.out.tradeableDaysReserve,
-                    Self.stockpileDaysRange
-                ) {
-                $0.r += self.state.inventory.out.sell(
-                    in: region.currency.id,
-                    to: &turn.worldMarkets
-                )
-            } else {
-                self.state.inventory.out.mark(
-                    in: region.currency.id,
-                    to: turn.worldMarkets
-                )
+            if !self.state.inventory.out.tradeable.isEmpty {
+                if  budget.liquidate || turn.random.wait(
+                        1 + self.state.inventory.out.tradeableDaysReserve,
+                        1 ... Self.stockpileDaysRange.upperBound
+                    ) {
+                    $0.r += self.state.inventory.out.sell(
+                        in: region.currency.id,
+                        to: &turn.worldMarkets
+                    )
+                } else {
+                    self.state.inventory.out.mark(
+                        in: region.currency.id,
+                        to: turn.worldMarkets
+                    )
+                }
             }
         } (&turn.bank[account: self.lei])
 
