@@ -25,7 +25,7 @@ extension FactoryContext.OfficeUpdate {
         let salariesPaid: Int64 = turn.bank.transfer(
             budget: budget.clerks,
             source: factory.id.lei,
-            recipients: turn.payscale(shuffling: clerks.pops, rate: factory.z.cn),
+            recipients: .shuffle(pops: clerks.pops, rate: factory.z.cn, using: &turn.random),
         )
 
         let fireToday: Int64

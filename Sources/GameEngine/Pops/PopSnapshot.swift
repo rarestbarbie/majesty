@@ -152,7 +152,7 @@ extension PopSnapshot {
 extension PopSnapshot {
     func tooltipAccount(_ account: Bank.Account) -> Tooltip? {
         let liquid: Delta<Int64> = account.Δ
-        let assets: Delta<Int64> = self.Δ.vl + self.Δ.ve + self.Δ.vx
+        let assets: Delta<Int64> = self.Δ.assets
         let valuation: Delta<Int64> = liquid + assets
 
         return .instructions {

@@ -46,15 +46,6 @@ extension Turn {
         self.ledger = ledger
     }
 }
-
 extension Turn {
     var date: GameDate { self.notifications.date }
-}
-extension Turn {
-    mutating func payscale(
-        shuffling pops: [(id: PopID, count: Int64)],
-        rate: Int64
-    ) -> Payscale {
-        .init(pops: pops.shuffled(using: &self.random.generator), rate: rate)
-    }
 }

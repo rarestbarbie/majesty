@@ -8,6 +8,7 @@ struct OperatingBudget {
     let l: ResourceBudgetTier
     let e: ResourceBudgetTier
     let x: ResourceBudgetTier
+    let liquidate: Bool
     /// Target fulfillment for Corporate Tier, which may be less than 100 percent due to
     /// diminishing returns and high cost of Corporate inputs relative to Materials.
     let fe: Double
@@ -78,8 +79,10 @@ extension OperatingBudget {
             corporateOptimal = 1.0
         }
 
-        let v: Int64 = state.vl + state.ve
-        let basis: Int64 = CashAllocationBasis.adjust(liquidity: account.settled, assets: v)
+        let (basis, liquidate): (
+            Int64,
+            Bool
+        ) = CashAllocationBasis.adjust(liquidity: account.settled, assets: state.vv)
 
         /// These are the minimum theoretical balances the factory would need to fill its
         /// stockpile for that tier all the way to maximum capacity
@@ -128,6 +131,7 @@ extension OperatingBudget {
             l: l,
             e: e,
             x: x,
+            liquidate: liquidate,
             fe: corporateOptimal,
             fk: clerksOptimal,
             buybacks: buybacks,
@@ -145,6 +149,7 @@ extension OperatingBudget {
         case e_tradeable = "et"
         case x_segmented = "xs"
         case x_tradeable = "xt"
+        case liquidate = "liq"
 
         case fe = "fe"
         case fk = "fk"
@@ -162,6 +167,7 @@ extension OperatingBudget: JavaScriptEncodable {
         js[.e_tradeable] = self.e.tradeable
         js[.x_segmented] = self.x.segmented
         js[.x_tradeable] = self.x.tradeable
+        js[.liquidate] = self.liquidate ? true : nil
 
         js[.fe] = self.fe
         js[.fk] = self.fk
@@ -186,6 +192,7 @@ extension OperatingBudget: JavaScriptDecodable {
                 segmented: try js[.x_segmented].decode(),
                 tradeable: try js[.x_tradeable].decode()
             ),
+            liquidate: try js[.liquidate]?.decode() ?? false,
             fe: try js[.fe].decode(),
             fk: try js[.fk].decode(),
             buybacks: try js[.buybacks].decode(),

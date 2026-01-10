@@ -17,20 +17,26 @@ extension ResourceOutputs {
     }
 }
 extension ResourceOutputs {
-    var valueSold: Int64 {
-        self.all.reduce(0) { $0 + $1.valueSold }
+    var valueEstimate: Int64 {
+        // only tradeable outputs have stockpiled value
+        self.tradeable.reduce(0) { $0 + $1.valueEstimate }
+    }
+    var valueProduced: Int64 {
+        self.all.reduce(0) { $0 + $1.valueProduced }
     }
 }
 extension ResourceOutputs {
     @frozen public enum ObjectKey: JSString, Sendable {
         case segmented = "s"
         case tradeable = "t"
+        case tradeableDaysReserve = "d"
     }
 }
 extension ResourceOutputs: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.segmented] = self.segmented
         js[.tradeable] = self.tradeable
+        js[.tradeableDaysReserve] = self.tradeableDaysReserve
     }
 }
 extension ResourceOutputs: JavaScriptDecodable {
@@ -38,6 +44,7 @@ extension ResourceOutputs: JavaScriptDecodable {
         self.init(
             segmented: try js[.segmented].decode(),
             tradeable: try js[.tradeable].decode(),
+            tradeableDaysReserve: try js[.tradeableDaysReserve].decode()
         )
     }
 }

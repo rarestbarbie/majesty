@@ -36,6 +36,8 @@ extension FactoryContext: LegalEntityContext {
     static var stockpileDaysRange: ClosedRange<Int64> { 4 ... 8 }
 }
 extension FactoryContext {
+    private static var maturationRate: Fraction { 1 %/ 4 }
+
     static var efficiencyBonusFromCorporate: Double { 0.3 }
     static var efficiencyBonusFromClerks: Double { 0.3 }
 
@@ -148,7 +150,6 @@ extension FactoryContext: TransactingContext {
             self.stats.productivity * min($0.limit, $0.count + 1)
         } ?? 0
 
-        self.state.inventory.out.sync(with: self.type.output, releasing: 1 %/ 4)
         self.state.inventory.l.sync(
             with: self.type.materials,
             scalingFactor: (throughput, self.state.z.ei),
@@ -164,6 +165,23 @@ extension FactoryContext: TransactingContext {
                 self.state.z.ei
             ),
         )
+
+        // produce matured goods from pipeline
+        self.state.inventory.out.sync(with: self.type.output)
+        if  self.state.pipeline > 0 {
+            let matured: Int64 = self.state.pipeline >< Self.maturationRate
+            self.state.pipeline -= matured
+
+            #assert(
+                self.state.pipeline >= 0,
+                "Factory pipeline (\(self.state.pipeline)) went negative?!?!"
+            )
+
+            self.state.inventory.out.produce(
+                from: self.type.output,
+                scalingFactor: (matured, self.state.z.eo)
+            )
+        }
 
         if  self.equity.sharePrice.n > 0 {
             self.state.z.px = Double.init(self.equity.sharePrice)
@@ -294,7 +312,7 @@ extension FactoryContext: TransactingContext {
             return
         }
 
-        let stockpileDays: ResourceStockpileTarget = self.stockpileTarget(&turn.random)
+        let stockpileDays: ResourceStockpileTarget = Self.stockpileTarget(&turn.random)
 
         switch budget {
         case .constructing(let budget):
@@ -503,6 +521,7 @@ extension FactoryContext: TransactingContext {
         self.state.z.vl = self.state.inventory.l.valueAcquired
         self.state.z.ve = self.state.inventory.e.valueAcquired
         self.state.z.vx = self.state.inventory.x.valueAcquired
+        self.state.z.vout = self.state.inventory.out.valueEstimate
 
         guard case nil = self.state.liquidation,
         let player: CountryID = self.region?.occupiedBy else {
@@ -622,10 +641,20 @@ extension FactoryContext {
                 """
             )
 
-            $0.r += self.state.inventory.out.sell(
-                in: region.currency.id,
-                on: &turn.worldMarkets
-            )
+            if  budget.liquidate || turn.random.wait(
+                    self.state.inventory.out.tradeableDaysReserve,
+                    Self.stockpileDaysRange
+                ) {
+                $0.r += self.state.inventory.out.sell(
+                    in: region.currency.id,
+                    to: &turn.worldMarkets
+                )
+            } else {
+                self.state.inventory.out.mark(
+                    in: region.currency.id,
+                    to: turn.worldMarkets
+                )
+            }
         } (&turn.bank[account: self.lei])
 
         let update: FloorUpdate = .operate(
@@ -642,21 +671,17 @@ extension FactoryContext {
         /// estimate of the factory’s profitability, we need to credit the day’s balance with
         /// the amount of currency that was sunk into purchasing inputs, and subtract the
         /// approximate value of the inputs consumed today.
-        let throughput: Int64 = self.stats.productivity * update.workersPaid
+        let batches: Int64 = self.stats.productivity * update.workersPaid
         let fl: Double = self.state.inventory.l.consumeAmortized(
             from: self.type.materials,
-            scalingFactor: (throughput, self.state.z.ei)
+            scalingFactor: (batches, self.state.z.ei)
         )
         let fe: Double = self.state.inventory.e.consumeAmortized(
             from: self.type.corporate,
-            scalingFactor: (throughput, self.state.z.ei * budget.fe)
+            scalingFactor: (batches, self.state.z.ei * budget.fe)
         )
 
-        self.state.inventory.out.deposit(
-            from: self.type.output,
-            scalingFactor: (throughput, self.state.z.eo)
-        )
-
+        self.state.pipeline += batches
         self.state.z.fl = fl
         // `fulfilled` counts stockpiled resources that were saved for the next day,
         // so to compute the actual usage today we need `min` it with the consumption fraction

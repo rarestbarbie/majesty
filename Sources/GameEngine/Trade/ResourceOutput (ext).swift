@@ -10,6 +10,8 @@ extension ResourceOutput {
         case unitsRemoved = "b"
         case unitsSold = "s"
         case valueSold = "v"
+        case valueProduced = "u"
+        case valueEstimate = "w"
         case price = "p"
     }
 }
@@ -21,6 +23,8 @@ extension ResourceOutput: JavaScriptEncodable {
         js[.unitsRemoved] = self.units.removed
         js[.unitsSold] = self.unitsSold
         js[.valueSold] = self.valueSold
+        js[.valueProduced] = self.valueProduced
+        js[.valueEstimate] = self.valueEstimate == 0 ? nil : self.valueEstimate
         js[.price] = self.price
     }
 }
@@ -35,6 +39,8 @@ extension ResourceOutput: JavaScriptDecodable {
             ),
             unitsSold: try js[.unitsSold].decode(),
             valueSold: try js[.valueSold].decode(),
+            valueProduced: try js[.valueProduced].decode(),
+            valueEstimate: try js[.valueEstimate]?.decode() ?? 0,
             price: try js[.price]?.decode()
         )
     }

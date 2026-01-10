@@ -72,7 +72,7 @@ extension BuildingSnapshot {
     func tooltipAccount(_ account: Bank.Account) -> Tooltip? {
         let profit: ProfitMargins = self.stats.profit
         let liquid: Delta<Int64> = account.Δ
-        let assets: Delta<Int64> = self.Δ.vl + self.Δ.ve + self.Δ.vx
+        let assets: Delta<Int64> = self.Δ.assets
 
         return .instructions {
             $0["Total valuation", +] = (liquid + assets)[/3]

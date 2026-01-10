@@ -31,9 +31,17 @@ extension Reservoir {
     @inlinable public var change: Int64 { self.added - self.removed }
     @inlinable public var before: Int64 { self.value - self.change }
 
+    @inlinable mutating func drain() {
+        self.removed += self.value
+        self.value = 0
+    }
     @inlinable mutating func turn() {
         self.added = 0
         self.removed = 0
+    }
+    @inlinable mutating func wash(_ units: Int64) {
+        self.added += units
+        self.removed += units
     }
 
     @inlinable public static func -= (self: inout Self, change: Int64) {

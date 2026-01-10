@@ -92,7 +92,6 @@ extension BuildingContext: TransactingContext {
 
         self.state.z.ei = 1
 
-        self.state.inventory.out.sync(with: self.type.output, releasing: 1)
         self.state.inventory.l.sync(
             with: self.type.operations,
             scalingFactor: (self.state.z.active, self.state.z.ei),
@@ -104,6 +103,12 @@ extension BuildingContext: TransactingContext {
         self.state.inventory.x.sync(
             with: self.type.development,
             scalingFactor: (self.state.z.total, self.state.z.ei),
+        )
+
+        self.state.inventory.out.sync(with: self.type.output)
+        self.state.inventory.out.produce(
+            from: self.type.output,
+            scalingFactor: (self.state.z.active, 1)
         )
 
         if  self.equity.sharePrice.n > 0 {
@@ -174,7 +179,7 @@ extension BuildingContext: TransactingContext {
         }
 
         {
-            let stockpileDays: ResourceStockpileTarget = self.stockpileTarget(&turn.random)
+            let stockpileDays: ResourceStockpileTarget = Self.stockpileTarget(&turn.random)
 
             if  budget.l.tradeable > 0 {
                 $0 += self.state.inventory.l.tradeAsBusiness(
@@ -209,16 +214,22 @@ extension BuildingContext: TransactingContext {
                 """
             )
 
-            $0.r += self.state.inventory.out.sell(
-                in: region.currency.id,
-                on: &turn.worldMarkets
-            )
+            if  budget.liquidate || turn.random.wait(
+                    self.state.inventory.out.tradeableDaysReserve,
+                    Self.stockpileDaysRange
+                ) {
+                $0.r += self.state.inventory.out.sell(
+                    in: region.currency.id,
+                    to: &turn.worldMarkets
+                )
+            } else {
+                self.state.inventory.out.mark(
+                    in: region.currency.id,
+                    to: turn.worldMarkets
+                )
+            }
         } (&turn.bank[account: self.lei])
 
-        self.state.inventory.out.deposit(
-            from: self.type.output,
-            scalingFactor: (self.state.z.active, 1)
-        )
         self.state.z.fl = self.state.inventory.l.consumeAmortized(
             from: self.type.operations,
             scalingFactor: (self.state.z.active, self.state.z.ei)
@@ -273,6 +284,7 @@ extension BuildingContext: TransactingContext {
         self.state.z.vl = self.state.inventory.l.valueAcquired
         self.state.z.ve = self.state.inventory.e.valueAcquired
         self.state.z.vx = self.state.inventory.x.valueAcquired
+        self.state.z.vout = self.state.inventory.out.valueEstimate
 
         guard
         let player: CountryID = self.region?.occupiedBy else {
