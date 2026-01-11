@@ -281,7 +281,7 @@
             "Nuclear Power Plant": 1,
             "Aluminum Mill": 3,
             "Appliance Factory": 5,
-            "Automotive Assembly Plant": 1,
+            "Automotive Assembly Plant": 3,
             "Battery Plant": 1,
             "Medical Equipment Factory": 3,
             "Polypropylene Plant": 2,
@@ -301,7 +301,7 @@
             "Clothing Workshop": 4,
             "Machine Parts Factory": 1,
             "Electronics Factory": 1,
-            "Automotive Assembly Plant": 1,
+            "Automotive Assembly Plant": 3,
             "Chicken Plant": 1,
             "Appliance Factory": 2
         }

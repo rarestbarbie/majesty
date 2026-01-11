@@ -52,7 +52,7 @@ extension MineMetadata {
     }
 }
 extension MineMetadata {
-    static var efficiencyPoliticiansPerMilitancyPoint: Double { 0.01 }
+    static var efficiencyPoliticiansPerMilitancyPoint: Double { 0.03 }
     static var efficiencyPoliticians: Decimal { 5% }
     static var efficiencyMiners: Decimal { 1% }
 
