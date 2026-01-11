@@ -20,7 +20,6 @@ extension ResourceInput {
         case unitsAdded = "b"
         case unitsRemoved = "c"
 
-        case valueReturned = "q"
         case valueTotal = "v"
         case valueAdded = "w"
         case valueRemoved = "x"
@@ -38,7 +37,6 @@ extension ResourceInput: JavaScriptEncodable {
         js[.unitsAdded] = self.units.added
         js[.unitsRemoved] = self.units.removed
 
-        js[.valueReturned] = self.valueReturned
         js[.valueTotal] = self.value.total
         js[.valueAdded] = self.value.added
         js[.valueRemoved] = self.value.removed
@@ -57,7 +55,6 @@ extension ResourceInput: JavaScriptDecodable {
                 added: try js[.unitsAdded].decode(),
                 removed: try js[.unitsRemoved].decode()
             ),
-            valueReturned: try js[.valueReturned].decode(),
             value: .init(
                 total: try js[.valueTotal].decode(),
                 added: try js[.valueAdded].decode(),

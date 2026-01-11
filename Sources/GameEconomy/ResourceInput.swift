@@ -9,7 +9,6 @@ import GameIDs
     public var unitsReturned: Int64
     public var units: Reservoir
 
-    public var valueReturned: Int64
     /// The “consumed value” is not a real valuation, but merely the fraction of the
     /// unitsAcquired value of the resource that was consumed, rounded up to the nearest unit.
     public var value: Reservoir
@@ -23,7 +22,6 @@ import GameIDs
         unitsDemanded: Int64,
         unitsReturned: Int64,
         units: Reservoir,
-        valueReturned: Int64,
         value: Reservoir,
         price: Double?
     ) {
@@ -31,7 +29,6 @@ import GameIDs
         self.unitsDemanded = unitsDemanded
         self.unitsReturned = unitsReturned
         self.units = units
-        self.valueReturned = valueReturned
         self.value = value
         self.price = price
     }
@@ -43,7 +40,6 @@ extension ResourceInput: ResourceStockpile {
             unitsDemanded: 0,
             unitsReturned: 0,
             units: .zero,
-            valueReturned: 0,
             value: .zero,
             price: nil
         )
@@ -55,7 +51,7 @@ extension ResourceInput {
     }
 
     @inlinable public var valueConsumed: Int64 {
-        self.value.removed + self.valueReturned
+        self.value.removed
     }
 
     mutating func turn(
@@ -65,10 +61,7 @@ extension ResourceInput {
         self.unitsDemanded = .init((Double.init(unitsDemanded) * efficiency).rounded(.up))
         self.unitsReturned = 0
         self.units.turn()
-
-        self.valueReturned = 0
         self.value.turn()
-        // self.valueAtMarket.turn()
     }
 }
 extension ResourceInput {
@@ -102,7 +95,8 @@ extension ResourceInput {
     }
 }
 extension ResourceInput {
-    /// Returns the amount of funds actually spent.
+    /// Returns the amount of funds actually spent, negative if funds were spent, positive
+    /// if funds were refunded.
     mutating func trade(
         stockpileDaysTarget: Int64,
         stockpileDaysReturn: Int64,
@@ -120,18 +114,14 @@ extension ResourceInput {
                 let valueRefunded: Int64 = $0.sell(&unitsExceeded)
                 let unitsSold: Int64 = self.units.total - limit - unitsExceeded
 
-                self.price = $0.price
+                self.units -= unitsSold
+                self.unitsReturned -= unitsSold
 
-                if  unitsSold > 0 {
-                    let writedown: Fraction = (unitsSold %/ self.units.total)
-                    let valueReturned: Int64 = self.value.total <> writedown
-
-                    self.units -= unitsSold
-                    self.unitsReturned -= unitsSold
-
-                    self.value -= valueReturned
-                    self.valueReturned -= valueReturned
-                }
+                // when this happens, it’s a good idea to also re-appraise the market value
+                // of the entire resource stockpile, which we woudn’t normally do otherwise
+                let price: Double = $0.price
+                self.value.untracked = Int64.init(Double.init(self.units.total) * price)
+                self.price = price
 
                 return valueRefunded
             } else {
@@ -159,7 +149,6 @@ extension ResourceInput {
                     return -fundsSpent
                 }
             }
-
         } (&exchange[self.id / currency])
     }
 }
