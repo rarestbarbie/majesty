@@ -70,8 +70,11 @@ extension BuildingContext: TransactingContext {
             return
         }
 
+        let π: Double = self.stats.profit.π
+        self.state.z.mix(profitability: π)
+
         if  let units: Int64 = self.state.backgroundable(
-                base: self.stats.utilization - Self.utilizationThreshold,
+                base: min(self.stats.utilization - Self.utilizationThreshold, π),
                 random: &turn.random
             ) {
             self.state.z.background(active: units)
@@ -262,8 +265,6 @@ extension BuildingContext: TransactingContext {
                 using: &turn.random.generator
             )
         )
-
-        self.state.z.mix(profitability: self.stats.profit.marginalProfitability)
     }
 
     mutating func advance(turn: inout Turn) {

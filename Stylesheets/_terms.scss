@@ -26,7 +26,7 @@ ul.terms {
             }
         }
         &[data-term-id^='e'],
-        &[data-term-id^='b'],
+        &[data-term-id^='f'],
         &[data-term-id^='t'] {
             > span.label::before {
                 content: var(--term-icon);
@@ -41,10 +41,10 @@ ul.terms {
         &[data-term-id='eA'] {
             --term-icon: '🧲';
         }
-        &[data-term-id='bA'] {
+        &[data-term-id='fA'] {
             --term-icon: '💡';
         }
-        &[data-term-id='bV'] {
+        &[data-term-id='fV'] {
             --term-icon: '💡';
 
             span.label::before {

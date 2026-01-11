@@ -4,7 +4,7 @@
         "decay": false,
         "scale": 400,
         "base": {
-            "Influence": 100
+            "Influence": 240
         }
     },
 

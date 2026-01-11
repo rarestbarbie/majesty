@@ -9,10 +9,10 @@
     },
     "expansion": {
         "*": {
-            "Construction": 100000
+            "Construction": 400000
         },
         "Nuclear Power Plant": {
-            "Construction": 100000,
+            "Construction": 400000,
             "Influence": 100000
         }
     }

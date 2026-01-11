@@ -49,7 +49,7 @@ extension Differentiable where Dimensions: BackgroundableMetrics {
     }
 
     func backgroundable(
-        base: Double = 0,
+        base: Double,
         random: inout PseudoRandom
     ) -> Int64? {
         let recallable: Int64 = self.z.active - 1
@@ -57,22 +57,16 @@ extension Differentiable where Dimensions: BackgroundableMetrics {
             return nil
         }
 
+        // operational needs not being met
+        let deficit: Double = self.z.fl - 1
         /// a number between -1 and 0, if backgrounding should occur
-        let scale: Double = min(
-            // utilization of active units is below threshold
-            base,
-            // operational needs not being met
-            self.z.fl - 1,
-            // self-explanatory
-            self.z.profitability
-        )
+        let scale: Double = min(base, deficit)
         if  scale >= 0 {
             return nil
         }
 
-        let mothball: Int64 = Binomial[recallable, scale * Dimensions.mothballing].sample(
-            using: &random.generator
-        )
+        let p: Double = max(-1, scale) * Dimensions.mothballing
+        let mothball: Int64 = Binomial[recallable, p].sample(using: &random.generator)
 
         return mothball > 0 ? mothball : nil
     }

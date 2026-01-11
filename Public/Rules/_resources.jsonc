@@ -24,7 +24,7 @@
         "color": "#f77c4c",
         "local": true,
         "floor": "wage",
-        "hours": 8
+        "hours": 32
     },
     "Services": {
         "emoji": "💼",
@@ -41,8 +41,7 @@
         "emoji": "⚖️",
         "color": "#873a8a",
         "local": true,
-        "floor": "wage",
-        "hours": 1
+        "floor": "wage"
     },
 
     "Beef": {
