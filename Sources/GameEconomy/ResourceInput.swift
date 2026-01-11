@@ -105,9 +105,7 @@ extension ResourceInput {
         on exchange: inout WorldMarkets
     ) -> Int64 {
         {
-            let target: Int64 = self.unitsDemanded * stockpileDaysTarget
             let limit: Int64 = self.unitsDemanded * stockpileDaysReturn
-
             if  limit < self.units.total {
                 // We actually have too much of the resource, and need to sell some off.
                 var unitsExceeded: Int64 = self.units.total - limit
@@ -120,35 +118,48 @@ extension ResourceInput {
                 // when this happens, it’s a good idea to also re-appraise the market value
                 // of the entire resource stockpile, which we woudn’t normally do otherwise
                 let price: Double = $0.price
-                self.value.untracked = Int64.init(Double.init(self.units.total) * price)
+                self.value.untracked = Int64.init(
+                    (Double.init(self.units.total) * price).rounded()
+                )
                 self.price = price
 
                 return valueRefunded
-            } else {
-                let needed: Int64 = target - self.units.total
-                if  needed <= 0 {
-                    self.price = $0.price
-                    return 0
-                }
-                if  budget <= 0 {
-                    self.price = $0.price
-                    return 0
-                } else {
-                    var funds: Int64 = budget
-                    let unitsAcquired: Int64 = $0.buy(needed, with: &funds)
-                    let fundsSpent: Int64 = budget - funds
-
-                    self.units += unitsAcquired
-                    self.value += fundsSpent
-
-                    // Compute actual price, if at least one unit was purchased, otherwise
-                    // theoretical market price
-                    self.price = unitsAcquired != 0
-                        ? Double.init(fundsSpent %/ unitsAcquired)
-                        : $0.price
-                    return -fundsSpent
-                }
             }
+
+            let target: Int64 = self.unitsDemanded * stockpileDaysTarget
+            let price: Double
+            let gains: Int64
+
+            let needed: Int64 = target - self.units.total
+            if  needed <= 0 {
+                price = $0.price
+                gains = 0
+            } else if budget <= 0 {
+                price = $0.price
+                gains = 0
+            } else {
+                var funds: Int64 = budget
+                let unitsAcquired: Int64 = $0.buy(needed, with: &funds)
+                let spent: Int64 = budget - funds
+
+                self.units += unitsAcquired
+                self.value += spent
+
+                // Compute actual price, if at least one unit was purchased, otherwise
+                // theoretical market price
+                price = unitsAcquired != 0 ? Double.init(spent %/ unitsAcquired) : $0.price
+                gains = -spent
+            }
+
+            if  let previous: Double = self.price, price < previous {
+                // adjust valuation downwards if market price has dropped
+                self.value.untracked = Int64.init(
+                    (Double.init(self.units.total) * price).rounded()
+                )
+            }
+
+            self.price = price
+            return gains
         } (&exchange[self.id / currency])
     }
 }
