@@ -4,12 +4,12 @@
     "maintenance": {
         "*": {
             "Electricity": 1,
-            "Construction": 1
+            "Construction": 4
         }
     },
     "development": {
         "*": {
-            "Construction": 2,
+            "Construction": 8,
             "Appliances": 2
         }
     }

@@ -56,10 +56,9 @@ extension InventoryBreakdown {
                 return
             }
 
-            let Δ: Delta<Pop.Dimensions> = pop.Δ
-            // reusing the buildings indicators for slaves
-            $0[.buildingsActive, +, tooltip: .PopActive, help: .PopActiveHelp] = Δ.active[/3]
-            $0[.buildingsVacant, -, tooltip: .PopVacant, help: .PopVacantHelp] = Δ.vacant[/3]
+            $0[.active, +, tooltip: .PopActive, help: .PopActiveHelp] = pop.Δ.active[/3]
+            $0[.vacant, -, tooltip: .PopVacant, help: .PopVacantHelp] = pop.Δ.vacant[/3]
+            $0[.stockAttraction, +, tooltip: nil, help: nil] = +pop.stats.profit.π[%1]
         }
 
         self.costs = pop.stats.cashFlow.chart(rules: cache.rules)
@@ -167,8 +166,9 @@ extension InventoryBreakdown {
 
         self.terms = Term.list {
             let Δ: Delta<Building.Dimensions> = building.Δ
-            $0[.buildingsActive, +, tooltip: .BuildingActive, help: .BuildingActiveHelp] = Δ.active[/3]
-            $0[.buildingsVacant, -, tooltip: .BuildingVacant, help: .BuildingVacantHelp] = Δ.vacant[/3]
+            $0[.active, +, tooltip: .BuildingActive, help: .BuildingActiveHelp] = Δ.active[/3]
+            $0[.vacant, -, tooltip: .BuildingVacant, help: .BuildingVacantHelp] = Δ.vacant[/3]
+            $0[.stockAttraction, +, tooltip: nil, help: nil] = +building.stats.profit.π[%1]
         }
 
         self.costs = building.stats.cashFlow.chart(rules: cache.rules)

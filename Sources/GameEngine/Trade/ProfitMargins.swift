@@ -92,7 +92,9 @@ extension ProfitMargins {
     /// The marginal profitability is associated with **contribution margin**, i.e. how much
     /// profit is generated after deducting only the share of fixed costs associated with
     /// actively utilized capacity.
-    var marginalProfitability: Double {
+    ///
+    /// This metric is always in the range of –1 to +1.
+    var π: Double {
         let variableCosts: Int64 = self.materialsCosts + self.operatingCosts
         if  variableCosts > self.revenue {
             // implies `variableCosts > 0`

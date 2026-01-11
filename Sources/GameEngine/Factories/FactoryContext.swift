@@ -214,7 +214,7 @@ extension FactoryContext: TransactingContext {
             let utilization: Double = min(1, Double.init(workers.count %/ workers.limit))
 
             // update profitability based on yesterday’s profit margins
-            self.state.z.mix(profitability: self.stats.profit.marginalProfitability)
+            self.state.z.mix(profitability: self.stats.profit.π)
 
             weights.segmented = .business(
                 l: self.state.inventory.l,
@@ -389,7 +389,7 @@ extension FactoryContext: TransactingContext {
                     } else {
                         /// Fire up to 40% of workers based on marginal profitability.
                         /// If gross profit is also negative, this happens more quickly.
-                        let p: Double = -0.4 * self.stats.profit.marginalProfitability
+                        let p: Double = -0.4 * self.stats.profit.π
                         let q: Double = 1 - self.stats.utilization
                         let l: Double = max(0, p, q)
                         let firable: Int64 = .init(l * Double.init(workers.count))

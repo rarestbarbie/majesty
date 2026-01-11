@@ -37,7 +37,6 @@
             "Poultry": 6
         },
         "l": {
-            "Water": 1,
             "Wheat": 6
         }
     },
@@ -49,7 +48,7 @@
             "Beef": 6
         },
         "l": {
-            "Water": 5,
+            "Water": 4,
             "Wheat": 5
         }
     },
@@ -59,8 +58,8 @@
             "occupation": "Livestock"
         },
         "e": {
-            "Hormones": 1,
-            "Housing": 1
+            "Construction": 1,
+            "Water": 1
         }
     },
     {
@@ -76,7 +75,7 @@
             "occupation": "Contractor"
         },
         "output": {
-            "Construction": 8
+            "Construction": 32
         }
     },
     {
