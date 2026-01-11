@@ -301,6 +301,8 @@ extension PopContext: TransactingContext {
 
             if !self.state.inventory.out.tradeable.isEmpty ||
                !self.state.mines.isEmpty {
+                // there are a lot more pops than there are factories, so to reduce the number
+                // of market trades, we sell stockpiles entirely or not at all, at random.
                 if  budget.liquidate || turn.random.wait(
                         // this should be in sync for all the mining job outputs as well
                         1 + self.state.inventory.out.tradeableDaysReserve,

@@ -2,6 +2,7 @@ import Assert
 import Fraction
 import GameIDs
 import OrderedCollections
+import Random
 
 @frozen public struct ResourceOutputs {
     public var tradeableDaysReserve: Int64
@@ -101,7 +102,7 @@ extension ResourceOutputs {
     }
 }
 extension ResourceOutputs {
-    /// Returns the amount of funds actually received.
+    /// Sell all of the stockpiled resource, returning the amount of funds actually received.
     public mutating func sell(
         in currency: CurrencyID,
         to exchange: inout WorldMarkets,
@@ -111,6 +112,20 @@ extension ResourceOutputs {
             $0 += self.outputs.values[$1].sell(in: currency, to: &exchange)
         }
     }
+    /// Sell a uniformly-distributed random amount of the stockpiled resource, returning the
+    /// amount of funds actually received.
+    public mutating func sell(
+        in currency: CurrencyID,
+        to exchange: inout WorldMarkets,
+        random: inout PseudoRandom
+    ) -> Int64 {
+        self.tradeableDaysReserve = 0
+        return self.tradeable.indices.reduce(into: 0) {
+            $0 += self.outputs.values[$1].sell(in: currency, to: &exchange, random: &random)
+        }
+    }
+    /// Mark the value of all stockpiled goods to the theoretical market value at the last
+    /// traded price, or the market mid price if there is no last traded price.
     public mutating func mark(
         in currency: CurrencyID,
         to exchange: borrowing WorldMarkets,

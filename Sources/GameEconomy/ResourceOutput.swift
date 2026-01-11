@@ -1,5 +1,6 @@
 import Fraction
 import GameIDs
+import Random
 
 @frozen public struct ResourceOutput: Identifiable {
     public let id: Resource
@@ -86,14 +87,45 @@ extension ResourceOutput {
 extension ResourceOutput {
     mutating func sell(
         in currency: CurrencyID,
+        to exchange: inout WorldMarkets,
+    ) -> Int64 {
+        self.sell(units: self.units.total, in: currency, to: &exchange)
+    }
+
+    mutating func sell(
+        in currency: CurrencyID,
+        to exchange: inout WorldMarkets,
+        random: inout PseudoRandom
+    ) -> Int64 {
+        self.units.total > 0 ? self.sell(
+            units: .random(in: 0 ... self.units.total, using: &random.generator),
+            in: currency,
+            to: &exchange
+        ) : 0
+    }
+
+    mutating func mark(
+        in currency: CurrencyID,
+        to exchange: borrowing WorldMarkets
+    ) {
+        // if we previously recorded a price, use it for theoretical calculation,
+        // otherwise use the (optimistic) market mid price
+        let price: Double = self.price ?? exchange[self.id / currency].price
+        self.mark(to: price)
+    }
+}
+extension ResourceOutput {
+    private mutating func sell(
+        units unitsAvailable: Int64,
+        in currency: CurrencyID,
         to exchange: inout WorldMarkets
     ) -> Int64 {
-        var unitsRemaining: Int64 = self.units.total
+        var unitsRemaining: Int64 = unitsAvailable
         if  unitsRemaining > 0 {
             let valueSold: Int64 = exchange[self.id / currency].sell(&unitsRemaining)
-            let unitsSold: Int64 = self.units.total - unitsRemaining
+            let unitsSold: Int64 = unitsAvailable - unitsRemaining
 
-            self.units.drain()
+            self.units -= unitsAvailable
             self.unitsSold = unitsSold
             self.valueSold = valueSold
             // we drained any unsold units, so value estimate is now zero
@@ -108,20 +140,11 @@ extension ResourceOutput {
             return 0
         }
     }
-    mutating func mark(
-        in currency: CurrencyID,
-        to exchange: borrowing WorldMarkets
-    ) {
-        // if we previously recorded a price, use it for theoretical calculation,
-        // otherwise use the (optimistic) market mid price
-        let price: Double = self.price ?? exchange[self.id / currency].price
-        self.mark(to: price)
-        self.valueEstimate = Int64.init(Double.init(self.units.total) * price)
-    }
 
     private mutating func mark(to price: Double) {
         self.price = price
         self.valueProduced = Int64.init(Double.init(self.units.added) * price)
+        self.valueEstimate = Int64.init(Double.init(self.units.total) * price)
     }
 }
 
