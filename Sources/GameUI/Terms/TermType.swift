@@ -9,8 +9,8 @@ import JavaScriptInterop
     case stockAttraction
 
     case pop(PopOccupation)
-    case buildingsActive
-    case buildingsVacant
+    case active
+    case vacant
 
     case gdp
 }
@@ -32,8 +32,8 @@ extension TermType: RawRepresentable {
         case .pop(.Influencer): "pI"
         case .pop(.Aristocrat): "pO"
         case .pop(.Politician): "pP"
-        case .buildingsActive: "bA"
-        case .buildingsVacant: "bV"
+        case .active: "fA"
+        case .vacant: "fV"
         case .gdp: "tD"
         }
     }

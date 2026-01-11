@@ -245,7 +245,7 @@
     },
     "Fossil Power Plant": {
         "materials": {
-            "Construction": 1,
+            "Construction": 2,
             "Hydrocarbons": 6,
             "Water": 5
         },
@@ -259,7 +259,7 @@
     },
     "Hydroelectric Dam": {
         "materials": {
-            "Construction": 1,
+            "Construction": 4,
             "Machine Parts": 1
         },
         "output": {

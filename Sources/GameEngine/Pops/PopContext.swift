@@ -125,7 +125,10 @@ extension PopContext: AllocatingContext {
         }
 
         if case .Ward = self.state.type.stratum {
-            if  let units: Int64 = self.state.backgroundable(random: &turn.random) {
+            let π: Double = self.stats.profit.π
+            self.state.z.mix(profitability: π)
+
+            if  let units: Int64 = self.state.backgroundable(base: π, random: &turn.random) {
                 self.state.z.background(active: units)
                 self.state.mothballed += units
             } else if
@@ -179,8 +182,6 @@ extension PopContext: AllocatingContext {
         let budget: Pop.Budget
 
         if  case .Ward = self.state.type.stratum {
-            self.state.z.mix(profitability: self.stats.profit.marginalProfitability)
-
             let weights: (
                 segmented: SegmentedWeights<InelasticDemand>,
                 tradeable: AggregateWeights<InelasticDemand>

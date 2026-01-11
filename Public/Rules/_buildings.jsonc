@@ -9,10 +9,10 @@
         },
         "maintenance": {
             "Electricity": 30,
-            "Construction": 10
+            "Construction": 40
         },
         "development": {
-            "Construction": 480,
+            "Construction": 200,
             "Appliances": 480,
             "Influence": 1
         },

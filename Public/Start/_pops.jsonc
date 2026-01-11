@@ -439,6 +439,11 @@
                 "size": 640000
             },
             {
+                "race": "Chicken",
+                "type": "A",
+                "size": 42000
+            },
+            {
                 "race": "Cow",
                 "type": "A",
                 "size": 29000
