@@ -13,6 +13,7 @@ extension Pop {
         var vl: Int64
         var ve: Int64
         var vx: Int64
+        var vout: Int64
         var px: Double
         /// A number between -1 and 1.
         var profitability: Double
@@ -39,6 +40,7 @@ extension Pop.Dimensions {
             vl: 0,
             ve: 0,
             vx: 0,
+            vout: 0,
             px: 1,
             profitability: 0
         )
@@ -56,6 +58,7 @@ extension Pop.Dimensions {
         case vl = "vl"
         case ve = "ve"
         case vx = "vx"
+        case vout = "vout"
         case px = "px"
         case profitability = "pa"
     }
@@ -72,6 +75,7 @@ extension Pop.Dimensions: JavaScriptEncodable {
         js[.vl] = self.vl
         js[.ve] = self.ve
         js[.vx] = self.vx
+        js[.vout] = self.vout == 0 ? nil : self.vout
         js[.px] = self.px
         js[.profitability] = self.profitability
     }
@@ -89,6 +93,7 @@ extension Pop.Dimensions: JavaScriptDecodable {
             vl: try js[.vl]?.decode() ?? 0,
             ve: try js[.ve]?.decode() ?? 0,
             vx: try js[.vx]?.decode() ?? 0,
+            vout: try js[.vout]?.decode() ?? 0,
             px: try js[.px]?.decode() ?? 1,
             profitability: try js[.profitability]?.decode() ?? 0,
         )

@@ -14,7 +14,7 @@ extension LegalEntityContext {
         ResourceInputs.stockpileDaysFactor * Self.stockpileDaysRange.upperBound
     }
 
-    func stockpileTarget(_ random: inout PseudoRandom) -> ResourceStockpileTarget {
+    static func stockpileTarget(_ random: inout PseudoRandom) -> ResourceStockpileTarget {
         .random(in: Self.stockpileDaysRange, using: &random)
     }
 

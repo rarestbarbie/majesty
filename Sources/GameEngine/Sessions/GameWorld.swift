@@ -12,6 +12,8 @@ struct GameWorld: ~Copyable {
     var localMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
     var worldMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>
     var tradeRoutes: OrderedDictionary<CurrencyID, TradeRoutes>
+
+    var ledger: EconomicLedger
 }
 extension GameWorld {
     init(
@@ -20,6 +22,7 @@ extension GameWorld {
         localMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>,
         worldMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>,
         tradeRoutes: OrderedDictionary<CurrencyID, TradeRoutes>,
+        ledger: EconomicLedger,
         random: PseudoRandom,
     ) {
         self.random = random
@@ -28,6 +31,7 @@ extension GameWorld {
         self.worldMarkets = worldMarkets
         self.localMarkets = localMarkets
         self.tradeRoutes = tradeRoutes
+        self.ledger = ledger
     }
 }
 extension GameWorld {
@@ -47,7 +51,8 @@ extension GameWorld {
                 localMarkets: .init(
                     table: self.localMarkets
                 ),
-                tradeRoutes: self.tradeRoutes
+                tradeRoutes: self.tradeRoutes,
+                ledger: self.ledger
             )
         }
         _modify {
@@ -59,6 +64,7 @@ extension GameWorld {
                     localMarkets: [:],
                     worldMarkets: [:],
                     tradeRoutes: [:],
+                    ledger: .init(),
                     random: .init(seed: 0),
                 )
             }
@@ -69,6 +75,7 @@ extension GameWorld {
                     localMarkets: turn.localMarkets.all,
                     worldMarkets: turn.worldMarkets.all,
                     tradeRoutes: turn.tradeRoutes,
+                    ledger: turn.ledger,
                     random: turn.random,
                 )
             }

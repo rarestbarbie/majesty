@@ -42,7 +42,7 @@ extension FactoryContext.FloorUpdate {
         let wagesPaid: Int64 = workersPaid <= 0 ? 0 : turn.bank.transfer(
             budget: workersPaid * factory.z.wn,
             source: factory.id.lei,
-            recipients: turn.payscale(shuffling: workers.pops, rate: factory.z.wn)
+            recipients: .shuffle(pops: workers.pops, rate: factory.z.wn, using: &turn.random)
         )
 
         let fireLater: Int64 = workers.count - fireToday - workersPaid

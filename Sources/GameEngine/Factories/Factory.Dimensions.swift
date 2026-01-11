@@ -7,6 +7,7 @@ extension Factory {
         var vl: Int64
         var ve: Int64
         var vx: Int64
+        var vout: Int64
 
         /// Worker raise probability, set if the factory couldn’t hire any workers.
         ///
@@ -42,6 +43,7 @@ extension Factory.Dimensions {
             vl: 0,
             ve: 0,
             vx: 0,
+            vout: 0,
             wf: nil,
             wn: 1,
             cf: nil,
@@ -61,6 +63,7 @@ extension Factory.Dimensions {
         case vl = "vl"
         case ve = "ve"
         case vx = "vx"
+        case vout = "vout"
         case wf = "wf"
         case wn = "wn"
         case cf = "cf"
@@ -79,6 +82,7 @@ extension Factory.Dimensions: JavaScriptEncodable {
         js[.vl] = self.vl
         js[.ve] = self.ve
         js[.vx] = self.vx
+        js[.vout] = self.vout
         js[.wf] = self.wf
         js[.wn] = self.wn
         js[.cf] = self.cf
@@ -98,6 +102,7 @@ extension Factory.Dimensions: JavaScriptDecodable {
             vl: try js[.vl]?.decode() ?? 0,
             ve: try js[.ve]?.decode() ?? 0,
             vx: try js[.vx]?.decode() ?? 0,
+            vout: try js[.vout]?.decode() ?? 0,
             wf: try js[.wf]?.decode(),
             wn: try js[.wn]?.decode() ?? 1,
             cf: try js[.cf]?.decode(),

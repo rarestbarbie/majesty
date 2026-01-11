@@ -7,6 +7,7 @@ extension Pop {
         let l: ResourceBudgetTier
         let e: ResourceBudgetTier
         let x: ResourceBudgetTier
+        let liquidate: Bool
         let investment: Int64
         let dividend: Int64
         let buybacks: Int64
@@ -30,8 +31,10 @@ extension Pop.Budget {
         )
 
         let d: CashAllocationBasis = .business
-        let v: Int64 = state.vl + state.ve
-        let basis: Int64 = CashAllocationBasis.adjust(liquidity: account.settled, assets: v)
+        let (basis, liquidate): (
+            Int64,
+            Bool
+        ) = CashAllocationBasis.adjust(liquidity: account.settled, assets: state.vv)
 
         let bl: Int64 = d.l * stockpileMaxDays * totalCostPerDay.l
         let be: Int64 = d.e * stockpileMaxDays * totalCostPerDay.e
@@ -57,6 +60,7 @@ extension Pop.Budget {
             l: l,
             e: e,
             x: .init(),
+            liquidate: liquidate,
             investment: 0,
             dividend: dividend,
             buybacks: buybacks
@@ -82,8 +86,10 @@ extension Pop.Budget {
         )
 
         let d: CashAllocationBasis = .consumer
-        let v: Int64 = state.vl + state.ve
-        let basis: Int64 = CashAllocationBasis.adjust(liquidity: account.settled, assets: v)
+        let (basis, liquidate): (
+            Int64,
+            Bool
+        ) = CashAllocationBasis.adjust(liquidity: account.settled, assets: state.vv)
 
         let bl: Int64 = stockpileMaxDays * d.l * totalCostPerDay.l
         let be: Int64 = stockpileMaxDays * d.e * totalCostPerDay.e
@@ -123,6 +129,7 @@ extension Pop.Budget {
             l: l,
             e: e,
             x: x,
+            liquidate: liquidate,
             investment: investor ? (basis - bl - be) / d.y : 0,
             dividend: 0,
             buybacks: 0
@@ -137,6 +144,7 @@ extension Pop.Budget {
         case e_tradeable = "et"
         case x_segmented = "xs"
         case x_tradeable = "xt"
+        case liquidate = "liq"
 
         case investment = "i"
         case dividend = "d"
@@ -151,6 +159,7 @@ extension Pop.Budget: JavaScriptEncodable {
         js[.e_tradeable] = self.e.tradeable
         js[.x_segmented] = self.x.segmented
         js[.x_tradeable] = self.x.tradeable
+        js[.liquidate] = self.liquidate ? true : nil
 
         js[.investment] = self.investment
         js[.dividend] = self.dividend
@@ -172,6 +181,7 @@ extension Pop.Budget: JavaScriptDecodable {
                 segmented: try js[.x_segmented].decode(),
                 tradeable: try js[.x_tradeable].decode()
             ),
+            liquidate: try js[.liquidate]?.decode() ?? false,
             investment: try js[.investment].decode(),
             dividend: try js[.dividend].decode(),
             buybacks: try js[.buybacks].decode(),

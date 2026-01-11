@@ -1,9 +1,19 @@
 import GameIDs
+import Random
 
 extension Turn {
     struct Payscale {
         let pops: [(id: PopID, count: Int64)]
         let rate: Int64
+    }
+}
+extension Turn.Payscale {
+    static func shuffle(
+        pops: [(id: PopID, count: Int64)],
+        rate: Int64,
+        using random: inout PseudoRandom,
+    ) -> Self {
+        .init(pops: pops.shuffled(using: &random.generator), rate: rate)
     }
 }
 extension Turn.Payscale: RandomAccessCollection {

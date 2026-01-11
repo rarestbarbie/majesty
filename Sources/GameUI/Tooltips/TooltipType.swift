@@ -62,4 +62,5 @@ import JavaScriptKit
     case TileCulture
     case TilePopType
     case TileGDP
+    case TileEconomyContribution
 }

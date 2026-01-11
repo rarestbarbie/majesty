@@ -16,9 +16,10 @@ struct Factory: LegalEntityState, Identifiable {
     var size: Size
 
     var liquidation: FactoryLiquidation?
-
     var inventory: Inventory
     var spending: Spending
+    /// The number of batches currently in the production pipeline.
+    var pipeline: Int64
     /// This is part of the persistent state, because it is only computed during a turn, and
     /// we want the budget info to be available for inspection when loading a save.
     var budget: Budget?
@@ -37,6 +38,7 @@ extension Factory: Sectionable {
             liquidation: nil,
             inventory: .init(),
             spending: .zero,
+            pipeline: 0,
             budget: nil,
             y: .init(),
             z: .init(),
@@ -96,6 +98,8 @@ extension Factory {
         case spending_oc = "sOC"
         case spending_ow = "sOW"
 
+        case pipeline
+
         case budget_liquidation = "bL"
         case budget_operating = "bO"
 
@@ -126,6 +130,8 @@ extension Factory: JavaScriptEncodable {
         js[.spending_wages] = self.spending.wages
         js[.spending_oc] = self.spending.oc
         js[.spending_ow] = self.spending.ow
+
+        js[.pipeline] = self.pipeline
 
         switch self.budget {
         case .constructing(let value)?: js[.budget_operating] = value
@@ -180,6 +186,7 @@ extension Factory: JavaScriptDecodable {
                 oc: try js[.spending_oc]?.decode() ?? 0,
                 ow: try js[.spending_ow]?.decode() ?? 0
             ),
+            pipeline: try js[.pipeline]?.decode() ?? 0,
             budget: budget,
             y: try js[.y]?.decode() ?? today,
             z: today,

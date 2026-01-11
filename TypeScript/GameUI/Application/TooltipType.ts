@@ -51,4 +51,5 @@ export enum TooltipType {
 
     TileCulture = 'TileCulture',
     TilePopType = 'TilePopType',
+    TileEconomyContribution = 'TileEconomyContribution',
 }

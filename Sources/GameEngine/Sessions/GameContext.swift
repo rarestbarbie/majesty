@@ -222,7 +222,7 @@ extension GameContext {
             self.pops[i].state.prune(in: retain)
         }
     }
-    private mutating func index(world: borrowing GameWorld) throws {
+    private mutating func index(world: borrowing GameWorld) throws -> EconomicLedger {
         for i: Int in self.countries.indices {
             let country: Country = self.countries.state[i]
             let properties: CountryProperties = try .compute(for: country, in: self)
@@ -274,7 +274,11 @@ extension GameContext {
                 self.mines[modifying: job.id].addWorkforceCount(pop: pop, job: job)
             }
 
-            guard pop.type.stratum <= .Ward else {
+            if case .Owner = pop.type.stratum {
+                // resources produced by aristocrats and politicians are not counted as part of
+                // GDP, otherwise campaign contributions would be like, 99 percent of GDP
+                continue
+            } else if pop.type.stratum > .Ward {
                 // free pops do not have shareholders
                 economy.count(output: pop, region: region)
                 continue
@@ -283,9 +287,8 @@ extension GameContext {
             /// context can exclude the pop table itself, allowing us to mutate `PopContext`
             /// in-place there without individually retaining and releasing every `PopContext`
             /// in the array on every loop iteration, which would be O(n²)!
-            let equity: Equity<LEI>.Statistics = .compute(
-                equity: pop.equity,
-                assets: world.bank[account: pop.id.lei],
+            let equity: Equity<LEI>.Statistics = world.bank.valuation(
+                of: pop,
                 in: self.legalPass
             )
             economy.count(output: pop.inventory.out, region: region, equity: equity)
@@ -301,9 +304,8 @@ extension GameContext {
                 fatalError("Factory \(factory.id) has no home tile!!!")
             }
 
-            let equity: Equity<LEI>.Statistics = .compute(
-                equity: factory.equity,
-                assets: world.bank[account: factory.id.lei],
+            let equity: Equity<LEI>.Statistics = world.bank.valuation(
+                of: factory,
                 in: self.legalPass
             )
             economy.count(output: factory.inventory.out, region: region, equity: equity)
@@ -319,9 +321,8 @@ extension GameContext {
                 fatalError("Building \(building.id) has no home tile!!!")
             }
 
-            let equity: Equity<LEI>.Statistics = .compute(
-                equity: building.equity,
-                assets: world.bank[account: building.id.lei],
+            let equity: Equity<LEI>.Statistics = world.bank.valuation(
+                of: building,
                 in: self.legalPass
             )
             economy.count(output: building.inventory.out, region: region, equity: equity)
@@ -335,11 +336,9 @@ extension GameContext {
             #assert(counted != nil, "Mine \(mine.id) has no home tile!!!")
         }
 
-        self.count(
-            aggregating: economy.aggregate(
-                localMarkets: world.localMarkets,
-                worldMarkets: world.worldMarkets,
-            )
+        return economy.aggregate(
+            localMarkets: world.localMarkets,
+            worldMarkets: world.worldMarkets,
         )
     }
 }
@@ -448,7 +447,9 @@ extension GameContext {
 
     mutating func compute(_ world: inout GameWorld) throws {
         self.prune(world: &world)
-        try self.index(world: world)
+
+        world.ledger = try self.index(world: world)
+        self.count(aggregating: world.ledger)
 
         for i: Int in self.planets.indices {
             try self.planets[i].afterIndexCount(world: world, context: self.territoryPass)

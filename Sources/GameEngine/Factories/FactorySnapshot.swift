@@ -22,6 +22,7 @@ struct FactorySnapshot: FactoryProperties, Sendable {
 
     let inventory: InventorySnapshot
     let spending: Factory.Spending
+    let pipeline: Int64
     /// This is part of the persistent state, because it is only computed during a turn, and
     /// we want the budget info to be available for inspection when loading a save.
     let budget: Factory.Budget?
@@ -53,6 +54,7 @@ extension FactorySnapshot {
             liquidation: state.liquidation,
             inventory: .factory(state),
             spending: state.spending,
+            pipeline: state.pipeline,
             budget: state.budget,
             y: state.y,
             z: state.z,
@@ -71,6 +73,7 @@ extension FactorySnapshot {
             $0["Productivity", +] = productivity[%2]
             $0["Efficiency", +] = +?(efficiency - 1)[%2]
         }
+        ul["Batches in progress", +] = self.pipeline[/3]
     }
 
     private func explainNeeds(_ ul: inout TooltipInstructionEncoder, x: Int64) {
@@ -98,7 +101,7 @@ extension FactorySnapshot {
     func tooltipAccount(_ account: Bank.Account) -> Tooltip? {
         let profit: ProfitMargins = self.stats.profit
         let liquid: Delta<Int64> = account.Δ
-        let assets: Delta<Int64> = self.Δ.vl + self.Δ.ve + self.Δ.vx
+        let assets: Delta<Int64> = self.Δ.assets
 
         return .instructions {
             $0["Total valuation", +] = (liquid + assets)[/3]

@@ -9,6 +9,7 @@ extension Building {
         var vl: Int64
         var ve: Int64
         var vx: Int64
+        var vout: Int64
 
         var fl: Double
         var fe: Double
@@ -35,6 +36,7 @@ extension Building.Dimensions {
             vl: 0,
             ve: 0,
             vx: 0,
+            vout: 0,
             fl: 0,
             fe: 0,
             fx: 0,
@@ -51,6 +53,7 @@ extension Building.Dimensions {
         case vl
         case ve
         case vx
+        case vout
         case fl
         case fe
         case fx
@@ -66,6 +69,7 @@ extension Building.Dimensions: JavaScriptEncodable {
         js[.vl] = self.vl
         js[.ve] = self.ve
         js[.vx] = self.vx
+        js[.vout] = self.vout
         js[.fl] = self.fl
         js[.fe] = self.fe
         js[.fx] = self.fx
@@ -82,6 +86,7 @@ extension Building.Dimensions: JavaScriptDecodable {
             vl: try js[.vl]?.decode() ?? 0,
             ve: try js[.ve]?.decode() ?? 0,
             vx: try js[.vx]?.decode() ?? 0,
+            vout: try js[.vout]?.decode() ?? 0,
             fl: try js[.fl]?.decode() ?? 0,
             fe: try js[.fe]?.decode() ?? 0,
             fx: try js[.fx]?.decode() ?? 0,

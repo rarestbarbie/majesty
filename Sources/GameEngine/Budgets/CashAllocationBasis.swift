@@ -19,11 +19,16 @@ extension CashAllocationBasis {
     /// buybacks, currently constant, but could be dynamic in the future
     var y: Int64 { 365 }
 
-    static func adjust(liquidity: Int64, assets: Int64) -> Int64 {
+    static func adjust(liquidity: Int64, assets: Int64) -> (basis: Int64, liquidate: Bool) {
         /// if the stockpile is expanded sharply, that makes the next day’s balance look
         /// artificially low, so we need to account for that when calculating budgets
         /// as long as the `d` vector is reasonably sized (less than 75 percent of funds),
         /// this will not cause overspending
-        return liquidity + min(assets, liquidity / 4)
+        let assetsCap: Int64 = liquidity / 4
+        if  assetsCap < assets {
+            return (liquidity + assetsCap, true)
+        } else {
+            return (liquidity + assets, false)
+        }
     }
 }

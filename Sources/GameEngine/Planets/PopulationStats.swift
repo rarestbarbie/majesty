@@ -1,6 +1,4 @@
-import D
 import GameIDs
-import GameUI
 
 struct PopulationStats {
     var occupation: [PopOccupation: Row]
@@ -35,60 +33,6 @@ extension PopulationStats {
         } else {
             self.employed += stats.employedBeforeEgress
             self.free.addResidentCount(pop)
-        }
-    }
-}
-extension PopulationStats {
-    func tooltip(culture: Culture) -> Tooltip? {
-        let free: Int64? = self.free.cultures[culture.id]
-        let enslaved: Int64? = self.enslaved.cultures[culture.id]
-
-        let share: Int64
-        let total: Int64
-
-        if  let free: Int64 {
-            share = free
-            total = self.free.total
-        } else if
-            let enslaved: Int64 {
-            share = enslaved
-            total = self.enslaved.total
-        } else {
-            return nil
-        }
-
-        if  total == 0 {
-            return nil
-        }
-
-        return .instructions(style: .borderless) {
-            $0[culture.name] = (Double.init(share) / Double.init(total))[%3]
-            $0[>] {
-                $0["Free"] = free?[/3]
-                $0["Enslaved"] = enslaved?[/3]
-            }
-        }
-    }
-    func tooltip(occupation: PopOccupation) -> Tooltip? {
-        guard
-        let share: Row = self.occupation[occupation],
-            share.count > 0 else {
-            return nil
-        }
-
-        let total: Int64 = self.free.total
-
-        if  total == 0 {
-            return nil
-        }
-
-        return .instructions(style: .borderless) {
-            let n: Double = Double.init(share.count)
-            let d: Double = Double.init(total)
-            $0[occupation.plural] = (n / d)[%3]
-            $0[>] {
-                $0["Unemployment rate", (-)] = (Double.init(share.unemployed) / n)[%3]
-            }
         }
     }
 }

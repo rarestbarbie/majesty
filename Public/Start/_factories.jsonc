@@ -41,10 +41,10 @@
         "factories": {
             "Hydroelectric Dam": 5,
             "Supermarket": 2,
-            "Cereal Farm": 1,
+            "Cereal Farm": 3,
             "Machine Parts Factory": 1,
             "Automotive Assembly Plant": 1,
-            "Appliance Factory": 1,
+            "Appliance Factory": 2,
             "Nuclear Power Plant": 0,
             "Fossil Power Plant": 3,
             "Chicken Plant": 1
@@ -245,9 +245,10 @@
     {
         "tile": "399N2,-1",
         "factories": {
-            "Hydroelectric Dam": 1,
+            "Hydroelectric Dam": 3,
             "Supermarket": 1,
-            "Fossil Power Plant": 1
+            "Fossil Power Plant": 1,
+            "Cereal Farm": 3
         }
     },
 
@@ -279,13 +280,13 @@
             "Supermarket": 5,
             "Nuclear Power Plant": 1,
             "Aluminum Mill": 3,
-            "Appliance Factory": 4,
+            "Appliance Factory": 5,
             "Automotive Assembly Plant": 1,
             "Battery Plant": 1,
             "Medical Equipment Factory": 3,
             "Polypropylene Plant": 2,
             "Semiconductor Foundry": 1,
-            "Electronics Factory": 1
+            "Electronics Factory": 2
         }
     },
     // Northern China
@@ -301,7 +302,8 @@
             "Machine Parts Factory": 1,
             "Electronics Factory": 1,
             "Automotive Assembly Plant": 1,
-            "Chicken Plant": 1
+            "Chicken Plant": 1,
+            "Appliance Factory": 2
         }
     },
 

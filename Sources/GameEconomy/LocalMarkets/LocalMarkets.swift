@@ -76,7 +76,7 @@ extension LocalMarkets {
         tile: Address,
     ) {
         for output: ResourceOutput in supply {
-            let units: Int64 = output.unitsReleased
+            let units: Int64 = output.units.removed
             if  units > 0 {
                 self[output.id / tile].sell(amount: units, entity: entity, memo: memo)
             }

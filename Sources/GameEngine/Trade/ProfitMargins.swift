@@ -34,7 +34,7 @@ extension ProfitMargins {
             materialsCosts: factory.inventory.l.valueConsumed + factory.spending.wages,
             operatingCosts: factory.inventory.e.valueConsumed + factory.spending.salariesUsed,
             carryingCosts: factory.spending.salariesIdle,
-            revenue: factory.inventory.out.valueSold
+            revenue: factory.inventory.out.valueProduced
         )
     }
 
@@ -52,7 +52,7 @@ extension ProfitMargins {
             materialsCosts: asset.inventory.l.valueConsumed,
             operatingCosts: fixedCosts - carryingCosts,
             carryingCosts: carryingCosts,
-            revenue: asset.inventory.out.valueSold
+            revenue: asset.inventory.out.valueProduced
         )
     }
 }

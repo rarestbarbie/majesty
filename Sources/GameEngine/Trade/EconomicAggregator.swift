@@ -23,12 +23,9 @@ extension EconomicAggregator {
         region: RegionalAuthority,
         tradeable: Bool
     ) {
-        let regionalKey: EconomicLedger.Regional = .init(
-                resource: output.id,
-                location: region.id
-            )
         let currency: CurrencyID? = tradeable ? region.country.currency.id : nil
-        self.produced[regionalKey, default: (0, currency)].units += output.units.added
+        let produced: Int64 = tradeable ? output.units.added : output.unitsSold
+        self.produced[region.id / output.id, default: (0, currency)].units += produced
     }
     private mutating func countNational(
         output: ResourceOutput,
@@ -37,7 +34,7 @@ extension EconomicAggregator {
         country: CountryID,
         profile: PopType
     ) {
-        let produced: Double = .init(output.units.added)
+        let produced: Double = .init(tradeable ? output.units.added : output.unitsSold)
         let location: Address? = tradeable ? nil : region.id
 
         let cultureKey: EconomicLedger.National<CultureID> = .init(
@@ -66,7 +63,9 @@ extension EconomicAggregator {
         for (tradeable, output): (tradeable: Bool, ResourceOutput) in output.joined {
             self.countRegional(output: output, region: region, tradeable: tradeable)
 
-            let share: Double = Double.init(output.units.added %/ equity.shareCount)
+            let share: Double = Double.init(
+                (tradeable ? output.units.added : output.unitsSold) %/ equity.shareCount
+            )
             for owner: Equity<LEI>.Statistics.Shareholder in equity.owners {
                 let owned: Double = Double.init(owner.shares) * share
                 let location: Address? = tradeable ? nil : region.id

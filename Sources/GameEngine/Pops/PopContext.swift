@@ -141,15 +141,23 @@ extension PopContext: AllocatingContext {
 
         let currency: CurrencyID = region.currency.id
 
-        self.state.inventory.out.sync(with: self.output, releasing: 1)
+        self.state.inventory.out.sync(with: self.output)
+        self.state.inventory.out.produce(
+            from: self.output,
+            scalingFactor: (self.state.z.active, 1)
+        )
         for j: Int in self.state.mines.values.indices {
             {
                 guard
-                let output: ResourceTier = self.mines[$0.id]?.output else {
+                let conditions: MiningJobConditions = self.mines[$0.id] else {
                     fatalError("missing stored info for mine '\($0.id)'!!!")
                 }
 
-                $0.out.sync(with: output, releasing: 1 %/ 4)
+                $0.out.sync(with: conditions.output)
+                $0.out.produce(
+                    from: conditions.output,
+                    scalingFactor: ($0.count, conditions.factor)
+                )
             } (&self.state.mines.values[j])
         }
 
@@ -291,31 +299,40 @@ extension PopContext: TransactingContext {
         {
             (account: inout Bank.Account) in
 
-            account.r += self.state.inventory.out.sell(
-                in: region.currency.id,
-                on: &turn.worldMarkets
-            )
-            self.state.inventory.out.deposit(
-                from: self.output,
-                scalingFactor: (self.state.z.active, 1)
-            )
-
-            for j: Int in self.state.mines.values.indices {
-                account.r += {
-                    guard
-                    let conditions: MiningJobConditions = self.mines[$0.id] else {
-                        fatalError("missing stored info for mine '\($0.id)'!!!")
-                    }
-
-                    $0.out.deposit(
-                        from: conditions.output,
-                        scalingFactor: ($0.count, conditions.factor)
+            if !self.state.inventory.out.tradeable.isEmpty ||
+               !self.state.mines.isEmpty {
+                // there are a lot more pops than there are factories, so to reduce the number
+                // of market trades, we sell stockpiles entirely or not at all, at random.
+                if  budget.liquidate || turn.random.wait(
+                        // this should be in sync for all the mining job outputs as well
+                        1 + self.state.inventory.out.tradeableDaysReserve,
+                        1 ... Self.stockpileDaysRange.upperBound
+                    ) {
+                    account.r += self.state.inventory.out.sell(
+                        in: region.currency.id,
+                        to: &turn.worldMarkets
                     )
-                    return $0.out.sell(in: region.currency.id, on: &turn.worldMarkets)
-                } (&self.state.mines.values[j])
+                    for j: Int in self.state.mines.values.indices {
+                        account.r += self.state.mines.values[j].out.sell(
+                            in: region.currency.id,
+                            to: &turn.worldMarkets
+                        )
+                    }
+                } else {
+                    self.state.inventory.out.mark(
+                        in: region.currency.id,
+                        to: turn.worldMarkets
+                    )
+                    for j: Int in self.state.mines.values.indices {
+                        self.state.mines.values[j].out.mark(
+                            in: region.currency.id,
+                            to: turn.worldMarkets
+                        )
+                    }
+                }
             }
 
-            let stockpileDays: ResourceStockpileTarget = self.stockpileTarget(&turn.random)
+            let stockpileDays: ResourceStockpileTarget = Self.stockpileTarget(&turn.random)
             let z: (l: Double, e: Double, x: Double) = self.state.needsScalePerCapita
 
             if  budget.l.tradeable > 0 {

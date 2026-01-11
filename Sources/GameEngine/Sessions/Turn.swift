@@ -20,6 +20,8 @@ struct Turn: ~Copyable {
         ),
         fire: Jobs.Fire
     )
+
+    let ledger: EconomicLedger
 }
 extension Turn {
     init(
@@ -29,6 +31,7 @@ extension Turn {
         worldMarkets: consuming WorldMarkets,
         localMarkets: consuming LocalMarkets,
         tradeRoutes: OrderedDictionary<CurrencyID, TradeRoutes>,
+        ledger: EconomicLedger,
     ) {
         self.random = random
         self.notifications = notifications
@@ -39,17 +42,10 @@ extension Turn {
         self.stockMarkets = .init()
         self.conversions = []
         self.jobs = (([:], [:]), .init())
+
+        self.ledger = ledger
     }
 }
-
 extension Turn {
     var date: GameDate { self.notifications.date }
-}
-extension Turn {
-    mutating func payscale(
-        shuffling pops: [(id: PopID, count: Int64)],
-        rate: Int64
-    ) -> Payscale {
-        .init(pops: pops.shuffled(using: &self.random.generator), rate: rate)
-    }
 }
