@@ -18,15 +18,6 @@ ul.factors {
         > span {
             display: inline-block;
         }
-
-        [data-factor='bonus'][data-sign='pos'],
-        [data-factor='malus'][data-sign='neg'] {
-            color: var(--color-pos-text);
-        }
-        [data-factor='malus'][data-sign='pos'],
-        [data-factor='bonus'][data-sign='neg'] {
-            color: var(--color-neg-text);
-        }
     }
 
     > li.indent-none > span {
