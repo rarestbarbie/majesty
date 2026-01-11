@@ -52,6 +52,9 @@ ul.terms {
                 filter: grayscale(50%) hue-rotate(180deg) brightness(50%);
             }
         }
+        &[data-term-id='fP'] {
+            --term-icon: '🍒';
+        }
         &[data-term-id='tD'] {
             --term-icon: '⛁';
         }

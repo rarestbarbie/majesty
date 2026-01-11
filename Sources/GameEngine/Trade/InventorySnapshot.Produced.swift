@@ -62,7 +62,7 @@ extension InventorySnapshot.Produced {
 
             $0[>] = actual == price.c ? nil : """
             Due to their position in line, and the available liquidity on the market, the \
-            average price they actually received today was \(em: actual[..2])
+            average price they actually received was \(em: actual[..2])
             """
             $0[>] = actual >= price.h ? nil : """
             The luckiest sellers earned \(em: price.h[..2]) today

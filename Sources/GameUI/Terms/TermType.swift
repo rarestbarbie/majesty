@@ -11,6 +11,7 @@ import JavaScriptInterop
     case pop(PopOccupation)
     case active
     case vacant
+    case profit
 
     case gdp
 }
@@ -34,6 +35,7 @@ extension TermType: RawRepresentable {
         case .pop(.Politician): "pP"
         case .active: "fA"
         case .vacant: "fV"
+        case .profit: "fP"
         case .gdp: "tD"
         }
     }
