@@ -58,7 +58,7 @@ extension InventoryBreakdown {
 
             $0[.active, +, tooltip: .PopActive, help: .PopActiveHelp] = pop.Δ.active[/3]
             $0[.vacant, -, tooltip: .PopVacant, help: .PopVacantHelp] = pop.Δ.vacant[/3]
-            $0[.stockAttraction, +, tooltip: nil, help: nil] = +pop.stats.profit.π[%1]
+            $0[.profit, +, tooltip: nil, help: nil] = +pop.stats.profit.π[%1]
         }
 
         self.costs = pop.stats.cashFlow.chart(rules: cache.rules)
@@ -168,7 +168,7 @@ extension InventoryBreakdown {
             let Δ: Delta<Building.Dimensions> = building.Δ
             $0[.active, +, tooltip: .BuildingActive, help: .BuildingActiveHelp] = Δ.active[/3]
             $0[.vacant, -, tooltip: .BuildingVacant, help: .BuildingVacantHelp] = Δ.vacant[/3]
-            $0[.stockAttraction, +, tooltip: nil, help: nil] = +building.stats.profit.π[%1]
+            $0[.profit, +, tooltip: nil, help: nil] = +building.stats.profit.π[%1]
         }
 
         self.costs = building.stats.cashFlow.chart(rules: cache.rules)
