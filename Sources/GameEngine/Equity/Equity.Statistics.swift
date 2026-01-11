@@ -21,14 +21,14 @@ extension Equity<LEI>.Statistics {
         assets: Int64,
         context: GameContext.LegalPass,
     ) -> Self {
-        let shareCount: Int64 = equity.shares.reduce(into: 0) { $0 += $1.value.shares }
+        let shareCount: Int64 = equity.shares.reduce(into: 0) { $0 += $1.value.shares.total }
 
         #assert(
             shareCount >= 0,
             "Outstanding shares (\(shareCount)) cannot be negative!!!"
         )
 
-        let sharePrice: Fraction = shareCount > 0 ? assets %/ shareCount : 1
+        let sharePrice: Fraction = assets %/ max(1, shareCount)
 
         return .init(
             owners: equity.shares.values.reduce(into: []) {
@@ -37,6 +37,16 @@ extension Equity<LEI>.Statistics {
                 let gender: Gender?
 
                 switch $1.id {
+                case .reserve(let id):
+                    guard
+                    let context: CountryContext = context.countries[id] else {
+                        return
+                    }
+
+                    country = id
+                    culture = context.state.culturePreferred
+                    gender = nil
+
                 case .building(let id):
                     guard
                     let building: BuildingContext = context.buildings[id],
@@ -74,9 +84,9 @@ extension Equity<LEI>.Statistics {
                 $0.append(
                     .init(
                         id: $1.id,
-                        shares: $1.shares,
-                        bought: $1.bought,
-                        sold: $1.sold,
+                        shares: $1.shares.total,
+                        bought: $1.shares.added,
+                        sold: $1.shares.removed,
                         country: country,
                         culture: culture,
                         gender: gender

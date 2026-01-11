@@ -284,14 +284,10 @@ extension BuildingContext: TransactingContext {
         self.state.z.vout = self.state.inventory.out.valueEstimate
 
         guard
-        let player: CountryID = self.region?.occupiedBy else {
+        let country: CountryID = self.region?.occupiedBy else {
             return
         }
 
-        self.state.equity.split(
-            price: self.state.z.px,
-            turn: &turn,
-            notifying: [player]
-        )
+        self.state.equity.split(at: self.state.z.px, in: country, turn: &turn)
     }
 }

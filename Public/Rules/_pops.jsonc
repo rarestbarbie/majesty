@@ -34,10 +34,14 @@
             "biology": "Chickens"
         },
         "output": {
-            "Poultry": 6
+            "Poultry": 12
         },
         "l": {
             "Wheat": 6
+        },
+        "e": {
+            "Construction": 1,
+            "Water": 1
         }
     },
     {
@@ -45,23 +49,17 @@
             "biology": "Cattle"
         },
         "output": {
-            "Beef": 6
+            "Beef": 12
         },
         "l": {
-            "Water": 4,
-            "Wheat": 5
+            "Wheat": 45
+        },
+        "e": {
+            "Construction": 10,
+            "Water": 45
         }
     },
 
-    {
-        "where": {
-            "occupation": "Livestock"
-        },
-        "e": {
-            "Construction": 1,
-            "Water": 1
-        }
-    },
     {
         "where": {
             "occupation": "Server"

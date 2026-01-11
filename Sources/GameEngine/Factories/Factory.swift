@@ -53,7 +53,7 @@ extension Factory: Sectionable {
 extension Factory: Deletable {
     var dead: Bool {
         if  case _? = self.liquidation,
-            self.equity.shares.values.allSatisfy({ $0.shares <= 0 }) {
+            self.equity.shares.values.allSatisfy({ $0.shares.total <= 0 }) {
             true
         } else {
             false

@@ -8,7 +8,8 @@
     "Semiconductor Devices": "5",
     "Machine Parts": "3",
     "Medical Equipment": "4",
+    "Clothing": "2",
     // these scale with local minimum wage
-    "Groceries": "0.1",
-    "Housing": "0.3"
+    "Groceries": "0.25",
+    "Housing": "2"
 }

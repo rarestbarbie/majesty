@@ -133,6 +133,7 @@ extension GameContext {
 extension GameContext {
     var pruningPass: PruningPass {
         .init(
+            countries: self.countries.keys,
             buildings: self.buildings.keys,
             factories: self.factories.keys,
             mines: self.mines.keys,
@@ -154,6 +155,7 @@ extension GameContext {
 
     private var legalPass: LegalPass {
         .init(
+            countries: self.countries,
             buildings: self.buildings,
             factories: self.factories,
             pops: self.pops,
@@ -387,6 +389,9 @@ extension GameContext {
             let shape: StockMarket.Shape = .init(r: 0.02)
             $0.match(shape: shape, random: &turn.random) {
                 switch $2.asset {
+                case .reserve:
+                    fatalError("Central bank should not have tradeable shares!!!")
+
                 case .building(let id):
                     self.buildings[modifying: id].state.equity.trade(
                         random: &$0,
@@ -475,12 +480,15 @@ extension GameContext {
         for stake: EquityStake<LEI> in equity.shares.values {
             // the pruning pass should have ensured that only valid stakes remain
             switch stake.id {
+            case .reserve:
+                continue
+
             case .building(let id):
-                self.buildings[modifying: id].addPosition(asset: asset, value: stake.shares)
+                self.buildings[modifying: id].addPosition(asset: asset, value: stake.shares.total)
             case .factory(let id):
-                self.factories[modifying: id].addPosition(asset: asset, value: stake.shares)
+                self.factories[modifying: id].addPosition(asset: asset, value: stake.shares.total)
             case .pop(let id):
-                self.pops[modifying: id].addPosition(asset: asset, value: stake.shares)
+                self.pops[modifying: id].addPosition(asset: asset, value: stake.shares.total)
             }
         }
     }
@@ -498,6 +506,9 @@ extension GameContext {
         side: LocalMarket.Side
     ) {
         switch fill.entity {
+        case .reserve:
+            fatalError("Central bank should not be participating in local market!!!")
+
         case .building(let id):
             self.buildings[modifying: id].state.inventory.report(
                 resource: resource,

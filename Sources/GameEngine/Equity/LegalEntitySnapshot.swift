@@ -1,4 +1,5 @@
 import D
+import Fraction
 import GameEconomy
 import GameIDs
 import GameUI
@@ -119,13 +120,13 @@ extension LegalEntitySnapshot {
     }
 
     func tooltipOwnership(
-        gender: Gender,
+        gender: Gender?,
         context: GameUI.CacheContext,
     ) -> Tooltip? {
         let (share, total): (share: Int64, total: Int64) = self.equity.owners.reduce(
             into: (0, 0)
         ) {
-            if case gender? = $1.gender {
+            if  $1.gender == gender {
                 $0.share += $1.shares
             }
 
@@ -133,8 +134,14 @@ extension LegalEntitySnapshot {
         }
 
         return .instructions(style: .borderless) {
-            $0[gender.singularTabular] = (Double.init(share) / Double.init(total))[%3]
-            $0[>] = "\(em: gender.pluralShort) own \(em: share[/3]) shares"
+            let fraction: Double = Double.init(share %/ total)
+            if  let gender: Gender {
+                $0[gender.singularTabular] = fraction[%3]
+                $0[>] = "\(em: gender.pluralShort) own \(em: share[/3]) shares"
+            } else {
+                $0["None"] = fraction[%3]
+                $0[>] = "Juridical persons own \(em: share[/3]) shares"
+            }
         }
     }
 

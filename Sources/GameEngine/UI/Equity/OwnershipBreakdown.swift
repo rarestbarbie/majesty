@@ -9,7 +9,7 @@ import VectorCharts_JavaScript
 struct OwnershipBreakdown<Tab>: Sendable where Tab: OwnershipTab {
     private var country: PieChart<CountryID, PieChartLabel>?
     private var culture: PieChart<CultureID, PieChartLabel>?
-    private var gender: PieChart<Gender, PieChartLabel>?
+    private var gender: PieChart<Gender?, PieChartLabel>?
     private var terms: [Term]
 
     init() {
@@ -28,7 +28,7 @@ extension OwnershipBreakdown {
         let (country, culture, gender): (
             country: [CountryID: (share: Int64, PieChartLabel)],
             culture: [CultureID: (share: Int64, PieChartLabel)],
-            gender: [Gender: (share: Int64, PieChartLabel)]
+            gender: [Gender?: (share: Int64, PieChartLabel)]
         ) = equity.owners.reduce(
             into: ([:], [:], [:])
         ) {
@@ -50,6 +50,9 @@ extension OwnershipBreakdown {
                     name: gender.singularTabular
                 )
                 $0.gender[gender, default: (0, label)].share += $1.shares
+            } else {
+                let label: PieChartLabel = .init(style: "NONE", name: "None")
+                $0.gender[nil, default: (0, label)].share += $1.shares
             }
         }
 
@@ -60,7 +63,7 @@ extension OwnershipBreakdown {
             values: culture.sorted { $0.key < $1.key }
         )
         self.gender = .init(
-            values: gender.sorted { $0.key.sortingRadially < $1.key.sortingRadially }
+            values: gender.sorted { $0.key?.sortingRadially <? $1.key?.sortingRadially }
         )
 
         self.terms = Term.list {

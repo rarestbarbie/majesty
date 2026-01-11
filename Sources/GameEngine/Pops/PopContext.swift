@@ -480,11 +480,7 @@ extension PopContext {
                 }
             }
 
-            self.state.equity.split(
-                price: self.state.z.px,
-                turn: &turn,
-                notifying: [region.occupiedBy]
-            )
+            self.state.equity.split(at: self.state.z.px, in: region.occupiedBy, turn: &turn)
         } else {
             self.convert(turn: &turn)
         }

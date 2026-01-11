@@ -30,6 +30,7 @@ extension RuntimeContextTable {
 }
 extension RuntimeContextTable {
     @inlinable public var state: RuntimeStateTable<ElementContext> { .init(index: self.index) }
+    @inlinable public var keys: OrderedSet<ElementContext.State.ID> { self.index.keys }
 }
 extension RuntimeContextTable {
     @inlinable public mutating func turn(by turn: (inout ElementContext) -> Void) {
