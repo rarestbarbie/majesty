@@ -449,8 +449,8 @@ extension GameUI.Cache {
 
             $0["Capital efficiency", -] = Δvelocity[%3]
             $0[>] {
-                $0["Base volume (EMA)", +] = market.Δ.vb[..2]
-                $0["Quote volume (EMA)", +] = market.Δ.vq[..2]
+                $0["Base volume (EMA)", +] = market.Δ.vb[/3..2]
+                $0["Quote volume (EMA)", +] = market.Δ.vq[/3..2]
             }
         }
     }
