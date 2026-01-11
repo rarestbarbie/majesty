@@ -13,7 +13,7 @@ extension LocalMarket.State {
         case bi
         case bo
         case y
-        case t
+        case z
     }
 }
 extension LocalMarket.State: JavaScriptEncodable {
@@ -27,7 +27,7 @@ extension LocalMarket.State: JavaScriptEncodable {
         js[.bi] = self.stockpile.added
         js[.bo] = self.stockpile.removed
         js[.y] = self.yesterday
-        js[.t] = self.today
+        js[.z] = self.today
     }
 }
 extension LocalMarket.State: JavaScriptDecodable {
@@ -46,7 +46,7 @@ extension LocalMarket.State: JavaScriptDecodable {
                 removed: try js[.bo].decode()
             ),
             yesterday: try js[.y].decode(),
-            today: try js[.t].decode(),
+            today: try js[.z].decode(),
         )
     }
 }

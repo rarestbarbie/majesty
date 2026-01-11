@@ -9,13 +9,13 @@ extension WorldMarket.Interval {
         case ph
         case pc
 
+        case bl
         case bi
         case bo
 
+        case ql
         case qi
         case qo
-
-        case l
     }
 }
 extension WorldMarket.Interval: JavaScriptEncodable {
@@ -25,23 +25,18 @@ extension WorldMarket.Interval: JavaScriptEncodable {
         js[.ph] = self.prices.h
         js[.pc] = self.prices.c
 
+        js[.bl] = self.assets.base
         js[.bi] = self.volume.base.i
         js[.bo] = self.volume.base.o
+        js[.ql] = self.assets.quote
         js[.qi] = self.volume.quote.i
         js[.qo] = self.volume.quote.o
-
-        js[.l] = self.liquidity
     }
 }
 extension WorldMarket.Interval: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
-            prices: .init(
-                o: try js[.po].decode(),
-                l: try js[.pl].decode(),
-                h: try js[.ph].decode(),
-                c: try js[.pc].decode()
-            ),
+            assets: .init(base: try js[.bl].decode(), quote: try js[.ql].decode()),
             volume: .init(
                 base: .init(
                     i: try js[.bi].decode(),
@@ -52,7 +47,12 @@ extension WorldMarket.Interval: JavaScriptDecodable {
                     o: try js[.qo].decode()
                 )
             ),
-            liquidity: try js[.l].decode()
+            prices: .init(
+                o: try js[.po].decode(),
+                l: try js[.pl].decode(),
+                h: try js[.ph].decode(),
+                c: try js[.pc].decode()
+            ),
         )
     }
 }

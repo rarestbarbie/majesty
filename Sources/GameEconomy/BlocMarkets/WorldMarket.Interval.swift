@@ -2,18 +2,18 @@ import LiquidityPool
 
 extension WorldMarket {
     @frozen public struct Interval {
-        public let prices: Candle<Double>
+        public let assets: LiquidityPool.Assets
         public let volume: LiquidityPool.Volume
-        public let liquidity: Double
+        public let prices: Candle<Double>
 
         @inlinable public init(
-            prices: Candle<Double>,
+            assets: LiquidityPool.Assets,
             volume: LiquidityPool.Volume,
-            liquidity: Double
+            prices: Candle<Double>,
         ) {
-            self.prices = prices
+            self.assets = assets
             self.volume = volume
-            self.liquidity = liquidity
+            self.prices = prices
         }
     }
 }

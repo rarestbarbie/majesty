@@ -38,13 +38,17 @@ extension WorldMarkets.Settings {
 }
 extension WorldMarkets.Settings {
     func new(_ pair: WorldMarket.ID) -> WorldMarket {
-        .init(
+        let units: LiquidityPool.Assets = self.capital
+        let indicators: WorldMarket.Indicators = .compute(from: units)
+        return .init(
             state: .init(
                 id: pair,
                 dividend: self.dividend,
                 history: [],
-                capital: self.capital,
                 fee: self.fee,
+                yesterday: indicators,
+                today: indicators,
+                units: units,
             )
         )
     }

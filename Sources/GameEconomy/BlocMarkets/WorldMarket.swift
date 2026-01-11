@@ -11,24 +11,31 @@ import RealModule
     @usableFromInline var current: Candle<Double>
     @usableFromInline var pool: LiquidityPool
 
+    public var yesterday: Indicators
+    public var today: Indicators
+
     @inlinable init(
         id: ID,
         dividend: Fraction,
         history: Deque<Interval>,
         current: Candle<Double>,
         pool: LiquidityPool,
+        yesterday: Indicators,
+        today: Indicators,
     ) {
         self.id = id
         self.dividend = dividend
         self.pool = pool
         self.history = history
         self.current = current
+        self.yesterday = yesterday
+        self.today = today
     }
 }
 extension WorldMarket {
     @inlinable public init(state: State) {
         let pool: LiquidityPool = .init(
-            assets: state.capital,
+            assets: state.units,
             volume: .init(),
             fee: state.fee
         )
@@ -38,6 +45,8 @@ extension WorldMarket {
             history: state.history,
             current: .open(pool.price),
             pool: pool,
+            yesterday: state.yesterday,
+            today: state.today,
         )
     }
     @inlinable public var state: State {
@@ -45,8 +54,10 @@ extension WorldMarket {
             id: self.id,
             dividend: self.dividend,
             history: self.history,
-            capital: self.pool.assets,
             fee: self.pool.fee,
+            yesterday: self.yesterday,
+            today: self.today,
+            units: self.pool.assets,
         )
     }
 }
@@ -83,10 +94,13 @@ extension WorldMarket {
         }
 
         let interval: Interval = .init(
-            prices: self.current,
+            assets: self.pool.assets,
             volume: self.pool.volume,
-            liquidity: self.pool.assets.liquidity
+            prices: self.current,
         )
+
+        self.yesterday = self.today
+        self.today.update(from: self.pool)
 
         self.current = .open(self.pool.price)
         self.pool.assets.drain(self.dividend)

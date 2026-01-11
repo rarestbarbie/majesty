@@ -73,25 +73,20 @@ extension InventorySnapshot.Consumed {
         }
     }
 
-    func tooltipExplainPriceTradeable(market: WorldMarket.State) -> Tooltip? {
-        guard
-        let price: Candle<Double> = market.history.last?.prices else {
-            return nil
-        }
-
-        return .instructions {
-            $0["Today’s closing price", -] = price.c[..2] <- price.o
+    func tooltipExplainPriceTradeable(market: WorldMarketSnapshot) -> Tooltip {
+        .instructions {
+            $0["Today’s closing price", -] = market.price.c[..2] <- market.price.o
 
             guard let actual: Double = self.input.price else {
                 return
             }
 
-            $0[>] = actual == price.c ? nil : """
+            $0[>] = actual == market.price.c ? nil : """
             Due to their position in line, and the available liquidity on the market, the \
             average price they actually paid was \(em: actual[..2])
             """
-            $0[>] = actual <= price.l ? nil : """
-            The luckiest buyers paid \(em: price.l[..2]) today
+            $0[>] = actual <= market.price.l ? nil : """
+            The luckiest buyers paid \(em: market.price.l[..2]) today
             """
         }
     }

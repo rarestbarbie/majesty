@@ -8,21 +8,29 @@ extension WorldMarket {
         public let id: ID
         public let dividend: Fraction
         public let history: Deque<Interval>
-        public let capital: LiquidityPool.Assets
         public let fee: Fraction
+
+        public let yesterday: Indicators
+        public let today: Indicators
+        public let units: LiquidityPool.Assets
 
         @inlinable public init(
             id: ID,
             dividend: Fraction,
             history: Deque<Interval>,
-            capital: LiquidityPool.Assets,
             fee: Fraction,
+            yesterday: Indicators,
+            today: Indicators,
+            units: LiquidityPool.Assets,
         ) {
             self.id = id
             self.dividend = dividend
             self.history = history
-            self.capital = capital
             self.fee = fee
+
+            self.yesterday = yesterday
+            self.today = today
+            self.units = units
         }
     }
 }
