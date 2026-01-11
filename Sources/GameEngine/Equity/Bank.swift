@@ -73,7 +73,8 @@ extension Bank {
         source: LEI,
         recipients shareholders: [EquityStake<LEI>]
     ) -> Int64 {
-        guard let payments: [Int64] = shareholders.distribute(budget, share: \.shares) else {
+        guard
+        let payments: [Int64] = shareholders.distribute(budget, share: \.shares.total) else {
             return 0
         }
 

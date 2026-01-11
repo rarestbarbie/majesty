@@ -524,7 +524,7 @@ extension FactoryContext: TransactingContext {
         self.state.z.vout = self.state.inventory.out.valueEstimate
 
         guard case nil = self.state.liquidation,
-        let player: CountryID = self.region?.occupiedBy else {
+        let country: CountryID = self.region?.occupiedBy else {
             return
         }
 
@@ -534,11 +534,7 @@ extension FactoryContext: TransactingContext {
             self.state.z.profitability <= 0 {
             self.state.liquidation = .init(started: turn.date, burning: self.equity.shareCount)
         } else {
-            self.state.equity.split(
-                price: self.state.z.px,
-                turn: &turn,
-                notifying: [player]
-            )
+            self.state.equity.split(at: self.state.z.px, in: country, turn: &turn)
         }
     }
 }

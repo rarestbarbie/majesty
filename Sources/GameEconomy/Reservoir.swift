@@ -10,9 +10,19 @@
     }
 }
 extension Reservoir {
-    @inlinable static var zero: Self { .init(total: 0, added: 0, removed: 0) }
+    @inlinable public static var zero: Self { .init(total: 0, added: 0, removed: 0) }
 }
 extension Reservoir {
+    /// Set the number of units held without tracking changes.
+    @inlinable public var untracked: Int64 {
+        get {
+            self.value
+        }
+        set(value) {
+            self.value = value
+        }
+    }
+    /// Set the number of units held, tracking changes.
     @inlinable public var total: Int64 {
         get {
             self.value
@@ -31,15 +41,15 @@ extension Reservoir {
     @inlinable public var change: Int64 { self.added - self.removed }
     @inlinable public var before: Int64 { self.value - self.change }
 
-    @inlinable mutating func drain() {
+    @inlinable public mutating func drain() {
         self.removed += self.value
         self.value = 0
     }
-    @inlinable mutating func turn() {
+    @inlinable public mutating func turn() {
         self.added = 0
         self.removed = 0
     }
-    @inlinable mutating func wash(_ units: Int64) {
+    @inlinable public mutating func wash(_ units: Int64) {
         self.added += units
         self.removed += units
     }

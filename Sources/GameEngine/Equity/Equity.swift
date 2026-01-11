@@ -39,7 +39,7 @@ extension Equity<LEI> {
     mutating func turn() {
         self.shares.update {
             $0.turn()
-            return $0.shares > 0
+            return $0.shares.total > 0
         }
         self.traded = 0
         self.issued = 0
@@ -56,7 +56,7 @@ extension Equity {
         switch split.factor {
         case .forward(let factor):
             for i: Int in self.shares.values.indices {
-                self.shares.values[i].shares *= factor
+                self.shares.values[i].shares.untracked *= factor
             }
             if  case .forward? = self.splits.last?.factor {
                 self.splits.append(split)
@@ -67,7 +67,7 @@ extension Equity {
 
         case .reverse(let factor):
             for i: Int in self.shares.values.indices {
-                self.shares.values[i].shares /= factor
+                self.shares.values[i].shares.untracked /= factor
             }
             if  case .reverse? = self.splits.last?.factor {
                 self.splits.append(split)
@@ -76,13 +76,17 @@ extension Equity {
             }
         }
     }
-
+}
+extension Equity<LEI> {
     mutating func split(
-        price: Double,
+        at price: Double,
+        in country: CountryID,
         turn: inout Turn,
-        notifying subscribers: [CountryID]
     ) {
-        if self.shares.isEmpty {
+        if  self.shares.isEmpty {
+            self.splits = []
+            self.issued += 1
+            self[.reserve(country)].shares += 1
             return
         }
 
@@ -112,7 +116,7 @@ extension Equity {
             let factor: Int64 = 1 << exponent
             split = .forward(factor: factor, on: turn.date)
 
-            turn.notifications[subscribers] = """
+            turn.notifications[country] = """
             Stock split executed for factor of \(factor)x.
             """
         } else if price < 0.5 {
@@ -138,7 +142,7 @@ extension Equity {
             let factor: Int64 = 1 << exponent
             split = .reverse(factor: factor, on: turn.date)
 
-            turn.notifications[subscribers] = """
+            turn.notifications[country] = """
             Reverse stock split executed for factor of \(factor)x.
             """
         } else {
@@ -159,10 +163,7 @@ extension Equity<LEI> {
 
         let quantity: Int64 = fill.issued.quantity + traded.quantity
 
-        ; {
-            $0.shares += quantity
-            $0.bought += quantity
-        } (&self[fill.buyer])
+        self[fill.buyer].shares += quantity
 
         bank[account: fill.buyer].e -= fill.issued.value + traded.value
         bank[account: fill.asset].e += fill.issued.value
@@ -180,7 +181,7 @@ extension Equity<LEI> {
 
         // Occasionally the factory will receive a large windfall, and `quote(value:)` will
         // return a quantity that exceeds the number of shares in circulation!
-        let shares: [Int64]? = recipients.distribute(share: \.shares) {
+        let shares: [Int64]? = recipients.distribute(share: \.shares.total) {
             // Cap the number of shares bought back at 1 percent of the total circulation,
             // but always allow at least one share to be bought back
             min(max(1, $0 / 100), quote.quantity)
@@ -197,10 +198,7 @@ extension Equity<LEI> {
                 // Note that because of the way `distribute(share:funds:)` works, it’s possible
                 // for `compensation` to be non-zero even while `shares` is zero. We ban this
                 // situation manually here.
-                {
-                    $0.shares -= shares
-                    $0.sold += shares
-                } (&self[recipient.id])
+                self[recipient.id].shares -= shares
 
 
                 liquidated.quantity += shares
