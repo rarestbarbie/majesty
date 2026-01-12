@@ -3,15 +3,20 @@ import GameIDs
 import OrderedCollections
 
 @frozen public struct LocalMarkets {
+    @usableFromInline let settings: Settings
     // iteration order matters, because the RNG is called statefully during matching
     @usableFromInline var table: OrderedDictionary<LocalMarket.ID, LocalMarket>
 
-    @inlinable public init(table: OrderedDictionary<LocalMarket.ID, LocalMarket>) {
+    @inlinable public init(
+        settings: Settings,
+        table: OrderedDictionary<LocalMarket.ID, LocalMarket>
+    ) {
+        self.settings = settings
         self.table = table
     }
 
     @inlinable public init() {
-        self.init(table: [:])
+        self.init(settings: .init(), table: [:])
     }
 }
 extension LocalMarkets {
@@ -21,15 +26,15 @@ extension LocalMarkets {
 
     @inlinable public subscript(id: LocalMarket.ID) -> LocalMarket {
         _read {
-            yield  self.table[id, default: .init(id: id)]
+            yield  self.table[id, default: self.settings.new(id)]
         }
         _modify {
-            yield &self.table[id, default: .init(id: id)]
+            yield &self.table[id, default: self.settings.new(id)]
         }
     }
 }
 extension LocalMarkets {
-    public mutating func turn(by turn: (inout LocalMarket) -> ()) {
+    @inlinable public mutating func turn(by turn: (inout LocalMarket) -> ()) {
         for i: Int in self.table.elements.indices {
             turn(&self.table.values[i])
         }

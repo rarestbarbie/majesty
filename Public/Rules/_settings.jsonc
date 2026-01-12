@@ -1,0 +1,11 @@
+{
+    "local_markets": {
+    },
+    "world_markets": {
+        "depth": "365",
+        "rot": "0.0025",
+        "fee": "1/500",
+        "capital": "1000000000/1000000000",
+        "history": 365
+    }
+}

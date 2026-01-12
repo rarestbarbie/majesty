@@ -13,8 +13,8 @@ public struct GameSave: Sendable {
     let cultures: [Culture]
 
     let accounts: OrderedDictionary<LEI, Bank.Account>.Items
-    let localMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
-    let worldMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>
+    let localMarkets: [LocalMarket.State]
+    let worldMarkets: [WorldMarket.State]
     let date: GameDate
 
     let currencies: [Currency]
@@ -77,8 +77,8 @@ extension GameSave: JavaScriptDecodable {
             player: try js[.player].decode(),
             cultures: try js[.cultures].decode(),
             accounts: try js[.accounts]?.decode() ?? .init(dictionary: [:]),
-            localMarkets: try js[.markets_local]?.decode() ?? [:],
-            worldMarkets: try js[.markets_world]?.decode() ?? [:],
+            localMarkets: try js[.markets_local]?.decode() ?? [],
+            worldMarkets: try js[.markets_world]?.decode() ?? [],
             date: try js[.date].decode(),
             currencies: try js[.currencies].decode(),
             countries: try js[.countries].decode(),

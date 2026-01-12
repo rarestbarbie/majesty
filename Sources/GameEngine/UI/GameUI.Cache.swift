@@ -424,24 +424,7 @@ extension GameUI.Cache {
     func tooltipMarketLiquidity(
         _ id: WorldMarket.ID
     ) -> Tooltip? {
-        guard
-        let market: WorldMarketSnapshot = self.worldMarkets[id]?.snapshot else {
-            return nil
-        }
-
-        return .instructions {
-            $0["Available liquidity", +] = market.Δ.assets.liquidity[/3..2]
-            $0[>] {
-                $0["Base instrument", -] = market.Δ.assets.base[/3]
-                $0["Quote instrument", +] = market.Δ.assets.quote[/3]
-            }
-
-            $0["Capital efficiency", -] = market.Δ.velocity[%3]
-            $0[>] {
-                $0["Base volume (EMA)", +] = market.Δ.vb[/3..2]
-                $0["Quote volume (EMA)", +] = market.Δ.vq[/3..2]
-            }
-        }
+        self.worldMarkets[id]?.snapshot?.tooltipLiquidity()
     }
 }
 extension GameUI.Cache {

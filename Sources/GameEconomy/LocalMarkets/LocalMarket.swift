@@ -37,18 +37,6 @@ import Random
     }
 }
 extension LocalMarket {
-    @inlinable init(id: ID) {
-        let interval: Interval = .init(bid: .init(), ask: .init(), supply: 0, demand: 0)
-        self.init(
-            id: id,
-            stabilizationFundFees: 0,
-            stabilizationFund: .zero,
-            stockpile: .zero,
-            yesterday: interval,
-            today: interval
-        )
-    }
-
     @inlinable public init(state: State) {
         self.init(
             id: state.id,

@@ -17,6 +17,6 @@ extension GameMetadata {
         case geology
         case terrains
 
-        case exchange
+        case settings
     }
 }
