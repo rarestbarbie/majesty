@@ -425,29 +425,18 @@ extension GameUI.Cache {
         _ id: WorldMarket.ID
     ) -> Tooltip? {
         guard
-        let market: WorldMarketSnapshot = self.worldMarkets[id]?.snapshot,
-        let last: Int = market.history.indices.last else {
+        let market: WorldMarketSnapshot = self.worldMarkets[id]?.snapshot else {
             return nil
         }
 
-        let z: WorldMarket.Interval = market.history[last]
-        let y: WorldMarket.Interval = last != market.history.startIndex
-            ? market.history[market.history.index(before: last)]
-            : z
-        let Δ: Delta<WorldMarket.Interval> = .init(y: y, z: z)
-        let Δvelocity: Delta<Double> = .init(
-            y: market.y.v / y.assets.liquidity,
-            z: market.z.v / z.assets.liquidity,
-        )
-
         return .instructions {
-            $0["Available liquidity", +] = Δ.assets.liquidity[/3..2]
+            $0["Available liquidity", +] = market.Δ.assets.liquidity[/3..2]
             $0[>] {
-                $0["Base instrument", -] = Δ.assets.base[/3]
-                $0["Quote instrument", +] = Δ.assets.quote[/3]
+                $0["Base instrument", -] = market.Δ.assets.base[/3]
+                $0["Quote instrument", +] = market.Δ.assets.quote[/3]
             }
 
-            $0["Capital efficiency", -] = Δvelocity[%3]
+            $0["Capital efficiency", -] = market.Δ.velocity[%3]
             $0[>] {
                 $0["Base volume (EMA)", +] = market.Δ.vb[/3..2]
                 $0["Quote volume (EMA)", +] = market.Δ.vq[/3..2]
