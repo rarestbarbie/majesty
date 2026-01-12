@@ -32,10 +32,10 @@ extension LegalEntitySnapshot {
         let resource: Resource = line.resource
         let market: (
             segmented: LocalMarketSnapshot?,
-            tradeable: WorldMarket.State?
+            tradeable: WorldMarketSnapshot?
         ) = (
             context.localMarkets[resource / self.tile]?.snapshot(self.region),
-            context.worldMarkets[resource / self.region.currency.id]?.state
+            context.worldMarkets[resource / self.region.currency.id]?.snapshot
         )
 
         switch line.query {
@@ -45,7 +45,7 @@ extension LegalEntitySnapshot {
             }
 
             if  consumed.tradeable,
-                let tradeable: WorldMarket.State = market.tradeable {
+                let tradeable: WorldMarketSnapshot = market.tradeable {
                 return consumed.tooltipExplainPriceTradeable(market: tradeable)
             } else if
                 let segmented: LocalMarketSnapshot = market.segmented {
@@ -58,7 +58,7 @@ extension LegalEntitySnapshot {
             }
 
             if  produced.tradeable,
-                let tradeable: WorldMarket.State = market.tradeable {
+                let tradeable: WorldMarketSnapshot = market.tradeable {
                 return produced.tooltipExplainPriceTradeable(market: tradeable)
             } else if
                 let segmented: LocalMarketSnapshot = market.segmented {
