@@ -30,8 +30,8 @@ import OrderedCollections
     @usableFromInline var table: OrderedDictionary<WorldMarket.ID, WorldMarket>
 
     @inlinable public init(
-        settings: Settings = .default,
-        table: OrderedDictionary<WorldMarket.ID, WorldMarket> = [:],
+        settings: Settings,
+        table: OrderedDictionary<WorldMarket.ID, WorldMarket>,
     ) {
         self.settings = settings
         self.table = table
@@ -64,8 +64,13 @@ extension WorldMarkets {
     }
 
     public mutating func turn() {
-        for i: Int in self.table.values.indices {
-            self.table.values[i].turn(history: self.settings.history)
+        for i: Int in self.table.elements.indices {
+            self.table.values[i].turn()
+        }
+    }
+    public mutating func advance() {
+        for i: Int in self.table.elements.indices {
+            _ = self.table.values[i].advance(history: self.settings.history)
         }
     }
 }

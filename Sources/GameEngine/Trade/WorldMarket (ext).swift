@@ -10,16 +10,6 @@ extension WorldMarket {
             return nil
         }
 
-        return .init(state: state, price: price)
-    }
-}
-extension WorldMarket: JavaScriptEncodable {
-    @inlinable public func encode(to js: inout JavaScriptEncoder<State.ObjectKey>) {
-        self.state.encode(to: &js)
-    }
-}
-extension WorldMarket: JavaScriptDecodable {
-    @inlinable public init(from js: borrowing JavaScriptDecoder<State.ObjectKey>) throws {
-        self.init(state: try .init(from: js))
+        return .init(state: state, shape: self.shape, price: price)
     }
 }

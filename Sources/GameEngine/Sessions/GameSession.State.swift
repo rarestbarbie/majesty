@@ -41,8 +41,8 @@ extension GameSession.State {
         let world: GameWorld = .init(
             notifications: .init(date: save.date),
             bank: .init(accounts: save.accounts.dictionary),
-            localMarkets: save.localMarkets,
-            worldMarkets: save.worldMarkets,
+            localMarkets: rules.settings.localMarkets.load(save.localMarkets),
+            worldMarkets: rules.settings.worldMarkets.load(save.worldMarkets),
             // placeholder
             tradeRoutes: [:],
             // placeholder

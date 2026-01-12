@@ -16,7 +16,7 @@ public struct GameRules: Sendable {
     let geology: SymbolTable<GeologicalDescription>
     let terrains: SymbolTable<TerrainDescription>
 
-    let exchange: WorldMarkets.Settings
+    let settings: GameMetadata.Settings
 }
 extension GameRules {
     public func resolve(symbols: inout GameSaveSymbols) throws -> GameMetadata {
@@ -39,7 +39,7 @@ extension GameRules {
         return try .init(
             symbols: symbols,
             objects: objects,
-            settings: .init(exchange: self.exchange),
+            settings: self.settings,
             legend: self.legend,
             pops: self.pops,
         )
@@ -60,7 +60,7 @@ extension GameRules: JavaScriptDecodable {
             biology: try js[.biology].decode(),
             geology: try js[.geology].decode(),
             terrains: try js[.terrains].decode(),
-            exchange: try js[.exchange].decode(),
+            settings: try js[.settings].decode(),
         )
     }
 }

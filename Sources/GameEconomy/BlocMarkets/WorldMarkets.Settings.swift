@@ -1,11 +1,12 @@
+import D
 import Fraction
 import LiquidityPool
+import OrderedCollections
 
 extension WorldMarkets {
     @frozen public struct Settings {
-        /// The fraction of the pool’s liquidity that will be drained each day. It is
-        /// recommended to set this to no more than 0.5% of the transaction ``fee``.
-        public let dividend: Fraction
+        public let depth: Decimal
+        public let rot: Decimal
         /// The transaction fee for using the exchange.
         public let fee: Fraction
         /// The initial liquidity for each market in the exchange.
@@ -14,12 +15,14 @@ extension WorldMarkets {
         public let history: Int
 
         @inlinable public init(
-            dividend: Fraction,
+            depth: Decimal,
+            rot: Decimal,
             fee: Fraction,
             capital: LiquidityPool.Assets,
             history: Int
         ) {
-            self.dividend = dividend
+            self.depth = depth
+            self.rot = rot
             self.fee = fee
             self.capital = capital
             self.history = history
@@ -27,12 +30,11 @@ extension WorldMarkets {
     }
 }
 extension WorldMarkets.Settings {
-    @inlinable public static var `default`: Self {
+    var shape: WorldMarket.Shape {
         .init(
-            dividend: 0 %/ 1,
-            fee: 0 %/ 1,
-            capital: .init(base: 2, quote: 2),
-            history: 1,
+            depth: Double.init(self.depth),
+            rot: Double.init(self.rot),
+            fee: self.fee,
         )
     }
 }
@@ -41,15 +43,25 @@ extension WorldMarkets.Settings {
         let initial: WorldMarket.Interval = .init(
             assets: self.capital,
             indicators: .compute(from: self.capital))
-        return .init(
-            state: .init(
-                id: pair,
-                dividend: self.dividend,
-                history: [],
-                fee: self.fee,
-                y: initial,
-                z: initial,
-            )
+        let state: WorldMarket.State = .init(
+            id: pair,
+            history: [],
+            y: initial,
+            z: initial,
         )
+        return self.load(state)
+    }
+
+    func load(_ state: WorldMarket.State) -> WorldMarket {
+        .init(state: state, shape: shape)
+    }
+
+    public func load(
+        _ markets: [WorldMarket.State]
+    ) -> OrderedDictionary<WorldMarket.ID, WorldMarket> {
+        markets.reduce(
+            into: .init(minimumCapacity: markets.count)) {
+            $0[$1.id] = self.load($1)
+        }
     }
 }

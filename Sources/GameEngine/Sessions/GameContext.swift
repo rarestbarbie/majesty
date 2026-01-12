@@ -51,8 +51,8 @@ extension GameContext {
             player: self.player,
             cultures: self.rules.pops.cultures.values.sorted { $0.id < $1.id },
             accounts: world.bank.accounts.items,
-            localMarkets: world.localMarkets,
-            worldMarkets: world.worldMarkets,
+            localMarkets: world.localMarkets.values.map(\.state),
+            worldMarkets: world.worldMarkets.values.map(\.state),
             date: world.date,
             currencies: self.currencies.values.elements,
             countries: [_].init(self.countries.state),
@@ -356,6 +356,7 @@ extension GameContext {
             try self.countries[i].advance(turn: &turn, context: self)
         }
 
+        turn.worldMarkets.turn()
         // need to call this first, to update prices before trading
         turn.localMarkets.turn {
             guard
@@ -429,7 +430,7 @@ extension GameContext {
             }
         }
 
-        turn.worldMarkets.turn()
+        turn.worldMarkets.advance()
 
         self.buildings.turn { $0.advance(turn: &turn) }
         self.factories.turn { $0.advance(turn: &turn) }

@@ -45,10 +45,11 @@ extension GameWorld {
                 notifications: self.notifications,
                 bank: self.bank,
                 worldMarkets: .init(
-                    settings: settings.exchange,
+                    settings: settings.worldMarkets,
                     table: self.worldMarkets
                 ),
                 localMarkets: .init(
+                    settings: settings.localMarkets,
                     table: self.localMarkets
                 ),
                 tradeRoutes: self.tradeRoutes,

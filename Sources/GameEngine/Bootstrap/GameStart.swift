@@ -200,8 +200,8 @@ extension GameStart {
             }
         }
 
-        var tradeable: WorldMarkets = .init(settings: rules.settings.exchange)
-        var segmented: LocalMarkets = .init()
+        var tradeable: WorldMarkets = .init(settings: rules.settings.worldMarkets, table: [:])
+        var segmented: LocalMarkets = .init(settings: rules.settings.localMarkets, table: [:])
         /// ordering is important for determinism
         let prices: [(Resource, Exact)] = try self.prices.quantities(
             keys: symbols.static.resources
@@ -234,7 +234,7 @@ extension GameStart {
                     }
                 }
             } else {
-                let l: Double = rules.settings.exchange.capital.liquidity
+                let l: Double = rules.settings.worldMarkets.capital.liquidity
                 let n: Double = Double.init(n)
                 let d: Double = Double.init(d ?? 1)
                 for currency: Currency in self.currencies {
@@ -271,8 +271,8 @@ extension GameStart {
             player: self.player,
             cultures: cultures,
             accounts: accounts.items,
-            localMarkets: segmented.all,
-            worldMarkets: tradeable.all,
+            localMarkets: segmented.all.values.map(\.state),
+            worldMarkets: tradeable.all.values.map(\.state),
             date: self.date,
             currencies: self.currencies,
             countries: countries,
