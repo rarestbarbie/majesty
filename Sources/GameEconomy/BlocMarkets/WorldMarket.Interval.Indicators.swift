@@ -1,14 +1,14 @@
 import LiquidityPool
 import RealModule
 
-extension WorldMarket {
-    @frozen public struct Indicators {
+extension WorldMarket.Interval {
+    @frozen @usableFromInline struct Indicators {
         /// Square root of quote volume times base volume.
-        public var v: Double
-        public var vb: Double
-        public var vq: Double
+        @usableFromInline var v: Double
+        @usableFromInline var vb: Double
+        @usableFromInline var vq: Double
 
-        @inlinable public init(
+        @inlinable init(
             v: Double,
             vb: Double,
             vq: Double
@@ -19,10 +19,10 @@ extension WorldMarket {
         }
     }
 }
-extension WorldMarket.Indicators {
+extension WorldMarket.Interval.Indicators {
     @inlinable static var ema: Double { 0.01 }
 }
-extension WorldMarket.Indicators {
+extension WorldMarket.Interval.Indicators {
     @inlinable static var zero: Self {
         .init(v: 0, vb: 0, vq: 0)
     }

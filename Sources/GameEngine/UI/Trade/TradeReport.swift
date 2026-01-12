@@ -43,7 +43,7 @@ extension TradeReport: PersistentReport {
             sort: { $0.name < $1.name }
         ) {
             guard
-            let today: WorldMarket.Interval = $0.state.history.last,
+            let today: WorldMarket.Aggregate = $0.state.history.last,
             case .good(let good) = $0.id.x,
             case .fiat(let fiat) = $0.id.y,
             let currency: Currency = cache.currencies[fiat] else {

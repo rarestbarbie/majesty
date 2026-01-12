@@ -23,10 +23,8 @@ extension WorldMarket.State: JavaScriptEncodable {
         js[.history] = self.history
         js[.fee] = self.fee
 
-        js[.y] = self.yesterday
-        js[.z] = self.today
-        js[.b] = self.units.base
-        js[.q] = self.units.quote
+        js[.y] = self.y
+        js[.z] = self.z
     }
 }
 extension WorldMarket.State: JavaScriptDecodable {
@@ -36,9 +34,8 @@ extension WorldMarket.State: JavaScriptDecodable {
             dividend: try js[.dividend].decode(),
             history: try js[.history].decode(),
             fee: try js[.fee].decode() ?? 0 %/ 1,
-            yesterday: try js[.y].decode(),
-            today: try js[.z].decode(),
-            units: .init(base: try js[.b].decode(), quote: try js[.q].decode()),
+            y: try js[.y].decode(),
+            z: try js[.z].decode(),
         )
     }
 }

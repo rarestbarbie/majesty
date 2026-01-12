@@ -7,35 +7,35 @@ import RealModule
 @frozen public struct WorldMarket: Identifiable {
     public let id: ID
     public let dividend: Fraction
-    @usableFromInline var history: Deque<Interval>
+    @usableFromInline var history: Deque<Aggregate>
     @usableFromInline var current: Candle<Double>
     @usableFromInline var pool: LiquidityPool
 
-    public var yesterday: Indicators
-    public var today: Indicators
+    @usableFromInline var y: Interval
+    @usableFromInline var z: Interval.Indicators
 
     @inlinable init(
         id: ID,
         dividend: Fraction,
-        history: Deque<Interval>,
+        history: Deque<Aggregate>,
         current: Candle<Double>,
         pool: LiquidityPool,
-        yesterday: Indicators,
-        today: Indicators,
+        y: Interval,
+        z: Interval.Indicators,
     ) {
         self.id = id
         self.dividend = dividend
         self.pool = pool
         self.history = history
         self.current = current
-        self.yesterday = yesterday
-        self.today = today
+        self.y = y
+        self.z = z
     }
 }
 extension WorldMarket {
     @inlinable public init(state: State) {
         let pool: LiquidityPool = .init(
-            assets: state.units,
+            assets: state.z.assets,
             volume: .init(),
             fee: state.fee
         )
@@ -45,8 +45,8 @@ extension WorldMarket {
             history: state.history,
             current: .open(pool.price),
             pool: pool,
-            yesterday: state.yesterday,
-            today: state.today,
+            y: state.y,
+            z: state.z.indicators
         )
     }
     @inlinable public var state: State {
@@ -55,9 +55,8 @@ extension WorldMarket {
             dividend: self.dividend,
             history: self.history,
             fee: self.pool.fee,
-            yesterday: self.yesterday,
-            today: self.today,
-            units: self.pool.assets,
+            y: self.y,
+            z: .init(assets: self.pool.assets, indicators: self.z)
         )
     }
 }
@@ -93,14 +92,13 @@ extension WorldMarket {
             self.history.removeFirst(self.history.count - history + 1)
         }
 
-        let interval: Interval = .init(
-            assets: self.pool.assets,
+        let interval: Aggregate = .init(
             volume: self.pool.volume,
             prices: self.current,
         )
 
-        self.yesterday = self.today
-        self.today.update(from: self.pool)
+        self.y = .init(assets: self.pool.assets, indicators: self.z)
+        self.z.update(from: self.pool)
 
         self.current = .open(self.pool.price)
         self.pool.assets.drain(self.dividend)
