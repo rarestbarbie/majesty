@@ -19,7 +19,7 @@ export * from './OwnershipBreakdown.js';
 export * from './OwnershipBreakdownState.js';
 
 export * from './Markets/Candle.js';
-export * from './Markets/CandleGeometry.js';
+export * from './Markets/Candlestick.js';
 export * from './Charts/PieChart.js';
 export * from './Charts/PieChartComponent.js';
 export * from './Charts/PieChartSector.js';
@@ -58,8 +58,7 @@ export * from './ResourceNeedMeterState.js';
 export * from './ResourceNeedRow.js';
 export * from './ResourceSale.js';
 export * from './ResourceSaleBox.js';
-export * from './Markets/CandlestickChart.js';
-export * from './Markets/CandlestickChartInterval.js';
+export * from './Markets/CandlestickState.js';
 export * from './Markets/MarketDetails.js';
 export * from './Markets/MarketFilter.js';
 export * from './Markets/MarketFilterLabel.js';
@@ -67,6 +66,9 @@ export * from './Markets/MarketTableEntry.js';
 export * from './Markets/MarketTableRow.js';
 export * from './Markets/TradeReport.js';
 export * from './Markets/TradeOverview.js';
+export * from './Markets/TradingViewState.js';
+export * from './Markets/TradingViewTick.js';
+export * from './Markets/TradingViewTickState.js';
 
 export * from './Planets/NavigatorState.js';
 export * from './Planets/NavigatorTile.js';

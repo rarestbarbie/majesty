@@ -5,7 +5,7 @@ import JavaScriptInterop
 
 struct MarketDetails: Identifiable {
     let id: WorldMarket.ID
-    var chart: CandlestickChart
+    var chart: TradingView
 
     init(id: WorldMarket.ID) {
         self.id = id

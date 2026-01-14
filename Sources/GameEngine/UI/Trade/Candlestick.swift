@@ -3,12 +3,12 @@ import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
 
-struct CandlestickChartInterval {
-    public let id: GameDate
-    public let prices: Candle<Double>
-    public let volume: Int64
+struct Candlestick {
+    let id: GameDate
+    let prices: Candle<Double>
+    let volume: Int64
 }
-extension CandlestickChartInterval: JavaScriptEncodable {
+extension Candlestick: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
         case id
         case c

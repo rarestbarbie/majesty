@@ -1,5 +1,4 @@
 @use 'celestial-view';
-@use 'candlesticks';
 @use 'clock';
 @use 'conditions';
 @use 'devtools';
@@ -17,6 +16,7 @@
 @use 'tabs';
 @use 'terms';
 @use 'tooltip';
+@use 'tradingview';
 
 [data-count] > span:nth-child(2)::before {
     content: '/';

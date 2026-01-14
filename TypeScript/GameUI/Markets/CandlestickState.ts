@@ -1,7 +1,7 @@
 import { GameDate } from '../../GameEngine/GameDate.js';
 import { Candle } from '../exports.js';
 
-export interface CandlestickChartInterval {
+export interface CandlestickState {
     readonly id: GameDate;
     readonly c: Candle<number>;
     readonly v: bigint;

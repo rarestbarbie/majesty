@@ -9,23 +9,29 @@ import {
     GameDate
 } from '../../GameEngine/exports.js';
 import {
-    CandleGeometry,
+    Candlestick,
+    CandlestickState,
     TradeReport,
     MarketFilter,
     MarketFilterLabel,
-    CandlestickChartInterval,
     MarketTableRow,
     MarketTableEntry,
     ScreenType,
+    TradingViewTick,
+    TradingViewTickState,
 } from '../exports.js';
 
 export class TradeOverview extends ScreenContent {
     private filters: FilterList<MarketFilter, string>[];
-    private history: StaticList<CandleGeometry, GameDate>;
+
+    private chartCandles: StaticList<Candlestick, GameDate>;
+    private chartTicks: StaticList<TradingViewTick, number>;
+
     private markets: StaticList<MarketTableRow, string>;
     private dom?: {
         readonly index: FilterTabs;
         readonly panel: HTMLDivElement;
+        readonly chart: HTMLDivElement;
     };
 
     constructor() {
@@ -36,9 +42,15 @@ export class TradeOverview extends ScreenContent {
             new FilterList<MarketFilter, string>('💶'),
         ];
 
-        this.history = new StaticList<CandleGeometry, GameDate>(document.createElement('div'));
-        this.history.node.classList.add('candlesticks');
+        this.chartCandles = new StaticList<Candlestick, GameDate>(document.createElement('div'));
+        this.chartCandles.node.classList.add('candles');
 
+        this.chartTicks = new StaticList<TradingViewTick, number>(document.createElement('div'));
+        this.chartTicks.node.classList.add('ticks');
+
+
+
+        this.markets = new StaticList<MarketTableRow, string>(document.createElement('div'));
         this.markets = new StaticList<MarketTableRow, string>(document.createElement('div'));
         this.markets.table('Markets', MarketTableRow.columns);
     }
@@ -50,10 +62,15 @@ export class TradeOverview extends ScreenContent {
             this.dom = {
                 index: new FilterTabs(this.filters),
                 panel: document.createElement('div'),
+                chart: document.createElement('div'),
             }
 
+            this.dom.chart.classList.add('tradingview');
+            this.dom.chart.appendChild(this.chartCandles.node);
+            this.dom.chart.appendChild(this.chartTicks.node);
+
             const upper: HTMLDivElement = document.createElement('div');
-            upper.appendChild(this.history.node);
+            upper.appendChild(this.dom.chart);
             upper.classList.add('upper');
 
             this.dom.panel.appendChild(upper);
@@ -102,17 +119,24 @@ export class TradeOverview extends ScreenContent {
             state.market?.id
         );
 
-        if (state.market) {
-            this.history.update(
+        if (state.market !== undefined) {
+            console.log(state.market.chart.ticks);
+            this.dom.chart.style.setProperty('--y-min', state.market.chart.min.toString());
+            this.dom.chart.style.setProperty('--y-max', state.market.chart.max.toString());
+            this.dom.chart.style.setProperty('--y-maxv', state.market.chart.maxv.toString());
+
+            this.chartCandles.update(
                 state.market.chart.history,
-                (interval: CandlestickChartInterval) => new CandleGeometry(interval),
-                (interval: CandlestickChartInterval, candle: CandleGeometry) =>
+                (interval: CandlestickState) => new Candlestick(interval),
+                (interval: CandlestickState, candle: Candlestick) =>
                     candle.update(interval),
             );
-
-            this.history.node.style.setProperty('--y-min', state.market.chart.min.toString());
-            this.history.node.style.setProperty('--y-max', state.market.chart.max.toString());
-            this.history.node.style.setProperty('--y-maxv', state.market.chart.maxv.toString());
+            this.chartTicks.update(
+                state.market.chart.ticks,
+                (tick: TradingViewTickState) => new TradingViewTick(tick),
+                (tick: TradingViewTickState, tickElement: TradingViewTick) =>
+                    tickElement.update(tick),
+            );
         }
     }
 }
