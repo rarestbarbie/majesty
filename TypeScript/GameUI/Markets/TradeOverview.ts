@@ -120,7 +120,6 @@ export class TradeOverview extends ScreenContent {
         );
 
         if (state.market !== undefined) {
-            console.log(state.market.chart.ticks);
             this.dom.chart.style.setProperty('--y-min', state.market.chart.min.toString());
             this.dom.chart.style.setProperty('--y-max', state.market.chart.max.toString());
             this.dom.chart.style.setProperty('--y-maxv', state.market.chart.maxv.toString());

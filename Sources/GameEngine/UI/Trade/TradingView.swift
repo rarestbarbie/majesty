@@ -41,9 +41,8 @@ extension TradingView {
         let step: Double
         switch scale / decade {
         case ...1: step = decade
-        case ...2: step = decade * 2
-        case ...5: step = decade * 5
-        default: step = decade * 10
+        case ...3: step = decade * 2
+        default: step = decade * 5
         }
 
         let steps: (first: Int64, last: Int64) = (
