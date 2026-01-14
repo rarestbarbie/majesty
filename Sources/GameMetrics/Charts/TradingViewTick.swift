@@ -2,21 +2,21 @@ import ColorText
 import JavaScriptKit
 import JavaScriptInterop
 
-struct TradingViewTick {
+@frozen public struct TradingViewTick {
     let id: Int
     let price: Double
     let label: String
     let style: ColorText.Style?
 }
 extension TradingViewTick: JavaScriptEncodable {
-    enum ObjectKey: JSString, Sendable {
+    @frozen public enum ObjectKey: JSString, Sendable {
         case id
         case price = "p"
         case label = "l"
         case style = "s"
     }
 
-    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+    public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.price] = self.price
         js[.label] = self.label

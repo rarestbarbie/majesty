@@ -1,4 +1,5 @@
 import GameEconomy
+import GameMetrics
 import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
