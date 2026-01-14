@@ -1,0 +1,153 @@
+div.tradingview {
+    position: relative;
+    height: 325px;
+    width: 100%;
+
+    direction: rtl;
+
+    background-color: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+
+    --vh: 25%;
+
+    --height: calc((100% - var(--vh)) / (var(--y-max) - var(--y-min)));
+    --heightv: calc(var(--vh) / var(--y-maxv));
+
+    > div {
+        position: absolute;
+        bottom: 0;
+        right: 0;
+    }
+
+    > div.candles {
+        overflow-x: scroll;
+        overflow-y: hidden;
+        scrollbar-gutter: auto;
+
+        display: flex;
+        height: 100%;
+        width: 100%;
+
+        border-right: 3.5rem solid transparent;
+        box-sizing: border-box;
+
+        > div {
+            flex-shrink: 0;
+
+            position: relative;
+            height: 100%;
+            width: 5px;
+
+            &:hover::before {
+                display: inline-block;
+                position: absolute;
+                content: '';
+                height: 100%;
+                border-left: 1px dashed rgba(255, 255, 255, 0.2);
+                left: 2px;
+            }
+
+            &[data-change='pos'] > div {
+                background-color: var(--color-pos-fill)
+            }
+            &[data-change='neg'] > div {
+                background-color: var(--color-neg-fill);
+            }
+            &[data-change='zero'] > div {
+                background-color: var(--color-neu-fill);
+            }
+
+            div:nth-child(1) {
+                position: absolute;
+                margin: 0 1px;
+                width: 3px;
+                background-color: rgb(61, 61, 61);
+                bottom: 0;
+                height: calc(var(--heightv) * var(--v));
+            }
+
+            &:hover div:nth-child(1) {
+                background-color: rgb(117, 117, 117);
+            }
+
+            div:nth-child(2) {
+                position: absolute;
+                margin: 0 1px;
+                width: 3px;
+                bottom: calc(var(--vh) + var(--height) * (min(var(--c), var(--o)) - var(--y-min)));
+                height: calc(max(1px, var(--height) * (abs(var(--c) - var(--o)))));
+            }
+            div:nth-child(3) {
+                position: absolute;
+                margin: 0 2px;
+                width: 1px;
+                bottom: calc(var(--vh) + var(--height) * (var(--l) - var(--y-min)));
+                height: calc(max(1px, var(--height) * (var(--h) - var(--l))));
+            }
+        }
+    }
+
+    div.ticks {
+        pointer-events: none;
+
+        position: absolute;
+        height: 100%;
+        width: 100%;
+
+        > div {
+            position: absolute;
+            height: 0;
+            width: 100%;
+
+            bottom: calc(var(--vh) + var(--height) * (var(--y) - var(--y-min)));
+            right: 0;
+
+            display: flex;
+            align-items: center;
+
+            &::after {
+                flex: 1 1 auto;
+                content: '';
+            }
+
+            > div {
+                width: 3rem;
+                padding: 0.2em 0.3em 0 0;
+                box-sizing: border-box;
+            }
+        }
+
+        > div[data-id='0'] {
+
+            &[data-style='ins'] {
+                --bg: var(--color-pos-fill);
+                --fg: black;
+            }
+            &[data-style='del'] {
+                --bg: var(--color-neg-fill);
+                --fg: white;
+            }
+
+            --bg: rgb(117, 117, 117);
+            --fg: white;
+
+            > div {
+                position: relative;
+
+                background-color: var(--bg);
+                color: var(--fg);
+
+                clip-path: polygon(0% 50%, 0.5em 0%, 100% 0%, 100% 100%, 0.5em 100%);
+            }
+            &::after {
+                border-bottom: 1px dashed var(--bg);
+            }
+        }
+
+        > div:not([data-id='0']) {
+            &::after {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+        }
+    }
+}

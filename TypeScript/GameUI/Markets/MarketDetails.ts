@@ -1,6 +1,6 @@
-import { CandlestickChart } from '../exports.js';
+import { TradingViewState } from '../exports.js';
 
 export interface MarketDetails {
     readonly id: string;
-    readonly chart: CandlestickChart;
+    readonly chart: TradingViewState;
 }
