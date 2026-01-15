@@ -383,6 +383,11 @@ extension GameUI.Model {
                 return $0.tooltipMarketLiquidity(
                     try arguments[0].decode(),
                 )
+            case .MarketHistory:
+                return $0.tooltipMarketHistory(
+                    try arguments[0].decode(),
+                    try arguments[1].decode(),
+                )
             case .PlanetCell:
                 return $0.tooltipPlanetTile(
                     try arguments[0].decode(),

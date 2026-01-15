@@ -18,6 +18,10 @@ extension GameDate {
         self.rawValue += 1
     }
 
+    @inlinable public func distance(to next: Self) -> Int {
+        Int.init(next.rawValue - self.rawValue)
+    }
+
     @inlinable public mutating func advance(by days: Int) {
         self.rawValue += Int32.init(days)
     }

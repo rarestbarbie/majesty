@@ -2,7 +2,10 @@ import {
     DiffableListElement,
 } from '../../DOM/exports.js';
 import { GameDate } from '../../GameEngine/exports.js';
-import { CandlestickState } from '../exports.js';
+import {
+    CandlestickState,
+    TooltipType
+} from '../exports.js';
 
 export class Candlestick implements DiffableListElement<GameDate> {
     public readonly id: GameDate;
@@ -11,7 +14,7 @@ export class Candlestick implements DiffableListElement<GameDate> {
     private readonly wick: HTMLDivElement;
     private readonly volume: HTMLDivElement;
 
-    constructor(interval: CandlestickState) {
+    constructor(interval: CandlestickState, market: string) {
         this.id = interval.id;
         this.node = document.createElement('div');
         this.body = document.createElement('div');
@@ -21,6 +24,9 @@ export class Candlestick implements DiffableListElement<GameDate> {
         this.node.appendChild(this.volume);
         this.node.appendChild(this.wick);
         this.node.appendChild(this.body);
+
+        this.node.setAttribute('data-tooltip-type', TooltipType.MarketHistory);
+        this.node.setAttribute('data-tooltip-arguments', JSON.stringify([market, this.id]));
     }
 
     public update(interval: CandlestickState): void {

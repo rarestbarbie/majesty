@@ -48,6 +48,7 @@ export enum TooltipType {
     BuildingBudgetItem = 'BuildingBudgetItem',
 
     MarketLiquidity = 'MarketLiquidity',
+    MarketHistory = 'MarketHistory',
 
     TileCulture = 'TileCulture',
     TilePopType = 'TilePopType',

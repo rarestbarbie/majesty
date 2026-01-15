@@ -58,6 +58,7 @@ import JavaScriptKit
     case PopBudgetItem
 
     case MarketLiquidity
+    case MarketHistory
 
     case TileCulture
     case TilePopType

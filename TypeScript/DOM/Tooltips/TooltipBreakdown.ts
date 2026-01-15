@@ -5,4 +5,5 @@ import {
 export interface TooltipBreakdown {
     conditions: ConditionListItem[][];
     display?: string;
+    flipped?: boolean;
 }
