@@ -75,8 +75,8 @@ extension GameContext {
 extension GameContext {
     mutating func loadTerrain(from editor: PlanetTileEditor) throws {
         let resized: Bool? = {
-            if  let size: Int8 = $0?.size {
-                $0?.size = editor.size
+            if  let size: Int8 = $0?.state.size {
+                $0?.state.size = editor.size
                 return editor.size != size
             } else {
                 return nil
@@ -158,7 +158,7 @@ extension GameContext {
             planetSurfaces: self.planets.map {
                 PlanetSurface.init(
                     id: $0.state.id,
-                    size: $0.size,
+                    size: $0.state.size,
                     grid: planets[$0.state.id] ?? []
                 )
             }
@@ -499,7 +499,15 @@ extension GameContext {
         self.count(aggregating: world.ledger)
 
         for i: Int in self.planets.indices {
-            try self.planets[i].afterIndexCount(world: world, _context: self.territoryPass)
+            // update physical planet location, without triggering a copy-on-write
+            let motion: (
+                global: CelestialMotion?,
+                local: CelestialMotion?
+            ) = self.planets[i].state.motion(in: self.planets.state)
+            ; {
+                $0.motion = motion
+                $0.afterIndexCount(world: world)
+            } (&self.planets[i])
         }
         for i: Int in self.tiles.indices {
             self.tiles[i].afterIndexCount(world: world)

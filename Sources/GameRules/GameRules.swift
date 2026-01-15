@@ -25,6 +25,16 @@ extension GameRules {
         // biology table currently only used to assign stable IDs to biological types
         _ = try symbols.biology.extend(over: self.biology)
 
+        /// due to order of evaluation, we must mutate symbols here, before calling `init`,
+        /// or loading other metadata
+        let ecology: OrderedDictionary<
+            SymbolAssignment<EcologicalType>,
+            EcologicalDescription
+        > = try symbols.ecology.extend(over: self.ecology)
+        let geology: OrderedDictionary<
+            SymbolAssignment<GeologicalType>,
+            GeologicalDescription
+        > = try symbols.geology.extend(over: self.geology)
         let objects: GameObjects = try .init(
             resolving: self,
             table: (
@@ -36,16 +46,6 @@ extension GameRules {
             ),
             symbols: symbols,
         )
-
-        /// due to order of evaluation, we must mutate symbols here, before calling `init`
-        let ecology: OrderedDictionary<
-            SymbolAssignment<EcologicalType>,
-            EcologicalDescription
-        > = try symbols.ecology.extend(over: self.ecology)
-        let geology: OrderedDictionary<
-            SymbolAssignment<GeologicalType>,
-            GeologicalDescription
-        > = try symbols.geology.extend(over: self.geology)
 
         return try .init(
             symbols: symbols,

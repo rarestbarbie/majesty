@@ -130,7 +130,7 @@ extension GameSession {
         return .init(
             id: tile.id,
             rotate: nil,
-            size: planet.size,
+            size: planet.state.size,
             name: tile.state.name,
             ecology: tile.type.ecology.symbol,
             ecologyChoices: self.state.context.rules.tiles.ecologyChoices,

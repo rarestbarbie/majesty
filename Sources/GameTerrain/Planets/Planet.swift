@@ -8,6 +8,7 @@ import JavaScriptKit
     public let id: PlanetID
     public let name: String
     public let type: PlanetType
+    public var size: Int8
     public let color: Color
     public let orbit: Orbit?
     public let opposes: PlanetID?
@@ -22,6 +23,7 @@ extension Planet {
         case id
         case name
         case type
+        case size
         case color
         case orbit
         case opposes
@@ -39,6 +41,7 @@ extension Planet: JavaScriptEncodable {
         js[.id] = self.id
         js[.name] = self.name
         js[.type] = self.type
+        js[.size] = self.size
         js[.color] = self.color
         js[.orbit] = self.orbit
         js[.opposes] = self.opposes
@@ -57,6 +60,7 @@ extension Planet: JavaScriptDecodable {
             id: try js[.id].decode(),
             name: try js[.name].decode(),
             type: try js[.type].decode(),
+            size: try js[.size]?.decode() ?? 0,
             color: try js[.color].decode(),
             orbit: try js[.orbit]?.decode(),
             opposes: try js[.opposes]?.decode(),

@@ -8,6 +8,9 @@ struct PlanetSnapshot: Sendable {
     let state: Planet
     let motion: (global: CelestialMotion?, local: CelestialMotion?)
     let position: (global: Vector3, local: Vector3)
-    let grid: HexGrid
 }
-
+extension PlanetSnapshot {
+    var grid: HexGrid {
+        .init(radius: self.state.size)
+    }
+}

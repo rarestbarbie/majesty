@@ -275,6 +275,10 @@ extension GameStart {
             fatalError("No geological metadata found in rules!!!")
         }
 
+        let planetSizes: [PlanetID: Int8] = terrain.planetSurfaces.reduce(into: [:]) {
+            $0[$1.id] = $1.size
+        }
+
         return .init(
             symbols: symbols.static,
             random: random,
@@ -284,7 +288,13 @@ extension GameStart {
             localMarkets: segmented.all.values.map(\.state),
             worldMarkets: tradeable.all.values.map(\.state),
             date: self.date,
-            planets: terrain.planets,
+            planets: terrain.planets.map {
+                var planet: Planet = $0
+                if  let size: Int8 = planetSizes[$0.id] {
+                    planet.size = size
+                }
+                return planet
+            },
             tiles: try terrain.load(
                 resolving: symbols.static,
                 geologyDefault: geologyDefault,
