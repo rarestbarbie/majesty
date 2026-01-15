@@ -4,6 +4,7 @@ import GameEconomy
 import GameIDs
 import GameRules
 import GameStarts
+import GameTerrain
 import JavaScriptKit
 import JavaScriptInterop
 import OrderedCollections
@@ -43,7 +44,7 @@ extension GameStart {
         return highest
     }
 
-    func unpack(rules: inout GameMetadata) throws -> GameSave {
+    func unpack(rules: inout GameMetadata, terrain: TerrainMap) throws -> GameSave {
         let symbols: GameStart.Symbols = .init(static: self.symbols, cultures: self.cultures)
 
         let starter: Set<Technology> = rules.technologies.values.reduce(into: []) {
@@ -265,6 +266,15 @@ extension GameStart {
             }
         }
 
+        guard
+        let ecologyDefault: EcologicalType = rules.tiles.ecologyDefault else {
+            fatalError("No ecological metadata found in rules!!!")
+        }
+        guard
+        let geologyDefault: GeologicalType = rules.tiles.geologyDefault else {
+            fatalError("No geological metadata found in rules!!!")
+        }
+
         return .init(
             symbols: symbols.static,
             random: random,
@@ -274,6 +284,12 @@ extension GameStart {
             localMarkets: segmented.all.values.map(\.state),
             worldMarkets: tradeable.all.values.map(\.state),
             date: self.date,
+            planets: terrain.planets,
+            tiles: try terrain.load(
+                resolving: symbols.static,
+                geologyDefault: geologyDefault,
+                ecologyDefault: ecologyDefault
+            ),
             currencies: self.currencies,
             countries: countries,
             buildings: buildings,

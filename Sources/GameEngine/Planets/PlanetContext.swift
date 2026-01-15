@@ -13,8 +13,7 @@ struct PlanetContext: RuntimeContext {
 
     var motion: (global: CelestialMotion?, local: CelestialMotion?)
     var position: (global: Vector3, local: Vector3)
-
-    var grid: PlanetGrid
+    var size: Int8
 
     init(type: _NoMetadata, state: Planet) {
         self.type = type
@@ -22,8 +21,7 @@ struct PlanetContext: RuntimeContext {
 
         self.motion = (nil, nil)
         self.position = (.zero, .zero)
-
-        self.grid = .init()
+        self.size = 0
     }
 }
 extension PlanetContext {
@@ -32,27 +30,19 @@ extension PlanetContext {
             state: self.state,
             motion: (self.motion.global, self.motion.local),
             position: (self.position.global, self.position.local),
-            grid: .init(radius: self.grid.size)
+            grid: .init(radius: self.size)
         )
-    }
-
-    subscript(tile: Int) -> PlanetGrid.Tile {
-        _read   { yield  self.grid.tiles.values[tile] }
-        _modify { yield &self.grid.tiles.values[tile] }
     }
 }
 extension PlanetContext {
     mutating func startIndexCount() {
-        for j: Int in self.grid.tiles.values.indices {
-            self.grid.tiles.values[j].startIndexCount()
-        }
     }
     mutating func afterIndexCount(
         world: borrowing GameWorld,
-        context: GameContext.TerritoryPass
+        _context: GameContext.TerritoryPass
     ) throws {
         if  let orbit: Planet.Orbit = self.state.orbit,
-            let orbits: Planet = context.planets[orbit.orbits] {
+            let orbits: Planet = _context.planets[orbit.orbits] {
             let motion: CelestialMotion = .init(
                 orbit: orbit,
                 of: self.state.id,
@@ -64,7 +54,7 @@ extension PlanetContext {
         }
 
         if  let opposes: PlanetID = self.state.opposes,
-            let opposes: Planet = context.planets[opposes],
+            let opposes: Planet = _context.planets[opposes],
             let orbit: Planet.Orbit = opposes.orbit {
             let orbit: CelestialMotion = .init(
                 orbit: orbit,
@@ -80,10 +70,6 @@ extension PlanetContext {
             self.motion.local = motion
         } else {
             self.motion.local = nil
-        }
-
-        for j: Int in self.grid.tiles.values.indices {
-            self.grid.tiles.values[j].afterIndexCount(world: world)
         }
     }
 

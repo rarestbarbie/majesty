@@ -16,27 +16,25 @@ extension GameSession {
 extension GameSession.State {
     @_spi(testable) public static func load(
         _ save: consuming GameSave,
-        rules: borrowing GameRules,
-        map: borrowing TerrainMap,
+        rules: borrowing GameRules
     ) throws -> Self {
         let metadata: GameMetadata = try rules.resolve(symbols: &save.symbols)
-        return try .load(save, rules: metadata, map: map)
+        return try .load(save, rules: metadata)
     }
 
     @_spi(testable) public static func load(
         start: consuming GameStart,
         rules: borrowing GameRules,
-        map: borrowing TerrainMap,
+        map: borrowing TerrainMap
     ) throws -> Self {
         var metadata: GameMetadata = try rules.resolve(symbols: &start.symbols)
-        let save: GameSave = try start.unpack(rules: &metadata)
-        return try .load(save, rules: metadata, map: map)
+        let save: GameSave = try start.unpack(rules: &metadata, terrain: map)
+        return try .load(save, rules: metadata)
     }
 
     private static func load(
         _ save: consuming GameSave,
         rules: consuming GameMetadata,
-        map: borrowing TerrainMap,
     ) throws -> Self {
         let world: GameWorld = .init(
             notifications: .init(date: save.date),
@@ -50,10 +48,7 @@ extension GameSession.State {
             random: save.random,
         )
 
-        var context: GameContext = try .load(save, rules: rules)
-        try context.loadTerrain(map)
-
-        return .init(context: context, world: world)
+        return .init(context: try .load(save, rules: rules), world: world)
     }
 }
 extension GameSession.State {

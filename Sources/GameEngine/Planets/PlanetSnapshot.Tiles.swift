@@ -6,14 +6,14 @@ import Vector
 extension PlanetSnapshot {
     struct Tiles: Sendable {
         let planet: PlanetSnapshot
-        let cached: [Address: PlanetGrid.TileSnapshot]
+        let cached: [Address: TileSnapshot]
     }
 }
 extension PlanetSnapshot.Tiles {
     func color(layer: PlanetMapLayer) -> [PlanetMapTile] {
         switch layer {
         case .Terrain:
-            return self.color { $0.terrain.color }
+            return self.color { $0.metadata.ecology.color }
 
         case .Population:
             let scale: Double = .init(
@@ -44,19 +44,19 @@ extension PlanetSnapshot.Tiles {
     }
 }
 extension PlanetSnapshot.Tiles {
-    func color(_ color: (PlanetGrid.TileSnapshot) -> Color) -> [PlanetMapTile] {
+    func color(_ color: (TileSnapshot) -> Color) -> [PlanetMapTile] {
         self.color { (color($0), nil, nil, nil) }
     }
-    func color(_ color: (PlanetGrid.TileSnapshot) -> Double) -> [PlanetMapTile] {
+    func color(_ color: (TileSnapshot) -> Double) -> [PlanetMapTile] {
         self.color { (nil, color($0), nil, nil) }
     }
-    func color(_ color: (PlanetGrid.TileSnapshot) -> (x: Double, y: Double)) -> [PlanetMapTile] {
+    func color(_ color: (TileSnapshot) -> (x: Double, y: Double)) -> [PlanetMapTile] {
         self.color {
             let (x, y): (Double, Double) = color($0)
             return (nil, x, y, nil)
         }
     }
-    func color(_ color: (PlanetGrid.TileSnapshot) -> (x: Double, y: Double, z: Double)) -> [PlanetMapTile] {
+    func color(_ color: (TileSnapshot) -> (x: Double, y: Double, z: Double)) -> [PlanetMapTile] {
         self.color {
             let (x, y, z): (Double, Double, Double) = color($0)
             return (nil, x, y, z)
@@ -64,7 +64,7 @@ extension PlanetSnapshot.Tiles {
     }
 
     private func color(
-        _ color: (PlanetGrid.TileSnapshot) -> (color: Color?, x: Double?, y: Double?, z: Double?)
+        _ color: (TileSnapshot) -> (color: Color?, x: Double?, y: Double?, z: Double?)
     ) -> [PlanetMapTile] {
         let z: Int8 = self.planet.grid.radius
         let radius: Double = 1.5 * Double.init(1 + z)
@@ -116,7 +116,7 @@ extension PlanetSnapshot.Tiles {
 
     func reduce<T>(
         initial: consuming T,
-        combine: (consuming T, HexCoordinate, PlanetGrid.TileSnapshot) throws -> T
+        combine: (consuming T, HexCoordinate, TileSnapshot) throws -> T
     ) rethrows -> T {
         try self.reduce(into: initial) {
             $0 = try combine($0, $1, $2)
@@ -125,11 +125,11 @@ extension PlanetSnapshot.Tiles {
 
     func reduce<T>(
         into result: consuming T,
-        with yield: (inout T, HexCoordinate, PlanetGrid.TileSnapshot) throws -> ()
+        with yield: (inout T, HexCoordinate, TileSnapshot) throws -> ()
     ) rethrows -> T {
         try self.planet.grid.reduce(into: result) {
             guard
-            let tile: PlanetGrid.TileSnapshot = self.cached[self.planet.state.id / $1] else {
+            let tile: TileSnapshot = self.cached[self.planet.state.id / $1] else {
                 return
             }
 

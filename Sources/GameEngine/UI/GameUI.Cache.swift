@@ -48,7 +48,7 @@ extension GameUI.Cache {
         _ layer: PlanetMapLayer,
     ) -> ContextMenu? {
         guard
-        let tile: PlanetGrid.TileSnapshot = self.tiles[id] else {
+        let tile: TileSnapshot = self.tiles[id] else {
             return nil
         }
 
@@ -299,7 +299,7 @@ extension GameUI.Cache {
         case .m(let id):
             guard
             let mine: MineSnapshot = self.mines[id.mine],
-            let tile: PlanetGrid.TileSnapshot = self.tiles[mine.state.tile] else {
+            let tile: TileSnapshot = self.tiles[mine.state.tile] else {
                 return nil
             }
             return .instructions {
@@ -318,7 +318,7 @@ extension GameUI.Cache {
                     }
                     if  let yieldRank: Int = mine.state.z.yieldRank,
                         let (chance, spawn): (Fraction, SpawnWeight) = mine.metadata.chance(
-                            tile: tile.geology.id,
+                            tile: tile.type.geology,
                             size: mine.state.z.size,
                             yieldRank: yieldRank
                         ),

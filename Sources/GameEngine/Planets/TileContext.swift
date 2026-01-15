@@ -2,87 +2,81 @@ import Fraction
 import GameEconomy
 import GameRules
 import GameIDs
+import GameState
 import GameTerrain
 import HexGrids
 import OrderedCollections
 import Random
 
-extension PlanetGrid {
-    struct Tile: Identifiable {
-        let id: Address
-        private(set) var properties: RegionalProperties?
-        private(set) var authority: RegionalAuthority?
-        private var stats: RegionalStats
+struct TileContext: RuntimeContext {
+    let type: TileMetadata
+    var state: Tile
 
-        var name: String?
-        var terrain: TerrainMetadata
-        var geology: GeologicalMetadata
+    private(set) var properties: RegionalProperties?
+    private(set) var authority: RegionalAuthority?
+    private var stats: RegionalStats
 
-        // Computed statistics
-        private(set) var buildingsAlreadyPresent: Set<BuildingType>
-        private(set) var buildings: [BuildingID]
+    // Computed statistics
+    private(set) var buildingsAlreadyPresent: Set<BuildingType>
+    private(set) var buildings: [BuildingID]
 
-        private(set) var factoriesUnderConstruction: Int64
-        private(set) var factoriesAlreadyPresent: Set<FactoryType>
-        private(set) var factories: [FactoryID]
+    private(set) var factoriesUnderConstruction: Int64
+    private(set) var factoriesAlreadyPresent: Set<FactoryType>
+    private(set) var factories: [FactoryID]
 
-        private(set) var minesAlreadyPresent: [MineType: (size: Int64, yieldRank: Int?)]
-        private(set) var mines: [MineID]
-        private var criticalShortages: [Resource]
+    private(set) var minesAlreadyPresent: [MineType: (size: Int64, yieldRank: Int?)]
+    private(set) var mines: [MineID]
+    private var criticalShortages: [Resource]
 
-        init(
-            id: Address,
-            name: String?,
-            terrain: TerrainMetadata,
-            geology: GeologicalMetadata,
-        ) {
-            self.id = id
-            self.properties = nil
-            self.authority = nil
-            self.stats = .init()
+    init(type: TileMetadata, state: Tile) {
+        self.type = type
+        self.state = state
 
-            self.name = name
-            self.terrain = terrain
-            self.geology = geology
+        self.properties = nil
+        self.authority = nil
+        self.stats = .init()
 
-            self.buildingsAlreadyPresent = []
-            self.buildings = []
+        self.buildingsAlreadyPresent = []
+        self.buildings = []
 
-            self.factoriesUnderConstruction = 0
-            self.factoriesAlreadyPresent = []
-            self.factories = []
+        self.factoriesUnderConstruction = 0
+        self.factoriesAlreadyPresent = []
+        self.factories = []
 
-            self.minesAlreadyPresent = [:]
-            self.mines = []
+        self.minesAlreadyPresent = [:]
+        self.mines = []
 
-            self.criticalShortages = []
-        }
+        self.criticalShortages = []
     }
 }
-extension PlanetGrid.Tile {
+extension TileContext {
     var governedBy: CountryID? { self.authority?.governedBy }
     var occupiedBy: CountryID? { self.authority?.occupiedBy }
 
     var pops: PopulationStats { self.stats.pops }
+    var name: String? { self.state.name }
+    var id: Address { self.state.id }
 
-    var snapshot: PlanetGrid.TileSnapshot {
+    var snapshot: TileSnapshot {
         .init(
+            metadata: self.type,
             id: self.id,
+            type: self.state.type,
+            name: self.state.name,
+            properties: self.properties
+        )
+    }
+
+    var terrain: Terrain {
+        .init(
+            id: self.state.id.tile,
             name: self.name,
-            properties: self.properties,
-            terrain: self.terrain,
-            geology: self.geology
+            ecology: self.type.ecology.symbol,
+            geology: self.type.geology.symbol
         )
     }
 }
-extension PlanetGrid.Tile {
-    mutating func copy(from source: Self) {
-        self.name = source.name
-        self.terrain = source.terrain
-        self.geology = source.geology
-    }
-}
-extension PlanetGrid.Tile {
+extension TileContext {
     mutating func update(
         governedBy: CountryID,
         occupiedBy: CountryID,
@@ -168,7 +162,10 @@ extension PlanetGrid.Tile {
         }
     }
 }
-extension PlanetGrid.Tile {
+extension TileContext {
+    mutating func advance(turn: inout Turn, context: GameContext) throws {}
+}
+extension TileContext {
     func pickBuilding(
         among buildings: OrderedDictionary<BuildingType, BuildingMetadata>,
         using random: inout PseudoRandom,
@@ -187,7 +184,7 @@ extension PlanetGrid.Tile {
         return nil
     }
 }
-extension PlanetGrid.Tile {
+extension TileContext {
     private func filter(
         factories: OrderedDictionary<FactoryType, FactoryMetadata>,
         where predicate: (FactoryMetadata) -> Bool
@@ -199,7 +196,7 @@ extension PlanetGrid.Tile {
             if  $0.terrainAllowed.isEmpty {
                 return predicate($0)
             } else if
-                $0.terrainAllowed.contains(self.terrain.id) {
+                $0.terrainAllowed.contains(self.type.ecology.id) {
                 return predicate($0)
             } else {
                 return false
@@ -258,7 +255,7 @@ extension PlanetGrid.Tile {
         return choices.randomElement(using: &random.generator)
     }
 }
-extension PlanetGrid.Tile {
+extension TileContext {
     func pickMine(
         among mines: OrderedDictionary<MineType, MineMetadata>,
         turn: inout Turn,
@@ -298,7 +295,7 @@ extension PlanetGrid.Tile {
         for (type, size, yieldRank): (MineMetadata, Int64, Int) in existing {
             guard
             let (chance, spawn): (Fraction, SpawnWeight) = type.chance(
-                tile: self.geology.id,
+                tile: self.type.geology.id,
                 size: size,
                 yieldRank: yieldRank
             ) else {
@@ -326,7 +323,7 @@ extension PlanetGrid.Tile {
             //  on this tile’s geology
             guard
             let (chance, spawn): (Fraction, SpawnWeight) = mine.chanceNew(
-                tile: self.geology.id
+                tile: self.type.geology.id
             ) else {
                 continue
             }

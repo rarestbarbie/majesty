@@ -12,7 +12,7 @@ public final class BuildingMetadata: GameObjectMetadata {
     public let sharesInitial: Int64
     public let sharesPerLevel: Int64
 
-    public let terrainAllowed: Set<TerrainType>
+    public let terrainAllowed: Set<EcologicalType>
     public let required: Bool
 
     init(
@@ -23,7 +23,7 @@ public final class BuildingMetadata: GameObjectMetadata {
         output: ResourceTier,
         sharesInitial: Int64,
         sharesPerLevel: Int64,
-        terrainAllowed: Set<TerrainType>,
+        terrainAllowed: Set<EcologicalType>,
         required: Bool
     ) {
         self.identity = identity

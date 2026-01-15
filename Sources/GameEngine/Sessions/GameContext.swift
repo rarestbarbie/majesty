@@ -5,6 +5,7 @@ import GameIDs
 import GameRules
 import GameState
 import GameTerrain
+import HexGrids
 import JavaScriptKit
 import OrderedCollections
 
@@ -12,6 +13,8 @@ struct GameContext {
     var player: CountryID
 
     private(set) var planets: RuntimeContextTable<PlanetContext>
+    private(set) var tiles: RuntimeContextTable<TileContext>
+
     private(set) var currencies: OrderedDictionary<CurrencyID, Currency>
     private(set) var countries: RuntimeContextTable<CountryContext>
     private(set) var buildings: DynamicContextTable<BuildingContext>
@@ -25,14 +28,18 @@ struct GameContext {
 extension GameContext {
     static func load(_ save: borrowing GameSave, rules: consuming GameMetadata) throws -> Self {
         let _none: _NoMetadata = .init()
-        // closure captures `rules`, and calls a mutating subscript! writing it inline would
+        // closure captures `rules`, and calls a mutating subscript! writing these inline would
         // still be correct, due to order of evaluation, but this is much clearer
+        let tiles: RuntimeContextTable<TileContext> = try .init(states: save.tiles) {
+            rules.tiles[$0.type]
+        }
         let pops: DynamicContextTable<PopContext> = try .init(states: save.pops) {
             rules.pops[$0.type]
         }
         return .init(
             player: save.player,
-            planets: [:],
+            planets: try .init(states: save.planets) { _ in _none },
+            tiles: tiles,
             currencies: save.currencies.reduce(into: [:]) { $0[$1.id] = $1 },
             countries: try .init(states: save.countries) { _ in _none },
             buildings: try .init(states: save.buildings) { rules.buildings[$0.type] },
@@ -54,6 +61,8 @@ extension GameContext {
             localMarkets: world.localMarkets.values.map(\.state),
             worldMarkets: world.worldMarkets.values.map(\.state),
             date: world.date,
+            planets: [_].init(self.planets.state),
+            tiles: [_].init(self.tiles.state),
             currencies: self.currencies.values.elements,
             countries: [_].init(self.countries.state),
             buildings: [_].init(self.buildings.state),
@@ -65,66 +74,92 @@ extension GameContext {
 }
 extension GameContext {
     mutating func loadTerrain(from editor: PlanetTileEditor) throws {
-        let terrain: TerrainType = try self.symbols[terrain: editor.terrain]
-        let geology: GeologicalType = try self.symbols[geology: editor.geology]
+        let resized: Bool? = {
+            if  let size: Int8 = $0?.size {
+                $0?.size = editor.size
+                return editor.size != size
+            } else {
+                return nil
+            }
+        }(&self.planets[editor.id.planet])
+
         guard
-        let terrain: TerrainMetadata = self.rules.terrains[terrain],
-        let geology: GeologicalMetadata = self.rules.geology[geology] else {
+        let resized: Bool else {
+            fatalError("Planet \(editor.id.planet) does not exist!!!")
+        }
+
+        // editor supports only one operation at a time
+        let moved: [Tile]
+        if  resized {
+            // when resizing, we extract all existing tiles, and then move them, plus the new
+            // tiles (any minus deleted ones) to the end of the table. this ensures they remain
+            // contiguous, and prevents zombie tiles from lingering
+            let template: HexGrid = .init(radius: editor.size)
+            moved = try template.reduce(into: []) {
+                let id: Address = editor.id.planet / $1
+                let tile: Tile = try self.tiles.state[id] ?? .init(
+                    id: id,
+                    type: .init(
+                        ecology: try self.symbols[ecology: editor.ecology],
+                        geology: try self.symbols[geology: editor.geology]
+                    ),
+                    name: editor.name
+                )
+
+                $0.append(tile)
+            }
+        } else if let direction: HexRotation = editor.rotate {
+            let template: HexGrid = .init(radius: editor.size)
+            /// although rotations could be spatially performed in-place, in practice we still
+            /// need to reload metadata, so we do the same extract-and-move strategy as when
+            /// resizing the planet grid
+            moved = template.reduce(into: []) {
+                guard let source: Tile = self.tiles.state[editor.id.planet / $1] else {
+                    return
+                }
+
+                let id: HexCoordinate = source.id.tile.rotated(direction)
+                let moved: Tile = .init(
+                    id: editor.id.planet / id,
+                    type: source.type,
+                    name: source.name
+                )
+
+                $0.append(moved)
+            }
+        } else {
+            let type: TileType = .init(
+                ecology: try self.symbols[ecology: editor.ecology],
+                geology: try self.symbols[geology: editor.geology]
+            )
+            if  let metadata: TileMetadata = self.rules.tiles[type] {
+                self.tiles[editor.id] = .init(
+                    type: metadata,
+                    state: .init(
+                        id: editor.id,
+                        type: type,
+                        name: editor.name,
+                    )
+                )
+            }
+
             return
         }
 
-        self.planets[editor.id] = .init(
-            id: editor.id,
-            name: editor.name,
-            terrain: terrain,
-            geology: geology
-        )
-        self.planets[editor.id.planet]?.grid.resurface(
-            planet: editor.id.planet,
-            rotate: editor.rotate,
-            size: editor.size,
-            terrainDefault: terrain,
-            geologyDefault: geology
-        )
-    }
-
-    mutating func loadTerrain(_ map: TerrainMap) throws {
-        // Load planets
-        let planetMetadata: PlanetContext.Metadata = .init()
-        self.planets = try .init(states: map.planets) { _ in planetMetadata }
-        // Initialize hex grids
-        guard
-        let terrainDefault: TerrainMetadata = self.rules.terrains.values.first else {
-            fatalError("No terrain metadata found in rules!!!")
-        }
-        guard
-        let geologyDefault: GeologicalMetadata = self.rules.geology.values.first else {
-            fatalError("No geological metadata found in rules!!!")
-        }
-        let defined: [PlanetID: PlanetSurface] = map.planetSurfaces.reduce(into: [:]) {
-            $0[$1.id] = $1
-        }
-        for i: Int in self.planets.indices {
-            try {
-                try $0.grid.replace(
-                    surface: defined[$0.state.id] ?? .init(id: $0.state.id),
-                    symbols: self.symbols,
-                    rules: self.rules,
-                    terrainDefault: terrainDefault,
-                    geologyDefault: geologyDefault
-                )
-            } (&self.planets[i])
-        }
+        try self.tiles.replace(planet: editor.id.planet, with: moved, metadata: &self.rules)
     }
 
     func saveTerrain() -> TerrainMap {
-        .init(
+        let planets: [PlanetID: [Terrain]] = self.tiles.reduce(into: [:]) {
+            $0[$1.state.id.planet, default: []].append($1.terrain)
+        }
+        return .init(
             planets: self.planets.map(\.state),
             planetSurfaces: self.planets.map {
                 PlanetSurface.init(
                     id: $0.state.id,
-                    size: $0.grid.size,
-                    grid: $0.grid.tiles.values.map(PlanetSurface.Tile.init(from:))
+                    size: $0.size,
+                    grid: planets[$0.state.id] ?? []
                 )
             }
         )
@@ -188,21 +223,21 @@ extension GameContext {
         .init(
             player: self.player,
             rules: self.rules,
-            planets: self.planets,
+            tiles: self.tiles,
         )
     }
     private var minePass: MineContext.ComputationPass {
         .init(
             player: self.player,
             rules: self.rules,
-            planets: self.planets,
+            tiles: self.tiles,
         )
     }
     private var popPass: PopContext.ComputationPass {
         .init(
             player: self.player,
             rules: self.rules,
-            planets: self.planets,
+            tiles: self.tiles,
             factories: self.factories.state,
             mines: self.mines.state,
         )
@@ -229,7 +264,7 @@ extension GameContext {
             let country: Country = self.countries.state[i]
             let properties: CountryProperties = try .compute(for: country, in: self)
             for tile: Address in country.tilesControlled {
-                self.planets[tile]?.update(
+                self.tiles[tile]?.update(
                     governedBy: country.id,
                     occupiedBy: country.id,
                     suzerain: country.suzerain,
@@ -240,6 +275,9 @@ extension GameContext {
 
         for i: Int in self.planets.indices {
             self.planets[i].startIndexCount()
+        }
+        for i: Int in self.tiles.indices {
+            self.tiles[i].startIndexCount()
         }
 
         var economy: EconomicAggregator = .init()
@@ -262,7 +300,7 @@ extension GameContext {
             let (pop, stats): (Pop, Pop.Stats) = { ($0.state, $0.stats) } (self.pops[i])
 
             guard
-            let region: RegionalAuthority = self.planets[pop.tile]?.addResidentCount(
+            let region: RegionalAuthority = self.tiles[pop.tile]?.addResidentCount(
                 pop,
                 stats
             ) else {
@@ -300,7 +338,7 @@ extension GameContext {
         for i: Int in self.factories.indices {
             let factory: Factory = self.factories.state[i]
             guard
-            let region: RegionalAuthority = self.planets[factory.tile]?.addResidentCount(
+            let region: RegionalAuthority = self.tiles[factory.tile]?.addResidentCount(
                 factory
             ) else {
                 fatalError("Factory \(factory.id) has no home tile!!!")
@@ -317,7 +355,7 @@ extension GameContext {
         for i: Int in self.buildings.indices {
             let building: Building = self.buildings.state[i]
             guard
-            let region: RegionalAuthority = self.planets[building.tile]?.addResidentCount(
+            let region: RegionalAuthority = self.tiles[building.tile]?.addResidentCount(
                 building
             ) else {
                 fatalError("Building \(building.id) has no home tile!!!")
@@ -333,7 +371,7 @@ extension GameContext {
         }
         for i: Int in self.mines.indices {
             let mine: Mine = self.mines.state[i]
-            let counted: ()? = self.planets[mine.tile]?.addResidentCount(mine)
+            let counted: ()? = self.tiles[mine.tile]?.addResidentCount(mine)
 
             #assert(counted != nil, "Mine \(mine.id) has no home tile!!!")
         }
@@ -352,6 +390,9 @@ extension GameContext {
         for i: Int in self.planets.indices {
             try self.planets[i].advance(turn: &turn, context: self)
         }
+        for i: Int in self.tiles.indices {
+            try self.tiles[i].advance(turn: &turn, context: self)
+        }
         for i: Int in self.countries.indices {
             try self.countries[i].advance(turn: &turn, context: self)
         }
@@ -360,7 +401,7 @@ extension GameContext {
         // need to call this first, to update prices before trading
         turn.localMarkets.turn {
             guard
-            let region: RegionalAuthority = self.planets[$0.id.location]?.authority else {
+            let region: RegionalAuthority = self.tiles[$0.id.location]?.authority else {
                 fatalError("LocalMarket \($0.id) exists in a tile with no authority!!!")
             }
 
@@ -458,7 +499,10 @@ extension GameContext {
         self.count(aggregating: world.ledger)
 
         for i: Int in self.planets.indices {
-            try self.planets[i].afterIndexCount(world: world, context: self.territoryPass)
+            try self.planets[i].afterIndexCount(world: world, _context: self.territoryPass)
+        }
+        for i: Int in self.tiles.indices {
+            self.tiles[i].afterIndexCount(world: world)
         }
 
         for i: Int in self.buildings.indices {
@@ -498,7 +542,7 @@ extension GameContext {
             $0[$1.key.location, default: 0] += $1.value.value
         }
         for (id, gdp): (Address, Double) in gdp {
-            self.planets[id]?.update(gdp: gdp)
+            self.tiles[id]?.update(gdp: gdp)
         }
     }
     private mutating func report(
@@ -599,24 +643,22 @@ extension GameContext {
         }
     }
     private mutating func awardRanksToMines() {
-        for i: Int in self.planets.indices {
-            for tile: PlanetGrid.Tile in self.planets[i].grid.tiles.values {
-                var ranks: [PopOccupation: [(id: MineID, yield: Double)]] = [:]
-                for mine: MineID in tile.mines {
-                    guard
-                    let mine: MineContext = self.mines[mine] else {
-                        continue
-                    }
-
-                    ranks[mine.type.miner, default: []].append(
-                        (id: mine.state.id, yield: mine.state.z.yield)
-                    )
+        for tile: TileContext in self.tiles {
+            var ranks: [PopOccupation: [(id: MineID, yield: Double)]] = [:]
+            for mine: MineID in tile.mines {
+                guard
+                let mine: MineContext = self.mines[mine] else {
+                    continue
                 }
-                for var mines: [(id: MineID, yield: Double)] in ranks.values {
-                    mines.sort { $0.yield > $1.yield }
-                    for (yieldRank, (id, _)): (Int, (MineID, _)) in mines.enumerated() {
-                        self.mines[modifying: id].state.z.yieldRank = yieldRank
-                    }
+
+                ranks[mine.type.miner, default: []].append(
+                    (id: mine.state.id, yield: mine.state.z.yield)
+                )
+            }
+            for var mines: [(id: MineID, yield: Double)] in ranks.values {
+                mines.sort { $0.yield > $1.yield }
+                for (yieldRank, (id, _)): (Int, (MineID, _)) in mines.enumerated() {
+                    self.mines[modifying: id].state.z.yieldRank = yieldRank
                 }
             }
         }
@@ -682,58 +724,56 @@ extension GameContext {
         }
     }
     private mutating func executeConstructions(_ turn: inout Turn) throws {
-        for i: Int in self.planets.indices {
-            for j: Int in self.planets[i].grid.tiles.values.indices {
-                let (building, factory, mine, tile): (
-                    BuildingMetadata?,
-                    FactoryMetadata?,
-                    (type: MineMetadata, size: Int64)?,
-                    Address
-                ) = {
-                    let building: BuildingMetadata? = $0.pickBuilding(
-                        among: self.rules.buildings,
-                        using: &turn.random
-                    )
-                    let factory: FactoryMetadata? = $0.pickFactory(
-                        among: self.rules.factories,
-                        using: &turn.random
-                    )
-                    let mine: (type: MineMetadata, size: Int64)? = $0.pickMine(
-                        among: self.rules.mines,
-                        turn: &turn
-                    )
-                    return (building, factory, mine, tile: $0.id)
-                } (&self.planets[i][j])
+        for i: Int in self.tiles.indices {
+            let (building, factory, mine, tile): (
+                BuildingMetadata?,
+                FactoryMetadata?,
+                (type: MineMetadata, size: Int64)?,
+                Address
+            ) = {
+                let building: BuildingMetadata? = $0.pickBuilding(
+                    among: self.rules.buildings,
+                    using: &turn.random
+                )
+                let factory: FactoryMetadata? = $0.pickFactory(
+                    among: self.rules.factories,
+                    using: &turn.random
+                )
+                let mine: (type: MineMetadata, size: Int64)? = $0.pickMine(
+                    among: self.rules.mines,
+                    turn: &turn
+                )
+                return (building, factory, mine, tile: $0.id)
+            } (&self.tiles[i])
 
-                if  let type: BuildingMetadata = building {
-                    let building: Building.Section = .init(type: type.id, tile: tile)
-                    try self.buildings[building] {
-                        _ in
-                        type
-                    } update: {
-                        $1.z.active = 1
-                    }
+            if  let type: BuildingMetadata = building {
+                let building: Building.Section = .init(type: type.id, tile: tile)
+                try self.buildings[building] {
+                    _ in
+                    type
+                } update: {
+                    $1.z.active = 1
                 }
+            }
 
-                if  let type: FactoryMetadata = factory {
-                    let factory: Factory.Section = .init(type: type.id, tile: tile)
-                    try self.factories[factory] {
-                        _ in
-                        type
-                    } update: {
-                        $1.size = .init(level: 0)
-                    }
+            if  let type: FactoryMetadata = factory {
+                let factory: Factory.Section = .init(type: type.id, tile: tile)
+                try self.factories[factory] {
+                    _ in
+                    type
+                } update: {
+                    $1.size = .init(level: 0)
                 }
+            }
 
-                if  let (type, size): (MineMetadata, Int64) = mine {
-                    let mine: Mine.Section = .init(type: type.id, tile: tile)
-                    try self.mines[mine] {
-                        _ in
-                        type
-                    } update: {
-                        $1.z.size += size
-                        $1.last = Mine.Expansion.init(size: size, date: turn.date)
-                    }
+            if  let (type, size): (MineMetadata, Int64) = mine {
+                let mine: Mine.Section = .init(type: type.id, tile: tile)
+                try self.mines[mine] {
+                    _ in
+                    type
+                } update: {
+                    $1.z.size += size
+                    $1.last = Mine.Expansion.init(size: size, date: turn.date)
                 }
             }
         }

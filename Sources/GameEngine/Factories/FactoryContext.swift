@@ -112,7 +112,7 @@ extension FactoryContext {
             self.clerks?.limit = area * self.type.clerks.amount
         }
 
-        self.region = context.planets[self.state.tile]?.properties
+        self.region = context.tiles[self.state.tile]?.properties
 
         guard
         let region: RegionalProperties = self.region else {

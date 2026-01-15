@@ -12,8 +12,8 @@ public struct PlanetTileEditor: Sendable {
     let size: Int8
     let name: String?
 
-    let terrain: Symbol
-    let terrainChoices: [Symbol]
+    let ecology: Symbol
+    let ecologyChoices: [Symbol]
 
     let geology: Symbol
     let geologyChoices: [Symbol]
@@ -27,8 +27,8 @@ extension PlanetTileEditor {
         case rotate
         case size
         case name
-        case terrain
-        case terrainChoices
+        case ecology = "terrain"
+        case ecologyChoices = "terrainChoices"
         case geology
         case geologyChoices
     }
@@ -40,8 +40,8 @@ extension PlanetTileEditor: JavaScriptEncodable {
         js[.rotate] = self.rotate
         js[.size] = self.size
         js[.name] = self.name
-        js[.terrain] = self.terrain
-        js[.terrainChoices] = self.terrainChoices
+        js[.ecology] = self.ecology
+        js[.ecologyChoices] = self.ecologyChoices
         js[.geology] = self.geology
         js[.geologyChoices] = self.geologyChoices
     }
@@ -53,8 +53,8 @@ extension PlanetTileEditor: JavaScriptDecodable {
             rotate: try js[.rotate]?.decode(),
             size: try js[.size].decode(),
             name: try js[.name]?.decode(),
-            terrain: try js[.terrain].decode(),
-            terrainChoices: try js[.terrainChoices].decode(),
+            ecology: try js[.ecology].decode(),
+            ecologyChoices: try js[.ecologyChoices].decode(),
             geology: try js[.geology].decode(),
             geologyChoices: try js[.geologyChoices].decode()
         )

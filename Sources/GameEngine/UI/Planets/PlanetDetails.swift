@@ -9,7 +9,7 @@ struct PlanetDetails {
     let id: Address
     var open: PlanetMapLayer
 
-    private var tile: PlanetGrid.TileSnapshot?
+    private var tile: TileSnapshot?
     private var terms: [Term]
 
     private var gdp: PieChart<Resource, PieChartLabel>?
@@ -28,7 +28,7 @@ extension PlanetDetails: PersistentReportDetails {
     }
 }
 extension PlanetDetails {
-    mutating func update(from tile: PlanetGrid.TileSnapshot, in cache: borrowing GameUI.Cache) {
+    mutating func update(from tile: TileSnapshot, in cache: borrowing GameUI.Cache) {
         self.tile = tile
         self.terms = Term.list {
             $0[.gdp, (+), tooltip: .TileGDP] = tile.properties?._gdp[/3..2]

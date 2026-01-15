@@ -30,10 +30,8 @@ extension GameSession {
             planets: self.state.context.planets.reduce(into: [:]) {
                 $0[$1.state.id] = $1.snapshot
             },
-            tiles: self.state.context.planets.reduce(into: [:]) {
-                for tile: PlanetGrid.Tile in $1.grid.tiles.values {
-                    $0[tile.id] = tile.snapshot
-                }
+            tiles: self.state.context.tiles.reduce(into: [:]) {
+                $0[$1.state.id] = $1.snapshot
             },
             localMarkets: self.state.world.localMarkets,
             worldMarkets: self.state.world.worldMarkets,
@@ -78,10 +76,9 @@ extension GameSession {
 extension GameSession {
     public static func load(
         _ save: consuming GameSave,
-        rules: borrowing GameRules,
-        map: borrowing TerrainMap,
+        rules: borrowing GameRules
     ) throws -> Self {
-        .init(state: try .load(save, rules: rules, map: map))
+        .init(state: try .load(save, rules: rules))
     }
 
     public static func load(
@@ -126,19 +123,19 @@ extension GameSession {
         guard
         case (_, let current?) = await self.model.ui.navigator.current,
         let planet: PlanetContext = self.state.context.planets[current.planet],
-        let tile: PlanetGrid.Tile = planet.grid.tiles[current.tile] else {
+        let tile: TileContext = self.state.context.tiles[current.planet / current.tile] else {
             return nil
         }
 
         return .init(
             id: tile.id,
             rotate: nil,
-            size: planet.grid.size,
-            name: tile.name,
-            terrain: tile.terrain.symbol,
-            terrainChoices: self.state.context.rules.terrains.values.map(\.symbol),
-            geology: tile.geology.symbol,
-            geologyChoices: self.state.context.rules.geology.values.map(\.symbol)
+            size: planet.size,
+            name: tile.state.name,
+            ecology: tile.type.ecology.symbol,
+            ecologyChoices: self.state.context.rules.tiles.ecologyChoices,
+            geology: tile.type.geology.symbol,
+            geologyChoices: self.state.context.rules.tiles.geologyChoices
         )
     }
 

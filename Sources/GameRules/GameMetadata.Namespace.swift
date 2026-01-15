@@ -14,8 +14,8 @@ extension GameMetadata {
         case technologies
 
         case biology
+        case ecology
         case geology
-        case terrains
 
         case settings
     }

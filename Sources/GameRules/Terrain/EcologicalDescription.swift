@@ -2,10 +2,10 @@ import Color
 import JavaScriptInterop
 import JavaScriptKit
 
-struct TerrainDescription {
+struct EcologicalDescription {
     let color: Color
 }
-extension TerrainDescription: JavaScriptDecodable {
+extension EcologicalDescription: JavaScriptDecodable {
     enum ObjectKey: JSString {
         case color
     }

@@ -5,21 +5,16 @@ import JavaScriptKit
 @frozen public struct PlanetSurface {
     public let id: PlanetID
     public let size: Int8
-    public let grid: [Tile]
+    public let grid: [Terrain]
 
     @inlinable public init(
         id: PlanetID,
         size: Int8,
-        grid: [Tile]
+        grid: [Terrain]
     ) {
         self.id = id
         self.size = size
         self.grid = grid
-    }
-}
-extension PlanetSurface {
-    @inlinable public init(id: PlanetID) {
-        self.init(id: id, size: 0, grid: [])
     }
 }
 extension PlanetSurface {

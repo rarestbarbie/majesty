@@ -29,12 +29,12 @@ extension NavigatorTile {
     mutating func update(in cache: borrowing GameUI.Cache) {
         guard
         let planet: PlanetSnapshot = cache.planets[self.id.planet],
-        let tile: PlanetGrid.TileSnapshot = cache.tiles[self.id] else {
+        let tile: TileSnapshot = cache.tiles[self.id] else {
             return
         }
 
-        self.name = "\(tile.name ?? tile.terrain.title) (\(planet.state.name))"
-        self.terrain = tile.terrain.title
+        self.name = "\(tile.name ?? tile.metadata.ecology.title) (\(planet.state.name))"
+        self.terrain = tile.metadata.ecology.title
 
         let pops: PopulationStats = tile.pops
 
