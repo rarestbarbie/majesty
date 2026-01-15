@@ -426,6 +426,12 @@ extension GameUI.Cache {
     ) -> Tooltip? {
         self.worldMarkets[id]?.snapshot?.tooltipLiquidity()
     }
+    func tooltipMarketHistory(
+        _ id: WorldMarket.ID,
+        _ date: GameDate
+    ) -> Tooltip? {
+        self.worldMarkets[id]?.snapshot?.tooltipCandle(date, today: self.context.date)
+    }
 }
 extension GameUI.Cache {
     func tooltipPlanetTile(

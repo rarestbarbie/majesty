@@ -58,6 +58,10 @@ export class TradeOverview extends ScreenContent {
     public override async open(parameters: URLSearchParams): Promise<void> {
         let state: TradeReport = await Swift.openTrade(parameters);
 
+        // otherwise tooltips will be queried against the wrong market
+        this.chartCandles.clear();
+        this.chartTicks.clear();
+
         if (this.dom === undefined) {
             this.dom = {
                 index: new FilterTabs(this.filters),
@@ -124,11 +128,12 @@ export class TradeOverview extends ScreenContent {
             this.dom.chart.style.setProperty('--y-max', state.market.chart.max.toString());
             this.dom.chart.style.setProperty('--y-maxv', state.market.chart.maxv.toString());
 
+            const id: string = state.market.id;
+
             this.chartCandles.update(
                 state.market.chart.history,
-                (interval: CandlestickState) => new Candlestick(interval),
-                (interval: CandlestickState, candle: Candlestick) =>
-                    candle.update(interval),
+                (interval: CandlestickState) => new Candlestick(interval, id),
+                (interval: CandlestickState, candle: Candlestick) => candle.update(interval),
             );
             this.chartTicks.update(
                 state.market.chart.ticks,

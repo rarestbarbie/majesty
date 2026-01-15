@@ -1,6 +1,7 @@
 import D
 import DequeModule
 import Fraction
+import GameIDs
 import GameEconomy
 import GameUI
 import LiquidityPool
@@ -25,6 +26,38 @@ extension WorldMarketSnapshot {
     }
 }
 extension WorldMarketSnapshot {
+    func tooltipCandle(_ date: GameDate, today: GameDate) -> Tooltip? {
+        let offset: Int = today.distance(to: date)
+        guard
+        let index: Int = self.history.index(
+            self.history.endIndex,
+            offsetBy: offset - 1,
+            limitedBy: self.history.startIndex
+        ) else {
+            return nil
+        }
+
+        let day: WorldMarket.Aggregate = self.history[index]
+
+        return .instructions(style: .borderless, flipped: true) {
+            $0[date[.phrasal_US], +] = day.prices.c[/3..3] <- day.prices.o
+            $0[>] {
+                $0["Low"] = day.prices.l[/3..3]
+                $0["High"] = day.prices.h[/3..3]
+            }
+            $0["Volume"] = day.volume.base.total[/3]
+            $0[>] {
+                let signed: Double =
+                Double.init(day.volume.base.i) * Double.init(day.volume.quote.o) -
+                Double.init(day.volume.quote.i) * Double.init(day.volume.base.o)
+
+                $0["Taker flow", -] = +?(
+                    signed >= 0 ? Double.sqrt(signed) : -Double.sqrt(-signed)
+                )[/3..2]
+            }
+        }
+    }
+
     func tooltipLiquidity() -> Tooltip? {
         return .instructions {
             $0["Available liquidity", +] = self.Δ.assets.liquidity[/3..2]
