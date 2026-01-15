@@ -6,14 +6,14 @@ import JavaScriptKit
 import JavaScriptInterop
 import RealModule
 
-struct TradingView {
-    var history: [Candlestick]
-    var min: Double
-    var max: Double
-    var maxv: Int64
-    var ticks: [TradingViewTick]
+@frozen public struct TradingView {
+    @usableFromInline var history: [Candlestick]
+    @usableFromInline var min: Double
+    @usableFromInline var max: Double
+    @usableFromInline var maxv: Int64
+    @usableFromInline var ticks: [TradingViewTick]
 
-    init() {
+    @inlinable public init() {
         self.history = []
         self.min = 0
         self.max = 1
@@ -82,7 +82,7 @@ extension TradingView {
     }
 }
 extension TradingView {
-    mutating func update(with market: WorldMarket.State, date: GameDate) {
+    public mutating func update(with market: WorldMarket.State, date: GameDate) {
         guard
         let first: WorldMarket.Aggregate = market.history.first,
         let last: WorldMarket.Aggregate = market.history.last else {
@@ -143,7 +143,7 @@ extension TradingView {
     }
 }
 extension TradingView: JavaScriptEncodable {
-    enum ObjectKey: JSString, Sendable {
+    @frozen public enum ObjectKey: JSString, Sendable {
         case history
         case min
         case max
@@ -151,7 +151,7 @@ extension TradingView: JavaScriptEncodable {
         case ticks
     }
 
-    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
+    public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.history] = self.history
         js[.min] = self.min
         js[.max] = self.max

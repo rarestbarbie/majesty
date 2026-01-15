@@ -8,6 +8,32 @@
     /// Southern hemisphere tile.
     case s(_ q: Int8, _ r: Int8)
 }
+extension HexCoordinate {
+    @inlinable public consuming func rotated(_ rotation: HexRotation) -> Self {
+        self.rotate(rotation)
+        return self
+    }
+
+    @inlinable public mutating func rotate(_ rotation: HexRotation) {
+        switch rotation {
+        case .ccw:
+            switch self {
+            case .x:                self = .x
+            case .n(let q, let r):  self = .n(r + q, -q)
+            case .e(let φ):         self = .e(φ == 5 ? 0 : φ + 1)
+            case .s(let q, let r):  self = .s(r + q, -q)
+            }
+
+        case .cw:
+            switch self {
+            case .x:                self = .x
+            case .n(let q, let r):  self = .n(-r, r + q)
+            case .e(let φ):         self = .e(φ == 0 ? 5 : φ - 1)
+            case .s(let q, let r):  self = .s(-r, r + q)
+            }
+        }
+    }
+}
 extension HexCoordinate: CustomStringConvertible {
     @inlinable public var description: String {
         switch self {

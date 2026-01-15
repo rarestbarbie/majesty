@@ -10,9 +10,8 @@ import OrderedCollections
     public let factories: OrderedDictionary<FactoryType, FactoryMetadata>
     public let mines: OrderedDictionary<MineType, MineMetadata>
     public let technologies: OrderedDictionary<Technology, TechnologyMetadata>
-    public let geology: OrderedDictionary<GeologicalType, GeologicalMetadata>
-    public let terrains: OrderedDictionary<TerrainType, TerrainMetadata>
 
+    public var tiles: Tiles
     public var pops: Pops
 }
 extension GameMetadata {
@@ -21,6 +20,8 @@ extension GameMetadata {
         objects: GameObjects,
         settings: Settings,
         legend: Legend.Description,
+        ecology: OrderedDictionary<SymbolAssignment<EcologicalType>, EcologicalDescription>,
+        geology: OrderedDictionary<SymbolAssignment<GeologicalType>, GeologicalDescription>,
         pops: [PopAttributesDescription],
     ) throws {
         self.init(
@@ -46,8 +47,11 @@ extension GameMetadata {
             factories: objects.factories,
             mines: objects.mines,
             technologies: objects.technologies,
-            geology: objects.geology,
-            terrains: objects.terrains,
+            tiles: try .init(
+                symbols: symbols,
+                ecology: ecology,
+                geology: geology
+            ),
             pops: try .init(
                 resources: objects.resources,
                 symbols: symbols,
@@ -78,12 +82,9 @@ extension GameMetadata {
         for value: TechnologyMetadata in self.technologies.values {
             value.hash.hash(into: &hasher)
         }
-        for value: GeologicalMetadata in self.geology.values {
-            value.hash.hash(into: &hasher)
-        }
-        for value: TerrainMetadata in self.terrains.values {
-            value.hash.hash(into: &hasher)
-        }
+
+        self.tiles.geology.hash(into: &hasher)
+        self.tiles.ecology.hash(into: &hasher)
 
         return hasher.finalize()
     }

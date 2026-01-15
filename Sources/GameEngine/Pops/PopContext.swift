@@ -73,7 +73,7 @@ extension PopContext {
         world _: borrowing GameWorld,
         context: ComputationPass
     ) throws {
-        self.region = context.planets[self.state.tile]?.properties
+        self.region = context.tiles[self.state.tile]?.properties
 
         self.mines.removeAll(keepingCapacity: true)
         for job: MiningJob in self.state.mines.values {

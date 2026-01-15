@@ -6,7 +6,6 @@ extension MineContext {
     struct ComputationPass {
         let player: CountryID
         let rules: GameMetadata
-
-        let planets: RuntimeContextTable<PlanetContext>
+        let tiles: RuntimeContextTable<TileContext>
     }
 }

@@ -1,5 +1,7 @@
 import GameEconomy
+import GameIDs
 import JavaScriptInterop
+import OrderedCollections
 
 public struct GameRules: Sendable {
     let legend: Legend.Description
@@ -13,8 +15,8 @@ public struct GameRules: Sendable {
     let mines: SymbolTable<MineDescription>
     let technologies: SymbolTable<TechnologyDescription>
     let biology: SymbolTable<BiologicalDescription>
+    let ecology: SymbolTable<EcologicalDescription>
     let geology: SymbolTable<GeologicalDescription>
-    let terrains: SymbolTable<TerrainDescription>
 
     let settings: GameMetadata.Settings
 }
@@ -23,6 +25,16 @@ extension GameRules {
         // biology table currently only used to assign stable IDs to biological types
         _ = try symbols.biology.extend(over: self.biology)
 
+        /// due to order of evaluation, we must mutate symbols here, before calling `init`,
+        /// or loading other metadata
+        let ecology: OrderedDictionary<
+            SymbolAssignment<EcologicalType>,
+            EcologicalDescription
+        > = try symbols.ecology.extend(over: self.ecology)
+        let geology: OrderedDictionary<
+            SymbolAssignment<GeologicalType>,
+            GeologicalDescription
+        > = try symbols.geology.extend(over: self.geology)
         let objects: GameObjects = try .init(
             resolving: self,
             table: (
@@ -31,16 +43,17 @@ extension GameRules {
                 try symbols.factories.extend(over: self.factories),
                 try symbols.mines.extend(over: self.mines),
                 try symbols.technologies.extend(over: self.technologies),
-                try symbols.geology.extend(over: self.geology),
-                try symbols.terrains.extend(over: self.terrains),
             ),
             symbols: symbols,
         )
+
         return try .init(
             symbols: symbols,
             objects: objects,
             settings: self.settings,
             legend: self.legend,
+            ecology: ecology,
+            geology: geology,
             pops: self.pops,
         )
     }
@@ -58,8 +71,8 @@ extension GameRules: JavaScriptDecodable {
             mines: try js[.mines].decode(),
             technologies: try js[.technologies].decode(),
             biology: try js[.biology].decode(),
+            ecology: try js[.ecology].decode(),
             geology: try js[.geology].decode(),
-            terrains: try js[.terrains].decode(),
             settings: try js[.settings].decode(),
         )
     }

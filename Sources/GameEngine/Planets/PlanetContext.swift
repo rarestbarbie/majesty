@@ -14,16 +14,12 @@ struct PlanetContext: RuntimeContext {
     var motion: (global: CelestialMotion?, local: CelestialMotion?)
     var position: (global: Vector3, local: Vector3)
 
-    var grid: PlanetGrid
-
     init(type: _NoMetadata, state: Planet) {
         self.type = type
         self.state = state
 
         self.motion = (nil, nil)
         self.position = (.zero, .zero)
-
-        self.grid = .init()
     }
 }
 extension PlanetContext {
@@ -32,58 +28,61 @@ extension PlanetContext {
             state: self.state,
             motion: (self.motion.global, self.motion.local),
             position: (self.position.global, self.position.local),
-            grid: .init(radius: self.grid.size)
         )
     }
+}
+extension PlanetContext {
+    static func move(
+        _ planets: RuntimeStateTable<PlanetContext>
+    ) -> [(global: CelestialMotion?, local: CelestialMotion?)] {
+        planets.map {
+            let global: CelestialMotion?
+            let local: CelestialMotion?
+            if  let orbit: Planet.Orbit = $0.orbit,
+                let orbits: Planet = planets[orbit.orbits] {
+                let motion: CelestialMotion = .init(
+                    orbit: orbit,
+                    of: $0.id,
+                    around: orbits.mass
+                )
 
-    subscript(tile: Int) -> PlanetGrid.Tile {
-        _read   { yield  self.grid.tiles.values[tile] }
-        _modify { yield &self.grid.tiles.values[tile] }
+                global = motion
+            } else {
+                global = nil
+            }
+
+            if  let opposes: PlanetID = $0.opposes,
+                let opposes: Planet = planets[opposes],
+                let orbit: Planet.Orbit = opposes.orbit {
+                let orbit: CelestialMotion = .init(
+                    orbit: orbit,
+                    of: opposes.id,
+                    around: $0.mass
+                )
+                let motion: CelestialMotion = orbit.pair(
+                    massOfSatellite: opposes.mass,
+                    massOfPrimary: $0.mass
+                )
+
+                local = motion
+            } else {
+                local = nil
+            }
+            return (global, local)
+        }
     }
 }
 extension PlanetContext {
     mutating func startIndexCount() {
-        for j: Int in self.grid.tiles.values.indices {
-            self.grid.tiles.values[j].startIndexCount()
-        }
     }
     mutating func afterIndexCount(
         world: borrowing GameWorld,
-        context: GameContext.TerritoryPass
-    ) throws {
-        if  let orbit: Planet.Orbit = self.state.orbit,
-            let orbits: Planet = context.planets[orbit.orbits] {
-            let motion: CelestialMotion = .init(
-                orbit: orbit,
-                of: self.state.id,
-                around: orbits.mass
-            )
-
+    ) {
+        if  let motion: CelestialMotion = self.motion.global {
             self.position.global = motion.position(world.date)
-            self.motion.global = motion
         }
-
-        if  let opposes: PlanetID = self.state.opposes,
-            let opposes: Planet = context.planets[opposes],
-            let orbit: Planet.Orbit = opposes.orbit {
-            let orbit: CelestialMotion = .init(
-                orbit: orbit,
-                of: opposes.id,
-                around: self.state.mass
-            )
-            let motion: CelestialMotion = orbit.pair(
-                massOfSatellite: opposes.mass,
-                massOfPrimary: self.state.mass
-            )
-
+        if  let motion: CelestialMotion = self.motion.local {
             self.position.local = motion.position(world.date)
-            self.motion.local = motion
-        } else {
-            self.motion.local = nil
-        }
-
-        for j: Int in self.grid.tiles.values.indices {
-            self.grid.tiles.values[j].afterIndexCount(world: world)
         }
     }
 

@@ -9,8 +9,6 @@ struct GameObjects {
     let factories: OrderedDictionary<FactoryType, FactoryMetadata>
     let mines: OrderedDictionary<MineType, MineMetadata>
     let technologies: OrderedDictionary<Technology, TechnologyMetadata>
-    let geology: OrderedDictionary<GeologicalType, GeologicalMetadata>
-    let terrains: OrderedDictionary<TerrainType, TerrainMetadata>
 }
 extension GameObjects {
     /// It is critical here that `symbols` is the last parameter, because Swift evaluates
@@ -23,8 +21,6 @@ extension GameObjects {
             factories: OrderedDictionary<SymbolAssignment<FactoryType>, FactoryDescription>,
             mines: OrderedDictionary<SymbolAssignment<MineType>, MineDescription>,
             technologies: OrderedDictionary<SymbolAssignment<Technology>, TechnologyDescription>,
-            geology: OrderedDictionary<SymbolAssignment<GeologicalType>, GeologicalDescription>,
-            terrains: OrderedDictionary<SymbolAssignment<TerrainType>, TerrainDescription>
         ),
         symbols: GameSaveSymbols,
     ) throws {
@@ -90,7 +86,7 @@ extension GameObjects {
                     sharesInitial: rules.buildingCosts.sharesInitial,
                     sharesPerLevel: rules.buildingCosts.sharesPerLevel,
                     terrainAllowed: .init(
-                        try $1.terrain.lazy.map { try symbols.terrains[$0] }
+                        try $1.terrain.lazy.map { try symbols.ecology[$0] }
                     ),
                     required: $1.required
                 )
@@ -126,7 +122,7 @@ extension GameObjects {
                     sharesInitial: rules.factoryCosts.sharesInitial,
                     sharesPerLevel: rules.factoryCosts.sharesPerLevel,
                     terrainAllowed: .init(
-                        try $1.terrain.lazy.map { try symbols.terrains[$0] }
+                        try $1.terrain.lazy.map { try symbols.ecology[$0] }
                     )
                 )
             },
@@ -150,23 +146,6 @@ extension GameObjects {
                     effects: try $1.effects.resolved(with: symbols),
                     summary: $1.summary
                 )
-            },
-            geology: try table.geology.map {
-                GeologicalMetadata.init(
-                    identity: $0,
-                    title: $1.title,
-                    base: try $1.base.map(keys: symbols.resources),
-                    bonus: try $1.bonus.map(keys: symbols.resources) {
-                        .init(
-                            weightNone: $0.weightNone,
-                            weights: try $0.weights.map(keys: symbols.resources)
-                        )
-                    },
-                    color: $1.color
-                )
-            },
-            terrains: table.terrains.map {
-                TerrainMetadata.init(identity: $0, color: $1.color)
             },
         )
     }

@@ -3,19 +3,17 @@ import GameIDs
 import GameRules
 import GameUI
 
-extension PlanetGrid {
-    struct TileSnapshot: Identifiable, Sendable {
-        let id: Address
-        let name: String?
-        let properties: RegionalProperties?
-        let terrain: TerrainMetadata
-        let geology: GeologicalMetadata
-    }
+struct TileSnapshot: Identifiable, Sendable {
+    let metadata: TileMetadata
+    let id: Address
+    let type: TileType
+    let name: String?
+    let properties: RegionalProperties?
 }
-extension PlanetGrid.TileSnapshot {
+extension TileSnapshot {
     var pops: PopulationStats { self.properties?.pops ?? .init() }
 }
-extension PlanetGrid.TileSnapshot {
+extension TileSnapshot {
     func tooltip(
         _ layer: PlanetMapLayer,
     ) -> Tooltip? {
@@ -23,7 +21,7 @@ extension PlanetGrid.TileSnapshot {
         return .instructions(style: .borderless) {
             switch layer {
             case .Terrain:
-                $0[>] = "\(self.terrain.title) (\(self.geology.title))"
+                $0[>] = "\(self.metadata.ecology.title) (\(self.metadata.geology.title))"
 
             case .Population:
                 $0["Population"] = pops.free.total[/3]

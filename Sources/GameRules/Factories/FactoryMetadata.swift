@@ -14,7 +14,7 @@ public final class FactoryMetadata: GameObjectMetadata {
     public let sharesInitial: Int64
     public let sharesPerLevel: Int64
 
-    public let terrainAllowed: Set<TerrainType>
+    public let terrainAllowed: Set<EcologicalType>
 
     init(
         identity: SymbolAssignment<FactoryType>,
@@ -25,7 +25,7 @@ public final class FactoryMetadata: GameObjectMetadata {
         workers divisions: [Quantity<PopOccupation>],
         sharesInitial: Int64,
         sharesPerLevel: Int64,
-        terrainAllowed: Set<TerrainType>
+        terrainAllowed: Set<EcologicalType>
     ) throws {
         self.identity = identity
 

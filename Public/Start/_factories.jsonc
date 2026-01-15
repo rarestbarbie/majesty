@@ -59,7 +59,8 @@
             "Supermarket": 2,
             "Cereal Farm": 1,
             "Machine Parts Factory": 2,
-            "Fossil Power Plant": 7
+            "Fossil Power Plant": 7,
+            "Medical Equipment Factory": 3
         }
     },
 
@@ -204,7 +205,8 @@
             "Machine Parts Factory": 1,
             "Polypropylene Plant": 1,
             "Fossil Power Plant": 1,
-            "Automotive Assembly Plant": 1
+            "Automotive Assembly Plant": 1,
+            "Medical Equipment Factory": 2
         }
     },
 
@@ -303,7 +305,8 @@
             "Electronics Factory": 1,
             "Automotive Assembly Plant": 3,
             "Chicken Plant": 1,
-            "Appliance Factory": 2
+            "Appliance Factory": 2,
+            "Medical Equipment Factory": 2
         }
     },
 

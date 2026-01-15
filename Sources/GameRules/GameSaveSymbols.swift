@@ -13,20 +13,18 @@ import JavaScriptInterop
     public internal(set) var technologies: SymbolTable<Technology>
 
     @usableFromInline var biology: SymbolTable<CultureType>
+    @usableFromInline var ecology: SymbolTable<EcologicalType>
     @usableFromInline var geology: SymbolTable<GeologicalType>
-    @usableFromInline var terrains: SymbolTable<TerrainType>
 }
 extension GameSaveSymbols {
     @inlinable public subscript(biology symbol: Symbol) -> CultureType {
         get throws { try self.biology[symbol] }
     }
-
+    @inlinable public subscript(ecology symbol: Symbol) -> EcologicalType {
+        get throws { try self.ecology[symbol] }
+    }
     @inlinable public subscript(geology symbol: Symbol) -> GeologicalType {
         get throws { try self.geology[symbol] }
-    }
-
-    @inlinable public subscript(terrain symbol: Symbol) -> TerrainType {
-        get throws { try self.terrains[symbol] }
     }
 }
 extension GameSaveSymbols: JavaScriptEncodable {
@@ -37,8 +35,8 @@ extension GameSaveSymbols: JavaScriptEncodable {
         js[.resources] = self.resources
         js[.technologies] = self.technologies
         js[.biology] = self.biology
+        js[.ecology] = self.ecology
         js[.geology] = self.geology
-        js[.terrains] = self.terrains
     }
 }
 extension GameSaveSymbols: JavaScriptDecodable {
@@ -56,8 +54,8 @@ extension GameSaveSymbols: JavaScriptDecodable {
             resources: try js[.resources]?.decode() ?? [:],
             technologies: try js[.technologies]?.decode() ?? [:],
             biology: try js[.biology]?.decode() ?? [:],
+            ecology: try js[.ecology]?.decode() ?? [:],
             geology: try js[.geology]?.decode() ?? [:],
-            terrains: try js[.terrains]?.decode() ?? [:],
         )
     }
 }

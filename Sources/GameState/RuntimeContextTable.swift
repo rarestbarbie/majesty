@@ -33,17 +33,21 @@ extension RuntimeContextTable {
     @inlinable public var keys: OrderedSet<ElementContext.State.ID> { self.index.keys }
 }
 extension RuntimeContextTable {
+    /// Removes all entries for which `predicate` returns false on the key.
+    /// This is more efficient than calling `filter` when all values are retained.
+    ///
+    /// Returns true if any entries were removed, which can change the indices of remaining
+    /// entries.
+    @discardableResult @inlinable public mutating func prune(
+        unless predicate: (ElementContext.State.ID) throws -> Bool
+    ) rethrows -> Bool {
+        try self.index.prune(unless: predicate)
+    }
+
     @inlinable public mutating func turn(by turn: (inout ElementContext) -> Void) {
         for i: Int in self.index.values.indices {
             turn(&self.index.values[i])
         }
-    }
-
-    /// Returns the **current** location of the element with the given ID, if it exists.
-    /// This may change after items are deleted from the table, although indices are stable
-    /// across insertions.
-    @inlinable public mutating func find(id: ElementContext.State.ID) -> Int? {
-        self.index.index(forKey: id)
     }
 }
 extension RuntimeContextTable: ExpressibleByDictionaryLiteral {
@@ -76,7 +80,18 @@ extension RuntimeContextTable {
         _modify { yield &self.index[id] }
     }
 
-    @inlinable public mutating func append(_ element: ElementContext) -> Int {
+    @discardableResult @inlinable public mutating func append(
+        _ state: ElementContext.State,
+        metadata: (ElementContext.State) -> ElementContext.Metadata?
+    ) throws -> Int {
+        guard let type: ElementContext.Metadata = metadata(state) else {
+            throw RuntimeMetadataError<ElementContext.State.ID>.missing(state.id)
+        }
+        let element: ElementContext = .init(type: type, state: state)
+        return self.append(element)
+    }
+
+    @inlinable mutating func append(_ element: ElementContext) -> Int {
         guard case (nil, let index): (ElementContext?, Int) = self.index.updateValue(
             element,
             forKey: element.state.id,

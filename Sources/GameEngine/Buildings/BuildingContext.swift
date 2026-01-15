@@ -60,7 +60,7 @@ extension BuildingContext {
         world _: borrowing GameWorld,
         context: ComputationPass
     ) throws {
-        self.region = context.planets[self.state.tile]?.properties
+        self.region = context.tiles[self.state.tile]?.properties
     }
 }
 extension BuildingContext: TransactingContext {

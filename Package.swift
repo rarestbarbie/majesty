@@ -130,6 +130,7 @@ let package: Package = .init(
                 .target(name: "GameClock"),
                 .target(name: "GameConditions"),
                 .target(name: "GameEconomy"),
+                .target(name: "GameMetrics"),
                 .target(name: "GameRules"),
                 .target(name: "GameStarts"),
                 .target(name: "GameState"),
@@ -169,6 +170,14 @@ let package: Package = .init(
                 .target(name: "GameStateMacros"),
                 .target(name: "HexGrids"),
                 .product(name: "Bijection", package: "bijection"),
+            ]
+        ),
+
+        .target(
+            name: "GameMetrics",
+            dependencies: [
+                .target(name: "GameEconomy"),
+                .target(name: "GameUI"),
             ]
         ),
 
@@ -227,6 +236,7 @@ let package: Package = .init(
             name: "GameUI",
             dependencies: [
                 .target(name: "ColorText"),
+                .target(name: "GameEconomy"),
                 .target(name: "GameIDs"),
                 .target(name: "JavaScriptInterop"),
                 .product(name: "D", package: "d"),

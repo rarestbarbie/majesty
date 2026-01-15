@@ -1,6 +1,7 @@
 import GameEconomy
 import GameIDs
 import GameRules
+import GameTerrain
 import JavaScriptKit
 import JavaScriptInterop
 import Random
@@ -16,6 +17,9 @@ public struct GameSave: Sendable {
     let localMarkets: [LocalMarket.State]
     let worldMarkets: [WorldMarket.State]
     let date: GameDate
+
+    var planets: [Planet]
+    var tiles: [Tile]
 
     let currencies: [Currency]
     let countries: [Country]
@@ -37,8 +41,9 @@ extension GameSave {
         case markets_world
         case date
 
-        // case terrain
-        // case planets
+        case planets
+        case tiles
+
         case currencies
         case countries
         case buildings
@@ -61,6 +66,9 @@ extension GameSave: JavaScriptEncodable {
         js[.markets_world] = self.worldMarkets
         js[.date] = self.date
 
+        js[.planets] = self.planets
+        js[.tiles] = self.tiles
+
         js[.currencies] = self.currencies
         js[.countries] = self.countries
         js[.buildings] = self.buildings
@@ -80,6 +88,8 @@ extension GameSave: JavaScriptDecodable {
             localMarkets: try js[.markets_local]?.decode() ?? [],
             worldMarkets: try js[.markets_world]?.decode() ?? [],
             date: try js[.date].decode(),
+            planets: try js[.planets].decode(),
+            tiles: try js[.tiles].decode(),
             currencies: try js[.currencies].decode(),
             countries: try js[.countries].decode(),
             buildings: try js[.buildings].decode(),

@@ -10,7 +10,7 @@ extension GameUI {
         let currencies: OrderedDictionary<CurrencyID, Currency>
         let countries: OrderedDictionary<CountryID, Country>
         let planets: OrderedDictionary<PlanetID, PlanetSnapshot>
-        let tiles: [Address: PlanetGrid.TileSnapshot]
+        let tiles: [Address: TileSnapshot]
 
         let localMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
         let worldMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>
