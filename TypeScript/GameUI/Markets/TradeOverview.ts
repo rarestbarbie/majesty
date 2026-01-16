@@ -49,7 +49,6 @@ export class TradeOverview extends ScreenContent {
         this.chartTicks.node.classList.add('ticks');
 
         this.markets = new StaticList<MarketTableRow, string>(document.createElement('div'));
-        this.markets = new StaticList<MarketTableRow, string>(document.createElement('div'));
         this.markets.table('Markets', MarketTableRow.columns);
     }
 
