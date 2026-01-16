@@ -1,5 +1,6 @@
 import D
 import GameIDs
+import GameMetrics
 import GameUI
 import JavaScriptKit
 import JavaScriptInterop
@@ -13,6 +14,7 @@ struct PlanetDetails {
     private var terms: [Term]
 
     private var gdp: PieChart<Resource, PieChartLabel>?
+    private var gdpGraph: TimeSeries
 
     init(id: Address, focus: Focus) {
         self.id = id
@@ -20,6 +22,7 @@ struct PlanetDetails {
         self.tile = nil
         self.terms = []
         self.gdp = nil
+        self.gdpGraph = .init()
     }
 }
 extension PlanetDetails: PersistentReportDetails {
@@ -37,6 +40,11 @@ extension PlanetDetails {
             rules: cache.rules,
             region: self.id
         )
+        self.gdpGraph.update(
+            with: tile.history.suffix(365),
+            date: cache.date,
+            linear: \.gdp
+        )
     }
 }
 extension PlanetDetails: JavaScriptEncodable {
@@ -48,6 +56,7 @@ extension PlanetDetails: JavaScriptEncodable {
         case terms
 
         case gdp
+        case gdpGraph
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
@@ -56,5 +65,6 @@ extension PlanetDetails: JavaScriptEncodable {
         js[.name] = self.tile?.name
         js[.terms] = self.terms
         js[.gdp] = self.gdp
+        js[.gdpGraph] = self.gdpGraph
     }
 }

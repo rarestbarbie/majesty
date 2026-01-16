@@ -1,4 +1,4 @@
-import { GameDate } from '../../GameEngine/GameDate.js';
+import { GameDate } from '../../GameEngine/exports.js';
 import { Candle } from '../exports.js';
 
 export interface CandlestickState {

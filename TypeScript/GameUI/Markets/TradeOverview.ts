@@ -17,15 +17,15 @@ import {
     MarketTableRow,
     MarketTableEntry,
     ScreenType,
-    TradingViewTick,
-    TradingViewTickState,
+    TickRule,
+    TickRuleState,
 } from '../exports.js';
 
 export class TradeOverview extends ScreenContent {
     private filters: FilterList<MarketFilter, string>[];
 
-    private chartCandles: StaticList<Candlestick, GameDate>;
-    private chartTicks: StaticList<TradingViewTick, number>;
+    private readonly chartCandles: StaticList<Candlestick, GameDate>;
+    private readonly chartTicks: StaticList<TickRule, number>;
 
     private markets: StaticList<MarketTableRow, string>;
     private dom?: {
@@ -45,10 +45,8 @@ export class TradeOverview extends ScreenContent {
         this.chartCandles = new StaticList<Candlestick, GameDate>(document.createElement('div'));
         this.chartCandles.node.classList.add('candles');
 
-        this.chartTicks = new StaticList<TradingViewTick, number>(document.createElement('div'));
+        this.chartTicks = new StaticList<TickRule, number>(document.createElement('div'));
         this.chartTicks.node.classList.add('ticks');
-
-
 
         this.markets = new StaticList<MarketTableRow, string>(document.createElement('div'));
         this.markets = new StaticList<MarketTableRow, string>(document.createElement('div'));
@@ -137,9 +135,8 @@ export class TradeOverview extends ScreenContent {
             );
             this.chartTicks.update(
                 state.market.chart.ticks,
-                (tick: TradingViewTickState) => new TradingViewTick(tick),
-                (tick: TradingViewTickState, tickElement: TradingViewTick) =>
-                    tickElement.update(tick),
+                (state: TickRuleState) => new TickRule(state),
+                (state: TickRuleState, tick: TickRule) => tick.update(state),
             );
         }
     }

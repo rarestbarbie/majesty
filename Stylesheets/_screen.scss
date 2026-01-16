@@ -63,11 +63,18 @@
         display: flex;
         justify-content: center;
 
+        > * {
+            min-width: 0;
+        }
+
         div.panel {
             flex: 1 1 auto;
 
             display: flex;
             flex-direction: column;
+            > * {
+                min-height: 0;
+            }
 
             h3 {
                 font-size: 1.1rem;
@@ -139,6 +146,10 @@
                         }
                     }
                 }
+            }
+
+            > div.details {
+                flex-basis: 50%;
             }
         }
     }

@@ -27,6 +27,26 @@
     }
 }
 
+[data-subscreen='Region'] {
+    height: 100%;
+    margin: 0.5rem 0;
+    display: flex;
+    gap: 1rem;
+
+    > * {
+        min-width: 0;
+    }
+
+    > div.line-graph {
+        flex-basis: 50%;
+        height: 100%;
+    }
+    > div.stats {
+        flex-grow: 1;
+    }
+}
+
+
 [data-subscreen='Inventory'] {
     position: relative;
 

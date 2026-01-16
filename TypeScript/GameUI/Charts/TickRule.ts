@@ -2,14 +2,14 @@ import {
     DiffableListElement,
     UpdateText,
 } from '../../DOM/exports.js';
-import { TradingViewTickState } from '../exports.js';
+import { TickRuleState } from '../exports.js';
 
-export class TradingViewTick implements DiffableListElement<number> {
+export class TickRule implements DiffableListElement<number> {
     public readonly id: number;
     public readonly node: HTMLDivElement;
     private readonly body: HTMLDivElement;
 
-    constructor(tick: TradingViewTickState) {
+    constructor(tick: TickRuleState) {
         this.id = tick.id;
 
         this.body = document.createElement('div');
@@ -20,9 +20,9 @@ export class TradingViewTick implements DiffableListElement<number> {
 
     }
 
-    public update(tick: TradingViewTickState): void {
+    public update(tick: TickRuleState): void {
         UpdateText(this.body, tick.l);
-        this.node.style.setProperty('--y', tick.p.toString());
+        this.node.style.setProperty('--y', tick.y.toString());
         if (tick.s !== undefined) {
             this.node.setAttribute('data-style', tick.s);
         } else {

@@ -7,7 +7,8 @@ import {
     UpdateText,
 } from '../../DOM/exports.js';
 import {
-    GameID
+    GameID,
+    GameDate
 } from '../../GameEngine/exports.js';
 import {
     ScreenContent,
@@ -18,7 +19,11 @@ import {
     PlanetMapLayerSelector,
     ScreenType,
     PieChart,
+    TimeSeriesFrame,
+    TimeSeriesFrameState,
     TooltipType,
+    TickRule,
+    TickRuleState
 } from '../exports.js';
 import { Swift } from '../../Swift.js';
 
@@ -29,6 +34,8 @@ export class PlanetOverview extends ScreenContent {
 
     private readonly terms: StaticList<Term, string>;
     private readonly gdp: PieChart<GameID>;
+    private readonly chart: StaticList<TimeSeriesFrame, GameDate>;
+    private readonly chartTicks: StaticList<TickRule, number>;
 
     private layerShown?: string;
     private dom?: {
@@ -38,7 +45,9 @@ export class PlanetOverview extends ScreenContent {
         readonly layers: HTMLElement;
         readonly titleUpper: HTMLHeadingElement;
         readonly titleLower: HTMLHeadingElement;
+        readonly details: HTMLDivElement;
         readonly stats: HTMLDivElement;
+        readonly chart: HTMLDivElement;
     };
 
     constructor() {
@@ -53,10 +62,19 @@ export class PlanetOverview extends ScreenContent {
         this.terms.node.classList.add('terms');
 
         this.gdp = new PieChart<GameID>(TooltipType.TileEconomyContribution);
+
+        this.chart = new StaticList<TimeSeriesFrame, GameDate>(document.createElement('ul'));
+        this.chart.node.classList.add('line-graph-markers');
+        this.chartTicks = new StaticList<TickRule, number>(document.createElement('div'));
+        this.chartTicks.node.classList.add('ticks');
     }
 
     public override async open(parameters: URLSearchParams): Promise<void> {
         const state: PlanetReport = await Swift.openPlanet(parameters);
+
+        // don’t keep stale bar graph bars around
+        this.chart.clear();
+        this.chartTicks.clear();
 
         if (this.dom === undefined) {
             this.dom = {
@@ -66,7 +84,9 @@ export class PlanetOverview extends ScreenContent {
                 layers: document.createElement('nav'),
                 titleUpper: document.createElement('h3'),
                 titleLower: document.createElement('h3'),
+                details: document.createElement('div'),
                 stats: document.createElement('div'),
+                chart: document.createElement('div'),
             };
 
             const panorama: HTMLElement = document.createElement('div');
@@ -77,18 +97,23 @@ export class PlanetOverview extends ScreenContent {
             this.dom.header.appendChild(this.dom.titleUpper);
             this.dom.layers.appendChild(this.layers.node);
 
-            this.dom.panel.appendChild(this.dom.header);
-            this.dom.panel.appendChild(panorama);
-            this.dom.panel.appendChild(this.dom.titleLower);
-            this.dom.panel.appendChild(this.dom.stats);
-            this.dom.panel.classList.add('panel');
+            this.dom.chart.classList.add('line-graph');
+            this.dom.chart.appendChild(this.chart.node);
+            this.dom.chart.appendChild(this.chartTicks.node);
 
             this.dom.stats.classList.add('stats');
 
+            this.dom.panel.appendChild(this.dom.header);
+            this.dom.panel.appendChild(panorama);
+            this.dom.panel.appendChild(this.dom.titleLower);
+            this.dom.panel.appendChild(this.dom.details);
+            this.dom.panel.classList.add('panel');
+
+            this.dom.details.classList.add('details');
         } else {
+            this.dom.details.replaceChildren();
             this.dom.stats.replaceChildren();
         }
-
 
         const charts: [PieChart<any>, string][] = [
             [this.gdp, 'GDP Contribution'],
@@ -108,7 +133,10 @@ export class PlanetOverview extends ScreenContent {
 
         this.dom.stats.appendChild(this.terms.node);
         this.dom.stats.appendChild(figures);
-        this.dom.stats.setAttribute('data-subscreen', 'Region');
+
+        this.dom.details.appendChild(this.dom.chart);
+        this.dom.details.appendChild(this.dom.stats);
+        this.dom.details.setAttribute('data-subscreen', 'Region');
 
         this.dom.index.tabs[state.filterlist].checked = true;
         this.update(state);
@@ -179,5 +207,19 @@ export class PlanetOverview extends ScreenContent {
         );
 
         this.gdp.update([id], state.details.gdp ?? []);
+
+        this.dom.chart.style.setProperty('--y-min', `${state.details.gdpGraph.min}`);
+        this.dom.chart.style.setProperty('--y-max', `${state.details.gdpGraph.max}`);
+
+        this.chart.update(
+            state.details.gdpGraph.history,
+            (interval: TimeSeriesFrameState) => new TimeSeriesFrame(interval, id),
+            (interval: TimeSeriesFrameState, frame: TimeSeriesFrame) => frame.update(interval),
+        );
+        this.chartTicks.update(
+            state.details.gdpGraph.ticks,
+            (state: TickRuleState) => new TickRule(state),
+            (state: TickRuleState, tick: TickRule) => tick.update(state),
+        );
     }
 }
