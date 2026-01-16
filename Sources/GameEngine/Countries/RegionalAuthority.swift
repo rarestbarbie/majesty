@@ -1,23 +1,16 @@
 import GameIDs
 
-struct RegionalAuthority {
+@dynamicMemberLookup struct RegionalAuthority {
     let id: Address
-    let governedBy: CountryID
-    let occupiedBy: CountryID
-    let suzerain: CountryID?
-    let country: CountryProperties
+    let country: DiplomaticAuthority
 
-    init(
-        id: Address,
-        governedBy: CountryID,
-        occupiedBy: CountryID,
-        suzerain: CountryID?,
-        country: CountryProperties,
-    ) {
+    init(id: Address, country: DiplomaticAuthority) {
         self.id = id
-        self.governedBy = governedBy
-        self.occupiedBy = occupiedBy
-        self.suzerain = suzerain
         self.country = country
+    }
+}
+extension RegionalAuthority {
+    subscript<T>(dynamicMember keyPath: KeyPath<DiplomaticAuthority, T>) -> T {
+        self.country[keyPath: keyPath]
     }
 }

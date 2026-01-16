@@ -262,14 +262,9 @@ extension GameContext {
     private mutating func index(world: borrowing GameWorld) throws -> EconomicLedger {
         for i: Int in self.countries.indices {
             let country: Country = self.countries.state[i]
-            let properties: CountryProperties = try .compute(for: country, in: self)
+            let authority: DiplomaticAuthority = try .compute(for: country, in: self)
             for tile: Address in country.tilesControlled {
-                self.tiles[tile]?.update(
-                    governedBy: country.id,
-                    occupiedBy: country.id,
-                    suzerain: country.suzerain,
-                    properties: properties,
-                )
+                self.tiles[tile]?.update(authority: authority)
             }
         }
 
@@ -391,8 +386,9 @@ extension GameContext {
             try self.planets[i].advance(turn: &turn, context: self)
         }
         for i: Int in self.tiles.indices {
-            try self.tiles[i].advance(turn: &turn, context: self)
+            try self.tiles[i].advance(turn: &turn)
         }
+
         for i: Int in self.countries.indices {
             try self.countries[i].advance(turn: &turn, context: self)
         }
@@ -401,13 +397,11 @@ extension GameContext {
         // need to call this first, to update prices before trading
         turn.localMarkets.turn {
             guard
-            let region: RegionalAuthority = self.tiles[$0.id.location]?.authority else {
+            let authority: DiplomaticAuthority = self.tiles[$0.id.location]?.authority else {
                 fatalError("LocalMarket \($0.id) exists in a tile with no authority!!!")
             }
 
-            $0.turn(
-                policy: region.country.modifiers.localMarkets[$0.id.resource] ?? .default
-            )
+            $0.turn(policy: authority.modifiers.localMarkets[$0.id.resource] ?? .default)
         }
 
         self.buildings.turn { $0.turn(on: &turn) }

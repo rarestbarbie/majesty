@@ -2,13 +2,13 @@ import GameIDs
 
 struct PopulationStats {
     var occupation: [PopOccupation: Row]
-    var free: PopulationStratum
-    var enslaved: PopulationStratum
     var employed: Int64
+    var enslaved: Stratum
+    var free: Stratum
 }
 extension PopulationStats {
     init() {
-        self.init(occupation: [:], free: .init(), enslaved: .init(), employed: 0)
+        self.init(occupation: [:], employed: 0, enslaved: .init(), free: .init())
     }
 }
 extension PopulationStats {
@@ -17,9 +17,9 @@ extension PopulationStats {
 extension PopulationStats {
     mutating func startIndexCount() {
         self.occupation.removeAll(keepingCapacity: true)
-        self.free.startIndexCount()
-        self.enslaved.startIndexCount()
         self.employed = 0
+        self.enslaved.startIndexCount()
+        self.free.startIndexCount()
     }
 
     mutating func addResidentCount(_ pop: Pop, _ stats: Pop.Stats) {
@@ -36,3 +36,6 @@ extension PopulationStats {
         }
     }
 }
+#if TESTABLE
+extension PopulationStats: Equatable, Hashable {}
+#endif
