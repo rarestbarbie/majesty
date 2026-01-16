@@ -28,7 +28,17 @@ extension Vector2.ArcGeometry {
 }
 extension Vector2.ArcGeometry {
     @usableFromInline var d: String {
-        var d: String = "M 0,0 L \(self.startArc)"
+        var d: String = "M 0,0"
+
+        if  self.startArc.x == 0 {
+            d += " V \(self.startArc.y)"
+        } else if
+            self.startArc.y == 0 {
+            d += " H \(self.startArc.x)"
+        } else {
+            d += " L \(self.startArc)"
+        }
+
         switch self.share {
         case 0 ..< 0.375:
             d += " A 1,1 0 0 0 \(self.endArc)"
@@ -42,19 +52,32 @@ extension Vector2.ArcGeometry {
             d += " A 1,1 0 0 0 \(p) A 1,1 0 0 0 \(self.endArc)"
         }
 
-        if  self.endArc.x >= 0,
-            self.endArc.y == 0 {
-            d += " Z"
+        //  aligning with an axis helps prevent anti-aliasing artifacts
+        if  self.endArc.x > 0 {
+            if  self.endArc.y < 0 {
+                // quadrant i
+                d += " H 0 Z"
+            } else if
+                self.endArc.y > 0 {
+                // quadrant iv
+                d += " V 0 Z"
+            } else {
+                d += " Z"
+            }
         } else if
-            self.endArc.x >= 0,
-            self.endArc.y >= 0 {
-            var fringe: Vector2 = .init(radians: self.end + 0.1) * 0.5
-            fringe.y = max(fringe.y, 0)
-
-            d += " L \(fringe) Z"
+            self.endArc.x < 0 {
+            if  self.endArc.y < 0 {
+                // quadrant ii
+                d += " V 0 Z"
+            } else if
+                self.endArc.y > 0 {
+                // quadrant iii
+                d += " H 0 Z"
+            } else {
+                d += " Z"
+            }
         } else {
-            let fringe: Vector2 = .init(radians: self.end + 0.1) * 0.5
-            d += " L \(fringe) Z"
+            d += " Z"
         }
 
         return d
