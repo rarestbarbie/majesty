@@ -11,8 +11,6 @@
         "cultures_accepted": ["Jewish"],
         "currency": 1,
         "tiles": [
-            // Pacific Northwest
-            "399N-2,2",
             // California
             "399N-2,3",
             // American Midwest
@@ -43,7 +41,9 @@
             // Canada
             "399N0,1",
             // Hudson Bay
-            "399N-1,1"
+            "399N-1,1",
+            // Pacific Northwest
+            "399N-2,2"
         ],
         "minwage": 15
     },
@@ -105,7 +105,7 @@
         "currency": 1,
         "tiles": [
             // Greenland
-            "399N1,1"
+            "399N1,0"
         ],
         "minwage": 15
     },
@@ -256,15 +256,13 @@
         "suzerain": 1,
         "currency": 1,
         "tiles": [
-            // Northern Europe
-            "399N2,0",
             // Southwestern Europe
             "399N3,0",
             // Atlantropa
             "399N3,-1",
             // Eastern Mediterranean
             "399N3,-2",
-            // Eastern Europe
+            // Northern Europe
             "399N2,-1",
             // Queen Maud Land
             "399S1,-1"
@@ -274,8 +272,25 @@
     {
         "name": {
             "article": "The",
-            "short": "Joint Security Zone",
-            "long": "Joint Security Administration",
+            "short": "Great Britain",
+            "long": "United Kingdom",
+            "color": "#ff5454"
+        },
+        "culture_preferred": "Atlantean",
+        "cultures_accepted": ["Jewish"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // British Isles
+            "399N2,0"
+        ],
+        "minwage": 15
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Joint Security Initiative",
+            "long": "Joint Security Initiative",
             "color": "#214fe6"
         },
         "culture_preferred": "Jewish",

@@ -86,6 +86,11 @@
                 "race": "Black American",
                 "type": "D",
                 "size": 2300
+            },
+            {
+                "race": "Turtle Islander",
+                "type": "D",
+                "size": 115000
             }
         ]
     },
@@ -255,7 +260,7 @@
 
     // Greenland
     {
-        "tile": "399N1,1",
+        "tile": "399N1,0",
         "pops": [
             {
                 "race": "Atlantean",
@@ -546,7 +551,7 @@
         ]
     },
 
-    // Northern Europe
+    // British Isles
     {
         "tile": "399N2,0",
         "pops": [
@@ -558,7 +563,12 @@
             {
                 "race": "Atlantean",
                 "type": "G",
-                "size": 7600000
+                "size": 76000
+            },
+            {
+                "race": "Atlantean",
+                "type": "D",
+                "size": 3800000
             },
             {
                 "race": "Anatolian",
@@ -769,7 +779,7 @@
         ]
     },
 
-    // Eastern Europe
+    // Northern Europe
     {
         "tile": "399N2,-1",
         "pops": [
@@ -786,12 +796,12 @@
             {
                 "race": "West Slavic",
                 "type": "D",
-                "size": 2490000
+                "size": 1490000
             },
             {
                 "race": "Atlantean",
                 "type": "D",
-                "size": 1890000
+                "size": 2390000
             },
             {
                 "race": "Anatolian",

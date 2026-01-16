@@ -49,7 +49,7 @@
 
     // Greenland
     {
-        "tile": "399N1,1",
+        "tile": "399N1,0",
         "buildings": {
             "High Density Housing": 500
         }
@@ -159,7 +159,7 @@
         }
     },
 
-    // Northern Europe
+    // British Isles
     {
         "tile": "399N2,0",
         "buildings": {
@@ -191,7 +191,7 @@
         }
     },
 
-    // Eastern Europe
+    // Northern Europe
     {
         "tile": "399N2,-1",
         "buildings": {

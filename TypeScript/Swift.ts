@@ -112,5 +112,5 @@ export class Swift {
 
     declare public static editTerrain: () => Promise<PlanetTileEditorState | null>;
     declare public static loadTerrain: (from: PlanetTileEditorState) => void;
-    declare public static saveTerrain: () => any[] | null;
+    declare public static saveTerrain: () => Promise<any[] | null>;
 }

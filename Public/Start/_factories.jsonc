@@ -78,7 +78,7 @@
 
     // Greenland
     {
-        "tile": "399N1,1"
+        "tile": "399N1,0"
     },
 
     // Mexico
@@ -195,18 +195,15 @@
         "tile": "399S1,-1"
     },
 
-    // Northern Europe
+    // British Isles
     {
         "tile": "399N2,0",
         "factories": {
-            "Hydroelectric Dam": 4,
-            "Supermarket": 3,
-            "Instrument Factory": 2,
-            "Machine Parts Factory": 1,
-            "Polypropylene Plant": 1,
+            "Hydroelectric Dam": 3,
+            "Supermarket": 1,
             "Fossil Power Plant": 1,
-            "Automotive Assembly Plant": 1,
-            "Medical Equipment Factory": 2
+            "Fashion House": 1,
+            "Medical Equipment Factory": 1
         }
     },
 
@@ -243,13 +240,18 @@
         }
     },
 
-    // Eastern Europe
+    // Northern Europe
     {
         "tile": "399N2,-1",
         "factories": {
-            "Hydroelectric Dam": 3,
-            "Supermarket": 1,
+            "Hydroelectric Dam": 4,
+            "Supermarket": 3,
+            "Instrument Factory": 2,
+            "Machine Parts Factory": 1,
+            "Polypropylene Plant": 1,
             "Fossil Power Plant": 1,
+            "Automotive Assembly Plant": 1,
+            "Medical Equipment Factory": 2,
             "Cereal Farm": 3
         }
     },
