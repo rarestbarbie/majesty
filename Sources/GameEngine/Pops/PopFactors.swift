@@ -52,7 +52,7 @@ extension PopFactors {
                 $0[$1 >= 9.0] = -10%
             } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
 
-            let culture: Culture = self.region.culturePreferred
+            let culture: Culture = self.region.country.culturePreferred
             if case .Ward = self.type.stratum {
                 $0[true] {
                     $0 = -100%
@@ -126,7 +126,7 @@ extension PopFactors {
                 $0[$1 >= 8.0] = -10%
             } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
 
-            let culture: Culture = self.region.culturePreferred
+            let culture: Culture = self.region.country.culturePreferred
             if case .Ward = self.type.stratum {
                 $0[true] {
                     $0 = -100%

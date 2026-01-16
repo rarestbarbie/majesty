@@ -23,4 +23,12 @@ extension JavaScriptDecoder.Field {
             throw JavaScriptDecodingStack.init(problem: error, in: self.id)
         }
     }
+
+    @inlinable public func decode<T, U>(
+        as _: T.Type = T.self,
+        with transform: (T) throws -> U
+    ) throws -> U where T: LoadableFromJSValue {
+        let representation: T = try self.decode()
+        return try transform(representation)
+    }
 }

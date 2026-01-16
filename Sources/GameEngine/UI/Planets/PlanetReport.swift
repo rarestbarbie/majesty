@@ -35,7 +35,7 @@ extension PlanetReport: PersistentReport {
             Never?
         ) = cache.tiles.values.reduce(into: ([:], nil)) {
             let id: PlanetID = $1.id.planet
-            if case bloc? = $1.properties?.bloc {
+            if case bloc? = $1.country?.bloc {
                 {
                     if  case nil = $0,
                         let planet: PlanetSnapshot = cache.planets[id] {

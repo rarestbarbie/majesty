@@ -48,22 +48,22 @@ extension GameSession {
         let cache: GameUI.Cache = .init(
             context: context,
             pops: self.state.context.pops.reduce(into: [:]) {
-                if  case bloc? = $1.region?.bloc {
+                if  case bloc? = $1.region?.country.bloc {
                     $0[$1.id] = $1.snapshot
                 }
             },
             factories: self.state.context.factories.reduce(into: [:]) {
-                if  case bloc? = $1.region?.bloc {
+                if  case bloc? = $1.region?.country.bloc {
                     $0[$1.id] = $1.snapshot
                 }
             },
             buildings: self.state.context.buildings.reduce(into: [:]) {
-                if  case bloc? = $1.region?.bloc {
+                if  case bloc? = $1.region?.country.bloc {
                     $0[$1.id] = $1.snapshot
                 }
             },
             mines: self.state.context.mines.reduce(into: [:]) {
-                if  case bloc? = $1.region?.bloc {
+                if  case bloc? = $1.region?.country.bloc {
                     $0[$1.state.id] = $1.snapshot
                 }
             }

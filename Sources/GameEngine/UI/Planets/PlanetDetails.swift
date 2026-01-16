@@ -31,7 +31,7 @@ extension PlanetDetails {
     mutating func update(from tile: TileSnapshot, in cache: borrowing GameUI.Cache) {
         self.tile = tile
         self.terms = Term.list {
-            $0[.gdp, (+), tooltip: .TileGDP] = tile.properties?._gdp[/3..2]
+            $0[.gdp, (+), tooltip: .TileGDP] = tile.Δ.stats.gdp[/3..2]
         }
         self.gdp = cache.ledger.breakdownGDP(
             rules: cache.rules,

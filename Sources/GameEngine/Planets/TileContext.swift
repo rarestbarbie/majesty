@@ -13,8 +13,8 @@ struct TileContext: RuntimeContext {
     var state: Tile
 
     private(set) var properties: RegionalProperties?
-    private(set) var authority: RegionalAuthority?
-    private var stats: RegionalStats
+    private(set) var authority: DiplomaticAuthority?
+    private var stats: Tile.Stats
 
     // Computed statistics
     private(set) var buildingsAlreadyPresent: Set<BuildingType>
@@ -23,6 +23,8 @@ struct TileContext: RuntimeContext {
     private(set) var factoriesUnderConstruction: Int64
     private(set) var factoriesAlreadyPresent: Set<FactoryType>
     private(set) var factories: [FactoryID]
+
+    private(set) var pops: (enslaved: [PopID], free: [PopID])
 
     private(set) var minesAlreadyPresent: [MineType: (size: Int64, yieldRank: Int?)]
     private(set) var mines: [MineID]
@@ -43,6 +45,8 @@ struct TileContext: RuntimeContext {
         self.factoriesAlreadyPresent = []
         self.factories = []
 
+        self.pops = (enslaved: [], free: [])
+
         self.minesAlreadyPresent = [:]
         self.mines = []
 
@@ -50,11 +54,6 @@ struct TileContext: RuntimeContext {
     }
 }
 extension TileContext {
-    var governedBy: CountryID? { self.authority?.governedBy }
-    var occupiedBy: CountryID? { self.authority?.occupiedBy }
-
-    var pops: PopulationStats { self.stats.pops }
-    var name: String? { self.state.name }
     var id: Address { self.state.id }
 
     var snapshot: TileSnapshot {
@@ -63,35 +62,22 @@ extension TileContext {
             id: self.id,
             type: self.state.type,
             name: self.state.name,
-            properties: self.properties
+            country: self.authority,
+            y: self.state.y,
+            z: .init(stats: self.stats, state: self.state.z)
         )
     }
 
     var terrain: Terrain {
         .init(
             id: self.state.id.tile,
-            name: self.name,
+            name: self.state.name,
             ecology: self.type.ecology.symbol,
             geology: self.type.geology.symbol
         )
     }
 }
 extension TileContext {
-    mutating func update(
-        governedBy: CountryID,
-        occupiedBy: CountryID,
-        suzerain: CountryID?,
-        properties: CountryProperties,
-    ) {
-        self.authority = .init(
-            id: self.id,
-            governedBy: governedBy,
-            occupiedBy: occupiedBy,
-            suzerain: suzerain,
-            country: properties
-        )
-    }
-
     mutating func startIndexCount() {
         self.buildingsAlreadyPresent.removeAll(keepingCapacity: true)
         self.buildings.removeAll(keepingCapacity: true)
@@ -100,6 +86,13 @@ extension TileContext {
         self.factoriesAlreadyPresent.removeAll(keepingCapacity: true)
         self.factories.removeAll(keepingCapacity: true)
 
+        // use the previous day’s counts to allocate capacity
+        let count: (enslaved: Int, free: Int) = (self.pops.enslaved.count, self.pops.free.count)
+        self.pops.enslaved = []
+        self.pops.enslaved.reserveCapacity(count.enslaved)
+        self.pops.free = []
+        self.pops.free.reserveCapacity(count.free)
+
         self.minesAlreadyPresent.removeAll(keepingCapacity: true)
         self.mines.removeAll(keepingCapacity: true)
 
@@ -107,14 +100,20 @@ extension TileContext {
     }
 
     mutating func addResidentCount(_ pop: Pop, _ stats: Pop.Stats) -> RegionalAuthority? {
+        if  pop.occupation.stratum <= .Ward {
+            self.pops.enslaved.append(pop.id)
+        } else {
+            self.pops.free.append(pop.id)
+        }
+
         self.stats.pops.addResidentCount(pop, stats)
         // this should not return the ``RegionalProperties``, that has not been published yet
-        return self.authority
+        return self.authority?[self.id]
     }
     mutating func addResidentCount(_ building: Building) -> RegionalAuthority? {
         self.buildings.append(building.id)
         self.buildingsAlreadyPresent.insert(building.type)
-        return self.authority
+        return self.authority?[self.id]
     }
     mutating func addResidentCount(_ factory: Factory) -> RegionalAuthority? {
         self.factories.append(factory.id)
@@ -124,34 +123,35 @@ extension TileContext {
             self.factoriesUnderConstruction += 1
         }
 
-        return self.authority
+        return self.authority?[self.id]
     }
     mutating func addResidentCount(_ mine: Mine) {
         self.mines.append(mine.id)
         self.minesAlreadyPresent[mine.type] = (mine.z.size, mine.z.yieldRank)
     }
 
+    mutating func update(authority: DiplomaticAuthority) {
+        self.authority = authority
+    }
     mutating func update(gdp: Double) {
         self.stats.gdp = gdp
     }
 
     mutating func afterIndexCount(world: borrowing GameWorld) {
-        guard let region: RegionalAuthority = self.authority else {
+        guard let authority: DiplomaticAuthority = self.authority else {
+            self.properties = nil
             return
         }
 
         self.properties = .init(
             id: self.id,
-            name: self.name ?? "",
-            pops: self.stats.pops,
-            _gdp: self.stats.gdp,
-            occupiedBy: region.occupiedBy,
-            governedBy: region.governedBy,
-            suzerain: region.suzerain,
-            country: region.country,
+            name: self.state.name ?? "",
+            country: authority,
+            stats: self.stats,
+            state: self.state.z // when this is called, always the same as `y`
         )
 
-        self.criticalShortages = region.country.criticalResources.filter {
+        self.criticalShortages = authority.criticalResources.filter {
             if  let localMarket: LocalMarket = world.localMarkets[$0 / self.id],
                     localMarket.today.supply == 0,
                     localMarket.today.demand > 0 {
@@ -163,7 +163,25 @@ extension TileContext {
     }
 }
 extension TileContext {
-    mutating func advance(turn: inout Turn, context: GameContext) throws {}
+    private static var history: Int { 5 * 365 }
+
+    mutating func advance(turn _: inout Turn) throws {
+        self.state.y = .init(stats: self.stats, state: self.state.z)
+
+        guard case _? = self.properties else {
+            self.state.history = []
+            return
+        }
+
+        if  self.state.history.count >= Self.history {
+            self.state.history.removeFirst()
+        }
+
+        let today: Tile.Aggregate = .init(
+            gdp: self.stats.gdp
+        )
+        self.state.history.append(today)
+    }
 }
 extension TileContext {
     func pickBuilding(

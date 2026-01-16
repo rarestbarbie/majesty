@@ -54,7 +54,7 @@ extension GameUI.Cache {
 
         return .items {
             $0["Switch to Player"] {
-                if  let country: CountryID = tile.properties?.governedBy {
+                if  let country: CountryID = tile.country?.governedBy {
                     $0[.SwitchToPlayer] = country
                 }
             }
@@ -322,7 +322,7 @@ extension GameUI.Cache {
                             size: mine.state.z.size,
                             yieldRank: yieldRank
                         ),
-                        let miners: PopulationStats.Row = tile.properties?.pops.occupation[.Miner],
+                        let miners: PopulationStats.Row = tile.z.stats.pops.occupation[.Miner],
                         let fromWorkers: Fraction = miners.mineExpansionFactor {
                         let fromDeposit: Double = .init(
                             mine.metadata.scale %/ (mine.metadata.scale + mine.state.z.size)
@@ -447,22 +447,19 @@ extension GameUI.Cache {
         guard let culture: Culture = self.rules.pops.cultures[culture] else {
             return nil
         }
-        return self.tiles[id]?.properties?.tooltip(culture: culture)
+        return self.tiles[id]?.tooltip(culture: culture)
     }
     func tooltipTilePopType(
         _ id: Address,
         _ occupation: PopOccupation,
     ) -> Tooltip? {
-        self.tiles[id]?.properties?.tooltip(occupation: occupation)
+        self.tiles[id]?.tooltip(occupation: occupation)
     }
 
     func tooltipTileEconomyContribution(
         _ id: Address,
         _ resource: Resource,
     ) -> Tooltip? {
-        self.tiles[id]?.properties?.tooltipEconomyContribution(
-            resource: resource,
-            context: self.context
-        )
+        self.tiles[id]?.tooltipEconomyContribution(resource: resource, context: self.context)
     }
 }

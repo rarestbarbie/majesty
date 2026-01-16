@@ -1,10 +1,10 @@
-extension PopulationStratum {
+extension PopulationStats.Stratum {
     struct Fields {
         var mil: Double
         var con: Double
     }
 }
-extension PopulationStratum.Fields {
+extension PopulationStats.Stratum.Fields {
     static var zero: Self {
         .init(
             mil: 0,
@@ -12,3 +12,6 @@ extension PopulationStratum.Fields {
         )
     }
 }
+#if TESTABLE
+extension PopulationStats.Stratum.Fields: Equatable, Hashable {}
+#endif
