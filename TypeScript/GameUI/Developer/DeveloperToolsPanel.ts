@@ -79,9 +79,9 @@ export class DeveloperToolsPanel {
     }
 
     private async exportTerrain(download: boolean): Promise<void> {
-        const serializedTerrain: any[] | null = Swift.saveTerrain();
+        const serializedTerrain: any[] | null = await Swift.saveTerrain();
         if (serializedTerrain === null) {
-            console.error("Failed to export terrain data from Swift.");
+            console.error("Failed to export terrain data from Swift");
             return;
         }
 

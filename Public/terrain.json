@@ -4,6 +4,7 @@
             "id": 10,
             "name": "Sun",
             "type": "S",
+            "size": 0,
             "color": 16743168,
             "mass": 1.9891e+30,
             "radius": 696340,
@@ -16,6 +17,7 @@
             "id": 199,
             "name": "Mercury",
             "type": "P",
+            "size": 0,
             "color": 9211020,
             "orbit": {
                 "orbits": 10,
@@ -37,6 +39,7 @@
             "id": 299,
             "name": "Venus",
             "type": "P",
+            "size": 4,
             "color": 12420096,
             "orbit": {
                 "orbits": 10,
@@ -58,6 +61,7 @@
             "id": 399,
             "name": "Earth",
             "type": "P",
+            "size": 4,
             "color": 15242,
             "orbit": {
                 "orbits": 10,
@@ -80,6 +84,7 @@
             "id": 499,
             "name": "Mars",
             "type": "P",
+            "size": 3,
             "color": 8727552,
             "orbit": {
                 "orbits": 10,
@@ -101,6 +106,7 @@
             "id": 599,
             "name": "Jupiter",
             "type": "P",
+            "size": 0,
             "color": 9854509,
             "orbit": {
                 "orbits": 10,
@@ -122,6 +128,7 @@
             "id": 699,
             "name": "Saturn",
             "type": "P",
+            "size": 0,
             "color": 9730627,
             "orbit": {
                 "orbits": 10,
@@ -143,6 +150,7 @@
             "id": 799,
             "name": "Uranus",
             "type": "P",
+            "size": 0,
             "color": 616069,
             "orbit": {
                 "orbits": 10,
@@ -164,6 +172,7 @@
             "id": 899,
             "name": "Neptune",
             "type": "P",
+            "size": 0,
             "color": 544133,
             "orbit": {
                 "orbits": 10,
@@ -185,6 +194,7 @@
             "id": 301,
             "name": "The Moon",
             "type": "M",
+            "size": 3,
             "color": 5066061,
             "orbit": {
                 "orbits": 399,
@@ -205,6 +215,7 @@
             "id": 401,
             "name": "Phobos",
             "type": "M",
+            "size": 0,
             "color": 9140069,
             "orbit": {
                 "orbits": 499,
@@ -225,6 +236,7 @@
             "id": 402,
             "name": "Deimos",
             "type": "M",
+            "size": 0,
             "color": 10461087,
             "orbit": {
                 "orbits": 499,
@@ -245,6 +257,7 @@
             "id": 501,
             "name": "Io",
             "type": "M",
+            "size": 0,
             "color": 14273355,
             "orbit": {
                 "orbits": 599,
@@ -265,6 +278,7 @@
             "id": 502,
             "name": "Europa",
             "type": "M",
+            "size": 0,
             "color": 14408667,
             "orbit": {
                 "orbits": 599,
@@ -285,6 +299,7 @@
             "id": 503,
             "name": "Ganymede",
             "type": "M",
+            "size": 0,
             "color": 11580869,
             "orbit": {
                 "orbits": 599,
@@ -305,6 +320,7 @@
             "id": 504,
             "name": "Callisto",
             "type": "M",
+            "size": 0,
             "color": 6052956,
             "orbit": {
                 "orbits": 599,
@@ -325,6 +341,7 @@
             "id": 505,
             "name": "Amalthea",
             "type": "M",
+            "size": 0,
             "color": 11023922,
             "orbit": {
                 "orbits": 599,
@@ -345,6 +362,7 @@
             "id": 506,
             "name": "Himalia",
             "type": "M",
+            "size": 0,
             "color": 9139029,
             "orbit": {
                 "orbits": 599,
@@ -365,6 +383,7 @@
             "id": 507,
             "name": "Elara",
             "type": "M",
+            "size": 0,
             "color": 9139029,
             "orbit": {
                 "orbits": 599,
@@ -385,6 +404,7 @@
             "id": 508,
             "name": "Pasiphae",
             "type": "M",
+            "size": 0,
             "color": 5066061,
             "orbit": {
                 "orbits": 599,
@@ -405,6 +425,7 @@
             "id": 509,
             "name": "Sinope",
             "type": "M",
+            "size": 0,
             "color": 5066061,
             "orbit": {
                 "orbits": 599,
@@ -425,6 +446,7 @@
             "id": 510,
             "name": "Lysithea",
             "type": "M",
+            "size": 0,
             "color": 5066061,
             "orbit": {
                 "orbits": 599,
@@ -445,6 +467,7 @@
             "id": 511,
             "name": "Carme",
             "type": "M",
+            "size": 0,
             "color": 5066061,
             "orbit": {
                 "orbits": 599,
@@ -465,6 +488,7 @@
             "id": 512,
             "name": "Ananke",
             "type": "M",
+            "size": 0,
             "color": 5066061,
             "orbit": {
                 "orbits": 599,
@@ -485,6 +509,7 @@
             "id": 513,
             "name": "Leda",
             "type": "M",
+            "size": 0,
             "color": 5066061,
             "orbit": {
                 "orbits": 599,
@@ -505,6 +530,7 @@
             "id": 514,
             "name": "Thebe",
             "type": "M",
+            "size": 0,
             "color": 9139029,
             "orbit": {
                 "orbits": 599,
@@ -525,6 +551,7 @@
             "id": 515,
             "name": "Adrastea",
             "type": "M",
+            "size": 0,
             "color": 5066061,
             "orbit": {
                 "orbits": 599,
@@ -545,6 +572,7 @@
             "id": 516,
             "name": "Metis",
             "type": "M",
+            "size": 0,
             "color": 5066061,
             "orbit": {
                 "orbits": 599,
@@ -565,6 +593,7 @@
             "id": 601,
             "name": "Mimas",
             "type": "M",
+            "size": 0,
             "color": 12632256,
             "orbit": {
                 "orbits": 699,
@@ -585,6 +614,7 @@
             "id": 602,
             "name": "Enceladus",
             "type": "M",
+            "size": 0,
             "color": 16777215,
             "orbit": {
                 "orbits": 699,
@@ -605,6 +635,7 @@
             "id": 603,
             "name": "Tethys",
             "type": "M",
+            "size": 0,
             "color": 14737632,
             "orbit": {
                 "orbits": 699,
@@ -625,6 +656,7 @@
             "id": 604,
             "name": "Dione",
             "type": "M",
+            "size": 0,
             "color": 13882323,
             "orbit": {
                 "orbits": 699,
@@ -645,6 +677,7 @@
             "id": 605,
             "name": "Rhea",
             "type": "M",
+            "size": 0,
             "color": 13421772,
             "orbit": {
                 "orbits": 699,
@@ -665,6 +698,7 @@
             "id": 606,
             "name": "Titan",
             "type": "M",
+            "size": 0,
             "color": 15248640,
             "orbit": {
                 "orbits": 699,
@@ -685,6 +719,7 @@
             "id": 607,
             "name": "Hyperion",
             "type": "M",
+            "size": 0,
             "color": 12357519,
             "orbit": {
                 "orbits": 699,
@@ -705,6 +740,7 @@
             "id": 608,
             "name": "Iapetus",
             "type": "M",
+            "size": 0,
             "color": 10506797,
             "orbit": {
                 "orbits": 699,
@@ -725,6 +761,7 @@
             "id": 609,
             "name": "Phoebe",
             "type": "M",
+            "size": 0,
             "color": 6908265,
             "orbit": {
                 "orbits": 699,
@@ -745,6 +782,7 @@
             "id": 610,
             "name": "Janus",
             "type": "M",
+            "size": 0,
             "color": 11119017,
             "orbit": {
                 "orbits": 699,
@@ -765,6 +803,7 @@
             "id": 611,
             "name": "Epimetheus",
             "type": "M",
+            "size": 0,
             "color": 11119017,
             "orbit": {
                 "orbits": 699,
@@ -785,6 +824,7 @@
             "id": 612,
             "name": "Helene",
             "type": "M",
+            "size": 0,
             "color": 12105912,
             "orbit": {
                 "orbits": 699,
@@ -805,6 +845,7 @@
             "id": 613,
             "name": "Telesto",
             "type": "M",
+            "size": 0,
             "color": 12105912,
             "orbit": {
                 "orbits": 699,
@@ -825,6 +866,7 @@
             "id": 614,
             "name": "Calypso",
             "type": "M",
+            "size": 0,
             "color": 12105912,
             "orbit": {
                 "orbits": 699,
@@ -845,6 +887,7 @@
             "id": 615,
             "name": "Atlas",
             "type": "M",
+            "size": 0,
             "color": 11579568,
             "orbit": {
                 "orbits": 699,
@@ -865,6 +908,7 @@
             "id": 616,
             "name": "Prometheus",
             "type": "M",
+            "size": 0,
             "color": 11579568,
             "orbit": {
                 "orbits": 699,
@@ -885,6 +929,7 @@
             "id": 617,
             "name": "Pandora",
             "type": "M",
+            "size": 0,
             "color": 11579568,
             "orbit": {
                 "orbits": 699,
@@ -905,6 +950,7 @@
             "id": 618,
             "name": "Pan",
             "type": "M",
+            "size": 0,
             "color": 11579568,
             "orbit": {
                 "orbits": 699,
@@ -925,6 +971,7 @@
             "id": 619,
             "name": "Ymir",
             "type": "M",
+            "size": 0,
             "color": 5066061,
             "orbit": {
                 "orbits": 699,
@@ -945,6 +992,7 @@
             "id": 705,
             "name": "Miranda",
             "type": "M",
+            "size": 0,
             "color": 12632256,
             "orbit": {
                 "orbits": 799,
@@ -965,6 +1013,7 @@
             "id": 701,
             "name": "Ariel",
             "type": "M",
+            "size": 0,
             "color": 14737632,
             "orbit": {
                 "orbits": 799,
@@ -985,6 +1034,7 @@
             "id": 702,
             "name": "Umbriel",
             "type": "M",
+            "size": 0,
             "color": 8421504,
             "orbit": {
                 "orbits": 799,
@@ -1005,6 +1055,7 @@
             "id": 703,
             "name": "Titania",
             "type": "M",
+            "size": 0,
             "color": 12500670,
             "orbit": {
                 "orbits": 799,
@@ -1025,6 +1076,7 @@
             "id": 704,
             "name": "Oberon",
             "type": "M",
+            "size": 0,
             "color": 11119017,
             "orbit": {
                 "orbits": 799,
@@ -1045,6 +1097,7 @@
             "id": 803,
             "name": "Naiad",
             "type": "M",
+            "size": 0,
             "color": 11119017,
             "orbit": {
                 "orbits": 899,
@@ -1065,6 +1118,7 @@
             "id": 804,
             "name": "Thalassa",
             "type": "M",
+            "size": 0,
             "color": 11119017,
             "orbit": {
                 "orbits": 899,
@@ -1085,6 +1139,7 @@
             "id": 805,
             "name": "Despina",
             "type": "M",
+            "size": 0,
             "color": 11119017,
             "orbit": {
                 "orbits": 899,
@@ -1105,6 +1160,7 @@
             "id": 806,
             "name": "Galatea",
             "type": "M",
+            "size": 0,
             "color": 11119017,
             "orbit": {
                 "orbits": 899,
@@ -1125,6 +1181,7 @@
             "id": 807,
             "name": "Larissa",
             "type": "M",
+            "size": 0,
             "color": 11119017,
             "orbit": {
                 "orbits": 899,
@@ -1145,6 +1202,7 @@
             "id": 808,
             "name": "Proteus",
             "type": "M",
+            "size": 0,
             "color": 8421504,
             "orbit": {
                 "orbits": 899,
@@ -1165,6 +1223,7 @@
             "id": 801,
             "name": "Triton",
             "type": "M",
+            "size": 0,
             "color": 15132390,
             "orbit": {
                 "orbits": 899,
@@ -1185,6 +1244,7 @@
             "id": 802,
             "name": "Nereid",
             "type": "M",
+            "size": 0,
             "color": 12632256,
             "orbit": {
                 "orbits": 899,
@@ -1205,6 +1265,7 @@
             "id": 999,
             "name": "Pluto",
             "type": "P",
+            "size": 0,
             "color": 15061949,
             "orbit": {
                 "orbits": 10,
@@ -1227,6 +1288,7 @@
             "id": 901,
             "name": "Charon",
             "type": "M",
+            "size": 0,
             "color": 13158600,
             "orbit": {
                 "orbits": 999,
@@ -1247,6 +1309,7 @@
             "id": 902,
             "name": "Nix",
             "type": "M",
+            "size": 0,
             "color": 15066597,
             "orbit": {
                 "orbits": 999,
@@ -1267,6 +1330,7 @@
             "id": 903,
             "name": "Hydra",
             "type": "M",
+            "size": 0,
             "color": 15066597,
             "orbit": {
                 "orbits": 999,
@@ -1287,6 +1351,7 @@
             "id": 904,
             "name": "Kerberos",
             "type": "M",
+            "size": 0,
             "color": 13158600,
             "orbit": {
                 "orbits": 999,
@@ -1307,6 +1372,7 @@
             "id": 905,
             "name": "Styx",
             "type": "M",
+            "size": 0,
             "color": 13158600,
             "orbit": {
                 "orbits": 999,
@@ -2410,9 +2476,9 @@
                 },
                 {
                     "id": "N1,0",
-                    "name": "North Sea",
+                    "name": "Greenland",
                     "type": "Arctic",
-                    "geology": "Earth_Polar"
+                    "geology": "Earth_Large_Igneous_Province"
                 },
                 {
                     "id": "S1,0",
@@ -2422,9 +2488,9 @@
                 },
                 {
                     "id": "N1,1",
-                    "name": "Greenland",
-                    "type": "Archipelago",
-                    "geology": "Earth_Large_Igneous_Province"
+                    "name": "North Atlantic Ocean",
+                    "type": "Hydrothermal Vent Field",
+                    "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "S1,1",
@@ -2434,9 +2500,9 @@
                 },
                 {
                     "id": "N1,2",
-                    "name": "North Atlantic Gyre",
-                    "type": "Abyssal Plain",
-                    "geology": "Earth_Oceanic_Abyssal"
+                    "name": "Bahamas",
+                    "type": "Continental Shelf",
+                    "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S1,2",
@@ -2494,7 +2560,7 @@
                 },
                 {
                     "id": "N2,-1",
-                    "name": "Eastern Europe",
+                    "name": "Northern Europe",
                     "type": "Forest",
                     "geology": "Earth_Continental_Crust"
                 },
@@ -2506,9 +2572,9 @@
                 },
                 {
                     "id": "N2,0",
-                    "name": "Northern Europe",
-                    "type": "Forest",
-                    "geology": "Earth_Continental_Crust"
+                    "name": "British Isles",
+                    "type": "Archipelago",
+                    "geology": "Earth_Oceanic_Shelf"
                 },
                 {
                     "id": "S2,0",
@@ -2519,8 +2585,8 @@
                 {
                     "id": "N2,1",
                     "name": "Azores",
-                    "type": "Continental Shelf",
-                    "geology": "Earth_Oceanic_Shelf"
+                    "type": "Abyssal Plain",
+                    "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "S2,1",
@@ -2603,8 +2669,8 @@
                 {
                     "id": "N3,1",
                     "name": "Canary Islands",
-                    "type": "Continental Shelf",
-                    "geology": "Earth_Oceanic_Shelf"
+                    "type": "Abyssal Plain",
+                    "geology": "Earth_Oceanic_Abyssal"
                 },
                 {
                     "id": "S3,1",
@@ -2632,7 +2698,7 @@
                 },
                 {
                     "id": "N4,-2",
-                    "name": "North Africa",
+                    "name": "Libya",
                     "type": "Desert",
                     "geology": "Earth_Sedimentary_Basin"
                 },
