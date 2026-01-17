@@ -46,8 +46,8 @@ extension TickRuleAssignable {
 
         let step: Double
         switch scale / decade {
-        case ...1: step = decade
-        case ...5: step = decade * 2
+        case ...3: step = decade
+        case ...6: step = decade * 2
         default: step = decade * 5
         }
 
