@@ -1,9 +1,9 @@
-import { CandlestickState, TradingViewTickState } from '../exports.js';
+import { CandlestickState, TickRuleState } from '../exports.js';
 
 export interface TradingViewState {
     readonly history: CandlestickState[];
     readonly min: number;
     readonly max: number;
     readonly maxv: bigint;
-    readonly ticks: TradingViewTickState[];
+    readonly ticks: TickRuleState[];
 }

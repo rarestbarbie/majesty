@@ -56,9 +56,9 @@ export class OwnershipBreakdown {
     }
 
     public update(id: GameID, state: OwnershipBreakdownState<any>): void {
-        this.byCountry.update([id], state.country ?? []);
-        this.byCulture.update([id], state.culture ?? []);
-        this.byGender.update([id], state.gender ?? []);
+        this.byCountry.update(state.country ?? [], id);
+        this.byCulture.update(state.culture ?? [], id);
+        this.byGender.update(state.gender ?? [], id);
 
         this.terms.update(
             state.terms ?? [],

@@ -57,11 +57,17 @@ extension TileContext {
     var id: Address { self.state.id }
 
     var snapshot: TileSnapshot {
-        .init(
+        var history: [Tile.Aggregate] = [];
+        history.reserveCapacity(self.state.history.count + 1)
+        history += self.state.history
+        history.append(self.today)
+
+        return .init(
             metadata: self.type,
             id: self.id,
             type: self.state.type,
             name: self.state.name,
+            history: history,
             country: self.authority,
             y: self.state.y,
             z: .init(stats: self.stats, state: self.state.z)
@@ -164,6 +170,11 @@ extension TileContext {
 }
 extension TileContext {
     private static var history: Int { 5 * 365 }
+    private var today: Tile.Aggregate {
+        .init(
+            gdp: self.stats.gdp
+        )
+    }
 
     mutating func advance(turn _: inout Turn) throws {
         self.state.y = .init(stats: self.stats, state: self.state.z)
@@ -177,10 +188,7 @@ extension TileContext {
             self.state.history.removeFirst()
         }
 
-        let today: Tile.Aggregate = .init(
-            gdp: self.stats.gdp
-        )
-        self.state.history.append(today)
+        self.state.history.append(self.today)
     }
 }
 extension TileContext {

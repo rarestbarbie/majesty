@@ -1,7 +1,8 @@
 import { TermState } from '../../DOM/exports.js';
 import { GameID } from '../../GameEngine/exports.js';
 import {
-    PieChartSector
+    PieChartSector,
+    TimeSeriesState
 } from '../exports.js';
 
 export interface PlanetDetails {
@@ -10,4 +11,5 @@ export interface PlanetDetails {
     readonly name?: string;
     readonly terms: TermState[];
     readonly gdp?: PieChartSector<GameID>[];
+    readonly gdpGraph: TimeSeriesState;
 }

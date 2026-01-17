@@ -1,3 +1,105 @@
+div.line-chart {
+    position: relative;
+    height: 325px;
+
+    direction: rtl;
+
+    border-radius: 4px;
+
+    --y-offset: 0%;
+    --height: calc((100% - var(--y-offset)) / (var(--y-max) - var(--y-min)));
+    --ticks-gutter: 6rem;
+
+    > div {
+        bottom: 0;
+        right: 0;
+    }
+    > div.line-chart-content {
+        position: relative;
+
+        background-color: rgba(0, 0, 0, 0.1);
+        overflow-x: scroll;
+        overflow-y: hidden;
+        scrollbar-gutter: auto;
+        height: 100%;
+
+        margin-right: var(--ticks-gutter);
+
+        --x-step: 5px;
+        --line-color: rgb(255, 166, 0);
+
+        > svg {
+            position: absolute;
+            width: calc(var(--x-length) * var(--x-step));
+            height: 100%;
+
+            path {
+                stroke: var(--line-color);
+                stroke-width: 2;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+                fill: none;
+
+                vector-effect: non-scaling-stroke;
+
+                transform-origin: 0 0;
+                transform:
+                    // shrink x values from range [0, x-length] to [0, 1]
+                    scale(calc(1 / (var(--x-length))), 1)
+                    // make the vertices align to the centers of the markers
+                    translate(-0.5px, 0);
+            }
+        }
+
+        > ul.line-chart-markers {
+            display: flex;
+            padding: 0;
+            margin: 0;
+
+            height: 100%;
+
+            --marker-size: 8px;
+
+            > div {
+                flex-shrink: 0;
+
+                position: relative;
+                height: 100%;
+                width: var(--x-step);
+
+                &:hover::before {
+                    display: inline-block;
+                    position: absolute;
+                    content: '';
+                    height: 100%;
+                    border-left: 1px dashed rgba(255, 255, 255, 0.2);
+                    left: 2px;
+                }
+
+                > div {
+                    position: absolute;
+                    bottom: calc(var(--y-offset) + var(--height) * (var(--y) - var(--y-min)));
+                    height: 0;
+                    width: 0;
+                }
+
+                &:hover > div::before {
+                    position: relative;
+                    display: block;
+                    content: '';
+                    top: calc(var(--marker-size) / -2);
+                    right: calc((var(--x-step) - var(--marker-size)) / 2);
+                    width: var(--marker-size);
+                    height: var(--marker-size);
+                    border-radius: 50%;
+
+                    background-color: var(--line-color);
+                }
+            }
+        }
+    }
+}
+
 div.tradingview {
     position: relative;
     height: 325px;
@@ -8,13 +110,13 @@ div.tradingview {
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 4px;
 
-    --vh: 25%;
+    --y-offset: 25%;
+    --height: calc((100% - var(--y-offset)) / (var(--y-max) - var(--y-min)));
+    --heightv: calc(var(--y-offset) / var(--y-maxv));
 
-    --height: calc((100% - var(--vh)) / (var(--y-max) - var(--y-min)));
-    --heightv: calc(var(--vh) / var(--y-maxv));
+    --ticks-gutter: 4rem;
 
     > div {
-        position: absolute;
         bottom: 0;
         right: 0;
     }
@@ -26,10 +128,7 @@ div.tradingview {
 
         display: flex;
         height: 100%;
-        width: 100%;
-
-        border-right: 3.5rem solid transparent;
-        box-sizing: border-box;
+        margin-right: calc(0.25rem + var(--ticks-gutter));
 
         > div {
             flex-shrink: 0;
@@ -74,80 +173,82 @@ div.tradingview {
                 position: absolute;
                 margin: 0 1px;
                 width: 3px;
-                bottom: calc(var(--vh) + var(--height) * (min(var(--c), var(--o)) - var(--y-min)));
+                bottom: calc(var(--y-offset) + var(--height) * (min(var(--c), var(--o)) - var(--y-min)));
                 height: calc(max(1px, var(--height) * (abs(var(--c) - var(--o)))));
             }
             div:nth-child(3) {
                 position: absolute;
                 margin: 0 2px;
                 width: 1px;
-                bottom: calc(var(--vh) + var(--height) * (var(--l) - var(--y-min)));
+                bottom: calc(var(--y-offset) + var(--height) * (var(--l) - var(--y-min)));
                 height: calc(max(1px, var(--height) * (var(--h) - var(--l))));
             }
         }
     }
+}
 
-    div.ticks {
-        pointer-events: none;
+div.ticks {
+    pointer-events: none;
 
+    position: absolute;
+    height: 100%;
+    width: 100%;
+
+    > div {
         position: absolute;
-        height: 100%;
+        height: 0;
         width: 100%;
 
+        --bottom: calc(var(--y-offset) + var(--height) * (var(--y) - var(--y-min)));
+
+        bottom: var(--bottom);
+        right: 0;
+
+        display: flex;
+        align-items: center;
+
+        &::after {
+            flex: 1 1 auto;
+            content: '';
+        }
+
         > div {
-            position: absolute;
-            height: 0;
-            width: 100%;
-
-            bottom: calc(var(--vh) + var(--height) * (var(--y) - var(--y-min)));
-            right: 0;
-
-            display: flex;
-            align-items: center;
-
-            &::after {
-                flex: 1 1 auto;
-                content: '';
-            }
-
-            > div {
-                width: 3rem;
-                padding: 0.2em 0.3em 0 0;
-                box-sizing: border-box;
-            }
+            width: var(--ticks-gutter);
+            padding: 0.2em 0.3em 0 0;
+            box-sizing: border-box;
         }
+    }
 
-        > div[data-id='0'] {
+    > div[data-id='0'] {
 
-            &[data-style='ins'] {
-                --bg: var(--color-pos-fill);
-                --fg: black;
-            }
-            &[data-style='del'] {
-                --bg: var(--color-neg-fill);
-                --fg: white;
-            }
-
-            --bg: rgb(117, 117, 117);
+        &[data-style='ins'] {
+            --bg: var(--color-pos-fill);
+            --fg: black;
+        }
+        &[data-style='del'] {
+            --bg: var(--color-neg-fill);
             --fg: white;
-
-            > div {
-                position: relative;
-
-                background-color: var(--bg);
-                color: var(--fg);
-
-                clip-path: polygon(0% 50%, 0.5em 0%, 100% 0%, 100% 100%, 0.5em 100%);
-            }
-            &::after {
-                border-bottom: 1px dashed var(--bg);
-            }
         }
 
-        > div:not([data-id='0']) {
-            &::after {
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            }
+        --bg: rgb(117, 117, 117);
+        --fg: white;
+
+        > div {
+            position: relative;
+
+            background-color: var(--bg);
+            color: var(--fg);
+
+            clip-path: polygon(0% 50%, 0.5em 0%, 100% 0%, 100% 100%, 0.5em 100%);
+        }
+        &::after {
+            border-bottom: 1px dashed var(--bg);
+        }
+    }
+
+    > div:not([data-id='0']) {
+        &::after {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
     }
 }

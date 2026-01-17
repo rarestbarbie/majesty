@@ -10,6 +10,7 @@ struct TileSnapshot: Differentiable, Identifiable, Sendable {
     let type: TileType
     let name: String?
 
+    let history: [Tile.Aggregate]
     let country: DiplomaticAuthority?
     let y: Tile.Interval
     let z: Tile.Interval

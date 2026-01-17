@@ -7,11 +7,13 @@ import {
     UpdateText,
 } from '../../DOM/exports.js';
 import {
-    GameID
+    GameID,
+    GameDate
 } from '../../GameEngine/exports.js';
 import {
     ScreenContent,
     HexGrid,
+    LineChart,
     PlanetReport,
     PlanetFilter,
     PlanetFilterLabel,
@@ -29,6 +31,7 @@ export class PlanetOverview extends ScreenContent {
 
     private readonly terms: StaticList<Term, string>;
     private readonly gdp: PieChart<GameID>;
+    private readonly gdpHistorical: LineChart;
 
     private layerShown?: string;
     private dom?: {
@@ -38,6 +41,7 @@ export class PlanetOverview extends ScreenContent {
         readonly layers: HTMLElement;
         readonly titleUpper: HTMLHeadingElement;
         readonly titleLower: HTMLHeadingElement;
+        readonly details: HTMLDivElement;
         readonly stats: HTMLDivElement;
     };
 
@@ -53,6 +57,7 @@ export class PlanetOverview extends ScreenContent {
         this.terms.node.classList.add('terms');
 
         this.gdp = new PieChart<GameID>(TooltipType.TileEconomyContribution);
+        this.gdpHistorical = new LineChart();
     }
 
     public override async open(parameters: URLSearchParams): Promise<void> {
@@ -66,6 +71,7 @@ export class PlanetOverview extends ScreenContent {
                 layers: document.createElement('nav'),
                 titleUpper: document.createElement('h3'),
                 titleLower: document.createElement('h3'),
+                details: document.createElement('div'),
                 stats: document.createElement('div'),
             };
 
@@ -77,18 +83,19 @@ export class PlanetOverview extends ScreenContent {
             this.dom.header.appendChild(this.dom.titleUpper);
             this.dom.layers.appendChild(this.layers.node);
 
+            this.dom.stats.classList.add('stats');
+
             this.dom.panel.appendChild(this.dom.header);
             this.dom.panel.appendChild(panorama);
             this.dom.panel.appendChild(this.dom.titleLower);
-            this.dom.panel.appendChild(this.dom.stats);
+            this.dom.panel.appendChild(this.dom.details);
             this.dom.panel.classList.add('panel');
 
-            this.dom.stats.classList.add('stats');
-
+            this.dom.details.classList.add('details');
         } else {
+            this.dom.details.replaceChildren();
             this.dom.stats.replaceChildren();
         }
-
 
         const charts: [PieChart<any>, string][] = [
             [this.gdp, 'GDP Contribution'],
@@ -108,7 +115,10 @@ export class PlanetOverview extends ScreenContent {
 
         this.dom.stats.appendChild(this.terms.node);
         this.dom.stats.appendChild(figures);
-        this.dom.stats.setAttribute('data-subscreen', 'Region');
+
+        this.dom.details.appendChild(this.gdpHistorical.node);
+        this.dom.details.appendChild(this.dom.stats);
+        this.dom.details.setAttribute('data-subscreen', 'Region');
 
         this.dom.index.tabs[state.filterlist].checked = true;
         this.update(state);
@@ -178,6 +188,7 @@ export class PlanetOverview extends ScreenContent {
             (term: TermState, item: Term) => item.update(term, [id]),
         );
 
-        this.gdp.update([id], state.details.gdp ?? []);
+        this.gdp.update(state.details.gdp ?? [], id);
+        this.gdpHistorical.update(state.details.gdpGraph, id);
     }
 }

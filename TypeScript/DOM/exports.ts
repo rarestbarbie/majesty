@@ -36,6 +36,12 @@ export * from './Fields/Ticker.js';
 export * from './Terms/Term.js';
 export * from './Terms/TermState.js';
 
+export function CreateSVG<T extends keyof SVGElementTagNameMap>(
+    type: T
+): SVGElementTagNameMap[T] {
+    return document.createElementNS('http://www.w3.org/2000/svg', type);
+}
+
 export function UpdateText(field: HTMLElement, value: string): void {
     if (field.textContent !== value) {
         field.textContent = value;
