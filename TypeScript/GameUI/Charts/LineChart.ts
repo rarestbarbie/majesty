@@ -72,7 +72,7 @@ export class LineChart {
             this.ticks.clear();
         }
 
-        const length: number = this.markers.length;
+        const length: number = state.history.length;
 
         this.node.style.setProperty('--y-min', `${state.min}`);
         this.node.style.setProperty('--y-max', `${state.max}`);
