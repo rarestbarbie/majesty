@@ -29,7 +29,7 @@
 
 [data-subscreen='Region'] {
     height: 100%;
-    margin: 0.5rem 0;
+    margin: 1rem 0;
     display: flex;
     gap: 1rem;
 
@@ -37,7 +37,7 @@
         min-width: 0;
     }
 
-    > div.line-graph {
+    > div.line-chart {
         flex-basis: 50%;
         height: 100%;
     }

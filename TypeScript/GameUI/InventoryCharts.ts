@@ -56,7 +56,7 @@ export class InventoryCharts {
             (term: TermState, item: Term) => item.update(term, [id]),
         );
 
-        this.costs.update([id], state.costs ?? []);
-        this.budget.update([id], state.budget ?? []);
+        this.costs.update(state.costs ?? [], id);
+        this.budget.update(state.budget ?? [], id);
     }
 }

@@ -18,6 +18,24 @@ import JavaScriptInterop
 }
 extension TimeSeries: TickRuleAssignable {}
 extension TimeSeries {
+    private var d: String? {
+        if  self.history.count < 2 {
+            return nil
+        }
+
+        let height: Double = self.max - self.min
+        let scale: Double = 1 / height
+        var x: Int = 0
+        var d: String = "M"
+        for frame: TimeSeriesFrame in self.history {
+            let y: Double = scale * (self.max - frame.value)
+            d += x == 0 ? " 0,\(y)" : " L \(x),\(y)"
+            x -= 1
+        }
+        return d
+    }
+}
+extension TimeSeries {
     @inlinable public mutating func update<Frame>(
         with history: some RandomAccessCollection<Frame>,
         date: GameDate,
@@ -74,6 +92,7 @@ extension TimeSeries: JavaScriptEncodable {
         case min
         case max
         case ticks
+        case d
     }
 
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
@@ -81,5 +100,6 @@ extension TimeSeries: JavaScriptEncodable {
         js[.min] = self.min
         js[.max] = self.max
         js[.ticks] = self.ticks
+        js[.d] = self.d
     }
 }

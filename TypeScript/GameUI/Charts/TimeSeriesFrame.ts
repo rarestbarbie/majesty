@@ -12,14 +12,16 @@ export class TimeSeriesFrame implements DiffableListElement<GameDate> {
     public readonly node: HTMLDivElement;
     private readonly marker: HTMLDivElement;
 
-    constructor(frame: TimeSeriesFrameState, tile: string) {
+    constructor(frame: TimeSeriesFrameState, tile: string, tooltip?: TooltipType) {
         this.id = frame.id;
         this.marker = document.createElement('div');
         this.node = document.createElement('div');
         this.node.appendChild(this.marker);
 
-        // this.node.setAttribute('data-tooltip-type', TooltipType.MarketHistory);
-        this.node.setAttribute('data-tooltip-arguments', JSON.stringify([tile, this.id]));
+        if (tooltip !== undefined) {
+            this.node.setAttribute('data-tooltip-type', tooltip);
+            this.node.setAttribute('data-tooltip-arguments', JSON.stringify([tile, this.id]));
+        }
     }
 
     public update(frame: TimeSeriesFrameState): void {

@@ -13,17 +13,14 @@ import {
 import {
     ScreenContent,
     HexGrid,
+    LineChart,
     PlanetReport,
     PlanetFilter,
     PlanetFilterLabel,
     PlanetMapLayerSelector,
     ScreenType,
     PieChart,
-    TimeSeriesFrame,
-    TimeSeriesFrameState,
     TooltipType,
-    TickRule,
-    TickRuleState
 } from '../exports.js';
 import { Swift } from '../../Swift.js';
 
@@ -34,8 +31,7 @@ export class PlanetOverview extends ScreenContent {
 
     private readonly terms: StaticList<Term, string>;
     private readonly gdp: PieChart<GameID>;
-    private readonly chart: StaticList<TimeSeriesFrame, GameDate>;
-    private readonly chartTicks: StaticList<TickRule, number>;
+    private readonly gdpHistorical: LineChart;
 
     private layerShown?: string;
     private dom?: {
@@ -47,7 +43,6 @@ export class PlanetOverview extends ScreenContent {
         readonly titleLower: HTMLHeadingElement;
         readonly details: HTMLDivElement;
         readonly stats: HTMLDivElement;
-        readonly chart: HTMLDivElement;
     };
 
     constructor() {
@@ -62,19 +57,11 @@ export class PlanetOverview extends ScreenContent {
         this.terms.node.classList.add('terms');
 
         this.gdp = new PieChart<GameID>(TooltipType.TileEconomyContribution);
-
-        this.chart = new StaticList<TimeSeriesFrame, GameDate>(document.createElement('ul'));
-        this.chart.node.classList.add('line-graph-markers');
-        this.chartTicks = new StaticList<TickRule, number>(document.createElement('div'));
-        this.chartTicks.node.classList.add('ticks');
+        this.gdpHistorical = new LineChart();
     }
 
     public override async open(parameters: URLSearchParams): Promise<void> {
         const state: PlanetReport = await Swift.openPlanet(parameters);
-
-        // don’t keep stale bar graph bars around
-        this.chart.clear();
-        this.chartTicks.clear();
 
         if (this.dom === undefined) {
             this.dom = {
@@ -86,7 +73,6 @@ export class PlanetOverview extends ScreenContent {
                 titleLower: document.createElement('h3'),
                 details: document.createElement('div'),
                 stats: document.createElement('div'),
-                chart: document.createElement('div'),
             };
 
             const panorama: HTMLElement = document.createElement('div');
@@ -96,10 +82,6 @@ export class PlanetOverview extends ScreenContent {
 
             this.dom.header.appendChild(this.dom.titleUpper);
             this.dom.layers.appendChild(this.layers.node);
-
-            this.dom.chart.classList.add('line-graph');
-            this.dom.chart.appendChild(this.chart.node);
-            this.dom.chart.appendChild(this.chartTicks.node);
 
             this.dom.stats.classList.add('stats');
 
@@ -134,7 +116,7 @@ export class PlanetOverview extends ScreenContent {
         this.dom.stats.appendChild(this.terms.node);
         this.dom.stats.appendChild(figures);
 
-        this.dom.details.appendChild(this.dom.chart);
+        this.dom.details.appendChild(this.gdpHistorical.node);
         this.dom.details.appendChild(this.dom.stats);
         this.dom.details.setAttribute('data-subscreen', 'Region');
 
@@ -206,20 +188,7 @@ export class PlanetOverview extends ScreenContent {
             (term: TermState, item: Term) => item.update(term, [id]),
         );
 
-        this.gdp.update([id], state.details.gdp ?? []);
-
-        this.dom.chart.style.setProperty('--y-min', `${state.details.gdpGraph.min}`);
-        this.dom.chart.style.setProperty('--y-max', `${state.details.gdpGraph.max}`);
-
-        this.chart.update(
-            state.details.gdpGraph.history,
-            (interval: TimeSeriesFrameState) => new TimeSeriesFrame(interval, id),
-            (interval: TimeSeriesFrameState, frame: TimeSeriesFrame) => frame.update(interval),
-        );
-        this.chartTicks.update(
-            state.details.gdpGraph.ticks,
-            (state: TickRuleState) => new TickRule(state),
-            (state: TickRuleState, tick: TickRule) => tick.update(state),
-        );
+        this.gdp.update(state.details.gdp ?? [], id);
+        this.gdpHistorical.update(state.details.gdpGraph, id);
     }
 }

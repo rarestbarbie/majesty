@@ -1,4 +1,4 @@
-div.line-graph {
+div.line-chart {
     position: relative;
     height: 325px;
 
@@ -14,58 +14,87 @@ div.line-graph {
         bottom: 0;
         right: 0;
     }
-    > ul.line-graph-markers {
-        background-color: rgba(0, 0, 0, 0.1);
+    > div.line-chart-content {
+        position: relative;
 
+        background-color: rgba(0, 0, 0, 0.1);
         overflow-x: scroll;
         overflow-y: hidden;
         scrollbar-gutter: auto;
-
         height: 100%;
-        display: flex;
-        padding: 0;
-        margin: 0;
+
         margin-right: var(--ticks-gutter);
 
+        --x-step: 5px;
+        --line-color: rgb(255, 166, 0);
 
-        > div {
-            flex-shrink: 0;
-
-            position: relative;
+        > svg {
+            position: absolute;
+            width: calc(var(--x-length) * var(--x-step));
             height: 100%;
-            width: 5px;
 
-            &:hover::before {
-                display: inline-block;
-                position: absolute;
-                content: '';
-                height: 100%;
-                border-left: 1px dashed rgba(255, 255, 255, 0.2);
-                left: 2px;
+            path {
+                stroke: var(--line-color);
+                stroke-width: 2;
+                stroke-linecap: round;
+                stroke-linejoin: round;
+                fill: none;
+
+                vector-effect: non-scaling-stroke;
+
+                transform-origin: 0 0;
+                transform:
+                    // shrink x values from range [0, x-length] to [0, 1]
+                    scale(calc(1 / (var(--x-length))), 1)
+                    // make the vertices align to the centers of the markers
+                    translate(-0.5px, 0);
             }
+        }
+
+        > ul.line-chart-markers {
+            display: flex;
+            padding: 0;
+            margin: 0;
+
+            height: 100%;
+
+            --marker-size: 8px;
 
             > div {
-                position: absolute;
-                margin: 0;
-                height: 0;
-                width: 5px;
+                flex-shrink: 0;
 
-                bottom: calc(var(--y-offset) + var(--height) * (var(--y) - var(--y-min)));
+                position: relative;
+                height: 100%;
+                width: var(--x-step);
 
-                display: flex;
-                justify-content: center;
-                align-items: center;
-
-                &::before {
-                    display: block;
+                &:hover::before {
+                    display: inline-block;
+                    position: absolute;
                     content: '';
-                    width: 3px;
-                    height: 3px;
-                    border-radius: 50%;
-
-                    background-color: rgb(117, 117, 117);
+                    height: 100%;
+                    border-left: 1px dashed rgba(255, 255, 255, 0.2);
+                    left: 2px;
                 }
 
+                > div {
+                    position: absolute;
+                    bottom: calc(var(--y-offset) + var(--height) * (var(--y) - var(--y-min)));
+                    height: 0;
+                    width: 0;
+                }
+
+                &:hover > div::before {
+                    position: relative;
+                    display: block;
+                    content: '';
+                    top: calc(var(--marker-size) / -2);
+                    right: calc((var(--x-step) - var(--marker-size)) / 2);
+                    width: var(--marker-size);
+                    height: var(--marker-size);
+                    border-radius: 50%;
+
+                    background-color: var(--line-color);
+                }
             }
         }
     }

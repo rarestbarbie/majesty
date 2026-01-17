@@ -1,5 +1,6 @@
 import * as GameEngine from '../../GameEngine/exports.js';
 import {
+    CreateSVG,
     StaticList,
 } from '../../DOM/exports.js';
 
@@ -10,22 +11,17 @@ import {
 } from '../exports.js';
 
 export class PieChart<Sector> {
-    public readonly type: TooltipType;
     public readonly node: HTMLDivElement;
 
+    private id?: any;
+    private readonly type: TooltipType;
     private readonly sectors: StaticList<PieChartComponent<Sector>, Sector>;
-
-    private static element<T extends keyof SVGElementTagNameMap>(
-        type: T
-    ): SVGElementTagNameMap[T] {
-        return document.createElementNS('http://www.w3.org/2000/svg', type);
-    }
 
     constructor(type: TooltipType) {
         this.type = type;
 
-        const svg: SVGSVGElement = PieChart.element('svg');
-        const g: SVGGElement = PieChart.element('g');
+        const svg: SVGSVGElement = CreateSVG('svg');
+        const g: SVGGElement = CreateSVG('g');
 
         svg.setAttribute('viewBox', '-1 -1 2 2');
         svg.appendChild(g);
@@ -38,23 +34,31 @@ export class PieChart<Sector> {
         this.node.appendChild(svg);
     }
 
-    public update(prefix: any[], sectors: PieChartSector<Sector>[]): void {
+    public update(sectors: PieChartSector<Sector>[], id: any): void {
         if (sectors.length === 0) {
             this.node.classList.add('empty');
         } else {
             this.node.classList.remove('empty');
         }
 
+        if (this.id !== id) {
+            this.id = id;
+            this.sectors.clear();
+        }
+
         this.sectors.update(
             sectors,
             (sector: PieChartSector<Sector>) => {
-                return { id: sector.id, node: PieChart.element('g') };
+                const node: SVGGElement = CreateSVG('g');
+                node.setAttribute('data-tooltip-type', this.type);
+                node.setAttribute('data-tooltip-arguments', JSON.stringify([id, sector.id]));
+                return { id: sector.id, node: node };
             },
             (sector: PieChartSector<Sector>, element: PieChartComponent<Sector>) => {
                 if (sector.d) {
                     if (!(element.geometry instanceof SVGPathElement)) {
                         element.geometry?.remove();
-                        element.geometry = PieChart.element('path');
+                        element.geometry = CreateSVG('path');
                         element.node.appendChild(element.geometry);
                     }
 
@@ -62,7 +66,7 @@ export class PieChart<Sector> {
                 } else {
                     if (!(element.geometry instanceof SVGCircleElement)) {
                         element.geometry?.remove();
-                        element.geometry = PieChart.element('circle');
+                        element.geometry = CreateSVG('circle');
                         element.node.appendChild(element.geometry);
                     }
 
@@ -75,12 +79,6 @@ export class PieChart<Sector> {
                 if (sector.value.style !== undefined) {
                     element.geometry.setAttribute('class', sector.value.style);
                 }
-
-                element.node.setAttribute('data-tooltip-type', this.type);
-                element.node.setAttribute(
-                    'data-tooltip-arguments',
-                    JSON.stringify([...prefix, sector.id])
-                );
             },
         );
     }

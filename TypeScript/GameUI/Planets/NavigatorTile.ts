@@ -46,10 +46,10 @@ export class NavigatorTile {
         this.header.innerText = tile.name;
 
         if (tile.culture !== undefined) {
-            this.charts.culture.update([tile.id], tile.culture);
+            this.charts.culture.update(tile.culture, tile.id);
         }
         if (tile.popType !== undefined) {
-            this.charts.popType.update([tile.id], tile.popType);
+            this.charts.popType.update(tile.popType, tile.id);
         }
     }
 }

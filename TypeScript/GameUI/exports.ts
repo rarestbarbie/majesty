@@ -20,6 +20,7 @@ export * from './OwnershipBreakdownState.js';
 
 export * from './Markets/Candle.js';
 export * from './Markets/Candlestick.js';
+export * from './Charts/LineChart.js';
 export * from './Charts/PieChart.js';
 export * from './Charts/PieChartComponent.js';
 export * from './Charts/PieChartSector.js';

@@ -5,4 +5,5 @@ export interface TimeSeriesState {
     readonly min: number;
     readonly max: number;
     readonly ticks: TickRuleState[];
+    readonly d?: string;
 }
