@@ -117,7 +117,7 @@ div.tradingview {
     --height: calc((100% - var(--y-offset)) / (var(--y-max) - var(--y-min)));
     --heightv: calc(var(--y-offset) / var(--y-maxv));
 
-    --ticks-gutter: 4rem;
+    --ticks-gutter: 4.25rem;
 
     > div {
         bottom: 0;
