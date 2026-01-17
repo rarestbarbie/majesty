@@ -1,4 +1,3 @@
-import ColorText
 import D
 import RealModule
 
@@ -8,31 +7,36 @@ import RealModule
 }
 extension TickRuleAssignable {
     @inlinable func tickLogarithmically(
-        current: (y: Double, style: ColorText.Style?),
-        detail: Double = 1 / 5
+        current: (y: Double, style: TickRule.Style?),
+        digits: Int,
+        detail: Double = 1 / 5,
     ) -> [TickRule] {
         Self.tickLogarithmically(
             current: current,
             visible: (min: self.min, max: self.max),
-            detail: detail
+            digits: digits,
+            detail: detail,
         )
     }
     @inlinable func tickLinearly(
-        current: (y: Double, style: ColorText.Style?),
-        detail: Double = 1 / 5
+        current: (y: Double, style: TickRule.Style?),
+        digits: Int,
+        detail: Double = 1 / 5,
     ) -> [TickRule] {
         Self.tickLinearly(
             current: current,
             visible: (min: self.min, max: self.max),
-            detail: detail
+            digits: digits,
+            detail: detail,
         )
     }
 }
 extension TickRuleAssignable {
     @usableFromInline static func tickLogarithmically(
-        current: (y: Double, style: ColorText.Style?),
+        current: (y: Double, style: TickRule.Style?),
         visible: (min: Double, max: Double),
-        detail: Double
+        digits: Int,
+        detail: Double,
     ) -> [TickRule] {
         let linear: (min: Double, max: Double) = (.exp10(visible.min), .exp10(visible.max))
         let range: Double = linear.max - linear.min
@@ -46,22 +50,24 @@ extension TickRuleAssignable {
 
         let step: Double
         switch scale / decade {
-        case ...3: step = decade
-        case ...6: step = decade * 2
+        case ...2: step = decade
+        case ...5: step = decade * 2
         default: step = decade * 5
         }
 
         return Self.tick(
             current: current,
             linear: (min: linear.min, max: linear.max, step: step),
+            digits: digits,
             transform: Double.log10(_:)
         )
     }
 
     @usableFromInline static func tickLinearly(
-        current: (y: Double, style: ColorText.Style?),
+        current: (y: Double, style: TickRule.Style?),
         visible: (min: Double, max: Double),
-        detail: Double
+        digits: Int,
+        detail: Double,
     ) -> [TickRule] {
         let range: Double = visible.max - visible.min
         let scale: Double = detail * range
@@ -73,20 +79,22 @@ extension TickRuleAssignable {
 
         let step: Double
         switch scale / decade {
-        case ...1: step = decade
-        case ...3: step = decade * 2
+        case ...2: step = decade
+        case ...4: step = decade * 2
         default: step = decade * 5
         }
 
         return Self.tick(
             current: current,
-            linear: (min: visible.min, max: visible.max, step: step)
+            linear: (min: visible.min, max: visible.max, step: step),
+            digits: digits,
         )
     }
 
     private static func tick(
-        current: (y: Double, style: ColorText.Style?),
+        current: (y: Double, style: TickRule.Style?),
         linear: (min: Double, max: Double, step: Double),
+        digits: Int,
         transform: (Double) -> Double = { $0 }
     ) -> [TickRule] {
         let steps: (first: Int64, last: Int64) = (
@@ -102,12 +110,12 @@ extension TickRuleAssignable {
 
         for i: Int64 in steps.first ... steps.last {
             let y: Double = Double.init(i) * linear.step
-            let linear: Decimal? = .init(rounding: y, places: 2)
+            let linear: Decimal? = .init(rounding: y, digits: digits)
             ticks.append(
                 TickRule.init(
                     id: 1 + Int.init(i - steps.first),
                     value: transform(y),
-                    label: linear.map { "\($0[..])" } ?? "",
+                    label: linear.map { "\($0[..][.financial])" } ?? "",
                     style: nil
                 )
             )
@@ -117,7 +125,9 @@ extension TickRuleAssignable {
             TickRule.init(
                 id: 0,
                 value: transform(current.y),
-                label: Decimal.init(rounding: current.y, places: 2).map { "\($0[..])" } ?? "",
+                label: Decimal.init(rounding: current.y, digits: digits).map {
+                    "\($0[..][.financial])"
+                } ?? "",
                 style: current.style
             )
         )

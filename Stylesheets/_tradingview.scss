@@ -2,13 +2,18 @@ div.line-chart {
     position: relative;
     height: 325px;
 
-    direction: rtl;
-
     border-radius: 4px;
 
     --y-offset: 0%;
     --height: calc((100% - var(--y-offset)) / (var(--y-max) - var(--y-min)));
-    --ticks-gutter: 6rem;
+    --ticks-gutter: 4.5rem;
+    --line-color: rgb(255, 166, 0);
+
+    // TODO: move somewhere else
+    > div.ticks {
+        --bg: var(--line-color);
+        --fg: black;
+    }
 
     > div {
         bottom: 0;
@@ -21,12 +26,12 @@ div.line-chart {
         overflow-x: scroll;
         overflow-y: hidden;
         scrollbar-gutter: auto;
+        direction: rtl;
         height: 100%;
 
         margin-right: var(--ticks-gutter);
 
         --x-step: 5px;
-        --line-color: rgb(255, 166, 0);
 
         > svg {
             position: absolute;
@@ -105,8 +110,6 @@ div.tradingview {
     height: 325px;
     width: 100%;
 
-    direction: rtl;
-
     background-color: rgba(0, 0, 0, 0.2);
     border-radius: 4px;
 
@@ -125,6 +128,7 @@ div.tradingview {
         overflow-x: scroll;
         overflow-y: hidden;
         scrollbar-gutter: auto;
+        direction: rtl;
 
         display: flex;
         height: 100%;
@@ -194,6 +198,9 @@ div.ticks {
     height: 100%;
     width: 100%;
 
+    --bg: rgb(117, 117, 117);
+    --fg: white;
+
     > div {
         position: absolute;
         height: 0;
@@ -207,31 +214,28 @@ div.ticks {
         display: flex;
         align-items: center;
 
-        &::after {
+        &::before {
             flex: 1 1 auto;
             content: '';
         }
 
         > div {
+            // text-align: right;
             width: var(--ticks-gutter);
-            padding: 0.2em 0.3em 0 0;
+            padding: 0.15em 0 0.05em 0.75em;
             box-sizing: border-box;
         }
     }
 
     > div[data-id='0'] {
-
-        &[data-style='ins'] {
+        &[data-style='pos'] {
             --bg: var(--color-pos-fill);
             --fg: black;
         }
-        &[data-style='del'] {
+        &[data-style='neg'] {
             --bg: var(--color-neg-fill);
             --fg: white;
         }
-
-        --bg: rgb(117, 117, 117);
-        --fg: white;
 
         > div {
             position: relative;
@@ -241,13 +245,13 @@ div.ticks {
 
             clip-path: polygon(0% 50%, 0.5em 0%, 100% 0%, 100% 100%, 0.5em 100%);
         }
-        &::after {
+        &::before {
             border-bottom: 1px dashed var(--bg);
         }
     }
 
     > div:not([data-id='0']) {
-        &::after {
+        &::before {
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
     }

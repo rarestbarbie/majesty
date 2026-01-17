@@ -20,7 +20,7 @@ let package: Package = .init(
         .package(url: "https://github.com/ordo-one/bijection", branch: "master"),
         .package(url: "https://github.com/ordo-one/package-distributions", from: "0.2.0"),
         .package(url: "https://github.com/tayloraswift/dollup", from: "0.5.0"),
-        .package(url: "https://github.com/tayloraswift/d", from: "0.5.0"),
+        .package(url: "https://github.com/tayloraswift/d", from: "0.6.0"),
     ],
     targets: [
         .executableTarget(
@@ -177,7 +177,8 @@ let package: Package = .init(
             name: "GameMetrics",
             dependencies: [
                 .target(name: "GameEconomy"),
-                .target(name: "GameUI"),
+                .target(name: "JavaScriptInterop"),
+                .product(name: "D", package: "d"),
             ]
         ),
 

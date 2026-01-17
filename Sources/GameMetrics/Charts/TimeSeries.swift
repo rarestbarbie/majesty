@@ -1,4 +1,3 @@
-import ColorText
 import GameIDs
 import JavaScriptKit
 import JavaScriptInterop
@@ -39,6 +38,8 @@ extension TimeSeries {
     @inlinable public mutating func update<Frame>(
         with history: some RandomAccessCollection<Frame>,
         date: GameDate,
+        style: TickRule.Style? = nil,
+        digits: Int = 3,
         linear value: (Frame) -> Double
     ) {
         guard
@@ -83,7 +84,7 @@ extension TimeSeries {
         self.min -= margin
         self.max += margin
         self.max = Swift.max(self.max, self.min + 0.000_001)
-        self.ticks = self.tickLinearly(current: (y: value(last), style: .em))
+        self.ticks = self.tickLinearly(current: (y: value(last), style: style), digits: digits)
     }
 }
 extension TimeSeries: JavaScriptEncodable {

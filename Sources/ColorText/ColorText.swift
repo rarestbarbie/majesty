@@ -58,7 +58,7 @@ extension ColorText: StringInterpolationProtocol {
         _ value: some CustomStringConvertible,
         style: Style
     ) {
-        self.buffer.append("<\(style)>\(value)</\(style)>")
+        self.buffer.append("<\(style.tag)>\(value)</\(style.tag)>")
     }
 
     @inlinable public mutating func appendInterpolation(
