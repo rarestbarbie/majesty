@@ -126,9 +126,9 @@ extension GameUI.Cache {
     }
     func tooltipBuildingCashFlowItem(
         _ id: BuildingID,
-        _ item: CashFlowItem,
+        _ item: FinancialStatement.CostItem,
     ) -> Tooltip? {
-        self.buildings[id]?.stats.cashFlow.tooltip(rules: self.rules, item: item)
+        self.buildings[id]?.stats.financial.costs.tooltip(rules: self.rules, item: item)
     }
     func tooltipBuildingBudgetItem(
         _ id: BuildingID,
@@ -226,9 +226,9 @@ extension GameUI.Cache {
 
     func tooltipFactoryCashFlowItem(
         _ id: FactoryID,
-        _ item: CashFlowItem,
+        _ item: FinancialStatement.CostItem,
     ) -> Tooltip? {
-        self.factories[id]?.stats.cashFlow.tooltip(rules: self.rules, item: item)
+        self.factories[id]?.stats.financial.costs.tooltip(rules: self.rules, item: item)
     }
 
     func tooltipFactoryBudgetItem(
@@ -402,9 +402,9 @@ extension GameUI.Cache {
 
     func tooltipPopCashFlowItem(
         _ id: PopID,
-        _ item: CashFlowItem,
+        _ item: FinancialStatement.CostItem,
     ) -> Tooltip? {
-        self.pops[id]?.stats.cashFlow.tooltip(rules: self.rules, item: item)
+        self.pops[id]?.stats.financial.costs.tooltip(rules: self.rules, item: item)
     }
 
     func tooltipPopBudgetItem(

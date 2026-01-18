@@ -157,7 +157,7 @@ extension PopSnapshot {
 
         return .instructions {
             if case .Ward = self.type.stratum {
-                let profit: ProfitMargins = self.stats.profit
+                let profit: FinancialStatement.Profit = self.stats.financial.profit
                 $0["Total valuation", +] = valuation[/3]
                 $0[>] {
                     $0["Today’s profit", +] = +profit.operating[/3]

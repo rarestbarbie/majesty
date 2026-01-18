@@ -47,7 +47,7 @@ extension BuildingContext {
 }
 extension BuildingContext {
     mutating func startIndexCount() {
-        self.stats.update(from: self.state)
+        self.stats.startIndexCount(self.state)
     }
     mutating func addPosition(asset: LEI, value: Int64) {
         // TODO
@@ -70,7 +70,7 @@ extension BuildingContext: TransactingContext {
             return
         }
 
-        let π: Double = self.stats.profit.π
+        let π: Double = self.stats.financial.profit.π
         self.state.z.mix(profitability: π)
 
         if  let units: Int64 = self.state.backgroundable(

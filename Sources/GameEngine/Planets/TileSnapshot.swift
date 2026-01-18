@@ -126,14 +126,14 @@ extension TileSnapshot {
     ) -> Tooltip? {
         guard
         let country: DiplomaticAuthority = self.country,
-        let (units, value): (Int64, Double) = context.ledger.produced[self.id / resource] else {
+        let (units, value): (Int64, Int64) = context.ledger.production[self.id / resource] else {
             return nil
         }
 
-        let total: (worldwide: Int64, value: Double) = context.ledger.produced.reduce(
+        let total: (worldwide: Int64, value: Int64) = context.ledger.production.reduce(
             into: (0, 0)
         ) {
-            if  $1.key.resource == resource {
+            if  $1.key.crosstab == resource {
                 $0.worldwide += $1.value.units
             }
             if  $1.key.location == self.id {
@@ -145,10 +145,10 @@ extension TileSnapshot {
 
         return .instructions(style: .borderless) {
             $0[resourceName] = (
-                total.value > 0 ? value / total.value : 0
+                total.value > 0 ? Double.init(value %/ total.value) : 0
             )[%2]
             $0[>] {
-                $0["Estimated market value (\(country.currency.name))", +] = +?value[/3..2]
+                $0["Estimated market value (\(country.currency.name))", +] = +?value[/3]
             }
 
             let share: Double = .init(units %/ max(total.worldwide, 1))

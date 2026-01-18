@@ -3,7 +3,7 @@ import JavaScriptInterop
 
 extension Tile {
     struct Aggregate {
-        let gdp: Double
+        let gdp: Int64
     }
 }
 extension Tile.Aggregate {
@@ -19,7 +19,7 @@ extension Tile.Aggregate: JavaScriptEncodable {
 extension Tile.Aggregate: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
-            gdp: try js[.gdp].decode()
+            gdp: try js[.gdp].decode(),
         )
     }
 }

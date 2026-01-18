@@ -5,30 +5,35 @@ import GameRules
 import GameUI
 import VectorCharts
 
-struct CashFlowStatement {
-    private var costs: [CashFlowItem: Int64]
+extension FinancialStatement {
+    struct CostSummary {
+        private var costs: [CostItem: Int64]
 
-    init() {
-        self.costs = [:]
+        init() {
+            self.costs = [:]
+        }
     }
 }
-extension CashFlowStatement {
+extension FinancialStatement.CostSummary {
     mutating func reset() {
         self.costs.removeAll(keepingCapacity: true)
     }
-    mutating func update(with inputs: ResourceInputs) {
+    mutating func update(with inputs: ResourceInputs) -> Int64 {
+        var total: Int64 = 0
         for input: ResourceInput in inputs.all where input.valueConsumed > 0 {
+            total += input.valueConsumed
             self.costs[.resource(input.id), default: 0] += input.valueConsumed
         }
+        return total
     }
 
-    subscript(item: CashFlowItem) -> Int64 {
+    subscript(item: FinancialStatement.CostItem) -> Int64 {
         get { self.costs[item] ?? 0 }
         set { self.costs[item] = newValue == 0 ? nil : newValue }
     }
 }
-extension CashFlowStatement {
-    func tooltip(rules: GameMetadata, item: CashFlowItem) -> Tooltip {
+extension FinancialStatement.CostSummary {
+    func tooltip(rules: GameMetadata, item: FinancialStatement.CostItem) -> Tooltip {
         let (share, total): (share: Int64, total: Int64) = self.costs.reduce(into: (0, 0)) {
             if $1.key == item {
                 $0.share += $1.value
@@ -48,12 +53,12 @@ extension CashFlowStatement {
         }
     }
 
-    func chart(rules: GameMetadata) -> PieChart<CashFlowItem, ColorReference>? {
+    func chart(rules: GameMetadata) -> PieChart<FinancialStatement.CostItem, ColorReference>? {
         if self.costs.isEmpty {
             return nil
         }
 
-        var values: [(CashFlowItem, (Int64, ColorReference))] = self.costs.map {
+        var values: [(FinancialStatement.CostItem, (Int64, ColorReference))] = self.costs.map {
             let label: ColorReference?
 
             switch $0 {

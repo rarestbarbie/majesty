@@ -315,7 +315,7 @@ extension GameContext {
                 continue
             } else if pop.type.stratum > .Ward {
                 // free pops do not have shareholders
-                economy.count(output: pop, region: region)
+                economy.count(statement: stats.financial, region: region, free: pop)
                 continue
             }
             /// We compute this here, and not in `PopContext.compute`, so that its global
@@ -326,12 +326,21 @@ extension GameContext {
                 of: pop,
                 in: self.legalPass
             )
-            economy.count(output: pop.inventory.out, region: region, equity: equity)
+            economy.count(
+                statement: stats.financial,
+                region: region,
+                output: pop.inventory.out,
+                equity: equity,
+                industry: .slavery(pop.type.race),
+            )
             self.count(asset: pop.id.lei, equity: pop.equity)
             self.pops[i].update(equityStatistics: equity)
         }
         for i: Int in self.factories.indices {
-            let factory: Factory = self.factories.state[i]
+            let (factory, statement): (Factory, FinancialStatement) = {
+                ($0.state, $0.stats.financial)
+            } (self.factories[i])
+
             guard
             let region: RegionalAuthority = self.tiles[factory.tile]?.addResidentCount(
                 factory
@@ -343,12 +352,21 @@ extension GameContext {
                 of: factory,
                 in: self.legalPass
             )
-            economy.count(output: factory.inventory.out, region: region, equity: equity)
+            economy.count(
+                statement: statement,
+                region: region,
+                output: factory.inventory.out,
+                equity: equity,
+                industry: .factory(factory.type),
+            )
             self.count(asset: factory.id.lei, equity: factory.equity)
             self.factories[i].update(equityStatistics: equity)
         }
         for i: Int in self.buildings.indices {
-            let building: Building = self.buildings.state[i]
+            let (building, statement): (Building, FinancialStatement) = {
+                ($0.state, $0.stats.financial)
+            } (self.buildings[i])
+
             guard
             let region: RegionalAuthority = self.tiles[building.tile]?.addResidentCount(
                 building
@@ -360,7 +378,13 @@ extension GameContext {
                 of: building,
                 in: self.legalPass
             )
-            economy.count(output: building.inventory.out, region: region, equity: equity)
+            economy.count(
+                statement: statement,
+                region: region,
+                output: building.inventory.out,
+                equity: equity,
+                industry: .building(building.type),
+            )
             self.count(asset: building.id.lei, equity: building.equity)
             self.buildings[i].update(equityStatistics: equity)
         }
@@ -371,10 +395,7 @@ extension GameContext {
             #assert(counted != nil, "Mine \(mine.id) has no home tile!!!")
         }
 
-        return economy.aggregate(
-            localMarkets: world.localMarkets,
-            worldMarkets: world.worldMarkets,
-        )
+        return economy.aggregate()
     }
 }
 extension GameContext {
@@ -540,11 +561,12 @@ extension GameContext {
         }
     }
     private mutating func count(aggregating economy: EconomicLedger) {
-        let gdp: [Address: Double] = economy.produced.reduce(into: [:]) {
-            $0[$1.key.location, default: 0] += $1.value.value
+        var stats: [Address: EconomicStats] = [:]
+        for (key, value): (EconomicLedger.Regional<EconomicLedger.Industry>, Int64) in economy.valueAdded {
+            stats[key.location, default: .zero].gdp += value
         }
-        for (id, gdp): (Address, Double) in gdp {
-            self.tiles[id]?.update(gdp: gdp)
+        for (id, stats): (Address, EconomicStats) in stats {
+            self.tiles[id]?.update(economy: stats)
         }
     }
     private mutating func report(

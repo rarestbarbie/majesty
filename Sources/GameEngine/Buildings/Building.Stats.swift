@@ -3,28 +3,23 @@ import Assert
 extension Building {
     struct Stats {
         private(set) var utilization: Double
-        private(set) var cashFlow: CashFlowStatement
-        private(set) var profit: ProfitMargins
+        private(set) var financial: FinancialStatement
     }
 }
 extension Building.Stats {
     init() {
-        self.init(utilization: 0, cashFlow: .init(), profit: .undefined)
+        self.init(utilization: 0, financial: .init())
     }
 }
 extension Building.Stats {
-    mutating func update(from state: Building) {
-        if  let utilization: Double = state.inventory.out.utilization {
+    mutating func startIndexCount(_ building: Building) {
+        if  let utilization: Double = building.inventory.out.utilization {
             #assert(0 ... 1 ~= utilization, "Utilization must be between 0 and 1")
             self.utilization = utilization
         } else {
             self.utilization = 1
         }
 
-        self.cashFlow.reset()
-        self.cashFlow.update(with: state.inventory.l)
-        self.cashFlow.update(with: state.inventory.e)
-
-        self.profit = .compute(asset: state)
+        self.financial.update(from: building)
     }
 }

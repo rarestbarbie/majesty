@@ -139,8 +139,8 @@ extension TileContext {
     mutating func update(authority: DiplomaticAuthority) {
         self.authority = authority
     }
-    mutating func update(gdp: Double) {
-        self.stats.gdp = gdp
+    mutating func update(economy: EconomicStats) {
+        self.stats.economy = economy
     }
 
     mutating func afterIndexCount(world: borrowing GameWorld) {
@@ -172,7 +172,7 @@ extension TileContext {
     private static var history: Int { 5 * 365 }
     private var today: Tile.Aggregate {
         .init(
-            gdp: self.stats.gdp
+            gdp: self.stats.economy.gdp,
         )
     }
 
