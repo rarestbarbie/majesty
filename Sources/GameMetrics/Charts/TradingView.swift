@@ -1,4 +1,3 @@
-import ColorText
 import D
 import GameEconomy
 import GameIDs
@@ -77,7 +76,8 @@ extension TradingView {
                 style:
                     last.prices.c > last.prices.o ? .pos :
                     last.prices.c < last.prices.o ? .neg : nil
-            )
+            ),
+            digits: 3
         )
     }
 }

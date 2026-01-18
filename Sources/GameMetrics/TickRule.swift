@@ -1,4 +1,3 @@
-import ColorText
 import JavaScriptKit
 import JavaScriptInterop
 
@@ -6,7 +5,7 @@ import JavaScriptInterop
     let id: Int
     let value: Double
     let label: String
-    let style: ColorText.Style?
+    let style: Style?
 }
 extension TickRule: JavaScriptEncodable {
     @frozen public enum ObjectKey: JSString, Sendable {

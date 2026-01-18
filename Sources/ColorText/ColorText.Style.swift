@@ -5,8 +5,8 @@ extension ColorText {
         case neg
     }
 }
-extension ColorText.Style: Identifiable {
-    @inlinable public var id: String {
+extension ColorText.Style {
+    @inlinable public var tag: String {
         switch self {
         case .em: "em"
         case .pos: "ins"
@@ -14,8 +14,7 @@ extension ColorText.Style: Identifiable {
         }
     }
 }
+@available(*, deprecated, message: "Use 'tag' instead of 'description'")
 extension ColorText.Style: CustomStringConvertible {
-    @inlinable public var description: String {
-        self.id
-    }
+    @inlinable public var description: String { self.tag }
 }

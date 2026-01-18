@@ -43,6 +43,7 @@ extension PlanetDetails {
         self.gdpGraph.update(
             with: tile.history.suffix(365),
             date: cache.date,
+            digits: 4,
             linear: \.gdp
         )
     }
