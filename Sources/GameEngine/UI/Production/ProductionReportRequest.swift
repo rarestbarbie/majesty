@@ -1,5 +1,4 @@
 import GameIDs
-import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public struct ProductionReportRequest {

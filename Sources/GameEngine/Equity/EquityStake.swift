@@ -1,6 +1,5 @@
 import GameEconomy
 import GameState
-import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public struct EquityStake<ID>: Identifiable, Equatable, Hashable

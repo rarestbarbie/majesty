@@ -1,6 +1,5 @@
 import GameIDs
 import JavaScriptInterop
-import JavaScriptKit
 
 extension PopulationReport {
     @StringUnion @frozen public enum Filter: Equatable, Hashable {

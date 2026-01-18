@@ -2,7 +2,6 @@ import GameIDs
 import GameState
 import HexGrids
 import JavaScriptInterop
-import JavaScriptKit
 
 struct Minimap: Sendable {
     let id: PlanetID

@@ -1,6 +1,5 @@
 import GameIDs
 import JavaScriptInterop
-import JavaScriptKit
 
 extension ProductionReport {
     @StringUnion @frozen public enum Filter: Equatable, Hashable {

@@ -1,7 +1,6 @@
 import Color
 import GameIDs
 import HexGrids
-import JavaScriptKit
 import JavaScriptInterop
 
 struct PlanetMapTile: Identifiable {

@@ -1,6 +1,5 @@
 import Color
 import GameIDs
-import JavaScriptKit
 import JavaScriptInterop
 import Vector
 

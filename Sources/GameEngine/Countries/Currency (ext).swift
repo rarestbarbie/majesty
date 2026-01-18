@@ -1,6 +1,5 @@
 import GameIDs
 import JavaScriptInterop
-import JavaScriptKit
 
 extension Currency {
     var label: CurrencyLabel {

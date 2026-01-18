@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public enum CashAllocationItem: Unicode.Scalar, CaseIterable {
     case buybacks = "b"

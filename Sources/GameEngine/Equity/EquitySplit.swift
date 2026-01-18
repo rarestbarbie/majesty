@@ -1,6 +1,5 @@
 import GameIDs
 import JavaScriptInterop
-import JavaScriptKit
 
 struct EquitySplit {
     let code: Int64

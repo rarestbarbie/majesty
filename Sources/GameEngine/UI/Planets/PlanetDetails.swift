@@ -4,7 +4,6 @@ import D
 import GameIDs
 import GameMetrics
 import GameUI
-import JavaScriptKit
 import JavaScriptInterop
 import VectorCharts
 

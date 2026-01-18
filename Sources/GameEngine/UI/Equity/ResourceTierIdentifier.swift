@@ -1,5 +1,4 @@
 import Bijection
-import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public enum ResourceTierIdentifier {

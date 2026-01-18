@@ -1,7 +1,6 @@
 import Color
 import GameIDs
 import JavaScriptInterop
-import JavaScriptKit
 
 /// In Majesty, everything is a planet, even stars and moons.
 @frozen public struct Planet: Identifiable {

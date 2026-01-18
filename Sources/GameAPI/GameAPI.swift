@@ -140,7 +140,7 @@ extension GameAPI {
         self[.gregorian] = GameDateComponents.init(_:)
         self[.contextMenu] = { try Self.ui?.contextMenu(type: $0, with: .init(array: $1)) }
         self[.tooltip] = { try Self.ui?.tooltip(type: $0, with: .init(array: $1)) }
-        self[.orbit] = { Self.ui?.orbit($0) }
+        self[.orbit] = { Self.ui?.orbit($0)?.rendered() }
     }
 
     private func heartbeats() async throws {

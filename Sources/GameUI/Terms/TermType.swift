@@ -1,6 +1,5 @@
 internal import Bijection
 import GameIDs
-import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public enum TermType: Equatable, Hashable {

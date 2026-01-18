@@ -2,7 +2,6 @@ import GameEconomy
 import GameIDs
 import GameRules
 import GameTerrain
-import JavaScriptKit
 import JavaScriptInterop
 import Random
 import OrderedCollections

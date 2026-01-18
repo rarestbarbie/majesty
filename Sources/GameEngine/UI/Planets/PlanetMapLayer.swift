@@ -1,6 +1,5 @@
 import Bijection
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public enum PlanetMapLayer: CaseIterable {
     case Terrain

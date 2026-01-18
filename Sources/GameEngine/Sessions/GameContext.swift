@@ -6,7 +6,6 @@ import GameRules
 import GameState
 import GameTerrain
 import HexGrids
-import JavaScriptKit
 import OrderedCollections
 
 struct GameContext {

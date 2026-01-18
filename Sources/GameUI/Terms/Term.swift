@@ -1,7 +1,5 @@
 import ColorText
 import D
-
-import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public struct Term {

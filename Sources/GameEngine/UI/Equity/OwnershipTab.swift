@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptInterop
 import GameUI
 
 protocol OwnershipTab: ConvertibleToJSValue, Sendable {

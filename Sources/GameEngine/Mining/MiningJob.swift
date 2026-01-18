@@ -1,6 +1,5 @@
 import GameIDs
 import GameEconomy
-import JavaScriptKit
 import JavaScriptInterop
 
 struct MiningJob: PopJob, Identifiable {

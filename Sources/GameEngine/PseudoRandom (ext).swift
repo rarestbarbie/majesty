@@ -1,4 +1,3 @@
-import JavaScriptKit
 import JavaScriptInterop
 import Random
 

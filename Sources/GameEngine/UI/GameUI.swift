@@ -1,6 +1,5 @@
 import GameClock
 import GameIDs
-import JavaScriptKit
 import JavaScriptInterop
 
 public struct GameUI: Sendable {

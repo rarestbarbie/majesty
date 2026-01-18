@@ -1,4 +1,3 @@
-import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public enum PlanetType: String, ConvertibleToJSValue, LoadableFromJSValue {

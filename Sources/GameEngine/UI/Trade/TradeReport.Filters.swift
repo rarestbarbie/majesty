@@ -1,6 +1,5 @@
 import GameEconomy
 import JavaScriptInterop
-import JavaScriptKit
 
 extension TradeReport {
     struct Filters: Equatable, Hashable {

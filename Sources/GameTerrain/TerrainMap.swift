@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public struct TerrainMap {
     public let planets: [Planet]

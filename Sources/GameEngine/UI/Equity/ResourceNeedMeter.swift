@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 struct ResourceNeedMeter {
     let id: ResourceTierIdentifier

@@ -3,7 +3,6 @@ import GameIDs
 import GameRules
 import HexGrids
 import JavaScriptInterop
-import JavaScriptKit
 import VectorCharts
 
 struct NavigatorTile: Sendable {

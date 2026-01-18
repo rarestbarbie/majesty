@@ -1,5 +1,4 @@
 import GameIDs
-import JavaScriptKit
 import JavaScriptInterop
 
 @StringUnion @frozen public enum InventoryLine: Equatable, Hashable {
