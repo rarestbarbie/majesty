@@ -105,6 +105,7 @@ extension TickRuleAssignable {
             return []
         }
 
+        var tick: Int = current.count
         var ticks: [TickRule] = []
         ;   ticks.reserveCapacity(Int.init(steps.last - steps.first) + current.count)
 
@@ -113,17 +114,18 @@ extension TickRuleAssignable {
             let linear: Decimal? = .init(rounding: y, digits: digits)
             ticks.append(
                 TickRule.init(
-                    id: 1 + Int.init(i - steps.first),
+                    id: tick,
                     value: transform(y),
                     label: nil,
                     text: linear.map { "\($0[..][.financial])" } ?? "",
                 )
             )
+            tick += 1
         }
-        for (y, label): (Double, ColorReference?) in current {
+        for (id, (y, label)): (Int, (Double, ColorReference?)) in current.enumerated() {
             ticks.append(
                 TickRule.init(
-                    id: 0,
+                    id: id,
                     value: transform(y),
                     label: label,
                     text: Decimal.init(rounding: y, digits: digits).map {
