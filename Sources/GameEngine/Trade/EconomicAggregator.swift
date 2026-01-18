@@ -6,13 +6,15 @@ import GameState
 import OrderedCollections
 
 struct EconomicAggregator: ~Copyable {
-    private var produced: [EconomicLedger.Regional: (units: Int64, tradeable: CurrencyID?)]
+    private var valueAdded: [EconomicLedger.Regional<EconomicLedger.Industry>: Int64]
+    private var production: [EconomicLedger.Regional<Resource>: (units: Int64, value: Int64)]
     // These must be ordered, because floating point summation is not associative.
     private var cultural: OrderedDictionary<EconomicLedger.National<CultureID>, Double>
     private var gendered: OrderedDictionary<EconomicLedger.National<Gender>, Double>
 
     init() {
-        self.produced = [:]
+        self.valueAdded = [:]
+        self.production = [:]
         self.cultural = [:]
         self.gendered = [:]
     }
@@ -23,136 +25,74 @@ extension EconomicAggregator {
         region: RegionalAuthority,
         tradeable: Bool
     ) {
-        let currency: CurrencyID? = tradeable ? region.country.currency.id : nil
-        let produced: Int64 = tradeable ? output.units.added : output.unitsSold
-        self.produced[region.id / output.id, default: (0, currency)].units += produced
-    }
-    private mutating func countNational(
-        output: ResourceOutput,
-        region: RegionalAuthority,
-        tradeable: Bool,
-        country: CountryID,
-        profile: PopType
-    ) {
-        let produced: Double = .init(tradeable ? output.units.added : output.unitsSold)
-        let location: Address? = tradeable ? nil : region.id
-
-        let cultureKey: EconomicLedger.National<CultureID> = .init(
-            resource: output.id,
-            location: location,
-            country: country,
-            owner: profile.race
-        )
-        self.cultural[cultureKey, default: 0] += produced
-        let genderKey: EconomicLedger.National<Gender> = .init(
-            resource: output.id,
-            location: location,
-            country: country,
-            owner: profile.gender
-        )
-        self.gendered[genderKey, default: 0] += produced
+        {
+            $0.units += tradeable ? output.units.added : output.unitsSold
+            $0.value += output.valueProduced
+        } (&self.production[region.id / output.id, default: (0, 0)])
     }
 }
 extension EconomicAggregator {
     mutating func count(
-        output: ResourceOutputs,
+        statement: FinancialStatement,
         region: RegionalAuthority,
+        output: ResourceOutputs,
         equity: Equity<LEI>.Statistics,
+        industry: EconomicLedger.Industry,
     ) {
         let country: CountryID = region.occupiedBy
-        for (tradeable, output): (tradeable: Bool, ResourceOutput) in output.joined {
-            self.countRegional(output: output, region: region, tradeable: tradeable)
+        let value: Int64 = statement.valueAdded
 
-            let share: Double = Double.init(
-                (tradeable ? output.units.added : output.unitsSold) %/ equity.shareCount
+        self.valueAdded[region.id / industry, default: 0] += value
+
+        for (tradeable, output): (tradeable: Bool, ResourceOutput) in output.joined {
+            self.countRegional(
+                output: output,
+                region: region,
+                tradeable: tradeable
             )
+
+            let share: Double = Double.init(value %/ equity.shareCount)
             for owner: Equity<LEI>.Statistics.Shareholder in equity.owners {
                 let owned: Double = Double.init(owner.shares) * share
-                let location: Address? = tradeable ? nil : region.id
 
-                if  let culture: CultureID = owner.culture {
-                    let cultureKey: EconomicLedger.National<CultureID> = .init(
-                        resource: output.id,
-                        location: location,
-                        country: country,
-                        owner: culture
-                    )
-                    self.cultural[cultureKey, default: 0] += owned
-                }
+                self.cultural[country / owner.culture, default: 0] += owned
                 if  let gender: Gender = owner.gender {
-                    let genderKey: EconomicLedger.National<Gender> = .init(
-                        resource: output.id,
-                        location: location,
-                        country: country,
-                        owner: gender
-                    )
-                    self.gendered[genderKey, default: 0] += owned
+                    self.gendered[country / gender, default: 0] += owned
                 }
             }
         }
     }
     /// Miners are never enslaved, so no equity breakdown is necessary.
     mutating func count(
-        output pop: Pop,
+        statement: FinancialStatement,
         region: RegionalAuthority,
+        free pop: Pop,
     ) {
         let country: CountryID = region.occupiedBy
+        let value: Double = Double.init(statement.valueAdded)
+
+        self.cultural[country / pop.type.race, default: 0] += value
+        self.gendered[country / pop.type.gender, default: 0] += value
+
         for (tradeable, output): (tradeable: Bool, ResourceOutput) in pop.inventory.out.joined {
-            self.countRegional(
-                output: output,
-                region: region,
-                tradeable: tradeable
-            )
-            self.countNational(
-                output: output,
-                region: region,
-                tradeable: tradeable,
-                country: country,
-                profile: pop.type
-            )
+            let valueAdded: Int64 = output.valueProduced
+
+            self.valueAdded[region.id / .artisan(output.id), default: 0] += valueAdded
+            self.countRegional(output: output, region: region, tradeable: tradeable)
         }
         for mining: MiningJob in pop.mines.values {
             for (tradeable, output): (tradeable: Bool, ResourceOutput) in mining.out.joined {
-                self.countRegional(
-                    output: output,
-                    region: region,
-                    tradeable: tradeable
-                )
-                self.countNational(
-                    output: output,
-                    region: region,
-                    tradeable: tradeable,
-                    country: country,
-                    profile: pop.type
-                )
+                let valueAdded: Int64 = output.valueProduced
+
+                self.valueAdded[region.id / .artisan(output.id), default: 0] += valueAdded
+                self.countRegional(output: output, region: region, tradeable: tradeable)
             }
         }
     }
 
-    consuming func aggregate(
-        localMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>,
-        worldMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>,
-    ) -> EconomicLedger {
-        let produced: OrderedDictionary<
-            EconomicLedger.Regional,
-            (units: Int64, value: Double)
-        > = .init(
-            uniqueKeysWithValues: self.produced.lazy.map {
-                let value: Double
-                if  let currency: CurrencyID = $1.tradeable {
-                    let price: Double = worldMarkets[$0.resource / currency]?.price ?? 0
-                    value = Double.init($1.units) * price
-                } else if
-                    let price: LocalPrice = localMarkets[$0.resource / $0.location]?.today.bid {
-                    value = Double.init($1.units) * Double.init(price.value)
-                } else {
-                    value = 0
-                }
-                return ($0, (units: $1.units, value: value))
-            }
-        )
+    consuming func aggregate() -> EconomicLedger {
         return .init(
-            produced: produced,
+            production: self.production,
             cultural: self.cultural,
             gendered: self.gendered
         )

@@ -37,8 +37,7 @@ extension OwnershipBreakdown {
                 let label: ColorReference = .color(country.name.color)
                 $0.country[country.id, default: (0, label)].share += $1.shares
             }
-            if  let culture: CultureID = $1.culture,
-                let culture: Culture = context.rules.pops.cultures[culture] {
+            if  let culture: Culture = context.rules.pops.cultures[$1.culture] {
                 let label: ColorReference = .color(culture.color)
                 $0.culture[culture.id, default: (0, label)].share += $1.shares
             }

@@ -74,6 +74,8 @@ extension FactoryContext {
             self.workers = .empty
             self.clerks = .empty
         }
+
+        self.stats.startIndexCount(self.state)
     }
 
     mutating func addWorkforceCount(pop: Pop, job: FactoryJob) {
@@ -101,8 +103,7 @@ extension FactoryContext {
     mutating func update(equityStatistics: Equity<LEI>.Statistics) {
         self.equity = equityStatistics
     }
-}
-extension FactoryContext {
+
     mutating func afterIndexCount(
         world _: borrowing GameWorld,
         context: ComputationPass
@@ -119,7 +120,7 @@ extension FactoryContext {
             return
         }
 
-        self.stats.update(from: self.state, in: region)
+        self.stats.afterIndexCount(self.state, in: region)
     }
 }
 extension FactoryContext: TransactingContext {
@@ -214,7 +215,7 @@ extension FactoryContext: TransactingContext {
             let utilization: Double = min(1, Double.init(workers.count %/ workers.limit))
 
             // update profitability based on yesterday’s profit margins
-            self.state.z.mix(profitability: self.stats.profit.π)
+            self.state.z.mix(profitability: self.stats.financial.profit.π)
 
             weights.segmented = .business(
                 l: self.state.inventory.l,
@@ -375,13 +376,14 @@ extension FactoryContext: TransactingContext {
 
                 //  note that this is yesterday’s profit, since profit for today has not yet
                 //  been computed, but hopefully this is still responsive enough
+                let profit: FinancialStatement.Profit = self.stats.financial.profit
                 if  workers.count > 0,
-                    self.stats.profit.contribution < 0 ||
+                    profit.contribution < 0 ||
                     self.stats.utilization < Self.utilizationThreshold {
                     let fire: Int64
                     if  workers.count == 1, self.clerks?.count ?? 0 == 0 {
                         // the other branch would never fire the last worker
-                        if  turn.random.roll(1, self.stats.profit.gross < 0 ? 7 : 30) {
+                        if  turn.random.roll(1, profit.gross < 0 ? 7 : 30) {
                             fire = 1
                         } else {
                             fire = 0
@@ -389,11 +391,11 @@ extension FactoryContext: TransactingContext {
                     } else {
                         /// Fire up to 40% of workers based on marginal profitability.
                         /// If gross profit is also negative, this happens more quickly.
-                        let p: Double = -0.4 * self.stats.profit.π
+                        let p: Double = -0.4 * profit.π
                         let q: Double = 1 - self.stats.utilization
                         let l: Double = max(0, p, q)
                         let firable: Int64 = .init(l * Double.init(workers.count))
-                        if  firable > 0, self.stats.profit.gross < 0 || turn.random.roll(1, 3) {
+                        if  firable > 0, profit.gross < 0 || turn.random.roll(1, 3) {
                             fire = .random(in: 0 ... firable, using: &turn.random.generator)
                         } else {
                             fire = 0

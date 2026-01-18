@@ -5,8 +5,8 @@ extension Pop {
     struct Stats {
         private(set) var employmentBeforeEgress: Double
         private(set) var employedBeforeEgress: Int64
-        private(set) var cashFlow: CashFlowStatement
-        private(set) var profit: ProfitMargins
+        private(set) var financial: FinancialStatement
+        private(set) var consumption: Int64
     }
 }
 extension Pop.Stats {
@@ -14,13 +14,13 @@ extension Pop.Stats {
         self.init(
             employmentBeforeEgress: 0,
             employedBeforeEgress: 0,
-            cashFlow: .init(),
-            profit: .undefined,
+            financial: .init(),
+            consumption: 0
         )
     }
 }
 extension Pop.Stats {
-    mutating func update(from pop: Pop) {
+    mutating func startIndexCount(_ pop: Pop) {
         // we assume if a pop produces a local resource, it doesn’t work as an employee
         if  let utilization: Double = pop.inventory.out.utilization {
             self.employmentBeforeEgress = utilization
@@ -46,11 +46,6 @@ extension Pop.Stats {
 
         #assert(0 ... 1 ~= self.employmentBeforeEgress, "Employment must be between 0 and 1")
 
-        self.cashFlow.reset()
-        self.cashFlow.update(with: pop.inventory.l)
-        self.cashFlow.update(with: pop.inventory.e)
-        self.cashFlow.update(with: pop.inventory.x)
-
-        self.profit = .compute(asset: pop)
+        self.consumption = self.financial.update(from: pop)
     }
 }

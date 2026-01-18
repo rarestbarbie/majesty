@@ -33,7 +33,7 @@ extension Equity<LEI>.Statistics {
         return .init(
             owners: equity.shares.values.reduce(into: []) {
                 let country: CountryID
-                let culture: CultureID?
+                let culture: CultureID
                 let gender: Gender?
 
                 switch $1.id {
@@ -47,27 +47,11 @@ extension Equity<LEI>.Statistics {
                     culture = context.state.culturePreferred
                     gender = nil
 
-                case .building(let id):
-                    guard
-                    let building: BuildingContext = context.buildings[id],
-                    let region: RegionalProperties = building.region else {
-                        return
-                    }
+                case .building:
+                    fatalError("Buildings may not own equity!!!")
 
-                    country = region.occupiedBy
-                    culture = nil
-                    gender = nil
-
-                case .factory(let id):
-                    guard
-                    let factory: FactoryContext = context.factories[id],
-                    let region: RegionalProperties = factory.region else {
-                        return
-                    }
-
-                    country = region.occupiedBy
-                    culture = nil
-                    gender = nil
+                case .factory:
+                    fatalError("Factories may not own equity!!!")
 
                 case .pop(let id):
                     guard

@@ -1,3 +1,4 @@
+import Color
 import ColorReference
 import D
 import GameIDs
@@ -35,7 +36,7 @@ extension PlanetDetails {
     mutating func update(from tile: TileSnapshot, in cache: borrowing GameUI.Cache) {
         self.tile = tile
         self.terms = Term.list {
-            $0[.gdp, (+), tooltip: .TileGDP] = tile.Δ.stats.gdp[/3..2]
+            $0[.gdp, (+), tooltip: .TileGDP] = tile.Δ.stats.economy.gdp[/3]
         }
         self.gdp = cache.ledger.breakdownGDP(
             rules: cache.rules,
@@ -44,9 +45,10 @@ extension PlanetDetails {
         self.gdpGraph.update(
             with: tile.history.suffix(365),
             date: cache.date,
-            digits: 4,
-            linear: \.gdp
-        )
+            digits: 4
+        ) {
+            Double.init($0.gdp)
+        }
     }
 }
 extension PlanetDetails: JavaScriptEncodable {

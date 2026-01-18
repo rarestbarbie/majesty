@@ -4,19 +4,19 @@ import JavaScriptInterop
 
 extension Tile {
     struct Stats {
+        var economy: EconomicStats
         var pops: PopulationStats
-        var gdp: Double
     }
 }
 extension Tile.Stats {
     init() {
-        self.init(pops: .init(), gdp: 0)
+        self.init(economy: .init(gdp: 0), pops: .init())
     }
 }
 extension Tile.Stats {
     mutating func startIndexCount() {
+        self.economy.startIndexCount()
         self.pops.startIndexCount()
-        self.gdp = 0
     }
 }
 extension Tile.Stats {
@@ -25,7 +25,7 @@ extension Tile.Stats {
         case pops_employed = "pW"
         case pops_enslaved = "pE"
         case pops_free = "pF"
-        case gdp
+        case economy_gdp = "eG"
     }
 }
 extension Tile.Stats: JavaScriptEncodable {
@@ -34,12 +34,15 @@ extension Tile.Stats: JavaScriptEncodable {
         js[.pops_employed] = self.pops.employed
         js[.pops_enslaved] = self.pops.enslaved
         js[.pops_free] = self.pops.free
-        js[.gdp] = self.gdp
+        js[.economy_gdp] = self.economy.gdp
     }
 }
 extension Tile.Stats: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
+            economy: .init(
+                gdp: try js[.economy_gdp].decode()
+            ),
             pops: .init(
                 occupation: try js[.pops_occupation].decode(
                     with: \[PopOccupation: PopulationStats.Row].Sorted.dictionary
@@ -48,7 +51,6 @@ extension Tile.Stats: JavaScriptDecodable {
                 enslaved: try js[.pops_enslaved].decode(),
                 free: try js[.pops_free].decode(),
             ),
-            gdp: try js[.gdp].decode()
         )
     }
 }

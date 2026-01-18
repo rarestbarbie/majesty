@@ -53,8 +53,7 @@ extension PopContext {
 }
 extension PopContext {
     mutating func startIndexCount() {
-        // computed during indexing, because the index pass uses it
-        self.stats.update(from: self.state)
+        self.stats.startIndexCount(self.state)
     }
 
     mutating func addPosition(asset: LEI, value: Int64) {
@@ -67,8 +66,7 @@ extension PopContext {
     mutating func update(equityStatistics: Equity<LEI>.Statistics) {
         self.equity = equityStatistics
     }
-}
-extension PopContext {
+
     mutating func afterIndexCount(
         world _: borrowing GameWorld,
         context: ComputationPass
@@ -125,7 +123,7 @@ extension PopContext: AllocatingContext {
         }
 
         if case .Ward = self.state.type.stratum {
-            let π: Double = self.stats.profit.π
+            let π: Double = self.stats.financial.profit.π
             self.state.z.mix(profitability: π)
 
             if  let units: Int64 = self.state.backgroundable(base: π, random: &turn.random) {

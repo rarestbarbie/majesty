@@ -81,7 +81,7 @@ extension LegalEntitySnapshot {
         let (share, total): (share: Int64, total: Int64) = self.equity.owners.reduce(
             into: (0, 0)
         ) {
-            if case culture.id? = $1.culture {
+            if  $1.culture == culture.id {
                 $0.share += $1.shares
             }
 

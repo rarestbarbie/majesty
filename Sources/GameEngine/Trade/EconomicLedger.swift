@@ -7,16 +7,19 @@ import OrderedCollections
 import VectorCharts
 
 struct EconomicLedger {
-    let produced: OrderedDictionary<Regional, (units: Int64, value: Double)>
+    let valueAdded: [Regional<Industry>: Int64]
+    let production: [Regional<Resource>: (units: Int64, value: Int64)]
     let cultural: OrderedDictionary<National<CultureID>, Double>
     let gendered: OrderedDictionary<National<Gender>, Double>
 
     init(
-        produced: OrderedDictionary<Regional, (units: Int64, value: Double)> = [:],
+        valueAdded: [Regional<Industry>: Int64] = [:],
+        production: [Regional<Resource>: (units: Int64, value: Int64)] = [:],
         cultural: OrderedDictionary<National<CultureID>, Double> = [:],
         gendered: OrderedDictionary<National<Gender>, Double> = [:]
     ) {
-        self.produced = produced
+        self.valueAdded = valueAdded
+        self.production = production
         self.cultural = cultural
         self.gendered = gendered
     }
@@ -26,14 +29,13 @@ extension EconomicLedger {
         rules: GameMetadata,
         region: Address
     ) -> PieChart<Resource, ColorReference> {
-        var values: [(Resource, (Double, ColorReference))] = self.produced.compactMap {
+        var values: [(Resource, (Int64, ColorReference))] = self.production.compactMap {
             guard $0.location == region else {
                 return nil
             }
-            return ($0.resource, ($1.value, .color(rules.resources[$0.resource].color)))
+            return ($0.crosstab, ($1.value, .color(rules.resources[$0.crosstab].color)))
         }
         values.sort { $0.0 < $1.0 }
         return .init(values: values)
     }
 }
-

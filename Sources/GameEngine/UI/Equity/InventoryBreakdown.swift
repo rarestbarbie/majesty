@@ -15,7 +15,7 @@ struct InventoryBreakdown<Tab>: Sendable where Tab: InventoryTab {
     private var needs: [ResourceNeed]
     private var sales: [ResourceSale]
     private var terms: [Term]
-    private var costs: PieChart<CashFlowItem, ColorReference>?
+    private var costs: PieChart<FinancialStatement.CostItem, ColorReference>?
     private var budget: PieChart<CashAllocationItem, ColorReference>?
 
     init(focus: ResourceTierIdentifier) {
@@ -59,10 +59,10 @@ extension InventoryBreakdown {
 
             $0[.active, +, tooltip: .PopActive, help: .PopActiveHelp] = pop.Δ.active[/3]
             $0[.vacant, -, tooltip: .PopVacant, help: .PopVacantHelp] = pop.Δ.vacant[/3]
-            $0[.profit, +, tooltip: nil, help: nil] = +pop.stats.profit.π[%1]
+            $0[.profit, +, tooltip: nil, help: nil] = +pop.stats.financial.profit.π[%1]
         }
 
-        self.costs = pop.stats.cashFlow.chart(rules: cache.rules)
+        self.costs = pop.stats.financial.costs.chart(rules: cache.rules)
         if  let budget: Pop.Budget = pop.budget {
             let statement: CashAllocationStatement = .init(from: budget)
             self.budget = statement.chart()
@@ -122,7 +122,7 @@ extension InventoryBreakdown {
             }
         }
 
-        self.costs = factory.stats.cashFlow.chart(rules: cache.rules)
+        self.costs = factory.stats.financial.costs.chart(rules: cache.rules)
 
 
         switch factory.budget {
@@ -169,10 +169,10 @@ extension InventoryBreakdown {
             let Δ: Delta<Building.Dimensions> = building.Δ
             $0[.active, +, tooltip: .BuildingActive, help: .BuildingActiveHelp] = Δ.active[/3]
             $0[.vacant, -, tooltip: .BuildingVacant, help: .BuildingVacantHelp] = Δ.vacant[/3]
-            $0[.profit, +, tooltip: nil, help: nil] = +building.stats.profit.π[%1]
+            $0[.profit, +, tooltip: nil, help: nil] = +building.stats.financial.profit.π[%1]
         }
 
-        self.costs = building.stats.cashFlow.chart(rules: cache.rules)
+        self.costs = building.stats.financial.costs.chart(rules: cache.rules)
         self.budget = building.budget.map {
             let statement: CashAllocationStatement = .init(from: $0)
             return statement.chart()
