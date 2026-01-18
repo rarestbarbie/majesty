@@ -92,6 +92,7 @@ extension EconomicAggregator {
 
     consuming func aggregate() -> EconomicLedger {
         return .init(
+            valueAdded: self.valueAdded,
             production: self.production,
             cultural: self.cultural,
             gendered: self.gendered
