@@ -1,24 +1,25 @@
+import ColorReference
 import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public struct TickRule {
     let id: Int
     let value: Double
-    let label: String
-    let style: Style?
+    let label: ColorReference?
+    let text: String
 }
 extension TickRule: JavaScriptEncodable {
     @frozen public enum ObjectKey: JSString, Sendable {
         case id
         case value = "y"
-        case label = "l"
-        case style = "s"
+        case label
+        case text
     }
 
     public func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.id] = self.id
         js[.value] = self.value
         js[.label] = self.label
-        js[.style] = self.style?.id
+        js[.text] = self.text
     }
 }

@@ -1,3 +1,4 @@
+import ColorReference
 import D
 import GameIDs
 import GameRules
@@ -24,12 +25,12 @@ extension EconomicLedger {
     func breakdownGDP(
         rules: GameMetadata,
         region: Address
-    ) -> PieChart<Resource, PieChartLabel> {
-        var values: [(Resource, (Double, PieChartLabel))] = self.produced.compactMap {
+    ) -> PieChart<Resource, ColorReference> {
+        var values: [(Resource, (Double, ColorReference))] = self.produced.compactMap {
             guard $0.location == region else {
                 return nil
             }
-            return ($0.resource, ($1.value, rules.resources[$0.resource].label.pieChart))
+            return ($0.resource, ($1.value, .color(rules.resources[$0.resource].color)))
         }
         values.sort { $0.0 < $1.0 }
         return .init(values: values)

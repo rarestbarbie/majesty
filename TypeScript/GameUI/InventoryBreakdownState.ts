@@ -1,6 +1,6 @@
 import { TermState } from '../DOM/exports.js';
 import {
-    PieChartSector,
+    PieChartSectorState,
     ResourceNeed,
     ResourceNeedMeterState,
     ResourceSale
@@ -13,6 +13,6 @@ export interface InventoryBreakdownState<Type extends string> {
     readonly needs: ResourceNeed[];
     readonly sales: ResourceSale[];
     readonly terms: TermState[];
-    readonly costs?: PieChartSector<string>[];
-    readonly budget?: PieChartSector<string>[];
+    readonly costs?: PieChartSectorState<string>[];
+    readonly budget?: PieChartSectorState<string>[];
 }

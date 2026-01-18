@@ -8,10 +8,5 @@ struct ResourceLabel: Equatable, Identifiable {
     let color: Color
 }
 extension ResourceLabel {
-    var pieChart: PieChartLabel {
-        .init(color: self.color, name: self.title)
-    }
-}
-extension ResourceLabel {
     var nameWithIcon: String { "\(self.icon) \(self.title)" }
 }

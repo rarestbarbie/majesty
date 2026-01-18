@@ -1,3 +1,4 @@
+import ColorReference
 import D
 import GameIDs
 import GameUI
@@ -7,9 +8,9 @@ import VectorCharts
 import VectorCharts_JavaScript
 
 struct OwnershipBreakdown<Tab>: Sendable where Tab: OwnershipTab {
-    private var country: PieChart<CountryID, PieChartLabel>?
-    private var culture: PieChart<CultureID, PieChartLabel>?
-    private var gender: PieChart<Gender?, PieChartLabel>?
+    private var country: PieChart<CountryID, ColorReference>?
+    private var culture: PieChart<CultureID, ColorReference>?
+    private var gender: PieChart<Gender?, ColorReference>?
     private var terms: [Term]
 
     init() {
@@ -26,32 +27,26 @@ extension OwnershipBreakdown {
     ) {
         let equity: Equity<LEI>.Snapshot = asset.equity
         let (country, culture, gender): (
-            country: [CountryID: (share: Int64, PieChartLabel)],
-            culture: [CultureID: (share: Int64, PieChartLabel)],
-            gender: [Gender?: (share: Int64, PieChartLabel)]
+            country: [CountryID: (share: Int64, ColorReference)],
+            culture: [CultureID: (share: Int64, ColorReference)],
+            gender: [Gender?: (share: Int64, ColorReference)]
         ) = equity.owners.reduce(
             into: ([:], [:], [:])
         ) {
             if  let country: Country = context.countries[$1.country] {
-                let label: PieChartLabel = .init(
-                    color: country.name.color,
-                    name: country.name.short
-                )
+                let label: ColorReference = .color(country.name.color)
                 $0.country[country.id, default: (0, label)].share += $1.shares
             }
             if  let culture: CultureID = $1.culture,
                 let culture: Culture = context.rules.pops.cultures[culture] {
-                let label: PieChartLabel = .init(color: culture.color, name: culture.name)
+                let label: ColorReference = .color(culture.color)
                 $0.culture[culture.id, default: (0, label)].share += $1.shares
             }
             if  let gender: Gender = $1.gender {
-                let label: PieChartLabel = .init(
-                    style: gender.code.name,
-                    name: gender.singularTabular
-                )
+                let label: ColorReference = .style(gender.code.name)
                 $0.gender[gender, default: (0, label)].share += $1.shares
             } else {
-                let label: PieChartLabel = .init(style: "NONE", name: "None")
+                let label: ColorReference = .style("NONE")
                 $0.gender[nil, default: (0, label)].share += $1.shares
             }
         }

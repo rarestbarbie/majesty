@@ -83,6 +83,13 @@ let package: Package = .init(
         .target(
             name: "Color",
         ),
+        .target(
+            name: "ColorReference",
+            dependencies: [
+                .target(name: "Color"),
+                .target(name: "JavaScriptInterop"),
+            ]
+        ),
 
         .target(
             name: "ColorText",
@@ -176,6 +183,8 @@ let package: Package = .init(
         .target(
             name: "GameMetrics",
             dependencies: [
+                .target(name: "Color"),
+                .target(name: "ColorReference"),
                 .target(name: "GameEconomy"),
                 .target(name: "JavaScriptInterop"),
                 .product(name: "D", package: "d"),
@@ -186,6 +195,7 @@ let package: Package = .init(
             name: "GameRules",
             dependencies: [
                 .target(name: "Color"),
+                .target(name: "ColorReference"),
                 .target(name: "GameIDs"),
                 .target(name: "GameEconomy"),
                 .target(name: "JavaScriptInterop"),

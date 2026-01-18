@@ -228,11 +228,11 @@ div.ticks {
     }
 
     > div[data-id='0'] {
-        &[data-style='pos'] {
+        &.pos {
             --bg: var(--color-pos-fill);
             --fg: black;
         }
-        &[data-style='neg'] {
+        &.neg {
             --bg: var(--color-neg-fill);
             --fg: white;
         }
