@@ -1,5 +1,4 @@
 import GameEconomy
-import JavaScriptKit
 import JavaScriptInterop
 
 extension LocalMarkets.Settings {

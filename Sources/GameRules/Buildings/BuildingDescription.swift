@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 struct BuildingDescription {
     let operations: SymbolTable<Int64>

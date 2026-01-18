@@ -1,6 +1,5 @@
 import GameIDs
 import JavaScriptInterop
-import JavaScriptKit
 
 struct MineDescription {
     let miner: Symbol

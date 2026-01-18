@@ -1,6 +1,5 @@
 import Fraction
 import GameEconomy
-import JavaScriptKit
 import JavaScriptInterop
 
 extension WorldMarkets.Settings {

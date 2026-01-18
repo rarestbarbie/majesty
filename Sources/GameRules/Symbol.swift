@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public struct Symbol: Hashable {
     public let name: String

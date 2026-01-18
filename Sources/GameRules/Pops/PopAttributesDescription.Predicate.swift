@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 extension PopAttributesDescription {
     enum Predicate {

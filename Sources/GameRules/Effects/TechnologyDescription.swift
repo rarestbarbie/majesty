@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 struct TechnologyDescription {
     let starter: Bool

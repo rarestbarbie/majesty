@@ -1,6 +1,5 @@
 import D
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public struct SpawnWeight: Hashable, Equatable {
     public let rate: Exact

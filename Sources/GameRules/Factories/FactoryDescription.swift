@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 struct FactoryDescription {
     let materials: SymbolTable<Int64>
