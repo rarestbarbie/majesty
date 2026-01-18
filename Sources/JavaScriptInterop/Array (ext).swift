@@ -1,5 +1,3 @@
-import JavaScriptKit
-
 extension Array: LoadableFromJSArray, LoadableFromJSValue where Element: LoadableFromJSValue {
     @inlinable public static func load(
         from js: borrowing JavaScriptDecoder<JavaScriptArrayKey>

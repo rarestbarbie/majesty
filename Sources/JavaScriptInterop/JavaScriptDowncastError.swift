@@ -1,6 +1,3 @@
-
-import JavaScriptKit
-
 @frozen public struct JavaScriptDowncastError: Error {
     @usableFromInline let type: JavaScriptClass
 
