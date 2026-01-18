@@ -1,3 +1,4 @@
+import ColorReference
 import GameIDs
 import GameRules
 import HexGrids
@@ -12,8 +13,8 @@ struct NavigatorTile: Sendable {
 
     private var name: String
     private var terrain: String
-    private var culture: PieChart<CultureID, PieChartLabel>?
-    private var popType: PieChart<PopOccupation, PieChartLabel>?
+    private var culture: PieChart<CultureID, ColorReference>?
+    private var popType: PieChart<PopOccupation, ColorReference>?
 
     init(id: Address) {
         self.id = id
@@ -39,23 +40,23 @@ extension NavigatorTile {
         let pops: PopulationStats = tile.pops
 
         let culture: [
-            (key: CultureID, (share: Int64, PieChartLabel))
+            (key: CultureID, (share: Int64, ColorReference))
         ] = pops.free.cultures.compactMap {
             guard let culture: Culture = cache.rules.pops.cultures[$0] else {
                 return nil
             }
-            let label: PieChartLabel = .init(color: culture.color, name: culture.name)
+            let label: ColorReference = .color(culture.color)
             return ($0, ($1, label))
         }
         let popType: [
-            (key: PopOccupation, (share: Int64, PieChartLabel))
+            (key: PopOccupation, (share: Int64, ColorReference))
         ] = pops.occupation.compactMap {
             guard $0.stratum > .Ward,
             let key: Legend.Representation = cache.rules.legend.occupation[$0] else {
                 return nil
             }
 
-            let label: PieChartLabel = .init(color: key.color, name: $0.singular)
+            let label: ColorReference = .color(key.color)
             return ($0, ($1.count, label))
         }
 

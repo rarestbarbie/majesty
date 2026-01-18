@@ -1,6 +1,8 @@
+import { ColorReference } from '../../GameEngine/exports.js';
+
 export interface TickRuleState {
     readonly id: number;
     readonly y: number;
-    readonly l: string;
-    readonly s?: string;
+    readonly text: string;
+    readonly label?: ColorReference;
 }

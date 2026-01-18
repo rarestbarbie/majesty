@@ -1,8 +1,10 @@
-import { Color } from '../../GameEngine/exports.js';
+import {
+    DiffableListElement,
+} from '../../DOM/exports.js';
 
-export interface PieChartSector<ID> {
+export interface PieChartSector<ID> extends DiffableListElement<ID> {
     readonly id: ID;
-    readonly d?: string;
-    readonly share: number;
-    readonly value: { color?: Color; style?: string; name: string; };
+    readonly node: SVGGElement;
+
+    geometry?: SVGPathElement | SVGCircleElement;
 }

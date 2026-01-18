@@ -1,3 +1,4 @@
+import ColorReference
 import D
 import GameEconomy
 import GameRules
@@ -47,21 +48,21 @@ extension CashFlowStatement {
         }
     }
 
-    func chart(rules: GameMetadata) -> PieChart<CashFlowItem, PieChartLabel>? {
+    func chart(rules: GameMetadata) -> PieChart<CashFlowItem, ColorReference>? {
         if self.costs.isEmpty {
             return nil
         }
 
-        var values: [(CashFlowItem, (Int64, PieChartLabel))] = self.costs.map {
-            let label: PieChartLabel?
+        var values: [(CashFlowItem, (Int64, ColorReference))] = self.costs.map {
+            let label: ColorReference?
 
             switch $0 {
-            case .resource(let id): label = rules.resources[id].label.pieChart
-            case .workers: label = .init(color: 0x71bac7, name: "Workers")
-            case .clerks: label = .init(color: 0xdbd5d3, name: "Clerks")
+            case .resource(let id): label = .color(rules.resources[id].color)
+            case .workers: label = .color(0x71bac7)
+            case .clerks: label = .color(0xdbd5d3)
             }
 
-            return ($0, ($1, label ?? .init(color: 0xFFFFFF, name: "???")))
+            return ($0, ($1, label ?? .color(0xFFFFFF)))
         }
 
         values.sort { $0.0 < $1.0 }

@@ -2,6 +2,9 @@ import {
     DiffableListElement,
     UpdateText,
 } from '../../DOM/exports.js';
+import {
+    UpdateColorReference,
+} from '../../GameEngine/exports.js';
 import { TickRuleState } from '../exports.js';
 
 export class TickRule implements DiffableListElement<number> {
@@ -21,12 +24,11 @@ export class TickRule implements DiffableListElement<number> {
     }
 
     public update(tick: TickRuleState): void {
-        UpdateText(this.body, tick.l);
         this.node.style.setProperty('--y', tick.y.toString());
-        if (tick.s !== undefined) {
-            this.node.setAttribute('data-style', tick.s);
-        } else {
-            this.node.removeAttribute('data-style');
+        UpdateText(this.body, tick.text);
+        if (tick.label !== undefined) {
+            UpdateColorReference(this.node, tick.label);
         }
     }
 }
+

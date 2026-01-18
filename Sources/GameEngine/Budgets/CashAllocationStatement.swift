@@ -1,4 +1,5 @@
 import Color
+import ColorReference
 import D
 import GameEconomy
 import GameUI
@@ -103,16 +104,16 @@ extension CashAllocationStatement {
         }
     }
 
-    func chart() -> PieChart<CashAllocationItem, PieChartLabel>? {
+    func chart() -> PieChart<CashAllocationItem, ColorReference>? {
         if  self.total == 0 {
             return nil
         }
 
         let values: [
-            (CashAllocationItem, (Int64, PieChartLabel))
+            (CashAllocationItem, (Int64, ColorReference))
         ] = CashAllocationItem.allCases.map {
-            let (name, share): (String, Int64) = self[$0]
-            return ($0, (share, .init(style: self.style($0), name: name)))
+            let (_, share): (String, Int64) = self[$0]
+            return ($0, (share, .style(self.style($0))))
         }
 
         return .init(values: values)

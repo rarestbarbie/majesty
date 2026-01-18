@@ -7,19 +7,19 @@ import {
     TermState,
     UpdateText,
 } from '../../DOM/exports.js';
-import {
-    GameID,
-    GameDate
-} from '../../GameEngine/exports.js';
+import { UpdateColorReference } from '../../GameEngine/exports.js';
+import { GameDate } from '../../GameEngine/exports.js';
 import {
     ScreenContent,
     HexGrid,
+    TimeSeriesChannel,
     PlanetReport,
     PlanetFilter,
     PlanetFilterLabel,
     PlanetMapLayerSelector,
     ScreenType,
     PieChart,
+    TimeSeriesChannelState,
     TimeSeriesFrame,
     TimeSeriesFrameState,
     TimeSeriesState,
@@ -35,7 +35,7 @@ export class LineChart {
     private id?: any;
     private readonly markers: StaticList<TimeSeriesFrame, GameDate>;
     private readonly ticks: StaticList<TickRule, number>;
-    private readonly lines: SVGPathElement;
+    private readonly lines: StaticList<TimeSeriesChannel<number>, number>;
     private readonly svg: SVGSVGElement;
 
     constructor(type?: TooltipType) {
@@ -43,10 +43,10 @@ export class LineChart {
 
         this.ticks = new StaticList<TickRule, number>(document.createElement('div'));
         this.ticks.node.classList.add('ticks');
-        this.lines = CreateSVG('path');
+        this.lines = new StaticList<TimeSeriesChannel<number>, number>(CreateSVG('g'));
 
         this.svg = CreateSVG('svg');
-        this.svg.appendChild(this.lines);
+        this.svg.appendChild(this.lines.node);
 
         this.markers = new StaticList<TimeSeriesFrame, GameDate>(document.createElement('ul'));
         this.markers.node.classList.add('line-chart-markers');
@@ -72,23 +72,34 @@ export class LineChart {
             this.ticks.clear();
         }
 
-        const length: number = state.history.length;
+        const primary: TimeSeriesChannelState<number> | undefined = state.channels[0];
+        if (primary === undefined || primary.frames === undefined) {
+            return;
+        }
+
+        const length: number = primary.frames.length;
 
         this.node.style.setProperty('--y-min', `${state.min}`);
         this.node.style.setProperty('--y-max', `${state.max}`);
         this.node.style.setProperty('--x-length', `${length}`);
 
-        if (state.d === undefined) {
-            this.lines.removeAttribute('d');
-            this.lines.classList.add('empty');
-        } else {
-            this.lines.setAttribute('d', state.d);
-            this.lines.classList.remove('empty');
-        }
         this.markers.update(
-            state.history,
+            primary.frames,
             (interval: TimeSeriesFrameState) => new TimeSeriesFrame(interval, id, this.type),
             (interval: TimeSeriesFrameState, frame: TimeSeriesFrame) => frame.update(interval),
+        );
+        this.lines.update(
+            state.channels,
+            (series: TimeSeriesChannelState<number>): TimeSeriesChannel<number> => {
+                const node: SVGPathElement = CreateSVG('path');
+                return { id: series.id, node };
+            },
+            (series: TimeSeriesChannelState<number>, channel: TimeSeriesChannel<number>) => {
+                if (series.label !== undefined) {
+                    UpdateColorReference(channel.node, series.label);
+                }
+                channel.node.setAttribute('d', series.d);
+            }
         );
         this.ticks.update(
             state.ticks,

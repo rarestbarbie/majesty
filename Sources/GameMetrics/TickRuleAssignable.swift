@@ -1,31 +1,31 @@
+import ColorReference
 import D
 import RealModule
 
 @usableFromInline protocol TickRuleAssignable {
-    var min: Double { get }
-    var max: Double { get }
+    var range: (min: Double, max: Double) { get }
 }
 extension TickRuleAssignable {
     @inlinable func tickLogarithmically(
-        current: (y: Double, style: TickRule.Style?),
+        current: [(y: Double, label: ColorReference?)],
         digits: Int,
         detail: Double = 1 / 5,
     ) -> [TickRule] {
         Self.tickLogarithmically(
             current: current,
-            visible: (min: self.min, max: self.max),
+            visible: self.range,
             digits: digits,
             detail: detail,
         )
     }
     @inlinable func tickLinearly(
-        current: (y: Double, style: TickRule.Style?),
+        current: [(y: Double, label: ColorReference?)],
         digits: Int,
         detail: Double = 1 / 5,
     ) -> [TickRule] {
         Self.tickLinearly(
             current: current,
-            visible: (min: self.min, max: self.max),
+            visible: self.range,
             digits: digits,
             detail: detail,
         )
@@ -33,7 +33,7 @@ extension TickRuleAssignable {
 }
 extension TickRuleAssignable {
     @usableFromInline static func tickLogarithmically(
-        current: (y: Double, style: TickRule.Style?),
+        current: [(y: Double, label: ColorReference?)],
         visible: (min: Double, max: Double),
         digits: Int,
         detail: Double,
@@ -64,7 +64,7 @@ extension TickRuleAssignable {
     }
 
     @usableFromInline static func tickLinearly(
-        current: (y: Double, style: TickRule.Style?),
+        current: [(y: Double, label: ColorReference?)],
         visible: (min: Double, max: Double),
         digits: Int,
         detail: Double,
@@ -92,7 +92,7 @@ extension TickRuleAssignable {
     }
 
     private static func tick(
-        current: (y: Double, style: TickRule.Style?),
+        current: [(y: Double, label: ColorReference?)],
         linear: (min: Double, max: Double, step: Double),
         digits: Int,
         transform: (Double) -> Double = { $0 }
@@ -105,32 +105,35 @@ extension TickRuleAssignable {
             return []
         }
 
+        var tick: Int = current.count
         var ticks: [TickRule] = []
-        ;   ticks.reserveCapacity(Int.init(steps.last - steps.first) + 1)
+        ;   ticks.reserveCapacity(Int.init(steps.last - steps.first) + current.count)
 
         for i: Int64 in steps.first ... steps.last {
             let y: Double = Double.init(i) * linear.step
             let linear: Decimal? = .init(rounding: y, digits: digits)
             ticks.append(
                 TickRule.init(
-                    id: 1 + Int.init(i - steps.first),
+                    id: tick,
                     value: transform(y),
-                    label: linear.map { "\($0[..][.financial])" } ?? "",
-                    style: nil
+                    label: nil,
+                    text: linear.map { "\($0[..][.financial])" } ?? "",
+                )
+            )
+            tick += 1
+        }
+        for (id, (y, label)): (Int, (Double, ColorReference?)) in current.enumerated() {
+            ticks.append(
+                TickRule.init(
+                    id: id,
+                    value: transform(y),
+                    label: label,
+                    text: Decimal.init(rounding: y, digits: digits).map {
+                        "\($0[..][.financial])"
+                    } ?? "",
                 )
             )
         }
-
-        ticks.append(
-            TickRule.init(
-                id: 0,
-                value: transform(current.y),
-                label: Decimal.init(rounding: current.y, digits: digits).map {
-                    "\($0[..][.financial])"
-                } ?? "",
-                style: current.style
-            )
-        )
 
         return ticks
     }

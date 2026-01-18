@@ -1,7 +1,7 @@
-import { TimeSeriesFrameState, TickRuleState } from '../exports.js';
+import { TimeSeriesChannelState, TickRuleState } from '../exports.js';
 
 export interface TimeSeriesState {
-    readonly history: TimeSeriesFrameState[];
+    readonly channels: TimeSeriesChannelState<number>[];
     readonly min: number;
     readonly max: number;
     readonly ticks: TickRuleState[];

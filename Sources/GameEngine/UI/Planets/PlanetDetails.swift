@@ -1,3 +1,4 @@
+import ColorReference
 import D
 import GameIDs
 import GameMetrics
@@ -13,7 +14,7 @@ struct PlanetDetails {
     private var tile: TileSnapshot?
     private var terms: [Term]
 
-    private var gdp: PieChart<Resource, PieChartLabel>?
+    private var gdp: PieChart<Resource, ColorReference>?
     private var gdpGraph: TimeSeries
 
     init(id: Address, focus: Focus) {

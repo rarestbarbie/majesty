@@ -20,7 +20,9 @@ import RealModule
         self.ticks = []
     }
 }
-extension TradingView: TickRuleAssignable {}
+extension TradingView: TickRuleAssignable {
+    @inlinable var range: (min: Double, max: Double) { (min: self.min, max: self.max) }
+}
 extension TradingView {
     public mutating func update(with market: WorldMarket.State, date: GameDate) {
         guard
@@ -71,12 +73,14 @@ extension TradingView {
         self.max += margin
         self.max = Swift.max(self.max, self.min + 0.000_001)
         self.ticks = self.tickLogarithmically(
-            current: (
-                y: last.prices.c,
-                style:
-                    last.prices.c > last.prices.o ? .pos :
-                    last.prices.c < last.prices.o ? .neg : nil
-            ),
+            current: [
+                (
+                    y: last.prices.c,
+                    label:
+                        last.prices.c > last.prices.o ? .pos :
+                        last.prices.c < last.prices.o ? .neg : nil
+                )
+            ],
             digits: 3
         )
     }

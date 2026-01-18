@@ -1,3 +1,4 @@
+import ColorReference
 import D
 import GameEconomy
 import GameIDs
@@ -14,8 +15,8 @@ struct InventoryBreakdown<Tab>: Sendable where Tab: InventoryTab {
     private var needs: [ResourceNeed]
     private var sales: [ResourceSale]
     private var terms: [Term]
-    private var costs: PieChart<CashFlowItem, PieChartLabel>?
-    private var budget: PieChart<CashAllocationItem, PieChartLabel>?
+    private var costs: PieChart<CashFlowItem, ColorReference>?
+    private var budget: PieChart<CashAllocationItem, ColorReference>?
 
     init(focus: ResourceTierIdentifier) {
         self.focus = focus

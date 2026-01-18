@@ -1,4 +1,5 @@
 import Color
+import ColorReference
 import JavaScriptInterop
 import JavaScriptKit
 
