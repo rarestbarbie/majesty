@@ -1,6 +1,5 @@
 import ColorText
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public struct ConditionListItem: Equatable, Sendable {
     @usableFromInline let fulfilled: Bool?

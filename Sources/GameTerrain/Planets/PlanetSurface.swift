@@ -1,6 +1,5 @@
 import GameIDs
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public struct PlanetSurface {
     public let id: PlanetID

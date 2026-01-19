@@ -1,7 +1,6 @@
 import GameEconomy
 import GameIDs
 import JavaScriptInterop
-import JavaScriptKit
 
 extension TradeReport {
     @StringUnion @frozen public enum Filter: Equatable, Hashable, Comparable {

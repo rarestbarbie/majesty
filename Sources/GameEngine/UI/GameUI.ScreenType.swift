@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 extension GameUI {
     @frozen public enum ScreenType: JSString,

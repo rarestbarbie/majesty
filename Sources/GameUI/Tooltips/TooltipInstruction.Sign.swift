@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptInterop
 
 extension TooltipInstruction {
     @frozen public enum Sign: JSString, ConvertibleToJSValue {

@@ -1,5 +1,4 @@
 import GameClock
-import JavaScriptKit
 import JavaScriptInterop
 
 extension GameSpeed {

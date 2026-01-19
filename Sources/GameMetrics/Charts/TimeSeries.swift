@@ -1,6 +1,5 @@
 import ColorReference
 import GameIDs
-import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public struct TimeSeries {

@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 import OrderedCollections
 
 struct OrderedTable<Value> {

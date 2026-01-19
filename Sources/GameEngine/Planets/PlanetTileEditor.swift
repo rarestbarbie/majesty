@@ -2,7 +2,6 @@ import GameRules
 import GameIDs
 import GameTerrain
 import HexGrids
-import JavaScriptKit
 import JavaScriptInterop
 
 public struct PlanetTileEditor: Sendable {

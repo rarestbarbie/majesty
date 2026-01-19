@@ -1,5 +1,4 @@
 import ColorReference
-import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public struct TickRule {

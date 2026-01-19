@@ -1,6 +1,5 @@
 import GameIDs
 import GameTerrain
-import JavaScriptKit
 import JavaScriptInterop
 
 public struct CelestialView: Sendable {

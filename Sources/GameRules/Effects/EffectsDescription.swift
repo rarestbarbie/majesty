@@ -1,7 +1,6 @@
 import GameEconomy
 import GameIDs
 import JavaScriptInterop
-import JavaScriptKit
 
 struct EffectsDescription {
     let factoryProductivityAll: Int64?

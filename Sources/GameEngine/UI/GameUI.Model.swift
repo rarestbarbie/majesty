@@ -3,7 +3,6 @@ import GameRules
 import GameUI
 import HexGrids
 import JavaScriptInterop
-import JavaScriptKit
 import Synchronization
 
 extension GameUI {
@@ -140,8 +139,8 @@ extension GameUI.Model {
         }
     }
 
-    public nonisolated func orbit(_ id: PlanetID) -> JSTypedArray<Float>? {
-        self.cache { $0.planets[id]?.motion.global?.rendered() }
+    public nonisolated func orbit(_ id: PlanetID) -> CelestialMotion? {
+        self.cache { $0.planets[id]?.motion.global }
     }
 
     public nonisolated func tooltip(

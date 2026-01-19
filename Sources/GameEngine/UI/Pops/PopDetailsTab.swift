@@ -1,7 +1,6 @@
 import Bijection
 import GameUI
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public enum PopDetailsTab {
     case Inventory

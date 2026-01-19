@@ -1,6 +1,5 @@
 import D
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public struct GeologicalSpawnWeight: Equatable {
     public let chance: Int64

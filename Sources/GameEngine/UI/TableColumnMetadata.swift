@@ -1,4 +1,3 @@
-import JavaScriptKit
 import JavaScriptInterop
 
 struct TableColumnMetadata<Stop>: Identifiable, Sendable

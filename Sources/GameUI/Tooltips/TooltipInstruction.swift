@@ -1,5 +1,4 @@
 import ColorText
-import JavaScriptKit
 import JavaScriptInterop
 
 /// Represents a single instruction for the TypeScript renderer to build a piece of a tooltip.

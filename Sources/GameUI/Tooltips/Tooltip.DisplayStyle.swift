@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptInterop
 
 extension Tooltip {
     @frozen public enum DisplayStyle: JSString, ConvertibleToJSValue, Sendable {

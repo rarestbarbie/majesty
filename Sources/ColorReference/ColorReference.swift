@@ -1,5 +1,4 @@
 import Color
-import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public enum ColorReference {

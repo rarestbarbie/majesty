@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 extension GeologicalDescription.Bonuses {
     enum ObjectKey {

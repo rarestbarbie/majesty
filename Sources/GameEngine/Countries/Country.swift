@@ -4,7 +4,6 @@ import GameIDs
 import GameRules
 import GameStarts
 import JavaScriptInterop
-import JavaScriptKit
 
 struct Country: Identifiable {
     let id: CountryID

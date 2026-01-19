@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptInterop
 
 extension GameMetadata {
     @frozen public enum Namespace: JSString {

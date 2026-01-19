@@ -2,7 +2,6 @@ import GameIDs
 import GameRules
 import GameState
 import JavaScriptInterop
-import JavaScriptKit
 
 struct Mine {
     let id: MineID

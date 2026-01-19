@@ -1,6 +1,5 @@
 import GameEconomy
 import GameRules
-import JavaScriptKit
 import JavaScriptInterop
 
 struct ResourceNeed {

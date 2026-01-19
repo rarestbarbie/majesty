@@ -1,6 +1,5 @@
 import GameIDs
 import GameState
-import JavaScriptKit
 import JavaScriptInterop
 
 public struct PlanetReport: Sendable {

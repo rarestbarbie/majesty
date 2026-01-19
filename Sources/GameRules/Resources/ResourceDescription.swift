@@ -1,7 +1,6 @@
 import Color
 import ColorReference
 import JavaScriptInterop
-import JavaScriptKit
 
 struct ResourceDescription {
     let color: Color

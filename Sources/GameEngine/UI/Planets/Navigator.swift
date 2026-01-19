@@ -2,7 +2,6 @@ import GameIDs
 import GameState
 import HexGrids
 import JavaScriptInterop
-import JavaScriptKit
 
 public struct Navigator: Sendable {
     private var cursor: [PlanetID: HexCoordinate]

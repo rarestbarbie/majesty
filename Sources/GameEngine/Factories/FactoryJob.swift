@@ -1,7 +1,6 @@
 import Assert
 import GameIDs
 import JavaScriptInterop
-import JavaScriptKit
 
 struct FactoryJob: PopJob, Identifiable {
     let id: FactoryID

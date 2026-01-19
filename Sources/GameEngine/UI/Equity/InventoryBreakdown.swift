@@ -5,7 +5,6 @@ import GameIDs
 import GameState
 import GameUI
 import JavaScriptInterop
-import JavaScriptKit
 import VectorCharts
 
 struct InventoryBreakdown<Tab>: Sendable where Tab: InventoryTab {

@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public enum TooltipType: String, ConvertibleToJSValue, LoadableFromJSValue {
     case BuildingAccount

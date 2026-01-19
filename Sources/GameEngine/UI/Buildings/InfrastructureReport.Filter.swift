@@ -1,6 +1,5 @@
 import GameIDs
 import JavaScriptInterop
-import JavaScriptKit
 
 extension InfrastructureReport {
     @StringUnion @frozen public enum Filter: Equatable, Hashable {

@@ -1,5 +1,4 @@
 import GameIDs
-import JavaScriptKit
 import JavaScriptInterop
 
 @frozen @usableFromInline struct PopOccupationDescending: RawRepresentable {

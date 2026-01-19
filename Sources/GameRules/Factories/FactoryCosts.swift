@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 struct FactoryCosts {
     let corporate: SymbolTable<SymbolTable<Int64>>

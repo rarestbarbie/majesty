@@ -2,7 +2,6 @@ import Assert
 import Fraction
 import GameEconomy
 import JavaScriptInterop
-import JavaScriptKit
 
 extension Bank {
     struct Account: Equatable, Sendable {

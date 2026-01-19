@@ -1,5 +1,4 @@
 import Assert
-import JavaScriptKit
 import JavaScriptInterop
 import Fraction
 import GameEconomy

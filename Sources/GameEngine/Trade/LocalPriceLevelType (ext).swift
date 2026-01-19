@@ -1,6 +1,5 @@
 import Bijection
 import GameEconomy
-import JavaScriptKit
 import JavaScriptInterop
 
 extension LocalPriceLevelType: RawRepresentable {

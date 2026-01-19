@@ -2,7 +2,6 @@ import ColorReference
 import D
 import GameIDs
 import GameUI
-import JavaScriptKit
 import JavaScriptInterop
 import VectorCharts
 import VectorCharts_JavaScript

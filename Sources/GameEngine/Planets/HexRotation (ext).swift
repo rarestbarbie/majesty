@@ -1,5 +1,4 @@
 import HexGrids
-import JavaScriptKit
 import JavaScriptInterop
 
 extension HexRotation: RawRepresentable {

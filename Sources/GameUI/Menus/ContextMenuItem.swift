@@ -1,4 +1,3 @@
-import JavaScriptKit
 import JavaScriptInterop
 
 @frozen @usableFromInline struct ContextMenuItem {

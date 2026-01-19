@@ -1,5 +1,4 @@
 import DequeModule
-import JavaScriptKit
 import JavaScriptInterop
 
 extension Deque: LoadableFromJSArray, LoadableFromJSValue,

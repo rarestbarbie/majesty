@@ -1,7 +1,6 @@
 import GameRules
 import HexGrids
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public struct Terrain {
     public let id: HexCoordinate

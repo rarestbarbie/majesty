@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 struct BuildingCosts {
     let maintenance: SymbolTable<SymbolTable<Int64>>

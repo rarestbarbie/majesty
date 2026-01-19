@@ -4,7 +4,6 @@ import GameRules
 import GameTerrain
 import GameUI
 import JavaScriptInterop
-import JavaScriptKit
 
 public actor GameSession {
     private var clock: GameClock

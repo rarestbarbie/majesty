@@ -1,6 +1,5 @@
 import GameEconomy
 import JavaScriptInterop
-import JavaScriptKit
 import OrderedCollections
 
 @frozen public struct SymbolTable<Value> {

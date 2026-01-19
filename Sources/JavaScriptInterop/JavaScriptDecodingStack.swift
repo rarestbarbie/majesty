@@ -1,5 +1,3 @@
-import JavaScriptKit
-
 @frozen public struct JavaScriptDecodingStack: Error {
     @usableFromInline let problem: any Error
     @usableFromInline var path: [Frame]

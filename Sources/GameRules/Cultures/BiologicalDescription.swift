@@ -1,6 +1,5 @@
 import Color
 import JavaScriptInterop
-import JavaScriptKit
 
 struct BiologicalDescription {
 }

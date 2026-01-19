@@ -1,4 +1,3 @@
-import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public struct ContextMenuActionEncoder: ~Copyable {

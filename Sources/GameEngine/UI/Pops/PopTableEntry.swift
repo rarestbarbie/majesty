@@ -2,7 +2,6 @@ import Color
 import GameEconomy
 import GameRules
 import GameIDs
-import JavaScriptKit
 import JavaScriptInterop
 
 struct PopTableEntry: Identifiable {

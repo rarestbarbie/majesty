@@ -1,7 +1,6 @@
 import Color
 import GameIDs
 import GameRules
-import JavaScriptKit
 import JavaScriptInterop
 
 extension Culture {

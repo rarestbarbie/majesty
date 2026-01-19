@@ -1,5 +1,4 @@
 import Fraction
-import JavaScriptKit
 import JavaScriptInterop
 
 extension PopulationStats {
