@@ -9,12 +9,12 @@ on:
 jobs:
     Linux:
         runs-on: ubuntu-24.04
-        name: Ubuntu 24.04
+        name: host
         steps:
             -   name: 🝮 Checkout 🝮
                 uses: actions/checkout@v4
 
-            -   name: 🝮 Install Swift 🝮
+            -   name: 🝮 Install shared dependencies 🝮
                 uses: ./.github/actions/setup
 
             -   name: 🝮 Build and run unit tests 🝮
@@ -28,12 +28,12 @@ jobs:
 
     WebAssembly:
         runs-on: ubuntu-24.04
-        name: Ubuntu 24.04
+        name: wasm
         steps:
             -   name: 🝮 Checkout 🝮
                 uses: actions/checkout@v4
 
-            -   name: 🝮 Install Swift 🝮
+            -   name: 🝮 Install shared dependencies 🝮
                 uses: ./.github/actions/setup
 
             -   name: 🝮 Install Swift WebAssembly SDK 🝮
@@ -46,7 +46,7 @@ jobs:
                     --checksum c49407947f6d91809ad57a83a2482062eec6a50cc0e22e6fd6eb01d6de6925a5
 
             #   note: top-level node dependencies already installed in setup action
-            -   name: 🝮 Install Dependencies 🝮
+            -   name: 🝮 Install testing dependencies 🝮
                 run: |
                     sudo apt update
                     sudo apt install -y \
