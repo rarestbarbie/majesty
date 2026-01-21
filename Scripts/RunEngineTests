@@ -1,0 +1,5 @@
+#!/bin/bash
+
+# next step: compare outputs
+Scripts/.build/release/engine-tests
+Scripts/.build/release/engine-tests

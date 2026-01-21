@@ -41,6 +41,11 @@ jobs:
             -   name: 🝮 Build and run unit tests 🝮
                 run: swift test
 
+            -   name: 🝮 Build and run engine tests 🝮
+                run: |
+                    Scripts/Build -l -c release
+                    Scripts/RunEngineTests
+
             -   name: 🝮 Build integration tests 🝮
                 run: |
                     Scripts/Build -s
@@ -49,7 +54,4 @@ jobs:
                     Scripts/Build -i -c release
 
             -   name: 🝮 Run integration tests 🝮
-                run: |
-                    cd IntegrationTests
-                    npx tsc
-                    npm test
+                run: Scripts/RunIntegrationTests
