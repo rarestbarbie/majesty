@@ -11,6 +11,9 @@ jobs:
         runs-on: ubuntu-24.04
         name: Ubuntu 24.04
         steps:
+            -   name: 🝮 Checkout 🝮
+                uses: actions/checkout@v4
+
             -   uses: ./.github/actions/setup
 
             -   name: 🝮 Build and run unit tests 🝮
@@ -26,6 +29,9 @@ jobs:
         runs-on: ubuntu-24.04
         name: Ubuntu 24.04
         steps:
+            -   name: 🝮 Checkout 🝮
+                uses: actions/checkout@v4
+
             -   uses: ./.github/actions/setup
 
             -   name: 🝮 Install Swift WebAssembly SDK 🝮
