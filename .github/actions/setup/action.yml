@@ -1,8 +1,11 @@
-name: 'Setup App'
-description: 'Checkout, install, and cache'
+name: 'Setup Environment'
+description: 'install'
 runs:
     using: 'composite'
     steps:
+        -   name: 🝮 Install Node.js Dependencies 🝮
+            run: npm install
+
         -   name: 🝮 Install Swift 🝮
             uses: tayloraswift/swift-install-action@master
             with:

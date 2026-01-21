@@ -14,7 +14,8 @@ jobs:
             -   name: 🝮 Checkout 🝮
                 uses: actions/checkout@v4
 
-            -   uses: ./.github/actions/setup
+            -   name: 🝮 Install Swift 🝮
+                uses: ./.github/actions/setup
 
             -   name: 🝮 Build and run unit tests 🝮
                 run: swift test
@@ -32,7 +33,8 @@ jobs:
             -   name: 🝮 Checkout 🝮
                 uses: actions/checkout@v4
 
-            -   uses: ./.github/actions/setup
+            -   name: 🝮 Install Swift 🝮
+                uses: ./.github/actions/setup
 
             -   name: 🝮 Install Swift WebAssembly SDK 🝮
                 env:
@@ -43,12 +45,12 @@ jobs:
                     "https://github.com/swiftwasm/swift/releases/download/swift-wasm-$SWIFTWASM_VERSION/swift-wasm-$SWIFTWASM_VERSION-$SWIFTWASM_TRIPLE.artifactbundle.zip" \
                     --checksum c49407947f6d91809ad57a83a2482062eec6a50cc0e22e6fd6eb01d6de6925a5
 
+            #   note: top-level node dependencies already installed in setup action
             -   name: 🝮 Install Dependencies 🝮
                 run: |
                     sudo apt update
                     sudo apt install -y \
                         imagemagick
-                    npm install
                     cd Tests
                     npm install
 
