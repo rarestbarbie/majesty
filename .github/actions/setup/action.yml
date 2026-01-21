@@ -1,0 +1,14 @@
+name: 'Setup Environment'
+description: 'install'
+runs:
+    using: 'composite'
+    steps:
+        -   name: 🝮 Install Node.js Dependencies 🝮
+            run: npm install
+            shell: bash
+
+        -   name: 🝮 Install Swift 🝮
+            uses: tayloraswift/swift-install-action@master
+            with:
+                swift-prefix: 'swift-6.3-branch/ubuntu2404/swift-6.3-DEVELOPMENT-SNAPSHOT-2025-12-13-a'
+                swift-id: 'swift-6.3-DEVELOPMENT-SNAPSHOT-2025-12-13-a-ubuntu24.04'

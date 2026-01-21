@@ -7,36 +7,15 @@ on:
         branches: [ master ]
 
 jobs:
-    linux:
+    Linux:
         runs-on: ubuntu-24.04
-        name: Ubuntu 24.04
+        name: host
         steps:
-            -   name: 🝮 Checkout repository 🝮
-                uses: actions/checkout@v3
+            -   name: 🝮 Checkout 🝮
+                uses: actions/checkout@v4
 
-            -   name: 🝮 Install Dependencies 🝮
-                run: |
-                    sudo apt update
-                    sudo apt install -y \
-                        imagemagick
-                    npm install
-                    cd Tests
-                    npm install
-
-            -   name: 🝮 Install Swift 🝮
-                uses: tayloraswift/swift-install-action@master
-                with:
-                    swift-prefix: "swift-6.3-branch/ubuntu2404/swift-6.3-DEVELOPMENT-SNAPSHOT-2025-12-13-a"
-                    swift-id: "swift-6.3-DEVELOPMENT-SNAPSHOT-2025-12-13-a-ubuntu24.04"
-
-            -   name: 🝮 Install Swift WebAssembly SDK 🝮
-                env:
-                    SWIFTWASM_VERSION: "6.3-SNAPSHOT-2025-12-13-a"
-                    SWIFTWASM_TRIPLE: "wasm32-unknown-wasip1-threads"
-                run: |
-                    swift sdk install \
-                    "https://github.com/swiftwasm/swift/releases/download/swift-wasm-$SWIFTWASM_VERSION/swift-wasm-$SWIFTWASM_VERSION-$SWIFTWASM_TRIPLE.artifactbundle.zip" \
-                    --checksum c49407947f6d91809ad57a83a2482062eec6a50cc0e22e6fd6eb01d6de6925a5
+            -   name: 🝮 Install shared dependencies 🝮
+                uses: ./.github/actions/setup
 
             -   name: 🝮 Build and run unit tests 🝮
                 run: swift test
@@ -47,8 +26,37 @@ jobs:
                     Scripts/Build -l -c release
                     Scripts/RunEngineTests
 
+    WebAssembly:
+        runs-on: ubuntu-24.04
+        name: wasm
+        steps:
+            -   name: 🝮 Checkout 🝮
+                uses: actions/checkout@v4
+
+            -   name: 🝮 Install shared dependencies 🝮
+                uses: ./.github/actions/setup
+
+            -   name: 🝮 Install Swift WebAssembly SDK 🝮
+                env:
+                    SWIFTWASM_VERSION: "6.3-SNAPSHOT-2025-12-13-a"
+                    SWIFTWASM_TRIPLE: "wasm32-unknown-wasip1-threads"
+                run: |
+                    swift sdk install \
+                    "https://github.com/swiftwasm/swift/releases/download/swift-wasm-$SWIFTWASM_VERSION/swift-wasm-$SWIFTWASM_VERSION-$SWIFTWASM_TRIPLE.artifactbundle.zip" \
+                    --checksum c49407947f6d91809ad57a83a2482062eec6a50cc0e22e6fd6eb01d6de6925a5
+
+            #   note: top-level node dependencies already installed in setup action
+            -   name: 🝮 Install testing dependencies 🝮
+                run: |
+                    sudo apt update
+                    sudo apt install -y \
+                        imagemagick
+                    cd Tests
+                    npm install
+
             -   name: 🝮 Build integration tests 🝮
                 run: |
+                    Scripts/Build -j
                     Scripts/Build -s
                     Scripts/Build -x
                     Scripts/Build -i -c release
