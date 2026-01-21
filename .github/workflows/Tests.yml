@@ -43,13 +43,13 @@ jobs:
 
             -   name: 🝮 Build and run engine tests 🝮
                 run: |
+                    Scripts/Build -j
                     Scripts/Build -l -c release
                     Scripts/RunEngineTests
 
             -   name: 🝮 Build integration tests 🝮
                 run: |
                     Scripts/Build -s
-                    Scripts/Build -j
                     Scripts/Build -x
                     Scripts/Build -i -c release
 
