@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 enum PlayerEvent {
     case faster

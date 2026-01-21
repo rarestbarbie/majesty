@@ -1,5 +1,4 @@
 import JavaScriptInterop
-import JavaScriptKit
 
 enum PlayerEventID: String, LoadableFromJSValue, ConvertibleToJSValue {
     case Faster

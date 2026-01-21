@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 @frozen public struct JavaScriptEncoder<ObjectKey>: ~Copyable {
     @usableFromInline let object: JSObject
@@ -30,6 +30,10 @@ extension JavaScriptEncoder<JavaScriptArrayKey> {
     }
 
     @inlinable public mutating func push(_ value: some ConvertibleToJSValue) {
+        #if WebAssembly
         _ = self.object.push?(value.jsValue)
+        #else
+        self.object.push(value.jsValue)
+        #endif
     }
 }

@@ -1,7 +1,6 @@
 import GameIDs
 import GameRules
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public struct CountrySeed: Identifiable {
     public var id: CountryID?

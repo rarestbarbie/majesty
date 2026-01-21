@@ -1,7 +1,6 @@
 import GameIDs
 import GameRules
 import JavaScriptInterop
-import JavaScriptKit
 
 extension Currency {
     @frozen public enum ObjectKey: JSString, Sendable {

@@ -1,5 +1,5 @@
 import ColorText
-import JavaScriptKit
+import JavaScriptInterop
 
 extension ColorText: ConvertibleToJSValue {
     @inlinable public var jsValue: JSValue {

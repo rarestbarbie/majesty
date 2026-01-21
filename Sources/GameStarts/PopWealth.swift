@@ -1,7 +1,6 @@
 import GameIDs
 import GameRules
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public struct PopWealth {
     public let type: PopOccupation

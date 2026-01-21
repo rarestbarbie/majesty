@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 @frozen public struct QueryParameterDecoder<QueryKey>: ~Copyable
     where QueryKey: RawRepresentable<JSString> {
@@ -8,12 +8,14 @@ import JavaScriptKit
     }
 }
 extension QueryParameterDecoder {
+    #if WebAssembly
     @inlinable init(wrapping object: JSObject) {
         guard let get: (any ConvertibleToJSValue...) -> JSValue = object.get else {
             fatalError("member 'URLSearchParams.get' is not defined!")
         }
         self.init(get: get)
     }
+    #endif
 }
 extension QueryParameterDecoder {
     @inlinable func get(_ key: JSString) -> JSString? {

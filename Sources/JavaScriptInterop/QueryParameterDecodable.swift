@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 public protocol QueryParameterDecodable<QueryKey>: LoadableFromJSValue {
     associatedtype QueryKey: RawRepresentable<JSString>
@@ -6,6 +6,7 @@ public protocol QueryParameterDecodable<QueryKey>: LoadableFromJSValue {
 }
 extension QueryParameterDecodable {
     @inlinable public static func load(from js: JSValue) throws -> Self {
+        #if WebAssembly
         guard
         case .object(let object) = js, object.is(.URLSearchParams) else {
             throw JavaScriptTypecastError<Self>.diagnose(js)
@@ -13,5 +14,8 @@ extension QueryParameterDecodable {
 
         let decoder: QueryParameterDecoder<QueryKey> = .init(wrapping: object)
         return try .init(from: decoder)
+        #else
+        throw JavaScriptTypecastError<Self>.diagnose(js)
+        #endif
     }
 }

@@ -1,6 +1,5 @@
-import JavaScriptInterop
-import JavaScriptKit
 import GameIDs
+import JavaScriptInterop
 
 @frozen public struct PopSeedGroup {
     public let tile: Address

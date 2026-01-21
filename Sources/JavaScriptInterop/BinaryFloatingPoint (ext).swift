@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 extension BinaryFloatingPoint where Self: ConstructibleFromJSValue {
     @inlinable public static func load(from value: JSValue) throws -> Self {

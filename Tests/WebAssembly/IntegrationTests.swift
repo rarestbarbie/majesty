@@ -35,13 +35,6 @@ extension IntegrationTestFile: JavaScriptDecodable {
             JSObject.global["outputs"] = outputs.jsValue
         }
 
-        do {
-            try Self.HashRules()
-        } catch {
-            // 'fatalError' is used instead of 'exit(1)' because Glibc is not available in Wasm.
-            fatalError("Integration test 'HashRules' failed: \(error)")
-        }
-
         for target: GameDate in [
                 .gregorian(year: 2427, month: 1, day: 1),
                 // .gregorian(year: 2438, month: 1, day: 1)
@@ -72,19 +65,6 @@ extension IntegrationTestFile: JavaScriptDecodable {
     }
 }
 extension IntegrationTests {
-    static func HashRules() throws {
-        let s1: GameSession.State = try .reload()
-        let s2: GameSession.State = try .reload()
-
-        print("GameSession 1 rules hash: \(s1.rules.hash)")
-        print("GameSession 2 rules hash: \(s2.rules.hash)")
-
-        if  s1.rules.hash != s2.rules.hash {
-            throw """
-            GameRulesDescription mismatch after reload!
-            """ as IntegrationTestFailure
-        }
-    }
     static func HashGameState(target: GameDate) throws -> GameSave {
         var s1: GameSession.State = try .reload()
         var s2: GameSession.State = try .reload()

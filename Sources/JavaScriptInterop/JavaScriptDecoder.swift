@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 @frozen public struct JavaScriptDecoder<ObjectKey>: ~Copyable
     where ObjectKey: RawRepresentable<JSString> {
@@ -55,6 +55,7 @@ extension JavaScriptDecoder {
         }
     }
 
+    #if WebAssembly
     @inlinable public func values<T, Value>(
         storage: (_ count: Int) throws -> T,
         combine: (inout T, ObjectKey, Value) throws -> (),
@@ -76,4 +77,21 @@ extension JavaScriptDecoder {
             try combine(&$0, key, try self[key].decode())
         }
     }
+    #else
+    @inlinable public func values<T, Value>(
+        storage: (_ count: Int) throws -> T,
+        combine: (inout T, ObjectKey, Value) throws -> (),
+    ) throws -> T where Value: LoadableFromJSValue {
+        let properties: [String: JSValue] = self.object.properties
+        return try properties.reduce(into: try storage(properties.count)) {
+            let id: JSString = .init($1.key)
+            guard let key: ObjectKey = .init(rawValue: id) else {
+                throw KeyspaceError.init(invalid: $1.key)
+            }
+
+            let field: Field = .init(id: id, value: $1.value)
+            try combine(&$0, key, try field.decode())
+        }
+    }
+    #endif
 }

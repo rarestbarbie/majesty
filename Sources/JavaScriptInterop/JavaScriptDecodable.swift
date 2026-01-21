@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 public protocol JavaScriptDecodable<ObjectKey>: LoadableFromJSValue {
     associatedtype ObjectKey: RawRepresentable<JSString>

@@ -2,7 +2,6 @@ import GameIDs
 import GameEconomy
 import GameRules
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public struct BuildingSeedGroup {
     public let tile: Address

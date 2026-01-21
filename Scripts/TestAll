@@ -13,10 +13,12 @@ Scripts/Build -j
 
 Scripts/Build -x
 
+echo '🝮 Running engine tests 🝮'
+
+Scripts/Build -l -c release
+Scripts/RunEngineTests
+
 echo '🝮 Running integration tests 🝮'
 
 Scripts/Build -i -c release
-
-cd IntegrationTests
-npx tsc
-npm test
+Scripts/RunIntegrationTests
