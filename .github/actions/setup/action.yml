@@ -5,6 +5,7 @@ runs:
     steps:
         -   name: 🝮 Install Node.js Dependencies 🝮
             run: npm install
+            shell: bash
 
         -   name: 🝮 Install Swift 🝮
             uses: tayloraswift/swift-install-action@master
