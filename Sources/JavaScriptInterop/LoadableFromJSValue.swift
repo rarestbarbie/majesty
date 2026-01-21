@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 /// `LoadableFromJSValue` is a protocol that adds diagnostic traces to
 /// ``ConstructibleFromJSValue``.

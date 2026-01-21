@@ -1,6 +1,5 @@
 import Color
 import JavaScriptInterop
-import JavaScriptKit
 
 // JavaScript `number` is backed by double precision floating point, which can represent
 // integers up to 2^53 - 1 exactly.

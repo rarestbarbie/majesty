@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 public protocol JavaScriptEncodable<ObjectKey>: ConvertibleToJSValue {
     associatedtype ObjectKey: RawRepresentable<JSString>

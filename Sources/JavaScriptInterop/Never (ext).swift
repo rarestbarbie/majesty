@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 extension Never: @retroactive ConvertibleToJSValue {
     @inlinable public var jsValue: JSValue { fatalError("unreachable") }

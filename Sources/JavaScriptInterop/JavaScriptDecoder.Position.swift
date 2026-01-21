@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 extension JavaScriptDecoder {
     @frozen public struct Position {

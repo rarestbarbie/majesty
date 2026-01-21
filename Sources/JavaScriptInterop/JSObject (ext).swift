@@ -1,6 +1,8 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 extension JSObject {
+    #if WebAssembly
+
     @inlinable static func allocate(_ type: JavaScriptClass) -> JSObject {
         JSObject.global[type.rawValue].function!.new()
     }
@@ -9,13 +11,36 @@ extension JSObject {
         self.isInstanceOf(JSObject.global[type.rawValue].function!)
     }
 
+    #else
+
+    @inlinable static func allocate(_ type: JavaScriptClass) -> JSObject {
+        switch type {
+        case .Array:
+            return .array()
+        case .Object:
+            return .object()
+        case .URLSearchParams:
+            fatalError("URLSearchParams is not supported in this environment")
+        }
+    }
+
+    @inlinable func `is`(_ type: JavaScriptClass) -> Bool {
+        switch type {
+        case .Array: self.isArray
+        case .Object: true
+        case .URLSearchParams: false
+        }
+    }
+
+    #endif
+}
+extension JSObject {
     @inlinable func assert(is type: JavaScriptClass) throws {
         guard self.is(type) else {
             throw JavaScriptDowncastError.init(type: type)
         }
     }
-}
-extension JSObject {
+
     @inlinable public static func new<ObjectKey>(
         encoding encodable: some JavaScriptEncodable<ObjectKey>
     ) -> JSObject {

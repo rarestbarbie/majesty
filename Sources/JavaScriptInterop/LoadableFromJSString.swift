@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 public protocol LoadableFromJSString: LoadableFromJSValue {
     static func parse(from js: JSString) throws -> Self

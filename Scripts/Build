@@ -50,6 +50,11 @@ while [[ $# -gt 0 ]]; do
             PLATFORM="wasm"
             shift
             ;;
+        -l)
+            COMPONENT="headless"
+            PLATFORM="host"
+            shift
+            ;;
         -h)
             PLATFORM="host"
             shift
@@ -202,24 +207,35 @@ build_sprites() {
 
     local TIMESTAMP=$(date +%s)
     echo "\$spritesheet-url: '/Icons/Pops.png?v=$TIMESTAMP';" > Stylesheets/generated/_sprite-url.scss
-    echo "Spritesheet and URL variable baked successfully."
+    echo "Spritesheet and URL variable baked successfully"
 }
 
 build_host() {
-    # Corresponds to "Build (debug, host)"
-    # This task is always debug and always builds the main target
-    if [ "$COMPONENT" = "integration" ]; then
-        echo "Warning: integration tests are not built for host platform. Building engine instead."
+    if [ "$COMPONENT" = "headless" ]; then
+        scratch_path="Scripts/.build"
+
+        if [ "$NOASSERT" = true ]; then
+            echo "Warning: --noassert flag is ignored for integration-tests component"
+        fi
+
+        if [ "$PROFILE" = true ]; then
+            echo "Warning: --profile flag is ignored for integration-tests component"
+        fi
+
+        echo "--- Building Engine Tests ($CONFIG) ---"
+
+        swift build -c $CONFIG \
+            --explicit-target-dependency-import-check=error \
+            --scratch-path "$scratch_path" \
+            --package-path Scripts \
+            --product engine-tests \
+
+    else
+        echo "--- Building Engine for Host ($CONFIG) ---"
+
+        swift build -c $CONFIG --build-tests \
+            --explicit-target-dependency-import-check=error
     fi
-
-    if [ "$CONFIG" != "debug" ]; then
-        echo "Warning: Host build (-h) ignores config flag (-c). Building debug."
-    fi
-
-    echo "--- Building Engine for Host (debug) ---"
-
-    swift build -c debug --build-tests \
-        --explicit-target-dependency-import-check=error
 
     echo "Host build complete!"
 }
@@ -254,10 +270,10 @@ build_wasm() {
 
     elif [ "$COMPONENT" = "integration" ]; then
         product="integration-tests"
-        scratch_path="IntegrationTests/.build.wasm"
+        scratch_path="Tests/.build.wasm"
 
         if [ "$NOASSERT" = true ]; then
-            echo "Warning: --noassert flag is ignored for integration-tests component."
+            echo "Warning: --noassert flag is ignored for integration-tests component"
         fi
 
         if [ "$PROFILE" = true ]; then
@@ -268,7 +284,7 @@ build_wasm() {
         fi
 
     else
-        echo "Error: Unknown component '$COMPONENT' for WebAssembly build." >&2
+        echo "Error: Unknown component '$COMPONENT' for WebAssembly build" >&2
         exit 1
     fi
 
@@ -296,20 +312,20 @@ case "$COMPONENT" in
     sprites)
         build_sprites
         ;;
-    engine | integration)
+    engine | headless | integration)
         # This is a Swift build
         if [ "$PLATFORM" = "host" ]; then
             build_host
         elif [ "$PLATFORM" = "wasm" ]; then
             build_wasm
         else
-            echo "Error: Unknown platform '$PLATFORM'." >&2
+            echo "Error: Unknown platform '$PLATFORM'" >&2
             usage
         fi
         ;;
     *)
         # This should be unreachable due to the default
-        echo "Error: Unhandled component '$COMPONENT'." >&2
+        echo "Error: Unhandled component '$COMPONENT'" >&2
         usage
         ;;
 esac

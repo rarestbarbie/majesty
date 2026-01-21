@@ -1,4 +1,4 @@
-// swift-tools-version:6.1
+// swift-tools-version:6.2
 import CompilerPluginSupport
 import PackageDescription
 import typealias Foundation.ProcessInfo
@@ -6,21 +6,26 @@ import typealias Foundation.ProcessInfo
 let package: Package = .init(
     name: "majesty",
     products: [
+        .library(name: "GameEngine", targets: ["GameEngine"]),
         .executable(name: "engine", targets: ["GameAPI"]),
-        .executable(name: "vector", targets: ["VectorTest"]),
         .executable(name: "integration-tests", targets: ["GameIntegrationTests"]),
+        .executable(name: "vector", targets: ["VectorTest"]),
+    ],
+    traits: [
+        "Headless",
+        "WebAssembly",
+        .default(enabledTraits: ["WebAssembly"]),
     ],
     dependencies: [
         .package(url: "https://github.com/swiftlang/swift-syntax", from: "602.0.0"),
-        // .package(url: "https://github.com/swiftwasm/JavaScriptKit", from: "0.36.0"),
-        .package(url: "https://github.com/swiftwasm/JavaScriptKit", branch: "main"),
+        .package(url: "https://github.com/swiftwasm/JavaScriptKit", from: "0.38.0"),
         .package(url: "https://github.com/apple/swift-numerics", from: "1.0.3"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.2.1"),
-        // .package(url: "https://github.com/ordo-one/bijection", from: "0.1.7"),
-        .package(url: "https://github.com/ordo-one/bijection", branch: "master"),
+        .package(url: "https://github.com/ordo-one/bijection", from: "0.1.9"),
         .package(url: "https://github.com/ordo-one/package-distributions", from: "0.2.0"),
-        .package(url: "https://github.com/tayloraswift/dollup", from: "0.5.0"),
+        .package(url: "https://github.com/tayloraswift/dollup", from: "0.7.0"),
         .package(url: "https://github.com/tayloraswift/d", from: "0.6.0"),
+        .package(url: "https://github.com/tayloraswift/swift-json", from: "2.1.0"),
     ],
     targets: [
         .executableTarget(
@@ -37,7 +42,7 @@ let package: Package = .init(
                 .target(name: "GameEngine"),
                 .product(name: "JavaScriptEventLoop", package: "JavaScriptKit"),
             ],
-            path: "IntegrationTests/Swift",
+            path: "Tests/WebAssembly",
         ),
 
         .executableTarget(
@@ -107,7 +112,7 @@ let package: Package = .init(
             name: "FractionTests",
             dependencies: [
                 .target(name: "Fraction"),
-            ]
+            ],
         ),
 
         .target(
@@ -272,8 +277,27 @@ let package: Package = .init(
         .target(
             name: "JavaScriptInterop",
             dependencies: [
-                .product(name: "JavaScriptBigIntSupport", package: "JavaScriptKit"),
-                .product(name: "JavaScriptKit", package: "JavaScriptKit"),
+                .target(name: "JavaScriptBackend"),
+            ]
+        ),
+        .target(
+            name: "JavaScriptBackend",
+            dependencies: [
+                .product(
+                    name: "JavaScriptPersistence",
+                    package: "swift-json",
+                    condition: .when(traits: ["Headless"]),
+                ),
+                .product(
+                    name: "JavaScriptBigIntSupport",
+                    package: "JavaScriptKit",
+                    condition: .when(traits: ["WebAssembly"]),
+                ),
+                .product(
+                    name: "JavaScriptKit",
+                    package: "JavaScriptKit",
+                    condition: .when(traits: ["WebAssembly"]),
+                ),
             ]
         ),
 
@@ -322,8 +346,7 @@ for target: Target in package.targets {
     let swift: [SwiftSetting]
     let c: [CSetting]
 
-    switch ProcessInfo.processInfo.environment["SWIFT_NOASSERT"]
-    {
+    switch ProcessInfo.processInfo.environment["SWIFT_NOASSERT"] {
     case "1"?, "true"?:
         swift = [
             .enableUpcomingFeature("ExistentialAny"),
@@ -339,8 +362,7 @@ for target: Target in package.targets {
         fatalError("Unexpected 'SWIFT_NOASSERT' value: \(value)")
     }
 
-    switch ProcessInfo.processInfo.environment["SWIFT_WASM_SIMD128"]
-    {
+    switch ProcessInfo.processInfo.environment["SWIFT_WASM_SIMD128"] {
     case "1"?, "true"?:
         c = [
             .unsafeFlags(["-msimd128"])

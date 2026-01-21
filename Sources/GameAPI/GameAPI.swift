@@ -1,3 +1,9 @@
+#if !WebAssembly
+enum GameAPI {
+    #error("this target requires the 'WebAssembly' trait to be enabled")
+}
+#else
+
 import GameEconomy
 import GameEngine
 import GameIDs
@@ -303,3 +309,4 @@ extension GameAPI {
         )
     }
 }
+#endif

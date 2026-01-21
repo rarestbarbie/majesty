@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 public protocol LoadableFromJSArray: LoadableFromJSValue {
     static func load(from js: borrowing JavaScriptDecoder<JavaScriptArrayKey>) throws -> Self

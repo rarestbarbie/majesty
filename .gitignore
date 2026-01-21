@@ -11,8 +11,13 @@ package-lock.json
 /Public/Fonts/*.woff2
 /Public/rules.json
 /Public/start.json
-/IntegrationTests/.build/
-/IntegrationTests/.build.*
+
+/Scripts/.build
+/Scripts/.build.*
+/Scripts/Package.resolved
+
+/Tests/.build/
+/Tests/.build.*
 
 /Server/build/
 

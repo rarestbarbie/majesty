@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 public enum JavaScriptTypecastError<T>: Error {
     case boolean(Bool)

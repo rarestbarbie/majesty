@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 public protocol ConvertibleToJSArray: ConvertibleToJSValue {
     func encode(to js: inout JavaScriptEncoder<JavaScriptArrayKey>)

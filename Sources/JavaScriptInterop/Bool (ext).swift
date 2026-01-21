@@ -1,4 +1,4 @@
-import JavaScriptKit
+import JavaScriptBackend
 
 extension Bool: LoadableFromJSValue {
     @inlinable public static func load(from value: JSValue) throws -> Self {

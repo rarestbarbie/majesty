@@ -1,6 +1,5 @@
 import Color
 import JavaScriptInterop
-import JavaScriptKit
 
 @frozen public struct CountryName {
     /// The word “The”, if it precedes the name of the country.

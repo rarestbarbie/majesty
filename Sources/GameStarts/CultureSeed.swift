@@ -1,7 +1,6 @@
 import Color
 import GameIDs
 import GameRules
-import JavaScriptKit
 import JavaScriptInterop
 
 @frozen public struct CultureSeed: Identifiable {
