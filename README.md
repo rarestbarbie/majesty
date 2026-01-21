@@ -30,7 +30,7 @@ The server listens on port 3000.
 ## Running the Integration Tests
 
 ```bash
-cd IntegrationTests
+cd Tests
 npx tsc
 npm test
 ```

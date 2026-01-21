@@ -20,7 +20,7 @@ jobs:
                     sudo apt install -y \
                         imagemagick
                     npm install
-                    cd IntegrationTests
+                    cd Tests
                     npm install
 
             -   name: 🝮 Install Swift 🝮
