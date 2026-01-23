@@ -100,5 +100,5 @@ extension Pop.Dimensions: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension Pop.Dimensions: Equatable, Hashable {}
+extension Pop.Dimensions: Equatable {}
 #endif

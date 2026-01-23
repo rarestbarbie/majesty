@@ -138,5 +138,5 @@ extension ResourceOutputs {
 }
 
 #if TESTABLE
-extension ResourceOutputs: Equatable, Hashable {}
+extension ResourceOutputs: Equatable {}
 #endif

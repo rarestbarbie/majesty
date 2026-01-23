@@ -118,5 +118,5 @@ extension Factory.Dimensions: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension Factory.Dimensions: Equatable, Hashable {}
+extension Factory.Dimensions: Equatable {}
 #endif

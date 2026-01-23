@@ -23,5 +23,5 @@ extension Tile.Aggregate: JavaScriptDecodable {
     }
 }
 #if TESTABLE
-extension Tile.Aggregate: Equatable, Hashable {}
+extension Tile.Aggregate: Equatable {}
 #endif

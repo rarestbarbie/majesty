@@ -76,5 +76,5 @@ extension PopulationStats.Stratum: JavaScriptDecodable {
     }
 }
 #if TESTABLE
-extension PopulationStats.Stratum: Equatable, Hashable {}
+extension PopulationStats.Stratum: Equatable {}
 #endif

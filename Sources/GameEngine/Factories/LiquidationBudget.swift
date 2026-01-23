@@ -25,5 +25,5 @@ extension LiquidationBudget: JavaScriptDecodable {
     }
 }
 #if TESTABLE
-extension LiquidationBudget: Equatable, Hashable {}
+extension LiquidationBudget: Equatable {}
 #endif

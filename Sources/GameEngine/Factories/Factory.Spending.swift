@@ -34,5 +34,5 @@ extension Factory.Spending {
 }
 
 #if TESTABLE
-extension Factory.Spending: Equatable, Hashable {}
+extension Factory.Spending: Equatable {}
 #endif
