@@ -80,5 +80,5 @@ extension Mine: JavaScriptDecodable {
     }
 }
 #if TESTABLE
-extension Mine: Equatable, Hashable {}
+extension Mine: Equatable {}
 #endif

@@ -195,5 +195,5 @@ extension Factory: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension Factory: Equatable, Hashable {}
+extension Factory: Equatable {}
 #endif

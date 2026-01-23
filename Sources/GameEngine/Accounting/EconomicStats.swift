@@ -10,5 +10,5 @@ extension EconomicStats {
     }
 }
 #if TESTABLE
-extension EconomicStats: Equatable, Hashable {}
+extension EconomicStats: Equatable {}
 #endif

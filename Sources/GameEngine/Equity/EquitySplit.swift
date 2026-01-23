@@ -39,5 +39,5 @@ extension EquitySplit: JavaScriptDecodable {
     }
 }
 #if TESTABLE
-extension EquitySplit: Equatable, Hashable {}
+extension EquitySplit: Equatable {}
 #endif

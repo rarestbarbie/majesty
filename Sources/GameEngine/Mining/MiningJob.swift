@@ -56,5 +56,5 @@ extension MiningJob: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension MiningJob: Equatable, Hashable {}
+extension MiningJob: Equatable {}
 #endif

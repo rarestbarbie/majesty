@@ -6,6 +6,7 @@ package-lock.json
 
 /.build
 /.build.*
+/.games
 /Art/Pops/Icons/*.png
 /Public/Fonts/*.otf
 /Public/Fonts/*.woff2

@@ -121,7 +121,3 @@ extension Bank.Account: JavaScriptDecodable {
         )
     }
 }
-
-#if TESTABLE
-extension Bank.Account: Hashable {}
-#endif

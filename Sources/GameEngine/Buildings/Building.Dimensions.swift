@@ -97,5 +97,5 @@ extension Building.Dimensions: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension Building.Dimensions: Equatable, Hashable {}
+extension Building.Dimensions: Equatable {}
 #endif

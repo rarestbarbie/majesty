@@ -84,15 +84,6 @@ extension GameSession.State {
         self.context.rules
     }
 
-    @_spi(testable) public var _hash: Int {
-        var hasher: Hasher = .init()
-        self.context.buildings.state.hash(into: &hasher)
-        self.context.factories.state.hash(into: &hasher)
-        self.context.pops.state.hash(into: &hasher)
-        self.context.mines.state.hash(into: &hasher)
-        return hasher.finalize()
-    }
-
     @_spi(testable) public static func != (a: borrowing Self, b: borrowing Self) -> Bool {
         a.context.buildings.state != b.context.buildings.state ||
         a.context.factories.state != b.context.factories.state ||

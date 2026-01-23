@@ -26,5 +26,5 @@ extension Factory.Size {
     }
 }
 #if TESTABLE
-extension Factory.Size: Equatable, Hashable {}
+extension Factory.Size: Equatable {}
 #endif

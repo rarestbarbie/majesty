@@ -5,5 +5,5 @@ extension Tile {
     }
 }
 #if TESTABLE
-extension Tile.Interval: Equatable, Hashable {}
+extension Tile.Interval: Equatable {}
 #endif

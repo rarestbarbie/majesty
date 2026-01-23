@@ -18,5 +18,5 @@ extension Building.Spending {
 }
 
 #if TESTABLE
-extension Building.Spending: Equatable, Hashable {}
+extension Building.Spending: Equatable {}
 #endif

@@ -22,10 +22,11 @@ let package: Package = .init(
         .package(url: "https://github.com/apple/swift-numerics", from: "1.0.3"),
         .package(url: "https://github.com/apple/swift-collections", from: "1.2.1"),
         .package(url: "https://github.com/ordo-one/bijection", from: "0.1.9"),
+        .package(url: "https://github.com/ordo-one/lexic", exact: "0.1.1"),
         .package(url: "https://github.com/ordo-one/package-distributions", from: "0.2.0"),
         .package(url: "https://github.com/tayloraswift/dollup", from: "0.7.0"),
         .package(url: "https://github.com/tayloraswift/d", from: "0.6.0"),
-        .package(url: "https://github.com/tayloraswift/swift-json", from: "2.1.0"),
+        .package(url: "https://github.com/tayloraswift/swift-json", from: "2.2.0"),
     ],
     targets: [
         .executableTarget(
@@ -226,6 +227,7 @@ let package: Package = .init(
         .macro(
             name: "GameStateMacros",
             dependencies: [
+                .product(name: "Lexic", package: "lexic"),
                 .product(name: "SwiftSyntaxMacros", package: "swift-syntax"),
                 .product(name: "SwiftCompilerPlugin", package: "swift-syntax"),
             ]

@@ -127,5 +127,5 @@ extension Building.Budget: JavaScriptDecodable {
     }
 }
 #if TESTABLE
-extension Building.Budget: Equatable, Hashable {}
+extension Building.Budget: Equatable {}
 #endif

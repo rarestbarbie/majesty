@@ -19,5 +19,5 @@ extension Factory.Budget {
     }
 }
 #if TESTABLE
-extension Factory.Budget: Equatable, Hashable {}
+extension Factory.Budget: Equatable {}
 #endif
