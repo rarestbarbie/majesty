@@ -24,9 +24,9 @@ extension GameResources {
 }
 extension GameResources {
     func load() throws -> GameSession.State {
-        let terrain: TerrainMap = try .load(from: try JSValue.json(self.terrain))
-        let rules: GameRules = try .load(from: try JSValue.json(self.rules))
-        let start: GameStart = try .load(from: try JSValue.json(self.start))
+        let terrain: TerrainMap = try .load(from: try JSValue.init(json: self.terrain))
+        let rules: GameRules = try .load(from: try JSValue.init(json: self.rules))
+        let start: GameStart = try .load(from: try JSValue.init(json: self.start))
         return try .load(start: start, rules: rules, map: terrain)
     }
 }
