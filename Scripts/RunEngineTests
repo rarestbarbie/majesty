@@ -8,8 +8,7 @@ binary='Scripts/.build/release/engine-tests'
 
 "$binary" --output "$saves"/1 --target "$target_date"
 "$binary" --output "$saves"/2 --target "$target_date"
-"$binary" --output "$saves"/2 --target 2425-2-2
 
 echo '🝮 Comparing saved game outputs 🝮'
 
-diff -q <(jq -S . .games/1/2425-2-1.json) <(jq -S . .games/2/2425-2-1.json)
+diff -q <(jq -S . .games/1/$target_date.json) <(jq -S . .games/2/$target_date.json)
