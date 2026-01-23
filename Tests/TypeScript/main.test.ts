@@ -23,16 +23,10 @@ const start: string = path.resolve(__root, "Public/start.json");
 const rules: string = path.resolve(__root, "Public/rules.json");
 const terrain: string = path.resolve(__root, "Public/terrain.json");
 
-interface IntegrationTestFile {
-    name: string;
-    save: object;
-}
-
 declare global {
     var start: any;
     var rules: any;
     var terrain: any;
-    var outputs: IntegrationTestFile[];
 }
 
 console.log('using start file:', start);
@@ -49,9 +43,4 @@ const options: InstantiateOptions = await defaultNodeSetup(
 );
 await instantiate(options);
 
-console.log("Integration tests finished, writing outputs...");
-for (const output of global.outputs) {
-    const file: string = path.resolve(__root, output.name + ".msgpack");
-    fs.writeFileSync(file, msgpack.encode(output.save), 'utf8');
-    console.log(`Wrote output to '${file}'`);
-}
+console.log('Integration tests finished!');
