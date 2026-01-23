@@ -1,5 +1,14 @@
 #!/bin/bash
 
-# next step: compare outputs
-Scripts/.build/release/engine-tests
-Scripts/.build/release/engine-tests
+set -e
+
+target_date='2425-2-1'
+saves='.games'
+binary='Scripts/.build/release/engine-tests'
+
+"$binary" --output "$saves"/1 --target "$target_date"
+"$binary" --output "$saves"/2 --target "$target_date"
+
+echo '🝮 Comparing saved game outputs 🝮'
+
+diff -q <(jq -S . .games/1/$target_date.json) <(jq -S . .games/2/$target_date.json)

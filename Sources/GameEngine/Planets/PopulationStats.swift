@@ -37,5 +37,5 @@ extension PopulationStats {
     }
 }
 #if TESTABLE
-extension PopulationStats: Equatable, Hashable {}
+extension PopulationStats: Equatable {}
 #endif

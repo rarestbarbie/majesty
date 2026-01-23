@@ -101,5 +101,5 @@ extension ResourceBudgetTier {
     }
 }
 #if TESTABLE
-extension ResourceBudgetTier: Equatable, Hashable {}
+extension ResourceBudgetTier: Equatable {}
 #endif

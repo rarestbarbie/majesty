@@ -72,6 +72,29 @@ extension GameDate: CustomStringConvertible {
         return "\(y)-\(m)-\(d)"
     }
 }
+extension GameDate: LosslessStringConvertible {
+    @inlinable public init?(_ description: some StringProtocol) {
+        guard
+        let h1: String.Index = description.firstIndex(of: "-") else {
+            return nil
+        }
+        let m: String.Index = description.index(after: h1)
+        guard
+        let h2: String.Index = description[m...].firstIndex(of: "-") else {
+            return nil
+        }
+        let d: String.Index = description.index(after: h2)
+
+        guard
+        let y: Int32 = .init(description[..<h1]),
+        let m: Int32 = .init(description[m ..< h2]),
+        let d: Int32 = .init(description[d...]) else {
+            return nil
+        }
+
+        self = .gregorian(year: y, month: m, day: d)
+    }
+}
 extension GameDate {
     @inlinable public subscript(format: GameDateFormat) -> String {
         switch format {

@@ -151,5 +151,5 @@ extension Building: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension Building: Equatable, Hashable {}
+extension Building: Equatable {}
 #endif

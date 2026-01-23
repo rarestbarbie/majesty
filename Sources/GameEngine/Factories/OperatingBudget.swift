@@ -202,5 +202,5 @@ extension OperatingBudget: JavaScriptDecodable {
     }
 }
 #if TESTABLE
-extension OperatingBudget: Equatable, Hashable {}
+extension OperatingBudget: Equatable {}
 #endif

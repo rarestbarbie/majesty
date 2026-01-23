@@ -95,5 +95,5 @@ extension Inventory {
 }
 
 #if TESTABLE
-extension Inventory: Equatable, Hashable {}
+extension Inventory: Equatable {}
 #endif

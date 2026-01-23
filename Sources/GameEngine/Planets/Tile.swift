@@ -90,5 +90,5 @@ extension Tile: JavaScriptDecodable {
     }
 }
 #if TESTABLE
-extension Tile: Equatable, Hashable {}
+extension Tile: Equatable {}
 #endif

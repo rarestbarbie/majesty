@@ -13,5 +13,5 @@ extension PopulationStats.Stratum.Fields {
     }
 }
 #if TESTABLE
-extension PopulationStats.Stratum.Fields: Equatable, Hashable {}
+extension PopulationStats.Stratum.Fields: Equatable {}
 #endif

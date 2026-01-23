@@ -28,5 +28,5 @@ extension FactoryLiquidation: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension FactoryLiquidation: Equatable, Hashable {}
+extension FactoryLiquidation: Equatable {}
 #endif

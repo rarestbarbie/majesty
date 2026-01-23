@@ -67,5 +67,5 @@ extension FactoryJob: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension FactoryJob: Equatable, Hashable {}
+extension FactoryJob: Equatable {}
 #endif

@@ -46,5 +46,5 @@ extension Mine.Dimensions: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension Mine.Dimensions: Equatable, Hashable {}
+extension Mine.Dimensions: Equatable {}
 #endif

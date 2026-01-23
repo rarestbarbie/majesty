@@ -273,5 +273,5 @@ extension ResourceInputs {
 }
 
 #if TESTABLE
-extension ResourceInputs: Equatable, Hashable {}
+extension ResourceInputs: Equatable {}
 #endif

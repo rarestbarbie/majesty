@@ -50,5 +50,5 @@ extension PopulationStats.Row: JavaScriptDecodable {
     }
 }
 #if TESTABLE
-extension PopulationStats.Row: Equatable, Hashable {}
+extension PopulationStats.Row: Equatable {}
 #endif

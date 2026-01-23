@@ -189,5 +189,5 @@ extension Pop.Budget: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension Pop.Budget: Equatable, Hashable {}
+extension Pop.Budget: Equatable {}
 #endif

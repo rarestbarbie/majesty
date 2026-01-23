@@ -6,7 +6,8 @@ import JavaScriptKit
 extension GameSession.State {
     static func reload() throws -> Self {
         let terrain: TerrainMap = try .load(from: JSObject.global["terrain"])
+        let rules: GameRules = try .load(from: JSObject.global["rules"])
         let start: GameStart = try .load(from: JSObject.global["start"])
-        return try .load(start: start, rules: try .reload(), map: terrain)
+        return try .load(start: start, rules: rules, map: terrain)
     }
 }

@@ -17,5 +17,5 @@ extension Pop.Spending {
     }
 }
 #if TESTABLE
-extension Pop.Spending: Equatable, Hashable {}
+extension Pop.Spending: Equatable {}
 #endif

@@ -246,5 +246,5 @@ extension Equity: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension Equity: Equatable, Hashable {}
+extension Equity: Equatable {}
 #endif

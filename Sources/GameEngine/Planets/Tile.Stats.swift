@@ -54,5 +54,5 @@ extension Tile.Stats: JavaScriptDecodable {
     }
 }
 #if TESTABLE
-extension Tile.Stats: Equatable, Hashable {}
+extension Tile.Stats: Equatable {}
 #endif

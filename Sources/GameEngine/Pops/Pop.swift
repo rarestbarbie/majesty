@@ -251,5 +251,5 @@ extension Pop: JavaScriptDecodable {
 }
 
 #if TESTABLE
-extension Pop: Equatable, Hashable {}
+extension Pop: Equatable {}
 #endif
