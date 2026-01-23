@@ -1,6 +1,9 @@
 {
-    "vscode-color-picker.languages": [
-        "json",
-        "jsonc",
-    ],
+    "[jsonc]": {
+        "editor.colorDecorators": true,
+        "editor.defaultColorDecorators": "always",
+        "editor.quickSuggestions": {
+            "strings": true
+        }
+    }
 }

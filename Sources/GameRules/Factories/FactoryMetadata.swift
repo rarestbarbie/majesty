@@ -1,9 +1,11 @@
+import Color
 import GameEconomy
 import GameIDs
 
 public final class FactoryMetadata: GameObjectMetadata {
     public typealias ID = FactoryType
     public let identity: SymbolAssignment<FactoryType>
+    public let color: Color
     public let materials: ResourceTier
     public let corporate: ResourceTier
     public let expansion: ResourceTier
@@ -18,6 +20,7 @@ public final class FactoryMetadata: GameObjectMetadata {
 
     init(
         identity: SymbolAssignment<FactoryType>,
+        color: Color,
         materials: ResourceTier,
         corporate: ResourceTier,
         expansion: ResourceTier,
@@ -28,6 +31,7 @@ public final class FactoryMetadata: GameObjectMetadata {
         terrainAllowed: Set<EcologicalType>
     ) throws {
         self.identity = identity
+        self.color = color
 
         self.materials = materials
         self.corporate = corporate
@@ -51,24 +55,5 @@ public final class FactoryMetadata: GameObjectMetadata {
         self.sharesPerLevel = sharesPerLevel
 
         self.terrainAllowed = terrainAllowed
-    }
-}
-extension FactoryMetadata {
-    var hash: Int {
-        var hasher: Hasher = .init()
-
-        self.identity.hash(into: &hasher)
-        self.materials.hash(into: &hasher)
-        self.corporate.hash(into: &hasher)
-        self.expansion.hash(into: &hasher)
-        self.output.hash(into: &hasher)
-
-        self.workers.hash(into: &hasher)
-        self.clerks.hash(into: &hasher)
-        self.sharesInitial.hash(into: &hasher)
-        self.sharesPerLevel.hash(into: &hasher)
-        self.terrainAllowed.hash(into: &hasher)
-
-        return hasher.finalize()
     }
 }

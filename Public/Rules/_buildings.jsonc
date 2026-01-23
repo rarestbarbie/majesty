@@ -1,6 +1,7 @@
 {
     "High Density Housing": {
         "required": true,
+        "color": "#85cfb7",
         "operations": {
             "Electricity": 240,
             "Water": 480,

@@ -1,6 +1,8 @@
+import Color
 import JavaScriptInterop
 
 struct FactoryDescription {
+    let color: Color
     let materials: SymbolTable<Int64>
     let corporate: SymbolTable<Int64>?
     let expansion: SymbolTable<Int64>?
@@ -10,6 +12,7 @@ struct FactoryDescription {
 }
 extension FactoryDescription: JavaScriptDecodable {
     enum ObjectKey: JSString {
+        case color
         case materials
         case corporate
         case expansion
@@ -20,12 +23,13 @@ extension FactoryDescription: JavaScriptDecodable {
 
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
+            color: try js[.color].decode(),
             materials: try js[.materials]?.decode() ?? [:],
             corporate: try js[.corporate]?.decode(),
             expansion: try js[.expansion]?.decode(),
             output: try js[.output].decode(),
             workers: try js[.workers].decode(),
-            terrain: try js[.terrain]?.decode() ?? []
+            terrain: try js[.terrain]?.decode() ?? [],
         )
     }
 }

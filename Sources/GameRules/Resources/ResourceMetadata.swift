@@ -41,18 +41,3 @@ public final class ResourceMetadata: GameObjectMetadata {
         }
     }
 }
-extension ResourceMetadata {
-    var hash: Int {
-        var hasher: Hasher = .init()
-
-        self.identity.hash(into: &hasher)
-        self.color.hash(into: &hasher)
-        self.emoji.hash(into: &hasher)
-        self.local.hash(into: &hasher)
-        self.critical.hash(into: &hasher)
-        self.storable.hash(into: &hasher)
-        self.hours.hash(into: &hasher)
-
-        return hasher.finalize()
-    }
-}
