@@ -60,32 +60,3 @@ extension GameMetadata {
         )
     }
 }
-extension GameMetadata {
-    /// Compute a slow hash of the game rules, used for checking mod compatibility.
-    public var hash: Int {
-        var hasher: Hasher = .init()
-
-        // TODO: hash settings, pops
-
-        for value: ResourceMetadata in self.resources.all {
-            value.hash.hash(into: &hasher)
-        }
-        for value: BuildingMetadata in self.buildings.values {
-            value.hash.hash(into: &hasher)
-        }
-        for value: FactoryMetadata in self.factories.values {
-            value.hash.hash(into: &hasher)
-        }
-        for value: MineMetadata in self.mines.values {
-            value.hash.hash(into: &hasher)
-        }
-        for value: TechnologyMetadata in self.technologies.values {
-            value.hash.hash(into: &hasher)
-        }
-
-        self.tiles.geology.hash(into: &hasher)
-        self.tiles.ecology.hash(into: &hasher)
-
-        return hasher.finalize()
-    }
-}

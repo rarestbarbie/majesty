@@ -59,6 +59,7 @@ extension GameObjects {
             buildings: try table.buildings.map {
                 BuildingMetadata.init(
                     identity: $0,
+                    color: $1.color,
                     operations: .init(
                         metadata: resources,
                         quantity: try $1.operations.quantities(keys: symbols.resources)
@@ -94,6 +95,7 @@ extension GameObjects {
             factories: try table.factories.map {
                 try FactoryMetadata.init(
                     identity: $0,
+                    color: $1.color,
                     materials: .init(
                         metadata: resources,
                         quantity: try $1.materials.quantities(keys: symbols.resources)

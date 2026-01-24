@@ -22,7 +22,6 @@
             // Midway
             "399N-4,1"
         ],
-        "minwage": 15,
         "researched": [
         ]
     },
@@ -44,8 +43,7 @@
             "399N-1,1",
             // Pacific Northwest
             "399N-2,2"
-        ],
-        "minwage": 15
+        ]
     },
 
     {
@@ -68,8 +66,7 @@
             "399N-1,0",
             // Caucasus
             "399N2,-2"
-        ],
-        "minwage": 15
+        ]
     },
     {
         "name": {
@@ -87,8 +84,7 @@
             "399N-2,0",
             // Alaska
             "399N-2,1"
-        ],
-        "minwage": 15
+        ]
     },
 
     // all countries below set to US suzerain due to lack of foreign currency implementation
@@ -106,8 +102,7 @@
         "tiles": [
             // Greenland
             "399N1,0"
-        ],
-        "minwage": 15
+        ]
     },
     {
         "name": {
@@ -123,8 +118,7 @@
         "tiles": [
             // Mexico
             "399N-2,4"
-        ],
-        "minwage": 15
+        ]
     },
     {
         "name": {
@@ -241,8 +235,7 @@
             "399S0,1",
             // East Antarctica
             "399S1,0"
-        ],
-        "minwage": 15
+        ]
     },
     {
         "name": {
@@ -266,8 +259,7 @@
             "399N2,-1",
             // Queen Maud Land
             "399S1,-1"
-        ],
-        "minwage": 15
+        ]
     },
     {
         "name": {
@@ -283,8 +275,7 @@
         "tiles": [
             // British Isles
             "399N2,0"
-        ],
-        "minwage": 15
+        ]
     },
     {
         "name": {
@@ -300,8 +291,7 @@
         "tiles": [
             // Holy Land
             "399N3,-3"
-        ],
-        "minwage": 15
+        ]
     },
     {
         "name": {
@@ -337,8 +327,7 @@
             "399N-1,-1",
             // Taiwan
             "399N-1,-2"
-        ],
-        "minwage": 15
+        ]
     },
     {
         "name": {
@@ -359,8 +348,7 @@
             "399S-1,0",
             // New Territories
             "399S0,-1"
-        ],
-        "minwage": 15
+        ]
     },
     {
         "name": {
@@ -376,8 +364,7 @@
         "tiles": [
             // New Zealand
             "399S-2,0"
-        ],
-        "minwage": 15
+        ]
     },
     {
         "name": {
@@ -393,8 +380,7 @@
         "tiles": [
             // Japan
             "399N-2,-1"
-        ],
-        "minwage": 15
+        ]
     },
 
     // countries without suzerain set
@@ -413,8 +399,7 @@
             "399N2,-4",
             // Bay of Bengal
             "399S2,-4"
-        ],
-        "minwage": 15
+        ]
     },
     {
         "name": {
@@ -429,8 +414,7 @@
         "tiles": [
             // Thailand
             "399N0,-3"
-        ],
-        "minwage": 15
+        ]
     },
     {
         "name": {
@@ -447,8 +431,7 @@
             "399N4,-1",
             // Congo
             "399S4,-2"
-        ],
-        "minwage": 15
+        ]
     },
     {
         "name": {
@@ -463,7 +446,6 @@
         "tiles": [
             // Ethiopia
             "399N4,-3"
-        ],
-        "minwage": 15
+        ]
     }
 ]

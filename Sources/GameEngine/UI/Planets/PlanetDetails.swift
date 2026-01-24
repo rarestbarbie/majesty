@@ -14,7 +14,9 @@ struct PlanetDetails {
     private var tile: TileSnapshot?
     private var terms: [Term]
 
-    private var gdp: PieChart<Resource, ColorReference>?
+    private var produced: PieChart<Resource, ColorReference>?
+    private var consumed: PieChart<Resource, ColorReference>?
+    private var gdp: PieChart<EconomicLedger.Industry, ColorReference>?
     private var gdpGraph: TimeSeries
 
     init(id: Address, focus: Focus) {
@@ -37,7 +39,11 @@ extension PlanetDetails {
         self.terms = Term.list {
             $0[.gdp, (+), tooltip: .TileGDP] = tile.Δ.stats.economy.gdp[/3]
         }
-        self.gdp = cache.ledger.breakdownGDP(
+        (produced: self.produced, consumed: self.consumed) = cache.ledger.breakdownProduction(
+            rules: cache.rules,
+            region: self.id
+        )
+        self.gdp = cache.ledger.breakdownIndustries(
             rules: cache.rules,
             region: self.id
         )
@@ -47,6 +53,8 @@ extension PlanetDetails {
             digits: 4
         ) {
             Double.init($0.gdp)
+        } adjust: {
+            $0.min = 0
         }
     }
 }
@@ -58,6 +66,8 @@ extension PlanetDetails: JavaScriptEncodable {
         case name
         case terms
 
+        case produced
+        case consumed
         case gdp
         case gdpGraph
     }
@@ -67,6 +77,8 @@ extension PlanetDetails: JavaScriptEncodable {
         js[.open] = self.open
         js[.name] = self.tile?.name
         js[.terms] = self.terms
+        js[.produced] = self.produced
+        js[.consumed] = self.consumed
         js[.gdp] = self.gdp
         js[.gdpGraph] = self.gdpGraph
     }

@@ -30,23 +30,3 @@ public final class MineMetadata: GameObjectMetadata {
         self.spawn = spawn
     }
 }
-extension MineMetadata {
-    var hash: Int {
-        var hasher: Hasher = .init()
-
-        self.identity.hash(into: &hasher)
-        self.base.hash(into: &hasher)
-        self.miner.hash(into: &hasher)
-        self.decay.hash(into: &hasher)
-        self.scale.hash(into: &hasher)
-
-        for (key, value): (GeologicalType, SpawnWeight) in self.spawn.sorted(
-                by: { $0.key < $1.key }
-            ) {
-            key.hash(into: &hasher)
-            value.hash(into: &hasher)
-        }
-
-        return hasher.finalize()
-    }
-}

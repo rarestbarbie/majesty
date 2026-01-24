@@ -1,5 +1,6 @@
 {
     "Alloy Foundry": {
+        "color": "#b8b8b8",
         "materials": {
             "Machine Parts": 1,
             "Iron Ore": 20,
@@ -14,6 +15,7 @@
         }
     },
     "Aluminum Mill": {
+        "color": "#e4e4e4",
         "materials": {
             "Machine Parts": 1,
             "Alumina": 20,
@@ -69,6 +71,7 @@
         }
     },
     "Battery Plant": {
+        "color": "#baff82",
         "materials": {
             "Lithium": 4,
             "Polymers": 1
@@ -83,6 +86,7 @@
         }
     },
     "Cereal Farm": {
+        "color": "#beaa66",
         "materials": {
             "Water": 20,
             "Fertilizer": 5
@@ -98,6 +102,7 @@
         "terrain": ["Archipelago", "Desert", "Forest", "Rainforest", "Steppe"]
     },
     "Chemical Synthesis Plant": {
+        "color": "#ffcee1",
         "materials": {
             "Hydrocarbons": 2,
             // "Graphite": 1,
@@ -113,6 +118,7 @@
         }
     },
     "Chicken Plant": {
+        "color": "#da9669",
         "materials": {
             "Machine Parts": 1,
             "Poultry": 100,
@@ -145,7 +151,7 @@
     },
     "Creator Studio": {
         "emoji": "🎥",
-        "color": "#21b9ff",
+        "color": "#00AFF0",
         "materials": {
             "Storage": 4,
             "Services": 4,
@@ -164,7 +170,7 @@
     },
     "Cosmetics Factory": {
         "emoji": "💄",
-        "color": "#ffffff",
+        "color": "#ff2643",
         "materials": {
             "Polymers": 4,
             "Produce": 4,
@@ -182,6 +188,7 @@
         }
     },
     "Data Center": {
+        "color": "#d4b0f7",
         "materials": {
             "Electricity": 12,
             "Electronics": 4
@@ -195,6 +202,7 @@
         }
     },
     "Desalination Plant": {
+        "color": "#5ea9ff",
         "materials": {
             "Electricity": 10
         },
@@ -232,6 +240,7 @@
         }
     },
     "Fertilizer Plant": {
+        "color": "#8bc34a",
         "materials": {
             "Electricity": 20
         },
@@ -244,6 +253,7 @@
         }
     },
     "Fossil Power Plant": {
+        "color": "#332c25",
         "materials": {
             "Construction": 2,
             "Hydrocarbons": 6,
@@ -258,6 +268,7 @@
         }
     },
     "Hydroelectric Dam": {
+        "color": "#ffa229",
         "materials": {
             "Construction": 4,
             "Machine Parts": 1
@@ -282,6 +293,7 @@
         ]
     },
     "Hydroponic Farm": {
+        "color": "#74ff34",
         "materials": {
             "Water": 5,
             "Fertilizer": 10
@@ -360,6 +372,7 @@
         }
     },
     "Liquor Distillery": {
+        "color": "#e25247",
         "materials": {
             "Produce": 4,
             "Wheat": 4,
@@ -374,6 +387,7 @@
         }
     },
     "Machine Parts Factory": {
+        "color": "#a0a0a0",
         "materials": {
             "Aluminum": 6,
             "Alloys": 6,
@@ -406,6 +420,7 @@
         }
     },
     "Nuclear Power Plant": {
+        "color": "#9fffc4",
         "materials": {
             "Water": 2,
             "Nuclear Fuel": 1
@@ -419,6 +434,7 @@
         }
     },
     "Plantation": {
+        "color": "#7ac500",
         "materials": {
             "Water": 40,
             "Fertilizer": 10
@@ -435,6 +451,7 @@
         "terrain": ["Archipelago", "Desert", "Steppe", "Forest", "Rainforest"]
     },
     "Polypropylene Plant": {
+        "color": "#009c9c",
         "materials": {
             "Hydrocarbons": 8,
             "Water": 8
@@ -467,6 +484,7 @@
         }
     },
     "Slaughterhouse": {
+        "color": "#c5533e",
         "materials": {
             "Machine Parts": 1,
             "Beef": 20,
@@ -481,6 +499,7 @@
         }
     },
     "Supermarket": {
+        "color": "#ce9a4c",
         "materials": {
             "Appliances": 1,
             "Services": 8,
@@ -496,6 +515,7 @@
         }
     },
     "Synthetic Mica Plant": {
+        "color": "#d4a0a0",
         "materials": {
             "Electricity": 100
         },
@@ -508,6 +528,7 @@
         }
     },
     "Uranium Enrichment Facility": {
+        "color": "#26302a",
         "materials": {
             "Machine Parts": 2,
             "Electricity": 10,
@@ -522,6 +543,7 @@
         }
     },
     "Vape Factory": {
+        "color": "#74597c",
         "materials": {
             "Polymers": 1,
             "Electronics": 1,
@@ -535,52 +557,8 @@
             "Engineer": 5000
         }
     },
-
-
-    // "Ammonia Plant": {
-    //     "materials": {
-    //         "Hydrocarbons": 12
-    //     },
-    //     "output": {
-    //         "Ammonia": 12
-    //     },
-    //     "workers": {
-    //         "Driver": 5000,
-    //         "Engineer": 5000
-    //     }
-    // },
-
-
-    // "Compute Cluster": {
-    //     "materials": {
-    //         "Electricity": 24,
-    //         "Electronics": 4,
-    //         "Storage": 24
-    //     },
-    //     "output": {
-    //         "Autocomplete": 16
-    //     },
-    //     "workers": {
-    //         "Driver": 5000,
-    //         "Engineer": 5000
-    //     }
-    // },
-    // "Fermentation Plant": {
-    //     "materials": {
-    //         "Hydrocarbons": 2,
-    //         "Hormones": 1,
-    //         "Fertilizer": 3,
-    //         "Water": 2
-    //     },
-    //     "output": {
-    //         "Antibiotics": 8
-    //     },
-    //     "workers": {
-    //         "Driver": 5000,
-    //         "Engineer": 5000
-    //     }
-    // },
     "Water Treatment Plant": {
+        "color": "#5ea9ff",
         "materials": {
             "Electricity": 1
         },

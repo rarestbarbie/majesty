@@ -62,5 +62,7 @@ import JavaScriptInterop
     case TileCulture
     case TilePopType
     case TileGDP
-    case TileEconomyContribution
+    case TileIndustry
+    case TileResourceProduced
+    case TileResourceConsumed
 }

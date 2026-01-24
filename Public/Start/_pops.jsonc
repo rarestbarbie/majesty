@@ -52,7 +52,7 @@
             },
             {
                 "race": "Atlantean",
-                "type": "X",
+                "type": "S",
                 "size": 650000
             },
             {
@@ -75,7 +75,12 @@
             {
                 "race": "Atlantean",
                 "type": "X",
-                "size": 14000000
+                "size": 40000
+            },
+            {
+                "race": "Atlantean",
+                "type": "S",
+                "size": 13900000
             },
             {
                 "race": "Mexican",
@@ -107,7 +112,12 @@
             {
                 "race": "Atlantean",
                 "type": "X",
-                "size": 21016000
+                "size": 6000
+            },
+            {
+                "race": "Atlantean",
+                "type": "S",
+                "size": 21010000
             },
             {
                 "race": "Turtle Islander",
@@ -144,7 +154,12 @@
             {
                 "race": "Atlantean",
                 "type": "X",
-                "size": 12019000
+                "size": 90000
+            },
+            {
+                "race": "Atlantean",
+                "type": "S",
+                "size": 11900000
             },
             {
                 "race": "Mexican",
@@ -181,7 +196,12 @@
             {
                 "race": "Atlantean",
                 "type": "X",
-                "size": 16600000
+                "size": 20000
+            },
+            {
+                "race": "Atlantean",
+                "type": "S",
+                "size": 16500000
             },
             {
                 "race": "Black American",
@@ -232,7 +252,7 @@
             },
             {
                 "race": "Atlantean",
-                "type": "X",
+                "type": "S",
                 "size": 4300000
             },
             {

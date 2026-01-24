@@ -19,15 +19,3 @@ public final class TechnologyMetadata: GameObjectMetadata {
         self.summary = summary
     }
 }
-extension TechnologyMetadata {
-    var hash: Int {
-        var hasher: Hasher = .init()
-
-        self.identity.hash(into: &hasher)
-        self.starter.hash(into: &hasher)
-        self.effects.hash(into: &hasher)
-        self.summary.hash(into: &hasher)
-
-        return hasher.finalize()
-    }
-}

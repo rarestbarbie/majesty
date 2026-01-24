@@ -1,9 +1,11 @@
+import Color
 import GameEconomy
 import GameIDs
 
 public final class BuildingMetadata: GameObjectMetadata {
     public typealias ID = BuildingType
     public let identity: SymbolAssignment<BuildingType>
+    public let color: Color
     public let operations: ResourceTier
     public let maintenance: ResourceTier
     public let development: ResourceTier
@@ -17,6 +19,7 @@ public final class BuildingMetadata: GameObjectMetadata {
 
     init(
         identity: SymbolAssignment<BuildingType>,
+        color: Color,
         operations: ResourceTier,
         maintenance: ResourceTier,
         development: ResourceTier,
@@ -27,6 +30,7 @@ public final class BuildingMetadata: GameObjectMetadata {
         required: Bool
     ) {
         self.identity = identity
+        self.color = color
 
         self.operations = operations
         self.maintenance = maintenance
@@ -37,22 +41,5 @@ public final class BuildingMetadata: GameObjectMetadata {
         self.sharesPerLevel = sharesPerLevel
         self.terrainAllowed = terrainAllowed
         self.required = required
-    }
-}
-extension BuildingMetadata {
-    var hash: Int {
-        var hasher: Hasher = .init()
-
-        self.identity.hash(into: &hasher)
-        self.operations.hash(into: &hasher)
-        self.maintenance.hash(into: &hasher)
-        self.development.hash(into: &hasher)
-        self.output.hash(into: &hasher)
-        self.sharesInitial.hash(into: &hasher)
-        self.sharesPerLevel.hash(into: &hasher)
-        self.terrainAllowed.hash(into: &hasher)
-        self.required.hash(into: &hasher)
-
-        return hasher.finalize()
     }
 }

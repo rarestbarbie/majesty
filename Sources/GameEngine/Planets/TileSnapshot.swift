@@ -19,6 +19,34 @@ extension TileSnapshot {
     var pops: PopulationStats { self.z.stats.pops }
 }
 extension TileSnapshot {
+    private func aggregate<Crosstab, Value>(
+        where crosstab: Crosstab,
+        among totals: [EconomicLedger.Regional<Crosstab>: Value],
+        worldContribution: (Value) -> Int64,
+        localContribution: (Value) -> Int64
+    ) -> (world: Int64, local: Int64) {
+        totals.reduce(into: (0, 0)) {
+            if  $1.key.crosstab == crosstab {
+                $0.world += worldContribution($1.value)
+            }
+            if  $1.key.location == self.id {
+                $0.local += localContribution($1.value)
+            }
+        }
+    }
+    private func aggregate<Crosstab>(
+        where crosstab: Crosstab,
+        among totals: [EconomicLedger.Regional<Crosstab>: Int64],
+    ) -> (world: Int64, local: Int64) {
+        self.aggregate(
+            where: crosstab,
+            among: totals,
+            worldContribution: { $0 },
+            localContribution: { $0 }
+        )
+    }
+}
+extension TileSnapshot {
     func tooltip(
         _ layer: PlanetMapLayer,
     ) -> Tooltip? {
@@ -120,41 +148,117 @@ extension TileSnapshot {
     }
 }
 extension TileSnapshot {
-    func tooltipEconomyContribution(
-        resource: Resource,
+    func tooltipIndustry(
+        _ id: EconomicLedger.Industry,
         context: GameUI.CacheContext
     ) -> Tooltip? {
         guard
         let country: DiplomaticAuthority = self.country,
-        let (units, value): (Int64, Int64) = context.ledger.production[self.id / resource] else {
+        let value: Int64 = context.ledger.valueAdded[self.id / id] else {
             return nil
         }
 
-        let total: (worldwide: Int64, value: Int64) = context.ledger.production.reduce(
-            into: (0, 0)
-        ) {
-            if  $1.key.crosstab == resource {
-                $0.worldwide += $1.value.units
-            }
-            if  $1.key.location == self.id {
-                $0.value += $1.value.value
-            }
+        let total: (world: Int64, local: Int64) = self.aggregate(
+            where: id,
+            among: context.ledger.valueAdded,
+            worldContribution: { $0 },
+            localContribution: { $0 }
+        )
+
+        let industryName: String?
+        switch id {
+        case .building(let type):
+            industryName = context.rules.buildings[type]?.title
+        case .factory(let type):
+            industryName = context.rules.factories[type]?.title
+        case .artisan(let type):
+            industryName = context.rules.resources[type].title
+        case .slavery(let type):
+            industryName = context.rules.pops.cultures[type]?.name
         }
 
-        let resourceName: String = context.rules.resources[resource].title
-
         return .instructions(style: .borderless) {
-            $0[resourceName] = (
-                total.value > 0 ? Double.init(value %/ total.value) : 0
+            $0[industryName ?? "?"] = (
+                total.local > 0 ? Double.init(value %/ total.local) : 0
             )[%2]
             $0[>] {
+                $0["Estimated GDP contribution (\(country.currency.name))", +] = +?value[/3]
+            }
+        }
+    }
+
+    func tooltipResourceProduced(
+        _ resource: Resource,
+        context: GameUI.CacheContext,
+    ) -> Tooltip? {
+        guard
+        let country: DiplomaticAuthority = self.country,
+        let traded: TradeVolume = context.ledger.resource[self.id / resource] else {
+            return nil
+        }
+
+        let total: (world: Int64, local: Int64) = self.aggregate(
+            where: resource,
+            among: context.ledger.resource,
+            worldContribution: \.unitsProduced,
+            localContribution: \.valueProduced
+        )
+
+        let resource: ResourceMetadata = context.rules.resources[resource]
+        let value: Int64 = traded.valueProduced
+        let units: Int64 = traded.unitsProduced
+
+        return .instructions(style: .borderless) {
+            $0[resource.title] = (total.local > 0 ? Double.init(value %/ total.local) : 0)[%2]
+            $0[>] {
                 $0["Estimated market value (\(country.currency.name))", +] = +?value[/3]
+                if !resource.local {
+                    $0 += traded
+                }
             }
 
-            let share: Double = .init(units %/ max(total.worldwide, 1))
+            let share: Double = .init(units %/ max(total.world, 1))
             $0[>] = """
-            Today this region produced \(em: units[/3]) units of \(em: resourceName) \
+            Today this region produced \(em: units[/3]) units of \(em: resource.title) \
             comprising \(em: share[%2]) of world production
+            """
+        }
+    }
+
+    func tooltipResourceConsumed(
+        _ resource: Resource,
+        context: GameUI.CacheContext,
+    ) -> Tooltip? {
+        guard
+        let country: DiplomaticAuthority = self.country,
+        let traded: TradeVolume = context.ledger.resource[self.id / resource] else {
+            return nil
+        }
+
+        let total: (world: Int64, local: Int64) = self.aggregate(
+            where: resource,
+            among: context.ledger.resource,
+            worldContribution: \.unitsConsumed,
+            localContribution: \.valueConsumed
+        )
+
+        let resource: ResourceMetadata = context.rules.resources[resource]
+        let value: Int64 = traded.valueConsumed
+        let units: Int64 = traded.unitsConsumed
+
+        return .instructions(style: .borderless) {
+            $0[resource.title] = (total.local > 0 ? Double.init(value %/ total.local) : 0)[%2]
+            $0[>] {
+                $0["Estimated market value (\(country.currency.name))", -] = +?value[/3]
+                if !resource.local {
+                    $0 += traded
+                }
+            }
+
+            let share: Double = .init(units %/ max(total.world, 1))
+            $0[>] = """
+            Today this region consumed \(em: units[/3]) units of \(em: resource.title) \
+            comprising \(em: share[%2]) of world consumption
             """
         }
     }
