@@ -206,7 +206,7 @@ build_sprites() {
     node Scripts/spritesheet.js
 
     local TIMESTAMP=$(date +%s)
-    echo "\$spritesheet-url: '/Icons/Pops.png?v=$TIMESTAMP';" > Stylesheets/generated/_sprite-url.scss
+    echo "\$spritesheet-url: '/Icons/Pops.png?v=$TIMESTAMP';" > TypeScript/Stylesheets/generated/_sprite-url.scss
     echo "Spritesheet and URL variable baked successfully"
 }
 

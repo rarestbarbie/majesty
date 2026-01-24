@@ -5,8 +5,8 @@ runs:
     steps:
         -   name: 🝮 Install Node.js Dependencies 🝮
             run: |
-                cd TypeScript
-                npm install
+                npm install -w Scripts
+                npm install -w TypeScript
             shell: bash
 
         -   name: 🝮 Install Swift 🝮
