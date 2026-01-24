@@ -57,23 +57,24 @@ extension FinancialStatement.CostSummary {
     }
 
     func chart(rules: GameMetadata) -> PieChart<FinancialStatement.CostItem, ColorReference>? {
-        if self.items.isEmpty {
+        if  self.items.isEmpty {
             return nil
         }
 
-        var values: [(FinancialStatement.CostItem, (Int64, ColorReference))] = self.items.map {
+        let values: [FinancialStatement.CostItem: (Int64, ColorReference)] = self.items.reduce(
+            into: .init(minimumCapacity: self.items.count)
+        ) {
             let label: ColorReference?
 
-            switch $0 {
+            switch $1 {
             case .resource(id: let id, _, _): label = .color(rules.resources[id].color)
             case .workers: label = .color(0x71bac7)
             case .clerks: label = .color(0xdbd5d3)
             }
 
-            return ($0.id, ($0.value, label ?? .color(0xFFFFFF)))
+            $0[$1.id] = ($1.value, label ?? .color(0xFFFFFF))
         }
 
-        values.sort { $0.0 < $1.0 }
-        return .init(values: values)
+        return .init(values: values.sorted { $0.key < $1.key })
     }
 }
