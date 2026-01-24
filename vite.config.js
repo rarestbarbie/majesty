@@ -20,8 +20,12 @@ export default defineConfig({
     server: {
         watch: {
             ignored: [
-                '/swift/majesty/.build/*',
+                '/swift/majesty/.build',
+                '/swift/majesty/.games',
+                '/swift/majesty/Docs',
+                '/swift/majesty/Plugins',
                 '/swift/majesty/Scripts',
+                '/swift/majesty/Sources',
                 '/swift/majesty/Tests',
             ],
         },

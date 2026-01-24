@@ -1,3 +1,6 @@
+import D
+import GameUI
+
 struct TradeVolume {
     var unitsProduced: Int64
     var unitsConsumed: Int64
@@ -7,5 +10,11 @@ struct TradeVolume {
 extension TradeVolume {
     static var zero: Self {
         .init(unitsProduced: 0, unitsConsumed: 0, valueProduced: 0, valueConsumed: 0)
+    }
+}
+extension TradeVolume {
+    static func += (ul: inout TooltipInstructionEncoder, self: Self)  {
+        let surplus: Int64 = self.unitsProduced - self.unitsConsumed
+        ul[surplus < 0 ? "Deficit" : "Surplus", +] = +surplus[/3]
     }
 }

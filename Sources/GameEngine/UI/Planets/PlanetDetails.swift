@@ -53,6 +53,8 @@ extension PlanetDetails {
             digits: 4
         ) {
             Double.init($0.gdp)
+        } adjust: {
+            $0.min = 0
         }
     }
 }

@@ -27,23 +27,25 @@ extension TimeSeries {
         date: GameDate,
         label: ColorReference? = nil,
         digits: Int = 3,
-        linear value: (Frame) -> Double
+        linear value: (Frame) -> Double,
+        adjust: (inout (min: Double?, max: Double?)) -> () = { _ in }
     ) {
         self.update(
             with: history,
             date: date,
             labels: label.map { [$0] } ?? [],
-            digits: digits
-        ) {
-            CollectionOfOne<Double>.init(value($0))
-        }
+            digits: digits,
+            linear: { CollectionOfOne<Double>.init(value($0)) },
+            adjust: adjust
+        )
     }
     @inlinable public mutating func update<Frame, Values>(
         with history: some RandomAccessCollection<Frame>,
         date: GameDate,
         labels: [ColorReference],
         digits: Int = 3,
-        linear value: (Frame) -> Values
+        linear value: (Frame) -> Values,
+        adjust: (inout (min: Double?, max: Double?)) -> () = { _ in }
     ) where Values: Collection<Double> {
         self.reset()
 
@@ -57,12 +59,16 @@ extension TimeSeries {
 
         var labels: [ColorReference].Iterator = labels.makeIterator()
         var label: ColorReference? = labels.next()
-        var range: (min: Double, max: Double)? = nil
+        var range: (min: Double?, max: Double?) = (nil, nil)
+
+        adjust(&range)
+
         var index: Int = 0
         let rules: [(y: Double, label: ColorReference?)] = last.map {
             index += 1
             // this is just to initialize it with some point we know is in-range
-            range = ($0, $0)
+            range.min = range.min ?? $0
+            range.max = range.max ?? $0
             self.channels.append(.init(id: index, frames: [], label: label))
             // have to iterate this way because calling `next` after `nil` is undefined behavior
             if  let next: ColorReference = label {
@@ -73,8 +79,8 @@ extension TimeSeries {
             }
         }
 
-        if  let range: (min: Double, max: Double) {
-            self.range = range
+        if  case (min: let min?, max: let max?) = range {
+            self.range = (min: min, max: max)
         } else {
             return
         }
