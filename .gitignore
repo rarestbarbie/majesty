@@ -1,5 +1,3 @@
-node_modules
-package-lock.json
 *.svg
 
 /Package.resolved
@@ -16,11 +14,20 @@ package-lock.json
 /Scripts/.build
 /Scripts/.build.*
 /Scripts/Package.resolved
+/Scripts/node_modules
+/Scripts/package-lock.json
 
-/Tests/.build/
+/Server/build
+
+/Tests/.build
 /Tests/.build.*
+/Tests/node_modules
+/Tests/package-lock.json
 
-/Server/build/
+/TypeScript/.build.wasm
+/TypeScript/.build.vite
+/TypeScript/node_modules
+/TypeScript/package-lock.json
 
 /.vscode/launch.json
 /*.code-workspace

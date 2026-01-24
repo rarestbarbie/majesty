@@ -1,7 +1,7 @@
 
 import { io, Socket } from 'socket.io-client';
 import { Texture, TextureLoader } from 'three';
-import { init } from '../.build.wasm/plugins/PackageToJS/outputs/Package/index.js';
+import { init } from './.build.wasm/plugins/PackageToJS/outputs/Package/index.js';
 import { PlayerEventID, PlayerMessage } from './Multiplayer/exports.js';
 import { Swift } from './Swift.js';
 import { Persistence } from './DB/exports.js';
@@ -10,7 +10,7 @@ import { GameID } from './GameEngine/exports.js';
 
 import * as Firebase from 'firebase/auth';
 
-import '../Stylesheets/main.scss';
+import './Stylesheets/main.scss';
 
 declare global {
     interface Window {

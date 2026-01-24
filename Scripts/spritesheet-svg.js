@@ -3,7 +3,7 @@ import { XMLParser } from 'fast-xml-parser';
 
 // --- CONFIGURATION ---
 const INPUT_FILE = 'Art/Icons/gender.svg'; // Adjusted path based on your previous logs
-const OUTPUT_FILE = 'Stylesheets/generated/_gender.scss';
+const OUTPUT_FILE = 'TypeScript/Stylesheets/generated/_gender.scss';
 const VIEWBOX = '0 0 20 30';
 const TARGET_LAYERS = ['XX', 'XF', 'XM', 'MM', 'MF', 'FF', 'FM'];
 

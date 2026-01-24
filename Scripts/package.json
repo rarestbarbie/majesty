@@ -1,0 +1,9 @@
+{
+    "type": "module",
+    "devDependencies": {
+        "fs-extra": "^11.3.1",
+        "glob": "^13.0.0",
+        "json5": "^2.2.3",
+        "spritesmith": "^3.5.1"
+    }
+}

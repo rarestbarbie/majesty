@@ -4,7 +4,9 @@ runs:
     using: 'composite'
     steps:
         -   name: 🝮 Install Node.js Dependencies 🝮
-            run: npm install
+            run: |
+                npm install --prefix Scripts
+                npm install --prefix TypeScript
             shell: bash
 
         -   name: 🝮 Install Swift 🝮
