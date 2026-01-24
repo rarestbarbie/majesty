@@ -30,7 +30,9 @@ export class PlanetOverview extends ScreenContent {
     private readonly grid: HexGrid;
 
     private readonly terms: StaticList<Term, string>;
-    private readonly gdp: PieChart<GameID>;
+    private readonly produced: PieChart<number>;
+    private readonly consumed: PieChart<number>;
+    private readonly gdp: PieChart<string>;
     private readonly gdpHistorical: LineChart;
 
     private layerShown?: string;
@@ -56,7 +58,9 @@ export class PlanetOverview extends ScreenContent {
         this.terms = new StaticList<Term, string>(document.createElement('ul'));
         this.terms.node.classList.add('terms');
 
-        this.gdp = new PieChart<GameID>(TooltipType.TileEconomyContribution);
+        this.produced = new PieChart<number>(TooltipType.TileResourceProduced);
+        this.consumed = new PieChart<number>(TooltipType.TileResourceConsumed);
+        this.gdp = new PieChart<string>(TooltipType.TileIndustry);
         this.gdpHistorical = new LineChart();
     }
 
@@ -98,7 +102,9 @@ export class PlanetOverview extends ScreenContent {
         }
 
         const charts: [PieChart<any>, string][] = [
-            [this.gdp, 'GDP Contribution'],
+            [this.gdp, 'Industries'],
+            [this.produced, 'Production'],
+            [this.consumed, 'Consumption'],
         ];
 
         const figures: HTMLDivElement = document.createElement('div');
@@ -188,6 +194,8 @@ export class PlanetOverview extends ScreenContent {
             (term: TermState, item: Term) => item.update(term, [id]),
         );
 
+        this.produced.update(state.details.produced ?? [], id);
+        this.consumed.update(state.details.consumed ?? [], id);
         this.gdp.update(state.details.gdp ?? [], id);
         this.gdpHistorical.update(state.details.gdpGraph, id);
     }

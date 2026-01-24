@@ -32,8 +32,8 @@ extension FinancialStatement {
         let valueConsumed: (l: Int64, e: Int64)
         valueConsumed.l = self.costs.update(with: factory.inventory.l)
         valueConsumed.e = self.costs.update(with: factory.inventory.e)
-        self.costs[.workers] = factory.spending.wages
-        self.costs[.clerks] = factory.spending.salaries
+        self.costs.update(with: .workers(value: factory.spending.wages))
+        self.costs.update(with: .clerks(value: factory.spending.salaries))
         self.lines = .compute(factory: factory, valueConsumed: valueConsumed)
     }
 
@@ -59,10 +59,6 @@ extension FinancialStatement {
     var valueAdded: Int64 {
         self.lines.valueProduced - self.lines.valueConsumed
     }
-
-    // var fixedCosts: Int64 {
-    //     self.lines.operatingCosts + self.lines.carryingCosts
-    // }
 
     var profit: Profit {
         .init(

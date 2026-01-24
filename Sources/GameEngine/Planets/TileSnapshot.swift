@@ -120,28 +120,73 @@ extension TileSnapshot {
     }
 }
 extension TileSnapshot {
-    func tooltipEconomyContribution(
-        resource: Resource,
+    func tooltipIndustry(
+        _ id: EconomicLedger.Industry,
         context: GameUI.CacheContext
     ) -> Tooltip? {
         guard
         let country: DiplomaticAuthority = self.country,
-        let (units, value): (Int64, Int64) = context.ledger.production[self.id / resource] else {
+        let value: Int64 = context.ledger.valueAdded[self.id / id] else {
             return nil
         }
 
-        let total: (worldwide: Int64, value: Int64) = context.ledger.production.reduce(
+        let total: (worldwide: Int64, value: Int64) = context.ledger.valueAdded.reduce(
+            into: (0, 0)
+        ) {
+            if  $1.key.crosstab == id {
+                $0.worldwide += $1.value
+            }
+            if  $1.key.location == self.id {
+                $0.value += $1.value
+            }
+        }
+
+        let industryName: String?
+        switch id {
+        case .building(let type):
+            industryName = context.rules.buildings[type]?.title
+        case .factory(let type):
+            industryName = context.rules.factories[type]?.title
+        case .artisan(let type):
+            industryName = context.rules.resources[type].title
+        case .slavery(let type):
+            industryName = context.rules.pops.cultures[type]?.name
+        }
+
+        return .instructions(style: .borderless) {
+            $0[industryName ?? "?"] = (
+                total.value > 0 ? Double.init(value %/ total.value) : 0
+            )[%2]
+            $0[>] {
+                $0["Estimated GDP contribution (\(country.currency.name))", +] = +?value[/3]
+            }
+        }
+    }
+
+    func tooltipResourceProduced(
+        _ resource: Resource,
+        context: GameUI.CacheContext,
+    ) -> Tooltip? {
+        guard
+        let country: DiplomaticAuthority = self.country,
+        let traded: TradeVolume = context.ledger.resource[self.id / resource] else {
+            return nil
+        }
+
+        let total: (worldwide: Int64, value: Int64) = context.ledger.resource.reduce(
             into: (0, 0)
         ) {
             if  $1.key.crosstab == resource {
-                $0.worldwide += $1.value.units
+                $0.worldwide += $1.value.unitsProduced
             }
             if  $1.key.location == self.id {
-                $0.value += $1.value.value
+                $0.value += $1.value.valueProduced
             }
         }
 
         let resourceName: String = context.rules.resources[resource].title
+        let value: Int64 = traded.valueProduced
+        let units: Int64 = traded.unitsProduced
 
         return .instructions(style: .borderless) {
             $0[resourceName] = (
@@ -156,6 +201,60 @@ extension TileSnapshot {
             Today this region produced \(em: units[/3]) units of \(em: resourceName) \
             comprising \(em: share[%2]) of world production
             """
+        }
+    }
+
+    func tooltipResourceConsumed(
+        _ resource: Resource,
+        context: GameUI.CacheContext,
+    ) -> Tooltip? {
+        guard
+        let country: DiplomaticAuthority = self.country,
+        let traded: TradeVolume = context.ledger.resource[self.id / resource] else {
+            return nil
+        }
+
+        let total: (worldwide: Int64, value: Int64) = context.ledger.resource.reduce(
+            into: (0, 0)
+        ) {
+            if  $1.key.crosstab == resource {
+                $0.worldwide += $1.value.unitsConsumed
+            }
+            if  $1.key.location == self.id {
+                $0.value += $1.value.valueConsumed
+            }
+        }
+
+        let resourceName: String = context.rules.resources[resource].title
+        let value: Int64 = traded.valueConsumed
+        let units: Int64 = traded.unitsConsumed
+
+        return .instructions(style: .borderless) {
+            $0[resourceName] = (
+                total.value > 0 ? Double.init(value %/ total.value) : 0
+            )[%2]
+            $0[>] {
+                $0["Estimated market value (\(country.currency.name))", +] = +?value[/3]
+            }
+
+            let share: Double = .init(units %/ max(total.worldwide, 1))
+            $0[>] = """
+            Today this region consumed \(em: units[/3]) units of \(em: resourceName) \
+            comprising \(em: share[%2]) of world consumption
+            """
+
+            if  units > traded.unitsProduced {
+                let deficit: Int64 = units - traded.unitsProduced
+                $0[>] = """
+                This region has a deficit of \(neg: deficit[/3])
+                """
+            } else if
+                units < traded.unitsProduced {
+                let surplus: Int64 = traded.unitsProduced - units
+                $0[>] = """
+                This region has a surplus of \(pos: surplus[/3])
+                """
+            }
         }
     }
 }

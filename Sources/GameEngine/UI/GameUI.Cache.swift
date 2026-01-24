@@ -456,10 +456,22 @@ extension GameUI.Cache {
         self.tiles[id]?.tooltip(occupation: occupation)
     }
 
-    func tooltipTileEconomyContribution(
+    func tooltipTileIndustry(
         _ id: Address,
-        _ resource: Resource,
+        _ crosstab: EconomicLedger.Industry,
     ) -> Tooltip? {
-        self.tiles[id]?.tooltipEconomyContribution(resource: resource, context: self.context)
+        self.tiles[id]?.tooltipIndustry(crosstab, context: self.context)
+    }
+    func tooltipTileResourceProduced(
+        _ id: Address,
+        _ crosstab: Resource,
+    ) -> Tooltip? {
+        self.tiles[id]?.tooltipResourceProduced(crosstab, context: self.context)
+    }
+    func tooltipTileResourceConsumed(
+        _ id: Address,
+        _ crosstab: Resource,
+    ) -> Tooltip? {
+        self.tiles[id]?.tooltipResourceConsumed(crosstab, context: self.context)
     }
 }

@@ -1,10 +1,13 @@
 import GameIDs
+import JavaScriptInterop
 
 extension EconomicLedger {
-    enum Industry: Hashable {
-        case building(BuildingType)
-        case factory(FactoryType)
-        case slavery(CultureID)
-        case artisan(Resource)
+    @StringUnion enum Industry: Hashable, Comparable {
+        @tag("B") case building(BuildingType)
+        @tag("F") case factory(FactoryType)
+        @tag("P") case slavery(CultureID)
+        @tag("R") case artisan(Resource)
     }
 }
+extension EconomicLedger.Industry: CustomStringConvertible, LosslessStringConvertible {}
+extension EconomicLedger.Industry: ConvertibleToJSString, LoadableFromJSString {}
