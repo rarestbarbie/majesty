@@ -1,7 +1,7 @@
 #!/bin/bash
 
 BUCKET_PATH="tayloraswift-apps/majesty"
-BUILD_FOLDER=".build.vite"
+BUILD_FOLDER="TypeScript/.build.vite"
 
 aws s3 sync "$BUILD_FOLDER" "s3://$BUCKET_PATH" --delete --exclude "*.gz" --exclude "*.html"
 

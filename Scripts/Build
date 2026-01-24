@@ -253,7 +253,7 @@ build_wasm() {
 
     if [ "$COMPONENT" = "engine" ]; then
         product="engine"
-        scratch_path=".build.wasm"
+        scratch_path="TypeScript/.build.wasm"
 
         if [ "$CONFIG" = "release" ] && [ "$NOASSERT" = true ]; then
             # "Build (release, noassert)"

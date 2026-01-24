@@ -4,7 +4,12 @@ import { resolve } from 'path';
 
 export default defineConfig({
     base: '/majesty/',
-    publicDir: 'Public',
+    publicDir: '../Public',
+    resolve: {
+        alias: {
+            '@bjorn3/browser_wasi_shim': resolve(__dirname, 'node_modules/@bjorn3/browser_wasi_shim')
+        }
+    },
     build: {
         target: 'esnext',
         outDir: '.build.vite',
@@ -20,13 +25,6 @@ export default defineConfig({
     server: {
         watch: {
             ignored: [
-                '/swift/majesty/.build',
-                '/swift/majesty/.games',
-                '/swift/majesty/Docs',
-                '/swift/majesty/Plugins',
-                '/swift/majesty/Scripts',
-                '/swift/majesty/Sources',
-                '/swift/majesty/Tests',
             ],
         },
         headers: {
