@@ -12,7 +12,6 @@ export default defineConfig({
     },
     build: {
         target: 'esnext',
-        outDir: '.build.vite',
         assetsDir: 'assets',
         rollupOptions: {
             input: {

@@ -23,6 +23,7 @@
 /Tests/package-lock.json
 
 /TypeScript/.build.wasm
+/TypeScript/.build.vite
 /TypeScript/node_modules
 /TypeScript/package-lock.json
 
