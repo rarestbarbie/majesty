@@ -103,11 +103,9 @@ extension PopSnapshot {
         base: Int64,
         mine: MiningJobConditions
     ) {
-        let mil: Double = self.region.pops.free.mil.average
-
         ul[>] = "Base: \(em: MineMetadata.efficiencyPoliticians[%])"
         ul["Militancy of Free Population", +] = +(
-            MineMetadata.efficiencyPoliticiansPerMilitancyPoint * mil
+            MineMetadata.efficiencyPoliticiansPerMilitancyPoint * self.region.pops.free.μ.mil
         )[%1]
     }
     private func explainProductionMiner(

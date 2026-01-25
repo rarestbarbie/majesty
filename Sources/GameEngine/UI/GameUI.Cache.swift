@@ -63,7 +63,7 @@ extension GameUI.Cache {
 }
 extension GameUI.Cache {
     func tooltipBuildingAccount(_ id: BuildingID) -> Tooltip? {
-        self.buildings[id]?.tooltipAccount(self.bank[account: .building(id)])
+        self.buildings[id]?.tooltipAccount(self.bank[account: id])
     }
     func tooltipBuildingNeeds(
         _ id: BuildingID,
@@ -143,7 +143,7 @@ extension GameUI.Cache {
 }
 extension GameUI.Cache {
     func tooltipFactoryAccount(_ id: FactoryID) -> Tooltip? {
-        self.factories[id]?.tooltipAccount(self.bank[account: .factory(id)])
+        self.factories[id]?.tooltipAccount(self.bank[account: id])
     }
 
     func tooltipFactoryWorkers(_ id: FactoryID) -> Tooltip? {
@@ -247,7 +247,7 @@ extension GameUI.Cache {
 }
 extension GameUI.Cache {
     func tooltipPopAccount(_ id: PopID) -> Tooltip? {
-        self.pops[id]?.tooltipAccount(self.bank[account: .pop(id)])
+        self.pops[id]?.tooltipAccount(self.bank[account: id])
     }
 
     func tooltipPopActive(_ id: PopID) -> Tooltip? {
@@ -456,6 +456,11 @@ extension GameUI.Cache {
         self.tiles[id]?.tooltip(occupation: occupation)
     }
 
+    func tooltipTileGDP(
+        _ id: Address,
+    ) -> Tooltip? {
+        self.tiles[id]?.tooltipGDP(context: self.context)
+    }
     func tooltipTileIndustry(
         _ id: Address,
         _ crosstab: EconomicLedger.Industry,

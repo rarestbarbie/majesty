@@ -17,6 +17,10 @@ extension Bank {
         _read   { yield  self.accounts[id, default: .zero] }
         _modify { yield &self.accounts[id, default: .zero] }
     }
+    subscript(account id: some LegalEntityIdentifier) -> Account {
+        _read   { yield  self.accounts[id.lei, default: .zero] }
+        _modify { yield &self.accounts[id.lei, default: .zero] }
+    }
 }
 extension Bank {
     mutating func prune(in context: GameContext.PruningPass) {
@@ -30,6 +34,7 @@ extension Bank {
     }
 }
 extension Bank {
+    @available(*, deprecated)
     func valuation(
         of entity: some LegalEntityState,
         in context: GameContext.LegalPass,

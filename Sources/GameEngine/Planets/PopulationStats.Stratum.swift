@@ -13,6 +13,9 @@ extension PopulationStats.Stratum {
         self.init(total: 0, cultures: [:], weighted: .zero)
     }
 }
+extension PopulationStats.Stratum: MeanAggregatable {
+    var weight: Double { Double.init(self.total) }
+}
 extension PopulationStats.Stratum {
     subscript<Float>(dynamicMember keyPath: KeyPath<Fields, Float>) -> (
         average: Float,

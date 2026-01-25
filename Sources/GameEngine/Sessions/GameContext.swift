@@ -292,6 +292,7 @@ extension GameContext {
             /// avoid copy-on-write. note that we should not be accessing `PopContext.region`
             /// here — that will be stale as it is not updated until after indexing is complete
             let (pop, stats): (Pop, Pop.Stats) = { ($0.state, $0.stats) } (self.pops[i])
+            let account: Bank.Account = world.bank[account: pop.id]
 
             guard
             let region: RegionalAuthority = self.tiles[pop.tile]?.addResidentCount(
@@ -311,19 +312,22 @@ extension GameContext {
             if case .Owner = pop.type.stratum {
                 // resources produced by aristocrats and politicians are not counted as part of
                 // GDP, otherwise campaign contributions would be like, 99 percent of GDP
+                economy.countFreePop(statement: stats.financial, region: region.id)
                 continue
             } else if pop.type.stratum > .Ward {
                 // free pops do not have shareholders
-                economy.count(statement: stats.financial, region: region, free: pop)
+                economy.countFreePop(statement: stats.financial, region: region, worker: pop)
+                economy.countIncome(account: account, region: region.id, worker: pop)
                 continue
             }
             /// We compute this here, and not in `PopContext.compute`, so that its global
             /// context can exclude the pop table itself, allowing us to mutate `PopContext`
             /// in-place there without individually retaining and releasing every `PopContext`
             /// in the array on every loop iteration, which would be O(n²)!
-            let equity: Equity<LEI>.Statistics = world.bank.valuation(
-                of: pop,
-                in: self.legalPass
+            let equity: Equity<LEI>.Statistics = .compute(
+                entity: pop,
+                account: account,
+                context: self.legalPass
             )
             economy.count(
                 statement: stats.financial,
@@ -347,9 +351,10 @@ extension GameContext {
                 fatalError("Factory \(factory.id) has no home tile!!!")
             }
 
-            let equity: Equity<LEI>.Statistics = world.bank.valuation(
-                of: factory,
-                in: self.legalPass
+            let equity: Equity<LEI>.Statistics = .compute(
+                entity: factory,
+                account: world.bank[account: factory.id],
+                context: self.legalPass
             )
             economy.count(
                 statement: statement,
@@ -373,9 +378,10 @@ extension GameContext {
                 fatalError("Building \(building.id) has no home tile!!!")
             }
 
-            let equity: Equity<LEI>.Statistics = world.bank.valuation(
-                of: building,
-                in: self.legalPass
+            let equity: Equity<LEI>.Statistics = .compute(
+                entity: building,
+                account: world.bank[account: building.id],
+                context: self.legalPass
             )
             economy.count(
                 statement: statement,
@@ -564,6 +570,13 @@ extension GameContext {
         for (key, value): (EconomicLedger.Regional<EconomicLedger.Industry>, Int64) in economy.valueAdded {
             stats[key.location, default: .zero].gdp += value
         }
+        for (key, value): (EconomicLedger.IncomeSection, EconomicLedger.LinearMetrics) in economy.byIncome {
+            if  key.stratum >= .Clerk {
+                stats[key.region, default: .zero].incomeUpper[key.gender.sex] += value
+            } else {
+                stats[key.region, default: .zero].incomeLower[key.gender.sex] += value
+            }
+        }
         for (id, stats): (Address, EconomicStats) in stats {
             self.tiles[id]?.update(economy: stats)
         }
@@ -743,7 +756,7 @@ extension GameContext {
                 return $1.id
             }
 
-            turn.bank[account: .pop(target)].d += inheritedCash
+            turn.bank[account: target].d += inheritedCash
         }
     }
     private mutating func executeConstructions(_ turn: inout Turn) throws {

@@ -64,26 +64,24 @@ extension TileSnapshot {
                 }
 
             case .AverageMilitancy:
-                let free: Delta<Double> = pops.free.mil.average
+                let free: Delta<Double> = pops.free.μ.mil
                 $0["Average militancy", -] = free[..2]
-                let enslaved: Double = self.z.stats.pops.enslaved.mil.average
-                if  self.z.stats.pops.enslaved.total > 0 {
+                if  let mil: Double = self.z.stats.pops.enslaved.μ.mil.defined {
                     $0[>] = """
                     The average militancy of the slave population is \(
-                        enslaved[..2],
-                        style: enslaved > 1.0 ? .neg : .em
+                        mil[..2],
+                        style: mil > 1.0 ? .neg : .em
                     )
                     """
                 }
             case .AverageConsciousness:
-                let free: Delta<Double> = pops.free.con.average
+                let free: Delta<Double> = pops.free.μ.con
                 $0["Average consciousness", -] = free[..2]
-                let enslaved: Double = self.z.stats.pops.enslaved.con.average
-                if  self.z.stats.pops.enslaved.total > 0 {
+                if  let con: Double = self.z.stats.pops.enslaved.μ.con.defined {
                     $0[>] = """
                     The average consciousness of the slave population is \(
-                        enslaved[..2],
-                        style: enslaved > 1.0 ? .neg : .em
+                        con[..2],
+                        style: con > 1.0 ? .neg : .em
                     )
                     """
                 }
@@ -148,6 +146,28 @@ extension TileSnapshot {
     }
 }
 extension TileSnapshot {
+    func tooltipGDP(
+        context: GameUI.CacheContext
+    ) -> Tooltip {
+        .instructions {
+            $0["GDP", +] = self.Δ.stats.economy.gdp[/3]
+
+            let average: Delta<Mean<EconomicStats>> = self.Δ.stats.μFree
+            $0[>] {
+                $0["GDP per capita", +] = average.gdp[/3..2]
+            }
+
+            /// average across sexes
+            let incomeUpper: Delta<EconomicLedger.LinearMetrics> = self.Δ.stats.economy.incomeUpper.all
+            let incomeLower: Delta<EconomicLedger.LinearMetrics> = self.Δ.stats.economy.incomeLower.all
+            let incomeAll: Delta<EconomicLedger.LinearMetrics> = incomeUpper + incomeLower
+            $0["Income per capita", +] = incomeAll.μ.incomeTotal[/3..2]
+            $0[>] {
+                $0["Clerks", +] = incomeUpper.μ.incomeTotal[/3..2]
+                $0["Workers", +] = incomeLower.μ.incomeTotal[/3..2]
+            }
+        }
+    }
     func tooltipIndustry(
         _ id: EconomicLedger.Industry,
         context: GameUI.CacheContext

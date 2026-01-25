@@ -201,7 +201,7 @@ extension PopContext: AllocatingContext {
             )
 
             budget = .slave(
-                account: turn.bank[account: self.lei],
+                account: turn.bank[account: self.id],
                 weights: weights,
                 state: self.state.z,
                 stockpileMaxDays: Self.stockpileDaysMax,
@@ -248,7 +248,7 @@ extension PopContext: AllocatingContext {
             )
 
             budget = .free(
-                account: turn.bank[account: self.lei],
+                account: turn.bank[account: self.id],
                 weights: weights,
                 state: self.state.z,
                 stockpileMaxDays: Self.stockpileDaysMax,
@@ -393,7 +393,7 @@ extension PopContext: TransactingContext {
 
             // Welfare
             account.s += self.state.z.active * region.minwage / 10
-        } (&turn.bank[account: self.lei])
+        } (&turn.bank[account: self.id])
 
         if  enslaved {
             // Pay dividends to shareholders, if any.

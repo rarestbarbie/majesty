@@ -80,10 +80,9 @@ extension MineMetadata {
     ) {
         let efficiency: Double
         if case .Politician = self.miner {
-            let mil: Double = tile.pops.free.mil.average
             efficiency = Double.init(
                 Self.efficiencyPoliticians
-            ) + Self.efficiencyPoliticiansPerMilitancyPoint * mil
+            ) + Self.efficiencyPoliticiansPerMilitancyPoint * tile.pops.free.μ.mil
         } else {
             let bonus: Decimal = tile.modifiers.miningEfficiency[self.id]?.value ?? 0
             efficiency = Double.init(

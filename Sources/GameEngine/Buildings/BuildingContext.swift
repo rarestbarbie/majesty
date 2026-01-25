@@ -143,7 +143,7 @@ extension BuildingContext: TransactingContext {
         )
 
         let budget: Building.Budget = .init(
-            account: turn.bank[account: self.lei],
+            account: turn.bank[account: self.id],
             weights: weights,
             state: self.state.z,
             stockpileMaxDays: Self.stockpileDaysMax,
@@ -227,7 +227,7 @@ extension BuildingContext: TransactingContext {
                     random: &turn.random
                 )
             }
-        } (&turn.bank[account: self.lei])
+        } (&turn.bank[account: self.id])
 
         self.state.z.fl = self.state.inventory.l.consumeAmortized(
             from: self.type.operations,

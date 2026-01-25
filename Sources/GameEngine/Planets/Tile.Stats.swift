@@ -9,7 +9,12 @@ extension Tile {
 }
 extension Tile.Stats {
     init() {
-        self.init(economy: .init(gdp: 0), pops: .init())
+        self.init(economy: .zero, pops: .init())
+    }
+}
+extension Tile.Stats {
+    var μFree: Mean<EconomicStats> {
+        .init(fields: self.economy, weight: Double.init(self.pops.free.total))
     }
 }
 extension Tile.Stats {
@@ -25,6 +30,8 @@ extension Tile.Stats {
         case pops_enslaved = "pE"
         case pops_free = "pF"
         case economy_gdp = "eG"
+        case economy_incomeUpper = "eU"
+        case economy_incomeLower = "eL"
     }
 }
 extension Tile.Stats: JavaScriptEncodable {
@@ -34,13 +41,17 @@ extension Tile.Stats: JavaScriptEncodable {
         js[.pops_enslaved] = self.pops.enslaved
         js[.pops_free] = self.pops.free
         js[.economy_gdp] = self.economy.gdp
+        js[.economy_incomeUpper] = self.economy.incomeUpper
+        js[.economy_incomeLower] = self.economy.incomeLower
     }
 }
 extension Tile.Stats: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             economy: .init(
-                gdp: try js[.economy_gdp].decode()
+                gdp: try js[.economy_gdp].decode(),
+                incomeUpper: try js[.economy_incomeUpper].decode(),
+                incomeLower: try js[.economy_incomeLower].decode(),
             ),
             pops: .init(
                 occupation: try js[.pops_occupation].decode(
