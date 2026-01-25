@@ -166,11 +166,15 @@ extension TileSnapshot {
             }
 
             /// average across sexes
+            let incomeElite: Delta<EconomicLedger.LinearMetrics> = self.Δ.stats.economy.incomeElite.all
             let incomeUpper: Delta<EconomicLedger.LinearMetrics> = self.Δ.stats.economy.incomeUpper.all
             let incomeLower: Delta<EconomicLedger.LinearMetrics> = self.Δ.stats.economy.incomeLower.all
-            let incomeAll: Delta<EconomicLedger.LinearMetrics> = incomeUpper + incomeLower
-            $0["Income per capita", +] = incomeAll.μ.incomeTotal[/3..2]
+            $0["Income per capita", +] = (
+                incomeElite + incomeUpper + incomeLower
+            ).μ.incomeTotal[/3..2]
+
             $0[>] {
+                $0["Elites", +] = incomeElite.μ.incomeTotal[/3..2]
                 $0["Clerks", +] = incomeUpper.μ.incomeTotal[/3..2]
                 $0["Workers", +] = incomeLower.μ.incomeTotal[/3..2]
             }

@@ -64,6 +64,10 @@ extension EconomicAggregator {
                 tradeable: tradeable
             )
 
+            guard equity.shareCount > 0 else {
+                continue
+            }
+
             let share: Double = Double.init(value %/ equity.shareCount)
             for owner: Equity<LEI>.Statistics.Shareholder in equity.owners {
                 let owned: Double = Double.init(owner.shares) * share
@@ -86,44 +90,48 @@ extension EconomicAggregator {
     ) {
         self.countConsumption(inputs: statement.costs.items, region: region.id)
 
-        if case .Owner = pop.type.stratum {
-            // resources produced by aristocrats and politicians are not counted as part of
-            // GDP, otherwise campaign contributions would be like, 99 percent of GDP
-            return
-        }
-
-        let country: CountryID = region.occupiedBy
-        let value: Double = Double.init(statement.valueAdded)
-
-        self.byCulture[country / pop.type.race, default: 0] += value
-        self.byGender[country / pop.type.gender, default: 0] += value
-
-        for (tradeable, output): (tradeable: Bool, ResourceOutput) in pop.inventory.out.joined {
-            let valueAdded: Int64 = output.valueProduced
-
-            self.valueAdded[region.id / .artisan(output.id), default: 0] += valueAdded
-            self.countProduction(output: output, region: region.id, tradeable: tradeable)
-        }
-        for mining: MiningJob in pop.mines.values {
-            for (tradeable, output): (tradeable: Bool, ResourceOutput) in mining.out.joined {
-                let valueAdded: Int64 = output.valueProduced
-
-                self.valueAdded[region.id / .artisan(output.id), default: 0] += valueAdded
-                self.countProduction(output: output, region: region.id, tradeable: tradeable)
-            }
-        }
-
         let section: EconomicLedger.IncomeSection = .init(
             stratum: pop.type.stratum,
             gender: pop.type.gender,
             region: region.id
         )
 
+        let incomeSelfEmployment: Int64
+
+        if case .Owner = pop.type.stratum {
+            // resources produced by aristocrats and politicians are not counted as part of
+            // GDP, otherwise campaign contributions would be like, 99 percent of GDP
+            incomeSelfEmployment = 0
+        } else {
+            let country: CountryID = region.occupiedBy
+            let value: Double = Double.init(statement.valueAdded)
+
+            incomeSelfEmployment = statement.valueAdded
+
+            self.byCulture[country / pop.type.race, default: 0] += value
+            self.byGender[country / pop.type.gender, default: 0] += value
+
+            for (tradeable, output): (tradeable: Bool, ResourceOutput) in pop.inventory.out.joined {
+                let valueAdded: Int64 = output.valueProduced
+
+                self.valueAdded[region.id / .artisan(output.id), default: 0] += valueAdded
+                self.countProduction(output: output, region: region.id, tradeable: tradeable)
+            }
+            for mining: MiningJob in pop.mines.values {
+                for (tradeable, output): (tradeable: Bool, ResourceOutput) in mining.out.joined {
+                    let valueAdded: Int64 = output.valueProduced
+
+                    self.valueAdded[region.id / .artisan(output.id), default: 0] += valueAdded
+                    self.countProduction(output: output, region: region.id, tradeable: tradeable)
+                }
+            }
+        }
+
         self.byIncome[section, default: .zero].count(
             pop,
             incomeSubsidies: account.s,
             incomeFromEmployment: account.i,
-            incomeSelfEmployment: statement.valueAdded
+            incomeSelfEmployment: incomeSelfEmployment
         )
     }
 

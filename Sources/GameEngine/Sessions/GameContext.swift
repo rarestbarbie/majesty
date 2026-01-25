@@ -570,9 +570,12 @@ extension GameContext {
             stats[key.location, default: .zero].gdp += value
         }
         for (key, value): (EconomicLedger.IncomeSection, EconomicLedger.LinearMetrics) in economy.byIncome {
-            if  key.stratum >= .Clerk {
+            switch key.stratum {
+            case .Owner:
+                stats[key.region, default: .zero].incomeElite[key.gender.sex] += value
+            case .Clerk:
                 stats[key.region, default: .zero].incomeUpper[key.gender.sex] += value
-            } else {
+            default:
                 stats[key.region, default: .zero].incomeLower[key.gender.sex] += value
             }
         }
