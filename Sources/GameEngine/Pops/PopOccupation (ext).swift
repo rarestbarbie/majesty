@@ -1,7 +1,7 @@
 import GameIDs
 
 extension PopOccupation {
-    var earnings: String {
+    var revenue: String {
         switch self {
         case .Livestock: "Market earnings"
         case .Driver: "Wages"

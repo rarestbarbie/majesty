@@ -34,20 +34,6 @@ extension Bank {
     }
 }
 extension Bank {
-    @available(*, deprecated)
-    func valuation(
-        of entity: some LegalEntityState,
-        in context: GameContext.LegalPass,
-    ) -> Equity<LEI>.Statistics {
-        .compute(
-            equity: entity.equity,
-            // inventory, not assets, to avoid cratering stock price when expanding factory
-            assets: self[account: entity.id.lei].balance + entity.z.vv,
-            context: context
-        )
-    }
-}
-extension Bank {
     mutating func transfer(
         budget: Int64,
         source: LEI,
@@ -60,7 +46,7 @@ extension Bank {
         var paid: Int64 = 0
 
         for ((pop, _), payment): ((PopID, _), Int64) in zip(recipients, payments) {
-            self[account: .pop(pop)].r += payment
+            self[account: pop].i += payment
             paid += payment
         }
 

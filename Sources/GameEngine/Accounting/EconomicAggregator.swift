@@ -78,11 +78,20 @@ extension EconomicAggregator {
         self.countConsumption(inputs: statement.costs.items, region: region.id)
     }
     /// Miners are never enslaved, so no equity breakdown is necessary.
-    mutating func countFreePop(
+    mutating func count(
+        free pop: Pop,
         statement: FinancialStatement,
         region: RegionalAuthority,
-        worker pop: Pop,
+        account: Bank.Account,
     ) {
+        self.countConsumption(inputs: statement.costs.items, region: region.id)
+
+        if case .Owner = pop.type.stratum {
+            // resources produced by aristocrats and politicians are not counted as part of
+            // GDP, otherwise campaign contributions would be like, 99 percent of GDP
+            return
+        }
+
         let country: CountryID = region.occupiedBy
         let value: Double = Double.init(statement.valueAdded)
 
@@ -104,27 +113,18 @@ extension EconomicAggregator {
             }
         }
 
-        self.countConsumption(inputs: statement.costs.items, region: region.id)
-    }
-    mutating func countFreePop(
-        statement: FinancialStatement,
-        region: Address,
-    ) {
-        self.countConsumption(inputs: statement.costs.items, region: region)
-    }
-
-    mutating func countIncome(
-        account: Bank.Account,
-        region: Address,
-        worker pop: Pop,
-    ) {
         let section: EconomicLedger.IncomeSection = .init(
             stratum: pop.type.stratum,
             gender: pop.type.gender,
-            region: region
+            region: region.id
         )
 
-        self.byIncome[section, default: .zero].count(account, of: pop)
+        self.byIncome[section, default: .zero].count(
+            pop,
+            incomeSubsidies: account.s,
+            incomeFromEmployment: account.i,
+            incomeSelfEmployment: statement.valueAdded
+        )
     }
 
     consuming func aggregate() -> EconomicLedger {

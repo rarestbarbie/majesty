@@ -10,12 +10,14 @@ extension Bank {
         /// Spending, excluding equity purchases. Negative if funds are spent.
         var b: Int64
 
-        /// Income.
+        /// Revenue.
         var r: Int64
         /// Subsidies.
         var s: Int64
 
-        /// Interest and dividends, positive for income, unset if paid out (counted in ``b``).
+        /// Income. Can include interest and dividends, when being received.
+        ///
+        /// Interest and dividends paid out are counted in ``b`` instead.
         var i: Int64
         /// Proceeds from stock sales. Not to be confused with ``e``.
         var j: Int64

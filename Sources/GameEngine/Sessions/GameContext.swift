@@ -309,15 +309,14 @@ extension GameContext {
                 self.mines[modifying: job.id].addWorkforceCount(pop: pop, job: job)
             }
 
-            if case .Owner = pop.type.stratum {
-                // resources produced by aristocrats and politicians are not counted as part of
-                // GDP, otherwise campaign contributions would be like, 99 percent of GDP
-                economy.countFreePop(statement: stats.financial, region: region.id)
-                continue
-            } else if pop.type.stratum > .Ward {
+            if pop.type.stratum > .Ward {
                 // free pops do not have shareholders
-                economy.countFreePop(statement: stats.financial, region: region, worker: pop)
-                economy.countIncome(account: account, region: region.id, worker: pop)
+                economy.count(
+                    free: pop,
+                    statement: stats.financial,
+                    region: region,
+                    account: account,
+                )
                 continue
             }
             /// We compute this here, and not in `PopContext.compute`, so that its global
