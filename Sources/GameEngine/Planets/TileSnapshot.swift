@@ -24,20 +24,28 @@ extension TileSnapshot {
         among totals: [EconomicLedger.Regional<Crosstab>: Value],
         worldContribution: (Value) -> Int64,
         localContribution: (Value) -> Int64
-    ) -> (world: Int64, local: Int64) {
-        totals.reduce(into: (0, 0)) {
+    ) -> (world: Int64, local: Int64, localExcluded: Int64) {
+        totals.reduce(into: (0, 0, 0)) {
             if  $1.key.crosstab == crosstab {
-                $0.world += worldContribution($1.value)
+                let worldContribution: Int64 = worldContribution($1.value)
+                if  worldContribution > 0 {
+                    $0.world += worldContribution
+                }
             }
             if  $1.key.location == self.id {
-                $0.local += localContribution($1.value)
+                let localContribution: Int64 = localContribution($1.value)
+                if  localContribution > 0 {
+                    $0.local += localContribution
+                } else {
+                    $0.localExcluded += localContribution
+                }
             }
         }
     }
     private func aggregate<Crosstab>(
         where crosstab: Crosstab,
         among totals: [EconomicLedger.Regional<Crosstab>: Int64],
-    ) -> (world: Int64, local: Int64) {
+    ) -> (world: Int64, local: Int64, localExcluded: Int64) {
         self.aggregate(
             where: crosstab,
             among: totals,
@@ -178,7 +186,7 @@ extension TileSnapshot {
             return nil
         }
 
-        let total: (world: Int64, local: Int64) = self.aggregate(
+        let total: (world: Int64, local: Int64, localExcluded: Int64) = self.aggregate(
             where: id,
             among: context.ledger.valueAdded,
             worldContribution: { $0 },
@@ -204,6 +212,23 @@ extension TileSnapshot {
             $0[>] {
                 $0["Estimated GDP contribution (\(country.currency.name))", +] = +?value[/3]
             }
+
+            if case .artisan = id {
+                $0[>] = """
+                All of the income from self-employment counts towards GDP
+                """
+            } else {
+                $0[>] = """
+                Only income left over after subtracting costs (except for labor) counts \
+                towards GDP
+                """
+            }
+            if  total.localExcluded < 0 {
+                $0[>] = """
+                \(neg: +total.localExcluded[/3]) \(country.currency.name) of business losses \
+                are excluded from percentage calculations
+                """
+            }
         }
     }
 
@@ -217,7 +242,7 @@ extension TileSnapshot {
             return nil
         }
 
-        let total: (world: Int64, local: Int64) = self.aggregate(
+        let total: (world: Int64, local: Int64, localExcluded: Int64) = self.aggregate(
             where: resource,
             among: context.ledger.resource,
             worldContribution: \.unitsProduced,
@@ -255,7 +280,7 @@ extension TileSnapshot {
             return nil
         }
 
-        let total: (world: Int64, local: Int64) = self.aggregate(
+        let total: (world: Int64, local: Int64, localExcluded: Int64) = self.aggregate(
             where: resource,
             among: context.ledger.resource,
             worldContribution: \.unitsConsumed,
