@@ -16,9 +16,6 @@ struct TileSnapshot: Differentiable, Identifiable, Sendable {
     let z: Tile.Interval
 }
 extension TileSnapshot {
-    var pops: PopulationStats { self.z.stats.pops }
-}
-extension TileSnapshot {
     private func aggregate<Crosstab, Value>(
         where crosstab: Crosstab,
         among totals: [EconomicLedger.Regional<Crosstab>: Value],
@@ -58,23 +55,36 @@ extension TileSnapshot {
     func tooltip(
         _ layer: PlanetMapLayer,
     ) -> Tooltip? {
-        let pops: Delta<PopulationStats> = self.Δ.stats.pops
+        /// average across sexes
+        let incomeElite: Delta<EconomicLedger.IncomeMetrics> = self.Δ.stats.incomeElite.all
+        let incomeUpper: Delta<EconomicLedger.IncomeMetrics> = self.Δ.stats.incomeUpper.all
+        let incomeLower: Delta<EconomicLedger.IncomeMetrics> = self.Δ.stats.incomeLower.all
+        let incomeAllFree: Delta<EconomicLedger.IncomeMetrics> = incomeElite
+            + incomeUpper
+            + incomeLower
+
         return .instructions(style: .borderless) {
             switch layer {
             case .Terrain:
                 $0[>] = "\(self.metadata.ecology.title) (\(self.metadata.geology.title))"
 
             case .Population:
-                $0["Population", +] = pops.free.total[/3]
+                $0["Population", +] = self.Δ.stats.voters.count[/3]
                 $0[>] {
-                    $0["Free", +] = pops.free.total[/3]
-                    $0["Enslaved", +] = pops.enslaved.total[/3]
+                    $0["Elites", -] = incomeElite.count[/2]
+                    $0["Clerks", -] = incomeUpper.count[/2]
+                    $0["Workers", -] = incomeLower.count[/2]
+                    $0["Enslaved", +] = self.Δ.stats.slaves.count[/3]
                 }
 
             case .AverageMilitancy:
-                let free: Delta<Double> = pops.free.μ.mil
-                $0["Average militancy", -] = free[..2]
-                if  let mil: Double = self.z.stats.pops.enslaved.μ.mil.defined {
+                $0["Average militancy", -] = incomeAllFree.μ.mil[..2]
+                $0[>] {
+                    $0["Elites", -] = incomeElite.μ.mil[..2]
+                    $0["Clerks", -] = incomeUpper.μ.mil[..2]
+                    $0["Workers", -] = incomeLower.μ.mil[..2]
+                }
+                if  let mil: Double = self.z.stats.slaves.μ.mil.defined {
                     $0[>] = """
                     The average militancy of the slave population is \(
                         mil[..2],
@@ -83,9 +93,13 @@ extension TileSnapshot {
                     """
                 }
             case .AverageConsciousness:
-                let free: Delta<Double> = pops.free.μ.con
-                $0["Average consciousness", -] = free[..2]
-                if  let con: Double = self.z.stats.pops.enslaved.μ.con.defined {
+                $0["Average consciousness", -] = incomeAllFree.μ.con[..2]
+                $0[>] {
+                    $0["Elites", -] = incomeElite.μ.con[..2]
+                    $0["Clerks", -] = incomeUpper.μ.con[..2]
+                    $0["Workers", -] = incomeLower.μ.con[..2]
+                }
+                if  let con: Double = self.z.stats.slaves.μ.con.defined {
                     $0[>] = """
                     The average consciousness of the slave population is \(
                         con[..2],
@@ -102,51 +116,62 @@ extension TileSnapshot {
     }
 }
 extension TileSnapshot {
-    func tooltip(culture: Culture) -> Tooltip? {
-        let free: Delta<Int64>? = self.Δ.stats.pops.free.cultures[culture.id]
-        let enslaved: Delta<Int64>? = self.Δ.stats.pops.enslaved.cultures[culture.id]
-
-        let count: Delta<Int64>
-        let total: Delta<Int64>
-
-        if  let free: Delta<Int64> {
-            count = free
-            total = self.Δ.stats.pops.free.total
-        } else if
-            let enslaved: Delta<Int64> {
-            count = enslaved
-            total = self.Δ.stats.pops.enslaved.total
-        } else {
+    func tooltipRace(
+        in context: GameUI.CacheContext,
+        id: CultureID
+    ) -> Tooltip? {
+        /// note: capital metrics are currently only tracked for free pops
+        guard
+        let culture: Culture = context.rules.pops.cultures[id],
+        let metrics: Delta<EconomicLedger.CapitalMetrics> = context.ledger.Δ.economy.racial[
+            self.id / id
+        ] else {
             return nil
         }
 
         guard
-        let share: Delta<Double> = count.percentage(of: total) else {
+        let share: Delta<Double> = metrics.count.percentage(
+            of: self.Δ.stats.voters.count
+        ) else {
             return nil
         }
 
         return .instructions(style: .borderless) {
             $0[culture.name, +] = share[%3]
             $0[>] {
-                $0["Free", +] = free?[/3]
-                $0["Enslaved", +] = enslaved?[/3]
+                $0["GNI per-capita", +] = metrics.μ.income[/3..2]
+                $0["Average militancy", -] = metrics.μ.mil[/3]
+                $0["Average consciousness", -] = metrics.μ.con[/3]
             }
+            $0[>] = """
+            There are \(em: metrics.z.count[/3]) people of the \(em: culture.name) race in \
+            \(self.name ?? "this region")
+            """
+            $0[>] = """
+            The Gross National Income (GNI) counts all income earned by people of this race, \
+            including unrealized capital gains
+            """
         }
     }
-    func tooltip(occupation: PopOccupation) -> Tooltip? {
+    func tooltipOccupation(
+        in context: GameUI.CacheContext,
+        id: PopOccupation
+    ) -> Tooltip? {
         guard
-        let row: Delta<PopulationStats.Row> = self.Δ.stats.pops.occupation[occupation] else {
+        let row: Delta<EconomicLedger.LaborMetrics> = context.ledger.Δ.economy.employment[
+            self.id / id
+        ] else {
             return nil
         }
 
-        let total: Delta<Int64> = self.Δ.stats.pops.free.total
+        let total: Delta<Int64> = self.Δ.stats.voters.count
         guard
         let share: Delta<Double> = row.count.percentage(of: total) else {
             return nil
         }
 
         return .instructions(style: .borderless) {
-            $0[occupation.plural, +] = share[%3]
+            $0[id.plural, +] = share[%3]
             $0[>] {
                 $0["Unemployment rate", -] = row.unemployed.percentage(of: row.count)?[%3]
             }
@@ -155,20 +180,21 @@ extension TileSnapshot {
 }
 extension TileSnapshot {
     func tooltipGDP(
-        context: GameUI.CacheContext
+        in context: GameUI.CacheContext
     ) -> Tooltip {
         .instructions {
-            $0["GDP", +] = self.Δ.stats.economy.gdp[/3]
+            $0["GDP", +] = self.Δ.stats.gdp[/3]
 
-            let average: Delta<Mean<EconomicStats>> = self.Δ.stats.μFree
+            let average: Delta<Mean<Tile.Stats>> = self.Δ.stats._μFree
             $0[>] {
                 $0["GDP per capita", +] = average.gdp[/3..2]
+                $0["GNP per capita", +] = average.gnp[/3..2]
             }
 
             /// average across sexes
-            let incomeElite: Delta<EconomicLedger.LinearMetrics> = self.Δ.stats.economy.incomeElite.all
-            let incomeUpper: Delta<EconomicLedger.LinearMetrics> = self.Δ.stats.economy.incomeUpper.all
-            let incomeLower: Delta<EconomicLedger.LinearMetrics> = self.Δ.stats.economy.incomeLower.all
+            let incomeElite: Delta<EconomicLedger.IncomeMetrics> = self.Δ.stats.incomeElite.all
+            let incomeUpper: Delta<EconomicLedger.IncomeMetrics> = self.Δ.stats.incomeUpper.all
+            let incomeLower: Delta<EconomicLedger.IncomeMetrics> = self.Δ.stats.incomeLower.all
             $0["Income per capita", +] = (
                 incomeElite + incomeUpper + incomeLower
             ).μ.incomeTotal[/3..2]
@@ -181,18 +207,18 @@ extension TileSnapshot {
         }
     }
     func tooltipIndustry(
-        _ id: EconomicLedger.Industry,
-        context: GameUI.CacheContext
+        in context: GameUI.CacheContext,
+        id: EconomicLedger.Industry,
     ) -> Tooltip? {
         guard
         let country: DiplomaticAuthority = self.country,
-        let value: Int64 = context.ledger.valueAdded[self.id / id] else {
+        let value: Int64 = context.ledger.z.economy.gdp[self.id / id] else {
             return nil
         }
 
         let total: (world: Int64, local: Int64, localExcluded: Int64) = self.aggregate(
             where: id,
-            among: context.ledger.valueAdded,
+            among: context.ledger.z.economy.gdp,
             worldContribution: { $0 },
             localContribution: { $0 }
         )
@@ -237,18 +263,18 @@ extension TileSnapshot {
     }
 
     func tooltipResourceProduced(
-        _ resource: Resource,
-        context: GameUI.CacheContext,
+        in context: GameUI.CacheContext,
+        id resource: Resource,
     ) -> Tooltip? {
         guard
         let country: DiplomaticAuthority = self.country,
-        let traded: TradeVolume = context.ledger.resource[self.id / resource] else {
+        let traded: TradeVolume = context.ledger.z.economy.resource[self.id / resource] else {
             return nil
         }
 
         let total: (world: Int64, local: Int64, localExcluded: Int64) = self.aggregate(
             where: resource,
-            among: context.ledger.resource,
+            among: context.ledger.z.economy.resource,
             worldContribution: \.unitsProduced,
             localContribution: \.valueProduced
         )
@@ -275,18 +301,18 @@ extension TileSnapshot {
     }
 
     func tooltipResourceConsumed(
-        _ resource: Resource,
-        context: GameUI.CacheContext,
+        in context: GameUI.CacheContext,
+        id resource: Resource,
     ) -> Tooltip? {
         guard
         let country: DiplomaticAuthority = self.country,
-        let traded: TradeVolume = context.ledger.resource[self.id / resource] else {
+        let traded: TradeVolume = context.ledger.z.economy.resource[self.id / resource] else {
             return nil
         }
 
         let total: (world: Int64, local: Int64, localExcluded: Int64) = self.aggregate(
             where: resource,
-            among: context.ledger.resource,
+            among: context.ledger.z.economy.resource,
             worldContribution: \.unitsConsumed,
             localContribution: \.valueConsumed
         )
@@ -309,6 +335,62 @@ extension TileSnapshot {
             Today this region consumed \(em: units[/3]) units of \(em: resource.title) \
             comprising \(em: share[%2]) of world consumption
             """
+        }
+    }
+}
+extension TileSnapshot {
+    func tooltipResourceOrigin(mine: MineSnapshot, ledger: GameLedger.Interval) -> Tooltip {
+        .instructions {
+            $0[mine.metadata.miner.plural, +] = mine.miners.count[/3] / mine.miners.limit
+            $0["Today’s change", +] = mine.miners.count[/3] <- mine.miners.before
+            $0[>] {
+                // only elide fired, it’s annoying when the lines below jump around
+                $0["Hired", +] = +mine.miners.hired[/3]
+                $0["Fired", -] = +?mine.miners.fired[/3]
+                $0["Quit", -] = +mine.miners.quit[/3]
+            }
+            if  mine.metadata.decay {
+                $0["Estimated deposits"] = mine.state.Δ.size[/3]
+                $0[>] {
+                    $0["Estimated yield", (+)] = mine.state.Δ.yield[..2]
+                }
+                if  let yieldRank: Int = mine.state.z.yieldRank,
+                    let (chance, spawn): (Fraction, SpawnWeight) = mine.metadata.chance(
+                        tile: self.type.geology,
+                        size: mine.state.z.size,
+                        yieldRank: yieldRank
+                    ),
+                    let miners: EconomicLedger.LaborMetrics = ledger.economy.employment[
+                        self.id / .Miner
+                    ],
+                    let fromWorkers: Fraction = miners.mineExpansionFactor {
+                    let fromDeposit: Double = .init(
+                        mine.metadata.scale %/ (mine.metadata.scale + mine.state.z.size)
+                    )
+                    let fromWorkers: Double = .init(fromWorkers)
+                    let fromRank: Double = MineMetadata.yieldRankExpansionFactor(
+                        yieldRank
+                    ).map(
+                        Double.init(_:)
+                    ) ?? 0.0
+                    let chance: Double = Double.init(chance) * fromWorkers
+                    $0["Chance to expand mine", (+)] = chance[%2]
+                    $0[>] {
+                        $0["Base"] = spawn.rate.value[%]
+                        $0["From yield rank", (+)] = +?(fromRank - 1)[%0]
+                        $0["From size of deposit", (+)] = (fromDeposit - 1)[%2]
+                        $0["From unemployed miners", (+)] = fromWorkers[%2]
+                    }
+                }
+                if  let expanded: Mine.Expansion = mine.state.last {
+                    $0[>] = """
+                    We recently unearthed a deposit of size \(em: expanded.size[/3]) on \
+                    \(em: expanded.date[.phrasal_US])
+                    """
+                }
+            }
+
+            $0[>] = "\(mine.metadata.title)"
         }
     }
 }

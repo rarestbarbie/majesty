@@ -14,3 +14,19 @@ extension LoadableFromJSArray {
         return try .load(from: decoder)
     }
 }
+extension LoadableFromJSArray
+    where Self: RangeReplaceableCollection, Element: LoadableFromJSValue {
+    @inlinable public static func load(
+        from js: borrowing JavaScriptDecoder<JavaScriptArrayKey>
+    ) throws -> Self {
+        let count: Int = try js[.length].decode()
+        var collection: Self = .init()
+        ;   collection.reserveCapacity(count)
+
+        for i: Int in 0 ..< count {
+            collection.append(try js[i].decode())
+        }
+
+        return collection
+    }
+}

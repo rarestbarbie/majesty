@@ -32,7 +32,8 @@ extension OwnershipBreakdown {
         ) = equity.owners.reduce(
             into: ([:], [:], [:])
         ) {
-            if  let country: Country = context.countries[$1.country] {
+            if  let country: CountryID = context.tiles[$1.region]?.country?.occupiedBy,
+                let country: Country = context.countries[country] {
                 let label: ColorReference = .color(country.name.color)
                 $0.country[country.id, default: (0, label)].share += $1.shares
             }

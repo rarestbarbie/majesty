@@ -8,24 +8,43 @@ import OrderedCollections
 import VectorCharts
 
 struct EconomicLedger {
-    let valueAdded: [Regional<Industry>: Int64]
+    let employment: [Regional<PopOccupation>: EconomicLedger.LaborMetrics]
+    let gdp: [Regional<Industry>: Int64]
     let resource: [Regional<Resource>: TradeVolume]
-    let byCulture: OrderedDictionary<National<CultureID>, Double>
-    let byGender: OrderedDictionary<National<Gender>, Double>
-    let byIncome: OrderedDictionary<IncomeSection, LinearMetrics>
+    let racial: OrderedDictionary<Regional<CultureID>, CapitalMetrics>
+    let gender: OrderedDictionary<Regional<Gender>, CapitalMetrics>
+    let income: OrderedDictionary<IncomeSection, IncomeMetrics>
+    let slaves: OrderedDictionary<Address, SocialMetrics>
 
     init(
-        valueAdded: [Regional<Industry>: Int64] = [:],
-        resource: [Regional<Resource>: TradeVolume] = [:],
-        byCulture: OrderedDictionary<National<CultureID>, Double> = [:],
-        byGender: OrderedDictionary<National<Gender>, Double> = [:],
-        byIncome: OrderedDictionary<IncomeSection, LinearMetrics> = [:]
+        employment: [Regional<PopOccupation>: EconomicLedger.LaborMetrics],
+        gdp: [Regional<Industry>: Int64],
+        resource: [Regional<Resource>: TradeVolume],
+        racial: OrderedDictionary<Regional<CultureID>, CapitalMetrics>,
+        gender: OrderedDictionary<Regional<Gender>, CapitalMetrics>,
+        income: OrderedDictionary<IncomeSection, IncomeMetrics>,
+        slaves: OrderedDictionary<Address, SocialMetrics>
     ) {
-        self.valueAdded = valueAdded
+        self.employment = employment
+        self.gdp = gdp
         self.resource = resource
-        self.byCulture = byCulture
-        self.byGender = byGender
-        self.byIncome = byIncome
+        self.racial = racial
+        self.gender = gender
+        self.income = income
+        self.slaves = slaves
+    }
+}
+extension EconomicLedger {
+    init() {
+        self.init(
+            employment: [:],
+            gdp: [:],
+            resource: [:],
+            racial: [:],
+            gender: [:],
+            income: [:],
+            slaves: [:]
+        )
     }
 }
 extension EconomicLedger {
@@ -33,7 +52,7 @@ extension EconomicLedger {
         rules: GameMetadata,
         region: Address
     ) -> PieChart<Industry, ColorReference> {
-        var values: [(Industry, (Int64, ColorReference))] = self.valueAdded.compactMap {
+        var values: [(Industry, (Int64, ColorReference))] = self.gdp.compactMap {
             guard $0.location == region else {
                 return nil
             }

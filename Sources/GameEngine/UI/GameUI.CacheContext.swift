@@ -14,7 +14,7 @@ extension GameUI {
 
         let localMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>
         let worldMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>
-        let ledger: EconomicLedger
+        let ledger: GameLedger
         let bank: Bank
         let date: GameDate
 

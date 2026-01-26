@@ -189,10 +189,10 @@ extension GameContext {
 
     private var legalPass: LegalPass {
         .init(
-            countries: self.countries,
-            buildings: self.buildings,
-            factories: self.factories,
-            pops: self.pops,
+            countries: self.countries.state,
+            buildings: self.buildings.state,
+            factories: self.factories.state,
+            pops: self.pops.state,
         )
     }
 
@@ -258,7 +258,7 @@ extension GameContext {
             self.pops[i].state.prune(in: retain)
         }
     }
-    private mutating func index(world: borrowing GameWorld) throws -> EconomicLedger {
+    private mutating func index(world: borrowing GameWorld) throws -> GameLedger.Interval {
         for i: Int in self.countries.indices {
             let country: Country = self.countries.state[i]
             let authority: DiplomaticAuthority = try .compute(for: country, in: self)
@@ -295,10 +295,7 @@ extension GameContext {
             let account: Bank.Account = world.bank[account: pop.id]
 
             guard
-            let region: RegionalAuthority = self.tiles[pop.tile]?.addResidentCount(
-                pop,
-                stats
-            ) else {
+            let _: RegionalAuthority = self.tiles[pop.tile]?.addResidentCount(pop, stats) else {
                 fatalError("Pop \(pop.id) has no home tile!!!")
             }
 
@@ -309,32 +306,20 @@ extension GameContext {
                 self.mines[modifying: job.id].addWorkforceCount(pop: pop, job: job)
             }
 
-            if pop.type.stratum > .Ward {
+            let equity: Equity<LEI>.Statistics
+            if  pop.type.stratum > .Ward {
                 // free pops do not have shareholders
-                economy.count(
-                    free: pop,
-                    statement: stats.financial,
-                    region: region,
-                    account: account,
-                )
+                economy.countFree(state: pop, stats: stats, account: account)
                 continue
+            } else {
+                /// We compute this here, and not in `PopContext.compute`, so that its global
+                /// context can exclude the pop table itself, allowing us to mutate `PopContext`
+                /// in-place there without individually retaining and releasing every `PopContext`
+                /// in the array on every loop iteration, which would be O(n²)!
+                equity = .compute(entity: pop, account: account, context: self.legalPass)
+                economy.countSlave(state: pop, stats: stats, equity: equity)
             }
-            /// We compute this here, and not in `PopContext.compute`, so that its global
-            /// context can exclude the pop table itself, allowing us to mutate `PopContext`
-            /// in-place there without individually retaining and releasing every `PopContext`
-            /// in the array on every loop iteration, which would be O(n²)!
-            let equity: Equity<LEI>.Statistics = .compute(
-                entity: pop,
-                account: account,
-                context: self.legalPass
-            )
-            economy.count(
-                statement: stats.financial,
-                region: region,
-                output: pop.inventory.out,
-                equity: equity,
-                industry: .slavery(pop.type.race),
-            )
+
             self.count(asset: pop.id.lei, equity: pop.equity)
             self.pops[i].update(equityStatistics: equity)
         }
@@ -344,9 +329,7 @@ extension GameContext {
             } (self.factories[i])
 
             guard
-            let region: RegionalAuthority = self.tiles[factory.tile]?.addResidentCount(
-                factory
-            ) else {
+            let _: RegionalAuthority = self.tiles[factory.tile]?.addResidentCount(factory) else {
                 fatalError("Factory \(factory.id) has no home tile!!!")
             }
 
@@ -357,9 +340,9 @@ extension GameContext {
             )
             economy.count(
                 statement: statement,
-                region: region,
-                output: factory.inventory.out,
                 equity: equity,
+                region: factory.tile,
+                output: factory.inventory.out,
                 industry: .factory(factory.type),
             )
             self.count(asset: factory.id.lei, equity: factory.equity)
@@ -371,7 +354,7 @@ extension GameContext {
             } (self.buildings[i])
 
             guard
-            let region: RegionalAuthority = self.tiles[building.tile]?.addResidentCount(
+            let _: RegionalAuthority = self.tiles[building.tile]?.addResidentCount(
                 building
             ) else {
                 fatalError("Building \(building.id) has no home tile!!!")
@@ -384,9 +367,9 @@ extension GameContext {
             )
             economy.count(
                 statement: statement,
-                region: region,
-                output: building.inventory.out,
                 equity: equity,
+                region: building.tile,
+                output: building.inventory.out,
                 industry: .building(building.type),
             )
             self.count(asset: building.id.lei, equity: building.equity)
@@ -399,7 +382,7 @@ extension GameContext {
             #assert(counted != nil, "Mine \(mine.id) has no home tile!!!")
         }
 
-        return economy.aggregate()
+        return .init(economy: economy.aggregate())
     }
 }
 extension GameContext {
@@ -514,8 +497,9 @@ extension GameContext {
     mutating func compute(_ world: inout GameWorld) throws {
         self.prune(world: &world)
 
-        world.ledger = try self.index(world: world)
-        self.count(aggregating: world.ledger)
+        world.ledger.y = world.ledger.z
+        world.ledger.z = try self.index(world: world)
+        self.count(aggregating: world.ledger.z)
 
         for i: Int in self.planets.indices {
             // update physical planet location, without triggering a copy-on-write
@@ -564,23 +548,27 @@ extension GameContext {
             }
         }
     }
-    private mutating func count(aggregating economy: EconomicLedger) {
-        var stats: [Address: EconomicStats] = [:]
-        for (key, value): (EconomicLedger.Regional<EconomicLedger.Industry>, Int64) in economy.valueAdded {
-            stats[key.location, default: .zero].gdp += value
+    private mutating func count(aggregating ledger: GameLedger.Interval) {
+        for (key, value): (EconomicLedger.Regional<EconomicLedger.Industry>, Int64) in ledger.economy.gdp {
+            self.tiles[key.location]?.stats.gdp += value
         }
-        for (key, value): (EconomicLedger.IncomeSection, EconomicLedger.LinearMetrics) in economy.byIncome {
+        // the gender table is incomplete, as it excludes non-natural persons, but every entity
+        // in the game has a race, so we can use that to compute GNI
+        for (key, value): (EconomicLedger.Regional<CultureID>, EconomicLedger.CapitalMetrics) in ledger.economy.racial {
+            self.tiles[key.location]?.stats.gnp += value.income
+        }
+        for (key, value): (EconomicLedger.IncomeSection, EconomicLedger.IncomeMetrics) in ledger.economy.income {
             switch key.stratum {
             case .Owner:
-                stats[key.region, default: .zero].incomeElite[key.gender.sex] += value
+                self.tiles[key.region]?.stats.incomeElite[key.gender.sex] += value
             case .Clerk:
-                stats[key.region, default: .zero].incomeUpper[key.gender.sex] += value
+                self.tiles[key.region]?.stats.incomeUpper[key.gender.sex] += value
             default:
-                stats[key.region, default: .zero].incomeLower[key.gender.sex] += value
+                self.tiles[key.region]?.stats.incomeLower[key.gender.sex] += value
             }
         }
-        for (id, stats): (Address, EconomicStats) in stats {
-            self.tiles[id]?.update(economy: stats)
+        for (key, value): (Address, EconomicLedger.SocialMetrics) in ledger.economy.slaves {
+            self.tiles[key]?.stats.slaves += value
         }
     }
     private mutating func report(

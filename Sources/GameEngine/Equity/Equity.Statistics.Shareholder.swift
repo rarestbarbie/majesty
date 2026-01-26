@@ -6,8 +6,8 @@ extension Equity.Statistics {
         let shares: Int64
         let bought: Int64
         let sold: Int64
-        let country: CountryID
         let culture: CultureID
+        let region: Address
         let gender: Gender?
     }
 }

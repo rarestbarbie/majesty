@@ -393,12 +393,12 @@ extension GameUI.Model {
                     try arguments[1].decode(),
                 )
             case .TileCulture:
-                return $0.tooltipTileCulture(
+                return $0.tooltipTileRace(
                     try arguments[0].decode(),
                     try arguments[1].decode(),
                 )
             case .TilePopType:
-                return $0.tooltipTilePopType(
+                return $0.tooltipTileOccupation(
                     try arguments[0].decode(),
                     try arguments[1].decode(),
                 )

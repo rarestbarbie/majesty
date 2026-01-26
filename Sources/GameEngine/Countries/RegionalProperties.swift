@@ -4,7 +4,7 @@ final class RegionalProperties: Sendable {
     let id: Address
     let name: String
     let country: DiplomaticAuthority
-    private let stats: Tile.Stats
+    let stats: Tile.Stats
     private let state: Tile.Dimensions
 
     init(
@@ -28,6 +28,4 @@ extension RegionalProperties {
     var modifiers: CountryModifiers { self.country.modifiers }
     var currency: Currency { self.country.currency }
     var minwage: Int64 { self.country.minwage }
-
-    var pops: PopulationStats { self.stats.pops }
 }

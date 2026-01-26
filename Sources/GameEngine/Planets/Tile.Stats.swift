@@ -3,67 +3,82 @@ import JavaScriptInterop
 
 extension Tile {
     struct Stats {
-        var economy: EconomicStats
-        var pops: PopulationStats
+        var gdp: Int64
+        var gnp: Double
+        var incomeElite: Sex.Stratified<EconomicLedger.IncomeMetrics>
+        var incomeUpper: Sex.Stratified<EconomicLedger.IncomeMetrics>
+        var incomeLower: Sex.Stratified<EconomicLedger.IncomeMetrics>
+        var slaves: EconomicLedger.SocialMetrics
+        var voters: EconomicLedger.SocialMetrics
     }
 }
 extension Tile.Stats {
-    init() {
-        self.init(economy: .zero, pops: .init())
+    static var zero: Self {
+        self.init(
+            gdp: 0,
+            gnp: 0,
+            incomeElite: .zero,
+            incomeUpper: .zero,
+            incomeLower: .zero,
+            slaves: .zero,
+            voters: .zero,
+        )
     }
 }
 extension Tile.Stats {
-    var μFree: Mean<EconomicStats> {
-        .init(fields: self.economy, weight: Double.init(self.pops.free.total))
+    var _μFree: Mean<Self> {
+        .init(fields: self, weight: Double.init(self.voters.count))
     }
 }
 extension Tile.Stats {
     mutating func startIndexCount() {
-        self.economy.startIndexCount()
-        self.pops.startIndexCount()
+        self = .zero
+    }
+    mutating func afterIndexCount() {
+        // TODO: implement actual sex-dependent weighting
+        let votersElite: Sex.Stratified<EconomicLedger.SocialMetrics> = self.incomeElite.map(\.social)
+        let votersUpper: Sex.Stratified<EconomicLedger.SocialMetrics> = self.incomeUpper.map(\.social)
+        let votersLower: Sex.Stratified<EconomicLedger.SocialMetrics> = self.incomeLower.map(\.social)
+
+        let votersBySex: Sex.Stratified<EconomicLedger.SocialMetrics> = votersElite
+            + votersUpper
+            + votersLower
+
+        self.voters = votersBySex.all
     }
 }
 extension Tile.Stats {
     enum ObjectKey: JSString, Sendable {
-        case pops_occupation = "pO"
-        case pops_employed = "pW"
-        case pops_enslaved = "pE"
-        case pops_free = "pF"
-        case economy_gdp = "eG"
-        case economy_incomeElite = "eE"
-        case economy_incomeUpper = "eU"
-        case economy_incomeLower = "eL"
+        case gdp = "eG"
+        case gnp = "eN"
+        case incomeElite = "eE"
+        case incomeUpper = "eU"
+        case incomeLower = "eL"
+        case slaves = "eS"
+        case voters = "v"
     }
 }
 extension Tile.Stats: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
-        js[.pops_occupation] = self.pops.occupation.sorted
-        js[.pops_employed] = self.pops.employed
-        js[.pops_enslaved] = self.pops.enslaved
-        js[.pops_free] = self.pops.free
-        js[.economy_gdp] = self.economy.gdp
-        js[.economy_incomeElite] = self.economy.incomeElite
-        js[.economy_incomeUpper] = self.economy.incomeUpper
-        js[.economy_incomeLower] = self.economy.incomeLower
+        js[.gdp] = self.gdp
+        js[.gnp] = self.gnp
+        js[.incomeElite] = self.incomeElite
+        js[.incomeUpper] = self.incomeUpper
+        js[.incomeLower] = self.incomeLower
+        js[.slaves] = self.slaves
+        js[.voters] = self.voters
     }
 }
 extension Tile.Stats: JavaScriptDecodable {
     init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
-            economy: .init(
-                gdp: try js[.economy_gdp].decode(),
-                incomeElite: try js[.economy_incomeElite].decode(),
-                incomeUpper: try js[.economy_incomeUpper].decode(),
-                incomeLower: try js[.economy_incomeLower].decode(),
-            ),
-            pops: .init(
-                occupation: try js[.pops_occupation].decode(
-                    with: \[PopOccupation: PopulationStats.Row].Sorted.dictionary
-                ),
-                employed: try js[.pops_employed].decode(),
-                enslaved: try js[.pops_enslaved].decode(),
-                free: try js[.pops_free].decode(),
-            ),
+            gdp: try js[.gdp].decode(),
+            gnp: try js[.gnp].decode(),
+            incomeElite: try js[.incomeElite].decode(),
+            incomeUpper: try js[.incomeUpper].decode(),
+            incomeLower: try js[.incomeLower].decode(),
+            slaves: try js[.slaves].decode(),
+            voters: try js[.voters].decode(),
         )
     }
 }

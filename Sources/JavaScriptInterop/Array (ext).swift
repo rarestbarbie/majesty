@@ -1,15 +1,3 @@
-extension Array: LoadableFromJSArray, LoadableFromJSValue where Element: LoadableFromJSValue {
-    @inlinable public static func load(
-        from js: borrowing JavaScriptDecoder<JavaScriptArrayKey>
-    ) throws -> Self {
-        let count: Int = try js[.length].decode()
-        var array: [Element] = []
-        array.reserveCapacity(count)
-
-        for i: Int in 0 ..< count {
-            array.append(try js[i].decode())
-        }
-
-        return array
-    }
-}
+// no need to conform Array to ConvertibleToJSArray as it already has the ConvertibleToJSValue
+// witness from JavaScriptKit
+extension Array: LoadableFromJSArray, LoadableFromJSValue where Element: LoadableFromJSValue {}

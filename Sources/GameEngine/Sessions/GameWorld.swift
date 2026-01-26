@@ -13,7 +13,7 @@ struct GameWorld: ~Copyable {
     var worldMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>
     var tradeRoutes: OrderedDictionary<CurrencyID, TradeRoutes>
 
-    var ledger: EconomicLedger
+    var ledger: GameLedger
 }
 extension GameWorld {
     init(
@@ -22,7 +22,7 @@ extension GameWorld {
         localMarkets: OrderedDictionary<LocalMarket.ID, LocalMarket>,
         worldMarkets: OrderedDictionary<WorldMarket.ID, WorldMarket>,
         tradeRoutes: OrderedDictionary<CurrencyID, TradeRoutes>,
-        ledger: EconomicLedger,
+        ledger: GameLedger,
         random: PseudoRandom,
     ) {
         self.random = random
