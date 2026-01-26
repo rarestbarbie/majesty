@@ -16,30 +16,66 @@ extension PlanetSnapshot.Tiles {
             return self.color { $0.metadata.ecology.color }
 
         case .Population:
-            let scale: Double = .init(
-                self.reduce(initial: 0) { max($0, $2.pops.free.total) }
-            )
+            let populationScale: Double = self.populationScale(count: \.pops.free.total)
             return self.color {
-                scale > 0 ? Double.init($0.pops.free.total) / scale : 0
+                Double.init($0.pops.free.total) * populationScale
             }
 
         case .AverageMilitancy:
-            let scale: Double = .init(
-                self.reduce(initial: 0) { max($0, $2.pops.free.total) }
+            return self.color(
+                range: 0 ... 10,
+                color: \.pops.free.μ.mil,
+                count: \.pops.free.total
             )
-            return self.color {
-                let (value, population): (Double, of: Double) = $0.pops.free.mil
-                return (0.1 * value, population / scale)
-            }
 
         case .AverageConsciousness:
-            let scale: Double = .init(
-                self.reduce(initial: 0) { max($0, $2.pops.free.total) }
+            return self.color(
+                range: 0 ... 10,
+                color: \.pops.free.μ.con,
+                count: \.pops.free.total
             )
-            return self.color {
-                let (value, population): (Double, of: Double) = $0.pops.free.con
-                return (0.1 * value, population / scale)
+        }
+    }
+}
+extension PlanetSnapshot.Tiles {
+    private func populationScale(
+        count: (TileSnapshot) -> Int64
+    ) -> Double {
+        let populationTotal: Int64 = self.reduce(initial: 0) { max($0, count($2)) }
+        if  populationTotal <= 0 {
+            return 0
+        } else {
+            return 1 / Double.init(populationTotal)
+        }
+    }
+    private func color(
+        range: ClosedRange<Double>,
+        color: (TileSnapshot) -> Mean<Double>,
+        count: (TileSnapshot) -> Int64
+    ) -> [PlanetMapTile] {
+        let rangeScale: Double = 1 / (range.upperBound - range.lowerBound)
+        if !rangeScale.isFinite {
+            return []
+        }
+
+        let populationScale: Double = self.populationScale(count: count)
+        return self.color {
+            let mean: Mean<Double> = color($0)
+            let populationScaled: Double = mean.population * populationScale
+            let x: Double
+            if  let value: Double = mean.defined {
+                if  value < range.lowerBound {
+                    x = 0
+                } else if
+                    value > range.upperBound {
+                    x = 1
+                } else {
+                    x = (value - range.lowerBound) * rangeScale
+                }
+            } else {
+                x = 0
             }
+            return (x, populationScaled)
         }
     }
 }

@@ -196,7 +196,7 @@ extension FactoryContext: TransactingContext {
             // set profitability to -1 to deter investment in bankrupt factories
             self.state.z.profitability = -1
             self.state.budget = .liquidating(
-                account: turn.bank[account: self.lei],
+                account: turn.bank[account: self.id],
                 sharePrice: self.equity.sharePrice
             )
             return
@@ -233,7 +233,7 @@ extension FactoryContext: TransactingContext {
             )
 
             budget = .factory(
-                account: turn.bank[account: self.lei],
+                account: turn.bank[account: self.id],
                 weights: weights,
                 state: self.state.z,
                 type: self.type,
@@ -269,7 +269,7 @@ extension FactoryContext: TransactingContext {
             )
 
             budget = .factory(
-                account: turn.bank[account: self.lei],
+                account: turn.bank[account: self.id],
                 weights: weights,
                 state: self.state.z,
                 type: self.type,
@@ -555,7 +555,7 @@ extension FactoryContext {
                     in: region.currency.id,
                     on: &turn.worldMarkets,
                 )
-            } (&turn.bank[account: self.lei])
+            } (&turn.bank[account: self.id])
         }
 
         let growthFactor: Int64 = self.stats.productivity * (self.state.size.level + 1)
@@ -603,7 +603,7 @@ extension FactoryContext {
 
             let proceeds: Int64 = tl.gain + te.gain + tx.gain
             $0.r += proceeds
-        } (&turn.bank[account: self.lei])
+        } (&turn.bank[account: self.id])
     }
 
     private mutating func operate(
@@ -652,7 +652,7 @@ extension FactoryContext {
                 )
             }
 
-        } (&turn.bank[account: self.lei])
+        } (&turn.bank[account: self.id])
 
         let update: FloorUpdate = .operate(
             factory: self.state,

@@ -103,11 +103,9 @@ extension PopSnapshot {
         base: Int64,
         mine: MiningJobConditions
     ) {
-        let mil: Double = self.region.pops.free.mil.average
-
         ul[>] = "Base: \(em: MineMetadata.efficiencyPoliticians[%])"
         ul["Militancy of Free Population", +] = +(
-            MineMetadata.efficiencyPoliticiansPerMilitancyPoint * mil
+            MineMetadata.efficiencyPoliticiansPerMilitancyPoint * self.region.pops.free.μ.mil
         )[%1]
     }
     private func explainProductionMiner(
@@ -175,8 +173,8 @@ extension PopSnapshot {
             $0[>] {
                 let excluded: Int64 = self.spending.totalExcludingEquityPurchases
                 $0["Welfare", +] = +?account.s[/3]
-                $0[self.occupation.earnings, +] = +?account.r[/3]
-                $0["Interest and dividends", +] = +?account.i[/3]
+                $0[self.occupation.revenue, +] = +?account.r[/3]
+                $0["Income", +] = +?account.i[/3]
 
                 $0["Market spending", +] = +?(account.b - excluded)[/3]
                 $0["Stock sales", +] = +?account.j[/3]

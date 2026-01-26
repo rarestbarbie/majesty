@@ -17,6 +17,10 @@ extension Bank {
         _read   { yield  self.accounts[id, default: .zero] }
         _modify { yield &self.accounts[id, default: .zero] }
     }
+    subscript(account id: some LegalEntityIdentifier) -> Account {
+        _read   { yield  self.accounts[id.lei, default: .zero] }
+        _modify { yield &self.accounts[id.lei, default: .zero] }
+    }
 }
 extension Bank {
     mutating func prune(in context: GameContext.PruningPass) {
@@ -27,19 +31,6 @@ extension Bank {
             $0.settle()
             return $0.balance != 0
         }
-    }
-}
-extension Bank {
-    func valuation(
-        of entity: some LegalEntityState,
-        in context: GameContext.LegalPass,
-    ) -> Equity<LEI>.Statistics {
-        .compute(
-            equity: entity.equity,
-            // inventory, not assets, to avoid cratering stock price when expanding factory
-            assets: self[account: entity.id.lei].balance + entity.z.vv,
-            context: context
-        )
     }
 }
 extension Bank {
@@ -55,7 +46,7 @@ extension Bank {
         var paid: Int64 = 0
 
         for ((pop, _), payment): ((PopID, _), Int64) in zip(recipients, payments) {
-            self[account: .pop(pop)].r += payment
+            self[account: pop].i += payment
             paid += payment
         }
 

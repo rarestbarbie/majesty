@@ -24,20 +24,28 @@ extension TileSnapshot {
         among totals: [EconomicLedger.Regional<Crosstab>: Value],
         worldContribution: (Value) -> Int64,
         localContribution: (Value) -> Int64
-    ) -> (world: Int64, local: Int64) {
-        totals.reduce(into: (0, 0)) {
+    ) -> (world: Int64, local: Int64, localExcluded: Int64) {
+        totals.reduce(into: (0, 0, 0)) {
             if  $1.key.crosstab == crosstab {
-                $0.world += worldContribution($1.value)
+                let worldContribution: Int64 = worldContribution($1.value)
+                if  worldContribution > 0 {
+                    $0.world += worldContribution
+                }
             }
             if  $1.key.location == self.id {
-                $0.local += localContribution($1.value)
+                let localContribution: Int64 = localContribution($1.value)
+                if  localContribution > 0 {
+                    $0.local += localContribution
+                } else {
+                    $0.localExcluded += localContribution
+                }
             }
         }
     }
     private func aggregate<Crosstab>(
         where crosstab: Crosstab,
         among totals: [EconomicLedger.Regional<Crosstab>: Int64],
-    ) -> (world: Int64, local: Int64) {
+    ) -> (world: Int64, local: Int64, localExcluded: Int64) {
         self.aggregate(
             where: crosstab,
             among: totals,
@@ -64,26 +72,24 @@ extension TileSnapshot {
                 }
 
             case .AverageMilitancy:
-                let free: Delta<Double> = pops.free.mil.average
+                let free: Delta<Double> = pops.free.μ.mil
                 $0["Average militancy", -] = free[..2]
-                let enslaved: Double = self.z.stats.pops.enslaved.mil.average
-                if  self.z.stats.pops.enslaved.total > 0 {
+                if  let mil: Double = self.z.stats.pops.enslaved.μ.mil.defined {
                     $0[>] = """
                     The average militancy of the slave population is \(
-                        enslaved[..2],
-                        style: enslaved > 1.0 ? .neg : .em
+                        mil[..2],
+                        style: mil > 1.0 ? .neg : .em
                     )
                     """
                 }
             case .AverageConsciousness:
-                let free: Delta<Double> = pops.free.con.average
+                let free: Delta<Double> = pops.free.μ.con
                 $0["Average consciousness", -] = free[..2]
-                let enslaved: Double = self.z.stats.pops.enslaved.con.average
-                if  self.z.stats.pops.enslaved.total > 0 {
+                if  let con: Double = self.z.stats.pops.enslaved.μ.con.defined {
                     $0[>] = """
                     The average consciousness of the slave population is \(
-                        enslaved[..2],
-                        style: enslaved > 1.0 ? .neg : .em
+                        con[..2],
+                        style: con > 1.0 ? .neg : .em
                     )
                     """
                 }
@@ -148,6 +154,32 @@ extension TileSnapshot {
     }
 }
 extension TileSnapshot {
+    func tooltipGDP(
+        context: GameUI.CacheContext
+    ) -> Tooltip {
+        .instructions {
+            $0["GDP", +] = self.Δ.stats.economy.gdp[/3]
+
+            let average: Delta<Mean<EconomicStats>> = self.Δ.stats.μFree
+            $0[>] {
+                $0["GDP per capita", +] = average.gdp[/3..2]
+            }
+
+            /// average across sexes
+            let incomeElite: Delta<EconomicLedger.LinearMetrics> = self.Δ.stats.economy.incomeElite.all
+            let incomeUpper: Delta<EconomicLedger.LinearMetrics> = self.Δ.stats.economy.incomeUpper.all
+            let incomeLower: Delta<EconomicLedger.LinearMetrics> = self.Δ.stats.economy.incomeLower.all
+            $0["Income per capita", +] = (
+                incomeElite + incomeUpper + incomeLower
+            ).μ.incomeTotal[/3..2]
+
+            $0[>] {
+                $0["Elites", +] = incomeElite.μ.incomeTotal[/3..2]
+                $0["Clerks", +] = incomeUpper.μ.incomeTotal[/3..2]
+                $0["Workers", +] = incomeLower.μ.incomeTotal[/3..2]
+            }
+        }
+    }
     func tooltipIndustry(
         _ id: EconomicLedger.Industry,
         context: GameUI.CacheContext
@@ -158,7 +190,7 @@ extension TileSnapshot {
             return nil
         }
 
-        let total: (world: Int64, local: Int64) = self.aggregate(
+        let total: (world: Int64, local: Int64, localExcluded: Int64) = self.aggregate(
             where: id,
             among: context.ledger.valueAdded,
             worldContribution: { $0 },
@@ -184,6 +216,23 @@ extension TileSnapshot {
             $0[>] {
                 $0["Estimated GDP contribution (\(country.currency.name))", +] = +?value[/3]
             }
+
+            if case .artisan = id {
+                $0[>] = """
+                All of the income from self-employment counts towards GDP
+                """
+            } else {
+                $0[>] = """
+                Only income left over after subtracting costs (except for labor) counts \
+                towards GDP
+                """
+            }
+            if  total.localExcluded < 0 {
+                $0[>] = """
+                \(neg: +total.localExcluded[/3]) \(country.currency.name) of business losses \
+                are excluded from percentage calculations
+                """
+            }
         }
     }
 
@@ -197,7 +246,7 @@ extension TileSnapshot {
             return nil
         }
 
-        let total: (world: Int64, local: Int64) = self.aggregate(
+        let total: (world: Int64, local: Int64, localExcluded: Int64) = self.aggregate(
             where: resource,
             among: context.ledger.resource,
             worldContribution: \.unitsProduced,
@@ -235,7 +284,7 @@ extension TileSnapshot {
             return nil
         }
 
-        let total: (world: Int64, local: Int64) = self.aggregate(
+        let total: (world: Int64, local: Int64, localExcluded: Int64) = self.aggregate(
             where: resource,
             among: context.ledger.resource,
             worldContribution: \.unitsConsumed,

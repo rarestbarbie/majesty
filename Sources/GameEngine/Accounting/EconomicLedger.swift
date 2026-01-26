@@ -10,19 +10,22 @@ import VectorCharts
 struct EconomicLedger {
     let valueAdded: [Regional<Industry>: Int64]
     let resource: [Regional<Resource>: TradeVolume]
-    let cultural: OrderedDictionary<National<CultureID>, Double>
-    let gendered: OrderedDictionary<National<Gender>, Double>
+    let byCulture: OrderedDictionary<National<CultureID>, Double>
+    let byGender: OrderedDictionary<National<Gender>, Double>
+    let byIncome: OrderedDictionary<IncomeSection, LinearMetrics>
 
     init(
         valueAdded: [Regional<Industry>: Int64] = [:],
         resource: [Regional<Resource>: TradeVolume] = [:],
-        cultural: OrderedDictionary<National<CultureID>, Double> = [:],
-        gendered: OrderedDictionary<National<Gender>, Double> = [:]
+        byCulture: OrderedDictionary<National<CultureID>, Double> = [:],
+        byGender: OrderedDictionary<National<Gender>, Double> = [:],
+        byIncome: OrderedDictionary<IncomeSection, LinearMetrics> = [:]
     ) {
         self.valueAdded = valueAdded
         self.resource = resource
-        self.cultural = cultural
-        self.gendered = gendered
+        self.byCulture = byCulture
+        self.byGender = byGender
+        self.byIncome = byIncome
     }
 }
 extension EconomicLedger {

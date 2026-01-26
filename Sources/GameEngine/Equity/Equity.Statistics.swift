@@ -17,6 +17,19 @@ extension Equity.Statistics {
 }
 extension Equity<LEI>.Statistics {
     static func compute(
+        entity: some LegalEntityState,
+        account: Bank.Account,
+        context: GameContext.LegalPass,
+    ) -> Self {
+        .compute(
+            equity: entity.equity,
+            // inventory, not assets, to avoid cratering stock price when expanding factory
+            assets: account.balance + entity.z.vv,
+            context: context
+        )
+    }
+
+    static func compute(
         equity: Equity<LEI>,
         assets: Int64,
         context: GameContext.LegalPass,

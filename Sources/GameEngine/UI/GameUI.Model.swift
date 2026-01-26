@@ -403,8 +403,9 @@ extension GameUI.Model {
                     try arguments[1].decode(),
                 )
             case .TileGDP:
-                // TODO: Implement Tile GDP tooltip
-                return nil
+                return $0.tooltipTileGDP(
+                    try arguments[0].decode(),
+                )
             case .TileIndustry:
                 return $0.tooltipTileIndustry(
                     try arguments[0].decode(),

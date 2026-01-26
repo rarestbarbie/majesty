@@ -151,7 +151,7 @@
     },
     "Creator Studio": {
         "emoji": "🎥",
-        "color": "#00AFF0",
+        "color": "#00bbff",
         "materials": {
             "Storage": 4,
             "Services": 4,
