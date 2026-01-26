@@ -140,8 +140,8 @@ extension TileSnapshot {
             $0[culture.name, +] = share[%3]
             $0[>] {
                 $0["GNI per-capita", +] = metrics.μ.income[/3..2]
-                $0["Average militancy", -] = metrics.μ.mil[/3]
-                $0["Average consciousness", -] = metrics.μ.con[/3]
+                $0["Average militancy", -] = metrics.μ.mil[/3..2]
+                $0["Average consciousness", -] = metrics.μ.con[/3..2]
             }
             $0[>] = """
             There are \(em: metrics.z.count[/3]) people of the \(em: culture.name) race in \

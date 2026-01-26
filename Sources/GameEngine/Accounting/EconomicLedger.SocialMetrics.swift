@@ -12,8 +12,10 @@ extension EconomicLedger.SocialMetrics {
         slave pop: Pop
     ) {
         self.count += pop.z.total
-        self.mil += pop.z.mil
-        self.con += pop.z.con
+
+        let weight: Double = Double.init(pop.z.total)
+        self.mil += weight * pop.z.mil
+        self.con += weight * pop.z.con
     }
 }
 extension EconomicLedger.SocialMetrics: MeanAggregatable {

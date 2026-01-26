@@ -21,8 +21,11 @@ extension EconomicLedger.CapitalMetrics {
 extension EconomicLedger.CapitalMetrics {
     mutating func count(_ pop: Pop, income: Double) {
         self.count += pop.z.total
-        self.mil += pop.z.mil
-        self.con += pop.z.con
+
+        let weight: Double = Double.init(pop.z.total)
+        self.mil += weight * pop.z.mil
+        self.con += weight * pop.z.con
+
         self.income += income
     }
 }
