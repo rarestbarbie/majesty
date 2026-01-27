@@ -346,8 +346,8 @@ extension TileSnapshot {
             $0[>] {
                 // only elide fired, it’s annoying when the lines below jump around
                 $0["Hired", +] = +mine.miners.hired[/3]
-                $0["Fired", -] = +?(-mine.miners.fired)[/3]
-                $0["Quit", -] = +(-mine.miners.quit)[/3]
+                $0["Fired", +] = +?(-mine.miners.fired)[/3]
+                $0["Quit", +] = +(-mine.miners.quit)[/3]
             }
             if  mine.metadata.decay {
                 $0["Estimated deposits"] = mine.Δ.size[/3]
