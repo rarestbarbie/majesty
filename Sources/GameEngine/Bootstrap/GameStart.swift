@@ -70,6 +70,22 @@ extension GameStart {
             let researched: Set<Technology> = try seed.researched.reduce(into: starter) {
                 $0.insert(try symbols.static.technologies[$1])
             }
+            let capital: Address
+            if  let specified: Address = seed.capital {
+                capital = specified
+
+                guard seed.tiles.contains(specified) else {
+                    fatalError(
+                        "Country \(seed.name) capital \(specified) not in controlled tiles!"
+                    )
+                }
+            } else if
+                let first: Address = seed.tiles.first {
+                capital = first
+            } else {
+                fatalError("Country \(seed.name) has no capital tile!")
+            }
+
             let country: Country = .init(
                 id: seed.id ?? country.increment(),
                 name: seed.name,
@@ -79,6 +95,7 @@ extension GameStart {
                 currency: seed.currency,
                 suzerain: seed.suzerain,
                 minwage: seed.minwage ?? 5,
+                capital: capital,
                 tilesControlled: seed.tiles,
             )
             countries.append(country)

@@ -41,7 +41,7 @@ extension Tile {
             id: id,
             type: type,
             name: name,
-            y: .init(stats: .init(), state: nil),
+            y: .init(stats: .zero, state: nil),
             z: nil,
             history: []
         )

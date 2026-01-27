@@ -9,6 +9,14 @@ extension Sex {
     }
 }
 extension Sex.Stratified {
+    func map<U>(_ transform: (T) throws -> U) rethrows -> Sex.Stratified<U> {
+        .init(
+            f: try transform(self.f),
+            x: try transform(self.x),
+            m: try transform(self.m)
+        )
+    }
+
     subscript(sex: Sex) -> T {
         _read {
             switch sex {
@@ -30,27 +38,23 @@ extension Sex.Stratified: Sendable where T: Sendable {}
 extension Sex.Stratified: Equatable where T: Equatable {}
 extension Sex.Stratified: AdditiveArithmetic where T: AdditiveArithmetic {
     static var zero: Self { .init(f: .zero, x: .zero, m: .zero) }
-    static func + (self: consuming Self, other: Self) -> Self {
-        self += other
-        return self
+
+    static func + (a: Self, b: Self) -> Self {
+        .init(
+            f: a.f + b.f,
+            x: a.x + b.x,
+            m: a.m + b.m
+        )
     }
-    static func - (self: consuming Self, other: Self) -> Self {
-        self -= other
-        return self
+    static func - (a: Self, b: Self) -> Self {
+        .init(
+            f: a.f - b.f,
+            x: a.x - b.x,
+            m: a.m - b.m
+        )
     }
 }
 extension Sex.Stratified where T: AdditiveArithmetic {
-    static func += (self: inout Self, other: Self) {
-        self.f += other.f
-        self.x += other.x
-        self.m += other.m
-    }
-    static func -= (self: inout Self, other: Self) {
-        self.f -= other.f
-        self.x -= other.x
-        self.m -= other.m
-    }
-
     var all: T {
         self.f + self.x + self.m
     }

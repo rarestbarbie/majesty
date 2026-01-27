@@ -539,7 +539,7 @@ extension PopContext {
     private mutating func convert(turn: inout Turn) {
         let promotion: ConditionEvaluator
         let demotion: ConditionEvaluator
-        let stats: PopulationStats
+        let tile: Address
 
         if  let region: RegionalProperties = self.region {
             let converter: Converter  = .init(
@@ -552,7 +552,7 @@ extension PopContext {
 
             promotion = converter.promotion
             demotion = converter.demotion
-            stats = region.pops
+            tile = region.id
         } else {
             fatalError("missing region for pop '\(self.state.id)'!!!")
         }
@@ -560,12 +560,15 @@ extension PopContext {
         let current: PopOccupation = self.state.occupation
 
         // when demoting, inherit 1 percent
+        let ledger: EconomicLedger = turn.ledger.z.economy
         self.state.egress(
             evaluator: demotion,
             inherit: 1 %/ 100,
             on: &turn,
         ) {
-            current.demotes(to: $0) ? 0.01 + 0.4 * (stats.occupation[$0]?.employment ?? 0) : 0
+            current.demotes(to: $0)
+                ? 0.01 + 0.4 * (ledger.employment[tile / $0]?.employment ?? 0)
+                : 0
         }
 
         // when promoting, inherit all

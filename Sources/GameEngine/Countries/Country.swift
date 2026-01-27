@@ -4,6 +4,7 @@ import GameIDs
 import GameRules
 import GameStarts
 import JavaScriptInterop
+import OrderedCollections
 
 struct Country: Identifiable {
     let id: CountryID
@@ -20,9 +21,10 @@ struct Country: Identifiable {
     var currency: CurrencyID
     var suzerain: CountryID?
     var minwage: Int64
+    var capital: Address
 
     /// The tiles this country controls.
-    var tilesControlled: [Address]
+    var tilesControlled: OrderedSet<Address>
 }
 extension Country {
     enum ObjectKey: JSString, Sendable {
@@ -35,6 +37,7 @@ extension Country {
         case currency
         case suzerain
         case minwage
+        case capital
     }
 }
 extension Country: JavaScriptEncodable {
@@ -48,6 +51,7 @@ extension Country: JavaScriptEncodable {
         js[.currency] = self.currency
         js[.suzerain] = self.suzerain
         js[.minwage] = self.minwage
+        js[.capital] = self.capital
     }
 }
 extension Country: JavaScriptDecodable {
@@ -61,6 +65,7 @@ extension Country: JavaScriptDecodable {
             currency: try js[.currency].decode(),
             suzerain: try js[.suzerain]?.decode(),
             minwage: try js[.minwage].decode(),
+            capital: try js[.capital].decode(),
             tilesControlled: try js[.tiles_controlled]?.decode() ?? [],
         )
     }

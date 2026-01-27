@@ -105,7 +105,7 @@ extension PopSnapshot {
     ) {
         ul[>] = "Base: \(em: MineMetadata.efficiencyPoliticians[%])"
         ul["Militancy of Free Population", +] = +(
-            MineMetadata.efficiencyPoliticiansPerMilitancyPoint * self.region.pops.free.μ.mil
+            MineMetadata.efficiencyPoliticiansPerMilitancyPoint * self.region.stats.voters.μ.mil
         )[%1]
     }
     private func explainProductionMiner(

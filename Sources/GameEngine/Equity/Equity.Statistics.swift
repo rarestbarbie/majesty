@@ -29,7 +29,7 @@ extension Equity<LEI>.Statistics {
         )
     }
 
-    static func compute(
+    private static func compute(
         equity: Equity<LEI>,
         assets: Int64,
         context: GameContext.LegalPass,
@@ -45,19 +45,19 @@ extension Equity<LEI>.Statistics {
 
         return .init(
             owners: equity.shares.values.reduce(into: []) {
-                let country: CountryID
                 let culture: CultureID
+                let region: Address
                 let gender: Gender?
 
                 switch $1.id {
                 case .reserve(let id):
                     guard
-                    let context: CountryContext = context.countries[id] else {
+                    let country: Country = context.countries[id] else {
                         return
                     }
 
-                    country = id
-                    culture = context.state.culturePreferred
+                    culture = country.culturePreferred
+                    region = country.capital
                     gender = nil
 
                 case .building:
@@ -68,14 +68,13 @@ extension Equity<LEI>.Statistics {
 
                 case .pop(let id):
                     guard
-                    let pop: PopContext = context.pops[id],
-                    let region: RegionalProperties = pop.region else {
+                    let pop: Pop = context.pops[id] else {
                         return
                     }
 
-                    country = region.occupiedBy
-                    culture = pop.state.race
-                    gender = pop.state.gender
+                    culture = pop.race
+                    region = pop.tile
+                    gender = pop.gender
                 }
 
                 $0.append(
@@ -84,8 +83,8 @@ extension Equity<LEI>.Statistics {
                         shares: $1.shares.total,
                         bought: $1.shares.added,
                         sold: $1.shares.removed,
-                        country: country,
                         culture: culture,
+                        region: region,
                         gender: gender
                     )
                 )

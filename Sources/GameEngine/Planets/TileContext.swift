@@ -11,10 +11,10 @@ import Random
 struct TileContext: RuntimeContext {
     let type: TileMetadata
     var state: Tile
+    var stats: Tile.Stats
 
     private(set) var properties: RegionalProperties?
     private(set) var authority: DiplomaticAuthority?
-    private var stats: Tile.Stats
 
     // Computed statistics
     private(set) var buildingsAlreadyPresent: Set<BuildingType>
@@ -24,7 +24,7 @@ struct TileContext: RuntimeContext {
     private(set) var factoriesAlreadyPresent: Set<FactoryType>
     private(set) var factories: [FactoryID]
 
-    private(set) var pops: (enslaved: [PopID], free: [PopID])
+    private(set) var pops: (enslaved: ResidentPops, free: ResidentPops)
 
     private(set) var minesAlreadyPresent: [MineType: (size: Int64, yieldRank: Int?)]
     private(set) var mines: [MineID]
@@ -33,10 +33,10 @@ struct TileContext: RuntimeContext {
     init(type: TileMetadata, state: Tile) {
         self.type = type
         self.state = state
+        self.stats = .zero
 
         self.properties = nil
         self.authority = nil
-        self.stats = .init()
 
         self.buildingsAlreadyPresent = []
         self.buildings = []
@@ -45,7 +45,7 @@ struct TileContext: RuntimeContext {
         self.factoriesAlreadyPresent = []
         self.factories = []
 
-        self.pops = (enslaved: [], free: [])
+        self.pops = (enslaved: .init(), free: .init())
 
         self.minesAlreadyPresent = [:]
         self.mines = []
@@ -92,12 +92,8 @@ extension TileContext {
         self.factoriesAlreadyPresent.removeAll(keepingCapacity: true)
         self.factories.removeAll(keepingCapacity: true)
 
-        // use the previous day’s counts to allocate capacity
-        let count: (enslaved: Int, free: Int) = (self.pops.enslaved.count, self.pops.free.count)
-        self.pops.enslaved = []
-        self.pops.enslaved.reserveCapacity(count.enslaved)
-        self.pops.free = []
-        self.pops.free.reserveCapacity(count.free)
+        self.pops.enslaved.startIndexCount()
+        self.pops.free.startIndexCount()
 
         self.minesAlreadyPresent.removeAll(keepingCapacity: true)
         self.mines.removeAll(keepingCapacity: true)
@@ -107,12 +103,10 @@ extension TileContext {
 
     mutating func addResidentCount(_ pop: Pop, _ stats: Pop.Stats) -> RegionalAuthority? {
         if  pop.occupation.stratum <= .Ward {
-            self.pops.enslaved.append(pop.id)
+            self.pops.enslaved.addResidentCount(pop)
         } else {
-            self.pops.free.append(pop.id)
+            self.pops.free.addResidentCount(pop)
         }
-
-        self.stats.pops.addResidentCount(pop, stats)
         // this should not return the ``RegionalProperties``, that has not been published yet
         return self.authority?[self.id]
     }
@@ -139,9 +133,6 @@ extension TileContext {
     mutating func update(authority: DiplomaticAuthority) {
         self.authority = authority
     }
-    mutating func update(economy: EconomicStats) {
-        self.stats.economy = economy
-    }
 
     mutating func afterIndexCount(world: borrowing GameWorld) {
         guard let authority: DiplomaticAuthority = self.authority else {
@@ -149,6 +140,7 @@ extension TileContext {
             return
         }
 
+        self.stats.afterIndexCount()
         self.properties = .init(
             id: self.id,
             name: self.state.name ?? "",
@@ -172,7 +164,7 @@ extension TileContext {
     private static var history: Int { 5 * 365 }
     private var today: Tile.Aggregate {
         .init(
-            gdp: self.stats.economy.gdp,
+            gdp: self.stats.gdp,
         )
     }
 
@@ -238,10 +230,10 @@ extension TileContext {
         let region: RegionalProperties = self.properties else {
             return nil
         }
-        let pops: PopulationStats = region.pops
+        let pops: Int64 = region.stats.voters.count
 
         let chance: Int64
-        switch pops.free.total {
+        switch pops {
         case ...0:
             return nil
         case 1 ..< 50_000:
@@ -249,9 +241,9 @@ extension TileContext {
         case 50_000 ..< 2_000_000:
             chance = 2
         case 2_000_000 ..< 10_000_000:
-            chance = 2 + (pops.free.total / 2_000_000)
+            chance = 2 + (pops / 2_000_000)
         default:
-            chance = 7 + (pops.free.total / 10_000_000)
+            chance = 7 + (pops / 10_000_000)
         }
 
         guard random.roll(chance, 200 * (1 + self.factoriesUnderConstruction)) else {
@@ -295,7 +287,9 @@ extension TileContext {
 
         guard
         let region: RegionalProperties = self.properties,
-        let factor: Fraction = region.pops.occupation[.Miner]?.mineExpansionFactor else {
+        let factor: Fraction = turn.ledger.z.economy.employment[
+            region.id / .Miner
+        ]?.mineExpansionFactor else {
             return nil
         }
 

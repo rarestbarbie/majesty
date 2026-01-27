@@ -36,27 +36,31 @@ extension NavigatorTile {
         self.name = "\(tile.name ?? tile.metadata.ecology.title) (\(planet.state.name))"
         self.terrain = tile.metadata.ecology.title
 
-        let pops: PopulationStats = tile.pops
-
         let culture: [
             (key: CultureID, (share: Int64, ColorReference))
-        ] = pops.free.cultures.compactMap {
-            guard let culture: Culture = cache.rules.pops.cultures[$0] else {
+        ] = cache.rules.pops.cultures.compactMap {
+            guard
+            let metrics: EconomicLedger.CapitalMetrics = cache.context.ledger.z.economy.racial[
+                self.id / $0
+            ] else {
                 return nil
             }
-            let label: ColorReference = .color(culture.color)
-            return ($0, ($1, label))
+            let label: ColorReference = .color($1.color)
+            return ($0, (metrics.count, label))
         }
         let popType: [
             (key: PopOccupation, (share: Int64, ColorReference))
-        ] = pops.occupation.compactMap {
-            guard $0.stratum > .Ward,
+        ] = PopOccupation.allCases.compactMap {
+            guard
+            let row: EconomicLedger.LaborMetrics = cache.context.ledger.z.economy.employment[
+                self.id / $0
+            ],
             let key: Legend.Representation = cache.rules.legend.occupation[$0] else {
                 return nil
             }
 
             let label: ColorReference = .color(key.color)
-            return ($0, ($1.count, label))
+            return ($0, (row.count, label))
         }
 
         self._neighbors = self.id.tile.neighbors(size: planet.grid.radius)

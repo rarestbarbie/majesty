@@ -302,56 +302,8 @@ extension GameUI.Cache {
             let tile: TileSnapshot = self.tiles[mine.state.tile] else {
                 return nil
             }
-            return .instructions {
-                $0[mine.metadata.miner.plural, +] = mine.miners.count[/3] / mine.miners.limit
-                $0["Today’s change", +] = mine.miners.count[/3] <- mine.miners.before
-                $0[>] {
-                    // only elide fired, it’s annoying when the lines below jump around
-                    $0["Hired", +] = +mine.miners.hired[/3]
-                    $0["Fired", -] = +?mine.miners.fired[/3]
-                    $0["Quit", -] = +mine.miners.quit[/3]
-                }
-                if  mine.metadata.decay {
-                    $0["Estimated deposits"] = mine.state.Δ.size[/3]
-                    $0[>] {
-                        $0["Estimated yield", (+)] = mine.state.Δ.yield[..2]
-                    }
-                    if  let yieldRank: Int = mine.state.z.yieldRank,
-                        let (chance, spawn): (Fraction, SpawnWeight) = mine.metadata.chance(
-                            tile: tile.type.geology,
-                            size: mine.state.z.size,
-                            yieldRank: yieldRank
-                        ),
-                        let miners: PopulationStats.Row = tile.z.stats.pops.occupation[.Miner],
-                        let fromWorkers: Fraction = miners.mineExpansionFactor {
-                        let fromDeposit: Double = .init(
-                            mine.metadata.scale %/ (mine.metadata.scale + mine.state.z.size)
-                        )
-                        let fromWorkers: Double = .init(fromWorkers)
-                        let fromRank: Double = MineMetadata.yieldRankExpansionFactor(
-                            yieldRank
-                        ).map(
-                            Double.init(_:)
-                        ) ?? 0.0
-                        let chance: Double = Double.init(chance) * fromWorkers
-                        $0["Chance to expand mine", (+)] = chance[%2]
-                        $0[>] {
-                            $0["Base"] = spawn.rate.value[%]
-                            $0["From yield rank", (+)] = +?(fromRank - 1)[%0]
-                            $0["From size of deposit", (+)] = (fromDeposit - 1)[%2]
-                            $0["From unemployed miners", (+)] = fromWorkers[%2]
-                        }
-                    }
-                    if  let expanded: Mine.Expansion = mine.state.last {
-                        $0[>] = """
-                        We recently unearthed a deposit of size \(em: expanded.size[/3]) on \
-                        \(em: expanded.date[.phrasal_US])
-                        """
-                    }
-                }
 
-                $0[>] = "\(mine.metadata.title)"
-            }
+            return tile.tooltipResourceOrigin(mine: mine, ledger: self.ledger.z)
         }
     }
 
@@ -440,43 +392,41 @@ extension GameUI.Cache {
     ) -> Tooltip? {
         self.tiles[id]?.tooltip(layer)
     }
-    func tooltipTileCulture(
+
+    func tooltipTileOccupation(
         _ id: Address,
-        _ culture: CultureID,
+        _ crosstab: PopOccupation,
     ) -> Tooltip? {
-        guard let culture: Culture = self.rules.pops.cultures[culture] else {
-            return nil
-        }
-        return self.tiles[id]?.tooltip(culture: culture)
+        self.tiles[id]?.tooltipOccupation(in: self.context, id: crosstab)
     }
-    func tooltipTilePopType(
+    func tooltipTileRace(
         _ id: Address,
-        _ occupation: PopOccupation,
+        _ crosstab: CultureID,
     ) -> Tooltip? {
-        self.tiles[id]?.tooltip(occupation: occupation)
+        self.tiles[id]?.tooltipRace(in: self.context, id: crosstab)
     }
 
     func tooltipTileGDP(
         _ id: Address,
     ) -> Tooltip? {
-        self.tiles[id]?.tooltipGDP(context: self.context)
+        self.tiles[id]?.tooltipGDP(in: self.context)
     }
     func tooltipTileIndustry(
         _ id: Address,
         _ crosstab: EconomicLedger.Industry,
     ) -> Tooltip? {
-        self.tiles[id]?.tooltipIndustry(crosstab, context: self.context)
+        self.tiles[id]?.tooltipIndustry(in: self.context, id: crosstab)
     }
     func tooltipTileResourceProduced(
         _ id: Address,
         _ crosstab: Resource,
     ) -> Tooltip? {
-        self.tiles[id]?.tooltipResourceProduced(crosstab, context: self.context)
+        self.tiles[id]?.tooltipResourceProduced(in: self.context, id: crosstab)
     }
     func tooltipTileResourceConsumed(
         _ id: Address,
         _ crosstab: Resource,
     ) -> Tooltip? {
-        self.tiles[id]?.tooltipResourceConsumed(crosstab, context: self.context)
+        self.tiles[id]?.tooltipResourceConsumed(in: self.context, id: crosstab)
     }
 }

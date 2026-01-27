@@ -1,13 +1,13 @@
 import Fraction
 import JavaScriptInterop
 
-extension PopulationStats {
-    struct Row {
+extension EconomicLedger {
+    struct LaborMetrics {
         var count: Int64
         var employed: Int64
     }
 }
-extension PopulationStats.Row: AdditiveArithmetic {
+extension EconomicLedger.LaborMetrics: AdditiveArithmetic {
     static var zero: Self { .init(count: 0, employed: 0) }
 
     static func + (a: Self, b: Self) -> Self {
@@ -17,7 +17,7 @@ extension PopulationStats.Row: AdditiveArithmetic {
         .init(count: a.count - b.count, employed: a.employed - b.employed)
     }
 }
-extension PopulationStats.Row {
+extension EconomicLedger.LaborMetrics {
     var unemployed: Int64 { self.count - self.employed }
     var employment: Double? {
         self.count > 0 ? Double.init(self.employed) / Double.init(self.count) : nil
@@ -29,20 +29,20 @@ extension PopulationStats.Row {
         self.count > 0 ? self.unemployed %/ (30 * self.count) : nil
     }
 }
-extension PopulationStats.Row {
+extension EconomicLedger.LaborMetrics {
     enum ObjectKey: JSString, Sendable {
-        case count = "n"
+        case count = "N"
         case employed = "e"
     }
 }
-extension PopulationStats.Row: JavaScriptEncodable {
-    func encode(to js: inout JavaScriptEncoder<PopulationStats.Row.ObjectKey>) {
+extension EconomicLedger.LaborMetrics: JavaScriptEncodable {
+    func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.count] = self.count
         js[.employed] = self.employed
     }
 }
-extension PopulationStats.Row: JavaScriptDecodable {
-    init(from js: borrowing JavaScriptDecoder<PopulationStats.Row.ObjectKey>) throws {
+extension EconomicLedger.LaborMetrics: JavaScriptDecodable {
+    init(from js: borrowing JavaScriptDecoder<ObjectKey>) throws {
         self.init(
             count: try js[.count].decode(),
             employed: try js[.employed].decode()
@@ -50,5 +50,5 @@ extension PopulationStats.Row: JavaScriptDecodable {
     }
 }
 #if TESTABLE
-extension PopulationStats.Row: Equatable {}
+extension EconomicLedger.LaborMetrics: Equatable {}
 #endif

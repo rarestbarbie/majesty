@@ -106,7 +106,7 @@ extension LegalEntitySnapshot {
         let (share, total): (share: Int64, total: Int64) = self.equity.owners.reduce(
             into: (0, 0)
         ) {
-            if  $1.country == country.id {
+            if case country.id? = context.tiles[$1.region]?.country?.occupiedBy {
                 $0.share += $1.shares
             }
 

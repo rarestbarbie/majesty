@@ -1,6 +1,7 @@
 import GameIDs
 import GameRules
 import JavaScriptInterop
+import OrderedCollections
 
 @frozen public struct CountrySeed: Identifiable {
     public var id: CountryID?
@@ -16,8 +17,9 @@ import JavaScriptInterop
     public let currency: CurrencyID
     public let suzerain: CountryID?
     public let minwage: Int64?
+    public let capital: Address?
     /// The tiles this country controls.
-    public let tiles: [Address]
+    public let tiles: OrderedSet<Address>
 }
 extension CountrySeed {
     @frozen public enum ObjectKey: JSString, Sendable {
@@ -29,6 +31,7 @@ extension CountrySeed {
         case currency
         case suzerain
         case minwage
+        case capital
         case tiles
     }
 }
@@ -42,6 +45,7 @@ extension CountrySeed: JavaScriptDecodable {
         self.currency = try js[.currency].decode()
         self.suzerain = try js[.suzerain]?.decode()
         self.minwage = try js[.minwage]?.decode()
+        self.capital = try js[.capital]?.decode()
         self.tiles = try js[.tiles]?.decode() ?? []
     }
 }

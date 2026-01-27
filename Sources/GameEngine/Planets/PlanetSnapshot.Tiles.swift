@@ -16,23 +16,23 @@ extension PlanetSnapshot.Tiles {
             return self.color { $0.metadata.ecology.color }
 
         case .Population:
-            let populationScale: Double = self.populationScale(count: \.pops.free.total)
+            let populationScale: Double = self.populationScale(count: \.z.stats.voters.count)
             return self.color {
-                Double.init($0.pops.free.total) * populationScale
+                Double.init($0.z.stats.voters.count) * populationScale
             }
 
         case .AverageMilitancy:
             return self.color(
                 range: 0 ... 10,
-                color: \.pops.free.μ.mil,
-                count: \.pops.free.total
+                color: \.z.stats.voters.μ.mil,
+                count: \.z.stats.voters.count
             )
 
         case .AverageConsciousness:
             return self.color(
                 range: 0 ... 10,
-                color: \.pops.free.μ.con,
-                count: \.pops.free.total
+                color: \.z.stats.voters.μ.con,
+                count: \.z.stats.voters.count
             )
         }
     }
