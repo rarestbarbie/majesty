@@ -359,69 +359,141 @@ extension PopSnapshot {
     }
 }
 extension PopSnapshot {
-    func tooltipJobs(
+    func tooltipJobHelp(
+        factories: [FactoryID: FactorySnapshot],
+        mines: [MineID: MineSnapshot],
+        rules: GameMetadata,
+    ) -> Tooltip? {
+        .instructions {
+            var q: Double {
+                PopContext.q0 * PopContext.r²(yield: 0, referenceWage: 0)
+            }
+
+            switch self.occupation {
+            case .Politician:
+                $0["Base quit rate"] = q[%2]
+
+            case .Aristocrat:
+                let i: Double = self.region.stats.incomeElite[type.gender.sex].μ.incomeTotal
+                $0[>] = """
+                The average rent extracted by \(em: self.type.gender.sex.pluralLowercased) in \
+                this income stratum is \(em: i[/3..2]) per day
+                """
+
+            default:
+                $0["Base quit rate"] = q[%2]
+                let w0: Double = self.region.stats.w0(self.type)
+                $0[>] = """
+                The average income earned by \(em: self.type.gender.sex.pluralLowercased) in \
+                this income stratum is \(em: w0[/3..2]) per day
+                """
+            }
+        }
+    }
+
+    func tooltipJobList(
         factories: [FactoryID: FactorySnapshot],
         mines: [MineID: MineSnapshot],
         rules: GameMetadata,
     ) -> Tooltip? {
         switch self.occupation.mode {
         case .mining:
-            return self.tooltipPopJobs(list: self._mines.values.elements) {
+            return Self.tooltipPopJobList(list: self._mines.values.elements) {
                 mines[$0]?.metadata.title ?? "Unknown"
             }
 
         case .remote, .hourly:
-            return self.tooltipPopJobs(list: self._factories.values.elements) {
+            return Self.tooltipPopJobList(list: self._factories.values.elements) {
                 factories[$0]?.metadata.title ?? "Unknown"
             }
 
         case .aristocratic, .livestock:
-            return .instructions {
-                $0["Total employment"] = self.stats.employedBeforeEgress[/3]
-                for produced: InventorySnapshot.Produced in self.inventory.production() {
-                    let output: ResourceOutput = produced.output
-                    let name: String = rules.resources[output.id].title
-                    $0[>] = """
-                    Today these \(self.occupation.plural) sold \(
-                        output.unitsSold[/3],
-                        style: output.unitsSold < output.units.added ? .neg : .pos
-                    ) of \
-                    \(em: output.units.added[/3]) \(name) produced
-                    """
+            return self.tooltipPopSelfEmployment(rules: rules)
+        }
+    }
+    func tooltipJobs(rules: GameMetadata) -> Tooltip? {
+        switch self.occupation.mode {
+        case .mining:
+            return Self.tooltipPopJobs(list: self._mines.values.elements)
+
+        case .remote, .hourly:
+            return Self.tooltipPopJobs(list: self._factories.values.elements)
+
+        case .aristocratic, .livestock:
+            return self.tooltipPopSelfEmployment(rules: rules)
+        }
+    }
+
+    // this is shared across two UI elements
+    private func tooltipPopSelfEmployment(rules: GameMetadata) -> Tooltip {
+        .instructions {
+            $0["Total employment"] = self.stats.employedBeforeEgress[/3]
+            for produced: InventorySnapshot.Produced in self.inventory.production() {
+                let output: ResourceOutput = produced.output
+                let name: String = rules.resources[output.id].title
+                $0[>] = """
+                Today these \(self.occupation.plural) sold \(
+                    output.unitsSold[/3],
+                    style: output.unitsSold < output.units.added ? .neg : .pos
+                ) of \
+                \(em: output.units.added[/3]) \(name) produced
+                """
+            }
+        }
+    }
+}
+extension PopSnapshot {
+    private static func tooltipPopJobList<Job>(
+        list: [Job],
+        name: (Job.ID) -> String
+    ) -> Tooltip where Job: PopJob {
+        .instructions {
+            let total: (
+                count: Int64,
+                hired: Int64,
+                fired: Int64,
+                quit: Int64
+            ) = Self.aggregatePopJobs(list: list)
+            $0["Total employment", +] = total.count[/3] ^^ (
+                total.hired - total.fired - total.quit
+            )
+            $0[>] {
+                for job: Job in list {
+                    $0[name(job.id), +] = job.count[/3] ^^ (job.hired - job.fired - job.quit)
                 }
             }
         }
     }
-    private func tooltipPopJobs<Job>(
-        list: [Job],
-        name: (Job.ID) -> String
-    ) -> Tooltip where Job: PopJob {
-        let total: (
-            count: Int64,
-            hired: Int64,
-            fired: Int64,
-            quit: Int64
-        ) = list.reduce(into: (0, 0, 0, 0)) {
-            $0.count += $1.count
-            $0.hired += $1.hired
-            $0.fired += $1.fired
-            $0.quit += $1.quit
-        }
-
-        return .instructions {
-            $0["Total employment"] = total.count[/3]
-            $0[>] {
-                for job: Job in list {
-                    let change: Int64 = job.hired - job.fired - job.quit
-                    $0[name(job.id), +] = job.count[/3] <- job.count - change
-                }
-            }
-            $0["Today’s change", +] = +?(total.hired - total.fired - total.quit)[/3]
+    private static func tooltipPopJobs(list: [some PopJob]) -> Tooltip {
+        .instructions {
+            let total: (
+                count: Int64,
+                hired: Int64,
+                fired: Int64,
+                quit: Int64
+            ) = Self.aggregatePopJobs(list: list)
+            $0["Total employment", +] = total.count[/3] ^^ (
+                total.hired - total.fired - total.quit
+            )
             $0[>] {
                 $0["Hired today", +] = +?total.hired[/3]
                 $0["Fired today", +] = ??(-total.fired)[/3]
                 $0["Quit today", +] = ??(-total.quit)[/3]
             }
+        }
+    }
+
+    private static func aggregatePopJobs(list: [some PopJob]) -> (
+        count: Int64,
+        hired: Int64,
+        fired: Int64,
+        quit: Int64
+    ) {
+        list.reduce(into: (0, 0, 0, 0)) {
+            $0.count += $1.count
+            $0.hired += $1.hired
+            $0.fired += $1.fired
+            $0.quit += $1.quit
         }
     }
 }

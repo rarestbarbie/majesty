@@ -116,7 +116,7 @@ extension TileSnapshot {
     }
 }
 extension TileSnapshot {
-    func tooltipRace(
+    func tooltipPopRace(
         in context: GameUI.CacheContext,
         id: CultureID
     ) -> Tooltip? {
@@ -153,7 +153,7 @@ extension TileSnapshot {
             """
         }
     }
-    func tooltipOccupation(
+    func tooltipPopOccupation(
         in context: GameUI.CacheContext,
         id: PopOccupation
     ) -> Tooltip? {
@@ -346,8 +346,8 @@ extension TileSnapshot {
             $0[>] {
                 // only elide fired, it’s annoying when the lines below jump around
                 $0["Hired", +] = +mine.miners.hired[/3]
-                $0["Fired", -] = +?mine.miners.fired[/3]
-                $0["Quit", -] = +mine.miners.quit[/3]
+                $0["Fired", -] = +?(-mine.miners.fired)[/3]
+                $0["Quit", -] = +(-mine.miners.quit)[/3]
             }
             if  mine.metadata.decay {
                 $0["Estimated deposits"] = mine.state.Δ.size[/3]

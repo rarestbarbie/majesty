@@ -11,21 +11,21 @@ export class NavigatorTile {
     private readonly detail: HTMLDivElement;
 
     private readonly charts: {
-        readonly culture: PieChart<GameID>;
-        readonly popType: PieChart<string>;
+        readonly race: PieChart<GameID>;
+        readonly occupation: PieChart<string>;
     };
 
     constructor() {
         this.header = document.createElement('header');
 
         this.charts = {
-            culture: new PieChart<GameID>(TooltipType.TileCulture),
-            popType: new PieChart<string>(TooltipType.TilePopType),
+            race: new PieChart<GameID>(TooltipType.TilePopRace),
+            occupation: new PieChart<string>(TooltipType.TilePopOccupation),
         };
 
         this.detail = document.createElement('div');
-        this.detail.appendChild(this.charts.culture.node);
-        this.detail.appendChild(this.charts.popType.node);
+        this.detail.appendChild(this.charts.race.node);
+        this.detail.appendChild(this.charts.occupation.node);
 
         this.node = document.createElement('div');
         this.node.id = 'tile';
@@ -45,11 +45,11 @@ export class NavigatorTile {
 
         this.header.innerText = tile.name;
 
-        if (tile.culture !== undefined) {
-            this.charts.culture.update(tile.culture, tile.id);
+        if (tile.race !== undefined) {
+            this.charts.race.update(tile.race, tile.id);
         }
-        if (tile.popType !== undefined) {
-            this.charts.popType.update(tile.popType, tile.id);
+        if (tile.occupation !== undefined) {
+            this.charts.occupation.update(tile.occupation, tile.id);
         }
     }
 }

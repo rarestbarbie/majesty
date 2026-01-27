@@ -49,12 +49,10 @@ extension PopJob {
             "Negative employee count (count = \(self.count)) in job \(self.id)!!!"
         )
     }
-
-    mutating func quit(
-        rate: Double,
-        using generator: inout some RandomNumberGenerator
-    ) {
-        let quit: Int64 = Binomial[self.count, rate].sample(using: &generator)
+}
+extension PopJob {
+    mutating func quit(rate: Double, random: inout PseudoRandom) {
+        let quit: Int64 = Binomial[self.count, rate].sample(using: &random.generator)
 
         self.quit += quit
         self.count -= quit

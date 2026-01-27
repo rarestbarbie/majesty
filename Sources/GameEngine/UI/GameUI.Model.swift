@@ -316,6 +316,14 @@ extension GameUI.Model {
                 return $0.tooltipPopVacantHelp(
                     try arguments[0].decode(),
                 )
+            case .PopJobHelp:
+                return $0.tooltipPopJobHelp(
+                    try arguments[0].decode(),
+                )
+            case .PopJobList:
+                return $0.tooltipPopJobList(
+                    try arguments[0].decode(),
+                )
             case .PopJobs:
                 return $0.tooltipPopJobs(
                     try arguments[0].decode(),
@@ -392,13 +400,13 @@ extension GameUI.Model {
                     try arguments[0].decode(),
                     try arguments[1].decode(),
                 )
-            case .TileCulture:
-                return $0.tooltipTileRace(
+            case .TilePopRace:
+                return $0.tooltipTilePopRace(
                     try arguments[0].decode(),
                     try arguments[1].decode(),
                 )
-            case .TilePopType:
-                return $0.tooltipTileOccupation(
+            case .TilePopOccupation:
+                return $0.tooltipTilePopOccupation(
                     try arguments[0].decode(),
                     try arguments[1].decode(),
                 )

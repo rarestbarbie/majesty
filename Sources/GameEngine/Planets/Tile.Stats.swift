@@ -26,6 +26,14 @@ extension Tile.Stats {
     }
 }
 extension Tile.Stats {
+    func w0(_ type: PopType) -> Double {
+        switch type.stratum {
+        case .Worker: self.incomeLower[type.gender.sex].μ.incomeTotal
+        case .Clerk: self.incomeUpper[type.gender.sex].μ.incomeTotal
+        default: 0
+        }
+    }
+
     var _μFree: Mean<Self> {
         .init(fields: self, weight: Double.init(self.voters.count))
     }
