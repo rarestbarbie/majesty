@@ -74,18 +74,10 @@ extension PopContext {
     ) throws {
         self.region = context.tiles[self.state.tile]?.properties
 
-        switch self.state.occupation.mode {
-        case .aristocratic:
+        switch self.state.occupation.employer {
+        case nil:
             break
-        case .livestock:
-            break
-        case .hourly:
-            self.updateJobAttraction(to: context.factories, yield: \.wn)
-
-        case .remote:
-            self.updateJobAttraction(to: context.factories, yield: \.cn)
-
-        case .mining:
+        case .mine?:
             for job: MiningJob in self.state.mines.values {
                 let (state, type): (Mine, MineMetadata) = try context.mines[job.id]
                 self.mines[job.id] = .init(
@@ -96,8 +88,16 @@ extension PopContext {
             }
 
             // mining yield does not affect Politicians
-            if  case .Miner = self.state.occupation {
+            if  case .Elite = self.state.occupation.stratum {
+                break
+            } else {
                 self.updateJobAttraction(to: context.mines, yield: \.yield)
+            }
+        case .factory?:
+            if  case .Worker = self.state.occupation.stratum {
+                self.updateJobAttraction(to: context.factories, yield: \.wn)
+            } else {
+                self.updateJobAttraction(to: context.factories, yield: \.cn)
             }
         }
     }
@@ -284,7 +284,7 @@ extension PopContext: AllocatingContext {
                 weights: weights,
                 state: self.state.z,
                 stockpileMaxDays: Self.stockpileDaysMax,
-                investor: self.state.type.stratum == .Owner
+                investor: self.state.type.stratum == .Elite
             )
 
             // this short-circuits internally if investment is zero
@@ -459,7 +459,7 @@ extension PopContext {
 
     static func r²(yield w: Double, referenceWage w0: Double) -> Double {
         if  w0 <= 0 {
-            return 0.25
+            return self.r0
         }
 
         //  x = w / w0
@@ -474,6 +474,7 @@ extension PopContext {
         self.q0 * self.r²(yield: w, referenceWage: w0)
     }
 
+    static var r0: Double { 0.25 }
     static var q0: Double { 0.008 }
 }
 extension PopContext {
@@ -535,18 +536,14 @@ extension PopContext {
 
         self.convert(turn: &turn)
 
-        switch self.state.occupation.mode {
-        case .aristocratic:
-            break
-        case .livestock:
-            break
-        case .hourly, .remote:
+        if  let employer: PopOccupation.Employer = self.state.occupation.employer {
             let w0: Double = region.stats.w0(self.state.type)
-            self.quitFactoryJobs(w0: w0, random: &turn.random)
-
-        case .mining:
-            let w0: Double = region.stats.w0(self.state.type)
-            self.quitMiningJobs(w0: w0, random: &turn.random)
+            switch employer {
+            case .factory:
+                self.quitFactoryJobs(w0: w0, random: &turn.random)
+            case .mine:
+                self.quitMiningJobs(w0: w0, random: &turn.random)
+            }
         }
     }
 }

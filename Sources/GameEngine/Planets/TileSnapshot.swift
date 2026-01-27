@@ -350,14 +350,14 @@ extension TileSnapshot {
                 $0["Quit", -] = +(-mine.miners.quit)[/3]
             }
             if  mine.metadata.decay {
-                $0["Estimated deposits"] = mine.state.Δ.size[/3]
+                $0["Estimated deposits"] = mine.Δ.size[/3]
                 $0[>] {
-                    $0["Estimated yield", (+)] = mine.state.Δ.yield[..2]
+                    $0["Estimated yield", (+)] = mine.Δ.yield[..2]
                 }
-                if  let yieldRank: Int = mine.state.z.yieldRank,
+                if  let yieldRank: Int = mine.z.yieldRank,
                     let (chance, spawn): (Fraction, SpawnWeight) = mine.metadata.chance(
                         tile: self.type.geology,
-                        size: mine.state.z.size,
+                        size: mine.z.size,
                         yieldRank: yieldRank
                     ),
                     let miners: EconomicLedger.LaborMetrics = ledger.economy.employment[
@@ -365,7 +365,7 @@ extension TileSnapshot {
                     ],
                     let fromWorkers: Fraction = miners.mineExpansionFactor {
                     let fromDeposit: Double = .init(
-                        mine.metadata.scale %/ (mine.metadata.scale + mine.state.z.size)
+                        mine.metadata.scale %/ (mine.metadata.scale + mine.z.size)
                     )
                     let fromWorkers: Double = .init(fromWorkers)
                     let fromRank: Double = MineMetadata.yieldRankExpansionFactor(
@@ -382,7 +382,7 @@ extension TileSnapshot {
                         $0["From unemployed miners", (+)] = fromWorkers[%2]
                     }
                 }
-                if  let expanded: Mine.Expansion = mine.state.last {
+                if  let expanded: Mine.Expansion = mine.last {
                     $0[>] = """
                     We recently unearthed a deposit of size \(em: expanded.size[/3]) on \
                     \(em: expanded.date[.phrasal_US])

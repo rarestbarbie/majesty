@@ -76,8 +76,8 @@ extension PopOccupation {
         case .Farmer:       .Clerk
         case .Consultant:   .Clerk
         case .Influencer:   .Clerk
-        case .Aristocrat:   .Owner
-        case .Politician:   .Owner
+        case .Aristocrat:   .Elite
+        case .Politician:   .Elite
         }
     }
 }

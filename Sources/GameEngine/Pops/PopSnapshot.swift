@@ -30,10 +30,7 @@ struct PopSnapshot: PopProperties, Sendable {
     let z: Pop.Dimensions
 
     let equity: Equity<LEI>.Snapshot
-
-    // TODO; these should probably not be here
-    let _factories: OrderedDictionary<FactoryID, FactoryJob>
-    let _mines: OrderedDictionary<MineID, MiningJob>
+    let jobs: Jobs?
 }
 extension PopSnapshot {
     init(
@@ -44,6 +41,13 @@ extension PopSnapshot {
         mines: [MineID: MiningJobConditions],
         state: Pop,
     ) {
+        let jobs: Jobs? = state.occupation.employer.map {
+            switch $0 {
+            case .factory: .factories(state.factories.values.elements)
+            case .mine: .mines(state.mines.values.elements)
+            }
+        }
+
         self.init(
             metadata: metadata,
             stats: stats,
@@ -62,8 +66,7 @@ extension PopSnapshot {
             y: state.y,
             z: state.z,
             equity: .init(equity: state.equity, stats: equity),
-            _factories: state.factories,
-            _mines: state.mines
+            jobs: jobs,
         )
     }
 }
@@ -71,6 +74,43 @@ extension PopSnapshot: PopFactors {
     typealias Matrix = ConditionBreakdown
 }
 extension PopSnapshot: LegalEntitySnapshot {}
+extension PopSnapshot {
+    private func estimateIncomeFromEmployment(
+        factories: [FactoryID: FactorySnapshot],
+        mines: [MineID: MineSnapshot],
+    ) -> (min: Double, median: Double, max: Double)? {
+        var yields: [(count: Int64, value: Double)]
+        switch self.jobs {
+        case nil:
+            return nil
+        case .mines(let jobs)?:
+            if case .Elite = self.occupation.stratum {
+                return nil
+            } else {
+                yields = jobs.map { ($0.count, mines[$0.id]?.z.yield ?? 0) }
+            }
+        case .factories(let jobs)?:
+            if case .Worker = self.occupation.stratum {
+                yields = jobs.map { ($0.count, Double.init(factories[$0.id]?.z.wn ?? 0)) }
+            } else {
+                yields = jobs.map { ($0.count, Double.init(factories[$0.id]?.z.cn ?? 0)) }
+            }
+        }
+
+        // for expected lengths of jobs list, sorting is probably faster than specialized
+        // median-finding algorithms
+        yields.sort { $0.value < $1.value }
+
+        guard
+        let min: Double = yields.first?.value,
+        let max: Double = yields.last?.value,
+        let median: Double = yields.medianAssumingAscendingOrder() else {
+            return nil
+        }
+
+        return (min: min, median: median, max: max)
+    }
+}
 extension PopSnapshot {
     private func explainProduction(_ ul: inout TooltipInstructionEncoder, base: Int64) {
         ul["Production per worker"] = Double.init(base)[..3]
@@ -365,28 +405,71 @@ extension PopSnapshot {
         rules: GameMetadata,
     ) -> Tooltip? {
         .instructions {
-            var q: Double {
-                PopContext.q0 * PopContext.r²(yield: 0, referenceWage: 0)
-            }
+            if  let employer: PopOccupation.Employer = self.occupation.employer {
+                let income: Double?
+                let w: (
+                    min: Double,
+                    median: Double,
+                    max: Double
+                )? = self.estimateIncomeFromEmployment(factories: factories, mines: mines)
 
-            switch self.occupation {
-            case .Politician:
-                $0["Base quit rate"] = q[%2]
+                if  case .Elite = self.occupation.stratum {
+                    let r²: Double = PopContext.r0
+                    $0["Median quit rate"] = (PopContext.q0 * r²)[%2]
 
-            case .Aristocrat:
-                let i: Double = self.region.stats.incomeElite[type.gender.sex].μ.incomeTotal
-                $0[>] = """
-                The average rent extracted by \(em: self.type.gender.sex.pluralLowercased) in \
-                this income stratum is \(em: i[/3..2]) per day
-                """
+                    income = nil
+                } else {
+                    let w0: Double = self.region.stats.w0(self.type)
+                    let r²: Double = PopContext.r²(yield: w?.median ?? w0, referenceWage: w0)
+                    $0["Median quit rate"] = (PopContext.q0 * r²)[%2]
+                    $0[>] {
+                        $0["Base"] = (PopContext.q0 * PopContext.r0)[%2]
+                        $0["Relative earnings", -] = +?(r² / PopContext.r0 - 1)[%2]
+                    }
 
-            default:
-                $0["Base quit rate"] = q[%2]
-                let w0: Double = self.region.stats.w0(self.type)
-                $0[>] = """
-                The average income earned by \(em: self.type.gender.sex.pluralLowercased) in \
-                this income stratum is \(em: w0[/3..2]) per day
-                """
+                    income = w0
+                }
+
+                if  let (min, median, max): (Double, Double, Double) = w {
+                    let label: String
+                    switch employer {
+                    case .mine:
+                        label = "mining yield"
+                    case .factory:
+                        label = self.occupation.stratum > .Worker ? "salary" : "wage"
+                    }
+                    $0["Median \(label)"] = median[/3..2]
+                    $0[>] {
+                        $0["Lowest"] = min[/3..2]
+                        $0["Highest"] = max[/3..2]
+                    }
+                }
+
+                if  let income: Double {
+                    $0[>] = """
+                    The average income earned by \(em: self.type.gender.sex.pluralLowercased) \
+                    in this income stratum and region is \(em: income[/3..2]) per day
+                    """
+                    $0[>] = """
+                    Pops are much less likely to quit jobs that pay well compared to the \
+                    average income of their peers
+                    """
+                }
+
+            } else {
+                if  case .Elite = self.occupation.stratum {
+                    let i: Double = self.region.stats.incomeElite[type.gender.sex].μ.incomeTotal
+                    $0[>] = """
+                    The average rent extracted by \(em: self.type.gender.sex.pluralLowercased) \
+                    in this income stratum and region is \(em: i[/3..2]) per day
+                    """
+                } else {
+                    let w0: Double = self.region.stats.w0(self.type)
+                    $0[>] = """
+                    The average income earned by \(em: self.type.gender.sex.pluralLowercased) \
+                    in this income stratum and region is \(em: w0[/3..2]) per day
+                    """
+                }
             }
         }
     }
@@ -396,30 +479,28 @@ extension PopSnapshot {
         mines: [MineID: MineSnapshot],
         rules: GameMetadata,
     ) -> Tooltip? {
-        switch self.occupation.mode {
-        case .mining:
-            return Self.tooltipPopJobList(list: self._mines.values.elements) {
-                mines[$0]?.metadata.title ?? "Unknown"
-            }
-
-        case .remote, .hourly:
-            return Self.tooltipPopJobList(list: self._factories.values.elements) {
+        switch self.jobs {
+        case .factories(let jobs)?:
+            return Self.tooltipPopJobList(list: jobs) {
                 factories[$0]?.metadata.title ?? "Unknown"
             }
 
-        case .aristocratic, .livestock:
+        case .mines(let jobs)?:
+            return Self.tooltipPopJobList(list: jobs) {
+                mines[$0]?.metadata.title ?? "Unknown"
+            }
+
+        case nil:
             return self.tooltipPopSelfEmployment(rules: rules)
         }
     }
     func tooltipJobs(rules: GameMetadata) -> Tooltip? {
-        switch self.occupation.mode {
-        case .mining:
-            return Self.tooltipPopJobs(list: self._mines.values.elements)
-
-        case .remote, .hourly:
-            return Self.tooltipPopJobs(list: self._factories.values.elements)
-
-        case .aristocratic, .livestock:
+        switch self.jobs {
+        case .factories(let jobs)?:
+            return Self.tooltipPopJobs(list: jobs)
+        case .mines(let jobs)?:
+            return Self.tooltipPopJobs(list: jobs)
+        case nil:
             return self.tooltipPopSelfEmployment(rules: rules)
         }
     }

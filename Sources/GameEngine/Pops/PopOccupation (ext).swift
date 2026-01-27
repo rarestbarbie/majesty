@@ -18,6 +18,23 @@ extension PopOccupation {
         }
     }
 
+    var employer: Employer? {
+        switch self {
+        case .Politician: .mine
+        case .Aristocrat: nil
+        case .Consultant: nil
+        case .Influencer: nil
+        case .Engineer: .factory
+        case .Farmer: .factory
+        case .Driver: .factory
+        case .Editor: .factory
+        case .Miner: .mine
+        case .Server: nil
+        case .Contractor: nil
+        case .Livestock: nil
+        }
+    }
+
     var mode: Mode {
         switch self {
         // politicians are miners, they mine a finite pool of regional influence
@@ -43,8 +60,8 @@ extension PopOccupation {
 
     func promotes(to target: Self) -> Bool {
         switch (self.stratum, target.stratum) {
-        case (.Owner, .Owner): true
-        case (.Clerk, .Owner): true
+        case (.Elite, .Elite): true
+        case (.Clerk, .Elite): true
         case (.Clerk, .Clerk): true
         case (.Worker, .Clerk): true
         case (.Worker, .Worker): true
@@ -53,8 +70,8 @@ extension PopOccupation {
     }
     func demotes(to target: Self) -> Bool {
         switch (self.stratum, target.stratum) {
-        case (.Owner, .Owner): true
-        case (.Owner, .Clerk): true
+        case (.Elite, .Elite): true
+        case (.Elite, .Clerk): true
         case (.Clerk, .Clerk): true
         case (.Clerk, .Worker): true
         case (.Worker, .Worker): true

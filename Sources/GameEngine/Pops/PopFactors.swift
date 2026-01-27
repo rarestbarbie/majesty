@@ -79,7 +79,7 @@ extension PopFactors {
             } = { "\(+$0[%]): Militancy is above \(em: $1[..1])" }
 
             switch self.type.stratum {
-            case .Owner:
+            case .Elite:
                 $0[self.y.fx] {
                     $0[$1 >= 0.25] = +3‰
                     $0[$1 >= 0.50] = +3‰

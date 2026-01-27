@@ -309,7 +309,7 @@ extension GameUI.Cache {
         case .m(let id):
             guard
             let mine: MineSnapshot = self.mines[id.mine],
-            let tile: TileSnapshot = self.tiles[mine.state.tile] else {
+            let tile: TileSnapshot = self.tiles[mine.tile] else {
                 return nil
             }
 

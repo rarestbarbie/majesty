@@ -5,6 +5,7 @@ import JavaScriptInterop
     let id: Int
     let value: Double
     let label: ColorReference?
+    let grid: Bool
     let text: String
 }
 extension TickRule: JavaScriptEncodable {
@@ -12,6 +13,7 @@ extension TickRule: JavaScriptEncodable {
         case id
         case value = "y"
         case label
+        case grid
         case text
     }
 
@@ -19,6 +21,7 @@ extension TickRule: JavaScriptEncodable {
         js[.id] = self.id
         js[.value] = self.value
         js[.label] = self.label
+        js[.grid] = self.grid ? true : nil
         js[.text] = self.text
     }
 }
