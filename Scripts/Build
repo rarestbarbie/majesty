@@ -10,7 +10,7 @@ PROFILE=false
 NOASSERT=false
 
 # SWIFT_WASM_SDK='6.1-RELEASE-wasm32-unknown-wasip1-threads'
-SWIFT_WASM_SDK='6.3-SNAPSHOT-2025-12-13-a-wasm32-unknown-wasip1-threads'
+SWIFT_WASM_SDK='6.3-SNAPSHOT-2026-01-16-a-wasm32-unknown-wasip1-threads'
 
 # --- Usage Function ---
 usage() {
