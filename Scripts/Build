@@ -109,8 +109,8 @@ cd "$(dirname "$0")/.."
 
 build_json() {
     echo "--- Building JSON Rules ---"
-    node Scripts/collate_json.js Public/Rules/ Public/rules.json
-    node Scripts/collate_json.js Public/Start/ Public/start.json
+    node Scripts/collate_json.js World/Rules/ Public/rules.json
+    node Scripts/collate_json.js World/Start/ Public/start.json
     echo "JSON build complete."
 }
 
