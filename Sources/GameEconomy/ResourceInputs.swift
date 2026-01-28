@@ -156,11 +156,8 @@ extension ResourceInputs {
     public mutating func liquidate(
         in currency: CurrencyID,
         on exchange: inout WorldMarkets,
-    ) -> TradeProceeds {
-        for i: Int in self.segmented.indices {
-            self.inputs.values[i].consumeAll()
-        }
-        return self.trade(
+    ) -> Int64 {
+        let proceeds: TradeProceeds = self.trade(
             stockpileDaysTarget: 0,
             stockpileDaysReturn: 0,
             spendingLimit: 0,
@@ -168,6 +165,23 @@ extension ResourceInputs {
             on: &exchange,
             weights: []
         )
+
+        #assert(
+            proceeds.loss == 0,
+            "trading loss during liquidation is non-zero! (\(proceeds.loss))"
+        )
+
+        for i: Int in self.segmented.indices {
+            self.inputs.values[i].consumeAll()
+        }
+        // it’s possible for some resources to remain after liquidation, if the stockpile does
+        // not have enough of them to trade for at least 1 unit of currency. so we just
+        // throw them away, like we do with segmented resources.
+        for i: Int in self.tradeable.indices {
+            self.inputs.values[i].consumeAll()
+        }
+
+        return proceeds.gain
     }
 }
 extension ResourceInputs {

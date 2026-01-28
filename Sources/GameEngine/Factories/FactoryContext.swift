@@ -576,7 +576,8 @@ extension FactoryContext {
         budget: LiquidationBudget,
         turn: inout Turn
     ) {
-        var proceeds: TradeProceeds = .zero
+        var proceeds: Int64 = 0
+
         if  self.state.z.vl > 0 {
             proceeds += self.state.inventory.l.liquidate(
                 in: region.currency.id,
@@ -596,14 +597,13 @@ extension FactoryContext {
             )
         }
 
-        #assert(
-            proceeds.loss == 0,
-            "trading loss during liquidation is non-zero! (\(proceeds.loss))"
-        )
-
-        if  proceeds.gain > 0 {
-            turn.bank[account: self.id].r += proceeds.gain
+        if  proceeds > 0 {
+            turn.bank[account: self.id].r += proceeds
         }
+
+        self.state.z.fl = 0
+        self.state.z.fe = 0
+        self.state.z.fx = 0
     }
 
     private mutating func operate(
