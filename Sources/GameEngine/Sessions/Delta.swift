@@ -19,6 +19,21 @@ extension Delta where Dimensions: AdditiveArithmetic {
     static func - (a: Self, b: Self) -> Self {
         .init(y: a.y - b.y, z: a.z - b.z)
     }
+
+    static func + (a: Dimensions, b: Self) -> Self { b + a }
+    static func + (a: Self, b: Dimensions) -> Self {
+        .init(y: a.y + b, z: a.z + b)
+    }
+
+    static func - (a: Self, b: Dimensions) -> Self {
+        .init(y: a.y - b, z: a.z - b)
+    }
+}
+extension Delta where Dimensions: Numeric {
+    static func * (a: Dimensions, b: Self) -> Self { b * a }
+    static func * (a: Self, b: Dimensions) -> Self {
+        .init(y: a.y * b, z: a.z * b)
+    }
 }
 extension Delta where Dimensions: BinaryInteger {
     func percentage(of total: Self, initial: Double = 0) -> Delta<Double>? {
