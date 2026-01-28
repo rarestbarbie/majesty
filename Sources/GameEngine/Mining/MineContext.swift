@@ -131,12 +131,11 @@ extension MineContext {
 
             if  h < 0.25 {
                 let minersPossible: Int64 = self.miners.count + minersToHireToday
-                if  self.state.z.splits > 0, minersPossible < self.miners.limit / 8 {
+                if  self.state.z.splits > 0, minersPossible * 8 < self.miners.limit {
                     self.state.z.splits -= 1
                 }
             } else if h > 2 {
-                if  self.state.z.splits < 10,
-                    self.miners.count > self.miners.limit - self.miners.limit / 8 {
+                if  self.state.z.splits < 10, self.miners.count * 8 > self.miners.limit * 7 {
                     self.state.z.splits += 1
                 }
             }

@@ -133,38 +133,27 @@ extension PopSnapshot {
         ul["Mining efficiency"] = mineConditions.factor[%1]
         ul[>] {
             switch self.type.occupation {
-            case .Politician: self.explainProductionPolitician(&$0, base: base, mine: mine)
-            case .Miner: self.explainProductionMiner(&$0, base: base, mine: mine)
+            case .Politician:
+                let mil: Double = self.region.stats.voters.μ.mil
+                let rate: Double = MineMetadata.efficiencyPoliticiansPerMilitancyPoint
+                $0["Base"] = MineMetadata.efficiencyPoliticians[%]
+                $0["Militancy of Free Population", +] = +(rate * mil)[%1]
+
+            case .Miner:
+                guard
+                let modifiers: CountryModifiers.Stack<
+                    Decimal
+                > = self.region.modifiers.miningEfficiency[mine.type] else {
+                    return
+                }
+
+                $0["Base"] = MineMetadata.efficiencyMiners[%]
+                $0["Parceling", +] = +?(mine.z.parcelFraction - 1)[%]
+                for (effect, provenance): (Decimal, EffectProvenance) in modifiers.blame {
+                    $0[provenance.name, +] = +effect[%]
+                }
             default: break
             }
-        }
-    }
-    private func explainProductionPolitician(
-        _ ul: inout TooltipInstructionEncoder,
-        base: Int64,
-        mine: MineSnapshot,
-    ) {
-        ul["Base"] = MineMetadata.efficiencyPoliticians[%]
-        ul["Militancy of Free Population", +] = +(
-            MineMetadata.efficiencyPoliticiansPerMilitancyPoint * self.region.stats.voters.μ.mil
-        )[%1]
-    }
-    private func explainProductionMiner(
-        _ ul: inout TooltipInstructionEncoder,
-        base: Int64,
-        mine: MineSnapshot,
-    ) {
-        guard
-        let modifiers: CountryModifiers.Stack<
-            Decimal
-        > = self.region.modifiers.miningEfficiency[mine.type] else {
-            return
-        }
-
-        ul["Base"] = MineMetadata.efficiencyMiners[%]
-        ul["Parceling", +] = +?(mine.z.parcelFraction - 1)[%]
-        for (effect, provenance): (Decimal, EffectProvenance) in modifiers.blame {
-            ul[provenance.name, +] = +effect[%]
         }
     }
 
