@@ -192,7 +192,21 @@ extension FactoryContext: TransactingContext {
             self.equity = .init()
         }
 
-        if  case _? = self.state.liquidation {
+        //  check for bankruptcy
+        switch self.state.liquidation {
+        case nil:
+            guard
+            self.workers?.count ?? 0 == 0,
+            self.clerks?.count ?? 0 == 0,
+            self.state.y.profitability <= 0,
+            self.state.z.profitability <= 0 else {
+                break
+            }
+
+            self.state.liquidation = .init(started: turn.date, burning: self.equity.shareCount)
+            fallthrough
+
+        case _?:
             // set profitability to -1 to deter investment in bankrupt factories
             self.state.z.profitability = -1
             self.state.budget = .liquidating(
@@ -530,14 +544,7 @@ extension FactoryContext: TransactingContext {
             return
         }
 
-        if  self.workers?.count ?? 0 == 0,
-            self.clerks?.count ?? 0 == 0,
-            self.state.y.profitability <= 0,
-            self.state.z.profitability <= 0 {
-            self.state.liquidation = .init(started: turn.date, burning: self.equity.shareCount)
-        } else {
-            self.state.equity.split(at: self.state.z.px, in: country, turn: &turn)
-        }
+        self.state.equity.split(at: self.state.z.px, in: country, turn: &turn)
     }
 }
 extension FactoryContext {
