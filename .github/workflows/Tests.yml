@@ -43,7 +43,7 @@ jobs:
                 run: |
                     swift sdk install \
                     "https://github.com/swiftwasm/swift/releases/download/swift-wasm-$SWIFTWASM_VERSION/swift-wasm-$SWIFTWASM_VERSION-$SWIFTWASM_TRIPLE.artifactbundle.zip" \
-                    --checksum c49407947f6d91809ad57a83a2482062eec6a50cc0e22e6fd6eb01d6de6925a5
+                    --checksum 6054e019dce24a3ed875584cffa0621eaf2f6200f6366270b39768347addc133
 
             #   note: top-level node dependencies already installed in setup action
             -   name: 🝮 Install testing dependencies 🝮
