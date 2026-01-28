@@ -83,7 +83,7 @@ extension PopContext {
                 self.mines[job.id] = .init(
                     type: state.type,
                     output: type.base,
-                    factor: state.y.efficiency
+                    factor: state.y.efficiencyPerMiner
                 )
             }
 

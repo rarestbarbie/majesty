@@ -122,47 +122,38 @@ extension PopSnapshot {
     private func explainProduction(
         _ ul: inout TooltipInstructionEncoder,
         base: Int64,
-        mine: MiningJobConditions
+        mine: MineSnapshot,
+        mineConditions: MiningJobConditions
     ) {
-        ul["Production per miner"] = (mine.factor * Double.init(base))[..3]
+        ul["Production per miner"] = (mineConditions.factor * Double.init(base))[..3]
         ul[>] {
             $0["Base"] = base[/3]
         }
 
-        ul["Mining efficiency"] = mine.factor[%1]
+        ul["Mining efficiency"] = mineConditions.factor[%1]
         ul[>] {
             switch self.type.occupation {
-            case .Politician: self.explainProductionPolitician(&$0, base: base, mine: mine)
-            case .Miner: self.explainProductionMiner(&$0, base: base, mine: mine)
+            case .Politician:
+                let mil: Double = self.region.stats.voters.μ.mil
+                let rate: Double = MineMetadata.efficiencyPoliticiansPerMilitancyPoint
+                $0["Base"] = MineMetadata.efficiencyPoliticians[%]
+                $0["Militancy of Free Population", +] = +(rate * mil)[%1]
+
+            case .Miner:
+                guard
+                let modifiers: CountryModifiers.Stack<
+                    Decimal
+                > = self.region.modifiers.miningEfficiency[mine.type] else {
+                    return
+                }
+
+                $0["Base"] = MineMetadata.efficiencyMiners[%]
+                $0["Parceling", +] = +?(mine.z.parcelFraction - 1)[%]
+                for (effect, provenance): (Decimal, EffectProvenance) in modifiers.blame {
+                    $0[provenance.name, +] = +effect[%]
+                }
             default: break
             }
-        }
-    }
-    private func explainProductionPolitician(
-        _ ul: inout TooltipInstructionEncoder,
-        base: Int64,
-        mine: MiningJobConditions
-    ) {
-        ul[>] = "Base: \(em: MineMetadata.efficiencyPoliticians[%])"
-        ul["Militancy of Free Population", +] = +(
-            MineMetadata.efficiencyPoliticiansPerMilitancyPoint * self.region.stats.voters.μ.mil
-        )[%1]
-    }
-    private func explainProductionMiner(
-        _ ul: inout TooltipInstructionEncoder,
-        base: Int64,
-        mine: MiningJobConditions
-    ) {
-        guard
-        let modifiers: CountryModifiers.Stack<
-            Decimal
-        > = self.region.modifiers.miningEfficiency[mine.type] else {
-            return
-        }
-
-        ul[>] = "Base: \(em: MineMetadata.efficiencyMiners[%])"
-        for (effect, provenance): (Decimal, EffectProvenance) in modifiers.blame {
-            ul[provenance.name, +] = +effect[%]
         }
     }
 
@@ -365,6 +356,7 @@ extension PopSnapshot {
     }
     func tooltipResourceIO(
         _ line: InventoryLine,
+        mines: [MineID: MineSnapshot]
     ) -> Tooltip? {
         switch line {
         case .l(let resource):
@@ -389,11 +381,12 @@ extension PopSnapshot {
             )
         case .m(let id):
             guard
-            let miningConditions: MiningJobConditions = self.mines[id.mine] else {
+            let mine: MineSnapshot = mines[id.mine],
+            let mineConditions: MiningJobConditions = self.mines[id.mine] else {
                 return nil
             }
-            return self.inventory[.m(id)]?.tooltipSupply(tier: miningConditions.output) {
-                self.explainProduction(&$0, base: $1, mine: miningConditions)
+            return self.inventory[.m(id)]?.tooltipSupply(tier: mineConditions.output) {
+                self.explainProduction(&$0, base: $1, mine: mine, mineConditions: mineConditions)
             }
         }
     }

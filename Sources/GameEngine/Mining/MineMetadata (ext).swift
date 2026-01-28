@@ -103,16 +103,16 @@ extension MineMetadata {
         return (efficiency: efficiency, value: yieldBeforeScaling * efficiency)
     }
 
-    func h²(tile: RegionalProperties, yield: Double) -> Double {
-        self.h²(tile: tile.stats, yield: yield)
-    }
-
-    func h²(tile: Tile.Stats, yield: Double) -> Double {
-        let h: Double = self.h(tile: tile, yield: yield)
+    static func h²(h: Double) -> Double {
+        let h: Double = min(h, 1)
         return h * h
     }
+    func h²(tile: RegionalProperties, yield: Double) -> Double {
+        let h: Double = self.h(tile: tile.stats, yield: yield)
+        return Self.h²(h: h)
+    }
 
-    private func h(tile: Tile.Stats, yield: Double) -> Double {
+    func h(tile: Tile.Stats, yield: Double) -> Double {
         let incomeAverage: Mean<Int64>?
 
         switch self.miner.stratum {
@@ -127,7 +127,7 @@ extension MineMetadata {
         }
 
         if  let w0: Double = incomeAverage?.defined, w0 > 0 {
-            return min(yield / w0, 1)
+            return yield / w0
         } else {
             return 1
         }
