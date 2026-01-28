@@ -18,7 +18,7 @@ extension PopOccupation {
         }
     }
 
-    var employer: Employer? {
+    var employer: PopJobType? {
         switch self {
         case .Politician: .mine
         case .Aristocrat: nil

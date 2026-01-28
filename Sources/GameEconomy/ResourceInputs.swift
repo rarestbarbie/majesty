@@ -3,25 +3,25 @@ import GameIDs
 import OrderedCollections
 
 @frozen public struct ResourceInputs {
-    public var tradeableDaysReserve: Int64
+    @usableFromInline var tradingCooldown: Int64
     @usableFromInline var inputs: OrderedDictionary<Resource, ResourceInput>
     /// The index of the first **tradeable** resource in ``inputs``, which may be the end
     /// index if there are no tradeable resources.
     @usableFromInline var inputsPartition: Int
 
-    @inlinable public init(
-        tradeableDaysReserve: Int64,
+    @inlinable init(
+        tradingCooldown: Int64,
         inputs: OrderedDictionary<Resource, ResourceInput>,
         inputsPartition: Int
     ) {
-        self.tradeableDaysReserve = tradeableDaysReserve
+        self.tradingCooldown = tradingCooldown
         self.inputs = inputs
         self.inputsPartition = inputsPartition
     }
 }
 extension ResourceInputs {
     @inlinable public static var empty: Self {
-        .init(tradeableDaysReserve: 0, inputs: [:], inputsPartition: 0)
+        .init(tradingCooldown: 0, inputs: [:], inputsPartition: 0)
     }
 
     @inlinable public init(
@@ -40,7 +40,7 @@ extension ResourceInputs {
             combined[input.id] = input
         }
         self.init(
-            tradeableDaysReserve: tradeableDaysReserve,
+            tradingCooldown: tradeableDaysReserve,
             inputs: combined,
             inputsPartition: inputsPartition
         )
@@ -49,6 +49,7 @@ extension ResourceInputs {
 extension ResourceInputs {
     @inlinable public static var stockpileDaysFactor: Int64 { 2 }
 
+    @inlinable public var tradeableDaysReserve: Int64 { self.tradingCooldown }
     @inlinable public var count: Int { self.inputs.count }
     @inlinable public var all: [ResourceInput] { self.inputs.values.elements }
 
@@ -98,16 +99,14 @@ extension ResourceInputs {
     }
 
     /// This function ignores `tradeableDaysSupply` and consumes all available resources up to
-    /// the specified quantity. If this is being called, it’s highly probable that it is not
-    /// being called on every turn, which makes it advisable to reset `self.tradeableDaysSupply`
-    /// to zero, in order to encourage more of the resources to be purchased on the next turn.
+    /// the specified quantity.
     public mutating func consumeAvailable(
         from resourceTier: ResourceTier,
         scalingFactor: (x: Int64, z: Double),
     ) -> (Double, Bool) {
         // we need to reset this, or we won’t buy any tomorrow
         defer {
-            self.tradeableDaysReserve = 0
+            self.tradingCooldown = 0
         }
         if  self.full {
             self.consume(from: resourceTier, scalingFactor: scalingFactor, reservingDays: 1)
@@ -124,10 +123,10 @@ extension ResourceInputs {
         self.consume(
             from: resourceTier,
             scalingFactor: scalingFactor,
-            reservingDays: self.tradeableDaysReserve
+            reservingDays: self.tradingCooldown
         )
-        if  self.tradeableDaysReserve > 0 {
-            self.tradeableDaysReserve -= 1
+        if  self.tradingCooldown > 0 {
+            self.tradingCooldown -= 1
         }
         return self.fulfilledAfterReservation
     }
@@ -154,6 +153,35 @@ extension ResourceInputs {
     }
 }
 extension ResourceInputs {
+    public mutating func liquidate(
+        in currency: CurrencyID,
+        on exchange: inout WorldMarkets,
+    ) -> Int64 {
+        let proceeds: TradeProceeds = self.trade(
+            stockpileDaysTarget: 0,
+            stockpileDaysReturn: 0,
+            spendingLimit: 0,
+            in: currency,
+            on: &exchange,
+            weights: []
+        )
+
+        #assert(
+            proceeds.loss == 0,
+            "trading loss during liquidation is non-zero! (\(proceeds.loss))"
+        )
+
+        // it’s possible for some resources to remain after liquidation, if the stockpile does
+        // not have enough of them to trade for at least 1 unit of currency. so we just
+        // throw them away. we also need to do the same with segmented resources.
+        for i: Int in self.inputs.values.indices {
+            self.inputs.values[i].consumeAll()
+        }
+
+        return proceeds.gain
+    }
+}
+extension ResourceInputs {
     /// Returns the amount of funds actually spent.
     ///
     /// The only difference between this and `tradeAsConsumer` is that this method uses
@@ -166,7 +194,7 @@ extension ResourceInputs {
         in currency: CurrencyID,
         on exchange: inout WorldMarkets,
     ) -> TradeProceeds {
-        if  self.tradeableDaysReserve > 0 {
+        if  self.tradingCooldown > 0 {
             return .zero
         }
 
@@ -192,7 +220,7 @@ extension ResourceInputs {
         in currency: CurrencyID,
         on exchange: inout WorldMarkets,
     ) -> TradeProceeds {
-        if  self.tradeableDaysReserve > 0 {
+        if  self.tradingCooldown > 0 {
             return .zero
         }
 
@@ -266,7 +294,7 @@ extension ResourceInputs {
             """
         )
 
-        self.tradeableDaysReserve = stockpileDaysTarget
+        self.tradingCooldown = stockpileDaysTarget
 
         return .init(gain: gain, loss: loss)
     }

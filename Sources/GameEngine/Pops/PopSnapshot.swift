@@ -398,7 +398,7 @@ extension PopSnapshot {
         rules: GameMetadata,
     ) -> Tooltip? {
         .instructions {
-            if  let employer: PopOccupation.Employer = self.occupation.employer {
+            if  let jobType: PopJobType = self.occupation.employer {
                 let income: Double?
                 let w: (
                     min: Double,
@@ -407,17 +407,17 @@ extension PopSnapshot {
                 )? = self.estimateIncomeFromEmployment(factories: factories, mines: mines)
 
                 if  case .Elite = self.occupation.stratum {
-                    let r²: Double = PopContext.r0
-                    $0["Median quit rate"] = (PopContext.q0 * r²)[%2]
+                    let r²: Double = PopJobType.r0
+                    $0["Median quit rate"] = (jobType.q0 * r²)[%2]
 
                     income = nil
                 } else {
                     let w0: Double = self.region.stats.w0(self.type)
-                    let r²: Double = PopContext.r²(yield: w?.median ?? w0, referenceWage: w0)
-                    $0["Median quit rate"] = (PopContext.q0 * r²)[%2]
+                    let r²: Double = PopJobType.r²(yield: w?.median ?? w0, referenceWage: w0)
+                    $0["Median quit rate"] = (jobType.q0 * r²)[%2]
                     $0[>] {
-                        $0["Base"] = (PopContext.q0 * PopContext.r0)[%2]
-                        $0["Relative earnings", -] = +?(r² / PopContext.r0 - 1)[%2]
+                        $0["Base"] = (jobType.q0 * PopJobType.r0)[%2]
+                        $0["Relative earnings", -] = +?(r² / PopJobType.r0 - 1)[%2]
                     }
 
                     income = w0
@@ -425,7 +425,7 @@ extension PopSnapshot {
 
                 if  let (min, median, max): (Double, Double, Double) = w {
                     let label: String
-                    switch employer {
+                    switch jobType {
                     case .mine:
                         label = "mining yield"
                     case .factory:

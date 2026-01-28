@@ -192,7 +192,21 @@ extension FactoryContext: TransactingContext {
             self.equity = .init()
         }
 
-        if  case _? = self.state.liquidation {
+        //  check for bankruptcy
+        switch self.state.liquidation {
+        case nil:
+            guard
+            self.workers?.count ?? 0 == 0,
+            self.clerks?.count ?? 0 == 0,
+            self.state.y.profitability <= 0,
+            self.state.z.profitability <= 0 else {
+                break
+            }
+
+            self.state.liquidation = .init(started: turn.date, burning: self.equity.shareCount)
+            fallthrough
+
+        case _?:
             // set profitability to -1 to deter investment in bankrupt factories
             self.state.z.profitability = -1
             self.state.budget = .liquidating(
@@ -530,14 +544,7 @@ extension FactoryContext: TransactingContext {
             return
         }
 
-        if  self.workers?.count ?? 0 == 0,
-            self.clerks?.count ?? 0 == 0,
-            self.state.y.profitability <= 0,
-            self.state.z.profitability <= 0 {
-            self.state.liquidation = .init(started: turn.date, burning: self.equity.shareCount)
-        } else {
-            self.state.equity.split(at: self.state.z.px, in: country, turn: &turn)
-        }
+        self.state.equity.split(at: self.state.z.px, in: country, turn: &turn)
     }
 }
 extension FactoryContext {
@@ -576,34 +583,40 @@ extension FactoryContext {
         budget: LiquidationBudget,
         turn: inout Turn
     ) {
-        {
-            let stockpileNone: ResourceStockpileTarget = .init(lower: 0, today: 0, upper: 0)
-            let tl: TradeProceeds = self.state.inventory.l.tradeAsBusiness(
-                stockpileDays: stockpileNone,
-                spendingLimit: 0,
-                in: region.currency.id,
-                on: &turn.worldMarkets,
-            )
-            let te: TradeProceeds = self.state.inventory.e.tradeAsBusiness(
-                stockpileDays: stockpileNone,
-                spendingLimit: 0,
-                in: region.currency.id,
-                on: &turn.worldMarkets,
-            )
-            let tx: TradeProceeds = self.state.inventory.x.tradeAsBusiness(
-                stockpileDays: stockpileNone,
-                spendingLimit: 0,
-                in: region.currency.id,
-                on: &turn.worldMarkets,
-            )
+        var proceeds: Int64 = 0
 
-            #assert(tl.loss == 0, "nl loss during liquidation is non-zero! (\(tl.loss))")
-            #assert(te.loss == 0, "ne loss during liquidation is non-zero! (\(te.loss))")
-            #assert(tx.loss == 0, "nx loss during liquidation is non-zero! (\(tx.loss))")
+        if  self.state.z.vl > 0 {
+            proceeds += self.state.inventory.l.liquidate(
+                in: region.currency.id,
+                on: &turn.worldMarkets,
+            )
+        }
+        if  self.state.z.ve > 0 {
+            proceeds += self.state.inventory.e.liquidate(
+                in: region.currency.id,
+                on: &turn.worldMarkets,
+            )
+        }
+        if  self.state.z.vx > 0 {
+            proceeds += self.state.inventory.x.liquidate(
+                in: region.currency.id,
+                on: &turn.worldMarkets,
+            )
+        }
+        if  self.state.z.vout > 0 {
+            proceeds += self.state.inventory.out.liquidate(
+                in: region.currency.id,
+                on: &turn.worldMarkets,
+            )
+        }
 
-            let proceeds: Int64 = tl.gain + te.gain + tx.gain
-            $0.r += proceeds
-        } (&turn.bank[account: self.id])
+        if  proceeds > 0 {
+            turn.bank[account: self.id].r += proceeds
+        }
+
+        self.state.z.fl = 0
+        self.state.z.fe = 0
+        self.state.z.fx = 0
     }
 
     private mutating func operate(

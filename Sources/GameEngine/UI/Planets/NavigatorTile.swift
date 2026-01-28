@@ -12,15 +12,15 @@ struct NavigatorTile: Sendable {
 
     private var name: String
     private var terrain: String
-    private var culture: PieChart<CultureID, ColorReference>?
-    private var popType: PieChart<PopOccupation, ColorReference>?
+    private var race: PieChart<CultureID, ColorReference>?
+    private var occupation: PieChart<PopOccupation, ColorReference>?
 
     init(id: Address) {
         self.id = id
         self.name = ""
         self.terrain = ""
-        self.culture = nil
-        self.popType = nil
+        self.race = nil
+        self.occupation = nil
 
         self._neighbors = []
     }
@@ -36,7 +36,7 @@ extension NavigatorTile {
         self.name = "\(tile.name ?? tile.metadata.ecology.title) (\(planet.state.name))"
         self.terrain = tile.metadata.ecology.title
 
-        let culture: [
+        let race: [
             (key: CultureID, (share: Int64, ColorReference))
         ] = cache.rules.pops.cultures.compactMap {
             guard
@@ -48,7 +48,7 @@ extension NavigatorTile {
             let label: ColorReference = .color($1.color)
             return ($0, (metrics.count, label))
         }
-        let popType: [
+        let occupation: [
             (key: PopOccupation, (share: Int64, ColorReference))
         ] = PopOccupation.allCases.compactMap {
             guard
@@ -65,8 +65,8 @@ extension NavigatorTile {
 
         self._neighbors = self.id.tile.neighbors(size: planet.grid.radius)
 
-        self.culture = .init(values: culture.sorted { $0.key < $1.key })
-        self.popType = .init(values: popType.sorted { $0.key > $1.key })
+        self.race = .init(values: race.sorted { $0.key < $1.key })
+        self.occupation = .init(values: occupation.sorted { $0.key > $1.key })
     }
 }
 extension NavigatorTile: JavaScriptEncodable {
@@ -74,8 +74,8 @@ extension NavigatorTile: JavaScriptEncodable {
         case id
         case name
         case terrain
-        case culture
-        case popType
+        case race
+        case occupation
 
         case _neighbors
     }
@@ -84,8 +84,8 @@ extension NavigatorTile: JavaScriptEncodable {
         js[.id] = self.id
         js[.name] = self.name
         js[.terrain] = self.terrain
-        js[.culture] = self.culture
-        js[.popType] = self.popType
+        js[.race] = self.race
+        js[.occupation] = self.occupation
 
         js[._neighbors] = self._neighbors
     }
