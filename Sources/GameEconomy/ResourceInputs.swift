@@ -171,13 +171,10 @@ extension ResourceInputs {
             "trading loss during liquidation is non-zero! (\(proceeds.loss))"
         )
 
-        for i: Int in self.segmented.indices {
-            self.inputs.values[i].consumeAll()
-        }
         // it’s possible for some resources to remain after liquidation, if the stockpile does
         // not have enough of them to trade for at least 1 unit of currency. so we just
-        // throw them away, like we do with segmented resources.
-        for i: Int in self.tradeable.indices {
+        // throw them away. we also need to do the same with segmented resources.
+        for i: Int in self.inputs.values.indices {
             self.inputs.values[i].consumeAll()
         }
 
