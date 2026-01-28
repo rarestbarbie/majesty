@@ -107,7 +107,7 @@ extension ResourceOutputs {
     /// All unsold tradeable resources are discarded.
     public mutating func liquidate(
         in currency: CurrencyID,
-        to exchange: inout WorldMarkets,
+        on exchange: inout WorldMarkets,
     ) -> Int64 {
         // right now `sell` never leaves leftovers, but in the future it might, so bankrupt
         // firms should call `liquidate` instead of directly calling `sell`
