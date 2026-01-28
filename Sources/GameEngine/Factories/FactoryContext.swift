@@ -604,6 +604,19 @@ extension FactoryContext {
             let proceeds: Int64 = tl.gain + te.gain + tx.gain
             $0.r += proceeds
         } (&turn.bank[account: self.id])
+
+        //  inventory value has not been updated yet for today (that happens in `advance`), but
+        //  worst case we just discard non-existent resources the day after they were already
+        //  removed ... no rush during liquidation
+        if  self.state.z.vl > 0 {
+            self.state.inventory.l.discardAllSegmented()
+        }
+        if  self.state.z.ve > 0 {
+            self.state.inventory.e.discardAllSegmented()
+        }
+        if  self.state.z.vx > 0 {
+            self.state.inventory.x.discardAllSegmented()
+        }
     }
 
     private mutating func operate(

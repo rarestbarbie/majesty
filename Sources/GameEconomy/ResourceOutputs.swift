@@ -5,23 +5,23 @@ import OrderedCollections
 import Random
 
 @frozen public struct ResourceOutputs {
-    public var tradeableDaysReserve: Int64
+    @usableFromInline var tradingCooldown: Int64
     @usableFromInline var outputs: OrderedDictionary<Resource, ResourceOutput>
     @usableFromInline var outputsPartition: Int
 
-    @inlinable public init(
-        tradeableDaysReserve: Int64,
+    @inlinable init(
+        tradingCooldown: Int64,
         outputs: OrderedDictionary<Resource, ResourceOutput>,
         outputsPartition: Int
     ) {
-        self.tradeableDaysReserve = tradeableDaysReserve
+        self.tradingCooldown = tradingCooldown
         self.outputs = outputs
         self.outputsPartition = outputsPartition
     }
 }
 extension ResourceOutputs {
     @inlinable public static var empty: Self {
-        .init(tradeableDaysReserve: 0, outputs: [:], outputsPartition: 0)
+        .init(tradingCooldown: 0, outputs: [:], outputsPartition: 0)
     }
 
     @inlinable public init(
@@ -39,10 +39,11 @@ extension ResourceOutputs {
         for output: ResourceOutput in tradeable {
             combined[output.id] = output
         }
-        self.init(tradeableDaysReserve: tradeableDaysReserve, outputs: combined, outputsPartition: outputsPartition)
+        self.init(tradingCooldown: tradeableDaysReserve, outputs: combined, outputsPartition: outputsPartition)
     }
 }
 extension ResourceOutputs {
+    @inlinable public var tradeableDaysReserve: Int64 { self.tradingCooldown }
     @inlinable public var count: Int { self.outputs.count }
     @inlinable public var all: [ResourceOutput] { self.outputs.values.elements }
 
@@ -107,7 +108,7 @@ extension ResourceOutputs {
         in currency: CurrencyID,
         to exchange: inout WorldMarkets,
     ) -> Int64 {
-        self.tradeableDaysReserve = 0
+        self.tradingCooldown = 0
         return self.tradeable.indices.reduce(into: 0) {
             $0 += self.outputs.values[$1].sell(in: currency, to: &exchange)
         }
@@ -119,7 +120,7 @@ extension ResourceOutputs {
         to exchange: inout WorldMarkets,
         random: inout PseudoRandom
     ) -> Int64 {
-        self.tradeableDaysReserve = 0
+        self.tradingCooldown = 0
         return self.tradeable.indices.reduce(into: 0) {
             $0 += self.outputs.values[$1].sell(in: currency, to: &exchange, random: &random)
         }
@@ -130,7 +131,7 @@ extension ResourceOutputs {
         in currency: CurrencyID,
         to exchange: borrowing WorldMarkets,
     ) {
-        self.tradeableDaysReserve += 1
+        self.tradingCooldown += 1
         for i: Int in self.tradeable.indices {
             self.outputs.values[i].mark(in: currency, to: exchange)
         }
