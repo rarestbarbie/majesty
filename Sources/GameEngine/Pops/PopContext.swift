@@ -456,26 +456,6 @@ extension PopContext {
     static func con(fl: Double) -> Double { 0.010 * (fl - 1.0) }
     static func con(fe: Double) -> Double { 0.002 * (1.0 - fe) }
     static func con(fx: Double) -> Double { 0.020 * (fx - 0.0) }
-
-    static func r²(yield w: Double, referenceWage w0: Double) -> Double {
-        if  w0 <= 0 {
-            return self.r0
-        }
-
-        //  x = w / w0
-        //  r = 1 / (1 + x)
-        //  r = 1 / (1 + w / w0)
-        //  r = w0 / (w0 + w)
-        //  q = k * r²
-        let r: Double = w0 / (w0 + w)
-        return r * r
-    }
-    static func q(yield w: Double, referenceWage w0: Double) -> Double {
-        self.q0 * self.r²(yield: w, referenceWage: w0)
-    }
-
-    static var r0: Double { 0.25 }
-    static var q0: Double { 0.01 }
 }
 extension PopContext {
     mutating func advance(turn: inout Turn) {
@@ -536,7 +516,7 @@ extension PopContext {
 
         self.convert(turn: &turn)
 
-        if  let employer: PopOccupation.Employer = self.state.occupation.employer {
+        if  let employer: PopJobType = self.state.occupation.employer {
             let w0: Double = region.stats.w0(self.state.type)
             switch employer {
             case .factory:
@@ -598,7 +578,7 @@ extension PopContext {
         for i: Int in miningJobs {
             {
                 let w: Double = self.yield.mines[$0.id] ?? 0
-                let q: Double = Self.q(yield: w, referenceWage: w0)
+                let q: Double = PopJobType.mine.q(yield: w, referenceWage: w0)
                 $0.quit(rate: q, random: &random)
             } (&self.state.mines.values[i])
         }
@@ -625,7 +605,7 @@ extension PopContext {
                 /// At this rate, if the factory pays minimum wage or less, about half of
                 /// non-union workers, and one third of union workers, will quit every year.
                 let w: Double = self.yield.factories[$0.id].map(Double.init(_:)) ?? 0
-                let q: Double = Self.q(yield: w, referenceWage: w0)
+                let q: Double = PopJobType.factory.q(yield: w, referenceWage: w0)
                 $0.quit(rate: q, random: &random)
             } (&self.state.factories.values[i])
         }
