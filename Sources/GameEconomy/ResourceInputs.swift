@@ -151,11 +151,23 @@ extension ResourceInputs {
             )
         }
     }
-
-    public mutating func discardAllSegmented() {
+}
+extension ResourceInputs {
+    public mutating func liquidate(
+        in currency: CurrencyID,
+        on exchange: inout WorldMarkets,
+    ) -> TradeProceeds {
         for i: Int in self.segmented.indices {
             self.inputs.values[i].consumeAll()
         }
+        return self.trade(
+            stockpileDaysTarget: 0,
+            stockpileDaysReturn: 0,
+            spendingLimit: 0,
+            in: currency,
+            on: &exchange,
+            weights: []
+        )
     }
 }
 extension ResourceInputs {

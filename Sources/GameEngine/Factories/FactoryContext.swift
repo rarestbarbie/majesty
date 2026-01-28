@@ -576,46 +576,33 @@ extension FactoryContext {
         budget: LiquidationBudget,
         turn: inout Turn
     ) {
-        {
-            let stockpileNone: ResourceStockpileTarget = .init(lower: 0, today: 0, upper: 0)
-            let tl: TradeProceeds = self.state.inventory.l.tradeAsBusiness(
-                stockpileDays: stockpileNone,
-                spendingLimit: 0,
-                in: region.currency.id,
-                on: &turn.worldMarkets,
-            )
-            let te: TradeProceeds = self.state.inventory.e.tradeAsBusiness(
-                stockpileDays: stockpileNone,
-                spendingLimit: 0,
-                in: region.currency.id,
-                on: &turn.worldMarkets,
-            )
-            let tx: TradeProceeds = self.state.inventory.x.tradeAsBusiness(
-                stockpileDays: stockpileNone,
-                spendingLimit: 0,
-                in: region.currency.id,
-                on: &turn.worldMarkets,
-            )
-
-            #assert(tl.loss == 0, "nl loss during liquidation is non-zero! (\(tl.loss))")
-            #assert(te.loss == 0, "ne loss during liquidation is non-zero! (\(te.loss))")
-            #assert(tx.loss == 0, "nx loss during liquidation is non-zero! (\(tx.loss))")
-
-            let proceeds: Int64 = tl.gain + te.gain + tx.gain
-            $0.r += proceeds
-        } (&turn.bank[account: self.id])
-
-        //  inventory value has not been updated yet for today (that happens in `advance`), but
-        //  worst case we just discard non-existent resources the day after they were already
-        //  removed ... no rush during liquidation
+        var proceeds: TradeProceeds = .zero
         if  self.state.z.vl > 0 {
-            self.state.inventory.l.discardAllSegmented()
+            proceeds += self.state.inventory.l.liquidate(
+                in: region.currency.id,
+                on: &turn.worldMarkets,
+            )
         }
         if  self.state.z.ve > 0 {
-            self.state.inventory.e.discardAllSegmented()
+            proceeds += self.state.inventory.e.liquidate(
+                in: region.currency.id,
+                on: &turn.worldMarkets,
+            )
         }
         if  self.state.z.vx > 0 {
-            self.state.inventory.x.discardAllSegmented()
+            proceeds += self.state.inventory.x.liquidate(
+                in: region.currency.id,
+                on: &turn.worldMarkets,
+            )
+        }
+
+        #assert(
+            proceeds.loss == 0,
+            "trading loss during liquidation is non-zero! (\(proceeds.loss))"
+        )
+
+        if  proceeds.gain > 0 {
+            turn.bank[account: self.id].r += proceeds.gain
         }
     }
 
