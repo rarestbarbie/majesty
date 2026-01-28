@@ -579,7 +579,7 @@ extension PopContext {
             on: &turn,
         ) {
             current.demotes(to: $0)
-                ? 0.01 + 0.4 * (ledger.employment[tile / $0]?.employment ?? 0)
+                ? 0.01 + 0.4 * (ledger.labor[tile / $0]?.employment ?? 0)
                 : 0
         }
 

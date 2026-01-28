@@ -8,26 +8,26 @@ import OrderedCollections
 import VectorCharts
 
 struct EconomicLedger {
-    let employment: [Regional<PopOccupation>: EconomicLedger.LaborMetrics]
+    let labor: [Regional<PopOccupation>: EconomicLedger.LaborMetrics]
+    let trade: [Regional<Resource>: TradeVolume]
     let gdp: [Regional<Industry>: Int64]
-    let resource: [Regional<Resource>: TradeVolume]
     let racial: OrderedDictionary<Regional<CultureID>, CapitalMetrics>
     let gender: OrderedDictionary<Regional<Gender>, CapitalMetrics>
     let income: OrderedDictionary<IncomeSection, IncomeMetrics>
     let slaves: OrderedDictionary<Address, SocialMetrics>
 
     init(
-        employment: [Regional<PopOccupation>: EconomicLedger.LaborMetrics],
+        labor: [Regional<PopOccupation>: EconomicLedger.LaborMetrics],
+        trade: [Regional<Resource>: TradeVolume],
         gdp: [Regional<Industry>: Int64],
-        resource: [Regional<Resource>: TradeVolume],
         racial: OrderedDictionary<Regional<CultureID>, CapitalMetrics>,
         gender: OrderedDictionary<Regional<Gender>, CapitalMetrics>,
         income: OrderedDictionary<IncomeSection, IncomeMetrics>,
         slaves: OrderedDictionary<Address, SocialMetrics>
     ) {
-        self.employment = employment
+        self.labor = labor
         self.gdp = gdp
-        self.resource = resource
+        self.trade = trade
         self.racial = racial
         self.gender = gender
         self.income = income
@@ -37,9 +37,9 @@ struct EconomicLedger {
 extension EconomicLedger {
     init() {
         self.init(
-            employment: [:],
+            labor: [:],
+            trade: [:],
             gdp: [:],
-            resource: [:],
             racial: [:],
             gender: [:],
             income: [:],
@@ -78,7 +78,7 @@ extension EconomicLedger {
     ) {
         var values: [
             (Resource, (produced: Int64, consumed: Int64, color: ColorReference))
-        ] = self.resource.compactMap {
+        ] = self.trade.compactMap {
             guard $0.location == region else {
                 return nil
             }

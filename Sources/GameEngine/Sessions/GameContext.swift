@@ -324,8 +324,8 @@ extension GameContext {
             self.pops[i].update(equityStatistics: equity)
         }
         for i: Int in self.factories.indices {
-            let (factory, statement): (Factory, FinancialStatement) = {
-                ($0.state, $0.stats.financial)
+            let (factory, stats): (Factory, Factory.Stats) = {
+                ($0.state, $0.stats)
             } (self.factories[i])
 
             guard
@@ -338,19 +338,15 @@ extension GameContext {
                 account: world.bank[account: factory.id],
                 context: self.legalPass
             )
-            economy.count(
-                statement: statement,
-                equity: equity,
-                region: factory.tile,
-                output: factory.inventory.out,
-                industry: .factory(factory.type),
-            )
+
+            economy.countFactory(state: factory, stats: stats, equity: equity)
+
             self.count(asset: factory.id.lei, equity: factory.equity)
             self.factories[i].update(equityStatistics: equity)
         }
         for i: Int in self.buildings.indices {
-            let (building, statement): (Building, FinancialStatement) = {
-                ($0.state, $0.stats.financial)
+            let (building, stats): (Building, Building.Stats) = {
+                ($0.state, $0.stats)
             } (self.buildings[i])
 
             guard
@@ -365,13 +361,9 @@ extension GameContext {
                 account: world.bank[account: building.id],
                 context: self.legalPass
             )
-            economy.count(
-                statement: statement,
-                equity: equity,
-                region: building.tile,
-                output: building.inventory.out,
-                industry: .building(building.type),
-            )
+
+            economy.countBuilding(state: building, stats: stats, equity: equity)
+
             self.count(asset: building.id.lei, equity: building.equity)
             self.buildings[i].update(equityStatistics: equity)
         }

@@ -288,7 +288,7 @@ extension TileContext {
 
         guard
         let region: RegionalProperties = self.properties,
-        let factor: Fraction = turn.ledger.z.economy.employment[
+        let factor: Fraction = turn.ledger.z.economy.labor[
             region.id / .Miner
         ]?.mineExpansionFactor else {
             return nil
