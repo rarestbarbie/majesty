@@ -216,6 +216,9 @@ extension GameStart {
                 accounts[.pop(pop.id), default: .zero].s += seed.cash * pop.z.total
             }
         }
+        for i: Int in accounts.values.indices {
+            accounts.values[i].settle()
+        }
 
         var tradeable: WorldMarkets = .init(settings: rules.settings.worldMarkets, table: [:])
         var segmented: LocalMarkets = .init(settings: rules.settings.localMarkets, table: [:])

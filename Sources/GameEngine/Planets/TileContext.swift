@@ -165,6 +165,7 @@ extension TileContext {
     private var today: Tile.Aggregate {
         .init(
             gdp: self.stats.gdp,
+            gnp: self.stats.gnp
         )
     }
 

@@ -2,7 +2,7 @@
     case Ward
     case Worker
     case Clerk
-    case Owner
+    case Elite
 }
 extension PopStratum: CustomStringConvertible {
     @inlinable public var description: String {
@@ -10,7 +10,7 @@ extension PopStratum: CustomStringConvertible {
         case .Ward: "Ward"
         case .Worker: "Worker"
         case .Clerk: "Clerk"
-        case .Owner: "Owner"
+        case .Elite: "Elite"
         }
     }
 }
@@ -20,7 +20,7 @@ extension PopStratum: LosslessStringConvertible {
         case "Ward": self = .Ward
         case "Worker": self = .Worker
         case "Clerk": self = .Clerk
-        case "Owner": self = .Owner
+        case "Elite": self = .Elite
         default: return nil
         }
     }

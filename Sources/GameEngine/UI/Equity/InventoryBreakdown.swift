@@ -52,13 +52,16 @@ extension InventoryBreakdown {
         )
 
         self.terms = Term.list {
-            guard case .Ward = pop.type.stratum else {
-                return
-            }
+            switch pop.occupation.stratum {
+            case .Ward:
+                $0[.active, +, tooltip: .PopActive, help: .PopActiveHelp] = pop.Δ.active[/3]
+                $0[.vacant, -, tooltip: .PopVacant, help: .PopVacantHelp] = pop.Δ.vacant[/3]
+                $0[.profit, +, tooltip: nil, help: nil] = +pop.stats.financial.profit.π[%1]
 
-            $0[.active, +, tooltip: .PopActive, help: .PopActiveHelp] = pop.Δ.active[/3]
-            $0[.vacant, -, tooltip: .PopVacant, help: .PopVacantHelp] = pop.Δ.vacant[/3]
-            $0[.profit, +, tooltip: nil, help: nil] = +pop.stats.financial.profit.π[%1]
+            default:
+                let icon: TermType = .pop(pop.occupation)
+                $0[icon, +, tooltip: .PopJobList, help: .PopJobHelp] = pop.Δ.active[/3]
+            }
         }
 
         self.costs = pop.stats.financial.costs.chart(rules: cache.rules)

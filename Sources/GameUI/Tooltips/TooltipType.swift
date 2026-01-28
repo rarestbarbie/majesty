@@ -42,6 +42,8 @@ import JavaScriptInterop
     case PopActiveHelp
     case PopVacant
     case PopVacantHelp
+    case PopJobHelp
+    case PopJobList
     case PopJobs
     case PopResourceIO
     case PopResourceOrigin
@@ -59,8 +61,8 @@ import JavaScriptInterop
     case MarketLiquidity
     case MarketHistory
 
-    case TileCulture
-    case TilePopType
+    case TilePopRace
+    case TilePopOccupation
     case TileGDP
     case TileIndustry
     case TileResourceProduced

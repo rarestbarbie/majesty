@@ -559,7 +559,7 @@ extension GameContext {
         }
         for (key, value): (EconomicLedger.IncomeSection, EconomicLedger.IncomeMetrics) in ledger.economy.income {
             switch key.stratum {
-            case .Owner:
+            case .Elite:
                 self.tiles[key.region]?.stats.incomeElite[key.gender.sex] += value
             case .Clerk:
                 self.tiles[key.region]?.stats.incomeUpper[key.gender.sex] += value

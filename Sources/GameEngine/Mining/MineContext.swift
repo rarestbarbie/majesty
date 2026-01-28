@@ -28,9 +28,9 @@ extension MineContext {
 
         return .init(
             metadata: self.type,
-            state: self.state,
             region: region,
-            miners: self.miners
+            miners: self.miners,
+            state: self.state,
         )
     }
 }

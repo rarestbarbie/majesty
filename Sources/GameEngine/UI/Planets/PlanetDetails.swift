@@ -53,9 +53,13 @@ extension PlanetDetails {
         self.gdpGraph.update(
             with: tile.history.suffix(365),
             date: cache.date,
-            digits: 4
+            labels: [
+                .style("gdp"),
+                .style("gnp"),
+            ],
+            digits: 4,
         ) {
-            Double.init($0.gdp)
+            [Double.init($0.gdp), Double.init($0.gnp)]
         } adjust: {
             $0.min = 0
         }

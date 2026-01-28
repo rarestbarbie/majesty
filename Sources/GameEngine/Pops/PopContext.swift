@@ -16,8 +16,10 @@ struct PopContext: RuntimeContext {
     private(set) var equity: Equity<LEI>.Statistics
     private(set) var mines: [MineID: MiningJobConditions]
 
-    private var miningJobRank: [MineID: Int]
-    private var factoryJobPay: [FactoryID: Int64]
+    private var yield: (
+        factories: [FactoryID: Int64],
+        mines: [MineID: Double],
+    )
 
     public init(type: PopMetadata, state: Pop) {
         self.type = type
@@ -26,8 +28,7 @@ struct PopContext: RuntimeContext {
         self.region = nil
         self.equity = .init()
         self.mines = [:]
-        self.miningJobRank = [:]
-        self.factoryJobPay = [:]
+        self.yield = ([:], [:])
     }
 }
 extension PopContext: Identifiable {
@@ -73,31 +74,62 @@ extension PopContext {
     ) throws {
         self.region = context.tiles[self.state.tile]?.properties
 
-        self.mines.removeAll(keepingCapacity: true)
-        for job: MiningJob in self.state.mines.values {
-            let (state, type): (Mine, MineMetadata) = try context.mines[job.id]
-            self.mines[job.id] = .init(
-                type: state.type,
-                output: type.base,
-                factor: state.y.efficiency
-            )
-        }
+        switch self.state.occupation.employer {
+        case nil:
+            break
+        case .mine?:
+            for job: MiningJob in self.state.mines.values {
+                let (state, type): (Mine, MineMetadata) = try context.mines[job.id]
+                self.mines[job.id] = .init(
+                    type: state.type,
+                    output: type.base,
+                    factor: state.y.efficiency
+                )
+            }
 
-        self.factoryJobPay = [:]
-        self.miningJobRank = [:]
-
-        if  case .Miner = self.state.type.occupation {
             // mining yield does not affect Politicians
-            for job: MineID in self.state.mines.keys {
-                self.miningJobRank[job] = context.mines[job]?.z.yieldRank
+            if  case .Elite = self.state.occupation.stratum {
+                break
+            } else {
+                self.updateJobAttraction(to: context.mines, yield: \.yield)
             }
-        } else if case .Clerk = self.state.type.stratum {
-            for job: FactoryID in self.state.factories.keys {
-                self.factoryJobPay[job] = context.factories[job]?.z.cn
+        case .factory?:
+            if  case .Worker = self.state.occupation.stratum {
+                self.updateJobAttraction(to: context.factories, yield: \.wn)
+            } else {
+                self.updateJobAttraction(to: context.factories, yield: \.cn)
             }
-        } else {
-            for job: FactoryID in self.state.factories.keys {
-                self.factoryJobPay[job] = context.factories[job]?.z.wn
+        }
+    }
+}
+extension PopContext {
+    private mutating func updateJobAttraction(
+        to targets: RuntimeStateTable<FactoryContext>,
+        yield: (Factory.Dimensions) -> Int64
+    ) {
+        let count: Int = self.state.factories.count
+
+        self.yield.factories = [:]
+        self.yield.factories.reserveCapacity(count)
+
+        for job: FactoryID in self.state.factories.keys {
+            if  let factory: Factory = targets[job] {
+                self.yield.factories[job] = yield(factory.z)
+            }
+        }
+    }
+    private mutating func updateJobAttraction(
+        to targets: RuntimeStateTable<MineContext>,
+        yield: (Mine.Dimensions) -> Double
+    ) {
+        let count: Int = self.state.mines.count
+
+        self.yield.mines = [:]
+        self.yield.mines.reserveCapacity(count)
+
+        for job: MineID in self.state.mines.keys {
+            if  let mine: Mine = targets[job] {
+                self.yield.mines[job] = yield(mine.z)
             }
         }
     }
@@ -252,7 +284,7 @@ extension PopContext: AllocatingContext {
                 weights: weights,
                 state: self.state.z,
                 stockpileMaxDays: Self.stockpileDaysMax,
-                investor: self.state.type.stratum == .Owner
+                investor: self.state.type.stratum == .Elite
             )
 
             // this short-circuits internally if investment is zero
@@ -424,6 +456,26 @@ extension PopContext {
     static func con(fl: Double) -> Double { 0.010 * (fl - 1.0) }
     static func con(fe: Double) -> Double { 0.002 * (1.0 - fe) }
     static func con(fx: Double) -> Double { 0.020 * (fx - 0.0) }
+
+    static func r²(yield w: Double, referenceWage w0: Double) -> Double {
+        if  w0 <= 0 {
+            return self.r0
+        }
+
+        //  x = w / w0
+        //  r = 1 / (1 + x)
+        //  r = 1 / (1 + w / w0)
+        //  r = w0 / (w0 + w)
+        //  q = k * r²
+        let r: Double = w0 / (w0 + w)
+        return r * r
+    }
+    static func q(yield w: Double, referenceWage w0: Double) -> Double {
+        self.q0 * self.r²(yield: w, referenceWage: w0)
+    }
+
+    static var r0: Double { 0.25 }
+    static var q0: Double { 0.008 }
 }
 extension PopContext {
     mutating func advance(turn: inout Turn) {
@@ -447,7 +499,7 @@ extension PopContext {
         self.state.z.mil = max(0, min(10, self.state.z.mil))
         self.state.z.con = max(0, min(10, self.state.z.con))
 
-        if case .Ward = self.state.type.stratum {
+        guard self.state.type.stratum > .Ward else {
             if  let attrition: Double = self.state.attrition {
                 if  self.state.z.vacant > 0 {
                     let r: Decimal = Self.slaveCullingBase
@@ -479,58 +531,18 @@ extension PopContext {
             }
 
             self.state.equity.split(at: self.state.z.px, in: region.occupiedBy, turn: &turn)
-        } else {
-            self.convert(turn: &turn)
+            return
         }
 
-        // We do not need to remove jobs that have no employees left, that will be done
-        // automatically by ``Pop.turn``.
-        let factoryJobs: Range<Int> = self.state.factories.values.indices
-        let miningJobs: Range<Int> = self.state.mines.values.indices
+        self.convert(turn: &turn)
 
-        let w0: Double = .init(region.minwage)
-        let q: Double = 0.002
-        for i: Int in factoryJobs {
-            {
-                /// At this rate, if the factory pays minimum wage or less, about half of
-                /// non-union workers, and one third of union workers, will quit every year.
-                $0.quit(
-                    rate: q * w0 / max(w0, self.factoryJobPay[$0.id].map(Double.init(_:)) ?? 1),
-                    using: &turn.random.generator
-                )
-            } (&self.state.factories.values[i])
-        }
-        for i: Int in miningJobs {
-            {
-                $0.quit(
-                    rate: q + q * (self.miningJobRank[$0.id].map(Double.init(_:)) ?? 2),
-                    using: &turn.random.generator
-                )
-            } (&self.state.mines.values[i])
-        }
-
-        let unemployed: Int64 = self.state.z.active - self.state.employed()
-        if  unemployed < 0 {
-            /// We have negative unemployment! This happens when the popuation shrinks, either
-            /// through pop death or conversion.
-            var nonexistent: Int64 = -unemployed
-            /// This algorithm will probably generate more indices than we need. Alternatively,
-            /// we could draw indices on demand, but that would have very pathological
-            /// performance in the rare case that we have many empty jobs that have not yet
-            /// been linted.
-            for i: Int in factoryJobs.shuffled(using: &turn.random.generator) {
-                guard 0 < nonexistent else {
-                    break
-                }
-
-                self.state.factories.values[i].remove(excess: &nonexistent)
-            }
-            for i: Int in miningJobs.shuffled(using: &turn.random.generator) {
-                guard 0 < nonexistent else {
-                    break
-                }
-
-                self.state.mines.values[i].remove(excess: &nonexistent)
+        if  let employer: PopOccupation.Employer = self.state.occupation.employer {
+            let w0: Double = region.stats.w0(self.state.type)
+            switch employer {
+            case .factory:
+                self.quitFactoryJobs(w0: w0, random: &turn.random)
+            case .mine:
+                self.quitMiningJobs(w0: w0, random: &turn.random)
             }
         }
     }
@@ -578,6 +590,68 @@ extension PopContext {
             on: &turn,
         ) {
             current.promotes(to: $0) ? 1 : 0
+        }
+    }
+
+    private mutating func quitMiningJobs(w0: Double, random: inout PseudoRandom) {
+        let miningJobs: Range<Int> = self.state.mines.values.indices
+        for i: Int in miningJobs {
+            {
+                let w: Double = self.yield.mines[$0.id] ?? 0
+                let q: Double = Self.q(yield: w, referenceWage: w0)
+                $0.quit(rate: q, random: &random)
+            } (&self.state.mines.values[i])
+        }
+
+        var overemployment: Int64 = self.state.employedOverCapacity()
+        if  overemployment <= 0 {
+            // all good
+            return
+        }
+
+        for i: Int in miningJobs.shuffled(using: &random.generator) {
+            guard 0 < overemployment else {
+                break
+            }
+
+            self.state.mines.values[i].remove(excess: &overemployment)
+        }
+    }
+
+    private mutating func quitFactoryJobs(w0: Double, random: inout PseudoRandom) {
+        let factoryJobs: Range<Int> = self.state.factories.values.indices
+        for i: Int in factoryJobs {
+            {
+                /// At this rate, if the factory pays minimum wage or less, about half of
+                /// non-union workers, and one third of union workers, will quit every year.
+                let w: Double = self.yield.factories[$0.id].map(Double.init(_:)) ?? 0
+                let q: Double = Self.q(yield: w, referenceWage: w0)
+                $0.quit(rate: q, random: &random)
+            } (&self.state.factories.values[i])
+        }
+
+        var overemployment: Int64 = self.state.employedOverCapacity()
+        if  overemployment <= 0 {
+            // all good
+            return
+        }
+        /// We have negative unemployment! This happens when the popuation shrinks, either
+        /// through pop death or conversion.
+        ///
+        /// This algorithm will probably generate more indices than we need. Alternatively,
+        /// we could draw indices on demand, but that would have very pathological
+        /// performance in the rare case that we have many empty jobs that have not yet
+        /// been linted.
+        ///
+        /// We do not need to remove jobs that have no employees left, that will be done
+        /// automatically by ``Pop.turn``.
+
+        for i: Int in factoryJobs.shuffled(using: &random.generator) {
+            guard 0 < overemployment else {
+                break
+            }
+
+            self.state.factories.values[i].remove(excess: &overemployment)
         }
     }
 }

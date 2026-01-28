@@ -88,6 +88,9 @@ extension Pop: Turnable {
     }
 }
 extension Pop {
+    func employedOverCapacity() -> Int64 {
+        self.employed() - self.z.active
+    }
     func employed() -> Int64 {
         self.factories.values.reduce(0) { $0 + $1.count } +
         self.mines.values.reduce(0) { $0 + $1.count }

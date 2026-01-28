@@ -7,12 +7,20 @@ div.line-chart {
     --y-offset: 0%;
     --height: calc((100% - var(--y-offset)) / (var(--y-max) - var(--y-min)));
     --ticks-gutter: 4.5rem;
-    --line-color: rgb(255, 166, 0);
 
-    // TODO: move somewhere else
-    > div.ticks {
-        --bg: var(--line-color);
+    *.gdp {
+        --fill: rgb(255, 166, 0);
         --fg: black;
+    }
+    *.gnp {
+        --fill: rgb(255, 51, 136);
+        --fg: white;
+    }
+
+    > div.ticks {
+        div {
+            --bg: var(--fill);
+        }
     }
 
     > div {
@@ -227,7 +235,7 @@ div.ticks {
         }
     }
 
-    > div[data-id='0'] {
+    > div[data-tick-type='arrow'] {
         &.pos {
             --bg: var(--color-pos-fill);
             --fg: black;
@@ -250,7 +258,7 @@ div.ticks {
         }
     }
 
-    > div:not([data-id='0']) {
+    > div[data-tick-type='grid'] {
         &::before {
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }

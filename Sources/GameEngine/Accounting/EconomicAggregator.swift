@@ -107,7 +107,7 @@ extension EconomicAggregator {
 
         let incomeSelfEmployment: Int64
         let income: Double
-        if case .Owner = pop.type.stratum {
+        if case .Elite = pop.type.stratum {
             // resources produced by aristocrats and politicians are not counted as part of
             // GDP, otherwise campaign contributions would be like, 99 percent of GDP
             incomeSelfEmployment = 0

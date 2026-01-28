@@ -262,12 +262,22 @@ extension GameUI.Cache {
     func tooltipPopVacantHelp(_ id: PopID) -> Tooltip? {
         self.pops[id]?.tooltipVacantHelp()
     }
-    func tooltipPopJobs(_ id: PopID) -> Tooltip? {
-        self.pops[id]?.tooltipJobs(
+    func tooltipPopJobHelp(_ id: PopID) -> Tooltip? {
+        self.pops[id]?.tooltipJobHelp(
             factories: self.factories,
             mines: self.mines,
             rules: self.rules
         )
+    }
+    func tooltipPopJobList(_ id: PopID) -> Tooltip? {
+        self.pops[id]?.tooltipJobList(
+            factories: self.factories,
+            mines: self.mines,
+            rules: self.rules
+        )
+    }
+    func tooltipPopJobs(_ id: PopID) -> Tooltip? {
+        self.pops[id]?.tooltipJobs(rules: self.rules)
     }
     func tooltipPopNeeds(
         _ id: PopID,
@@ -299,7 +309,7 @@ extension GameUI.Cache {
         case .m(let id):
             guard
             let mine: MineSnapshot = self.mines[id.mine],
-            let tile: TileSnapshot = self.tiles[mine.state.tile] else {
+            let tile: TileSnapshot = self.tiles[mine.tile] else {
                 return nil
             }
 
@@ -393,17 +403,17 @@ extension GameUI.Cache {
         self.tiles[id]?.tooltip(layer)
     }
 
-    func tooltipTileOccupation(
+    func tooltipTilePopOccupation(
         _ id: Address,
         _ crosstab: PopOccupation,
     ) -> Tooltip? {
-        self.tiles[id]?.tooltipOccupation(in: self.context, id: crosstab)
+        self.tiles[id]?.tooltipPopOccupation(in: self.context, id: crosstab)
     }
-    func tooltipTileRace(
+    func tooltipTilePopRace(
         _ id: Address,
         _ crosstab: CultureID,
     ) -> Tooltip? {
-        self.tiles[id]?.tooltipRace(in: self.context, id: crosstab)
+        self.tiles[id]?.tooltipPopRace(in: self.context, id: crosstab)
     }
 
     func tooltipTileGDP(

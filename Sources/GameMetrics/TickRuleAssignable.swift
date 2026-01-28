@@ -117,6 +117,7 @@ extension TickRuleAssignable {
                     id: tick,
                     value: transform(y),
                     label: nil,
+                    grid: true,
                     text: linear.map { "\($0[..][.financial])" } ?? "",
                 )
             )
@@ -128,6 +129,7 @@ extension TickRuleAssignable {
                     id: id,
                     value: transform(y),
                     label: label,
+                    grid: false,
                     text: Decimal.init(rounding: y, digits: digits).map {
                         "\($0[..][.financial])"
                     } ?? "",

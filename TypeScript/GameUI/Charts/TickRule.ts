@@ -25,10 +25,16 @@ export class TickRule implements DiffableListElement<number> {
 
     public update(tick: TickRuleState): void {
         this.node.style.setProperty('--y', tick.y.toString());
+
         UpdateText(this.body, tick.text);
+
+        if (tick.grid === true) {
+            this.node.setAttribute('data-tick-type', 'grid');
+        } else {
+            this.node.setAttribute('data-tick-type', 'arrow');
+        }
         if (tick.label !== undefined) {
             UpdateColorReference(this.node, tick.label);
         }
     }
 }
-

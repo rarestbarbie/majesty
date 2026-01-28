@@ -3,6 +3,8 @@ export enum TooltipType {
 
     // Pop Tooltips
     PopAccount = 'PopAccount',
+    PopJobHelp = 'PopJobHelp',
+    PopJobList = 'PopJobList',
     PopJobs = 'PopJobs',
     PopResourceIO = 'PopResourceIO',
     PopResourceOrigin = 'PopResourceOrigin',
@@ -50,8 +52,8 @@ export enum TooltipType {
     MarketLiquidity = 'MarketLiquidity',
     MarketHistory = 'MarketHistory',
 
-    TileCulture = 'TileCulture',
-    TilePopType = 'TilePopType',
+    TilePopRace = 'TilePopRace',
+    TilePopOccupation = 'TilePopOccupation',
     TileIndustry = 'TileIndustry',
     TileResourceProduced = 'TileResourceProduced',
     TileResourceConsumed = 'TileResourceConsumed',
