@@ -475,7 +475,7 @@ extension PopContext {
     }
 
     static var r0: Double { 0.25 }
-    static var q0: Double { 0.008 }
+    static var q0: Double { 0.01 }
 }
 extension PopContext {
     mutating func advance(turn: inout Turn) {

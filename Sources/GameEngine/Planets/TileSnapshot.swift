@@ -349,6 +349,16 @@ extension TileSnapshot {
                 $0["Fired", +] = +?(-mine.miners.fired)[/3]
                 $0["Quit", +] = +(-mine.miners.quit)[/3]
             }
+            let h²: Delta<Double> = .init(
+                y: mine.metadata.h²(tile: self.y.stats, yield: mine.y.yield),
+                z: mine.metadata.h²(tile: self.z.stats, yield: mine.z.yield)
+            )
+            let h: Delta<Double> = MineContext.h0 * h²
+            $0["Hiring rate", +] = h[%2]
+            $0[>] {
+                $0["Base"] = MineContext.h0[%2]
+                $0["Relative yield", +] = +?(h².z - 1)[%2]
+            }
             if  mine.metadata.decay {
                 $0["Estimated deposits"] = mine.Δ.size[/3]
                 $0[>] {

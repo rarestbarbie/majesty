@@ -102,4 +102,34 @@ extension MineMetadata {
 
         return (efficiency: efficiency, value: yieldBeforeScaling * efficiency)
     }
+
+    func h²(tile: RegionalProperties, yield: Double) -> Double {
+        self.h²(tile: tile.stats, yield: yield)
+    }
+
+    func h²(tile: Tile.Stats, yield: Double) -> Double {
+        let h: Double = self.h(tile: tile, yield: yield)
+        return h * h
+    }
+
+    private func h(tile: Tile.Stats, yield: Double) -> Double {
+        let incomeAverage: Mean<Int64>?
+
+        switch self.miner.stratum {
+        case .Elite:
+            incomeAverage = nil
+        case .Clerk:
+            incomeAverage = tile.incomeUpper.map(\.μ.incomeTotal).all
+        case .Worker:
+            incomeAverage = tile.incomeLower.map(\.μ.incomeTotal).all
+        default:
+            fatalError("Invalid miner stratum!!!")
+        }
+
+        if  let w0: Double = incomeAverage?.defined, w0 > 0 {
+            return min(yield / w0, 1)
+        } else {
+            return 1
+        }
+    }
 }

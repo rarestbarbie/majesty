@@ -73,26 +73,39 @@ extension MineContext: AllocatingContext {
     }
 }
 extension MineContext {
+    static var h0: Double { 0.04 }
+}
+extension MineContext {
     mutating func advance(turn: inout Turn) {
-        guard let _: RegionalProperties = self.region else {
+        guard let region: RegionalProperties = self.region else {
             return
         }
 
         let minersToHire: Int64 = self.miners.limit - self.miners.count
         if  minersToHire > 0 {
-            let bid: PopJobOfferBlock = .init(
-                job: .mine(self.state.id),
-                bid: 1,
-                size: .random(
-                    in: 0 ... max(1, minersToHire / 25),
+            let h²: Double = self.type.h²(tile: region, yield: self.state.z.yield)
+            let minersToHireToday: Int64
+
+            let minersTarget: Double = Self.h0 * h² * Double.init(minersToHire)
+            if  minersTarget < 1 {
+                let roll: Double = Double.random(in: 0 ... 1, using: &turn.random.generator)
+                minersToHireToday = roll < minersTarget ? 1 : 0
+            } else {
+                minersToHireToday = .random(
+                    in: 0 ... min(Int64.init(minersTarget.rounded()), minersToHire),
                     using: &turn.random.generator
                 )
-            )
+            }
 
-            if  bid.size > 0 {
+            if  minersToHireToday > 0 {
                 let market: LaborMarket.Regionwide = .init(
                     id: self.state.tile,
                     type: self.type.miner
+                )
+                let bid: PopJobOfferBlock = .init(
+                    job: .mine(self.state.id),
+                    bid: 1,
+                    size: minersToHireToday
                 )
                 turn.jobs.hire.region[market].append(bid)
             }
