@@ -104,6 +104,18 @@ extension ResourceOutputs {
 }
 extension ResourceOutputs {
     /// Sell all of the stockpiled resource, returning the amount of funds actually received.
+    /// All unsold tradeable resources are discarded.
+    public mutating func liquidate(
+        in currency: CurrencyID,
+        to exchange: inout WorldMarkets,
+    ) -> Int64 {
+        // right now `sell` never leaves leftovers, but in the future it might, so bankrupt
+        // firms should call `liquidate` instead of directly calling `sell`
+        self.sell(in: currency, to: &exchange)
+    }
+}
+extension ResourceOutputs {
+    /// Sell all of the stockpiled resource, returning the amount of funds actually received.
     public mutating func sell(
         in currency: CurrencyID,
         to exchange: inout WorldMarkets,

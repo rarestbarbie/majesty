@@ -603,6 +603,12 @@ extension FactoryContext {
                 on: &turn.worldMarkets,
             )
         }
+        if  self.state.z.vout > 0 {
+            proceeds += self.state.inventory.out.liquidate(
+                in: region.currency.id,
+                on: &turn.worldMarkets,
+            )
+        }
 
         if  proceeds > 0 {
             turn.bank[account: self.id].r += proceeds

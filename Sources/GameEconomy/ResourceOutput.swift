@@ -128,8 +128,6 @@ extension ResourceOutput {
             self.units -= unitsAvailable
             self.unitsSold = unitsSold
             self.valueSold = valueSold
-            // we drained any unsold units, so value estimate is now zero
-            self.valueEstimate = 0
 
             // if goods were produced, but no units could be sold, the effective price is 0
             let price: Double = unitsSold != 0 ? Double.init(valueSold %/ unitsSold) : 0
