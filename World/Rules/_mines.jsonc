@@ -1,0 +1,142 @@
+{
+    "Regional Government": {
+        "miner": "Politician",
+        "decay": false,
+        "scale": 400,
+        "base": {
+            "Influence": 100
+        }
+    },
+
+    "Ice Mine": {
+        "miner": "Miner",
+        "decay": true,
+        "scale": 200000000,
+        "spawn": {
+            "Earth_Polar": {
+                "rate": "0.05",
+                "size": 4
+            }
+        },
+        "base": {
+            "Water Ice": 800
+        }
+    },
+
+    "Alumina Mine": {
+        "miner": "Miner",
+        "decay": true,
+        "scale": 200000000,
+        "spawn": {
+            "Earth_Continental_Crust": {
+                "rate": "0.05",
+                "size": 2
+            }
+        },
+        "base": {
+            "Alumina": 800
+        }
+    },
+
+    "Iron Mine": {
+        "miner": "Miner",
+        "decay": true,
+        "scale": 200000000,
+        "spawn": {
+            "Earth_Continental_Crust": {
+                "rate": "0.05",
+                "size": 1
+            },
+            "Earth_Large_Igneous_Province": {
+                "rate": "0.05",
+                "size": 2
+            }
+        },
+        "base": {
+            "Iron Ore": 800
+        }
+    },
+
+    "Lithium Mine": {
+        "miner": "Miner",
+        "decay": true,
+        "scale": 200000000,
+        "spawn": {
+            "Earth_Continental_Crust": {
+                "rate": "0.02",
+                "size": 1
+            }
+        },
+        "base": {
+            "Lithium": 800
+        }
+    },
+
+    "Mica Mine": {
+        "miner": "Miner",
+        "decay": true,
+        "scale": 200000000,
+        "spawn": {
+            "Earth_Large_Igneous_Province": {
+                "rate": "0.1",
+                "size": 4
+            },
+            "Earth_Sedimentary_Basin": {
+                "rate": "0.02",
+                "size": 1
+            }
+        },
+        "base": {
+            "Mica": 800
+        }
+    },
+
+    "Uranium Mine": {
+        "miner": "Miner",
+        "decay": true,
+        "scale": 200000000,
+        "spawn": {
+            "Earth_Continental_Crust": {
+                "rate": "0.01",
+                "size": 1
+            },
+            "Earth_Sedimentary_Basin": {
+                "rate": "0.01",
+                "size": 1
+            }
+        },
+        "base": {
+            "Uranium": 800
+        }
+    },
+
+    "Natural Gas Field": {
+        "miner": "Miner",
+        "decay": true,
+        "scale": 200000000,
+        "spawn": {
+            "Earth_Sedimentary_Basin": {
+                "rate": "0.05",
+                "size": 1
+            }
+        },
+        "base": {
+            "Hydrocarbons": 800
+        }
+    },
+
+    "Offshore Oil Field": {
+        "miner": "Miner",
+        "decay": true,
+        "scale": 200000000,
+        "spawn": {
+            "Earth_Oceanic_Shelf": {
+                "rate": "0.05",
+                "size": 2
+            }
+        },
+        "base": {
+            "Hydrocarbons": 800
+        }
+    }
+}

@@ -1,0 +1,163 @@
+[
+    {
+        "l": {
+            "Appliances": 1,
+            "Electricity": 2,
+            "Clothing": 2,
+            "Medical Equipment": 1,
+            "Groceries": 2,
+            "Vehicles": 1,
+            "Housing": 2
+        },
+        "e": {
+            "Electronics": 1,
+            "Makeup": 1,
+            "Produce": 2,
+            "Storage": 1,
+            "Services": 2,
+            "Liquor": 1,
+            "Vapes": 1
+        },
+        "x": {
+            "Electronics": 2,
+            "Services": 2,
+            "Firearms": 1,
+            "Media": 2,
+            "Instruments": 1,
+            "Jewelry": 1,
+            "Lingerie": 2
+        }
+    },
+
+    {
+        "where": {
+            "biology": "Chickens"
+        },
+        "output": {
+            "Poultry": 12
+        },
+        "l": {
+            "Wheat": 6
+        },
+        "e": {
+            "Construction": 1,
+            "Water": 1
+        }
+    },
+    {
+        "where": {
+            "biology": "Cattle"
+        },
+        "output": {
+            "Beef": 12
+        },
+        "l": {
+            "Wheat": 45
+        },
+        "e": {
+            "Construction": 10,
+            "Water": 45
+        }
+    },
+
+    {
+        "where": {
+            "occupation": "Server"
+        },
+        "output": {
+            "Services": 8
+        }
+    },
+    {
+        "where": {
+            "occupation": "Contractor"
+        },
+        "output": {
+            "Construction": 32
+        }
+    },
+    {
+        "where": {
+            "occupation": "Consultant"
+        },
+        "output": {
+            "Advice": 8
+        }
+    },
+    {
+        "where": {
+            "occupation": "Influencer"
+        },
+        "output": {
+            "Advertising": 36
+        }
+    },
+    {
+        "where": {
+            "occupation": "Aristocrat"
+        },
+        "l": {
+            "Appliances": 2,
+            "Electricity": 3,
+            "Clothing": 6,
+            "Medical Equipment": 2,
+            "Groceries": 2,
+            "Vehicles": 4,
+            "Housing": 12
+        },
+        "e": {
+            "Electronics": 2,
+            "Makeup": 2,
+            "Clothing": 6,
+            "Produce": 2,
+            "Storage": 2,
+            "Services": 12,
+            "Lingerie": 4,
+            "Vapes": 1
+        },
+        "x": {
+            "Electronics": 2,
+            "Firearms": 2,
+            "Media": 2,
+            "Instruments": 4,
+            "Jewelry": 2,
+            "Lingerie": 10,
+            "Influence": 1,
+            "Services": 12
+        }
+    },
+    {
+        "where": {
+            "occupation": "Politician"
+        },
+        "l": {
+            "Appliances": 2,
+            "Electricity": 3,
+            "Clothing": 6,
+            "Medical Equipment": 2,
+            "Groceries": 2,
+            "Vehicles": 4,
+            "Housing": 12
+        },
+        "e": {
+            "Electronics": 2,
+            "Makeup": 2,
+            "Clothing": 6,
+            "Produce": 2,
+            "Storage": 2,
+            "Services": 12,
+            "Lingerie": 4,
+            "Vapes": 1
+        },
+        "x": {
+            "Electronics": 2,
+            "Firearms": 2,
+            "Advertising": 16,
+            "Instruments": 4,
+            "Jewelry": 2,
+            "Lingerie": 10,
+            "Influence": 1,
+            "Services": 12
+        }
+    }
+]

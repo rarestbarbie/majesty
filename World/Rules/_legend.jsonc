@@ -1,0 +1,87 @@
+{
+    "occupation": {
+        "Livestock": {
+            "color": "#8b1e27"
+        },
+        "Miner": {
+            "color": "#7a7674"
+        },
+        "Editor": {
+            "color": "#502e28"
+        },
+        "Server": {
+            "color": "#1f224b"
+        },
+        "Driver": {
+            "color": "#71bac7"
+        },
+        "Contractor": {
+            "color": "#ff7a3d"
+        },
+        "Engineer": {
+            "color": "#e4e4e4"
+        },
+        "Farmer": {
+            "color": "#ff5959"
+        },
+        "Consultant": {
+            "color": "#f7e8b7"
+        },
+        "Influencer": {
+            "color": "#bf97ff"
+        },
+        "Aristocrat": {
+            "color": "#fd6dd2"
+        },
+        "Politician": {
+            "color": "#401249"
+        }
+    },
+    "gender": {
+        "FT": {
+            "color": "#ff3a6b"
+        },
+        "FTS": {
+            "color": "#ff3589"
+        },
+        "FC": {
+            "color": "#c518b7"
+        },
+        "FCS": {
+            "color": "#71107e"
+        },
+
+        "XTL": {
+            "color": "#ffac30"
+        },
+        "XT": {
+            "color": "#ffc933"
+        },
+        "XTG": {
+            "color": "#ffe656"
+        },
+
+        "XCL": {
+            "color": "#a56dd3"
+        },
+        "XC": {
+            "color": "#d6d6d6"
+        },
+        "XCG": {
+            "color": "#411032"
+        },
+
+        "MT": {
+            "color": "#42bbc4"
+        },
+        "MTS": {
+            "color": "#25768f"
+        },
+        "MC": {
+            "color": "#ffc1e3"
+        },
+        "MCS": {
+            "color": "#2c1fa7"
+        }
+    }
+}

@@ -1,0 +1,451 @@
+[
+    {
+        "id": 1,
+        "name": {
+            "article": "The",
+            "short": "America",
+            "long": "Federal Republic of America",
+            "color": "#272e97"
+        },
+        "culture_preferred": "Atlantean",
+        "cultures_accepted": ["Jewish"],
+        "currency": 1,
+        "tiles": [
+            // California
+            "399N-2,3",
+            // American Midwest
+            "399N-1,2",
+            // American East Coast
+            "399N0,2",
+            // Hawaii
+            "399N-4,2",
+            // Midway
+            "399N-4,1"
+        ],
+        "researched": [
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Canada",
+            "long": "Duchy of Canada",
+            "color": "#ff6673"
+        },
+        "culture_preferred": "Atlantean",
+        "cultures_accepted": ["Inuit", "Turtle Islander", "Alaskan"],
+        "currency": 1,
+        "suzerain": 1,
+        "tiles": [
+            // Canada
+            "399N0,1",
+            // Hudson Bay
+            "399N-1,1",
+            // Pacific Northwest
+            "399N-2,2"
+        ]
+    },
+
+    {
+        "id": 3,
+        "name": {
+            "article": "The",
+            "short": "Russia",
+            "long": "Russian Federation",
+            "color": "#caa12f"
+        },
+        "culture_preferred": "Russian",
+        "cultures_accepted": ["Caucasian", "Central Asian"],
+        "currency": 3,
+        "tiles": [
+            // Russia
+            "399N1,-1",
+            // Siberia
+            "399N0,-1",
+            // Bering Sea
+            "399N-1,0",
+            // Caucasus
+            "399N2,-2"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Alaska",
+            "long": "Republic of Alaska",
+            "color": "#7c2121"
+        },
+        "culture_preferred": "Alaskan",
+        "cultures_accepted": ["Inuit"],
+        "suzerain": 3,
+        "currency": 3,
+        "tiles": [
+            // Aleutian Islands
+            "399N-2,0",
+            // Alaska
+            "399N-2,1"
+        ]
+    },
+
+    // all countries below set to US suzerain due to lack of foreign currency implementation
+    {
+        // TODO: should not spawn on starting map
+        "name": {
+            "short": "Greenland",
+            "long": "Kalaallit Nunaat",
+            "color": "#ff9f9f"
+        },
+        "culture_preferred": "Inuit",
+        "cultures_accepted": [],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Greenland
+            "399N1,0"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Mexico",
+            "long": "Republic of Mexico",
+            "color": "#30633d"
+        },
+        "culture_preferred": "Hispanic",
+        "cultures_accepted": ["Mexican", "Turtle Islander"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Mexico
+            "399N-2,4"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Central America",
+            "long": "Republic of Central America",
+            "color": "#9ad7ff"
+        },
+        "culture_preferred": "Hispanic",
+        "cultures_accepted": ["Turtle Islander"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Central America
+            "399N-1,4"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Caribbean Union",
+            "long": "Caribbean Union",
+            "color": "#ffde66"
+        },
+        "culture_preferred": "Black American",
+        "cultures_accepted": ["Hispanic", "Atlantean"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Caribbean Sea
+            "399N0,3"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Panama",
+            "long": "Republic of Panama",
+            "color": "#fa66ff"
+        },
+        "culture_preferred": "Hispanic",
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Panama
+            "399E5"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Colombia",
+            "long": "Republic of Colombia",
+            "color": "#ffe9a2"
+        },
+        "culture_preferred": "Hispanic",
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Colombia
+            "399N1,3"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Peru",
+            "long": "Republic of Peru",
+            "color": "#ff6666"
+        },
+        "culture_preferred": "Hispanic",
+        "cultures_accepted": ["Andean"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Peru
+            "399S0,3"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Brazil",
+            "long": "Federal Republic of Brazil",
+            "color": "#0c853e"
+        },
+        "culture_preferred": "Brazilian",
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Amazon
+            "399S1,3",
+            // Brazil
+            "399S2,2"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Argentina",
+            "long": "Republic of Argentina",
+            "color": "#74ddd8"
+        },
+        "culture_preferred": "South American",
+        "cultures_accepted": ["Hispanic"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Argentina
+            "399S1,2",
+            // Patagonia
+            "399S0,2",
+             // West Antarctica
+            "399S0,1",
+            // East Antarctica
+            "399S1,0"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "European Union",
+            "long": "European Union",
+            "color": "#3436ad"
+        },
+        "culture_preferred": "Atlantean",
+        "cultures_accepted": ["Jewish", "Italian", "Hispanic", "Hellenic", "West Slavic"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Southwestern Europe
+            "399N3,0",
+            // Atlantropa
+            "399N3,-1",
+            // Eastern Mediterranean
+            "399N3,-2",
+            // Northern Europe
+            "399N2,-1",
+            // Queen Maud Land
+            "399S1,-1"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Great Britain",
+            "long": "United Kingdom",
+            "color": "#ff5454"
+        },
+        "culture_preferred": "Atlantean",
+        "cultures_accepted": ["Jewish"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // British Isles
+            "399N2,0"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Joint Security Initiative",
+            "long": "Joint Security Initiative",
+            "color": "#214fe6"
+        },
+        "culture_preferred": "Jewish",
+        "cultures_accepted": ["Atlantean", "Hellenic"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Holy Land
+            "399N3,-3"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Iran",
+            "long": "Duchy of Iran",
+            "color": "#71ffbd"
+        },
+        "culture_preferred": "Iranian",
+        "cultures_accepted": ["West Asian", "Caspian"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Persia
+            "399N2,-3"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "China",
+            "long": "Popular Republic of China",
+            "color": "#cc2037"
+        },
+        "culture_preferred": "East Asian",
+        "cultures_accepted": ["Central Asian"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Southern China
+            "399N0,-2",
+            // Northern China
+            "399N-1,-1",
+            // Taiwan
+            "399N-1,-2"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Australia",
+            "long": "Republic of Australia",
+            "color": "#0c159b"
+        },
+        "culture_preferred": "Atlantean",
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Western Australia
+            "399S-1,-2",
+            // Eastern Australia
+            "399S-2,-1",
+            // Antarctic Territories
+            "399S-1,0",
+            // New Territories
+            "399S0,-1"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "New Zealand",
+            "long": "Republic of New Zealand",
+            "color": "#0f145e"
+        },
+        "culture_preferred": "Atlantean",
+        "cultures_accepted": ["Maori"],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // New Zealand
+            "399S-2,0"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Japan",
+            "long": "Duchy of Japan",
+            "color": "#ffb3b3"
+        },
+        "culture_preferred": "Japanese",
+        "cultures_accepted": [],
+        "suzerain": 1,
+        "currency": 1,
+        "tiles": [
+            // Japan
+            "399N-2,-1"
+        ]
+    },
+
+    // countries without suzerain set
+    {
+        "name": {
+            "article": "The",
+            "short": "India",
+            "long": "Republic of India",
+            "color": "#ff7a3d"
+        },
+        "culture_preferred": "South Asian",
+        "cultures_accepted": [],
+        "currency": 4,
+        "tiles": [
+            // India
+            "399N2,-4",
+            // Bay of Bengal
+            "399S2,-4"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Thailand",
+            "long": "Kingdom of Thailand",
+            "color": "#cc004e"
+        },
+        "culture_preferred": "Thai",
+        "cultures_accepted": [],
+        "currency": 5,
+        "tiles": [
+            // Thailand
+            "399N0,-3"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Sahelia",
+            "long": "Republic of Sahelia",
+            "color": "#00ccaa"
+        },
+        "culture_preferred": "Sahelian",
+        "cultures_accepted": ["West African"],
+        "currency": 6,
+        "tiles": [
+            // West Africa
+            "399N4,-1",
+            // Congo
+            "399S4,-2"
+        ]
+    },
+    {
+        "name": {
+            "article": "The",
+            "short": "Ethiopia",
+            "long": "Republic of Ethiopia",
+            "color": "#5f004f"
+        },
+        "culture_preferred": "Ethiopian",
+        "cultures_accepted": [],
+        "currency": 7,
+        "tiles": [
+            // Ethiopia
+            "399N4,-3"
+        ]
+    }
+]

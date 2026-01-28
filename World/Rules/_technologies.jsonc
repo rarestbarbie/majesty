@@ -1,0 +1,68 @@
+{
+    "Forced Insemination": {
+        "starter": true,
+        "effects": {
+            "livestock_breeding_efficiency": "0.004"
+        },
+        "summary": "Forced insemination enabled farmers to significantly increase the breeding rates of their slave populations while avoiding many of the risks inherent in traditional breeding methods. This enabled them to rapidly scale up their herds to meet surging demand for meat and dairy products in the early 21st century."
+    },
+    "Industrial Gas Chambers": {
+        "starter": true,
+        "effects": {
+            "livestock_culling_efficiency": "0.009"
+        },
+        "summary": "Battlefield technologies developed during the Great Wars of the 20th century revolutionized industrial farming operations, allowing producers to safely and efficiently discard unprofitable slave populations. This greatly mitigated the cyclical overproduction crises that had plagued agricultural markets during the Early Classical Period."
+    },
+    "Mechanized Production": {
+        "starter": true,
+        "effects": {
+            "factory_productivity_all": 2
+        },
+        "summary": "The definition of stupidity is doing the same thing over and over again and expecting different results."
+    },
+    "Hydraulic Fracking": {
+        "starter": true,
+        "effects": {
+            "mining_efficiency": {
+                "Natural Gas Field": "0.03"
+            }
+        },
+        "summary": "Hydraulic Fracking involved the use of vast quantities of water under high pressure to fracture subterranean rock formations, thereby releasing the natural gas inside. The technique was so effective that it led to a boom in hydrocarbon production in the early 21st century, as well as a religious revival among certain groups who came to believe its use would bring about the end of the world."
+    },
+    "Deepwater Drilling": {
+        "starter": true,
+        "effects": {
+            "mining_efficiency": {
+                "Offshore Oil Field": "0.05"
+            }
+        },
+        "summary": "Deepwater Drilling technology enabled the extraction of oil from beneath the ocean floor, opening up vast new reserves of hydrocarbons that were previously inaccessible. This led to a significant increase in global oil production, fueling economic growth and geopolitical shifts in the late 20th century."
+    },
+    "Bayer Process": {
+        "starter": true,
+        "effects": {
+            "mining_efficiency": {
+                "Alumina Mine": "0.03"
+            }
+        },
+        "summary": "The Bayer Process enabled the efficient local extraction of alumina from bauxite ore, which could then be shipped long distances for further processing into aluminum metal. This dramatically lowered the cost of aluminum production in the Late Classical Period, leading to its widespread use in everything from aircraft to beverage cans."
+    },
+    "Taconite Concentration": {
+        "starter": true,
+        "effects": {
+            "mining_efficiency": {
+                "Iron Mine": "0.04"
+            }
+        },
+        "summary": "Taconite Concentration technology allowed for the economical extraction of iron from low-grade taconite ore, which was previously considered waste. This innovation revitalized the iron mining industry in the Midwestern United States during the 20th century, leading to increased steel production and economic growth in the region."
+    },
+    "Direct Lithium Extraction": {
+        "starter": true,
+        "effects": {
+            "mining_efficiency": {
+                "Lithium Mine": "0.03"
+            }
+        },
+        "summary": "Direct Lithium Extraction technology revolutionized the lithium mining industry by enabling the efficient extraction of lithium from brine sources. This was considered more environmentally friendly than traditional evaporation methods."
+    }
+}

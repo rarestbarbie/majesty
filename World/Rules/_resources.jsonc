@@ -1,0 +1,441 @@
+{
+    "Water": {
+        "emoji": "💧",
+        "color": "#5ea9ff",
+        "local": true,
+        "critical": true,
+        "storable": true
+    },
+    "Groceries": {
+        "emoji": "🥖",
+        "color": "#ce9a4c",
+        "local": true,
+        "critical": true,
+        "storable": true
+    },
+    "Housing": {
+        "emoji": "🏠",
+        "color": "#575a7e",
+        "local": true,
+        "storable": true
+    },
+    "Construction": {
+        "emoji": "🦺",
+        "color": "#f77c4c",
+        "local": true,
+        "floor": "wage",
+        "hours": 32
+    },
+    "Services": {
+        "emoji": "💼",
+        "color": "#242753",
+        "local": true,
+        "floor": "wage",
+        "hours": 8
+    },
+    "Advice": {
+        "emoji": "🧭",
+        "color": "#ffd29e"
+    },
+    "Influence": {
+        "emoji": "⚖️",
+        "color": "#873a8a",
+        "local": true,
+        "floor": "wage"
+    },
+
+    "Beef": {
+        "emoji": "🥩",
+        "color": "#a1312d"
+    },
+    "Poultry": {
+        "emoji": "🍗",
+        "color": "#da9669"
+    },
+    "Meat": {
+        "emoji": "🍖",
+        "color": "#c5533e"
+    },
+    "Produce": {
+        "emoji": "🥬",
+        "color": "#7ed157"
+    },
+    "Wheat": {
+        "emoji": "🌾",
+        "color": "#beaa66"
+    },
+
+    "Alumina": {
+        "emoji": "🪨",
+        "color": "#d4d4d4"
+    },
+    "Aluminum": {
+        "emoji": "⚪",
+        "color": "#c9c9c9"
+    },
+    "Ammonia": {
+        "emoji": "💨",
+        "color": "#1b7760"
+    },
+    "Anorthosite": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Chromium": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Cobalt": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Copper": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Diamonds": {
+        "emoji": "💎",
+        "color": "#161616"
+    },
+    "Dysprosium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Gallium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Germanium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Graphite": {
+        "emoji": "✏️",
+        "color": "#161616"
+    },
+    "Gold": {
+        "emoji": "💰",
+        "color": "#ffe2a4"
+    },
+    "Gypsum": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Helium-3": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Helium": {
+        "emoji": "🎈",
+        "color": "#ff4e37"
+    },
+    "Hydrocarbons": {
+        "emoji": "🛢️",
+        "color": "#292929"
+    },
+    "Iridium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Iron Ore": {
+        "emoji": "⛏️",
+        "color": "#412626"
+    },
+    "Ivory": {
+        "emoji": "🐘",
+        "color": "#dfd3cc"
+    },
+    "Jarosite": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Lanthanum": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Limestone": {
+        "emoji": "🏛️",
+        "color": "#d5e1e7"
+    },
+    "Lithium": {
+        "emoji": "🔋",
+        "color": "#dcf5bb"
+    },
+    "Manganese Nodules": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Mica": {
+        "emoji": "🎨",
+        "color": "#d4a0a0"
+    },
+    "Neon": {
+        "emoji": "💗",
+        "color": "#ff4dc4"
+    },
+    "Neodymium": {
+        "emoji": "🧲",
+        "color": "#ff81d5"
+    },
+    "Nickel": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Niobium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Olivine": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Pearls": {
+        "emoji": "⚪",
+        "color": "#ffd5c8"
+    },
+    "Perchlorates": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Phosphate": {
+        "emoji": "🧂",
+        "color": "#cecece"
+    },
+    "Platinum": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Polymetallic Sulfides": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Potash": {
+        "emoji": "🪨",
+        "color": "#d4a0a0"
+    },
+    "Pyroxene": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Quartz": {
+        "emoji": "?",
+        "color": "#6aff3d"
+    },
+    "Rhenium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Rhodium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Scandium": {
+        "emoji": "🟣",
+        "color": "#e6e6e6"
+    },
+    "Silver": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Sulfur": {
+        "emoji": "🟡",
+        "color": "#f4d03f"
+    },
+    "Tantalum": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Titanium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Tungsten": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Uranium": {
+        "emoji": "☢️",
+        "color": "#30ff8d"
+    },
+    "Yttrium": {
+        "emoji": "🟢",
+        "color": "#30ff52"
+    },
+    "Zinc": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+    "Zirconium": {
+        "emoji": "?",
+        "color": "#30ff52"
+    },
+
+    "Alloys": {
+        "emoji": "⬜",
+        "color": "#adadad"
+    },
+    "Advertising": {
+        "emoji": "🎙️",
+        "color": "#793fff"
+    },
+    "Antibiotics": {
+        "emoji": "⚕️",
+        "color": "#86b893"
+    },
+    "Appliances": {
+        "emoji": "🖥️",
+        "color": "#505253"
+    },
+    "Autocomplete": {
+        "emoji": "🤖",
+        "color": "#9ab3c4"
+    },
+    "Batteries": {
+        "emoji": "🔋",
+        "color": "#baff82"
+    },
+    "Clothing": {
+        "emoji": "👗",
+        "color": "#4cffd2"
+    },
+    "Deuterium": {
+        "emoji": "🟦",
+        "color": "#4cf9ff"
+    },
+    "Drones": {
+        "emoji": "🛫",
+        "color": "#6b73a1"
+    },
+    "Electronics": {
+        "emoji": "🎮",
+        "color": "#62a060"
+    },
+    "Electricity": {
+        "emoji": "⚡",
+        "color": "#fff27a"
+    },
+    "Explosives": {
+        "emoji": "🧨",
+        "color": "#ff6913"
+    },
+    "Fertilizer": {
+        "emoji": "🌱",
+        "color": "#8bc34a"
+    },
+    "Firearms": {
+        "emoji": "🔫",
+        "color": "#242424"
+    },
+    "Hormones": {
+        "emoji": "🧬",
+        "color": "#ffcee1"
+    },
+    "Instruments": {
+        "emoji": "🎸",
+        "color": "#a02535"
+    },
+    "Jewelry": {
+        "emoji": "💍",
+        "color": "#cfffff"
+    },
+    "Lingerie": {
+        "emoji": "💝",
+        "color": "#ff4171"
+    },
+    "Machine Parts": {
+        "emoji": "🔩",
+        "color": "#a0a0a0"
+    },
+    "Makeup": {
+        "emoji": "💄",
+        "color": "#ff2643"
+    },
+    "Media": {
+        "emoji": "🎞️",
+        "color": "#554a42"
+    },
+    "Medical Equipment": {
+        "emoji": "💉",
+        "color": "#9de9f7"
+    },
+    "Missiles": {
+        "emoji": "🚀",
+        "color": "#9c0000"
+    },
+    "Nuclear Fuel": {
+        "emoji": "⚫",
+        "color": "#26302a"
+    },
+    "Organs": {
+        "emoji": "🫁",
+        "color": "#ff95be"
+    },
+    "Polymers": {
+        "emoji": "🧴",
+        "color": "#009c9c"
+    },
+    "Semiconductor Devices": {
+        "emoji": "📀",
+        "color": "#e4b55f"
+    },
+    "Spacecraft": {
+        "emoji": "🛸",
+        "color": "#e9a72d"
+    },
+    "Shells": {
+        "emoji": "💣",
+        "color": "#4b3d3d"
+    },
+    "Storage": {
+        "emoji": "💾",
+        "color": "#d4b0f7"
+    },
+    "Vehicles": {
+        "emoji": "🛻",
+        "color": "#91091b"
+    },
+
+    "Adderall": {
+        "emoji": "💊",
+        "color": "#9dffe6"
+    },
+    "Liquor": {
+        "emoji": "🍺",
+        "color": "#b38a3e"
+    },
+    "Cocaine": {
+        "emoji": "❄️",
+        "color": "#FFFFFF"
+    },
+    "Vapes": {
+        "emoji": "🖊️",
+        "color": "#74597c"
+    },
+
+    // Placeholders
+    "Hydrogen": {
+        "emoji": "🧊",
+        "color": "#a7e9ff"
+    },
+    "Generic Rare Earth Ore": {
+        "emoji": "🧊",
+        "color": "#a7e9ff"
+    },
+    "Carbon Dioxide Ice": {
+        "emoji": "🧊",
+        "color": "#a7e9ff"
+    },
+    "KREEP Thorium": {
+        "emoji": "🧊",
+        "color": "#a7e9ff"
+    },
+    "Water Ice": {
+        "emoji": "🧊",
+        "color": "#a7e9ff"
+    },
+    "Carbonaceous Materials": {
+        "emoji": "🧊",
+        "color": "#a7e9ff",
+        "text": "Carbonaceous materials are bulk resources representing the mix of organic compounds, tars, and simple carbon molecules found in C-type (carbonaceous) asteroids. They can be refined to extract essential volatiles like water, nitrogen compounds, and hydrocarbons, but cannot be used in their raw form, even as fuel."
+    }
+}
