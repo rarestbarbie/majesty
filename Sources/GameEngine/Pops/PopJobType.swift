@@ -7,7 +7,7 @@ enum PopJobType {
 extension PopJobType {
     static func r²(yield w: Double, referenceWage w0: Double) -> Double {
         if  w0 <= 0 {
-            return PopJobType.r0
+            return Self.r0
         }
 
         //  x = w / w0
