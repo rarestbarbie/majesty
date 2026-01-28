@@ -71,9 +71,9 @@ extension TileSnapshot {
             case .Population:
                 $0["Population", +] = self.Δ.stats.voters.count[/3]
                 $0[>] {
-                    $0["Elites", -] = incomeElite.count[/2]
-                    $0["Clerks", -] = incomeUpper.count[/2]
-                    $0["Workers", -] = incomeLower.count[/2]
+                    $0["Elites", +] = incomeElite.count[/3]
+                    $0["Clerks", +] = incomeUpper.count[/3]
+                    $0["Workers", +] = incomeLower.count[/3]
                     $0["Enslaved", +] = self.Δ.stats.slaves.count[/3]
                 }
 
