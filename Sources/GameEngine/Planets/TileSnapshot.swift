@@ -342,6 +342,11 @@ extension TileSnapshot {
     func tooltipResourceOrigin(mine: MineSnapshot, ledger: GameLedger.Interval) -> Tooltip {
         .instructions {
             $0[mine.metadata.miner.plural, +] = mine.miners.count[/3] / mine.miners.limit
+            if  mine.z.parcels > 1 {
+                $0[>] {
+                    $0["Parcels"] = mine.z.parcels[/3]
+                }
+            }
             $0["Today’s change", +] = mine.miners.count[/3] <- mine.miners.before
             $0[>] {
                 // only elide fired, it’s annoying when the lines below jump around
@@ -350,8 +355,8 @@ extension TileSnapshot {
                 $0["Quit", +] = +(-mine.miners.quit)[/3]
             }
             let h²: Delta<Double> = .init(
-                y: mine.metadata.h²(tile: self.y.stats, yield: mine.y.yield),
-                z: mine.metadata.h²(tile: self.z.stats, yield: mine.z.yield)
+                y: MineMetadata.h²(h: mine.metadata.h(tile: self.y.stats, yield: mine.y.yield)),
+                z: MineMetadata.h²(h: mine.metadata.h(tile: self.z.stats, yield: mine.z.yield))
             )
             let h: Delta<Double> = MineContext.h0 * h²
             $0["Hiring rate", +] = h[%2]

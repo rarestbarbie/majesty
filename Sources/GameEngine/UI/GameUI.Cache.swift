@@ -290,7 +290,7 @@ extension GameUI.Cache {
         _ id: PopID,
         _ line: InventoryLine,
     ) -> Tooltip? {
-        self.pops[id]?.tooltipResourceIO(line)
+        self.pops[id]?.tooltipResourceIO(line, mines: self.mines)
     }
 
     func tooltipPopResourceOrigin(

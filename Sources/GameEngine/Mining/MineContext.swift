@@ -55,7 +55,10 @@ extension MineContext {
             return
         }
 
-        self.miners.limit = self.type.width(tile: region, size: self.state.z.size)
+        self.miners.limit = self.state.z.parcels * self.type.width(
+            tile: region,
+            size: self.state.z.size
+        )
     }
 }
 extension MineContext: AllocatingContext {
@@ -69,7 +72,7 @@ extension MineContext: AllocatingContext {
             turn: turn
         )
         self.state.z.efficiency = yield.efficiency
-        self.state.z.yield = yield.value
+        self.state.z.yieldBase = yield.value
     }
 }
 extension MineContext {
@@ -82,9 +85,11 @@ extension MineContext {
         }
 
         let minersToHire: Int64 = self.miners.limit - self.miners.count
+        let minersToHireToday: Int64
+        let h: Double = self.type.h(tile: region.stats, yield: self.state.z.yield)
+
         if  minersToHire > 0 {
-            let h²: Double = self.type.h²(tile: region, yield: self.state.z.yield)
-            let minersToHireToday: Int64
+            let h²: Double = MineMetadata.h²(h: h)
 
             let minersTarget: Double = Self.h0 * h² * Double.init(minersToHire)
             if  minersTarget < 1 {
@@ -113,10 +118,28 @@ extension MineContext {
             if  let layoff: PopJobLayoffBlock = .init(size: -minersToHire) {
                 turn.jobs.fire[self.state.id, self.type.miner] = layoff
             }
+
+            minersToHireToday = 0
         }
 
         if  self.type.decay {
-            self.state.z.size = max(0, self.state.z.size - self.miners.count)
+            let (q, r): (Int64, Int64) = self.miners.count.quotientAndRemainder(
+                dividingBy: self.state.z.parcels
+            )
+            let consumed: Int64 = r > 0 ? q + 1 : q
+            self.state.z.size = max(0, self.state.z.size - consumed)
+
+            if  h < 0.25 {
+                let minersPossible: Int64 = self.miners.count + minersToHireToday
+                if  self.state.z.splits > 0, minersPossible < self.miners.limit / 8 {
+                    self.state.z.splits -= 1
+                }
+            } else if h > 2 {
+                if  self.state.z.splits < 10,
+                    self.miners.count > self.miners.limit - self.miners.limit / 8 {
+                    self.state.z.splits += 1
+                }
+            }
         }
     }
 }

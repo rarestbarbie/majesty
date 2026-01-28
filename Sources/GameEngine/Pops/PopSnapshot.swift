@@ -122,14 +122,15 @@ extension PopSnapshot {
     private func explainProduction(
         _ ul: inout TooltipInstructionEncoder,
         base: Int64,
-        mine: MiningJobConditions
+        mine: MineSnapshot,
+        mineConditions: MiningJobConditions
     ) {
-        ul["Production per miner"] = (mine.factor * Double.init(base))[..3]
+        ul["Production per miner"] = (mineConditions.factor * Double.init(base))[..3]
         ul[>] {
             $0["Base"] = base[/3]
         }
 
-        ul["Mining efficiency"] = mine.factor[%1]
+        ul["Mining efficiency"] = mineConditions.factor[%1]
         ul[>] {
             switch self.type.occupation {
             case .Politician: self.explainProductionPolitician(&$0, base: base, mine: mine)
@@ -141,9 +142,9 @@ extension PopSnapshot {
     private func explainProductionPolitician(
         _ ul: inout TooltipInstructionEncoder,
         base: Int64,
-        mine: MiningJobConditions
+        mine: MineSnapshot,
     ) {
-        ul[>] = "Base: \(em: MineMetadata.efficiencyPoliticians[%])"
+        ul["Base"] = MineMetadata.efficiencyPoliticians[%]
         ul["Militancy of Free Population", +] = +(
             MineMetadata.efficiencyPoliticiansPerMilitancyPoint * self.region.stats.voters.μ.mil
         )[%1]
@@ -151,7 +152,7 @@ extension PopSnapshot {
     private func explainProductionMiner(
         _ ul: inout TooltipInstructionEncoder,
         base: Int64,
-        mine: MiningJobConditions
+        mine: MineSnapshot,
     ) {
         guard
         let modifiers: CountryModifiers.Stack<
@@ -160,7 +161,8 @@ extension PopSnapshot {
             return
         }
 
-        ul[>] = "Base: \(em: MineMetadata.efficiencyMiners[%])"
+        ul["Base"] = MineMetadata.efficiencyMiners[%]
+        ul["Parceling", +] = +?(mine.z.parcelFraction - 1)[%]
         for (effect, provenance): (Decimal, EffectProvenance) in modifiers.blame {
             ul[provenance.name, +] = +effect[%]
         }
@@ -365,6 +367,7 @@ extension PopSnapshot {
     }
     func tooltipResourceIO(
         _ line: InventoryLine,
+        mines: [MineID: MineSnapshot]
     ) -> Tooltip? {
         switch line {
         case .l(let resource):
@@ -389,11 +392,12 @@ extension PopSnapshot {
             )
         case .m(let id):
             guard
-            let miningConditions: MiningJobConditions = self.mines[id.mine] else {
+            let mine: MineSnapshot = mines[id.mine],
+            let mineConditions: MiningJobConditions = self.mines[id.mine] else {
                 return nil
             }
-            return self.inventory[.m(id)]?.tooltipSupply(tier: miningConditions.output) {
-                self.explainProduction(&$0, base: $1, mine: miningConditions)
+            return self.inventory[.m(id)]?.tooltipSupply(tier: mineConditions.output) {
+                self.explainProduction(&$0, base: $1, mine: mine, mineConditions: mineConditions)
             }
         }
     }
