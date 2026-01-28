@@ -6,9 +6,9 @@ import GameState
 import OrderedCollections
 
 struct EconomicAggregator: ~Copyable {
-    private var employment: [EconomicLedger.Regional<PopOccupation>: EconomicLedger.LaborMetrics]
+    private var labor: [EconomicLedger.Regional<PopOccupation>: EconomicLedger.LaborMetrics]
+    private var trade: [EconomicLedger.Regional<Resource>: TradeVolume]
     private var gdp: [EconomicLedger.Regional<EconomicLedger.Industry>: Int64]
-    private var resource: [EconomicLedger.Regional<Resource>: TradeVolume]
     // These must be ordered, because floating point summation is not associative.
     private var racial: OrderedDictionary<EconomicLedger.Regional<CultureID>, EconomicLedger.CapitalMetrics>
     private var gender: OrderedDictionary<EconomicLedger.Regional<Gender>, EconomicLedger.CapitalMetrics>
@@ -17,9 +17,9 @@ struct EconomicAggregator: ~Copyable {
     private var slaves: OrderedDictionary<Address, EconomicLedger.SocialMetrics>
 
     init() {
-        self.employment = [:]
+        self.labor = [:]
+        self.trade = [:]
         self.gdp = [:]
-        self.resource = [:]
         self.racial = [:]
         self.gender = [:]
         self.income = [:]
@@ -35,7 +35,7 @@ extension EconomicAggregator {
             {
                 $0.unitsConsumed += units
                 $0.valueConsumed += value
-            } (&self.resource[region / id, default: .zero])
+            } (&self.trade[region / id, default: .zero])
         }
     }
     private mutating func countProduction(
@@ -46,43 +46,90 @@ extension EconomicAggregator {
         {
             $0.unitsProduced += tradeable ? output.units.added : output.unitsSold
             $0.valueProduced += output.valueProduced
-        } (&self.resource[region / output.id, default: .zero])
+        } (&self.trade[region / output.id, default: .zero])
+    }
+
+    private mutating func countDomesticProduct(
+        income: Int64,
+        region: Address,
+        industry: EconomicLedger.Industry
+    ) {
+        self.gdp[region / industry, default: 0] += income
+    }
+    private mutating func countNationalProduct(
+        income: Int64,
+        equity: Equity<LEI>.Statistics
+    ) {
+        guard equity.shareCount > 0 else {
+            return
+        }
+
+        let share: Double = Double.init(income %/ equity.shareCount)
+        for owner: Equity<LEI>.Statistics.Shareholder in equity.owners {
+            let owned: Double = Double.init(owner.shares) * share
+            self.racial[owner.region / owner.culture, default: .zero].income += owned
+            if  let gender: Gender = owner.gender {
+                self.gender[owner.region / gender, default: .zero].income += owned
+            }
+        }
+    }
+
+    private mutating func countTrade(
+        statement: FinancialStatement,
+        region: Address,
+        output: ResourceOutputs,
+    ) {
+        self.countConsumption(inputs: statement.costs.items, region: region)
+        for (tradeable, output): (tradeable: Bool, ResourceOutput) in output.joined {
+            self.countProduction(output: output, region: region, tradeable: tradeable)
+        }
     }
 }
 extension EconomicAggregator {
-    mutating func count(
-        statement: FinancialStatement,
+    mutating func countBuilding(
+        state: Building,
+        stats: Building.Stats,
         equity: Equity<LEI>.Statistics,
-        region: Address,
-        output: ResourceOutputs,
-        industry: EconomicLedger.Industry,
     ) {
-        let value: Int64 = statement.valueAdded
+        let region: Address = state.tile
+        let income: Int64 = stats.financial.valueAdded
+        let industry: EconomicLedger.Industry = .building(state.type)
 
-        self.gdp[region / industry, default: 0] += value
+        self.countTrade(statement: stats.financial, region: region, output: state.inventory.out)
+        self.countDomesticProduct(income: income, region: region, industry: industry)
+        self.countNationalProduct(income: income, equity: equity)
+    }
 
-        for (tradeable, output): (tradeable: Bool, ResourceOutput) in output.joined {
-            self.countProduction(
-                output: output,
-                region: region,
-                tradeable: tradeable
-            )
+    mutating func countFactory(
+        state: Factory,
+        stats: Factory.Stats,
+        equity: Equity<LEI>.Statistics,
+    ) {
+        let region: Address = state.tile
+        let income: Int64 = stats.financial.valueAdded
+        let industry: EconomicLedger.Industry = .factory(state.type)
+        let laborCosts: Int64 = state.spending.wages + state.spending.salaries
 
-            guard equity.shareCount > 0 else {
-                continue
-            }
+        self.countTrade(statement: stats.financial, region: region, output: state.inventory.out)
+        self.countDomesticProduct(income: income, region: region, industry: industry)
+        // this is a crucial difference between GDP and GNP
+        self.countNationalProduct(income: income - laborCosts, equity: equity)
+    }
 
-            let share: Double = Double.init(value %/ equity.shareCount)
-            for owner: Equity<LEI>.Statistics.Shareholder in equity.owners {
-                let owned: Double = Double.init(owner.shares) * share
-                self.racial[owner.region / owner.culture, default: .zero].income += owned
-                if  let gender: Gender = owner.gender {
-                    self.gender[owner.region / gender, default: .zero].income += owned
-                }
-            }
-        }
+    mutating func countSlave(
+        state pop: Pop,
+        stats: Pop.Stats,
+        equity: Equity<LEI>.Statistics,
+    ) {
+        let region: Address = pop.tile
+        let income: Int64 = stats.financial.valueAdded
+        let industry: EconomicLedger.Industry = .slavery(pop.type.race)
 
-        self.countConsumption(inputs: statement.costs.items, region: region)
+        self.countTrade(statement: stats.financial, region: region, output: pop.inventory.out)
+        self.countDomesticProduct(income: income, region: region, industry: industry)
+        self.countNationalProduct(income: income, equity: equity)
+
+        self.slaves[region, default: .zero].count(slave: pop)
     }
 
     /// Miners are never enslaved, so no equity breakdown is necessary.
@@ -95,7 +142,7 @@ extension EconomicAggregator {
         ; {
             $0.count += pop.z.total
             $0.employed += stats.employedBeforeEgress
-        } (&self.employment[region / pop.occupation, default: .zero])
+        } (&self.labor[region / pop.occupation, default: .zero])
 
         self.countConsumption(inputs: stats.financial.costs.items, region: region)
 
@@ -134,6 +181,8 @@ extension EconomicAggregator {
             }
         }
 
+        // this is the equivalent of calling `countNationalProduct`, but with the pop having
+        // exactly one shareholder, which is itself
         self.racial[region / pop.type.race, default: .zero].count(pop, income: income)
         self.gender[region / pop.type.gender, default: .zero].count(pop, income: income)
         self.income[section, default: .zero].count(
@@ -143,28 +192,13 @@ extension EconomicAggregator {
             incomeSelfEmployment: incomeSelfEmployment
         )
     }
-
-    mutating func countSlave(
-        state pop: Pop,
-        stats: Pop.Stats,
-        equity: Equity<LEI>.Statistics,
-    ) {
-        self.slaves[pop.tile, default: .zero].count(slave: pop)
-        self.count(
-            statement: stats.financial,
-            equity: equity,
-            region: pop.tile,
-            output: pop.inventory.out,
-            industry: .slavery(pop.type.race),
-        )
-    }
 }
 extension EconomicAggregator {
     consuming func aggregate() -> EconomicLedger {
         return .init(
-            employment: self.employment,
+            labor: self.labor,
+            trade: self.trade,
             gdp: self.gdp,
-            resource: self.resource,
             racial: self.racial,
             gender: self.gender,
             income: self.income,

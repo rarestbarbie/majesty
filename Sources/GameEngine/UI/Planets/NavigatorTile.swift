@@ -52,7 +52,7 @@ extension NavigatorTile {
             (key: PopOccupation, (share: Int64, ColorReference))
         ] = PopOccupation.allCases.compactMap {
             guard
-            let row: EconomicLedger.LaborMetrics = cache.context.ledger.z.economy.employment[
+            let row: EconomicLedger.LaborMetrics = cache.context.ledger.z.economy.labor[
                 self.id / $0
             ],
             let key: Legend.Representation = cache.rules.legend.occupation[$0] else {

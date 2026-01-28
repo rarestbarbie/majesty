@@ -158,7 +158,7 @@ extension TileSnapshot {
         id: PopOccupation
     ) -> Tooltip? {
         guard
-        let row: Delta<EconomicLedger.LaborMetrics> = context.ledger.Δ.economy.employment[
+        let row: Delta<EconomicLedger.LaborMetrics> = context.ledger.Δ.economy.labor[
             self.id / id
         ] else {
             return nil
@@ -268,13 +268,13 @@ extension TileSnapshot {
     ) -> Tooltip? {
         guard
         let country: DiplomaticAuthority = self.country,
-        let traded: TradeVolume = context.ledger.z.economy.resource[self.id / resource] else {
+        let traded: TradeVolume = context.ledger.z.economy.trade[self.id / resource] else {
             return nil
         }
 
         let total: (world: Int64, local: Int64, localExcluded: Int64) = self.aggregate(
             where: resource,
-            among: context.ledger.z.economy.resource,
+            among: context.ledger.z.economy.trade,
             worldContribution: \.unitsProduced,
             localContribution: \.valueProduced
         )
@@ -306,13 +306,13 @@ extension TileSnapshot {
     ) -> Tooltip? {
         guard
         let country: DiplomaticAuthority = self.country,
-        let traded: TradeVolume = context.ledger.z.economy.resource[self.id / resource] else {
+        let traded: TradeVolume = context.ledger.z.economy.trade[self.id / resource] else {
             return nil
         }
 
         let total: (world: Int64, local: Int64, localExcluded: Int64) = self.aggregate(
             where: resource,
-            among: context.ledger.z.economy.resource,
+            among: context.ledger.z.economy.trade,
             worldContribution: \.unitsConsumed,
             localContribution: \.valueConsumed
         )
@@ -360,7 +360,7 @@ extension TileSnapshot {
                         size: mine.z.size,
                         yieldRank: yieldRank
                     ),
-                    let miners: EconomicLedger.LaborMetrics = ledger.economy.employment[
+                    let miners: EconomicLedger.LaborMetrics = ledger.economy.labor[
                         self.id / .Miner
                     ],
                     let fromWorkers: Fraction = miners.mineExpansionFactor {
