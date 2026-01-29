@@ -104,5 +104,12 @@
 }
 
 [data-table='Markets'] {
-    grid-template-columns: 2fr 1fr 1fr 1fr 1fr 1.5fr;
+    grid-template-columns: 2fr 1fr 2fr 1fr;
+
+    > * {
+        > *:nth-child(3) {
+            direction: rtl;
+            margin-right: 1rem;
+        }
+    }
 }

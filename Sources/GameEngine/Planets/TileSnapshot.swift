@@ -347,7 +347,7 @@ extension TileSnapshot {
                     $0["Parcels"] = mine.z.parcels[/3]
                 }
             }
-            $0["Today’s change", +] = mine.miners.count[/3] <- mine.miners.before
+            $0["Today’s change", +] = +(mine.miners.count - mine.miners.before)[/3]
             $0[>] {
                 // only elide fired, it’s annoying when the lines below jump around
                 $0["Hired", +] = +mine.miners.hired[/3]

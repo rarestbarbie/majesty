@@ -34,8 +34,8 @@ extension StockMarket {
 
         for bid: RandomPurchase in self.buyers {
             let fill: Fill = {
-                let issued: StockPrice.Quote
-                let market: StockPrice.Quote
+                let issued: Quote
+                let market: Quote
 
                 if  let stockPrice: StockPrice = $0.security.stockPrice {
                     let quantity: Int64 = stockPrice.quantity(value: bid.value)
@@ -49,11 +49,11 @@ extension StockMarket {
                 } else {
                     // target an initial share price of 10.00
                     let quantity: Int64 = min(bid.value / 10, $0.issuable)
-                    issued = .init(quantity: quantity, value: quantity * 10)
+                    issued = .init(units: quantity, value: quantity * 10)
                     market = .zero
                 }
 
-                $0.issuable -= issued.quantity
+                $0.issuable -= issued.units
 
                 return .init(
                     asset: $0.security.id,

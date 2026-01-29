@@ -6,8 +6,7 @@ import RealModule
 
 @frozen public struct WorldMarket: Identifiable {
     public let id: ID
-    @usableFromInline let depth: Double
-    @usableFromInline let rot: Double
+    public let shape: Shape
 
     @usableFromInline var history: Deque<Aggregate>
     @usableFromInline var current: Candle<Double>
@@ -16,10 +15,9 @@ import RealModule
     @usableFromInline var y: Interval
     @usableFromInline var z: Interval.Indicators
 
-    @inlinable init(
+    private init(
         id: ID,
-        depth: Double,
-        rot: Double,
+        shape: Shape,
         history: Deque<Aggregate>,
         current: Candle<Double>,
         pool: LiquidityPool,
@@ -27,8 +25,7 @@ import RealModule
         z: Interval.Indicators,
     ) {
         self.id = id
-        self.depth = depth
-        self.rot = rot
+        self.shape = shape
         self.pool = pool
         self.history = history
         self.current = current
@@ -37,16 +34,15 @@ import RealModule
     }
 }
 extension WorldMarket {
-    @inlinable public init(state: State, shape: Shape) {
+    init(state: State, shape: Shape) {
         let pool: LiquidityPool = .init(
             assets: state.z.assets,
             volume: .init(),
-            fee: shape.fee
+            fee: state.z.fee,
         )
         self.init(
             id: state.id,
-            depth: shape.depth,
-            rot: shape.rot,
+            shape: shape,
             history: state.history,
             current: .open(pool.price),
             pool: pool,
@@ -54,19 +50,13 @@ extension WorldMarket {
             z: state.z.indicators
         )
     }
+
     @inlinable public var state: State {
         .init(
             id: self.id,
             history: self.history,
             y: self.y,
-            z: .init(assets: self.pool.assets, indicators: self.z)
-        )
-    }
-    @inlinable public var shape: Shape {
-        .init(
-            depth: self.depth,
-            rot: self.rot,
-            fee: self.pool.fee
+            z: .init(from: self.pool, indicators: self.z)
         )
     }
 }
@@ -98,10 +88,11 @@ extension WorldMarket {
 }
 extension WorldMarket {
     mutating func turn() {
-        self.y = .init(assets: self.pool.assets, indicators: self.z)
+        self.y = .init(from: self.pool, indicators: self.z)
+        self.pool.fee = self.shape.fee(velocity: self.y.velocity)
     }
 
-    mutating func advance(history: Int) -> LiquidityPool.Assets {
+    mutating func advance(history: Int) -> Quote {
         if  self.history.count >= history {
             self.history.removeFirst(self.history.count - history + 1)
         }
@@ -114,21 +105,15 @@ extension WorldMarket {
         self.current = .open(self.pool.price)
         self.z.update(from: self.pool)
 
-        let drained: LiquidityPool.Assets = .init(
-            base: self.drain(assets: self.pool.assets.base, volume: self.z.vb),
-            quote: self.drain(assets: self.pool.assets.quote, volume: self.z.vq)
+        let drained: Quote = .init(
+            units: self.shape.drain(assets: self.pool.assets.base, volume: self.z.vb),
+            value: self.shape.drain(assets: self.pool.assets.quote, volume: self.z.vq)
         )
 
-        self.pool.assets.base -= drained.base
-        self.pool.assets.quote -= drained.quote
+        self.pool.assets.base -= drained.units
+        self.pool.assets.quote -= drained.value
         self.pool.volume.reset()
 
         return drained
-    }
-
-    private func drain(assets: Int64, volume: Double) -> Int64 {
-        let drain: Double = self.rot * (Double.init(assets) - volume * self.depth)
-        let units: Int64 = max(0, min(Int64.init(drain.rounded()), assets))
-        return units
     }
 }

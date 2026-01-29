@@ -49,7 +49,11 @@ export enum TooltipType {
     BuildingCashFlowItem = 'BuildingCashFlowItem',
     BuildingBudgetItem = 'BuildingBudgetItem',
 
+    MarketFee = 'MarketFee',
     MarketLiquidity = 'MarketLiquidity',
+    MarketPrices = 'MarketPrices',
+    MarketVolume = 'MarketVolume',
+    MarketVelocity = 'MarketVelocity',
     MarketHistory = 'MarketHistory',
 
     TilePopRace = 'TilePopRace',

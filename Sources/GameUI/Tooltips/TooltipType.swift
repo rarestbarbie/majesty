@@ -58,7 +58,11 @@ import JavaScriptInterop
     case PopCashFlowItem
     case PopBudgetItem
 
+    case MarketFee
     case MarketLiquidity
+    case MarketPrices
+    case MarketVolume
+    case MarketVelocity
     case MarketHistory
 
     case TilePopRace

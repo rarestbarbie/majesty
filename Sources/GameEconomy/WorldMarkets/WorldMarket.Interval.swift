@@ -4,6 +4,7 @@ import RealModule
 extension WorldMarket {
     @frozen public struct Interval {
         public let assets: LiquidityPool.Assets
+        public let fee: Double
         /// Square root of quote volume times base volume.
         public let v: Double
         public let vb: Double
@@ -11,11 +12,13 @@ extension WorldMarket {
 
         @inlinable public init(
             assets: LiquidityPool.Assets,
+            fee: Double,
             v: Double,
             vb: Double,
             vq: Double
         ) {
             self.assets = assets
+            self.fee = fee
             self.v = v
             self.vb = vb
             self.vq = vq
@@ -25,14 +28,19 @@ extension WorldMarket {
 extension WorldMarket.Interval {
     @inlinable init(
         assets: LiquidityPool.Assets,
+        fee: Double,
         indicators: Indicators
     ) {
         self.init(
             assets: assets,
+            fee: fee,
             v: indicators.v,
             vb: indicators.vb,
             vq: indicators.vq
         )
+    }
+    @inlinable init(from pool: LiquidityPool, indicators: Indicators) {
+        self.init(assets: pool.assets, fee: pool.fee, indicators: indicators)
     }
 
     @inlinable var indicators: Indicators {

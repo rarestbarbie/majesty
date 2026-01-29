@@ -20,7 +20,7 @@ extension StockPrice {
         return quantity >< self.exact
     }
     @inlinable public func quote(quantity: Int64) -> Quote {
-        .init(quantity: quantity, value: self.value(quantity: quantity))
+        .init(units: quantity, value: self.value(quantity: quantity))
     }
     @inlinable public func quote(value: Int64) -> Quote? {
         guard value > 0 else {
@@ -33,6 +33,6 @@ extension StockPrice {
             return nil
         }
 
-        return .init(quantity: quantity, value: self.value(quantity: quantity))
+        return .init(units: quantity, value: self.value(quantity: quantity))
     }
 }

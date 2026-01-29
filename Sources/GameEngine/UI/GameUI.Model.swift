@@ -386,8 +386,24 @@ extension GameUI.Model {
                     try arguments[0].decode(),
                     try arguments[1].decode(),
                 )
+            case .MarketFee:
+                return $0.tooltipMarketFee(
+                    try arguments[0].decode(),
+                )
             case .MarketLiquidity:
                 return $0.tooltipMarketLiquidity(
+                    try arguments[0].decode(),
+                )
+            case .MarketPrices:
+                return $0.tooltipMarketPrices(
+                    try arguments[0].decode(),
+                )
+            case .MarketVolume:
+                return $0.tooltipMarketVolume(
+                    try arguments[0].decode(),
+                )
+            case .MarketVelocity:
+                return $0.tooltipMarketVelocity(
                     try arguments[0].decode(),
                 )
             case .MarketHistory:

@@ -4,7 +4,12 @@
     "world_markets": {
         "depth": "365",
         "rot": "0.0025",
-        "fee": "1/500",
+        // base fee is 0.2 percent
+        "fee": "0.002",
+        // fee will range from base to zero when velocity is below 5 percent
+        "fee_boundary": 0.05,
+        // fee will increase by 0.25 pp for each percentage point of velocity above boundary
+        "fee_schedule": 0.25,
         "capital": "1000000000/1000000000",
         "history": 365
     }

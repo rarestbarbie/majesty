@@ -3,18 +3,17 @@ import Fraction
 @frozen public struct LiquidityPool {
     public var assets: Assets
     public var volume: Volume
-
-    public var fee: Fraction
+    public var fee: Double
 
     @inlinable public init() {
         self.assets = .init(base: 2, quote: 2)
         self.volume = .init()
-        self.fee = 0 %/ 1
+        self.fee = 0
     }
     @inlinable public init(
         assets: Assets,
         volume: Volume,
-        fee: Fraction,
+        fee: Double,
     ) {
         self.assets = assets
         self.volume = volume
@@ -47,11 +46,9 @@ extension LiquidityPool {
     private mutating func swap(base: Int64, for quote: Int64) -> Int64 {
         self.assets.swap(base: base, for: quote)
         self.volume.swap(base: base, for: quote)
-
-        let fee: Int64 = quote <> self.fee
+        /// fee rounds down
+        let fee: Int64 = Int64.init(Double.init(quote) * self.fee)
         self.assets.quote += fee
-        // self.volume.quote.fees += fee
-
         return quote - fee
     }
 }

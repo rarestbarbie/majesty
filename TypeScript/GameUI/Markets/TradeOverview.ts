@@ -1,9 +1,11 @@
 import {
     FilterList,
     FilterTabs,
-    StaticList
+    StaticList,
+    Term,
+    TermState,
+    UpdateText
 } from '../../DOM/exports.js';
-import { ScreenContent } from '../Application/ScreenContent.js';
 import { Swift } from '../../Swift.js';
 import {
     GameDate
@@ -17,6 +19,7 @@ import {
     MarketTableRow,
     MarketTableEntry,
     ScreenType,
+    ScreenContent,
     TickRule,
     TickRuleState,
 } from '../exports.js';
@@ -26,11 +29,14 @@ export class TradeOverview extends ScreenContent {
 
     private readonly chartCandles: StaticList<Candlestick, GameDate>;
     private readonly chartTicks: StaticList<TickRule, number>;
+    private readonly terms: StaticList<Term, string>;
 
     private markets: StaticList<MarketTableRow, string>;
     private dom?: {
         readonly index: FilterTabs;
         readonly panel: HTMLDivElement;
+        readonly title: HTMLElement;
+        readonly titleName: HTMLHeadingElement;
         readonly chart: HTMLDivElement;
     };
 
@@ -48,6 +54,9 @@ export class TradeOverview extends ScreenContent {
         this.chartTicks = new StaticList<TickRule, number>(document.createElement('div'));
         this.chartTicks.node.classList.add('ticks');
 
+        this.terms = new StaticList<Term, string>(document.createElement('ul'));
+        this.terms.node.classList.add('terms');
+
         this.markets = new StaticList<MarketTableRow, string>(document.createElement('div'));
         this.markets.table('Markets', MarketTableRow.columns);
     }
@@ -63,16 +72,26 @@ export class TradeOverview extends ScreenContent {
             this.dom = {
                 index: new FilterTabs(this.filters),
                 panel: document.createElement('div'),
+                title: document.createElement('header'),
+                titleName: document.createElement('h3'),
                 chart: document.createElement('div'),
             }
+
+            this.dom.title.appendChild(this.dom.titleName);
 
             this.dom.chart.classList.add('tradingview');
             this.dom.chart.appendChild(this.chartCandles.node);
             this.dom.chart.appendChild(this.chartTicks.node);
 
+            const market: HTMLDivElement = document.createElement('div');
+            market.setAttribute('data-subscreen', 'Market');
+            market.appendChild(this.dom.chart);
+            market.appendChild(this.terms.node);
+
             const upper: HTMLDivElement = document.createElement('div');
-            upper.appendChild(this.dom.chart);
             upper.classList.add('upper');
+            upper.appendChild(this.dom.title);
+            upper.appendChild(market);
 
             this.dom.panel.appendChild(upper);
             this.dom.panel.appendChild(this.markets.node);
@@ -120,7 +139,10 @@ export class TradeOverview extends ScreenContent {
             state.market?.id
         );
 
+        UpdateText(this.dom.titleName, state.market?.name ?? '');
+
         if (state.market !== undefined) {
+
             this.dom.chart.style.setProperty('--y-min', state.market.chart.min.toString());
             this.dom.chart.style.setProperty('--y-max', state.market.chart.max.toString());
             this.dom.chart.style.setProperty('--y-maxv', state.market.chart.maxv.toString());
@@ -136,6 +158,12 @@ export class TradeOverview extends ScreenContent {
                 state.market.chart.ticks,
                 (state: TickRuleState) => new TickRule(state),
                 (state: TickRuleState, tick: TickRule) => tick.update(state),
+            );
+
+            this.terms.update(
+                state.market.terms,
+                (term: TermState) => new Term(term),
+                (term: TermState, item: Term) => item.update(term, [id]),
             );
         }
     }

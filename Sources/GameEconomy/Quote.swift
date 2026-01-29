@@ -1,0 +1,12 @@
+@frozen public struct Quote {
+    public var units: Int64
+    public var value: Int64
+
+    @inlinable public init(units: Int64, value: Int64) {
+        self.units = units
+        self.value = value
+    }
+}
+extension Quote {
+    @inlinable public static var zero: Self { .init(units: 0, value: 0) }
+}
