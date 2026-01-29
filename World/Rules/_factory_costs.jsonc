@@ -13,7 +13,7 @@
         },
         "Nuclear Power Plant": {
             "Construction": 400000,
-            "Influence": 100000
+            "Consent": 100000
         }
     }
 }

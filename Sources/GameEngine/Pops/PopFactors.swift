@@ -60,11 +60,11 @@ extension PopFactors {
             } else if self.race == culture.id {
                 $0[true] {
                     $0 = -5%
-                } = { "\(+$0[%]): Culture is \(em: culture.name)" }
+                } = { "\(+$0[%]): Race is \(em: culture.name)" }
             } else {
                 $0[true] {
                     $0 = +100%
-                } = { "\(+$0[%]): Culture is not \(em: culture.name)" }
+                } = { "\(+$0[%]): Race is not \(em: culture.name)" }
             }
         }
     }
@@ -134,11 +134,11 @@ extension PopFactors {
             } else if self.race == culture.id {
                 $0[true] {
                     $0 = +5%
-                } = { "\(+$0[%]): Culture is \(em: culture.name)" }
+                } = { "\(+$0[%]): Race is \(em: culture.name)" }
             } else {
                 $0[true] {
                     $0 = -75%
-                } = { "\(+$0[%]): Culture is not \(em: culture.name)" }
+                } = { "\(+$0[%]): Race is not \(em: culture.name)" }
             }
         }
     }
