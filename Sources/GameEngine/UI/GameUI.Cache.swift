@@ -383,10 +383,30 @@ extension GameUI.Cache {
 }
 
 extension GameUI.Cache {
+    func tooltipMarketFee(
+        _ id: WorldMarket.ID
+    ) -> Tooltip? {
+        self.worldMarkets[id]?.snapshot?.tooltipFee()
+    }
     func tooltipMarketLiquidity(
         _ id: WorldMarket.ID
     ) -> Tooltip? {
         self.worldMarkets[id]?.snapshot?.tooltipLiquidity()
+    }
+    func tooltipMarketPrices(
+        _ id: WorldMarket.ID,
+    ) -> Tooltip? {
+        self.worldMarkets[id]?.snapshot?.tooltipPrices()
+    }
+    func tooltipMarketVolume(
+        _ id: WorldMarket.ID
+    ) -> Tooltip? {
+        self.worldMarkets[id]?.snapshot?.tooltipVolume(in: self.context)
+    }
+    func tooltipMarketVelocity(
+        _ id: WorldMarket.ID
+    ) -> Tooltip? {
+        self.worldMarkets[id]?.snapshot?.tooltipVelocity()
     }
     func tooltipMarketHistory(
         _ id: WorldMarket.ID,

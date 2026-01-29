@@ -10,6 +10,7 @@ import D
         self.z = z
     }
 }
+extension Delta: Sendable where Dimensions: Sendable {}
 extension Delta where Dimensions: AdditiveArithmetic {
     var value: Dimensions { self.z - self.y }
 

@@ -42,25 +42,22 @@ extension TradeReport: PersistentReport {
             sort: { $0.name < $1.name }
         ) {
             guard
-            let today: WorldMarket.Aggregate = $0.state.history.last,
-            case .good(let good) = $0.id.x,
-            case .fiat(let fiat) = $0.id.y,
-            let currency: Currency = cache.currencies[fiat] else {
+            let market: WorldMarketSnapshot = $0.snapshot,
+            let name: String = cache.context.name(market.id) else {
                 return nil
             }
-
-            let resource: ResourceLabel = cache.rules.resources[good].label
-
             return .init(
                 id: $0.id,
-                name: "\(resource.nameWithIcon) / \(currency.name)",
-                price: today.prices,
-                volume: today.volume.base.total
+                name: name,
+                open: market.price.o,
+                close: market.price.c,
+                volume: market.Δ.v,
+                velocity: market.Δ.velocity,
             )
         } filter: {
             $0.asset = $0.asset ?? .fiat(cache.playerCountry.currency)
         } update: {
-            $0.update(from: $2.state, date: cache.date)
+            $0.update(from: $2, context: cache.context)
         }
 
         self.filters.0 = filterlists.resource.values.map(MarketFilterLabel.resource(_:))

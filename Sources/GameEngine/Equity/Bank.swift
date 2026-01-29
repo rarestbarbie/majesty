@@ -92,14 +92,11 @@ extension Bank {
         equity: inout Equity<LEI>,
         random: inout PseudoRandom,
     ) -> Int64 {
-        guard let quote: StockPrice.Quote = security.stockPrice?.quote(value: budget) else {
+        guard
+        let quote: Quote = security.stockPrice?.quote(value: budget) else {
             return 0
         }
-        let liquidated: StockPrice.Quote = equity.liquidate(
-            random: &random,
-            quote: quote,
-            burn: true
-        ) {
+        let liquidated: Quote = equity.liquidate(random: &random, quote: quote, burn: true) {
             self[account: $0].j += $1
         }
         self[account: security.id].e -= liquidated.value

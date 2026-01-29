@@ -4,14 +4,14 @@ extension StockMarket {
     @frozen public struct Fill {
         public let asset: LEI
         public let buyer: LEI
-        public let issued: StockPrice.Quote
-        public let market: StockPrice.Quote
+        public let issued: Quote
+        public let market: Quote
 
         @inlinable init(
             asset: LEI,
             buyer: LEI,
-            issued: StockPrice.Quote,
-            market: StockPrice.Quote
+            issued: Quote,
+            market: Quote
         ) {
             self.asset = asset
             self.buyer = buyer

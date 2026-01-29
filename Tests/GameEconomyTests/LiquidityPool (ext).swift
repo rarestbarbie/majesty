@@ -1,4 +1,3 @@
-import Fraction
 import LiquidityPool
 
 extension LiquidityPool {
@@ -6,7 +5,7 @@ extension LiquidityPool {
         self.init(
             assets: .init(base: liquidity.base, quote: liquidity.quote),
             volume: .init(),
-            fee: 0 %/ 1
+            fee: 0
         )
     }
 

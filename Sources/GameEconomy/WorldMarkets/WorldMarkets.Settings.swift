@@ -1,3 +1,4 @@
+import Assert
 import D
 import Fraction
 import LiquidityPool
@@ -8,24 +9,33 @@ extension WorldMarkets {
         public let depth: Decimal
         public let rot: Decimal
         /// The transaction fee for using the exchange.
-        public let fee: Fraction
+        public let fee: Decimal
+        public let feeBoundary: Double
+        public let feeSchedule: Double
         /// The initial liquidity for each market in the exchange.
         public let capital: LiquidityPool.Assets
         /// How many days of history to preserve for each market in the exchange.
         public let history: Int
 
-        @inlinable public init(
+        public init(
             depth: Decimal,
             rot: Decimal,
-            fee: Fraction,
+            fee: Decimal,
+            feeBoundary: Double,
+            feeSchedule: Double,
             capital: LiquidityPool.Assets,
             history: Int
         ) {
             self.depth = depth
             self.rot = rot
             self.fee = fee
+            self.feeBoundary = feeBoundary
+            self.feeSchedule = feeSchedule
             self.capital = capital
             self.history = history
+
+            #assert(self.feeBoundary > 0, "Fee boundary must be positive!!!")
+            #assert(self.shape.fee(velocity: 1) < 1, "Maximum fee must be less than 100%!!!")
         }
     }
 }
@@ -33,8 +43,10 @@ extension WorldMarkets.Settings {
     var shape: WorldMarket.Shape {
         .init(
             depth: Double.init(self.depth),
-            rot: Double.init(self.rot),
+            rot: self.rot,
             fee: self.fee,
+            feeBoundary: self.feeBoundary,
+            feeSchedule: self.feeSchedule
         )
     }
 }
@@ -42,6 +54,7 @@ extension WorldMarkets.Settings {
     func new(_ pair: WorldMarket.ID) -> WorldMarket {
         let initial: WorldMarket.Interval = .init(
             assets: self.capital,
+            fee: 0,
             indicators: .compute(from: self.capital))
         let state: WorldMarket.State = .init(
             id: pair,
@@ -53,7 +66,7 @@ extension WorldMarkets.Settings {
     }
 
     func load(_ state: WorldMarket.State) -> WorldMarket {
-        .init(state: state, shape: shape)
+        .init(state: state, shape: self.shape)
     }
 
     public func load(

@@ -153,14 +153,14 @@ extension Equity<LEI> {
 }
 extension Equity<LEI> {
     mutating func trade(random: inout PseudoRandom, bank: inout Bank, fill: StockMarket.Fill) {
-        let traded: StockPrice.Quote = self.liquidate(random: &random, quote: fill.market) {
+        let traded: Quote = self.liquidate(random: &random, quote: fill.market) {
             bank[account: $0].j += $1
         }
 
-        self.traded += traded.quantity
-        self.issued += fill.issued.quantity
+        self.traded += traded.units
+        self.issued += fill.issued.units
 
-        let quantity: Int64 = fill.issued.quantity + traded.quantity
+        let quantity: Int64 = fill.issued.units + traded.units
 
         self[fill.buyer].shares += quantity
 
@@ -170,10 +170,10 @@ extension Equity<LEI> {
 
     mutating func liquidate(
         random: inout PseudoRandom,
-        quote: StockPrice.Quote,
+        quote: Quote,
         burn: Bool = false,
         credit: (LEI, Int64) -> (),
-    ) -> StockPrice.Quote {
+    ) -> Quote {
         let recipients: [EquityStake<LEI>] = self.shares.values.shuffled(
             using: &random.generator
         )
@@ -183,10 +183,10 @@ extension Equity<LEI> {
         let shares: [Int64]? = recipients.distribute(share: \.shares.total) {
             // Cap the number of shares bought back at 1 percent of the total circulation,
             // but always allow at least one share to be bought back
-            min(max(1, $0 / 100), quote.quantity)
+            min(max(1, $0 / 100), quote.units)
         }
 
-        var liquidated: StockPrice.Quote = .init(quantity: 0, value: 0)
+        var liquidated: Quote = .zero
 
         if  let shares: [Int64],
             let compensation: [Int64] = shares.distribute(quote.value) {
@@ -200,14 +200,14 @@ extension Equity<LEI> {
                 self[recipient.id].shares -= shares
 
 
-                liquidated.quantity += shares
+                liquidated.units += shares
                 liquidated.value += compensation
                 credit(recipient.id, compensation)
             }
         }
 
         if  burn {
-            self.issued -= liquidated.quantity
+            self.issued -= liquidated.units
         }
 
         #assert(

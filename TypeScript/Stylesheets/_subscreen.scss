@@ -46,6 +46,21 @@
     }
 }
 
+[data-subscreen='Market'] {
+    > ul.terms {
+        justify-content: flex-start;
+        flex-direction: row;
+
+        margin: 1rem 0;
+
+        > li {
+            flex-basis: 10rem;
+        }
+        > li:last-child {
+            flex-grow: 1;
+        }
+    }
+}
 
 [data-subscreen='Inventory'] {
     position: relative;

@@ -27,7 +27,8 @@ ul.terms {
         }
         &[data-term-id^='e'],
         &[data-term-id^='f'],
-        &[data-term-id^='t'] {
+        &[data-term-id^='t'],
+        &[data-term-id^='m'] {
             > span.label::before {
                 content: var(--term-icon);
             }
@@ -57,6 +58,13 @@ ul.terms {
         }
         &[data-term-id='tD'] {
             --term-icon: '⛁';
+        }
+
+        &[data-term-id='mF'] {
+            --term-icon: '🚦';
+        }
+        &[data-term-id='mL'] {
+            --term-icon: '⏳';
         }
     }
 }

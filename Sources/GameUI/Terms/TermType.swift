@@ -13,6 +13,9 @@ import JavaScriptInterop
     case profit
 
     case gdp
+
+    case fee
+    case liquidity
 }
 extension TermType: RawRepresentable {
     @Bijection(label: "rawValue") @inlinable public var rawValue: String {
@@ -36,6 +39,8 @@ extension TermType: RawRepresentable {
         case .vacant: "fV"
         case .profit: "fP"
         case .gdp: "tD"
+        case .fee: "mF"
+        case .liquidity: "mL"
         }
     }
 }

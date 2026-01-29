@@ -31,4 +31,16 @@ extension GameUI.CacheContext {
         }
         return player
     }
+
+    func name(_ market: WorldMarket.ID) -> String? {
+        guard
+        case .good(let good) = market.x,
+        case .fiat(let fiat) = market.y,
+        let currency: Currency = self.currencies[fiat] else {
+            return nil
+        }
+
+        let resource: ResourceLabel = self.rules.resources[good].label
+        return "\(resource.nameWithIcon) / \(currency.name)"
+    }
 }
