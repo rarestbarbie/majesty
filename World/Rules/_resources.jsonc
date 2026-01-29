@@ -37,9 +37,9 @@
         "emoji": "🧭",
         "color": "#ffd29e"
     },
-    "Influence": {
-        "emoji": "⚖️",
-        "color": "#873a8a",
+    "Consent": {
+        "emoji": "🚦",
+        "color": "#5c645c",
         "local": true,
         "floor": "wage"
     },

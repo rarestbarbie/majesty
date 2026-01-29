@@ -28,12 +28,14 @@ extension WorldMarketSnapshot {
     }
 }
 extension WorldMarketSnapshot {
-    private var takerFlow: Double {
+    private static func takerFlow(_ volume: LiquidityPool.Volume) -> Double {
         let signed: Double =
-        Double.init(self.volume.base.i) * Double.init(self.volume.quote.o) -
-        Double.init(self.volume.quote.i) * Double.init(self.volume.base.o)
+        Double.init(volume.base.i) * Double.init(volume.quote.o) -
+        Double.init(volume.quote.i) * Double.init(volume.base.o)
         return signed >= 0 ? Double.sqrt(signed) : -Double.sqrt(-signed)
     }
+
+    private var takerFlow: Double { Self.takerFlow(self.volume) }
 }
 extension WorldMarketSnapshot {
     func tooltipCandle(_ date: GameDate, today: GameDate) -> Tooltip? {
@@ -57,7 +59,7 @@ extension WorldMarketSnapshot {
             }
             $0["Volume"] = day.volume.base.total[/3]
             $0[>] {
-                $0["Taker flow", -] = +?self.takerFlow[/3..2]
+                $0["Taker flow", -] = +?Self.takerFlow(day.volume)[/3..2]
             }
         }
     }

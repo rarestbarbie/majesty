@@ -15,7 +15,7 @@
         "development": {
             "Construction": 200,
             "Appliances": 480,
-            "Influence": 1
+            "Consent": 1
         },
         "output": {
             "Housing": 1440

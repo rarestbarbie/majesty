@@ -118,11 +118,11 @@
         "x": {
             "Electronics": 2,
             "Firearms": 2,
-            "Media": 2,
+            "Media": 4,
             "Instruments": 4,
             "Jewelry": 2,
             "Lingerie": 10,
-            "Influence": 1,
+            "Consent": 1,
             "Services": 12
         }
     },
@@ -156,7 +156,7 @@
             "Instruments": 4,
             "Jewelry": 2,
             "Lingerie": 10,
-            "Influence": 1,
+            "Consent": 1,
             "Services": 12
         }
     }
