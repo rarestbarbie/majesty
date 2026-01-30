@@ -5,11 +5,7 @@ extension Array {
         /// significantly more expensive than on native platforms
         let count: Int = self.count
         self = []
-        /// don’t eagerly reserve capacity for zero-length arrays
-        if  count > 0 {
-            // add 25% + 3 buffer
-            self.reserveCapacity(count + (count >> 2) + 3)
-        }
+        self.reserveCapacity(count)
     }
 }
 extension [(count: Int64, value: Double)] {
