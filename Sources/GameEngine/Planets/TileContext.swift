@@ -85,18 +85,18 @@ extension TileContext {
 }
 extension TileContext {
     mutating func startIndexCount() {
-        self.buildingsAlreadyPresent.removeAll(keepingCapacity: true)
-        self.buildings.removeAll(keepingCapacity: true)
+        self.buildingsAlreadyPresent.resetUsingHint()
+        self.buildings.resetUsingHint()
 
         self.factoriesUnderConstruction = 0
-        self.factoriesAlreadyPresent.removeAll(keepingCapacity: true)
-        self.factories.removeAll(keepingCapacity: true)
+        self.factoriesAlreadyPresent.resetUsingHint()
+        self.factories.resetUsingHint()
 
         self.pops.enslaved.startIndexCount()
         self.pops.free.startIndexCount()
 
-        self.minesAlreadyPresent.removeAll(keepingCapacity: true)
-        self.mines.removeAll(keepingCapacity: true)
+        self.minesAlreadyPresent.resetUsingHint()
+        self.mines.resetUsingHint()
 
         self.stats.startIndexCount()
     }

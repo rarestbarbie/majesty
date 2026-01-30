@@ -1,3 +1,17 @@
+extension Array {
+    /// use the previous day’s counts to allocate capacity
+    @inlinable public mutating func resetUsingHint() {
+        /// in a wasm environment, memory growth operations (memory.grow) and reallocations are
+        /// significantly more expensive than on native platforms
+        let count: Int = self.count
+        self = []
+        /// don’t eagerly reserve capacity for zero-length arrays
+        if  count > 0 {
+            // add 25% + 3 buffer
+            self.reserveCapacity(count + (count >> 2) + 3)
+        }
+    }
+}
 extension [(count: Int64, value: Double)] {
     public func medianAssumingAscendingOrder() -> Double? {
         if  self.isEmpty {

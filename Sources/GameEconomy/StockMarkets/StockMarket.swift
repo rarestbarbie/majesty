@@ -20,8 +20,8 @@ extension StockMarket {
         execute: (inout PseudoRandom, CurrencyID, StockMarket.Fill) -> ()
     ) {
         defer {
-            self.buyers.removeAll(keepingCapacity: true)
-            self.assets.removeAll(keepingCapacity: true)
+            self.buyers.resetUsingHint()
+            self.assets.resetUsingHint()
         }
 
         guard

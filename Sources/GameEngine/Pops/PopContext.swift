@@ -14,12 +14,12 @@ struct PopContext: RuntimeContext {
     private(set) var stats: Pop.Stats
     private(set) var region: RegionalProperties?
     private(set) var equity: Equity<LEI>.Statistics
-    private(set) var mines: [MineID: MiningJobConditions]
-
+    private var mines: [MineID: MiningJobConditions]
     private var yield: (
         factories: [FactoryID: Int64],
         mines: [MineID: Double],
     )
+    private var portfolio: [LEI]
 
     public init(type: PopMetadata, state: Pop) {
         self.type = type
@@ -29,6 +29,7 @@ struct PopContext: RuntimeContext {
         self.equity = .init()
         self.mines = [:]
         self.yield = ([:], [:])
+        self.portfolio = []
     }
 }
 extension PopContext: Identifiable {
@@ -106,10 +107,7 @@ extension PopContext {
         to targets: RuntimeStateTable<FactoryContext>,
         yield: (Factory.Dimensions) -> Int64
     ) {
-        let count: Int = self.state.factories.count
-
-        self.yield.factories = [:]
-        self.yield.factories.reserveCapacity(count)
+        self.yield.factories.resetUsingHint()
 
         for job: FactoryID in self.state.factories.keys {
             if  let factory: Factory = targets[job] {
@@ -121,10 +119,7 @@ extension PopContext {
         to targets: RuntimeStateTable<MineContext>,
         yield: (Mine.Dimensions) -> Double
     ) {
-        let count: Int = self.state.mines.count
-
-        self.yield.mines = [:]
-        self.yield.mines.reserveCapacity(count)
+        self.yield.mines.resetUsingHint()
 
         for job: MineID in self.state.mines.keys {
             if  let mine: Mine = targets[job] {

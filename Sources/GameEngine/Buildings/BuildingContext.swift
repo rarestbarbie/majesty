@@ -49,13 +49,9 @@ extension BuildingContext {
     mutating func startIndexCount() {
         self.stats.startIndexCount(self.state)
     }
-    mutating func addPosition(asset: LEI, value: Int64) {
-        // TODO
-    }
     mutating func update(equityStatistics: Equity<LEI>.Statistics) {
         self.equity = equityStatistics
     }
-
     mutating func afterIndexCount(
         world _: borrowing GameWorld,
         context: ComputationPass

@@ -16,7 +16,7 @@ extension FinancialStatement {
 }
 extension FinancialStatement.CostSummary {
     mutating func reset() {
-        self.items.removeAll(keepingCapacity: true)
+        self.items.resetUsingHint()
     }
 
     mutating func update(with inputs: ResourceInputs) -> Int64 {

@@ -14,11 +14,7 @@ extension TileContext.ResidentPops {
 
 extension TileContext.ResidentPops {
     mutating func startIndexCount() {
-        // use the previous day’s counts to allocate capacity
-        let list: Int = self.list.count
-
-        self.list = []
-        self.list.reserveCapacity(list)
+        self.list.resetUsingHint()
     }
 
     mutating func addResidentCount(_ pop: Pop) {

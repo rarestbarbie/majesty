@@ -93,13 +93,7 @@ extension FactoryContext {
             )
         }
     }
-    mutating func addPosition(asset: LEI, value: Int64) {
-        guard value > 0 else {
-            return
-        }
 
-        // TODO
-    }
     mutating func update(equityStatistics: Equity<LEI>.Statistics) {
         self.equity = equityStatistics
     }
