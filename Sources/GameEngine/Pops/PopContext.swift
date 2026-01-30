@@ -56,6 +56,7 @@ extension PopContext {
 extension PopContext {
     mutating func startIndexCount() {
         self.stats.startIndexCount(self.state)
+        self.mines.resetUsingHint()
     }
 
     mutating func addPosition(asset: LEI, value: Int64) {
