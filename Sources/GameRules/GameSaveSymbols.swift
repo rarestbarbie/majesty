@@ -4,6 +4,7 @@ import JavaScriptInterop
 @frozen public struct GameSaveSymbols: Sendable {
     /// Pop types are not moddable.
     public let occupations: SymbolTable<PopOccupation>
+    public let stratum: SymbolTable<PopStratum>
     public let genders: SymbolTable<Gender>
 
     public internal(set) var mines: SymbolTable<MineType>
@@ -42,12 +43,9 @@ extension GameSaveSymbols: JavaScriptEncodable {
 extension GameSaveSymbols: JavaScriptDecodable {
     public init(from js: borrowing JavaScriptDecoder<GameMetadata.Namespace>) throws {
         self.init(
-            occupations: .init(
-                index: PopOccupation.allCases.reduce(into: [:]) {
-                    $0[.init(name: $1.singular)] = $1
-                }
-            ),
-            genders: .init(index: Gender.allCases.reduce(into: [:]) { $0[$1.code] = $1 }),
+            occupations: .cases(by: \.singular),
+            stratum: .cases(by: \.description),
+            genders: .cases(by: \.code),
             mines: try js[.mines]?.decode() ?? [:],
             buildings: try js[.buildings]?.decode() ?? [:],
             factories: try js[.factories]?.decode() ?? [:],
