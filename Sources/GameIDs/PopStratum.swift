@@ -1,4 +1,4 @@
-@frozen public enum PopStratum: Comparable {
+@frozen public enum PopStratum: Comparable, CaseIterable {
     case Ward
     case Worker
     case Clerk

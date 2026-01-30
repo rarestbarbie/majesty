@@ -56,6 +56,11 @@ extension GameMetadata.Pops {
             switch $1.where {
             case .occupation(let name)?:
                 $0.occupations[try symbols.occupations[name]] = attributes
+            case .stratum(let name)?:
+                let stratum: PopStratum = try symbols.stratum[name]
+                for occupation in PopOccupation.allCases where occupation.stratum == stratum {
+                    $0.occupations[occupation, default: .empty] |= attributes
+                }
             case .biology(let type)?:
                 $0.biology[try symbols.biology[type]] = attributes
             case nil:

@@ -15,6 +15,22 @@ extension SymbolTable: ExpressibleByDictionaryLiteral {
         self.init(index: [:])
     }
 }
+extension SymbolTable where Value: CaseIterable {
+    static func cases(
+        of _: Value.Type = Value.self,
+        by name: (Value) -> String
+    ) -> Self {
+        .cases { Symbol.init(name: name($0)) }
+    }
+    static func cases(
+        of _: Value.Type = Value.self,
+        by name: (Value) -> Symbol
+    ) -> Self {
+        .init(
+            index: Value.allCases.reduce(into: [:]) { $0[name($1)] = $1 }
+        )
+    }
+}
 extension SymbolTable {
     @inlinable public subscript(_ symbol: Symbol) -> Value {
         get throws {
