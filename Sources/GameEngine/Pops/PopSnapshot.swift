@@ -472,7 +472,7 @@ extension PopSnapshot {
                 in this income stratum and region is \(em: income[/3..2]) per day
                 """
             }
-            if  case _? = self.occupation.employer {
+            if  case _? = self.occupation.employer, self.occupation.stratum < .Elite {
                 $0[>] = """
                 Pops are much less likely to quit jobs that pay well compared to the \
                 average income of their peers
