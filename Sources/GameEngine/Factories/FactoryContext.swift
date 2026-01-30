@@ -611,7 +611,7 @@ extension FactoryContext {
         }
 
         if  proceeds > 0 {
-            turn.bank[account: self.id].r += proceeds
+            turn.bank[account: self.id].c += proceeds
         }
 
         self.state.z.fl = 0
@@ -655,7 +655,7 @@ extension FactoryContext {
             if !self.state.inventory.out.tradeable.isEmpty {
                 // if we are strapped for cash, liquidate all stockpiled goods, otherwise sell
                 // just a random portion
-                $0.r += budget.liquidate ? self.state.inventory.out.sell(
+                $0.c += budget.liquidate ? self.state.inventory.out.sell(
                     in: region.currency.id,
                     to: &turn.worldMarkets,
                 ) : self.state.inventory.out.sell(

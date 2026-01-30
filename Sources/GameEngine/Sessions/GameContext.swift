@@ -292,7 +292,6 @@ extension GameContext {
             /// avoid copy-on-write. note that we should not be accessing `PopContext.region`
             /// here — that will be stale as it is not updated until after indexing is complete
             let (pop, stats): (Pop, Pop.Stats) = { ($0.state, $0.stats) } (self.pops[i])
-            let account: Bank.Account = world.bank[account: pop.id]
 
             guard
             let _: RegionalAuthority = self.tiles[pop.tile]?.addResidentCount(pop, stats) else {
@@ -306,10 +305,12 @@ extension GameContext {
                 self.mines[modifying: job.id].addWorkforceCount(pop: pop, job: job)
             }
 
+            let account: Bank.Account = world.bank[account: pop.id]
             let equity: Equity<LEI>.Statistics
             if  pop.type.stratum > .Ward {
                 // free pops do not have shareholders
-                economy.countFree(state: pop, stats: stats, account: account)
+                economy.countConsumer(state: pop, statement: stats.financial, account: account)
+                economy.countSocial(free: pop, stats: stats)
                 continue
             } else {
                 /// We compute this here, and not in `PopContext.compute`, so that its global
@@ -317,7 +318,13 @@ extension GameContext {
                 /// in-place there without individually retaining and releasing every `PopContext`
                 /// in the array on every loop iteration, which would be O(n²)!
                 equity = .compute(entity: pop, account: account, context: self.legalPass)
-                economy.countSlave(state: pop, stats: stats, equity: equity)
+                economy.countBusiness(
+                    state: pop,
+                    statement: stats.financial,
+                    account: account,
+                    equity: equity,
+                )
+                economy.countSocial(slave: pop)
             }
 
             self.count(asset: pop.id.lei, equity: pop.equity)
@@ -333,13 +340,19 @@ extension GameContext {
                 fatalError("Factory \(factory.id) has no home tile!!!")
             }
 
+            let account: Bank.Account = world.bank[account: factory.id]
             let equity: Equity<LEI>.Statistics = .compute(
                 entity: factory,
-                account: world.bank[account: factory.id],
+                account: account,
                 context: self.legalPass
             )
 
-            economy.countFactory(state: factory, stats: stats, equity: equity)
+            economy.countBusiness(
+                state: factory,
+                statement: stats.financial,
+                account: account,
+                equity: equity,
+            )
 
             self.count(asset: factory.id.lei, equity: factory.equity)
             self.factories[i].update(equityStatistics: equity)
@@ -356,13 +369,19 @@ extension GameContext {
                 fatalError("Building \(building.id) has no home tile!!!")
             }
 
+            let account: Bank.Account = world.bank[account: building.id]
             let equity: Equity<LEI>.Statistics = .compute(
                 entity: building,
-                account: world.bank[account: building.id],
+                account: account,
                 context: self.legalPass
             )
 
-            economy.countBuilding(state: building, stats: stats, equity: equity)
+            economy.countBusiness(
+                state: building,
+                statement: stats.financial,
+                account: account,
+                equity: equity,
+            )
 
             self.count(asset: building.id.lei, equity: building.equity)
             self.buildings[i].update(equityStatistics: equity)
@@ -414,7 +433,7 @@ extension GameContext {
             $0.match(random: &turn.random) {
                 switch $1 {
                 case .sell:
-                    turn.bank[account: $0.entity].r += $0.value
+                    turn.bank[account: $0.entity].c += $0.value
                 case .buy:
                     turn.bank[account: $0.entity].b -= $0.value
                 }
@@ -547,7 +566,7 @@ extension GameContext {
         // the gender table is incomplete, as it excludes non-natural persons, but every entity
         // in the game has a race, so we can use that to compute GNI
         for (key, value): (EconomicLedger.Regional<CultureID>, EconomicLedger.CapitalMetrics) in ledger.economy.racial {
-            self.tiles[key.location]?.stats.gnp += value.income
+            self.tiles[key.location]?.stats.gnp += value.gnpContribution
         }
         for (key, value): (EconomicLedger.IncomeSection, EconomicLedger.IncomeMetrics) in ledger.economy.income {
             switch key.stratum {
@@ -670,7 +689,7 @@ extension GameContext {
                 }
 
                 ranks[mine.type.miner, default: []].append(
-                    (id: mine.state.id, yield: mine.state.z.yield)
+                    (id: mine.state.id, yield: mine.state.z.yieldBase)
                 )
             }
             for var mines: [(id: MineID, yield: Double)] in ranks.values {

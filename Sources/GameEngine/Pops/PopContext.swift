@@ -81,9 +81,8 @@ extension PopContext {
             for job: MiningJob in self.state.mines.values {
                 let (state, type): (Mine, MineMetadata) = try context.mines[job.id]
                 self.mines[job.id] = .init(
-                    type: state.type,
                     output: type.base,
-                    factor: state.y.efficiencyPerMiner
+                    efficiencyPerMiner: state.y.efficiencyPerMiner
                 )
             }
 
@@ -91,7 +90,7 @@ extension PopContext {
             if  case .Elite = self.state.occupation.stratum {
                 break
             } else {
-                self.updateJobAttraction(to: context.mines, yield: \.yield)
+                self.updateJobAttraction(to: context.mines, yield: \.yieldPerMiner)
             }
         case .factory?:
             if  case .Worker = self.state.occupation.stratum {
@@ -189,7 +188,7 @@ extension PopContext: AllocatingContext {
                 $0.out.sync(with: conditions.output)
                 $0.out.produce(
                     from: conditions.output,
-                    scalingFactor: ($0.count, conditions.factor)
+                    scalingFactor: ($0.count, conditions.efficiencyPerMiner)
                 )
             } (&self.state.mines.values[j])
         }
@@ -339,12 +338,12 @@ extension PopContext: TransactingContext {
                         1 + self.state.inventory.out.tradeableDaysReserve,
                         1 ... Self.stockpileDaysRange.upperBound
                     ) {
-                    account.r += self.state.inventory.out.sell(
+                    account.c += self.state.inventory.out.sell(
                         in: region.currency.id,
                         to: &turn.worldMarkets
                     )
                     for j: Int in self.state.mines.values.indices {
-                        account.r += self.state.mines.values[j].out.sell(
+                        account.c += self.state.mines.values[j].out.sell(
                             in: region.currency.id,
                             to: &turn.worldMarkets
                         )

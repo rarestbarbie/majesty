@@ -24,8 +24,8 @@ extension Mine.Dimensions {
         self.efficiency * self.parcelFraction
     }
 
-    var yield: Double {
-        self.yieldBase * self.efficiencyPerMiner
+    var yieldPerMiner: Double {
+        self.parcelFraction * self.yieldBase
     }
 }
 extension Mine.Dimensions {

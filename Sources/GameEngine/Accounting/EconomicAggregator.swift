@@ -67,9 +67,13 @@ extension EconomicAggregator {
         let share: Double = Double.init(income %/ equity.shareCount)
         for owner: Equity<LEI>.Statistics.Shareholder in equity.owners {
             let owned: Double = Double.init(owner.shares) * share
-            self.racial[owner.region / owner.culture, default: .zero].income += owned
+            self.racial[owner.region / owner.culture, default: .zero].countCapitalAttributable(
+                income: owned
+            )
             if  let gender: Gender = owner.gender {
-                self.gender[owner.region / gender, default: .zero].income += owned
+                self.gender[owner.region / gender, default: .zero].countCapitalAttributable(
+                    income: owned
+                )
             }
         }
     }
@@ -86,65 +90,42 @@ extension EconomicAggregator {
     }
 }
 extension EconomicAggregator {
-    mutating func countBuilding(
-        state: Building,
-        stats: Building.Stats,
+    mutating func countSocial(slave pop: Pop) {
+        self.slaves[pop.tile, default: .zero].count(slave: pop)
+    }
+    mutating func countSocial(free pop: Pop, stats: Pop.Stats) {
+        {
+            $0.count += pop.z.total
+            $0.employed += stats.employedBeforeEgress
+        } (&self.labor[pop.tile / pop.occupation, default: .zero])
+    }
+}
+extension EconomicAggregator {
+    mutating func countBusiness(
+        state: some LegalEntityState,
+        statement: FinancialStatement,
+        account: Bank.Account,
         equity: Equity<LEI>.Statistics,
     ) {
         let region: Address = state.tile
-        let income: Int64 = stats.financial.valueAdded
-        let industry: EconomicLedger.Industry = .building(state.type)
+        let income: Int64 = statement.incomeUnrealizedGain
 
-        self.countTrade(statement: stats.financial, region: region, output: state.inventory.out)
-        self.countDomesticProduct(income: income, region: region, industry: industry)
-        self.countNationalProduct(income: income, equity: equity)
-    }
-
-    mutating func countFactory(
-        state: Factory,
-        stats: Factory.Stats,
-        equity: Equity<LEI>.Statistics,
-    ) {
-        let region: Address = state.tile
-        let income: Int64 = stats.financial.valueAdded
-        let industry: EconomicLedger.Industry = .factory(state.type)
-        let laborCosts: Int64 = state.spending.wages + state.spending.salaries
-
-        self.countTrade(statement: stats.financial, region: region, output: state.inventory.out)
-        self.countDomesticProduct(income: income, region: region, industry: industry)
-        // this is a crucial difference between GDP and GNP
-        self.countNationalProduct(income: income - laborCosts, equity: equity)
-    }
-
-    mutating func countSlave(
-        state pop: Pop,
-        stats: Pop.Stats,
-        equity: Equity<LEI>.Statistics,
-    ) {
-        let region: Address = pop.tile
-        let income: Int64 = stats.financial.valueAdded
-        let industry: EconomicLedger.Industry = .slavery(pop.type.race)
-
-        self.countTrade(statement: stats.financial, region: region, output: pop.inventory.out)
-        self.countDomesticProduct(income: income, region: region, industry: industry)
-        self.countNationalProduct(income: income, equity: equity)
-
-        self.slaves[region, default: .zero].count(slave: pop)
+        self.countTrade(statement: statement, region: region, output: state.inventory.out)
+        self.countDomesticProduct(income: income, region: region, industry: state.industry)
+        // before we count GNP, we must deduct labor costs, as well as dividends paid to
+        // shareholders, both of which would show up in the recipient’s `account.i`
+        self.countNationalProduct(income: income + account.i, equity: equity)
     }
 
     /// Miners are never enslaved, so no equity breakdown is necessary.
-    mutating func countFree(
+    mutating func countConsumer(
         state pop: Pop,
-        stats: Pop.Stats,
+        statement: FinancialStatement,
         account: Bank.Account,
     ) {
         let region: Address = pop.tile
-        ; {
-            $0.count += pop.z.total
-            $0.employed += stats.employedBeforeEgress
-        } (&self.labor[region / pop.occupation, default: .zero])
 
-        self.countConsumption(inputs: stats.financial.costs.items, region: region)
+        self.countConsumption(inputs: statement.costs.items, region: region)
 
         let section: EconomicLedger.IncomeSection = .init(
             stratum: pop.type.stratum,
@@ -153,17 +134,12 @@ extension EconomicAggregator {
         )
 
         let incomeSelfEmployment: Int64
-        let income: Double
         if case .Elite = pop.type.stratum {
             // resources produced by aristocrats and politicians are not counted as part of
             // GDP, otherwise campaign contributions would be like, 99 percent of GDP
             incomeSelfEmployment = 0
-            /// do not count income from interest and dividends, that was already counted when
-            /// we iterated the equity structure of the assets themselves
-            income = Double.init(account.s)
         } else {
-            incomeSelfEmployment = stats.financial.valueAdded
-            income = Double.init(account.s + account.i + incomeSelfEmployment)
+            incomeSelfEmployment = statement.incomeSelfEmployment
 
             for (tradeable, output): (tradeable: Bool, ResourceOutput) in pop.inventory.out.joined {
                 let valueAdded: Int64 = output.valueProduced
@@ -181,15 +157,25 @@ extension EconomicAggregator {
             }
         }
 
+        let incomeLessTransfers: Int64 = account.i + incomeSelfEmployment
+        let incomeFromTransfers: Int64 = account.s
+
         // this is the equivalent of calling `countNationalProduct`, but with the pop having
         // exactly one shareholder, which is itself
-        self.racial[region / pop.type.race, default: .zero].count(pop, income: income)
-        self.gender[region / pop.type.gender, default: .zero].count(pop, income: income)
+        self.racial[region / pop.type.race, default: .zero].count(
+            free: pop,
+            incomeLessTransfers: incomeLessTransfers,
+            incomeFromTransfers: incomeFromTransfers
+        )
+        self.gender[region / pop.type.gender, default: .zero].count(
+            free: pop,
+            incomeLessTransfers: incomeLessTransfers,
+            incomeFromTransfers: incomeFromTransfers
+        )
         self.income[section, default: .zero].count(
             free: pop,
-            incomeSubsidies: account.s,
-            incomeFromEmployment: account.i,
-            incomeSelfEmployment: incomeSelfEmployment
+            incomeLessTransfers: incomeLessTransfers,
+            incomeFromTransfers: incomeFromTransfers
         )
     }
 }

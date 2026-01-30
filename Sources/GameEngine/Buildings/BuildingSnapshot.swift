@@ -53,7 +53,7 @@ extension BuildingSnapshot {
         )
     }
 }
-extension BuildingSnapshot: LegalEntitySnapshot {}
+extension BuildingSnapshot: LegalEntitySnapshot, BusinessSnapshot {}
 extension BuildingSnapshot {
     private func explainProduction(_ ul: inout TooltipInstructionEncoder, base: Int64) {
         ul["Production per facility"] = base[/3]
@@ -69,39 +69,12 @@ extension BuildingSnapshot {
     }
 }
 extension BuildingSnapshot {
-    func tooltipAccount(_ account: Bank.Account) -> Tooltip? {
-        let profit: FinancialStatement.Profit = self.stats.financial.profit
-        let liquid: Delta<Int64> = account.Δ
-        let assets: Delta<Int64> = self.Δ.assets
-
-        return .instructions {
-            $0["Total valuation", +] = (liquid + assets)[/3]
-            $0[>] {
-                $0["Today’s profit", +] = +profit.operating[/3]
-                $0["Gross margin", +] = profit.grossMargin.map {
-                    (Double.init($0))[%2]
-                }
-                $0["Operating margin", +] = profit.operatingMargin.map {
-                    (Double.init($0))[%2]
-                }
-            }
-
-            $0["Illiquid assets", +] = assets[/3]
-            $0["Liquid assets", +] = liquid[/3]
-            $0[>] {
-                let excluded: Int64 = self.spending.totalExcludingEquityPurchases
-                $0["Market spending", +] = +(account.b + excluded)[/3]
-                $0["Market earnings", +] = +?account.r[/3]
-                $0["Subsidies", +] = +?account.s[/3]
-                $0["Interest and dividends", +] = +?(-self.spending.dividend)[/3]
-                $0["Stock buybacks", +] = (-self.spending.buybacks)[/3]
-                if account.e > 0 {
-                    $0["Market capitalization", +] = +account.e[/3]
-                }
-            }
+    func tooltipAccount(_ account: Bank.Account) -> Tooltip {
+        .instructions {
+            self.explain(statement: self.stats.financial, account: account, tooltip: &$0)
         }
     }
-    func tooltipActive() -> Tooltip? {
+    func tooltipActive() -> Tooltip {
         .instructions {
             $0["Active facilities", +] = self.Δ.active[/3]
             $0[>] {
@@ -111,7 +84,7 @@ extension BuildingSnapshot {
             }
         }
     }
-    func tooltipActiveHelp() -> Tooltip? {
+    func tooltipActiveHelp() -> Tooltip {
         .instructions {
             let developmentRate: Double = self.developmentRate(
                 utilization: self.stats.utilization
@@ -130,7 +103,7 @@ extension BuildingSnapshot {
             """
         }
     }
-    func tooltipVacant() -> Tooltip? {
+    func tooltipVacant() -> Tooltip {
         .instructions {
             $0["Vacant facilities", -] = self.Δ.vacant[/3]
             $0[>] {
@@ -140,7 +113,7 @@ extension BuildingSnapshot {
             }
         }
     }
-    func tooltipVacantHelp() -> Tooltip? {
+    func tooltipVacantHelp() -> Tooltip {
         .instructions {
             $0["Vacancy rate", -] = self.Δ.vacancy[%1]
             $0[>] {
@@ -155,7 +128,7 @@ extension BuildingSnapshot {
             """
         }
     }
-    func tooltipNeeds(_ tier: ResourceTierIdentifier) -> Tooltip? {
+    func tooltipNeeds(_ tier: ResourceTierIdentifier) -> Tooltip {
         .instructions {
             var valueConsumed: Int64 { self.inventory.valueConsumed(tier: tier) }
 

@@ -7,7 +7,7 @@ import GameState
 import OrderedCollections
 import Random
 
-struct Building: LegalEntityState, Identifiable {
+struct Building: Identifiable {
     let id: BuildingID
     let tile: Address
     var type: BuildingType
@@ -22,6 +22,9 @@ struct Building: LegalEntityState, Identifiable {
     var z: Dimensions
 
     var equity: Equity<LEI>
+}
+extension Building: LegalEntityState {
+    var industry: EconomicLedger.Industry { .building(self.type) }
 }
 extension Building: Sectionable {
     init(id: BuildingID, section: Section) {

@@ -8,7 +8,7 @@ import GameState
 import OrderedCollections
 import Random
 
-struct Factory: LegalEntityState, Identifiable {
+struct Factory: Identifiable {
     let id: FactoryID
     let tile: Address
     var type: FactoryType
@@ -26,6 +26,9 @@ struct Factory: LegalEntityState, Identifiable {
     var z: Dimensions
 
     var equity: Equity<LEI>
+}
+extension Factory: LegalEntityState {
+    var industry: EconomicLedger.Industry { .factory(self.type) }
 }
 extension Factory: Sectionable {
     init(id: FactoryID, section: Section) {

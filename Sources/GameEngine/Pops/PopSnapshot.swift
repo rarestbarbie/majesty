@@ -73,7 +73,7 @@ extension PopSnapshot {
 extension PopSnapshot: PopFactors {
     typealias Matrix = ConditionBreakdown
 }
-extension PopSnapshot: LegalEntitySnapshot {}
+extension PopSnapshot: LegalEntitySnapshot, BusinessSnapshot {}
 extension PopSnapshot {
     private func estimateIncomeFromEmployment(
         factories: [FactoryID: FactorySnapshot],
@@ -87,7 +87,7 @@ extension PopSnapshot {
             if case .Elite = self.occupation.stratum {
                 return nil
             } else {
-                yields = jobs.map { ($0.count, mines[$0.id]?.z.yield ?? 0) }
+                yields = jobs.map { ($0.count, mines[$0.id]?.z.yieldPerMiner ?? 0) }
             }
         case .factories(let jobs)?:
             if case .Worker = self.occupation.stratum {
@@ -125,12 +125,16 @@ extension PopSnapshot {
         mine: MineSnapshot,
         mineConditions: MiningJobConditions
     ) {
-        ul["Production per miner"] = (mineConditions.factor * Double.init(base))[..3]
+        ul["Production per miner"] = (
+            mineConditions.efficiencyPerMiner * Double.init(base)
+        )[/3..3]
+
         ul[>] {
             $0["Base"] = base[/3]
+            $0["Parceling", +] = +?(mine.z.parcelFraction - 1)[%]
         }
 
-        ul["Mining efficiency"] = mineConditions.factor[%1]
+        ul["Mining efficiency", +] = mine.Δ.efficiency[%1]
         ul[>] {
             switch self.type.occupation {
             case .Politician:
@@ -148,7 +152,7 @@ extension PopSnapshot {
                 }
 
                 $0["Base"] = MineMetadata.efficiencyMiners[%]
-                $0["Parceling", +] = +?(mine.z.parcelFraction - 1)[%]
+
                 for (effect, provenance): (Decimal, EffectProvenance) in modifiers.blame {
                     $0[provenance.name, +] = +effect[%]
                 }
@@ -179,47 +183,59 @@ extension PopSnapshot {
     }
 }
 extension PopSnapshot {
-    func tooltipAccount(_ account: Bank.Account) -> Tooltip? {
-        let liquid: Delta<Int64> = account.Δ
-        let assets: Delta<Int64> = self.Δ.assets
-        let valuation: Delta<Int64> = liquid + assets
-
+    func tooltipAccount(_ account: Bank.Account) -> Tooltip {
         return .instructions {
             if case .Ward = self.type.stratum {
-                let profit: FinancialStatement.Profit = self.stats.financial.profit
-                $0["Total valuation", +] = valuation[/3]
-                $0[>] {
-                    $0["Today’s profit", +] = +profit.operating[/3]
-                    $0["Gross margin", +] = profit.grossMargin.map {
-                        (Double.init($0))[%2]
-                    }
-                    $0["Operating margin", +] = profit.operatingMargin.map {
-                        (Double.init($0))[%2]
-                    }
-                }
+                self.explain(statement: self.stats.financial, account: account, tooltip: &$0)
+                return
             }
 
-            $0["Illiquid assets", +] = assets[/3]
-            $0["Liquid assets", +] = liquid[/3]
-            $0[>] {
-                let excluded: Int64 = self.spending.totalExcludingEquityPurchases
-                $0["Welfare", +] = +?account.s[/3]
-                $0[self.occupation.revenue, +] = +?account.r[/3]
-                $0["Income", +] = +?account.i[/3]
+            let weight: Double = Double.init(self.z.total)
+            let income: Mean<Int64> = .init(
+                fields: self.stats.financial.incomeSelfEmployment + account.i + account.s,
+                weight: weight
+            )
 
-                $0["Market spending", +] = +?(account.b - excluded)[/3]
-                $0["Stock sales", +] = +?account.j[/3]
-                if case .Ward = self.type.stratum {
-                    $0["Loans taken", +] = +?account.e[/3]
+            $0["Per-capita income", +] = +(income.defined ?? 0)[/3..2]
+            $0[>] {
+                let account: Mean<Bank.Account> = .init(
+                    fields: account,
+                    weight: weight
+                )
+                let statement: Mean<FinancialStatement> = .init(
+                    fields: self.stats.financial,
+                    weight: weight
+                )
+                if case .Elite = self.occupation.stratum {
+                    $0["Fundraising", +] = +?statement.incomeSelfEmployment[/3]
+                    $0["Interest and dividends", +] = +?account.i[/3]
                 } else {
-                    $0["Investments", +] = +?account.e[/3]
+                    $0["Self-employment", +] = +?statement.incomeSelfEmployment[/3]
+                    $0["From employment", +] = +?account.i[/3]
                 }
 
+                $0["Welfare", +] = +?account.s[/3]
+
+                let cashFlow: CashFlow = self.spending
+
+                $0["Interest and dividends", +] = +?(-cashFlow.dividend)[/3]
+                $0["Salaries", +] = +?(-cashFlow.salaries)[/3]
+                $0["Wages", +] = +?(-cashFlow.wages)[/3]
+            }
+
+            $0["Liquid net worth", +] = account.Δ[/3]
+            $0[>] {
+                $0[self.occupation.s, +] = +?account.s[/3]
+                $0[self.occupation.i, +] = +?account.i[/3]
+                $0["Investments", +] = +?account.e[/3]
+                $0["Stock sales", +] = +?account.f[/3]
+                $0["Market spending", +] = +account.b[/3]
+                $0[self.occupation.c, +] = +?account.c[/3]
                 $0["Inheritances", +] = +?account.d[/3]
             }
         }
     }
-    func tooltipActive() -> Tooltip? {
+    func tooltipActive() -> Tooltip {
         .instructions {
             $0["Active slaves", +] = self.Δ.active[/3]
             $0[>] {
@@ -229,7 +245,7 @@ extension PopSnapshot {
             }
         }
     }
-    func tooltipActiveHelp() -> Tooltip? {
+    func tooltipActiveHelp() -> Tooltip {
         .instructions {
             let slaveBreedingEfficiency: Decimal = PopContext.slaveBreedingBase
                 + self.region.modifiers.livestockBreedingEfficiency.value
@@ -260,7 +276,7 @@ extension PopSnapshot {
             """
         }
     }
-    func tooltipVacant() -> Tooltip? {
+    func tooltipVacant() -> Tooltip {
         .instructions {
             $0["Backgrounded slaves", -] = self.Δ.vacant[/3]
             $0[>] {
@@ -270,7 +286,7 @@ extension PopSnapshot {
             }
         }
     }
-    func tooltipVacantHelp() -> Tooltip? {
+    func tooltipVacantHelp() -> Tooltip {
         .instructions {
             let attrition: Double = self.attrition ?? 0
 
@@ -300,8 +316,8 @@ extension PopSnapshot {
             """
         }
     }
-    func tooltipNeeds(_ tier: ResourceTierIdentifier) -> Tooltip? {
-        return .instructions {
+    func tooltipNeeds(_ tier: ResourceTierIdentifier) -> Tooltip {
+        .instructions {
             let valueConsumed: Int64 = self.inventory.valueConsumed(tier: tier)
             switch tier {
             case .l:
@@ -332,7 +348,7 @@ extension PopSnapshot {
             }
         }
     }
-    func tooltipOccupation() -> Tooltip? {
+    func tooltipOccupation() -> Tooltip {
         let promotion: ConditionBreakdown = self.promotion
         let demotion: ConditionBreakdown = self.demotion
 
@@ -396,10 +412,10 @@ extension PopSnapshot {
         factories: [FactoryID: FactorySnapshot],
         mines: [MineID: MineSnapshot],
         rules: GameMetadata,
-    ) -> Tooltip? {
+    ) -> Tooltip {
         .instructions {
+            let income: Double
             if  let jobType: PopJobType = self.occupation.employer {
-                let income: Double?
                 let w: (
                     min: Double,
                     median: Double,
@@ -410,7 +426,7 @@ extension PopSnapshot {
                     let r²: Double = PopJobType.r0
                     $0["Median quit rate"] = (jobType.q0 * r²)[%2]
 
-                    income = nil
+                    income = self.region.stats.incomeElite[self.type.gender.sex].μ.incomeTotal
                 } else {
                     let w0: Double = self.region.stats.w0(self.type)
                     let r²: Double = PopJobType.r²(yield: w?.median ?? w0, referenceWage: w0)
@@ -437,32 +453,30 @@ extension PopSnapshot {
                         $0["Highest"] = max[/3..2]
                     }
                 }
-
-                if  let income: Double {
-                    $0[>] = """
-                    The average income earned by \(em: self.type.gender.sex.pluralLowercased) \
-                    in this income stratum and region is \(em: income[/3..2]) per day
-                    """
-                    $0[>] = """
-                    Pops are much less likely to quit jobs that pay well compared to the \
-                    average income of their peers
-                    """
-                }
-
             } else {
                 if  case .Elite = self.occupation.stratum {
-                    let i: Double = self.region.stats.incomeElite[type.gender.sex].μ.incomeTotal
-                    $0[>] = """
-                    The average rent extracted by \(em: self.type.gender.sex.pluralLowercased) \
-                    in this income stratum and region is \(em: i[/3..2]) per day
-                    """
+                    income = self.region.stats.incomeElite[type.gender.sex].μ.incomeTotal
                 } else {
-                    let w0: Double = self.region.stats.w0(self.type)
-                    $0[>] = """
-                    The average income earned by \(em: self.type.gender.sex.pluralLowercased) \
-                    in this income stratum and region is \(em: w0[/3..2]) per day
-                    """
+                    income = self.region.stats.w0(self.type)
                 }
+            }
+
+            if  case .Elite = self.occupation.stratum {
+                $0[>] = """
+                The average rent extracted by \(em: self.type.gender.sex.pluralLowercased) \
+                in this income stratum and region is \(em: income[/3..2]) per day
+                """
+            } else {
+                $0[>] = """
+                The average income earned by \(em: self.type.gender.sex.pluralLowercased) \
+                in this income stratum and region is \(em: income[/3..2]) per day
+                """
+            }
+            if  case _? = self.occupation.employer {
+                $0[>] = """
+                Pops are much less likely to quit jobs that pay well compared to the \
+                average income of their peers
+                """
             }
         }
     }
@@ -471,7 +485,7 @@ extension PopSnapshot {
         factories: [FactoryID: FactorySnapshot],
         mines: [MineID: MineSnapshot],
         rules: GameMetadata,
-    ) -> Tooltip? {
+    ) -> Tooltip {
         switch self.jobs {
         case .factories(let jobs)?:
             return Self.tooltipPopJobList(list: jobs) {
@@ -487,7 +501,7 @@ extension PopSnapshot {
             return self.tooltipPopSelfEmployment(rules: rules)
         }
     }
-    func tooltipJobs(rules: GameMetadata) -> Tooltip? {
+    func tooltipJobs(rules: GameMetadata) -> Tooltip {
         switch self.jobs {
         case .factories(let jobs)?:
             return Self.tooltipPopJobs(list: jobs)
