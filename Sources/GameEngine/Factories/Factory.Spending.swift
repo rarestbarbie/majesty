@@ -1,5 +1,5 @@
 extension Factory {
-    struct Spending {
+    struct Spending: AccountingCashFlow {
         var buybacks: Int64
         var dividend: Int64
         var salariesUsed: Int64
@@ -27,10 +27,6 @@ extension Factory.Spending {
     }
 
     var salaries: Int64 { self.salariesUsed + self.salariesIdle }
-
-    var totalExcludingEquityPurchases: Int64 {
-        self.dividend + self.salaries + self.wages
-    }
 }
 
 #if TESTABLE

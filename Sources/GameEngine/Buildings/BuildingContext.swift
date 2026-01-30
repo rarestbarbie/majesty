@@ -218,7 +218,7 @@ extension BuildingContext: TransactingContext {
             )
 
             if !self.state.inventory.out.tradeable.isEmpty {
-                $0.r += budget.liquidate ? self.state.inventory.out.sell(
+                $0.c += budget.liquidate ? self.state.inventory.out.sell(
                     in: region.currency.id,
                     to: &turn.worldMarkets,
                 ) : self.state.inventory.out.sell(

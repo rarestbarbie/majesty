@@ -1,35 +1,25 @@
 import JavaScriptInterop
 
 extension EconomicLedger {
-    struct IncomeMetrics {
+    struct IncomeMetrics: SocialMetricsAggregatable {
         private(set) var count: Int64
         private(set) var mil: Double
         private(set) var con: Double
 
-        private(set) var incomeSubsidies: Int64
-        private(set) var incomeFromEmployment: Int64
-        private(set) var incomeSelfEmployment: Int64
+        private(set) var incomeLessTransfers: Int64
+        private(set) var incomeFromTransfers: Int64
     }
 }
 extension EconomicLedger.IncomeMetrics {
     var incomeTotal: Int64 {
-        self.incomeSubsidies + self.incomeFromEmployment + self.incomeSelfEmployment
-    }
-
-    var social: EconomicLedger.SocialMetrics {
-        .init(
-            count: self.count,
-            mil: self.mil,
-            con: self.con
-        )
+        self.incomeLessTransfers + self.incomeFromTransfers
     }
 }
 extension EconomicLedger.IncomeMetrics {
     mutating func count(
         free pop: Pop,
-        incomeSubsidies: Int64,
-        incomeFromEmployment: Int64,
-        incomeSelfEmployment: Int64
+        incomeLessTransfers: Int64,
+        incomeFromTransfers: Int64
     ) {
         self.count += pop.z.total
 
@@ -37,14 +27,9 @@ extension EconomicLedger.IncomeMetrics {
         self.mil += weight * pop.z.mil
         self.con += weight * pop.z.con
 
-        self.incomeSubsidies += incomeSubsidies
-        self.incomeFromEmployment += incomeFromEmployment
-        self.incomeSelfEmployment += incomeSelfEmployment
+        self.incomeLessTransfers += incomeLessTransfers
+        self.incomeFromTransfers += incomeFromTransfers
     }
-}
-extension EconomicLedger.IncomeMetrics: MeanAggregatable {
-    var weighted: Self { self }
-    var weight: Double { Double.init(self.count) }
 }
 extension EconomicLedger.IncomeMetrics: AdditiveArithmetic {
     static var zero: Self {
@@ -52,9 +37,8 @@ extension EconomicLedger.IncomeMetrics: AdditiveArithmetic {
             count: 0,
             mil: 0,
             con: 0,
-            incomeSubsidies: 0,
-            incomeFromEmployment: 0,
-            incomeSelfEmployment: 0,
+            incomeLessTransfers: 0,
+            incomeFromTransfers: 0,
         )
     }
 
@@ -63,9 +47,8 @@ extension EconomicLedger.IncomeMetrics: AdditiveArithmetic {
             count: a.count + b.count,
             mil: a.mil + b.mil,
             con: a.con + b.con,
-            incomeSubsidies: a.incomeSubsidies + b.incomeSubsidies,
-            incomeFromEmployment: a.incomeFromEmployment + b.incomeFromEmployment,
-            incomeSelfEmployment: a.incomeSelfEmployment + b.incomeSelfEmployment,
+            incomeLessTransfers: a.incomeLessTransfers + b.incomeLessTransfers,
+            incomeFromTransfers: a.incomeFromTransfers + b.incomeFromTransfers,
         )
     }
     static func - (a: Self, b: Self) -> Self {
@@ -73,9 +56,8 @@ extension EconomicLedger.IncomeMetrics: AdditiveArithmetic {
             count: a.count - b.count,
             mil: a.mil - b.mil,
             con: a.con - b.con,
-            incomeSubsidies: a.incomeSubsidies - b.incomeSubsidies,
-            incomeFromEmployment: a.incomeFromEmployment - b.incomeFromEmployment,
-            incomeSelfEmployment: a.incomeSelfEmployment - b.incomeSelfEmployment,
+            incomeLessTransfers: a.incomeLessTransfers - b.incomeLessTransfers,
+            incomeFromTransfers: a.incomeFromTransfers - b.incomeFromTransfers,
         )
     }
 }
@@ -84,18 +66,20 @@ extension EconomicLedger.IncomeMetrics: JavaScriptEncodable {
         case count = "N"
         case mil = "m"
         case con = "c"
-        case incomeSubsidies = "s"
-        case incomeFromEmployment = "i"
-        case incomeSelfEmployment = "r"
+        case incomeLessTransfers = "i"
+        case incomeFromTransfers = "j"
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.count] = self.count
         js[.mil] = self.mil
         js[.con] = self.con
-        js[.incomeSubsidies] = self.incomeSubsidies
-        js[.incomeFromEmployment] = self.incomeFromEmployment
-        js[.incomeSelfEmployment] = self.incomeSelfEmployment
+        js[.incomeLessTransfers] = self.incomeLessTransfers != 0
+            ? self.incomeLessTransfers
+            : nil
+        js[.incomeFromTransfers] = self.incomeFromTransfers != 0
+            ? self.incomeFromTransfers
+            : nil
     }
 }
 extension EconomicLedger.IncomeMetrics: JavaScriptDecodable {
@@ -104,9 +88,8 @@ extension EconomicLedger.IncomeMetrics: JavaScriptDecodable {
             count: try js[.count].decode(),
             mil: try js[.mil].decode(),
             con: try js[.con].decode(),
-            incomeSubsidies: try js[.incomeSubsidies].decode(),
-            incomeFromEmployment: try js[.incomeFromEmployment].decode(),
-            incomeSelfEmployment: try js[.incomeSelfEmployment].decode(),
+            incomeLessTransfers: try js[.incomeLessTransfers]?.decode() ?? 0,
+            incomeFromTransfers: try js[.incomeFromTransfers]?.decode() ?? 0
         )
     }
 }

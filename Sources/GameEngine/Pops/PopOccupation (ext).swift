@@ -1,23 +1,51 @@
 import GameIDs
 
 extension PopOccupation {
-    var revenue: String {
+    var c: String {
+        // `c` is used for market refunds, so even pops that do not work independently still
+        // need a name for that accounting column
         switch self {
-        case .Livestock: "Market earnings"
-        case .Driver: "Wages"
-        case .Editor: "Wages"
+        case .Livestock: "???"
+        case .Driver: "Refunds"
+        case .Editor: "Refunds"
         case .Miner: "Market earnings"
-        case .Server: "Wages"
-        case .Contractor: "Wages"
-        case .Engineer: "Salaries"
-        case .Farmer: "Salaries"
+        case .Server: "Wages and tips"
+        case .Contractor: "Wages and fees"
+        case .Engineer: "Refunds"
+        case .Farmer: "Refunds"
         case .Consultant: "Retainers"
-        case .Influencer: "Market earnings"
-        case .Aristocrat: "Fundraising"
+        case .Influencer: "Royalties"
+        case .Aristocrat: "Refunds"
         case .Politician: "Fundraising"
         }
     }
-
+    var i: String {
+        switch self {
+        case .Livestock: "???"
+        case .Driver: "Wages"
+        case .Editor: "Wages"
+        case .Miner: "???"
+        case .Server: "???"
+        case .Contractor: "???"
+        case .Engineer: "Salaries"
+        case .Farmer: "Salaries"
+        case .Consultant: "???"
+        case .Influencer: "???"
+        case .Aristocrat: "Interest and dividends"
+        case .Politician: "Interest and dividends"
+        }
+    }
+    var s: String {
+        // constant right now, could be customized later
+        switch self.stratum {
+        case .Ward: "???"
+        case .Worker: "Welfare"
+        case .Clerk: "Welfare"
+        case .Elite: "Welfare"
+        }
+    }
+}
+extension PopOccupation {
     var employer: PopJobType? {
         switch self {
         case .Politician: .mine

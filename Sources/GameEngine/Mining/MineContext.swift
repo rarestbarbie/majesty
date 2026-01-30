@@ -86,7 +86,7 @@ extension MineContext {
 
         let minersToHire: Int64 = self.miners.limit - self.miners.count
         let minersToHireToday: Int64
-        let h: Double = self.type.h(tile: region.stats, yield: self.state.z.yield)
+        let h: Double = self.type.h(tile: region.stats, yield: self.state.z.yieldPerMiner)
 
         if  minersToHire > 0 {
             let h²: Double = MineMetadata.h²(h: h)

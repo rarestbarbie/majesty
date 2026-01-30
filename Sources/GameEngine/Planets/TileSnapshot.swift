@@ -139,7 +139,7 @@ extension TileSnapshot {
         return .instructions(style: .borderless) {
             $0[culture.name, +] = share[%3]
             $0[>] {
-                $0["GNI per-capita", +] = metrics.μ.income[/3..2]
+                $0["GNP per-capita", +] = metrics.μ.gnpContribution[/3..2]
                 $0["Average militancy", -] = metrics.μ.mil[/3..2]
                 $0["Average consciousness", -] = metrics.μ.con[/3..2]
             }
@@ -148,7 +148,7 @@ extension TileSnapshot {
             \(self.name ?? "this region")
             """
             $0[>] = """
-            The Gross National Income (GNI) counts all income earned by people of this race, \
+            The Gross National Product (GNP) counts all income earned by people of this race, \
             including unrealized capital gains
             """
         }
@@ -355,8 +355,12 @@ extension TileSnapshot {
                 $0["Quit", +] = +(-mine.miners.quit)[/3]
             }
             let h²: Delta<Double> = .init(
-                y: MineMetadata.h²(h: mine.metadata.h(tile: self.y.stats, yield: mine.y.yield)),
-                z: MineMetadata.h²(h: mine.metadata.h(tile: self.z.stats, yield: mine.z.yield))
+                y: MineMetadata.h²(
+                    h: mine.metadata.h(tile: self.y.stats, yield: mine.y.yieldPerMiner)
+                ),
+                z: MineMetadata.h²(
+                    h: mine.metadata.h(tile: self.z.stats, yield: mine.z.yieldPerMiner)
+                )
             )
             let h: Delta<Double> = MineContext.h0 * h²
             $0["Hiring rate", +] = h[%2]
@@ -367,7 +371,7 @@ extension TileSnapshot {
             if  mine.metadata.decay {
                 $0["Estimated deposits"] = mine.Δ.size[/3]
                 $0[>] {
-                    $0["Estimated yield", (+)] = mine.Δ.yield[..2]
+                    $0["Estimated yield", (+)] = mine.Δ.yieldBase[/3..2]
                 }
                 if  let yieldRank: Int = mine.z.yieldRank,
                     let (chance, spawn): (Fraction, SpawnWeight) = mine.metadata.chance(

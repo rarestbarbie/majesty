@@ -154,7 +154,7 @@ extension Equity<LEI> {
 extension Equity<LEI> {
     mutating func trade(random: inout PseudoRandom, bank: inout Bank, fill: StockMarket.Fill) {
         let traded: Quote = self.liquidate(random: &random, quote: fill.market) {
-            bank[account: $0].j += $1
+            bank[account: $0].f += $1
         }
 
         self.traded += traded.units
@@ -165,7 +165,7 @@ extension Equity<LEI> {
         self[fill.buyer].shares += quantity
 
         bank[account: fill.buyer].e -= fill.issued.value + traded.value
-        bank[account: fill.asset].e += fill.issued.value
+        bank[account: fill.asset].f += fill.issued.value
     }
 
     mutating func liquidate(

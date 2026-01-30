@@ -1,37 +1,40 @@
 import JavaScriptInterop
 
 extension EconomicLedger {
-    struct CapitalMetrics {
+    struct CapitalMetrics: SocialMetricsAggregatable {
         private(set) var count: Int64
         private(set) var mil: Double
         private(set) var con: Double
 
-        var income: Double
+        private(set) var incomeLessTransfers: Int64
+        private(set) var incomeFromTransfers: Int64
+        private(set) var incomeCapitalAttribution: Double
     }
 }
 extension EconomicLedger.CapitalMetrics {
-    var social: EconomicLedger.SocialMetrics {
-        .init(
-            count: self.count,
-            mil: self.mil,
-            con: self.con
-        )
+    mutating func countCapitalAttributable(income: Double) {
+        self.incomeCapitalAttribution += income
     }
-}
-extension EconomicLedger.CapitalMetrics {
-    mutating func count(_ pop: Pop, income: Double) {
+
+    mutating func count(
+        free pop: Pop,
+        incomeLessTransfers: Int64,
+        incomeFromTransfers: Int64,
+    ) {
         self.count += pop.z.total
 
         let weight: Double = Double.init(pop.z.total)
         self.mil += weight * pop.z.mil
         self.con += weight * pop.z.con
 
-        self.income += income
+        self.incomeLessTransfers += incomeLessTransfers
+        self.incomeFromTransfers += incomeFromTransfers
     }
 }
-extension EconomicLedger.CapitalMetrics: MeanAggregatable {
-    var weighted: Self { self }
-    var weight: Double { Double.init(self.count) }
+extension EconomicLedger.CapitalMetrics {
+    var gnpContribution: Double {
+        Double.init(self.incomeLessTransfers) + self.incomeCapitalAttribution
+    }
 }
 extension EconomicLedger.CapitalMetrics: AdditiveArithmetic {
     static var zero: Self {
@@ -39,7 +42,9 @@ extension EconomicLedger.CapitalMetrics: AdditiveArithmetic {
             count: 0,
             mil: 0,
             con: 0,
-            income: 0,
+            incomeLessTransfers: 0,
+            incomeFromTransfers: 0,
+            incomeCapitalAttribution: 0
         )
     }
 
@@ -48,7 +53,9 @@ extension EconomicLedger.CapitalMetrics: AdditiveArithmetic {
             count: a.count + b.count,
             mil: a.mil + b.mil,
             con: a.con + b.con,
-            income: a.income + b.income,
+            incomeLessTransfers: a.incomeLessTransfers + b.incomeLessTransfers,
+            incomeFromTransfers: a.incomeFromTransfers + b.incomeFromTransfers,
+            incomeCapitalAttribution: a.incomeCapitalAttribution + b.incomeCapitalAttribution
         )
     }
     static func - (a: Self, b: Self) -> Self {
@@ -56,7 +63,9 @@ extension EconomicLedger.CapitalMetrics: AdditiveArithmetic {
             count: a.count - b.count,
             mil: a.mil - b.mil,
             con: a.con - b.con,
-            income: a.income - b.income,
+            incomeLessTransfers: a.incomeLessTransfers - b.incomeLessTransfers,
+            incomeFromTransfers: a.incomeFromTransfers - b.incomeFromTransfers,
+            incomeCapitalAttribution: a.incomeCapitalAttribution - b.incomeCapitalAttribution
         )
     }
 }
@@ -65,14 +74,24 @@ extension EconomicLedger.CapitalMetrics: JavaScriptEncodable {
         case count = "N"
         case mil = "m"
         case con = "c"
-        case income = "i"
+        case incomeLessTransfers = "i"
+        case incomeFromTransfers = "j"
+        case incomeCapitalAttribution = "k"
     }
 
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.count] = self.count
         js[.mil] = self.mil
         js[.con] = self.con
-        js[.income] = self.income
+        js[.incomeLessTransfers] = self.incomeLessTransfers != 0
+            ? self.incomeLessTransfers
+            : nil
+        js[.incomeFromTransfers] = self.incomeFromTransfers != 0
+            ? self.incomeFromTransfers
+            : nil
+        js[.incomeCapitalAttribution] = self.incomeCapitalAttribution != 0
+            ? self.incomeCapitalAttribution
+            : nil
     }
 }
 extension EconomicLedger.CapitalMetrics: JavaScriptDecodable {
@@ -81,7 +100,9 @@ extension EconomicLedger.CapitalMetrics: JavaScriptDecodable {
             count: try js[.count].decode(),
             mil: try js[.mil].decode(),
             con: try js[.con].decode(),
-            income: try js[.income].decode()
+            incomeLessTransfers: try js[.incomeLessTransfers]?.decode() ?? 0,
+            incomeFromTransfers: try js[.incomeFromTransfers]?.decode() ?? 0,
+            incomeCapitalAttribution: try js[.incomeCapitalAttribution]?.decode() ?? 0
         )
     }
 }

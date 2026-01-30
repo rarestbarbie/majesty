@@ -6,4 +6,6 @@ protocol LegalEntityState<Dimensions>: Turnable, Identifiable
     var inventory: Inventory { get }
     var equity: Equity<LEI> { get }
     var tile: Address { get }
+
+    var industry: EconomicLedger.Industry { get }
 }

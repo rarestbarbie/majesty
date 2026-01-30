@@ -56,8 +56,15 @@ extension FinancialStatement {
     }
 }
 extension FinancialStatement {
-    var valueAdded: Int64 {
+    var incomeUnrealizedGain: Int64 {
         self.lines.valueProduced - self.lines.valueConsumed
+    }
+
+    /// Returns the income from self-employment, which is identical to ``incomeUnrealizedGain``
+    /// assuming the financial statement is associated with a pop.
+    var incomeSelfEmployment: Int64 {
+        // `self.lines.valueConsumed` should be zero for pops
+        self.lines.valueProduced
     }
 
     var profit: Profit {

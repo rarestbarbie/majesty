@@ -4,6 +4,10 @@ extension Pop {
         var dividend: Int64
     }
 }
+extension Pop.Spending: AccountingCashFlow {
+    var salaries: Int64 { 0 }
+    var wages: Int64 { 0 }
+}
 extension Pop.Spending {
     static var zero: Self {
         .init(

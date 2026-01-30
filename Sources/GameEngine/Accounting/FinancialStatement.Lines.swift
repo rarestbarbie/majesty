@@ -83,9 +83,7 @@ extension FinancialStatement.Lines {
     static func compute(free pop: Pop) -> Self {
         var valueProduced: Int64 = pop.inventory.out.valueProduced
         for mining: MiningJob in pop.mines.values {
-            for output: ResourceOutput in mining.out.all {
-                valueProduced += output.valueProduced
-            }
+            valueProduced += mining.out.valueProduced
         }
         return .init(
             materialsCosts: 0,

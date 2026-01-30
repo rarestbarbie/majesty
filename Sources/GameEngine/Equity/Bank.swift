@@ -55,7 +55,7 @@ extension Bank {
             "Payments (\(paid)) exceed budget (\(budget))!"
         )
 
-        self[account: source].b -= paid
+        self[account: source].i -= paid
         return paid
     }
 
@@ -81,7 +81,7 @@ extension Bank {
             "Dividends paid (\(paid)) does not equal dividend allocated (\(budget))!"
         )
 
-        self[account: source].b -= paid
+        self[account: source].i -= paid
         return paid
     }
 
@@ -97,7 +97,7 @@ extension Bank {
             return 0
         }
         let liquidated: Quote = equity.liquidate(random: &random, quote: quote, burn: true) {
-            self[account: $0].j += $1
+            self[account: $0].f += $1
         }
         self[account: security.id].e -= liquidated.value
         return liquidated.value

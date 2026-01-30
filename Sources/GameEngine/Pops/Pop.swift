@@ -9,7 +9,7 @@ import JavaScriptInterop
 import Random
 import OrderedCollections
 
-struct Pop: PopProperties, LegalEntityState, Identifiable {
+struct Pop: PopProperties, Identifiable {
     let id: PopID
     let type: PopType
     let tile: Address
@@ -29,6 +29,9 @@ struct Pop: PopProperties, LegalEntityState, Identifiable {
 
     var factories: OrderedDictionary<FactoryID, FactoryJob>
     var mines: OrderedDictionary<MineID, MiningJob>
+}
+extension Pop: LegalEntityState {
+    var industry: EconomicLedger.Industry { .slavery(self.type.race) }
 }
 extension Pop: Sectionable {
     init(id: PopID, section: Section) {
