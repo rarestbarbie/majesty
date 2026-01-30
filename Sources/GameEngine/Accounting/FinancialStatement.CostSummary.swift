@@ -16,7 +16,7 @@ extension FinancialStatement {
 }
 extension FinancialStatement.CostSummary {
     mutating func reset() {
-        self.items.resetUsingHint()
+        self.items.resetExpectingCopy()
     }
 
     mutating func update(with inputs: ResourceInputs) -> Int64 {

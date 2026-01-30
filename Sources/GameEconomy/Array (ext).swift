@@ -1,11 +1,15 @@
 extension Array {
     /// use the previous day’s counts to allocate capacity
-    @inlinable public mutating func resetUsingHint() {
+    @inlinable public mutating func resetExpectingCopy() {
         /// in a wasm environment, memory growth operations (memory.grow) and reallocations are
         /// significantly more expensive than on native platforms
         let count: Int = self.count
         self = []
         self.reserveCapacity(count)
+    }
+    @inlinable public mutating func resetUsingHint() {
+        // todo: benchmark smarter heuristics
+        self.removeAll(keepingCapacity: true)
     }
 }
 extension [(count: Int64, value: Double)] {
