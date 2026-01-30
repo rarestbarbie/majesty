@@ -28,16 +28,16 @@ extension InventorySnapshot.Produced {
         }
 
         return .instructions {
-            $0["Units sold today", +] = self.output.unitsSold[/3] / self.output.units.removed
-            $0[>] {
-                $0["Proceeds earned", +] = +?self.output.valueSold[/3]
-            }
+            details(&$0, amount)
+
             $0["Stockpiled inventory", +] = self.output.units[/3]
             $0[>] {
                 $0["Produced today", +] = self.output.units.added[/3]
             }
-
-            details(&$0, amount)
+            $0["Units sold today", +] = self.output.unitsSold[/3] / self.output.units.removed
+            $0[>] {
+                $0["Proceeds earned", +] = +?self.output.valueSold[/3]
+            }
 
             if self.output.unitsSold < self.output.units.removed {
                 $0[>] = """
