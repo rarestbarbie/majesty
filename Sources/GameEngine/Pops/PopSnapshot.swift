@@ -207,20 +207,14 @@ extension PopSnapshot {
                     weight: weight
                 )
                 if case .Elite = self.occupation.stratum {
-                    $0["Fundraising", +] = +?statement.incomeSelfEmployment[/3]
-                    $0["Interest and dividends", +] = +?account.i[/3]
+                    $0["Fundraising", +] = +?statement.incomeSelfEmployment[/3..2]
+                    $0["Interest and dividends", +] = +?account.i[/3..2]
                 } else {
-                    $0["Self-employment", +] = +?statement.incomeSelfEmployment[/3]
-                    $0["From employment", +] = +?account.i[/3]
+                    $0["Self-employment", +] = +?statement.incomeSelfEmployment[/3..2]
+                    $0["From employment", +] = +?account.i[/3..2]
                 }
 
-                $0["Welfare", +] = +?account.s[/3]
-
-                let cashFlow: CashFlow = self.spending
-
-                $0["Interest and dividends", +] = +?(-cashFlow.dividend)[/3]
-                $0["Salaries", +] = +?(-cashFlow.salaries)[/3]
-                $0["Wages", +] = +?(-cashFlow.wages)[/3]
+                $0["Welfare", +] = +?account.s[/3..2]
             }
 
             $0["Liquid net worth", +] = account.Δ[/3]
