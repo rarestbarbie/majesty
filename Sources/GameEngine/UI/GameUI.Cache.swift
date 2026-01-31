@@ -43,6 +43,24 @@ extension GameUI.Cache {
     }
 }
 extension GameUI.Cache {
+    func industryClassification(of id: LEI) -> EconomicLedger.Industry? {
+        switch id {
+        case .reserve: fatalError("Reserves do not have an industry classification")
+        case .building(let id): self.buildings[id].map { .building($0.type) }
+        case .factory(let id): self.factories[id].map { .factory($0.type) }
+        case .pop(let id): self.pops[id].map { .slavery($0.type.race) }
+        }
+    }
+    func countryResidence(of id: LEI) -> CountryID? {
+        switch id {
+        case .reserve(let id): id
+        case .building(let id): self.buildings[id]?.region.occupiedBy
+        case .factory(let id): self.factories[id]?.region.occupiedBy
+        case .pop(let id): self.pops[id]?.region.occupiedBy
+        }
+    }
+}
+extension GameUI.Cache {
     func contextMenuMinimapTile(
         _ id: Address,
         _ layer: PlanetMapLayer,
@@ -105,19 +123,19 @@ extension GameUI.Cache {
         _ id: BuildingID,
         culture: CultureID,
     ) -> Tooltip? {
-        self.buildings[id]?.tooltipOwnership(culture: culture, context: self.context)
+        self.buildings[id]?.tooltipOwnership(in: self.context, id: culture)
     }
     func tooltipBuildingOwnership(
         _ id: BuildingID,
         country: CountryID,
     ) -> Tooltip? {
-        self.buildings[id]?.tooltipOwnership(country: country, context: self.context)
+        self.buildings[id]?.tooltipOwnership(in: self.context, id: country)
     }
     func tooltipBuildingOwnership(
         _ id: BuildingID,
         gender: Gender?
     ) -> Tooltip? {
-        self.buildings[id]?.tooltipOwnership(gender: gender, context: self.context)
+        self.buildings[id]?.tooltipOwnership(in: self.context, id: gender)
     }
     func tooltipBuildingOwnership(
         _ id: BuildingID,
@@ -203,19 +221,19 @@ extension GameUI.Cache {
         _ id: FactoryID,
         culture: CultureID,
     ) -> Tooltip? {
-        self.factories[id]?.tooltipOwnership(culture: culture, context: self.context)
+        self.factories[id]?.tooltipOwnership(in: self.context, id: culture)
     }
     func tooltipFactoryOwnership(
         _ id: FactoryID,
         country: CountryID,
     ) -> Tooltip? {
-        self.factories[id]?.tooltipOwnership(country: country, context: self.context)
+        self.factories[id]?.tooltipOwnership(in: self.context, id: country)
     }
     func tooltipFactoryOwnership(
         _ id: FactoryID,
         gender: Gender?
     ) -> Tooltip? {
-        self.factories[id]?.tooltipOwnership(gender: gender, context: self.context)
+        self.factories[id]?.tooltipOwnership(in: self.context, id: gender)
     }
 
     func tooltipFactoryOwnership(
@@ -341,19 +359,19 @@ extension GameUI.Cache {
         _ id: PopID,
         culture: CultureID,
     ) -> Tooltip? {
-        self.pops[id]?.tooltipOwnership(culture: culture, context: self.context)
+        self.pops[id]?.tooltipOwnership(in: self.context, id: culture)
     }
     func tooltipPopOwnership(
         _ id: PopID,
         country: CountryID,
     ) -> Tooltip? {
-        self.pops[id]?.tooltipOwnership(country: country, context: self.context)
+        self.pops[id]?.tooltipOwnership(in: self.context, id: country)
     }
     func tooltipPopOwnership(
         _ id: PopID,
         gender: Gender?
     ) -> Tooltip? {
-        self.pops[id]?.tooltipOwnership(gender: gender, context: self.context)
+        self.pops[id]?.tooltipOwnership(in: self.context, id: gender)
     }
 
     func tooltipPopOwnership(
@@ -379,6 +397,24 @@ extension GameUI.Cache {
         } else {
             return nil
         }
+    }
+
+    func tooltipPopPortfolioValue(
+        _ id: PopID,
+    ) -> Tooltip? {
+        self.pops[id]?.tooltipPortfolioValue(account: self.bank[account: id])
+    }
+    func tooltipPopPortfolio(
+        _ id: PopID,
+        country: CountryID,
+    ) -> Tooltip? {
+        self.pops[id]?.tooltipPortfolio(in: self, id: country)
+    }
+    func tooltipPopPortfolio(
+        _ id: PopID,
+        industry: EconomicLedger.Industry,
+    ) -> Tooltip? {
+        self.pops[id]?.tooltipPortfolio(in: self, id: industry)
     }
 }
 

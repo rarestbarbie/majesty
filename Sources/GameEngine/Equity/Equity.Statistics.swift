@@ -7,12 +7,14 @@ extension Equity {
         var owners: [Shareholder]
         var shareCount: Int64
         var sharePrice: Fraction
+        /// Same as ``sharePrice`` but as a ``Double`` for convenience
+        var shareValue: Double
     }
 }
 extension Equity.Statistics: Sendable where Owner: Sendable {}
 extension Equity.Statistics {
     init() {
-        self.init(owners: [], shareCount: 0, sharePrice: 0)
+        self.init(owners: [], shareCount: 0, sharePrice: 0, shareValue: 0)
     }
 }
 extension Equity<LEI>.Statistics {
@@ -89,7 +91,8 @@ extension Equity<LEI>.Statistics {
                 )
             },
             shareCount: shareCount,
-            sharePrice: sharePrice
+            sharePrice: sharePrice,
+            shareValue: Double.init(sharePrice)
         )
     }
 }

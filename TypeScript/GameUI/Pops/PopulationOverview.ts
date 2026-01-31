@@ -20,6 +20,7 @@ import {
     PopIcon,
     PopTableEntry,
     PopTableRow,
+    PortfolioBreakdown,
     ScreenType,
     TooltipType,
 } from '../exports.js';
@@ -31,6 +32,7 @@ export class PopulationOverview extends ScreenContent {
     private readonly inventoryCharts: InventoryCharts;
     private readonly inventory: InventoryBreakdown;
     private readonly ownership: OwnershipBreakdown;
+    private readonly portfolio: PortfolioBreakdown;
 
     private pops: Table<PopTableRow, GameID>;
     private dom?: {
@@ -65,8 +67,12 @@ export class PopulationOverview extends ScreenContent {
         this.inventory = new InventoryBreakdown();
         this.ownership = new OwnershipBreakdown(
             TooltipType.PopOwnershipCountry,
-            TooltipType.PopOwnershipCulture,
+            TooltipType.PopOwnershipRace,
             TooltipType.PopOwnershipGender
+        );
+        this.portfolio = new PortfolioBreakdown(
+            TooltipType.PopPortfolioCountry,
+            TooltipType.PopPortfolioIndustry,
         );
     }
 
@@ -130,33 +136,40 @@ export class PopulationOverview extends ScreenContent {
             this.dom.nav.replaceChildren();
         }
 
-        for (const tab of [PopDetailsTab.Inventory, PopDetailsTab.Ownership]) {
-            const link: HTMLAnchorElement = document.createElement('a');
-            link.href = `#screen=${ScreenType.Population}&details=${tab}`;
+        if (state.pop !== undefined) {
+            for (const tab of state.pop.tabs) {
+                const link: HTMLAnchorElement = document.createElement('a');
+                link.href = `#screen=${ScreenType.Population}&details=${tab}`;
 
-            switch (tab) {
-            case PopDetailsTab.Inventory: link.textContent = 'Consumption'; break;
-            case PopDetailsTab.Ownership: link.textContent = 'Investors'; break;
+                switch (tab) {
+                case PopDetailsTab.Inventory: link.textContent = 'Consumption'; break;
+                case PopDetailsTab.Ownership: link.textContent = 'Investors'; break;
+                case PopDetailsTab.Portfolio: link.textContent = 'Portfolio'; break;
+                }
+
+                if (tab == state.pop.open.type) {
+                    link.classList.add('selected');
+                }
+
+                this.dom.nav.appendChild(link);
             }
 
-            if (tab == state.pop?.open.type) {
-                link.classList.add('selected');
+            this.dom.stats.setAttribute('data-subscreen', state.pop.open.type);
+
+            switch (state.pop.open.type) {
+            case PopDetailsTab.Inventory:
+                this.dom.stats.appendChild(this.inventory.node);
+                this.dom.stats.appendChild(this.inventoryCharts.node);
+                break;
+
+            case PopDetailsTab.Ownership:
+                this.dom.stats.appendChild(this.ownership.node);
+                break;
+
+            case PopDetailsTab.Portfolio:
+                this.dom.stats.appendChild(this.portfolio.node);
+                break;
             }
-
-            this.dom.nav.appendChild(link);
-        }
-
-        switch (state.pop?.open.type) {
-        case PopDetailsTab.Inventory:
-            this.dom.stats.setAttribute('data-subscreen', 'Inventory');
-            this.dom.stats.appendChild(this.inventory.node);
-            this.dom.stats.appendChild(this.inventoryCharts.node);
-            break;
-
-        case PopDetailsTab.Ownership:
-            this.dom.stats.setAttribute('data-subscreen', 'Ownership');
-            this.dom.stats.appendChild(this.ownership.node);
-            break;
         }
 
         this.dom.index.tabs[state.filterlist].checked = true;
@@ -227,6 +240,10 @@ export class PopulationOverview extends ScreenContent {
 
         case PopDetailsTab.Ownership:
             this.ownership.update(id, state.pop.open);
+            break;
+
+        case PopDetailsTab.Portfolio:
+            this.portfolio.update(id, state.pop.open);
             break;
         }
     }

@@ -8,13 +8,13 @@ import VectorCharts_JavaScript
 
 struct OwnershipBreakdown<Tab>: Sendable where Tab: OwnershipTab {
     private var country: PieChart<CountryID, ColorReference>?
-    private var culture: PieChart<CultureID, ColorReference>?
+    private var race: PieChart<CultureID, ColorReference>?
     private var gender: PieChart<Gender?, ColorReference>?
     private var terms: [Term]
 
     init() {
         self.country = nil
-        self.culture = nil
+        self.race = nil
         self.gender = nil
         self.terms = []
     }
@@ -22,24 +22,22 @@ struct OwnershipBreakdown<Tab>: Sendable where Tab: OwnershipTab {
 extension OwnershipBreakdown {
     mutating func update(
         from asset: some LegalEntitySnapshot<Tab.State.ID>,
-        in context: borrowing GameUI.Cache
+        in context: GameUI.CacheContext
     ) {
         let equity: Equity<LEI>.Snapshot = asset.equity
-        let (country, culture, gender): (
+        let (country, race, gender): (
             country: [CountryID: (share: Int64, ColorReference)],
-            culture: [CultureID: (share: Int64, ColorReference)],
+            race: [CultureID: (share: Int64, ColorReference)],
             gender: [Gender?: (share: Int64, ColorReference)]
         ) = equity.owners.reduce(
             into: ([:], [:], [:])
         ) {
-            if  let country: CountryID = context.tiles[$1.region]?.country?.occupiedBy,
-                let country: Country = context.countries[country] {
-                let label: ColorReference = .color(country.name.color)
-                $0.country[country.id, default: (0, label)].share += $1.shares
+            if  let country: CountryID = context.tiles[$1.region]?.country?.occupiedBy {
+                $0.country[country, default: (0, context.color(country))].share += $1.shares
             }
-            if  let culture: Culture = context.rules.pops.cultures[$1.culture] {
-                let label: ColorReference = .color(culture.color)
-                $0.culture[culture.id, default: (0, label)].share += $1.shares
+            if  let race: Culture = context.rules.pops.cultures[$1.culture] {
+                let label: ColorReference = .color(race.color)
+                $0.race[race.id, default: (0, label)].share += $1.shares
             }
             if  let gender: Gender = $1.gender {
                 let label: ColorReference = .style(gender.code.name)
@@ -53,8 +51,8 @@ extension OwnershipBreakdown {
         self.country = .init(
             values: country.sorted { $0.key < $1.key }
         )
-        self.culture = .init(
-            values: culture.sorted { $0.key < $1.key }
+        self.race = .init(
+            values: race.sorted { $0.key < $1.key }
         )
         self.gender = .init(
             values: gender.sorted { $0.key?.sortingRadially <? $1.key?.sortingRadially }
@@ -73,7 +71,7 @@ extension OwnershipBreakdown: JavaScriptEncodable {
     enum ObjectKey: JSString, Sendable {
         case type
         case country
-        case culture
+        case race
         case gender
         case terms
     }
@@ -81,7 +79,7 @@ extension OwnershipBreakdown: JavaScriptEncodable {
     func encode(to js: inout JavaScriptEncoder<ObjectKey>) {
         js[.type] = Tab.Ownership
         js[.country] = self.country
-        js[.culture] = self.culture
+        js[.race] = self.race
         js[.gender] = self.gender
         js[.terms] = self.terms
     }

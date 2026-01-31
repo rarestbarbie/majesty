@@ -60,7 +60,7 @@ export class ProductionOverview extends ScreenContent {
         this.inventory = new InventoryBreakdown();
         this.ownership = new OwnershipBreakdown(
             TooltipType.FactoryOwnershipCountry,
-            TooltipType.FactoryOwnershipCulture,
+            TooltipType.FactoryOwnershipRace,
             TooltipType.FactoryOwnershipGender
         );
     }

@@ -3,6 +3,7 @@ import Fraction
 import GameEconomy
 import GameIDs
 import GameRules
+import GameUI
 
 extension MineMetadata {
     static func yieldRankExpansionFactor(_ yieldRank: Int) -> Fraction? {

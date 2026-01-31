@@ -71,76 +71,60 @@ extension LegalEntitySnapshot {
 }
 extension LegalEntitySnapshot {
     func tooltipOwnership(
-        culture: CultureID,
-        context: GameUI.CacheContext,
+        in context: GameUI.CacheContext,
+        id culture: CultureID,
     ) -> Tooltip? {
         guard
         let culture: Culture = context.rules.pops.cultures[culture] else {
             return nil
         }
-        let (share, total): (share: Int64, total: Int64) = self.equity.owners.reduce(
-            into: (0, 0)
-        ) {
-            if  $1.culture == culture.id {
-                $0.share += $1.shares
-            }
-
-            $0.total += $1.shares
+        let fraction: Ratio<Int64> = self.equity.aggregate {
+            $0.culture == culture.id
         }
 
         return .instructions(style: .borderless) {
-            $0[culture.name] = (Double.init(share) / Double.init(total))[%3]
-            $0[>] = "The \(em: culture.name) shareholders own \(em: share[/3]) shares"
+            $0[culture.name] = (fraction.defined ?? 0)[%3]
+            $0[>] = """
+            The \(em: culture.name) shareholders own \(em: fraction.selected[/3]) shares
+            """
         }
     }
 
     func tooltipOwnership(
-        country: CountryID,
-        context: GameUI.CacheContext,
+        in context: GameUI.CacheContext,
+        id country: CountryID,
     ) -> Tooltip? {
         guard
         let country: Country = context.countries[country] else {
             return nil
         }
 
-        let (share, total): (share: Int64, total: Int64) = self.equity.owners.reduce(
-            into: (0, 0)
-        ) {
-            if case country.id? = context.tiles[$1.region]?.country?.occupiedBy {
-                $0.share += $1.shares
-            }
-
-            $0.total += $1.shares
+        let fraction: Ratio<Int64> = self.equity.aggregate {
+            country.id == context.tiles[$0.region]?.country?.occupiedBy
         }
 
         return .instructions(style: .borderless) {
-            $0[country.name.short] = (Double.init(share) / Double.init(total))[%3]
-            $0[>] = "The residents of \(em: country.name.short) own \(em: share[/3]) shares"
+            $0[country.name.short] = (fraction.defined ?? 0)[%3]
+            $0[>] = """
+            The residents of \(em: country.name.short) own \(em: fraction.selected[/3]) shares
+            """
         }
     }
 
     func tooltipOwnership(
-        gender: Gender?,
-        context: GameUI.CacheContext,
+        in context: GameUI.CacheContext,
+        id gender: Gender?,
     ) -> Tooltip? {
-        let (share, total): (share: Int64, total: Int64) = self.equity.owners.reduce(
-            into: (0, 0)
-        ) {
-            if  $1.gender == gender {
-                $0.share += $1.shares
-            }
-
-            $0.total += $1.shares
+        let ratio: Ratio<Int64> = self.equity.aggregate {
+            $0.gender == gender
         }
 
         return .instructions(style: .borderless) {
-            let fraction: Double = Double.init(share %/ total)
+            $0[gender?.singularTabular ?? "None"] = (ratio.defined ?? 0)[%3]
             if  let gender: Gender {
-                $0[gender.singularTabular] = fraction[%3]
-                $0[>] = "\(em: gender.pluralShort) own \(em: share[/3]) shares"
+                $0[>] = "\(em: gender.pluralShort) own \(em: ratio.selected[/3]) shares"
             } else {
-                $0["None"] = fraction[%3]
-                $0[>] = "Juridical persons own \(em: share[/3]) shares"
+                $0[>] = "Juridical persons own \(em: ratio.selected[/3]) shares"
             }
         }
     }

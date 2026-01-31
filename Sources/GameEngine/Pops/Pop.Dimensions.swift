@@ -1,7 +1,8 @@
 import JavaScriptInterop
+import GameUI
 
 extension Pop {
-    struct Dimensions: LegalEntityMetrics {
+    struct Dimensions {
         var active: Int64
         var vacant: Int64
         var mil: Double
@@ -13,10 +14,42 @@ extension Pop {
         var ve: Int64
         var vx: Int64
         var vout: Int64
-        var px: Double
+        /// For an enslaved pop, this is the price per share; for a free pop, this is the
+        /// mark-to-market value of her investment portfolio.
+        var priceOrEquity: Double
         /// A number between -1 and 1.
         var profitability: Double
     }
+}
+extension Pop.Dimensions: MeanAggregatable {
+    /// These are the only fields that make sense to average, the rest are already averages
+    var weighted: (
+        portfolioValue: Double,
+        vl: Int64,
+        ve: Int64,
+        vx: Int64,
+        vout: Int64
+    ) {
+        (
+            portfolioValue: self.portfolioValue,
+            vl: self.vl,
+            ve: self.ve,
+            vx: self.vx,
+            vout: self.vout
+        )
+    }
+    var weight: Double {
+        // this only makes sense for free pops, who are never backgrounded
+        Double.init(self.active)
+    }
+}
+extension Pop.Dimensions {
+    /// Only valid for free pops
+    var portfolioValue: Double { self.priceOrEquity }
+}
+extension Pop.Dimensions: LegalEntityMetrics {
+    /// Only valid for enslaved pops
+    var px: Double { self.priceOrEquity }
 }
 extension Pop.Dimensions: BackgroundableMetrics {
     static var mothballing: Double { -0.1 }
@@ -40,7 +73,7 @@ extension Pop.Dimensions {
             ve: 0,
             vx: 0,
             vout: 0,
-            px: 1,
+            priceOrEquity: 0,
             profitability: 0
         )
     }
@@ -58,7 +91,7 @@ extension Pop.Dimensions {
         case ve = "ve"
         case vx = "vx"
         case vout = "vout"
-        case px = "px"
+        case priceOrEquity = "xx"
         case profitability = "pa"
     }
 }
@@ -75,7 +108,7 @@ extension Pop.Dimensions: JavaScriptEncodable {
         js[.ve] = self.ve
         js[.vx] = self.vx
         js[.vout] = self.vout == 0 ? nil : self.vout
-        js[.px] = self.px
+        js[.priceOrEquity] = self.priceOrEquity
         js[.profitability] = self.profitability
     }
 }
@@ -93,7 +126,7 @@ extension Pop.Dimensions: JavaScriptDecodable {
             ve: try js[.ve]?.decode() ?? 0,
             vx: try js[.vx]?.decode() ?? 0,
             vout: try js[.vout]?.decode() ?? 0,
-            px: try js[.px]?.decode() ?? 1,
+            priceOrEquity: try js[.priceOrEquity]?.decode() ?? 1,
             profitability: try js[.profitability]?.decode() ?? 0,
         )
     }

@@ -1,7 +1,7 @@
 import { Term, TermState } from '../DOM/exports.js';
 import { GameID } from '../GameEngine/exports.js';
 import {
-    OwnershipBreakdownState,
+    PortfolioBreakdownState,
     PieChart,
     TooltipType,
 } from './exports.js';
@@ -9,30 +9,26 @@ import {
     StaticList
 } from '../DOM/exports.js';
 
-export class OwnershipBreakdown {
+export class PortfolioBreakdown {
     public readonly node: HTMLDivElement;
 
     private readonly byCountry: PieChart<GameID>;
-    private readonly byRace: PieChart<GameID>;
-    private readonly byGender: PieChart<string>;
+    private readonly byIndustry: PieChart<string>;
 
     private readonly terms: StaticList<Term, string>;
 
     constructor(
         tooltipCountry: TooltipType,
-        tooltipRace: TooltipType,
-        tooltipGender: TooltipType,
+        tooltipIndustry: TooltipType,
     ) {
         this.byCountry = new PieChart<GameID>(tooltipCountry);
-        this.byRace = new PieChart<GameID>(tooltipRace);
-        this.byGender = new PieChart<string>(tooltipGender);
+        this.byIndustry = new PieChart<string>(tooltipIndustry);
 
         const left: HTMLDivElement = document.createElement('div');
 
         const charts: [PieChart<any>, string][] = [
             [this.byCountry, 'Country'],
-            [this.byRace, 'Race'],
-            [this.byGender, 'Gender'],
+            [this.byIndustry, 'Industry'],
         ];
 
         for (const [chart, label] of charts) {
@@ -55,10 +51,9 @@ export class OwnershipBreakdown {
         this.node.classList.add('hstack');
     }
 
-    public update(id: GameID, state: OwnershipBreakdownState<any>): void {
+    public update(id: GameID, state: PortfolioBreakdownState<any>): void {
         this.byCountry.update(state.country ?? [], id);
-        this.byRace.update(state.race ?? [], id);
-        this.byGender.update(state.gender ?? [], id);
+        this.byIndustry.update(state.industry ?? [], id);
 
         this.terms.update(
             state.terms ?? [],

@@ -1,4 +1,4 @@
-protocol RandomAccessMapping<Key, Value> {
+public protocol RandomAccessMapping<Key, Value> {
     associatedtype Values: Collection<Value>
     associatedtype Value
     associatedtype Key

@@ -1,5 +1,6 @@
 import Color
 import GameIDs
+import GameUI
 import HexGrids
 import Vector
 

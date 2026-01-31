@@ -1,4 +1,5 @@
 import Fraction
+import GameUI
 import Random
 
 protocol Differentiable<Dimensions> {

@@ -1,4 +1,5 @@
 import GameEconomy
+import GameUI
 import JavaScriptInterop
 
 struct MarketTableEntry: Identifiable {

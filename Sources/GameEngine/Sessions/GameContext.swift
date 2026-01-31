@@ -327,7 +327,7 @@ extension GameContext {
                 economy.countSocial(slave: pop)
             }
 
-            self.record(investors: pop.equity, in: pop.id.lei)
+            self.record(investors: pop.equity, in: pop.id.lei, px: equity.shareValue)
             self.pops[i].update(equityStatistics: equity)
         }
         for i: Int in self.factories.indices {
@@ -354,7 +354,7 @@ extension GameContext {
                 equity: equity,
             )
 
-            self.record(investors: factory.equity, in: factory.id.lei)
+            self.record(investors: factory.equity, in: factory.id.lei, px: equity.shareValue)
             self.factories[i].update(equityStatistics: equity)
         }
         for i: Int in self.buildings.indices {
@@ -383,7 +383,7 @@ extension GameContext {
                 equity: equity,
             )
 
-            self.record(investors: building.equity, in: building.id.lei)
+            self.record(investors: building.equity, in: building.id.lei, px: equity.shareValue)
             self.buildings[i].update(equityStatistics: equity)
         }
         for i: Int in self.mines.indices {
@@ -543,7 +543,7 @@ extension GameContext {
 }
 
 extension GameContext {
-    private mutating func record(investors equity: Equity<LEI>, in asset: LEI) {
+    private mutating func record(investors equity: Equity<LEI>, in asset: LEI, px: Double) {
         for stake: EquityStake<LEI> in equity.shares.values {
             guard case .pop(let id)  = stake.id else {
                 if  case .reserve = stake.id {
@@ -551,10 +551,12 @@ extension GameContext {
                 } else {
                     fatalError("Only pops and central bank can hold shares!!!")
                 }
-                continue
             }
             // the pruning pass should have ensured that only valid stakes remain
-            self.pops[modifying: id].addPosition(asset: asset, value: stake.shares.total)
+            if  stake.shares.total > 0 {
+                let value: Double = Double.init(stake.shares.total) * px
+                self.pops[modifying: id].record(investment: asset, value: value)
+            }
         }
     }
     private mutating func count(aggregating ledger: GameLedger.Interval) {

@@ -1,4 +1,5 @@
 import GameIDs
+import GameUI
 import JavaScriptInterop
 
 extension Tile {

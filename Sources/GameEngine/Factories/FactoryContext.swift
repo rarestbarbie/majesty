@@ -179,7 +179,7 @@ extension FactoryContext: TransactingContext {
         }
 
         if  self.equity.sharePrice.n > 0 {
-            self.state.z.px = Double.init(self.equity.sharePrice)
+            self.state.z.px = self.equity.shareValue
         } else {
             self.state.z.px = 0
             self.state.equity = [:]

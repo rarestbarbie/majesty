@@ -1,3 +1,4 @@
+import GameUI
 import JavaScriptInterop
 
 extension EconomicLedger {

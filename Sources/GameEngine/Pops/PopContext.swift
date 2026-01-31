@@ -19,7 +19,7 @@ struct PopContext: RuntimeContext {
         factories: [FactoryID: Int64],
         mines: [MineID: Double],
     )
-    private var portfolio: [LEI]
+    private var portfolio: [(asset: LEI, value: Double)]
 
     public init(type: PopMetadata, state: Pop) {
         self.type = type
@@ -45,11 +45,12 @@ extension PopContext {
         }
         return .init(
             metadata: self.type,
+            state: state,
             stats: self.stats,
             region: region,
             equity: self.equity,
             mines: self.mines,
-            state: state,
+            portfolio: self.portfolio
         )
     }
 }
@@ -60,12 +61,8 @@ extension PopContext {
         self.portfolio.resetExpectingCopy()
     }
 
-    mutating func addPosition(asset: LEI, value: Int64) {
-        guard value > 0 else {
-            return
-        }
-
-        // TODO
+    mutating func record(investment: LEI, value: Double) {
+        self.portfolio.append((investment, value))
     }
     mutating func update(equityStatistics: Equity<LEI>.Statistics) {
         self.equity = equityStatistics
@@ -208,6 +205,9 @@ extension PopContext: AllocatingContext {
         let budget: Pop.Budget
 
         if  case .Ward = self.state.type.stratum {
+            // Align share price
+            self.state.z.priceOrEquity = self.equity.shareValue
+
             let weights: (
                 segmented: SegmentedWeights<InelasticDemand>,
                 tradeable: AggregateWeights<InelasticDemand>
@@ -235,8 +235,6 @@ extension PopContext: AllocatingContext {
                 stockpileMaxDays: Self.stockpileDaysMax,
             )
 
-            // Align share price
-            self.state.z.px = Double.init(self.equity.sharePrice)
             turn.stockMarkets.issueShares(
                 currency: currency,
                 quantity: max(0, self.state.z.total - self.equity.shareCount),
@@ -255,6 +253,7 @@ extension PopContext: AllocatingContext {
                 in: self.state.tile,
             )
         } else {
+            self.state.z.priceOrEquity = self.portfolio.reduce(0) { $0 + $1.value }
             let weights: (
                 segmented: SegmentedWeights<ElasticDemand>,
                 tradeable: AggregateWeights<ElasticDemand>
