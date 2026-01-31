@@ -60,7 +60,7 @@ export class InfrastructureOverview extends ScreenContent {
         this.inventory = new InventoryBreakdown();
         this.ownership = new OwnershipBreakdown(
             TooltipType.BuildingOwnershipCountry,
-            TooltipType.BuildingOwnershipCulture,
+            TooltipType.BuildingOwnershipRace,
             TooltipType.BuildingOwnershipGender
         );
     }

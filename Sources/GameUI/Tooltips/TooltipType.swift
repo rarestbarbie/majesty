@@ -11,7 +11,7 @@ import JavaScriptInterop
     case BuildingExplainPrice
     case BuildingNeeds
     case BuildingOwnershipCountry
-    case BuildingOwnershipCulture
+    case BuildingOwnershipRace
     case BuildingOwnershipGender
     case BuildingOwnershipSecurities
     case BuildingCashFlowItem
@@ -28,7 +28,7 @@ import JavaScriptInterop
     case FactoryWorkersHelp
     case FactoryNeeds
     case FactoryOwnershipCountry
-    case FactoryOwnershipCulture
+    case FactoryOwnershipRace
     case FactoryOwnershipGender
     case FactoryOwnershipSecurities
     case FactorySummarizeEmployees
@@ -52,11 +52,14 @@ import JavaScriptInterop
     case PopNeeds
     case PopType
     case PopOwnershipCountry
-    case PopOwnershipCulture
+    case PopOwnershipRace
     case PopOwnershipGender
     case PopOwnershipSecurities
     case PopCashFlowItem
     case PopBudgetItem
+    case PopPortfolioValue
+    case PopPortfolioCountry
+    case PopPortfolioIndustry
 
     case MarketFee
     case MarketLiquidity

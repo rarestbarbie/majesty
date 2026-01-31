@@ -30,7 +30,7 @@ extension BuildingDetails {
     mutating func update(to building: BuildingSnapshot, cache: borrowing GameUI.Cache) {
         switch self.open {
         case .Inventory: self.inventory.update(from: building, in: cache)
-        case .Ownership: self.ownership.update(from: building, in: cache)
+        case .Ownership: self.ownership.update(from: building, in: cache.context)
         }
 
         self.name = building.metadata.title

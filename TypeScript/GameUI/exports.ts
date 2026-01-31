@@ -17,6 +17,8 @@ export * from './InventoryBreakdownState.js';
 export * from './InventoryCharts.js';
 export * from './OwnershipBreakdown.js';
 export * from './OwnershipBreakdownState.js';
+export * from './PortfolioBreakdown.js';
+export * from './PortfolioBreakdownState.js';
 
 export * from './Markets/Candle.js';
 export * from './Markets/Candlestick.js';

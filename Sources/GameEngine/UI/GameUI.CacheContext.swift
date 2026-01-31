@@ -1,3 +1,5 @@
+import Color
+import ColorReference
 import OrderedCollections
 import GameClock
 import GameEconomy
@@ -42,5 +44,10 @@ extension GameUI.CacheContext {
 
         let resource: ResourceLabel = self.rules.resources[good].label
         return "\(resource.nameWithIcon) / \(currency.name)"
+    }
+}
+extension GameUI.CacheContext {
+    func color(_ country: CountryID) -> ColorReference {
+        .color(self.countries[country]?.name.color ?? 0xFFFFFF)
     }
 }

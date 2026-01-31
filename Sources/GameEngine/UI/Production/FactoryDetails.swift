@@ -30,7 +30,7 @@ extension FactoryDetails {
     mutating func update(to factory: FactorySnapshot, cache: borrowing GameUI.Cache) {
         switch self.open {
         case .Inventory: self.inventory.update(from: factory, in: cache)
-        case .Ownership: self.ownership.update(from: factory, in: cache)
+        case .Ownership: self.ownership.update(from: factory, in: cache.context)
         }
 
         self.name = factory.metadata.title

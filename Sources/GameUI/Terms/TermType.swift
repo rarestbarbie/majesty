@@ -6,6 +6,7 @@ import JavaScriptInterop
     case shares
     case stockPrice
     case stockAttraction
+    case portfolio
 
     case pop(PopOccupation)
     case active
@@ -23,6 +24,7 @@ extension TermType: RawRepresentable {
         case .shares: "eN"
         case .stockPrice: "eP"
         case .stockAttraction: "eA"
+        case .portfolio: "eV"
         case .pop(.Livestock): "pA"
         case .pop(.Driver): "pD"
         case .pop(.Editor): "pE"

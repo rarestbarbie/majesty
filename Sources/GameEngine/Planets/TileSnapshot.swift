@@ -223,20 +223,8 @@ extension TileSnapshot {
             localContribution: { $0 }
         )
 
-        let industryName: String?
-        switch id {
-        case .building(let type):
-            industryName = context.rules.buildings[type]?.title
-        case .factory(let type):
-            industryName = context.rules.factories[type]?.title
-        case .artisan(let type):
-            industryName = context.rules.resources[type].title
-        case .slavery(let type):
-            industryName = context.rules.pops.cultures[type]?.name
-        }
-
         return .instructions(style: .borderless) {
-            $0[industryName ?? "?"] = (
+            $0[context.rules.name(id)] = (
                 total.local > 0 ? Double.init(value %/ total.local) : 0
             )[%2]
             $0[>] {

@@ -1,43 +1,47 @@
-import GameUI
 import D
 
-@dynamicMemberLookup struct Delta<Dimensions> {
-    let y: Dimensions
-    let z: Dimensions
+@dynamicMemberLookup @frozen public struct Delta<Dimensions> {
+    public let y: Dimensions
+    public let z: Dimensions
 
-    init(y: Dimensions, z: Dimensions) {
+    @inlinable public init(y: Dimensions, z: Dimensions) {
         self.y = y
         self.z = z
     }
 }
+extension Delta {
+    @inlinable public func map<T>(_ transform: (Dimensions) throws -> T) rethrows -> Delta<T> {
+        .init(y: try transform(self.y), z: try transform(self.z))
+    }
+}
 extension Delta: Sendable where Dimensions: Sendable {}
 extension Delta where Dimensions: AdditiveArithmetic {
-    var value: Dimensions { self.z - self.y }
+    @inlinable public var value: Dimensions { self.z - self.y }
 
-    static func + (a: Self, b: Self) -> Self {
+    @inlinable public static func + (a: Self, b: Self) -> Self {
         .init(y: a.y + b.y, z: a.z + b.z)
     }
-    static func - (a: Self, b: Self) -> Self {
+    @inlinable public static func - (a: Self, b: Self) -> Self {
         .init(y: a.y - b.y, z: a.z - b.z)
     }
 
-    static func + (a: Dimensions, b: Self) -> Self { b + a }
-    static func + (a: Self, b: Dimensions) -> Self {
+    @inlinable public static func + (a: Dimensions, b: Self) -> Self { b + a }
+    @inlinable public static func + (a: Self, b: Dimensions) -> Self {
         .init(y: a.y + b, z: a.z + b)
     }
 
-    static func - (a: Self, b: Dimensions) -> Self {
+    @inlinable public static func - (a: Self, b: Dimensions) -> Self {
         .init(y: a.y - b, z: a.z - b)
     }
 }
 extension Delta where Dimensions: Numeric {
-    static func * (a: Dimensions, b: Self) -> Self { b * a }
-    static func * (a: Self, b: Dimensions) -> Self {
+    @inlinable public static func * (a: Dimensions, b: Self) -> Self { b * a }
+    @inlinable public static func * (a: Self, b: Dimensions) -> Self {
         .init(y: a.y * b, z: a.z * b)
     }
 }
 extension Delta where Dimensions: BinaryInteger {
-    func percentage(of total: Self, initial: Double = 0) -> Delta<Double>? {
+    public func percentage(of total: Self, initial: Double = 0) -> Delta<Double>? {
         guard total.z > 0 else {
             return nil
         }
@@ -53,7 +57,7 @@ extension Delta where Dimensions: BinaryInteger {
     }
 }
 extension Delta where Dimensions: RandomAccessMapping, Dimensions.Value: AdditiveArithmetic {
-    subscript(key: Dimensions.Key) -> Delta<Dimensions.Value>? {
+    @inlinable public subscript(key: Dimensions.Key) -> Delta<Dimensions.Value>? {
         let y: Dimensions.Value? = self.y[key]
         let z: Dimensions.Value? = self.z[key]
         if  let y: Dimensions.Value {
@@ -67,23 +71,23 @@ extension Delta where Dimensions: RandomAccessMapping, Dimensions.Value: Additiv
     }
 }
 extension Delta where Dimensions: AdditiveArithmetic & DecimalFormattable {
-    subscript<Format>(format: Format) -> TooltipInstruction.Ticker
+    @inlinable public subscript<Format>(format: Format) -> TooltipInstruction.Ticker
         where Format: DecimalFormat {
         self.z[format] <- self.y
     }
-    subscript<Power>(
+    @inlinable public subscript<Power>(
         format: (Decimal.Ungrouped<Power>.Natural) -> ()
     ) -> TooltipInstruction.Ticker where Power: DecimalPower {
         self.z[format] <- self.y
     }
 }
 extension Delta where Dimensions: BinaryInteger {
-    subscript(format: BigIntFormat) -> TooltipInstruction.Ticker {
+    @inlinable public subscript(format: BigIntFormat) -> TooltipInstruction.Ticker {
         self.z[format] <- self.y
     }
 }
 extension Delta {
-    subscript<T>(dynamicMember keyPath: KeyPath<Dimensions, T>) -> Delta<T> {
+    @inlinable public subscript<T>(dynamicMember keyPath: KeyPath<Dimensions, T>) -> Delta<T> {
         .init(y: self.y[keyPath: keyPath], z: self.z[keyPath: keyPath])
     }
 }

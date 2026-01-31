@@ -1,6 +1,7 @@
 import Assert
 import Fraction
 import GameEconomy
+import GameUI
 import JavaScriptInterop
 
 extension Bank {

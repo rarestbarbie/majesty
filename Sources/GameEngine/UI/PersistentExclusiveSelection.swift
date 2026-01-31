@@ -1,3 +1,5 @@
+import GameUI
+
 @dynamicMemberLookup struct PersistentExclusiveSelection<Filter, DetailsFocus>
     where Filter: PersistentExclusiveSelectionFilter {
     private(set) var details: DetailsFocus

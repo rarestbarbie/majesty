@@ -1,3 +1,5 @@
+import GameUI
+
 extension EconomicLedger {
     protocol SocialMetricsAggregatable: MeanAggregatable {
         var count: Int64 { get }

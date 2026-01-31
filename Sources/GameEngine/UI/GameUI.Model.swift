@@ -194,7 +194,7 @@ extension GameUI.Model {
                     try arguments[0].decode(),
                     country: try arguments[1].decode(),
                 )
-            case .BuildingOwnershipCulture:
+            case .BuildingOwnershipRace:
                 return $0.tooltipBuildingOwnership(
                     try arguments[0].decode(),
                     culture: try arguments[1].decode(),
@@ -272,7 +272,7 @@ extension GameUI.Model {
                     try arguments[0].decode(),
                     country: try arguments[1].decode(),
                 )
-            case .FactoryOwnershipCulture:
+            case .FactoryOwnershipRace:
                 return $0.tooltipFactoryOwnership(
                     try arguments[0].decode(),
                     culture: try arguments[1].decode(),
@@ -362,7 +362,7 @@ extension GameUI.Model {
                     try arguments[0].decode(),
                     country: try arguments[1].decode(),
                 )
-            case .PopOwnershipCulture:
+            case .PopOwnershipRace:
                 return $0.tooltipPopOwnership(
                     try arguments[0].decode(),
                     culture: try arguments[1].decode(),
@@ -385,6 +385,20 @@ extension GameUI.Model {
                 return $0.tooltipPopBudgetItem(
                     try arguments[0].decode(),
                     try arguments[1].decode(),
+                )
+            case .PopPortfolioValue:
+                return $0.tooltipPopPortfolioValue(
+                    try arguments[0].decode(),
+                )
+            case .PopPortfolioCountry:
+                return $0.tooltipPopPortfolio(
+                    try arguments[0].decode(),
+                    country: try arguments[1].decode(),
+                )
+            case .PopPortfolioIndustry:
+                return $0.tooltipPopPortfolio(
+                    try arguments[0].decode(),
+                    industry: try arguments[1].decode(),
                 )
             case .MarketFee:
                 return $0.tooltipMarketFee(

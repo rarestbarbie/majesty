@@ -53,17 +53,7 @@ extension EconomicLedger {
         region: Address
     ) -> PieChart<Industry, ColorReference> {
         var values: [(Industry, (Int64, ColorReference))] = self.gdp.compactMap {
-            guard $0.location == region else {
-                return nil
-            }
-            let color: Color
-            switch $0.crosstab {
-            case .building(let type): color = rules.buildings[type]?.color ?? 0xFFFFFF
-            case .factory(let type): color = rules.factories[type]?.color ?? 0xFFFFFF
-            case .artisan(let type): color = rules.resources[type].color
-            case .slavery(let type): color = rules.pops.cultures[type]?.color ?? 0xFFFFFF
-            }
-            return ($0.crosstab, ($1, .color(color)))
+            $0.location == region ? ($0.crosstab, ($1, rules.color($0.crosstab))) : nil
         }
         values.sort { $0.0 < $1.0 }
         return .init(values: values)

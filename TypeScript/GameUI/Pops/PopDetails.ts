@@ -2,7 +2,8 @@ import { GameID } from '../../GameEngine/GameID.js';
 import {
     InventoryBreakdownState,
     OwnershipBreakdownState,
-    PopDetailsTab
+    PopDetailsTab,
+    PortfolioBreakdownState
 } from '../exports.js';
 
 export interface PopDetails {
@@ -14,7 +15,10 @@ export interface PopDetails {
     readonly gender?: string;
     readonly cis?: boolean;
 
+    readonly tabs: PopDetailsTab[];
     readonly open:
         InventoryBreakdownState<PopDetailsTab.Inventory> |
-        OwnershipBreakdownState<PopDetailsTab.Ownership>;
+        OwnershipBreakdownState<PopDetailsTab.Ownership> |
+        PortfolioBreakdownState<PopDetailsTab.Portfolio>
+    ;
 }

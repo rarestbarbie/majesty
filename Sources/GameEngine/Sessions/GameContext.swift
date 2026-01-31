@@ -327,7 +327,7 @@ extension GameContext {
                 economy.countSocial(slave: pop)
             }
 
-            self.count(asset: pop.id.lei, equity: pop.equity)
+            self.record(investors: pop.equity, in: pop.id.lei, px: equity.shareValue)
             self.pops[i].update(equityStatistics: equity)
         }
         for i: Int in self.factories.indices {
@@ -354,7 +354,7 @@ extension GameContext {
                 equity: equity,
             )
 
-            self.count(asset: factory.id.lei, equity: factory.equity)
+            self.record(investors: factory.equity, in: factory.id.lei, px: equity.shareValue)
             self.factories[i].update(equityStatistics: equity)
         }
         for i: Int in self.buildings.indices {
@@ -383,7 +383,7 @@ extension GameContext {
                 equity: equity,
             )
 
-            self.count(asset: building.id.lei, equity: building.equity)
+            self.record(investors: building.equity, in: building.id.lei, px: equity.shareValue)
             self.buildings[i].update(equityStatistics: equity)
         }
         for i: Int in self.mines.indices {
@@ -543,19 +543,19 @@ extension GameContext {
 }
 
 extension GameContext {
-    private mutating func count(asset: LEI, equity: Equity<LEI>) {
+    private mutating func record(investors equity: Equity<LEI>, in asset: LEI, px: Double) {
         for stake: EquityStake<LEI> in equity.shares.values {
+            guard case .pop(let id)  = stake.id else {
+                if  case .reserve = stake.id {
+                    continue
+                } else {
+                    fatalError("Only pops and central bank can hold shares!!!")
+                }
+            }
             // the pruning pass should have ensured that only valid stakes remain
-            switch stake.id {
-            case .reserve:
-                continue
-
-            case .building(let id):
-                self.buildings[modifying: id].addPosition(asset: asset, value: stake.shares.total)
-            case .factory(let id):
-                self.factories[modifying: id].addPosition(asset: asset, value: stake.shares.total)
-            case .pop(let id):
-                self.pops[modifying: id].addPosition(asset: asset, value: stake.shares.total)
+            if  stake.shares.total > 0 {
+                let value: Double = Double.init(stake.shares.total) * px
+                self.pops[modifying: id].record(investment: asset, value: value)
             }
         }
     }
@@ -708,7 +708,7 @@ extension GameContext {
     }
     private mutating func executeConversions(_ turn: inout Turn) throws {
         defer {
-            turn.conversions.removeAll(keepingCapacity: true)
+            turn.conversions.resetUsingHint()
         }
 
         // let investments: (

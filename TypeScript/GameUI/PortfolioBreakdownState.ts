@@ -2,10 +2,9 @@ import { PieChartSectorState } from './exports.js';
 import { GameID } from '../GameEngine/exports.js';
 import { TermState } from '../DOM/exports.js';
 
-export interface OwnershipBreakdownState<Type extends string> {
+export interface PortfolioBreakdownState<Type extends string> {
     readonly type: Type;
     readonly country?: PieChartSectorState<GameID>[];
-    readonly race?: PieChartSectorState<GameID>[];
-    readonly gender?: PieChartSectorState<string>[];
+    readonly industry?: PieChartSectorState<string>[];
     readonly terms?: TermState[];
 }

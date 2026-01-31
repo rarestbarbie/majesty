@@ -1,4 +1,5 @@
 export enum PopDetailsTab {
     Inventory = 'Inventory',
-    Ownership = 'Ownership'
+    Ownership = 'Ownership',
+    Portfolio = 'Portfolio',
 }

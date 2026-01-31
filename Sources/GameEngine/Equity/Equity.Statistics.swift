@@ -7,12 +7,14 @@ extension Equity {
         var owners: [Shareholder]
         var shareCount: Int64
         var sharePrice: Fraction
+        /// Same as ``sharePrice`` but as a ``Double`` for convenience
+        var shareValue: Double
     }
 }
 extension Equity.Statistics: Sendable where Owner: Sendable {}
 extension Equity.Statistics {
     init() {
-        self.init(owners: [], shareCount: 0, sharePrice: 0)
+        self.init(owners: [], shareCount: 0, sharePrice: 0, shareValue: 0)
     }
 }
 extension Equity<LEI>.Statistics {
@@ -44,16 +46,17 @@ extension Equity<LEI>.Statistics {
         let sharePrice: Fraction = assets %/ max(1, shareCount)
 
         return .init(
-            owners: equity.shares.values.reduce(into: []) {
+            // use direct map, pruning should have guaranteed all references are valid
+            owners: equity.shares.values.map {
                 let culture: CultureID
                 let region: Address
                 let gender: Gender?
 
-                switch $1.id {
+                switch $0.id {
                 case .reserve(let id):
                     guard
                     let country: Country = context.countries[id] else {
-                        return
+                        fatalError("Country [\(id)] not found for shareholder!!!")
                     }
 
                     culture = country.culturePreferred
@@ -69,7 +72,7 @@ extension Equity<LEI>.Statistics {
                 case .pop(let id):
                     guard
                     let pop: Pop = context.pops[id] else {
-                        return
+                        fatalError("Pop [\(id)] not found for shareholder!!!")
                     }
 
                     culture = pop.race
@@ -77,20 +80,19 @@ extension Equity<LEI>.Statistics {
                     gender = pop.gender
                 }
 
-                $0.append(
-                    .init(
-                        id: $1.id,
-                        shares: $1.shares.total,
-                        bought: $1.shares.added,
-                        sold: $1.shares.removed,
-                        culture: culture,
-                        region: region,
-                        gender: gender
-                    )
+                return .init(
+                    id: $0.id,
+                    shares: $0.shares.total,
+                    bought: $0.shares.added,
+                    sold: $0.shares.removed,
+                    culture: culture,
+                    region: region,
+                    gender: gender
                 )
             },
             shareCount: shareCount,
-            sharePrice: sharePrice
+            sharePrice: sharePrice,
+            shareValue: Double.init(sharePrice)
         )
     }
 }

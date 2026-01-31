@@ -49,13 +49,9 @@ extension BuildingContext {
     mutating func startIndexCount() {
         self.stats.startIndexCount(self.state)
     }
-    mutating func addPosition(asset: LEI, value: Int64) {
-        // TODO
-    }
     mutating func update(equityStatistics: Equity<LEI>.Statistics) {
         self.equity = equityStatistics
     }
-
     mutating func afterIndexCount(
         world _: borrowing GameWorld,
         context: ComputationPass
@@ -115,7 +111,7 @@ extension BuildingContext: TransactingContext {
         )
 
         if  self.equity.sharePrice.n > 0 {
-            self.state.z.px = Double.init(self.equity.sharePrice)
+            self.state.z.px = self.equity.shareValue
         } else {
             self.state.z.px = 0
             self.state.equity = [:]
