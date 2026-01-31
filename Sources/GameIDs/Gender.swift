@@ -65,6 +65,29 @@ extension Gender {
         case .MCS: .MS
         }
     }
+
+    @inlinable public var heterosexual: Bool {
+        switch self {
+        case .FT: false
+        case .FTS: true
+        case .FC: false
+        case .FCS: true
+
+        case .XTL: false
+        case .XT: false
+        case .XTG: false
+
+        case .XCL: false
+        case .XC: false
+        case .XCG: false
+
+        case .MT: false
+        case .MTS: true
+        case .MC: false
+        case .MCS: true
+        }
+    }
+
     @inlinable public var transgender: Bool {
         switch self {
         case .FT: true

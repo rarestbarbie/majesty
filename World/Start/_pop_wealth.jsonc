@@ -1,16 +1,16 @@
 [
     {
         "type": "O",
-        "cash": 10000000
+        "cash": 100000
     },
     {
         "type": "O",
-        "cash": 100000000,
+        "cash": 1000000,
         "race": "Atlantean"
     },
     {
         "type": "O",
-        "cash": 900000000,
+        "cash": 9000000,
         "race": "Jewish"
     }
 ]

@@ -260,18 +260,22 @@ extension PopSnapshot {
     }
     func tooltipActiveHelp() -> Tooltip {
         .instructions {
+            let developmentRate: Double = self.developmentRate(utilization: 1)
+            $0["Herd expansion", +] = developmentRate[%2]
+            $0[>] {
+                $0["Profitability", +] = max(0, self.z.profitability)[%1]
+                $0["Background population", +] = +?(self.developmentRateVacancyFactor - 1)[%2]
+            }
+
             let slaveBreedingEfficiency: Decimal = PopContext.slaveBreedingBase
                 + self.region.modifiers.livestockBreedingEfficiency.value
-            let slaveBreedingRate: Double = Double.init(
+            let slaveBreedingRate: Delta<Double> = self.Δ.fx * Double.init(
                 slaveBreedingEfficiency
-            ) * self.developmentRate(utilization: 1)
+            )
 
             $0["Breeding rate", +] = slaveBreedingRate[%2]
             $0[>] {
-                $0["Profitability", +] = max(0, self.z.profitability)[%1]
-                $0["Background population", +] = +?(
-                    self.developmentRateVacancyFactor - 1
-                )[%2]
+                $0["Luxury needs fulfilled", +] = self.Δ.fx[%2]
             }
             $0["Breeding efficiency", +] = slaveBreedingEfficiency[%]
             $0[>] {
@@ -334,21 +338,21 @@ extension PopSnapshot {
             let valueConsumed: Int64 = self.inventory.valueConsumed(tier: tier)
             switch tier {
             case .l:
-                $0["Life needs fulfilled"] = self.z.fl[%2]
+                $0["Life needs fulfilled", +] = self.Δ.fl[%2]
                 $0[>] {
                     $0["Market spending (amortized)", +] = valueConsumed[/3]
                     $0["Militancy", -] = +?PopContext.mil(fl: self.z.fl)[..3]
                     $0["Consciousness", -] = +?PopContext.con(fl: self.z.fl)[..3]
                 }
             case .e:
-                $0["Everyday needs fulfilled"] = self.z.fe[%2]
+                $0["Everyday needs fulfilled", +] = self.Δ.fe[%2]
                 $0[>] {
                     $0["Market spending (amortized)", +] = valueConsumed[/3]
                     $0["Militancy", -] = +?PopContext.mil(fe: self.z.fe)[..3]
                     $0["Consciousness", -] = +?PopContext.con(fe: self.z.fe)[..3]
                 }
             case .x:
-                $0["Luxury needs fulfilled"] = self.z.fx[%2]
+                $0["Luxury needs fulfilled", +] = self.Δ.fx[%2]
                 $0[>] {
                     $0["Market spending (amortized)", +] = valueConsumed[/3]
                     if let budget: Pop.Budget = self.budget, budget.investment > 0 {

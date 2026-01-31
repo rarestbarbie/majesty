@@ -84,6 +84,52 @@ extension Bank {
         self[account: source].i -= paid
         return paid
     }
+}
+extension Bank {
+    mutating func execute(
+        trade fill: StockMarket.Fill,
+        of equity: inout Equity<LEI>,
+        at random: inout PseudoRandom
+    ) {
+        /// if the asset is not issuing enough shares to satisfy the order, buy some on the open
+        /// market, which is essentially just a forced random liquidation
+        let traded: Quote = equity.liquidate(at: &random, quote: fill.market) {
+            self[account: $0].f += $1
+        }
+
+        equity.report(traded: traded.units)
+        equity.assign(traded: traded.units, issued: fill.issued.units, to: fill.buyer)
+
+        self[account: fill.buyer].e -= fill.issued.value + traded.value
+        self[account: fill.asset].f += fill.issued.value
+    }
+
+    mutating func buyout(
+        fraction: Double = 0.5,
+        of security: LEI,
+        as buyer: LEI,
+        budget: Int64,
+        equity: inout Equity<LEI>,
+        random: inout PseudoRandom
+    ) {
+        if  fraction <= 0 {
+            return
+        }
+        // compute number of shares that would have to be issued to make the buyer have
+        // roughly `fraction` of the total shares after the buyout
+        //
+        // for numerical reasons, no more than 68 percent can be acquired at a time
+        let fraction: Double = min(fraction, 0.68)
+        let existing: Int64 = equity.shares.values.reduce(0) { $0 + $1.shares.total }
+        let sharesToCreate: Int64 = .init(
+            (Double.init(max(existing, 1)) * fraction / (1 - fraction)).rounded(.up)
+        )
+
+        equity.assign(traded: 0, issued: sharesToCreate, to: buyer)
+
+        self[account: buyer].e -= budget
+        self[account: security].f += budget
+    }
 
     /// Returns the total compensation paid out to shareholders.
     mutating func buyback(
@@ -96,7 +142,7 @@ extension Bank {
         let quote: Quote = security.stockPrice?.quote(value: budget) else {
             return 0
         }
-        let liquidated: Quote = equity.liquidate(random: &random, quote: quote, burn: true) {
+        let liquidated: Quote = equity.liquidate(at: &random, quote: quote, burn: true) {
             self[account: $0].f += $1
         }
         self[account: security.id].e -= liquidated.value

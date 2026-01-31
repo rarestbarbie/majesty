@@ -84,9 +84,26 @@ extension MineContext {
             return
         }
 
+        let h: Double = self.type.h(tile: region.stats, yield: self.state.z.yieldPerMiner)
+
+        //  must restructure mine before hiring/firing miners, to avoid overhiring
+        if  self.type.decay {
+            if  h < 0.25 {
+                let minersPossible: Int64 = self.miners.count
+                if  self.state.z.splits > 0, minersPossible * 8 < self.miners.limit {
+                    self.state.z.splits -= 1
+                    self.miners.limit /= 2
+                }
+            } else if h > 2 {
+                if  self.state.z.splits < 10, self.miners.count * 8 > self.miners.limit * 7 {
+                    self.state.z.splits += 1
+                    self.miners.limit *= 2
+                }
+            }
+        }
+
         let minersToHire: Int64 = self.miners.limit - self.miners.count
         let minersToHireToday: Int64
-        let h: Double = self.type.h(tile: region.stats, yield: self.state.z.yieldPerMiner)
 
         if  minersToHire > 0 {
             let h²: Double = MineMetadata.h²(h: h)
@@ -124,21 +141,11 @@ extension MineContext {
 
         if  self.type.decay {
             let (q, r): (Int64, Int64) = self.miners.count.quotientAndRemainder(
-                dividingBy: self.state.z.parcels
+                // we must use yesterday’s value, restructuring could have changed parcels count
+                dividingBy: self.state.y.parcels
             )
             let consumed: Int64 = r > 0 ? q + 1 : q
             self.state.z.size = max(0, self.state.z.size - consumed)
-
-            if  h < 0.25 {
-                let minersPossible: Int64 = self.miners.count + minersToHireToday
-                if  self.state.z.splits > 0, minersPossible * 8 < self.miners.limit {
-                    self.state.z.splits -= 1
-                }
-            } else if h > 2 {
-                if  self.state.z.splits < 10, self.miners.count * 8 > self.miners.limit * 7 {
-                    self.state.z.splits += 1
-                }
-            }
         }
     }
 }

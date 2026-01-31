@@ -60,29 +60,29 @@ extension GameObjects {
                 BuildingMetadata.init(
                     identity: $0,
                     color: $1.color,
-                    operations: .init(
+                    operations: try .init(
                         metadata: resources,
-                        quantity: try $1.operations.quantities(keys: symbols.resources)
+                        quantity: $1.operations,
+                        symbols: symbols.resources
                     ),
-                    maintenance: .init(
+                    maintenance: try .init(
                         metadata: resources,
-                        quantity: try (
-                            try $1.maintenance ?? maintenanceCosts[$0.code] ?? maintenanceCosts[*]
-                        ).quantities(
-                            keys: symbols.resources
-                        )
+                        quantity: $1.maintenance
+                            ?? maintenanceCosts[$0.code]
+                            ?? maintenanceCosts[*],
+                        symbols: symbols.resources
                     ),
-                    development: .init(
+                    development: try .init(
                         metadata: resources,
-                        quantity: try (
-                            try $1.development ?? developmentCosts[$0.code] ?? developmentCosts[*]
-                        ).quantities(
-                            keys: symbols.resources
-                        )
+                        quantity: $1.development
+                            ?? developmentCosts[$0.code]
+                            ?? developmentCosts[*],
+                        symbols: symbols.resources
                     ),
-                    output: .init(
+                    output: try .init(
                         metadata: resources,
-                        quantity: try $1.output.quantities(keys: symbols.resources)
+                        quantity: $1.output,
+                        symbols: symbols.resources
                     ),
                     sharesInitial: rules.buildingCosts.sharesInitial,
                     sharesPerLevel: rules.buildingCosts.sharesPerLevel,
@@ -96,29 +96,25 @@ extension GameObjects {
                 try FactoryMetadata.init(
                     identity: $0,
                     color: $1.color,
-                    materials: .init(
+                    materials: try .init(
                         metadata: resources,
-                        quantity: try $1.materials.quantities(keys: symbols.resources)
+                        quantity: $1.materials,
+                        symbols: symbols.resources
                     ),
-                    corporate: .init(
+                    corporate: try .init(
                         metadata: resources,
-                        quantity: try (
-                            try $1.corporate ?? corporateCosts[$0.code] ?? corporateCosts[*]
-                        ).quantities(
-                            keys: symbols.resources
-                        )
+                        quantity: $1.corporate ?? corporateCosts[$0.code] ?? corporateCosts[*],
+                        symbols: symbols.resources
                     ),
-                    expansion: .init(
+                    expansion: try .init(
                         metadata: resources,
-                        quantity: try (
-                            try $1.expansion ?? expansionCosts[$0.code] ?? expansionCosts[*]
-                        ).quantities(
-                            keys: symbols.resources
-                        )
+                        quantity: $1.expansion ?? expansionCosts[$0.code] ?? expansionCosts[*],
+                        symbols: symbols.resources
                     ),
-                    output: .init(
+                    output: try .init(
                         metadata: resources,
-                        quantity: try $1.output.quantities(keys: symbols.resources)
+                        quantity: $1.output,
+                        symbols: symbols.resources
                     ),
                     workers: try $1.workers.quantities(keys: symbols.occupations),
                     sharesInitial: rules.factoryCosts.sharesInitial,
@@ -131,9 +127,10 @@ extension GameObjects {
             mines: try table.mines.map {
                 MineMetadata.init(
                     identity: $0,
-                    base: .init(
+                    base: try .init(
                         metadata: resources,
-                        quantity: try $1.base.quantities(keys: symbols.resources)
+                        quantity: $1.base,
+                        symbols: symbols.resources
                     ),
                     miner: try symbols.occupations[$1.miner],
                     decay: $1.decay,

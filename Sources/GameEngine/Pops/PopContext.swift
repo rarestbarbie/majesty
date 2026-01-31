@@ -233,6 +233,7 @@ extension PopContext: AllocatingContext {
                 weights: weights,
                 state: self.state.z,
                 stockpileMaxDays: Self.stockpileDaysMax,
+                invest: self.state.developmentRate(utilization: 1)
             )
 
             turn.stockMarkets.issueShares(
@@ -399,11 +400,6 @@ extension PopContext: TransactingContext {
                 scalingFactor: (self.state.z.total, z.e)
             )
 
-            if  enslaved {
-                self.state.z.fx = 0
-                return
-            }
-
             if  budget.x.tradeable > 0 {
                 account += self.state.inventory.x.tradeAsConsumer(
                     stockpileDays: stockpileDays,
@@ -419,7 +415,9 @@ extension PopContext: TransactingContext {
             )
 
             // Welfare
-            account.s += self.state.z.active * region.minwage / 10
+            if !enslaved {
+                account.s += self.state.z.active * region.minwage / 10
+            }
         } (&turn.bank[account: self.id])
 
         if  enslaved {
@@ -487,16 +485,16 @@ extension PopContext {
                     self.state.destroyed += destroyed
                 }
             } else {
-                let developmentRate: Double = self.state.developmentRate(utilization: 1)
-                if  developmentRate > 0 {
+                let fx: Double = self.state.z.fx
+                if  fx > 0 {
                     let r: Decimal = Self.slaveBreedingBase
                         + region.modifiers.livestockBreedingEfficiency.value
-                    let p: Double = Double.init(r) * developmentRate
+                    let p: Double = Double.init(r) * fx
                     // all slaves, including backgrounded ones, can breed
                     let birthed: Int64 = Binomial[self.state.z.total, p].sample(
                         using: &turn.random.generator
                     ) + Int64.random(
-                        in: 0 ... Int64.init((4 * developmentRate).rounded()),
+                        in: 0 ... Int64.init((4 * fx).rounded()),
                         using: &turn.random.generator
                     )
 

@@ -152,28 +152,26 @@ extension Equity<LEI> {
     }
 }
 extension Equity<LEI> {
-    mutating func trade(random: inout PseudoRandom, bank: inout Bank, fill: StockMarket.Fill) {
-        let traded: Quote = self.liquidate(random: &random, quote: fill.market) {
-            bank[account: $0].f += $1
-        }
+    mutating func report(traded units: Int64) {
+        self.traded += units
+    }
 
-        self.traded += traded.units
-        self.issued += fill.issued.units
-
-        let quantity: Int64 = fill.issued.units + traded.units
-
-        self[fill.buyer].shares += quantity
-
-        bank[account: fill.buyer].e -= fill.issued.value + traded.value
-        bank[account: fill.asset].f += fill.issued.value
+    mutating func assign(
+        traded: Int64,
+        issued: Int64,
+        to owner: Owner)  {
+        self.issued += issued
+        self[owner].shares += issued + traded
     }
 
     mutating func liquidate(
-        random: inout PseudoRandom,
+        at random: inout PseudoRandom,
         quote: Quote,
         burn: Bool = false,
         credit: (LEI, Int64) -> (),
     ) -> Quote {
+        // todo: should become stateful (persisting seed), and be lazily cached per turn, we
+        // wrote this when trading volume was low, but this can be a quadratic bomb
         let recipients: [EquityStake<LEI>] = self.shares.values.shuffled(
             using: &random.generator
         )

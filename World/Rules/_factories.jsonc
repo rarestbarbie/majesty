@@ -159,9 +159,12 @@
             "Lingerie": 1,
             "Instruments": 1
         },
+        "corporate": {
+            "Advertising": 2
+        },
         "output": {
-            "Media": 9,
-            "Advertising": 1
+            "Media": 8,
+            "Advertising": 2
         },
         "workers": {
             "Editor": 5000,
@@ -315,7 +318,7 @@
         "color": "#a02535",
         "materials": {
             "Polymers": 2,
-            "Alloys": 1,
+            "Aluminum": 1,
             "Electronics": 4,
             "Semiconductor Devices": 2
         },
@@ -331,8 +334,12 @@
         "emoji": "💝",
         "color": "#ff4171",
         "materials": {
-            "Advertising": 4,
+            "Advertising": 3,
             "Clothing": 4
+        },
+        "corporate": {
+            "Advertising": 1,
+            "Storage": 1
         },
         "output": {
             "Clothing": 4,
@@ -363,8 +370,12 @@
         "emoji": "💍",
         "color": "#9df0ff",
         "materials": {
-            "Advertising": 4,
+            "Advertising": 3,
             "Alloys": 1
+        },
+        "corporate": {
+            "Storage": 1,
+            "Advertising": 1
         },
         "output": {
             "Jewelry": 4
@@ -506,11 +517,12 @@
         "materials": {
             "Appliances": 1,
             "Services": 8,
-            "Meat": 100,
-            "Wheat": 100
+            "Meat": 80,
+            "Wheat": 80,
+            "Produce": 80
         },
         "output": {
-            "Groceries": 200
+            "Groceries": 240
         },
         "workers": {
             "Driver": 10000,

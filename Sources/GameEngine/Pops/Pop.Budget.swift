@@ -21,12 +21,14 @@ extension Pop.Budget {
         ),
         state: Pop.Dimensions,
         stockpileMaxDays: Int64,
+        invest: Double
     ) -> Self {
         let segmentedCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.segmented.value
         let tradeableCostPerDay: (l: Int64, e: Int64, x: Int64) = weights.tradeable.value
-        let totalCostPerDay: (l: Int64, e: Int64) = (
+        let totalCostPerDay: (l: Int64, e: Int64, x: Int64) = (
             l: tradeableCostPerDay.l + segmentedCostPerDay.l,
             e: tradeableCostPerDay.e + segmentedCostPerDay.e,
+            x: tradeableCostPerDay.x + segmentedCostPerDay.x,
         )
 
         let d: CashAllocationBasis = .business
@@ -40,6 +42,7 @@ extension Pop.Budget {
 
         var l: ResourceBudgetTier = .init()
         var e: ResourceBudgetTier = .init()
+        var x: ResourceBudgetTier = .init()
 
         l.distributeAsBusiness(
             funds: basis / d.l,
@@ -53,12 +56,18 @@ extension Pop.Budget {
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
         )
 
+        x.distributeAsBusiness(
+            funds: d.invest(basis - bl - be, aggressiveness: invest),
+            segmented: segmentedCostPerDay.x * stockpileMaxDays,
+            tradeable: tradeableCostPerDay.x * stockpileMaxDays,
+        )
+
         let dividend: Int64 = max(0, (basis - bl - be) / (10 * d.y))
         let buybacks: Int64 = max(0, (basis - bl - be - dividend) / d.y)
         return .init(
             l: l,
             e: e,
-            x: .init(),
+            x: x,
             liquidate: liquidate,
             investment: 0,
             dividend: dividend,

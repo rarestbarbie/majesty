@@ -1,5 +1,7 @@
 import GameIDs
+import JavaScriptInterop
 
+extension Sex: ConvertibleToJSString, LoadableFromJSString {}
 extension Sex {
     @inlinable public var pluralUppercased: String {
         switch self {
