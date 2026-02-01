@@ -110,7 +110,6 @@ extension Bank {
         as buyer: LEI,
         budget: Int64,
         equity: inout Equity<LEI>,
-        random: inout PseudoRandom
     ) {
         if  fraction <= 0 {
             return

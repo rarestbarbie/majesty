@@ -125,7 +125,6 @@ extension GameStart {
                         as: .reserve(id),
                         budget: 10_000 * seed.amount,
                         equity: &building.equity,
-                        random: &random
                     )
                 }
 
@@ -151,7 +150,6 @@ extension GameStart {
                         as: .reserve(id),
                         budget: 1_000_000 * seed.amount * seed.amount,
                         equity: &factory.equity,
-                        random: &random
                     )
                 }
                 factories.append(factory)
