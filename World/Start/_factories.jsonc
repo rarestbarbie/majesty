@@ -26,7 +26,7 @@
         "factories": {
             "Hydroelectric Dam": 3,
             "Supermarket": 1,
-            "Plantation": 1,
+            "Plantation": 3,
             "Creator Studio": 1,
             "Machine Parts Factory": 1,
             "Polypropylene Plant": 1,
@@ -107,7 +107,8 @@
     {
         "tile": "399N0,3",
         "factories": {
-            "Fossil Power Plant": 1
+            "Fossil Power Plant": 1,
+            "Plantation": 1
         }
     },
 
@@ -127,7 +128,8 @@
             "Hydroelectric Dam": 1,
             "Clothing Workshop": 1,
             "Fossil Power Plant": 1,
-            "Chicken Plant": 1
+            "Chicken Plant": 1,
+            "Plantation": 1
         }
     },
 
@@ -154,7 +156,8 @@
         "factories": {
             "Hydroelectric Dam": 1,
             "Fossil Power Plant": 1,
-            "Slaughterhouse": 1
+            "Slaughterhouse": 1,
+            "Plantation": 3
         }
     },
 
@@ -290,7 +293,7 @@
             "Medical Equipment Factory": 3,
             "Polypropylene Plant": 2,
             "Semiconductor Foundry": 1,
-            "Electronics Factory": 2
+            "Electronics Factory": 7
         }
     },
     // Northern China
@@ -304,7 +307,7 @@
             "Alloy Foundry": 2,
             "Clothing Workshop": 4,
             "Machine Parts Factory": 1,
-            "Electronics Factory": 1,
+            "Electronics Factory": 4,
             "Automotive Assembly Plant": 3,
             "Chicken Plant": 1,
             "Appliance Factory": 2,
@@ -341,7 +344,8 @@
             "Desalination Plant": 1,
             "Supermarket": 1,
             "Fossil Power Plant": 1,
-            "Automotive Assembly Plant": 1
+            "Automotive Assembly Plant": 3,
+            "Electronics Factory": 2
         }
     },
 

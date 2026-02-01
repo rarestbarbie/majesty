@@ -9,3 +9,6 @@ protocol LegalEntityState<Dimensions>: Turnable, Identifiable
 
     var industry: EconomicLedger.Industry { get }
 }
+extension LegalEntityState {
+    var lei: LEI { self.id.lei }
+}

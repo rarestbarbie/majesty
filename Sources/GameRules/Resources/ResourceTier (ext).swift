@@ -4,20 +4,30 @@ import OrderedCollections
 
 extension ResourceTier {
     init(
-        metadata: OrderedDictionary<Resource, ResourceMetadata>,
-        quantity: [Quantity<Resource>],
-    ) {
-        let x: (
-            segmented: [Quantity<Resource>],
-            tradeable: [Quantity<Resource>],
-        ) = quantity.reduce(into: ([], [])) {
-            if case true? = metadata[$1.unit]?.local {
-                $0.segmented.append($1)
-            } else {
-                $0.tradeable.append($1)
-            }
-        }
+        metadata: borrowing OrderedDictionary<Resource, ResourceMetadata>,
+        quantity: borrowing SymbolTable<Int64>,
+        symbols: borrowing SymbolTable<Resource>
+    ) throws {
+        self.init(
+            stacking: try .init(metadata: metadata, quantity: quantity, symbols: symbols)
+        )
+    }
 
-        self.init(segmented: x.segmented, tradeable: x.tradeable)
+    init(stacking layer: PopAttributes.StackingLayer) {
+        self.init(
+            segmented: Self.stack(layer.segmented),
+            tradeable: Self.stack(layer.tradeable)
+        )
+    }
+
+    private static func stack(
+        _ quantities: consuming [Quantity<Resource>]
+    ) -> [Quantity<Resource>] {
+        let total: [Resource: Int64] = quantities.reduce(into: [:]) {
+            $0[$1.unit, default: 0] += $1.amount
+        }
+        var stacked: [Quantity<Resource>] = total.map { .init(amount: $1, unit: $0) }
+        stacked.sort { $0.unit < $1.unit }
+        return stacked
     }
 }

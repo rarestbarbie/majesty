@@ -59,17 +59,8 @@ extension Building.Budget {
             tradeable: tradeableCostPerDay.e * stockpileMaxDays,
         )
 
-        let investmentBase: Int64 = (basis - bl - be) / d.x
-        let investment: Int64
-
-        if  invest < 1 {
-            investment = Int64.init(Double.init(investmentBase) * invest)
-        } else {
-            investment = investmentBase
-        }
-
         x.distributeAsBusiness(
-            funds: investment,
+            funds: d.invest(basis - bl - be, aggressiveness: invest),
             segmented: segmentedCostPerDay.x * stockpileMaxDays,
             tradeable: tradeableCostPerDay.x * stockpileMaxDays,
         )

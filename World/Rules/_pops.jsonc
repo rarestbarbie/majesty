@@ -1,21 +1,22 @@
 [
     {
+        "where": { "strata": ["Worker", "Clerk", "Elite"] },
         "l": {
             "Appliances": 1,
+
             "Electricity": 2,
             "Clothing": 2,
             "Medical Equipment": 1,
-            "Groceries": 2,
+
             "Vehicles": 1,
             "Housing": 2
         },
         "e": {
             "Electronics": 1,
-            "Makeup": 1,
-            "Produce": 2,
-            "Storage": 1,
+            "Clothing": 2,
+            "Makeup": 2,
             "Services": 2,
-            "Liquor": 1,
+
             "Vapes": 1
         },
         "x": {
@@ -26,13 +27,168 @@
             "Instruments": 1,
             "Jewelry": 1,
             "Lingerie": 2
+        },
+
+        // everybody buys the same amount of groceries
+        "+l": {
+            "Groceries": 2
         }
     },
 
+    // upper class
     {
-        "where": {
-            "biology": "Chickens"
+        "where": { "stratum": "Clerk" },
+        "l": {
+            "Appliances": 1,
+
+            "Electronics": 1,
+            "Clothing": 2,
+            "Medical Equipment": 1,
+
+            "Housing": 4
         },
+        "e": {
+            "Electronics": 2,
+            "Clothing": 6,
+            "Makeup": 2,
+            "Services": 12,
+
+            "Lingerie": 4,
+            "Vapes": 1,
+            "Storage": 2
+        },
+        "x": {
+            "Advice": 1,
+            "Services": 12,
+
+            "Media": 4,
+            "Instruments": 2,
+            "Jewelry": 2,
+            "Lingerie": 4,
+
+            "Vehicles": 2
+        }
+    },
+    // elite class
+    {
+        "where": { "stratum": "Elite" },
+        "l": {
+            "Services": 2,
+
+            "Electronics": 2,
+            "Clothing": 22,
+            "Medical Equipment": 2,
+
+            "Housing": 12,
+            "Vapes": 2
+        },
+        "e": {
+            "Electronics": 2,
+            "Lingerie": 10,
+            "Makeup": 2,
+            "Services": 12,
+
+            "Vehicles": 4
+        },
+        "x": {
+            "Advice": 2,
+            "Services": 12,
+
+            "Instruments": 4,
+            "Jewelry": 2,
+
+            "Firearms": 2,
+            "Consent": 1
+        }
+    },
+    {
+        "where": { "occupation": "Aristocrat" },
+        "+e": {
+            "Storage": 2,
+            "Media": 8
+        },
+        "+x": {
+            "Vehicles": 12
+        }
+    },
+    {
+        "where": { "occupation": "Politician" },
+        "+e": {
+            "Storage": 5
+        },
+        "+x": {
+            "Advertising": 16
+        }
+    },
+
+    // hormones
+    {
+        "where": { "transgender": true },
+        "+l": {
+            "Hormones": 1
+        },
+        "+e": {
+            "Liquor": 2
+        }
+    },
+    {
+        "where": { "transgender": false, "strata": ["Worker", "Clerk", "Elite"] },
+        "+e": {
+            "Hormones": 1
+        }
+    },
+    {
+        "where": { "transgender": false, "strata": ["Worker"] },
+        "+e": {
+            "Liquor": 2
+        }
+    },
+    {
+        "where": { "transgender": false, "strata": ["Clerk", "Elite"] },
+        "+l": {
+            "Liquor": 2
+        },
+        "+e": {
+            "Hormones": 1
+        }
+    },
+
+    // self-employed occupations
+    {
+        "where": { "occupation": "Server" },
+        "output": {
+            "Services": 8
+        }
+    },
+    {
+        "where": { "occupation": "Contractor" },
+        "output": {
+            "Construction": 32
+        }
+    },
+    {
+        "where": { "occupation": "Consultant" },
+        "output": {
+            "Advice": 8
+        }
+    },
+    {
+        "where": { "occupation": "Influencer" },
+        "output": {
+            "Advertising": 36
+        }
+    },
+
+    // farm animals
+    {
+        "where": { "occupation": "Livestock" },
+        "x": {
+            "Medical Equipment": 1,
+            "Hormones": 1
+        }
+    },
+    {
+        "where": { "biology": "Chickens" },
         "output": {
             "Poultry": 12
         },
@@ -57,107 +213,6 @@
         "e": {
             "Construction": 10,
             "Water": 45
-        }
-    },
-
-    {
-        "where": {
-            "occupation": "Server"
-        },
-        "output": {
-            "Services": 8
-        }
-    },
-    {
-        "where": {
-            "occupation": "Contractor"
-        },
-        "output": {
-            "Construction": 32
-        }
-    },
-    {
-        "where": {
-            "occupation": "Consultant"
-        },
-        "output": {
-            "Advice": 8
-        }
-    },
-    {
-        "where": {
-            "occupation": "Influencer"
-        },
-        "output": {
-            "Advertising": 36
-        }
-    },
-    {
-        "where": {
-            "occupation": "Aristocrat"
-        },
-        "l": {
-            "Appliances": 2,
-            "Electricity": 3,
-            "Clothing": 6,
-            "Medical Equipment": 2,
-            "Groceries": 2,
-            "Vehicles": 4,
-            "Housing": 12
-        },
-        "e": {
-            "Electronics": 2,
-            "Makeup": 2,
-            "Clothing": 6,
-            "Produce": 2,
-            "Storage": 2,
-            "Services": 12,
-            "Lingerie": 4,
-            "Vapes": 1
-        },
-        "x": {
-            "Electronics": 2,
-            "Firearms": 2,
-            "Media": 4,
-            "Instruments": 4,
-            "Jewelry": 2,
-            "Lingerie": 10,
-            "Consent": 1,
-            "Services": 12
-        }
-    },
-    {
-        "where": {
-            "occupation": "Politician"
-        },
-        "l": {
-            "Appliances": 2,
-            "Electricity": 3,
-            "Clothing": 6,
-            "Medical Equipment": 2,
-            "Groceries": 2,
-            "Vehicles": 4,
-            "Housing": 12
-        },
-        "e": {
-            "Electronics": 2,
-            "Makeup": 2,
-            "Clothing": 6,
-            "Produce": 2,
-            "Storage": 2,
-            "Services": 12,
-            "Lingerie": 4,
-            "Vapes": 1
-        },
-        "x": {
-            "Electronics": 2,
-            "Firearms": 2,
-            "Advertising": 16,
-            "Instruments": 4,
-            "Jewelry": 2,
-            "Lingerie": 10,
-            "Consent": 1,
-            "Services": 12
         }
     }
 ]

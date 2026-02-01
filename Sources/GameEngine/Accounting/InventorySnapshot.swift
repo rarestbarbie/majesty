@@ -72,8 +72,7 @@ extension InventorySnapshot {
     func consumption(where predicate: (Consumed.ID) -> Bool) -> [Consumed] {
         var snapshots: [Consumed] = []
         ;   snapshots.reserveCapacity(self.consumed.keys.count(where: predicate))
-        for (key, value): (Consumed.ID, Consumed.Value) in self.consumed
-            where predicate(key) {
+        for (key, value): (Consumed.ID, Consumed.Value) in self.consumed where predicate(key) {
             snapshots.append(.init(id: key, value: value))
         }
         snapshots.sort { $0.input.id < $1.input.id }

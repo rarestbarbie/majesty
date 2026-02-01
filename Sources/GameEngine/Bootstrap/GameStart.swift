@@ -63,7 +63,9 @@ extension GameStart {
         rules.pops.register(cultures: cultures)
 
         var random: PseudoRandom = self.random
+        var bank:Bank = .init(accounts: [:])
 
+        var countryMap: [Address: CountryID] = [:]
         var countries: [Country] = []
         var country: CountryID = Self.highest(in: self.countries)
         for seed: CountrySeed in self.countries {
@@ -86,6 +88,7 @@ extension GameStart {
                 fatalError("Country \(seed.name) has no capital tile!")
             }
 
+
             let country: Country = .init(
                 id: seed.id ?? country.increment(),
                 name: seed.name,
@@ -98,8 +101,12 @@ extension GameStart {
                 capital: capital,
                 tilesControlled: seed.tiles,
             )
+            for tile: Address in seed.tiles {
+                countryMap[tile] = country.id
+            }
             countries.append(country)
         }
+
 
         var buildings: [Building] = []
         var building: BuildingID = 0
@@ -111,6 +118,16 @@ extension GameStart {
                 var building: Building = .init(id: building.increment(), section: section)
 
                 building.z.active = seed.amount
+
+                if  let id: CountryID = countryMap[building.tile] {
+                    bank.buyout(
+                        of: building.lei,
+                        as: .reserve(id),
+                        budget: 10_000 * seed.amount,
+                        equity: &building.equity,
+                    )
+                }
+
                 buildings.append(building)
             }
         }
@@ -126,8 +143,15 @@ extension GameStart {
                     tile: group.tile
                 )
                 var factory: Factory = .init(id: factory.increment(), section: section)
-
                 factory.size = .init(level: seed.amount)
+                if  let id: CountryID = countryMap[factory.tile] {
+                    bank.buyout(
+                        of: factory.lei,
+                        as: .reserve(id),
+                        budget: 1_000_000 * seed.amount * seed.amount,
+                        equity: &factory.equity,
+                    )
+                }
                 factories.append(factory)
             }
         }
@@ -202,7 +226,6 @@ extension GameStart {
             }
         }
 
-        var accounts: OrderedDictionary<LEI, Bank.Account> = [:]
         // this is very slow, but we only do it once when initializing a new game
         for seed: PopWealth in self.popWealth {
             for pop: Pop in pops {
@@ -213,11 +236,8 @@ extension GameStart {
                     continue
                 }
 
-                accounts[.pop(pop.id), default: .zero].s += seed.cash * pop.z.total
+                bank[account: pop.id].s += seed.cash * pop.z.total
             }
-        }
-        for i: Int in accounts.values.indices {
-            accounts.values[i].settle()
         }
 
         var tradeable: WorldMarkets = .init(settings: rules.settings.worldMarkets, table: [:])
@@ -298,12 +318,14 @@ extension GameStart {
             $0[$1.id] = $1.size
         }
 
+        bank.turn()
+
         return .init(
             symbols: symbols.static,
             random: random,
             player: self.player,
             cultures: cultures,
-            accounts: accounts.items,
+            accounts: bank.accounts.items,
             localMarkets: segmented.all.values.map(\.state),
             worldMarkets: tradeable.all.values.map(\.state),
             date: self.date,

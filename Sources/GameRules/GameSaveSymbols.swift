@@ -28,6 +28,32 @@ extension GameSaveSymbols {
         get throws { try self.geology[symbol] }
     }
 }
+extension GameSaveSymbols {
+    subscript(
+        clause: PopAttributesDescription.Predicate.Clause
+    ) -> GameMetadata.Pops.SocialPredicate? {
+        get throws {
+            switch clause {
+            case .occupation(in: let names):
+                return .occupation(
+                    in: try names.reduce(into: []) { $0.insert(try self.occupations[$1]) }
+                )
+            case .stratum(in: let names):
+                return .stratum(
+                    in: try names.reduce(into: []) { $0.insert(try self.stratum[$1]) }
+                )
+            case .biology:
+                return nil
+            case .sex(in: let sexes):
+                return .sex(in: Set<Sex>.init(sexes))
+            case .heterosexual(let value):
+                return .heterosexual(value)
+            case .transgender(let value):
+                return .transgender(value)
+            }
+        }
+    }
+}
 extension GameSaveSymbols: JavaScriptEncodable {
     public func encode(to js: inout JavaScriptEncoder<GameMetadata.Namespace>) {
         js[.mines] = self.mines

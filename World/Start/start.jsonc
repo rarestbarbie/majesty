@@ -3,15 +3,25 @@
     "player": 1,
     "symbols": {
         "resources": {
-            "Ice": 1,
-            "Water": 2,
-            "Electricity": 3,
-            "Wheat": 4,
-            "Produce": 5,
-            "Livestock": 6,
-            "Poultry": 7,
-            "Beef": 8,
-            "Uranium": 116
+            "Groceries": 1,
+            "Housing": 2,
+            "Services": 3,
+            "Appliances": 4,
+            "Clothing": 6,
+            "Makeup": 7,
+            "Medical Equipment": 8,
+            "Vehicles": 9,
+            "Electronics": 10,
+            "Vapes": 11,
+            "Instruments": 12,
+            "Jewelry": 13,
+            "Lingerie": 14,
+
+            "Electricity": 50,
+
+            "Liquor": 200,
+            "Hormones": 201,
+            "Media": 202
         },
         "factories": {
             "Water Treatment Plant": 1,

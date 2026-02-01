@@ -32,3 +32,13 @@ extension CashAllocationBasis {
         }
     }
 }
+extension CashAllocationBasis {
+    func invest(_ available: Int64, aggressiveness: Double) -> Int64 {
+        if  aggressiveness < 1 {
+            let factor: Double = 1 / Double.init(self.x) * aggressiveness
+            return Int64.init(Double.init(available) * factor)
+        } else {
+            return available / self.x
+        }
+    }
+}

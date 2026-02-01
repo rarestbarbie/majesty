@@ -448,22 +448,22 @@ extension GameContext {
                     fatalError("Central bank should not have tradeable shares!!!")
 
                 case .building(let id):
-                    self.buildings[modifying: id].state.equity.trade(
-                        random: &$0,
-                        bank: &turn.bank,
-                        fill: $2
+                    turn.bank.execute(
+                        trade: $2,
+                        of: &self.buildings[modifying: id].state.equity,
+                        at: &$0
                     )
                 case .factory(let id):
-                    self.factories[modifying: id].state.equity.trade(
-                        random: &$0,
-                        bank: &turn.bank,
-                        fill: $2
+                    turn.bank.execute(
+                        trade: $2,
+                        of: &self.factories[modifying: id].state.equity,
+                        at: &$0
                     )
                 case .pop(let id):
-                    self.pops[modifying: id].state.equity.trade(
-                        random: &$0,
-                        bank: &turn.bank,
-                        fill: $2
+                    turn.bank.execute(
+                        trade: $2,
+                        of: &self.pops[modifying: id].state.equity,
+                        at: &$0
                     )
                 }
             }
