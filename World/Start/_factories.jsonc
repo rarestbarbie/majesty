@@ -24,8 +24,8 @@
     {
         "tile": "399N-2,3",
         "factories": {
-            "Hydroelectric Dam": 3,
-            "Supermarket": 1,
+            "Hydroelectric Dam": 4,
+            "Supermarket": 2,
             "Plantation": 3,
             "Creator Studio": 1,
             "Machine Parts Factory": 1,
@@ -107,6 +107,7 @@
     {
         "tile": "399N0,3",
         "factories": {
+            "Desalination Plant": 1,
             "Fossil Power Plant": 1,
             "Plantation": 1
         }
@@ -154,7 +155,7 @@
     {
         "tile": "399S2,2",
         "factories": {
-            "Hydroelectric Dam": 1,
+            "Hydroelectric Dam": 3,
             "Fossil Power Plant": 1,
             "Slaughterhouse": 1,
             "Plantation": 3

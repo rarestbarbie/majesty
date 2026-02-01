@@ -89,13 +89,20 @@ extension MineContext {
         //  must restructure mine before hiring/firing miners, to avoid overhiring
         if  self.type.decay {
             if  h < 0.25 {
-                let minersPossible: Int64 = self.miners.count
-                if  self.state.z.splits > 0, minersPossible * 8 < self.miners.limit {
+                if  self.state.z.splits > 0, self.miners.count * 8 < self.miners.limit {
                     self.state.z.splits -= 1
                     self.miners.limit /= 2
                 }
             } else if h > 2 {
-                if  self.state.z.splits < 10, self.miners.count * 8 > self.miners.limit * 7 {
+                //  if we let parceling subdivide too aggressively, this risks distorting
+                //  the mining economy by inflating the miner employment rate, so we only
+                //  permit it to happen if unemployment is very high
+                if  self.state.z.splits < 10, self.miners.count * 8 > self.miners.limit * 7,
+                    let employment: Double = turn.ledger.z.economy.labor[
+                        region.id / .Miner
+                    ]?.employment,
+                        employment < 0.333 {
+
                     self.state.z.splits += 1
                     self.miners.limit *= 2
                 }
